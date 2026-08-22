@@ -22,12 +22,16 @@ from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAb
 from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
     DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
 )
+from warhammer40k_core.engine.generic_rule_runtime_consumer_identity import (
+    GenericRuleRuntimeConsumerIdBuilder,
+)
 from warhammer40k_core.engine.stratagems import StratagemCatalogRecord
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_detachments_2026_27,
     faction_execution_2026_27,
     faction_generic_ir_support_2026_27,
+    faction_subrules_2026_27,
     mfm_2026_07,
 )
 
@@ -1257,7 +1261,16 @@ def _generic_enhancement_runtime_metadata_by_source_row_id() -> dict[
             for method_name in ("effect_id", "hook_id", "modifier_id"):
                 method = getattr(descriptor, method_name, None)
                 if callable(method):
-                    runtime_consumer_ids.add(method(source))
+                    runtime_consumer_ids.add(
+                        _generic_enhancement_runtime_consumer_id(
+                            descriptor=descriptor,
+                            source=source,
+                            runtime_consumer_id_method=cast(
+                                Callable[[GenericRuleAbilitySource], str],
+                                method,
+                            ),
+                        )
+                    )
                     break
             else:
                 raise TypeError("Generic Enhancement descriptor lacks a runtime consumer ID.")
@@ -1269,6 +1282,41 @@ def _generic_enhancement_runtime_metadata_by_source_row_id() -> dict[
             runtime_consumer_ids=tuple(sorted(runtime_consumer_ids)),
         )
     return metadata
+
+
+def _generic_enhancement_runtime_consumer_id(
+    *,
+    descriptor: object,
+    source: GenericRuleAbilitySource,
+    runtime_consumer_id_method: Callable[[GenericRuleAbilitySource], str],
+) -> str:
+    declared_builders = tuple(
+        value
+        for field_name in ("effect_id_builder", "hook_id_builder", "modifier_id_builder")
+        if type(value := getattr(descriptor, field_name, None))
+        is GenericRuleRuntimeConsumerIdBuilder
+    )
+    if not declared_builders:
+        return runtime_consumer_id_method(source)
+    if len(declared_builders) != 1:
+        raise TypeError("Generic Enhancement descriptor declares multiple runtime consumer IDs.")
+    declared_builder = declared_builders[0]
+    if declared_builder.coverage_descriptor_id != source.record.coverage_descriptor_id:
+        raise TypeError("Generic Enhancement declared consumer coverage descriptor drifted.")
+    runtime_status = source.record.runtime_support_status
+    if runtime_status == faction_subrules_2026_27.SourceSubruleRuntimeStatus.ENGINE_CONSUMED.value:
+        resolved_consumer_id = runtime_consumer_id_method(source)
+        if resolved_consumer_id != declared_builder.consumer_id:
+            raise TypeError("Generic Enhancement declared runtime consumer ID drifted.")
+        return resolved_consumer_id
+    if runtime_status not in (
+        None,
+        faction_subrules_2026_27.SourceSubruleRuntimeStatus.SOURCE_ONLY.value,
+    ):
+        raise TypeError("Generic Enhancement runtime support status is unsupported.")
+    if source.record.runtime_consumer_ids:
+        raise TypeError("Generic Enhancement bootstrap source declares runtime consumers.")
+    return declared_builder.consumer_id
 
 
 def _bootstrap_generic_enhancement_execution_record(
@@ -1293,7 +1341,7 @@ def _bootstrap_generic_enhancement_execution_record(
         rule_id=rule_id,
         timing_descriptor="army_construction",
         rule_category="enhancement",
-        runtime_support_status=ENGINE_CONSUMED_STATUS,
+        runtime_support_status=None,
         detachment_id=detachment_id,
         detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
         rule_ir_hash=rule_ir_hash,

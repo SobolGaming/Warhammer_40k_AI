@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.fight_eligibility_queries import (
+    unit_was_selected_to_fight_this_phase,
+)
 from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
@@ -869,7 +872,11 @@ def _not_selected_to_fight_target_error(
     if fight_state is None:
         return "missing_fight_phase_state"
     target_unit_id = _require_target_unit_id(target_binding)
-    if target_unit_id in fight_state.fight_order_state.selected_to_fight_unit_ids:
+    if unit_was_selected_to_fight_this_phase(
+        state=state,
+        fight_state=fight_state,
+        unit_instance_id=target_unit_id,
+    ):
         return "unit_already_selected_to_fight"
     return None
 

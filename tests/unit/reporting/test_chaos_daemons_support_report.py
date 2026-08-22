@@ -46,7 +46,7 @@ def test_chaos_daemons_report_preserves_faction_sections_and_attachment_evidence
     assert "## Datasheet component coverage" in markdown
     assert "Leader row consumer evidence" not in markdown
     assert "| Detachment rules | 9 | 6 | 0 | 3 |" in markdown
-    assert "| Enhancements | 29 | 16 | 0 | 13 |" in markdown
+    assert "| Enhancements | 29 | 17 | 0 | 12 |" in markdown
     assert "| Stratagems | 46 | 22 | 0 | 24 |" in markdown
     assert "### Detachment rules" in markdown
     for rule_name in (
@@ -58,6 +58,10 @@ def test_chaos_daemons_report_preserves_faction_sections_and_attachment_evidence
         assert rule_name in markdown
     assert "No Prey Can Evade Advance/Charge rerolls" in markdown
     assert "No Prey Too Great" not in markdown
+    assert (
+        "| Blood Legion | Brazenmaw<br>Fury's Cage<br>Gateway Unto Damnation"
+        "<br>Slaughterthirst (Aura) | None |"
+    ) in markdown
     assert "Source-backed, faction-agnostic Split materialization" in markdown
     assert "Attack destruction and Hazardous failures trigger" in markdown
     assert "PDF- and FAQ-backed Split composition normalization still needs review" not in markdown

@@ -49,6 +49,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
+    FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_execution import (
@@ -315,14 +316,18 @@ class CatalogSelectedToFightRiskRuntime:
                     "clause_id": source.clause.clause_id,
                     "rule_ir_hash": source.rule_ir.ir_hash(),
                 },
-                unit_effect_payload=generic_rule_effect_payload(
-                    rule_ir=source.rule_ir,
-                    clause=source.clause,
-                    effect=effect,
-                    context=execution_context,
-                    target_unit_instance_ids=(context.unit_instance_id,),
+                timed_effects=(
+                    FightUnitSelectedTimedEffect(
+                        effect_payload=generic_rule_effect_payload(
+                            rule_ir=source.rule_ir,
+                            clause=source.clause,
+                            effect=effect,
+                            context=execution_context,
+                            target_unit_instance_ids=(context.unit_instance_id,),
+                        ),
+                        expiration="end_phase",
+                    ),
                 ),
-                unit_effect_expiration="end_phase",
                 decline_allowed=True,
             )
 

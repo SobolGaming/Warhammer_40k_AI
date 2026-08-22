@@ -121,7 +121,8 @@ def test_martial_katah_selected_to_fight_request_exposes_stance_options() -> Non
         list[dict[str, JsonValue]],
         dacatarai_payload["selected_fight_unit_grants"],
     )
-    effect_payload = cast(dict[str, JsonValue], selected_grants[0]["unit_effect_payload"])
+    timed_effects = cast(list[dict[str, JsonValue]], selected_grants[0]["timed_effects"])
+    effect_payload = cast(dict[str, JsonValue], timed_effects[0]["effect_payload"])
     assert effect_payload["effect_kind"] == army_rule.MARTIAL_KATAH_EFFECT_KIND
     assert effect_payload["selected_martial_katah"] == army_rule.MartialKatahStance.DACATARAI.value
     assert effect_payload["phase"] == BattlePhase.FIGHT.value

@@ -35,6 +35,9 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerContext,
     StratagemHandlerExecutionResult,
 )
+from warhammer40k_core.engine.fight_eligibility_queries import (
+    unit_was_selected_to_fight_this_phase,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -1273,7 +1276,11 @@ def _unit_selected_to_fight(
     fight_state = context.state.fight_phase_state
     if fight_state is None:
         return False
-    return unit_instance_id in fight_state.fight_order_state.selected_to_fight_unit_ids
+    return unit_was_selected_to_fight_this_phase(
+        state=context.state,
+        fight_state=fight_state,
+        unit_instance_id=unit_instance_id,
+    )
 
 
 def _unit_selected_to_shoot(

@@ -18,6 +18,10 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+    MortalWoundDestructionEvidencePayload,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
@@ -28,6 +32,7 @@ if TYPE_CHECKING:
 RULE_MODEL_DESTRUCTION_CONTEXT_KIND = "rule_model_destroyed"
 RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND = "source_rule_destruction"
 RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND = "deadly_demise_collateral"
+RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND = "applied_mortal_wound_damage"
 RULE_DEADLY_DEMISE_SECONDARY_CONTINUATION_KIND = "rule_deadly_demise_secondary_casualties"
 
 
@@ -204,7 +209,10 @@ def damage_application_from_rule_context(
         if raw_damage is not None:
             raise GameLifecycleError("Source rule destruction cannot carry collateral damage.")
         return None
-    if completion_kind != RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND:
+    if completion_kind not in {
+        RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+        RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
+    }:
         raise GameLifecycleError("Rule destruction completion kind is unsupported.")
     damage = DamageApplication.from_payload(
         cast(DamageApplicationPayload, _payload_object(raw_damage, "damage_application"))
@@ -213,7 +221,7 @@ def damage_application_from_rule_context(
         context,
         "model_instance_id",
     ):
-        raise GameLifecycleError("Collateral rule destruction damage context drift.")
+        raise GameLifecycleError("Applied rule destruction damage context drift.")
     return damage
 
 
@@ -223,6 +231,15 @@ def destruction_provenance_from_rule_context(
     completion_kind = _payload_string(context, "completion_kind")
     if completion_kind == RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND:
         return DestructionProvenance.for_non_attack(DestructionSourceKind.ABILITY)
+    if completion_kind == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND:
+        raw_evidence = _payload_object(
+            context.get("mortal_wound_destruction_evidence"),
+            "mortal_wound_destruction_evidence",
+        )
+        evidence = MortalWoundDestructionEvidence.from_payload(
+            cast(MortalWoundDestructionEvidencePayload, raw_evidence)
+        )
+        return evidence.destruction_attribution.destruction_provenance
     if completion_kind != RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND:
         raise GameLifecycleError("Rule destruction completion kind is unsupported.")
     if context.get("destruction_source_kind") != DestructionSourceKind.DEADLY_DEMISE.value:

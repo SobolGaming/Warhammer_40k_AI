@@ -525,7 +525,16 @@ def _validate_supported_enhancement_ir(
     rule_ir: RuleIR,
     source_row: faction_subrules_2026_27.SourceEnhancementRow,
 ) -> None:
-    if source_row.source_row_id in _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS:
+    if source_row.source_row_id == blood_legion_ir.FURYS_CAGE_SOURCE_ROW_ID:
+        try:
+            blood_legion_ir.validate_furys_cage_rule_ir(rule_ir)
+        except blood_legion_ir.BloodLegionIrSupportError as exc:
+            raise Phase17FGenericIrSupportError(
+                "Fury's Cage generic RuleIR validation failed."
+            ) from exc
+    elif (
+        source_row.source_row_id in _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+    ):
         _validate_supported_effect_family_ir(
             rule_ir=rule_ir,
             source_row=source_row,
@@ -1469,6 +1478,7 @@ def _supported_enhancement_source_row_ids() -> frozenset[str]:
         | _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+        | frozenset({blood_legion_ir.FURYS_CAGE_SOURCE_ROW_ID})
         | _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
     )

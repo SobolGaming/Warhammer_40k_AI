@@ -52,10 +52,7 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartResultHandler,
 )
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
-    FightUnitSelectedContext,
-    FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
-    FightUnitSelectedGrantHandler,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_ability_effects import (
@@ -67,7 +64,6 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAdvanceEligibilityAbility,
     GenericRuleEnhancementEffectAbility,
     GenericRuleFightPhaseStartAbility,
-    GenericRuleFightUnitSelectedGrantAbility,
     GenericRuleMovementEndSurgeAbility,
     GenericRuleObjectiveControlModifierAbility,
     GenericRulePhaseEndObjectiveControlAbility,
@@ -89,6 +85,7 @@ from warhammer40k_core.engine.generic_rule_lifecycle_ability_sources import (
 from warhammer40k_core.engine.generic_rule_lifecycle_hook_handlers import (
     battle_formation_request_handler_for_descriptor,
     battle_formation_result_handler_for_descriptor,
+    fight_unit_selected_grant_handler_for_descriptor,
     save_option_modifier_handler_for_descriptor,
     stratagem_cost_choice_request_handler_for_descriptor,
     stratagem_cost_choice_result_handler_for_descriptor,
@@ -370,17 +367,26 @@ def fight_unit_selected_grant_hook_bindings(
 ) -> tuple[FightUnitSelectedGrantBinding, ...]:
     bindings: list[FightUnitSelectedGrantBinding] = []
     for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.fight_unit_selected_grant_abilities:
-        for source in _generic_rule_ability_sources(
-            activation=activation,
-            execution_records=execution_records,
-            coverage_descriptor_id=descriptor.coverage_descriptor_id,
-            ability_ids=descriptor.ability_ids(),
-        ):
+        sources = (
+            *_generic_rule_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+            *_generic_rule_enhancement_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+        )
+        for source in sources:
             bindings.append(
                 FightUnitSelectedGrantBinding(
                     hook_id=descriptor.hook_id(source),
                     source_id=descriptor.source_rule_id,
-                    handler=_fight_unit_selected_grant_handler_for_descriptor(
+                    handler=fight_unit_selected_grant_handler_for_descriptor(
                         source,
                         descriptor,
                     ),
@@ -876,28 +882,6 @@ def _shooting_unit_selected_grant_handler_for_descriptor(
     def handler(context: ShootingUnitSelectedContext) -> ShootingUnitSelectedGrant | None:
         if type(context) is not ShootingUnitSelectedContext:
             raise GameLifecycleError("Generic RuleIR shooting grant ability requires context.")
-        matching_effects = generic_rule_ability_effects_for_unit(
-            state=context.state,
-            source=source,
-            unit_instance_id=descriptor.target_unit_instance_id(context),
-            ability=descriptor.ability_id,
-        )
-        if not matching_effects:
-            return None
-        if not descriptor.context_predicate(context, source, matching_effects):
-            return None
-        return descriptor.grant_builder(context, source, matching_effects)
-
-    return handler
-
-
-def _fight_unit_selected_grant_handler_for_descriptor(
-    source: GenericRuleAbilitySource,
-    descriptor: GenericRuleFightUnitSelectedGrantAbility,
-) -> FightUnitSelectedGrantHandler:
-    def handler(context: FightUnitSelectedContext) -> FightUnitSelectedGrant | None:
-        if type(context) is not FightUnitSelectedContext:
-            raise GameLifecycleError("Generic RuleIR fight grant ability requires context.")
         matching_effects = generic_rule_ability_effects_for_unit(
             state=context.state,
             source=source,

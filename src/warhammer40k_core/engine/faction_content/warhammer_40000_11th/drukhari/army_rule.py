@@ -43,6 +43,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
+    FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -187,28 +188,32 @@ def hatred_eternal_fight_unit_selected_grant(
             "ordering_band": context.ordering_band,
         },
         decision_effect_payload=pain_token_spend_effect_payload(),
-        unit_effect_payload=power_from_pain_reroll_permission_effect_payload(
-            unit_instance_id=context.unit_instance_id,
-            target_unit_instance_ids=power_from_pain_target_unit_ids(
-                context.state,
-                unit_instance_id=context.unit_instance_id,
+        timed_effects=(
+            FightUnitSelectedTimedEffect(
+                effect_payload=power_from_pain_reroll_permission_effect_payload(
+                    unit_instance_id=context.unit_instance_id,
+                    target_unit_instance_ids=power_from_pain_target_unit_ids(
+                        context.state,
+                        unit_instance_id=context.unit_instance_id,
+                    ),
+                    trigger="selected_to_fight",
+                    phase=BattlePhaseKind.FIGHT,
+                    pain_ability_keys=(HATRED_ETERNAL_ABILITY_KEY,),
+                    permission=hatred_eternal_hit_reroll_permission(
+                        state=context.state,
+                        player_id=context.player_id,
+                        unit_instance_id=context.unit_instance_id,
+                    ),
+                    source_context={
+                        "activation_request_id": context.request_id,
+                        "activation_result_id": context.result_id,
+                        "fight_type": context.fight_type,
+                        "ordering_band": context.ordering_band,
+                    },
+                ),
+                expiration="end_phase",
             ),
-            trigger="selected_to_fight",
-            phase=BattlePhaseKind.FIGHT,
-            pain_ability_keys=(HATRED_ETERNAL_ABILITY_KEY,),
-            permission=hatred_eternal_hit_reroll_permission(
-                state=context.state,
-                player_id=context.player_id,
-                unit_instance_id=context.unit_instance_id,
-            ),
-            source_context={
-                "activation_request_id": context.request_id,
-                "activation_result_id": context.result_id,
-                "fight_type": context.fight_type,
-                "ordering_band": context.ordering_band,
-            },
         ),
-        unit_effect_expiration="end_phase",
     )
 
 
