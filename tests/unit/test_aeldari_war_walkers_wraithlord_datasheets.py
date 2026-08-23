@@ -13,7 +13,6 @@ from tools.generate_ability_support_matrix import (
 from tools.generate_aeldari_war_walkers_wraithlord_rule_ir import (
     CRYSTALLINE_TARGETING_ROW_ID,
     FATED_HERO_ROW_ID,
-    OUTPUT_PATH,
     PSYCHIC_GUIDANCE_ROW_ID,
     generated_artifact_payload,
 )
@@ -110,11 +109,13 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     parameter_payload,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_war_walkers_wraithlord_2026_06 as source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES,
+)
+
+source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14"
 )
 
 WAR_WALKERS_ID = "000000612"
@@ -130,7 +131,7 @@ def _package() -> CanonicalCatalogPackage:
 
 
 def test_generated_rule_ir_artifact_is_current_source_bound_and_fail_fast() -> None:
-    committed = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    committed = source_package.payload()
 
     assert committed == generated_artifact_payload()
     assert source_package.supported_datasheet_source_row_ids() == (
@@ -138,11 +139,11 @@ def test_generated_rule_ir_artifact_is_current_source_bound_and_fail_fast() -> N
         FATED_HERO_ROW_ID,
         PSYCHIC_GUIDANCE_ROW_ID,
     )
-    assert committed["package_hash"] == source_package.PACKAGE_HASH
+    assert committed["package_hash"] == source_package.package_hash
 
     committed["package_hash"] = "0" * 64
     with pytest.raises(
-        source_package.AeldariWarWalkersWraithlordRuleIrArtifactError,
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
         match="hash is stale",
     ):
         source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())

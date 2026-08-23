@@ -379,13 +379,17 @@ from warhammer40k_core.rules.rule_ir import (
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_corsair_skyreavers_2026_06 as skyreavers_package,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_kharseth_2026_06 as kharseth_package,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_pack_rule_ir,
+)
+
+skyreavers_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09"
+)
+kharseth_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-kharseth-datasheet-2026-06-09"
 )
 
 SOURCE_KEYWORD_SEQUENCE_PARTS = (

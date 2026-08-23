@@ -11,9 +11,6 @@ from tools.canonical_json_hash import canonical_json_sha256
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
-from tools.generate_emperors_children_lucius_rule_ir import (
-    OUTPUT_PATH as LUCIUS_RULE_IR_OUTPUT_PATH,
-)
 from tools.generate_emperors_children_lucius_rule_ir import REVIEW_MANIFEST_PATH
 from tools.generate_emperors_children_lucius_rule_ir import (
     generated_artifact_payload as generated_lucius_rule_ir_artifact_payload,
@@ -101,8 +98,10 @@ from warhammer40k_core.geometry.terrain import (
 )
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.rule_ir import RuleIR
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    emperors_children_lucius_2026_07 as lucius_source_package,
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+
+lucius_source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-emperors-children-lucius-datasheet-2026-07"
 )
 
 _LUCIUS_ID = "000004083"
@@ -114,24 +113,21 @@ _BELAKOR_ID = "000001148"
 
 
 def test_lucius_generated_rule_ir_and_catalog_are_complete_and_source_bound() -> None:
-    committed = cast(
-        dict[str, Any],
-        json.loads(LUCIUS_RULE_IR_OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed = lucius_source_package.payload()
 
     assert committed == generated_lucius_rule_ir_artifact_payload()
     assert lucius_source_package.supported_datasheet_source_row_ids() == (
         f"{_LUCIUS_ID}:5",
         f"{_LUCIUS_ID}:6",
     )
-    assert committed["package_hash"] == lucius_source_package.PACKAGE_HASH
+    assert committed["package_hash"] == lucius_source_package.package_hash
     assert committed["official_document_pages"] == []
     assert committed["review_row_id"] == f"source:{_LUCIUS_ID}"
     assert committed["review_treatment"] == "unchanged_predecessor"
     assert committed["review_manifest_sha256"] == canonical_json_sha256(REVIEW_MANIFEST_PATH)
 
     committed["package_hash"] = "0" * 64
-    with pytest.raises(lucius_source_package.LuciusRuleIrArtifactError, match="hash is stale"):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="hash is stale"):
         lucius_source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
 
     package = _catalog_package()

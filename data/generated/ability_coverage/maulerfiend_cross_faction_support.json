@@ -1,0 +1,180 @@
+{
+  "absent_factions": [
+    {
+      "evidence": "The exhaustive current Death Guard Faction Pack review contains no Maulerfiend datasheet row; no synthetic support row is emitted.",
+      "faction_id": "death-guard",
+      "faction_name": "Death Guard",
+      "status": "not_present_in_current_source_review"
+    }
+  ],
+  "family_id": "warhammer_40000_11th:datasheet-family:maulerfiend",
+  "family_name": "Maulerfiend",
+  "generic_mechanics": [
+    {
+      "certification_limit": "The parser and unit factory preserve the counted replacement for all four exact current-source variants; that reuse does not certify their faction-local rules bundles.",
+      "evidence": [
+        "src/warhammer40k_core/rules/wahapedia_bridge.py:_bridge_single_replacement_option",
+        "src/warhammer40k_core/engine/unit_factory.py:_apply_replace_wargear_effect_to_models",
+        "tests/unit/test_phase17a_wahapedia_source_mirror.py:test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_variants"
+      ],
+      "mechanic_id": "counted-wargear-replacement",
+      "scope": "content_neutral_engine_mechanic"
+    },
+    {
+      "certification_limit": "Both equipped copies receive stable identities for all four exact current-source variants; identity support alone does not certify faction-local ability execution.",
+      "evidence": [
+        "src/warhammer40k_core/engine/weapon_instances.py:equipped_weapon_instances_for_model",
+        "src/warhammer40k_core/engine/weapon_instances.py:weapon_instance_id_for_copy",
+        "tests/unit/test_phase17a_wahapedia_source_mirror.py:test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_variants"
+      ],
+      "mechanic_id": "deterministic-weapon-copy-identity",
+      "scope": "content_neutral_engine_mechanic"
+    },
+    {
+      "certification_limit": "The contract is generic, but the checked-in end-to-end regression currently certifies only Emperor's Children datasheet 000004091.",
+      "evidence": [
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py:test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay",
+        "tests/unit/test_phase17_emperors_children_datasheet_overlay.py:test_maulerfiend_magma_cutter_copies_can_split_legal_targets"
+      ],
+      "mechanic_id": "shooting-weapon-copy-contract",
+      "scope": "content_neutral_adapter_and_replay_mechanic"
+    }
+  ],
+  "identity_policy": "The shared name and generic engine mechanics do not make these records one datasheet. Support is keyed by exact faction_id plus datasheet_id; profiles, source rules, geometry bindings, and faction integration remain faction-local.",
+  "rows": [
+    {
+      "component_support": null,
+      "datasheet_id": "000000968",
+      "datasheet_name": "Maulerfiend",
+      "faction_id": "chaos-space-marines",
+      "faction_local_rules": [
+        {
+          "execution_status": "blocked_structured_semantics",
+          "rule_name": "Siege Crawler",
+          "runtime_consumer_ids": [],
+          "source_row_ids": [
+            "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000968:3"
+          ],
+          "support_transfer": "none"
+        }
+      ],
+      "faction_name": "Chaos Space Marines",
+      "identity_scope": "Faction-local catalog, profile, ability, RuleIR, geometry-binding, and runtime-support identity.",
+      "key": "chaos-space-marines:000000968",
+      "reusable_generic_mechanic_ids": [
+        "counted-wargear-replacement",
+        "deterministic-weapon-copy-identity",
+        "shooting-weapon-copy-contract"
+      ],
+      "source_reference": null,
+      "source_treatment": "unchanged_predecessor",
+      "support_conclusion": "Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration."
+    },
+    {
+      "component_support": {
+        "catalog_status": "Full",
+        "datasheet_ability_status": "Full",
+        "faction_interaction_status": "Partial",
+        "model_geometry_status": "Full",
+        "overall": "Playable",
+        "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:wound-roll-modifier`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
+        "wargear_status": "Full",
+        "weapon_keyword_status": "Full"
+      },
+      "datasheet_id": "000004091",
+      "datasheet_name": "Maulerfiend",
+      "faction_id": "emperors-children",
+      "faction_local_rules": [
+        {
+          "execution_status": "engine_consumed",
+          "rule_name": "Glutton for Punishment",
+          "runtime_consumer_ids": [
+            "catalog-ir:hit-roll-modifier",
+            "catalog-ir:wound-roll-modifier"
+          ],
+          "source_row_ids": [
+            "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004091:3"
+          ],
+          "support_transfer": "content_neutral_generic_ir"
+        }
+      ],
+      "faction_name": "Emperor's Children",
+      "identity_scope": "Faction-local catalog, profile, ability, RuleIR, geometry-binding, and runtime-support identity.",
+      "key": "emperors-children:000004091",
+      "reusable_generic_mechanic_ids": [
+        "counted-wargear-replacement",
+        "deterministic-weapon-copy-identity",
+        "shooting-weapon-copy-contract"
+      ],
+      "source_reference": null,
+      "source_treatment": "unchanged_predecessor",
+      "support_conclusion": "Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID."
+    },
+    {
+      "component_support": null,
+      "datasheet_id": "000001029",
+      "datasheet_name": "Maulerfiend",
+      "faction_id": "thousand-sons",
+      "faction_local_rules": [
+        {
+          "execution_status": "blocked_structured_semantics",
+          "rule_name": "Snarling Protector",
+          "runtime_consumer_ids": [],
+          "source_row_ids": [
+            "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001029:2"
+          ],
+          "support_transfer": "none"
+        }
+      ],
+      "faction_name": "Thousand Sons",
+      "identity_scope": "Faction-local catalog, profile, ability, RuleIR, geometry-binding, and runtime-support identity.",
+      "key": "thousand-sons:000001029",
+      "reusable_generic_mechanic_ids": [
+        "counted-wargear-replacement",
+        "deterministic-weapon-copy-identity",
+        "shooting-weapon-copy-contract"
+      ],
+      "source_reference": "Rules Updates, physical PDF pages 9-11",
+      "source_treatment": "rules_update",
+      "support_conclusion": "Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration."
+    },
+    {
+      "component_support": null,
+      "datasheet_id": "000002639",
+      "datasheet_name": "Maulerfiend",
+      "faction_id": "world-eaters",
+      "faction_local_rules": [
+        {
+          "execution_status": "blocked_structured_semantics",
+          "rule_name": "Savage Exaltation",
+          "runtime_consumer_ids": [],
+          "source_row_ids": [
+            "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002639:4"
+          ],
+          "support_transfer": "none"
+        },
+        {
+          "execution_status": "blocked_structured_semantics",
+          "rule_name": "The Scent of Blood",
+          "runtime_consumer_ids": [],
+          "source_row_ids": [
+            "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002639:3"
+          ],
+          "support_transfer": "none"
+        }
+      ],
+      "faction_name": "World Eaters",
+      "identity_scope": "Faction-local catalog, profile, ability, RuleIR, geometry-binding, and runtime-support identity.",
+      "key": "world-eaters:000002639",
+      "reusable_generic_mechanic_ids": [
+        "counted-wargear-replacement",
+        "deterministic-weapon-copy-identity",
+        "shooting-weapon-copy-contract"
+      ],
+      "source_reference": "Rules Updates, physical PDF pages 7-8",
+      "source_treatment": "rules_update",
+      "support_conclusion": "Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration."
+    }
+  ],
+  "schema_version": "maulerfiend-cross-faction-support-v1"
+}

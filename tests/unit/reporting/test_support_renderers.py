@@ -48,6 +48,7 @@ def test_global_support_renderer_preserves_section_order_and_runtime_inventory()
         "## Runtime Content Semantic Coverage",
         "## Mustering / List Construction Support",
         "## Factions",
+        "## Maulerfiend Cross-faction Support",
         "## Runtime Hook Inventory",
     )
     assert all(heading in markdown for heading in headings)
@@ -105,6 +106,7 @@ def test_faction_support_renderer_preserves_section_order() -> None:
         < emperors_children.index("## Datasheet Source Review")
         < emperors_children.index("## Secondary-reference Audit")
         < emperors_children.index("## Datasheet component coverage")
+        < emperors_children.index("### Maulerfiend Cross-faction Support")
         < emperors_children.index("## Cross-source Semantic Equivalence")
     )
     assert "Court of the Phoenician | **Implemented**" in emperors_children
@@ -124,6 +126,9 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     assert "e114f25710a8fbc2089ca2bf02fe578cb5d7ed541f1671ee8c1a6405e124ac8a" in (emperors_children)
     assert "100 have observed provider relationships" in emperors_children
     assert "http://39k.pro" not in emperors_children
+    assert "### Maulerfiend Cross-faction Support" in emperors_children
+    assert "#### Reusable generic mechanics" in emperors_children
+    assert "#### Exact faction variants" in emperors_children
     assert "### Unit Datasheet Source Treatments" not in emperors_children
     assert "### Datasheet Ability Details" not in emperors_children
     support_markdown = emperors_children.split("## Datasheet component coverage", 1)[1]

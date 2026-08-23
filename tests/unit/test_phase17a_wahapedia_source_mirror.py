@@ -10,6 +10,14 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tests.support.wahapedia_source_fixtures import (
+    artifact_by_table,
+    wahapedia_source_artifacts,
+)
+from tools.faction_pack_datasheet_review import (
+    DatasheetSourceTreatment,
+    faction_pack_datasheet_review,
+)
 from tools.generate_datasheet_keyword_lexicon import (
     build_keyword_sequence_parts,
     load_wahapedia_artifact,
@@ -21,6 +29,15 @@ from tools.wahapedia_fetch import (
     fetch_wahapedia_sources,
 )
 
+from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
+from warhammer40k_core.engine.list_validation import UnitMusterSelection
+from warhammer40k_core.engine.unit_factory import UnitFactory
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instances_for_model
+from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.html_sanitizer import (
     SourceHtmlSanitizationError,
@@ -38,6 +55,10 @@ from warhammer40k_core.rules.source_catalog import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
+)
+from warhammer40k_core.rules.wahapedia_bridge import (
+    ModelHeightOverride,
+    build_wahapedia_canonical_bridge_artifacts,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
     EditionSourceConfig,
@@ -567,6 +588,150 @@ def test_phase17a_datasheet_keyword_lexicon_matches_source_snapshot() -> None:
     assert "INFANTRY" in expected_parts
     assert "SPACE MARINES" in expected_parts
     assert "CHAOS DAEMONS" in expected_parts
+
+
+def test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_variants() -> None:
+    variant_details = {
+        ("chaos-space-marines", "000000968"): (
+            "CSM",
+            "000000968:magma-cutters",
+            DatasheetSourceTreatment.UNCHANGED_PREDECESSOR,
+        ),
+        ("thousand-sons", "000001029"): (
+            "TS",
+            "000001029:magma-cutter",
+            DatasheetSourceTreatment.RULES_UPDATE,
+        ),
+        ("world-eaters", "000002639"): (
+            "WE",
+            "000002639:magma-cutter",
+            DatasheetSourceTreatment.RULES_UPDATE,
+        ),
+        ("emperors-children", "000004091"): (
+            "EC",
+            "000004091:magma-cutters",
+            DatasheetSourceTreatment.UNCHANGED_PREDECESSOR,
+        ),
+    }
+    datasheet_ids = tuple(datasheet_id for _, datasheet_id in variant_details)
+    source_artifacts = wahapedia_source_artifacts()
+    source_datasheets = artifact_by_table(source_artifacts, "Datasheets")
+    source_identity_by_id: dict[str, tuple[str, str]] = {}
+    for row in source_datasheets.rows:
+        if row.source_row_id in datasheet_ids:
+            fields = row.runtime_fields_payload()
+            source_identity_by_id[row.source_row_id] = (fields["name"], fields["faction_id"])
+    assert source_identity_by_id == {
+        datasheet_id: ("Maulerfiend", source_faction_id)
+        for (_, datasheet_id), (source_faction_id, _, _) in variant_details.items()
+    }
+
+    for (faction_id, datasheet_id), (_, _, expected_treatment) in variant_details.items():
+        review_rows = tuple(
+            row
+            for row in faction_pack_datasheet_review(faction_id).rows
+            if row.datasheet_id == datasheet_id
+        )
+        assert len(review_rows) == 1
+        assert review_rows[0].datasheet_name == "Maulerfiend"
+        assert review_rows[0].treatment is expected_treatment
+
+    death_guard_review = faction_pack_datasheet_review("death-guard")
+    assert not any(row.datasheet_name == "Maulerfiend" for row in death_guard_review.rows)
+    assert not any(
+        row.runtime_fields_payload()["faction_id"] == death_guard_review.source_faction_id
+        and row.runtime_fields_payload()["name"] == "Maulerfiend"
+        for row in source_datasheets.rows
+    )
+
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=source_artifacts,
+        bridge_package_id=DataPackageId(
+            namespace="core-v2",
+            package_name="maulerfiend-cross-faction-bridge-test",
+            version="phase17a-test",
+        ),
+        datasheet_ids=datasheet_ids,
+        height_overrides=tuple(
+            ModelHeightOverride(
+                datasheet_id=datasheet_id,
+                model_name="Maulerfiend",
+                height=90.0,
+                height_units=GeometrySourceUnits.MILLIMETERS,
+                height_source_id=(
+                    f"geometry-review:maulerfiend-cross-faction:{datasheet_id}:height"
+                ),
+                height_document_reference=(
+                    "Maulerfiend cross-faction source-bridge regression fixture"
+                ),
+            )
+            for datasheet_id in datasheet_ids
+        ),
+    )
+    package = build_canonical_catalog_package(
+        package_id=DataPackageId(
+            namespace="core-v2",
+            package_name="maulerfiend-cross-faction-catalog-test",
+            version="phase17a-test",
+        ),
+        catalog_version=CatalogVersion.dated(
+            version_id="warhammer-40000-11th-maulerfiend-cross-faction-test",
+            source_date=date(2026, 6, 14),
+        ),
+        source_artifacts=bridge_artifacts,
+    )
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+
+    # This certifies shared bridge/mustering identity, not faction-local ability execution.
+    for (faction_id, datasheet_id), (_, magma_wargear_id, _) in variant_details.items():
+        datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
+        model_profile = datasheet.model_profiles[0]
+        selection = UnitMusterSelection(
+            unit_selection_id=f"{faction_id}-maulerfiend-magma-cutters",
+            datasheet_id=datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id=model_profile.model_profile_id,
+                    model_count=datasheet.composition[0].min_models,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=f"{datasheet_id}:magma-cutters:option-1",
+                    model_profile_id=model_profile.model_profile_id,
+                    wargear_ids=(magma_wargear_id,),
+                ),
+            ),
+        )
+        reconstructed_identity_rows: list[tuple[tuple[int, str], ...]] = []
+        for _ in range(2):
+            unit = factory.instantiate_unit(
+                army_id=f"{faction_id}-army",
+                datasheet=datasheet,
+                selection=selection,
+            )
+            model = unit.own_models[0]
+            assert model.wargear_ids == (
+                f"{datasheet_id}:maulerfiend-fists",
+                magma_wargear_id,
+                magma_wargear_id,
+            )
+            magma_instances = tuple(
+                weapon
+                for weapon in equipped_weapon_instances_for_model(model)
+                if weapon.wargear_id == magma_wargear_id
+            )
+            assert tuple(weapon.copy_ordinal for weapon in magma_instances) == (1, 2)
+            assert len({weapon.weapon_instance_id for weapon in magma_instances}) == 2
+            reconstructed_identity_rows.append(
+                tuple(
+                    (weapon.copy_ordinal, weapon.weapon_instance_id) for weapon in magma_instances
+                )
+            )
+        assert reconstructed_identity_rows[0] == reconstructed_identity_rows[1]
 
 
 def test_phase17a_datasheet_model_blank_name_is_optional_source_text() -> None:

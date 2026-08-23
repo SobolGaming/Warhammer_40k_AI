@@ -13,7 +13,6 @@ from tools.generate_ability_support_matrix import (
 from tools.generate_aeldari_autarchs_rule_ir import (
     ASPECT_TRAINING_ROW_ID,
     INDOMITABLE_STRENGTH_ROW_ID,
-    OUTPUT_PATH,
     SUPERLATIVE_STRATEGIST_ROW_ID,
     generated_artifact_payload,
 )
@@ -94,11 +93,13 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_autarchs_2026_06 as source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_AUTARCHS_HEIGHT_OVERRIDES,
+)
+
+source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-autarchs-datasheets-2026-06-14"
 )
 
 AUTARCH_ID = "000000577"
@@ -261,7 +262,7 @@ def _unit_muster_selection(
 
 
 def test_generated_autarch_rule_ir_is_current_source_bound_and_fail_fast() -> None:
-    committed = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    committed = source_package.payload()
 
     assert committed == generated_artifact_payload()
     assert source_package.supported_datasheet_source_row_ids() == (
@@ -269,10 +270,10 @@ def test_generated_autarch_rule_ir_is_current_source_bound_and_fail_fast() -> No
         ASPECT_TRAINING_ROW_ID,
         INDOMITABLE_STRENGTH_ROW_ID,
     )
-    assert committed["package_hash"] == source_package.PACKAGE_HASH
+    assert committed["package_hash"] == source_package.package_hash
 
     committed["package_hash"] = "0" * 64
-    with pytest.raises(source_package.AeldariAutarchsRuleIrArtifactError, match="hash is stale"):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="hash is stale"):
         source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
 
 

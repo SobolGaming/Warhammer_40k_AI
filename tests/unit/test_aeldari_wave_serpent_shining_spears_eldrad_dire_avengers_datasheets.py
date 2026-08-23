@@ -15,7 +15,6 @@ from tools.generate_aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_rul
     DOOM_ROW_ID,
     ELDRAD_ULTHRAN_DATASHEET_ID,
     EXTREME_MOBILITY_ROW_ID,
-    OUTPUT_PATH,
     SHINING_SPEARS_DATASHEET_ID,
     WAVE_SERPENT_DATASHEET_ID,
     WAVE_SERPENT_SHIELD_ROW_ID,
@@ -94,11 +93,13 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import RuleIR
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_2026_06 as source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES,
+)
+
+source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14"
 )
 
 TEST_DETACHMENT_ID = "aeldari-four-datasheets-test"
@@ -120,10 +121,10 @@ class _RuntimeFixture:
 
 
 def test_generated_rule_ir_artifact_is_current_hashed_and_exactly_consumed() -> None:
-    committed = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    committed = source_package.payload()
 
     assert committed == generated_artifact_payload()
-    assert committed["package_hash"] == source_package.PACKAGE_HASH
+    assert committed["package_hash"] == source_package.package_hash
     assert source_package.supported_datasheet_source_row_ids() == (
         DOOM_ROW_ID,
         BLADESTORM_ROW_ID,
@@ -146,17 +147,17 @@ def test_generated_rule_ir_artifact_is_current_hashed_and_exactly_consumed() -> 
 
 
 def test_generated_rule_ir_loader_rejects_hash_and_source_identity_drift() -> None:
-    payload = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    payload = source_package.payload()
     payload["package_hash"] = "0" * 64
-    with pytest.raises(source_package.AeldariFourDatasheetsRuleIrArtifactError, match="stale"):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="stale"):
         source_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
-    payload = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    payload = source_package.payload()
     payload["source_package_id"] = "source:drift"
     payload["package_hash"] = _package_hash(payload)
     with pytest.raises(
-        source_package.AeldariFourDatasheetsRuleIrArtifactError,
-        match="source package identity drifted",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="source identity does not match its source package",
     ):
         source_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 

@@ -40,6 +40,12 @@ if TYPE_CHECKING or __package__:
         faction_pack_datasheet_snapshot_markdown,
         reviewed_faction_ids,
     )
+    from tools.maulerfiend_cross_faction_support import (
+        MaulerfiendCrossFactionSupportPayload,
+        includes_maulerfiend_faction,
+        maulerfiend_cross_faction_support,
+        maulerfiend_cross_faction_support_markdown,
+    )
 else:
     import aeldari_datasheet_semantic_coverage
     from aeldari_support_report import (
@@ -69,6 +75,12 @@ else:
         faction_pack_datasheet_review_markdown,
         faction_pack_datasheet_snapshot_markdown,
         reviewed_faction_ids,
+    )
+    from maulerfiend_cross_faction_support import (
+        MaulerfiendCrossFactionSupportPayload,
+        includes_maulerfiend_faction,
+        maulerfiend_cross_faction_support,
+        maulerfiend_cross_faction_support_markdown,
     )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
@@ -1253,6 +1265,10 @@ def main() -> None:
     mustering_payloads = mustering_support_rows_payload(mustering_rows)
     runtime_semantic_payload = runtime_content_semantic_coverage_payload()
     semantic_audit = cross_source_semantic_audit(source_json_dir=source_json_dir)
+    maulerfiend_support = maulerfiend_cross_faction_support(
+        datasheet_support_rows=datasheet_rows,
+        semantic_audit=semantic_audit,
+    )
 
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
@@ -1260,6 +1276,10 @@ def main() -> None:
     _write_json(output_dir / "datasheet_support_rows.json", datasheet_payloads)
     _write_json(output_dir / "mustering_support_rows.json", mustering_payloads)
     _write_json(output_dir / "runtime_content_semantic_coverage.json", runtime_semantic_payload)
+    _write_json(
+        output_dir / "maulerfiend_cross_faction_support.json",
+        maulerfiend_support,
+    )
     _write_json(
         output_dir / "cross_source_semantic_equivalence.json",
         semantic_audit.to_payload(),
@@ -1269,6 +1289,7 @@ def main() -> None:
             category_payloads,
             ability_rows=row_payloads,
             runtime_semantic_coverage=runtime_semantic_payload,
+            maulerfiend_support=maulerfiend_support,
         ),
         encoding="utf-8",
     )
@@ -1286,6 +1307,7 @@ def main() -> None:
             )
         ),
         semantic_audit=semantic_audit,
+        maulerfiend_support=maulerfiend_support,
     ).items():
         (faction_docs_dir / filename).write_text(markdown, encoding="utf-8")
 
@@ -2995,11 +3017,20 @@ def support_matrix_markdown(
     *,
     ability_rows: list[AbilityCoverageRowPayload] | None = None,
     runtime_semantic_coverage: RuntimeContentSemanticCoveragePayload | None = None,
+    maulerfiend_support: MaulerfiendCrossFactionSupportPayload | None = None,
 ) -> str:
     runtime_semantic_payload = (
         runtime_content_semantic_coverage_payload()
         if runtime_semantic_coverage is None
         else runtime_semantic_coverage
+    )
+    maulerfiend_support_payload = (
+        maulerfiend_cross_faction_support(
+            datasheet_support_rows=datasheet_support_rows(),
+            semantic_audit=cross_source_semantic_audit(),
+        )
+        if maulerfiend_support is None
+        else maulerfiend_support
     )
     lines = [
         "# Ability Support Matrix V2",
@@ -3017,6 +3048,8 @@ def support_matrix_markdown(
         "`data/generated/ability_coverage/mustering_support_rows.json`.",
         "Runtime faction-content semantic status is generated separately in",
         "`data/generated/ability_coverage/runtime_content_semantic_coverage.json`.",
+        "Maulerfiend cross-faction identity and generic-mechanic reuse evidence is in",
+        "`data/generated/ability_coverage/maulerfiend_cross_faction_support.json`.",
         "",
         "Support stages:",
         "",
@@ -3041,6 +3074,7 @@ def support_matrix_markdown(
     ]
     lines.extend(_runtime_content_semantic_coverage_markdown(runtime_semantic_payload))
     lines.extend(_structured_support_sections_markdown())
+    lines.extend(maulerfiend_cross_faction_support_markdown(maulerfiend_support_payload))
     lines.extend(
         (
             "",
@@ -3134,6 +3168,7 @@ def faction_support_markdown_files(
     ability_rows: tuple[AbilityCoverageRow, ...] | None = None,
     leader_attachment_evidence_datasheet_ids: frozenset[str] | None = None,
     semantic_audit: CrossSourceSemanticAudit | None = None,
+    maulerfiend_support: MaulerfiendCrossFactionSupportPayload | None = None,
 ) -> dict[str, str]:
     if datasheet_support_rows is None or ability_rows is None:
         package = _ability_support_catalog_package()
@@ -3150,6 +3185,11 @@ def faction_support_markdown_files(
         )
     if semantic_audit is None:
         semantic_audit = cross_source_semantic_audit()
+    if maulerfiend_support is None:
+        maulerfiend_support = maulerfiend_cross_faction_support(
+            datasheet_support_rows=datasheet_support_rows,
+            semantic_audit=semantic_audit,
+        )
     ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
     return {
         f"{faction_row.faction_id}.md": _faction_support_markdown(
@@ -3160,6 +3200,7 @@ def faction_support_markdown_files(
             ability_rows_by_id=ability_rows_by_id,
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
             semantic_audit=semantic_audit,
+            maulerfiend_support=maulerfiend_support,
         )
         for faction_row in faction_detachments_2026_27.faction_rows()
     }
@@ -3172,6 +3213,7 @@ def _faction_support_markdown(
     ability_rows_by_id: Mapping[str, AbilityCoverageRow],
     leader_attachment_evidence_datasheet_ids: frozenset[str],
     semantic_audit: CrossSourceSemanticAudit,
+    maulerfiend_support: MaulerfiendCrossFactionSupportPayload,
 ) -> str:
     pdf_record = _faction_pdf_record(faction_row.faction_id)
     coverage_rows = tuple(
@@ -3403,6 +3445,13 @@ def _faction_support_markdown(
             leader_attachment_evidence_datasheet_ids=(leader_attachment_evidence_datasheet_ids),
         )
     )
+    if includes_maulerfiend_faction(maulerfiend_support, faction_row.faction_id):
+        lines.extend(
+            maulerfiend_cross_faction_support_markdown(
+                maulerfiend_support,
+                heading_level=3,
+            )
+        )
     lines.extend(
         faction_semantic_equivalence_markdown(
             semantic_audit,

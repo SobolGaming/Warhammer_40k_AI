@@ -332,6 +332,14 @@ Current status:
   provenance-free semantic hash; incomplete IR is grouped by exact normalized
   text only and cannot transfer gameplay support. Every generated faction
   support document consumes the same audit.
+- Datasheet RuleIR follows the stable, source-identified shard convention in
+  [`docs/FACTION_PACK_RULE_IR_ARTIFACTS.md`](docs/FACTION_PACK_RULE_IR_ARTIFACTS.md).
+  Physical shard labels are not faction-support assertions: exact datasheet
+  ownership is derived from the committed source snapshot and stored with typed
+  provenance. Datasheet work adds records to that registry instead of creating a
+  dated, datasheet-named runtime package. The generated Maulerfiend cross-faction
+  support report also makes explicit which mechanics are reusable and which
+  faction-local records remain unsupported.
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Phase 17G faction slices across Chaos Daemons,
   Chaos Space Marines, Aeldari, Death Guard, World Eaters, Orks,

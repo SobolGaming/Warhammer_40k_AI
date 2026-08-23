@@ -32,6 +32,10 @@ from tools.generate_ability_support_matrix import (
     runtime_content_semantic_coverage_payload,
     support_matrix_markdown,
 )
+from tools.maulerfiend_cross_faction_support import (
+    MaulerfiendCrossFactionSupportPayload,
+    maulerfiend_cross_faction_support,
+)
 
 from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageCategoryRow,
@@ -43,6 +47,7 @@ from warhammer40k_core.engine.ability_coverage import (
 from warhammer40k_core.engine.semantic_equivalence import (
     CrossSourceSemanticAudit,
     SemanticContentKind,
+    SemanticEquivalenceBasis,
     SemanticEquivalenceError,
     SemanticExecutionStatus,
     SemanticSupportTransfer,
@@ -57,6 +62,7 @@ _GENERATED_ARTIFACTS = (
     "data/generated/ability_coverage/datasheet_support_rows.json",
     "data/generated/ability_coverage/mustering_support_rows.json",
     "data/generated/ability_coverage/runtime_content_semantic_coverage.json",
+    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json",
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json",
     "docs/ABILITY_SUPPORT_MATRIX_V2.md",
     "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md",
@@ -86,6 +92,8 @@ def _generated_artifact(relative_path: str) -> object:
         return mustering_support_rows_payload(_mustering_support_rows())
     if relative_path.endswith("runtime_content_semantic_coverage.json"):
         return _runtime_semantic_payload()
+    if relative_path.endswith("maulerfiend_cross_faction_support.json"):
+        return _maulerfiend_support_payload()
     if relative_path.endswith("cross_source_semantic_equivalence.json"):
         return _semantic_audit().to_payload()
     if relative_path == "docs/ABILITY_SUPPORT_MATRIX_V2.md":
@@ -93,6 +101,7 @@ def _generated_artifact(relative_path: str) -> object:
             ability_coverage_category_rows_payload(_category_rows()),
             ability_rows=ability_coverage_rows_payload(_ability_rows()),
             runtime_semantic_coverage=_runtime_semantic_payload(),
+            maulerfiend_support=_maulerfiend_support_payload(),
         )
     if relative_path == "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md":
         return semantic_equivalence_markdown(_semantic_audit())
@@ -127,6 +136,14 @@ def _runtime_semantic_payload() -> RuntimeContentSemanticCoveragePayload:
 @cache
 def _semantic_audit() -> CrossSourceSemanticAudit:
     return cross_source_semantic_audit()
+
+
+@cache
+def _maulerfiend_support_payload() -> MaulerfiendCrossFactionSupportPayload:
+    return maulerfiend_cross_faction_support(
+        datasheet_support_rows=_datasheet_support_rows(),
+        semantic_audit=_semantic_audit(),
+    )
 
 
 def test_cross_source_semantic_audit_default_paths_are_platform_neutral() -> None:
@@ -293,3 +310,65 @@ def test_cross_source_semantic_audit_reports_both_shalaxi_sources_as_engine_cons
         assert (
             emperors_children.support_transfer is SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
         )
+
+
+def test_cross_source_semantic_audit_uses_exact_non_materialization_static_rule_ir() -> None:
+    member = _semantic_audit().member(
+        content_kind=SemanticContentKind.DATASHEET_ABILITY,
+        owner_id="000004091",
+        rule_name="Glutton for Punishment",
+    )
+
+    assert member.equivalence_basis is SemanticEquivalenceBasis.STRUCTURED_RULE_IR
+    assert member.execution_status is SemanticExecutionStatus.ENGINE_CONSUMED
+    assert member.support_transfer is SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
+    assert member.runtime_consumer_ids == (
+        "catalog-ir:hit-roll-modifier",
+        "catalog-ir:wound-roll-modifier",
+    )
+
+
+def test_maulerfiend_cross_faction_report_separates_generic_and_local_support() -> None:
+    payload = _maulerfiend_support_payload()
+    rows_by_key = {row["key"]: row for row in payload["rows"]}
+
+    assert set(rows_by_key) == {
+        "chaos-space-marines:000000968",
+        "emperors-children:000004091",
+        "thousand-sons:000001029",
+        "world-eaters:000002639",
+    }
+    assert all(row["faction_id"] != "death-guard" for row in payload["rows"])
+    assert payload["absent_factions"] == [
+        {
+            "faction_id": "death-guard",
+            "faction_name": "Death Guard",
+            "status": "not_present_in_current_source_review",
+            "evidence": (
+                "The exhaustive current Death Guard Faction Pack review contains no "
+                "Maulerfiend datasheet row; no synthetic support row is emitted."
+            ),
+        }
+    ]
+    mechanic_ids = {mechanic["mechanic_id"] for mechanic in payload["generic_mechanics"]}
+    assert mechanic_ids == {
+        "counted-wargear-replacement",
+        "deterministic-weapon-copy-identity",
+        "shooting-weapon-copy-contract",
+    }
+    assert all(set(row["reusable_generic_mechanic_ids"]) == mechanic_ids for row in payload["rows"])
+    assert rows_by_key["emperors-children:000004091"]["component_support"] is not None
+    assert all(
+        row["component_support"] is None
+        for key, row in rows_by_key.items()
+        if key != "emperors-children:000004091"
+    )
+    assert {
+        key: tuple(rule["rule_name"] for rule in row["faction_local_rules"])
+        for key, row in rows_by_key.items()
+    } == {
+        "chaos-space-marines:000000968": ("Siege Crawler",),
+        "emperors-children:000004091": ("Glutton for Punishment",),
+        "thousand-sons:000001029": ("Snarling Protector",),
+        "world-eaters:000002639": ("Savage Exaltation", "The Scent of Blood"),
+    }

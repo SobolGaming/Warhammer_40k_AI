@@ -13,7 +13,6 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_aeldari_corsair_void_units_rule_ir import (
-    OUTPUT_PATH,
     generated_artifact_payload,
 )
 
@@ -108,13 +107,15 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     parameter_payload,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_corsair_void_units_2026_06 as void_units_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
 )
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
+
+void_units_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14"
+)
 
 VOIDREAVERS_ID = "000002531"
 VOIDSCARRED_ID = "000002532"
@@ -205,13 +206,10 @@ def test_source_composition_fields_reject_implicit_or_malformed_optionality(
 
 
 def test_void_units_generated_rule_ir_artifact_is_current_and_fail_fast() -> None:
-    committed_payload = cast(
-        dict[str, Any],
-        json.loads(OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed_payload = void_units_package.payload()
 
     assert committed_payload == generated_artifact_payload()
-    assert void_units_package.DATASHEETS == {
+    assert committed_payload["datasheets"] == {
         VOIDREAVERS_ID: "Corsair Voidreavers",
         VOIDSCARRED_ID: "Corsair Voidscarred",
     }
@@ -222,19 +220,19 @@ def test_void_units_generated_rule_ir_artifact_is_current_and_fail_fast() -> Non
         "000002532:4",
         "000002532:6",
     )
-    assert committed_payload["package_hash"] == void_units_package.PACKAGE_HASH
+    assert committed_payload["package_hash"] == void_units_package.package_hash
 
     drifted = cast(dict[str, Any], json.loads(json.dumps(committed_payload)))
     drifted["package_hash"] = "0" * 64
     with pytest.raises(
-        void_units_package.CorsairVoidUnitsRuleIrArtifactError,
-        match="package hash is stale",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="package_hash is stale",
     ):
         void_units_package.validate_generated_artifact_bytes(json.dumps(drifted).encode())
 
     with pytest.raises(
-        void_units_package.CorsairVoidUnitsRuleIrArtifactError,
-        match="artifact is invalid",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="is not valid JSON",
     ):
         void_units_package.validate_generated_artifact_bytes(b"{")
 
@@ -246,8 +244,8 @@ def test_void_units_generated_rule_ir_artifact_is_current_and_fail_fast() -> Non
     ).to_payload()
     _rehash_artifact(drifted)
     with pytest.raises(
-        void_units_package.CorsairVoidUnitsRuleIrArtifactError,
-        match="source identity drifted",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="source identity does not match its source package",
     ):
         void_units_package.validate_generated_artifact_bytes(json.dumps(drifted).encode())
 

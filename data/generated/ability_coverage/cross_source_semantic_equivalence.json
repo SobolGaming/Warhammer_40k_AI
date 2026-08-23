@@ -1,5 +1,5 @@
 {
-  "cross_faction_group_count": 161,
+  "cross_faction_group_count": 159,
   "equivalence_groups": [
     {
       "content_kind": "datasheet_ability",
@@ -372,28 +372,6 @@
         "catalog-ir:hit-roll-reroll"
       ],
       "support_transfer": "content_neutral_generic_ir"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "0b7c0ebf395be10fc1da99a8f7a25a109786ad3fe7f133960b9bb80085ce34b7",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari",
-        "orks"
-      ],
-      "group_id": "semantic-equivalence:0b7c0ebf395be10fc1da99a8f7a25a109786ad3fe7f133960b9bb80085ce34b7",
-      "member_ids": [
-        "datasheet-ability:000000027:3",
-        "datasheet-ability:000000594:3"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [
-        "catalog-ir:can-advance-and-charge"
-      ],
-      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -977,25 +955,6 @@
     {
       "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "2669a8607a744c6f0f895d97b1854181fe01b58d57953b9cffaac5c061fbb981",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "emperors-children"
-      ],
-      "group_id": "semantic-equivalence:2669a8607a744c6f0f895d97b1854181fe01b58d57953b9cffaac5c061fbb981",
-      "member_ids": [
-        "datasheet-ability:000004079:4",
-        "datasheet-ability:000004080:4"
-      ],
-      "rules_surface": "wargear",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "269fd1d9d50c7ceaf4730e13f3f74171465b1b55d89fd3060fd08efea17e3b45",
       "execution_statuses": [
         "blocked_structured_semantics"
@@ -1133,26 +1092,6 @@
       "member_ids": [
         "datasheet-ability:000001485:4",
         "datasheet-ability:000001486:4"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "30770509278eee72652ba293bd74abafa2666063f2d8e77ffb0093ba8ecda136",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari",
-        "leagues-of-votann"
-      ],
-      "group_id": "semantic-equivalence:30770509278eee72652ba293bd74abafa2666063f2d8e77ffb0093ba8ecda136",
-      "member_ids": [
-        "datasheet-ability:000000574:4",
-        "datasheet-ability:000004140:4"
       ],
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
@@ -1495,25 +1434,6 @@
       "member_ids": [
         "datasheet-ability:000003898:1",
         "datasheet-ability:000003969:1"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "3b5f46ac35e5aafa3f807bee087743977013690d280c5953faa5f54e70428987",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari"
-      ],
-      "group_id": "semantic-equivalence:3b5f46ac35e5aafa3f807bee087743977013690d280c5953faa5f54e70428987",
-      "member_ids": [
-        "datasheet-ability:000004196:4",
-        "datasheet-ability:000004199:4"
       ],
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
@@ -1880,25 +1800,6 @@
     {
       "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "41b4d917ffcbdc3a5961f66795fd2120f14283f88a454936af317f23f643f006",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari"
-      ],
-      "group_id": "semantic-equivalence:41b4d917ffcbdc3a5961f66795fd2120f14283f88a454936af317f23f643f006",
-      "member_ids": [
-        "datasheet-ability:000004195:4",
-        "datasheet-ability:000004200:4"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "4286d865bc55fab3e5b8f07e5917b69d55605f6f1192cc295ee306994f449dd7",
       "execution_statuses": [
         "blocked_structured_semantics"
@@ -2076,6 +1977,27 @@
     },
     {
       "content_kind": "datasheet_ability",
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
+      "execution_statuses": [
+        "engine_consumed"
+      ],
+      "faction_ids": [
+        "emperors-children"
+      ],
+      "group_id": "semantic-equivalence:46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
+      "member_ids": [
+        "datasheet-ability:000004079:4",
+        "datasheet-ability:000004080:4"
+      ],
+      "rules_surface": "wargear",
+      "runtime_consumer_ids": [
+        "catalog-ir:command-point-gain"
+      ],
+      "support_transfer": "content_neutral_generic_ir"
+    },
+    {
+      "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "46e5c013eae1a3c77f7616b4629ad535ecfd79a1961e75636ea5c43cf21520b4",
       "execution_statuses": [
@@ -2112,7 +2034,6 @@
       "group_id": "semantic-equivalence:470603891948f0007abd20c299436afad075a398e4a60db29dae1ee1bec4fdb2",
       "member_ids": [
         "datasheet-ability:000000410:6",
-        "datasheet-ability:000004194:4",
         "datasheet-ability:000004197:4"
       ],
       "rules_surface": "datasheet",
@@ -2344,44 +2265,6 @@
         "datasheet-ability:000002779:7"
       ],
       "rules_surface": "wargear",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4ddc058d2cd843a19f01f934ef248f2b5de26f371eabd821f16cd18125d45054",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari"
-      ],
-      "group_id": "semantic-equivalence:4ddc058d2cd843a19f01f934ef248f2b5de26f371eabd821f16cd18125d45054",
-      "member_ids": [
-        "datasheet-ability:000002532:4",
-        "datasheet-ability:000004169:4"
-      ],
-      "rules_surface": "wargear",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4e6f96e273e1025cc8953952cc5c8bfd0b5a7a155a66f47abe495d0502e798ee",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari"
-      ],
-      "group_id": "semantic-equivalence:4e6f96e273e1025cc8953952cc5c8bfd0b5a7a155a66f47abe495d0502e798ee",
-      "member_ids": [
-        "datasheet-ability:000004193:5",
-        "datasheet-ability:000004198:5"
-      ],
-      "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
       "support_transfer": "none"
     },
@@ -3214,25 +3097,6 @@
     {
       "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "740b195b7662e77c605d4edc40453110b5736fc1df6ab3bac54f70386f2f3cf4",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "aeldari"
-      ],
-      "group_id": "semantic-equivalence:740b195b7662e77c605d4edc40453110b5736fc1df6ab3bac54f70386f2f3cf4",
-      "member_ids": [
-        "datasheet-ability:000004194:5",
-        "datasheet-ability:000004197:5"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "74c877e2e8666b43bd8b6ab46aa992b059d6dbffd12d569dc9c5df943ed0abd3",
       "execution_statuses": [
         "blocked_structured_semantics"
@@ -3278,15 +3142,13 @@
       ],
       "faction_ids": [
         "chaos-space-marines",
-        "emperors-children",
         "space-marines"
       ],
       "group_id": "semantic-equivalence:7758786d25bf1f54496a79196e5a2837e11e9519aa47f25806e1c7a73cf604a8",
       "member_ids": [
         "datasheet-ability:000001606:2",
         "datasheet-ability:000002570:2",
-        "datasheet-ability:000004064:2",
-        "datasheet-ability:000004080:3"
+        "datasheet-ability:000004064:2"
       ],
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
@@ -4757,7 +4619,6 @@
         "aeldari",
         "death-guard",
         "drukhari",
-        "emperors-children",
         "grey-knights",
         "world-eaters"
       ],
@@ -4767,7 +4628,6 @@
         "datasheet-ability:000000590:2",
         "datasheet-ability:000000644:3",
         "datasheet-ability:000002628:2",
-        "datasheet-ability:000004079:3",
         "datasheet-ability:000004113:3"
       ],
       "rules_surface": "datasheet",
@@ -4850,7 +4710,6 @@
       "group_id": "semantic-equivalence:b6397c7362da615cf39d7870b830b5f36913c9f0e2cdc20c34937a8028505077",
       "member_ids": [
         "datasheet-ability:000001138:5",
-        "datasheet-ability:000002531:3",
         "datasheet-ability:000004168:3"
       ],
       "rules_surface": "datasheet",
@@ -5253,15 +5112,13 @@
         "generic_ir_executable"
       ],
       "faction_ids": [
-        "aeldari",
         "necrons",
         "space-wolves"
       ],
       "group_id": "semantic-equivalence:c768561213058bea021af6579d5364e40b8c9da67841e0c7d23110139ca6ccde",
       "member_ids": [
         "datasheet-ability:000000302:4",
-        "datasheet-ability:000000533:5",
-        "datasheet-ability:000000599:3"
+        "datasheet-ability:000000533:5"
       ],
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
@@ -7174,8 +7031,8 @@
       "support_transfer": "none"
     }
   ],
-  "equivalent_group_count": 330,
-  "exact_text_only_member_count": 3228,
+  "equivalent_group_count": 323,
+  "exact_text_only_member_count": 3186,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -18017,8 +17874,8 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "cff9a500524c850f16808b9680c495dc51019f7d7dc61c34f50ad3afaf6be977",
-      "execution_status": "generic_ir_executable",
+      "equivalence_hash": "b6770e57f000afaf077c82b4ae1b5af87eb66194f653606ed604474cbef9d071",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000568:4",
@@ -18028,16 +17885,18 @@
       "rule_id": "000000568:4",
       "rule_name": "Doom (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-end-selected-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "c5f8349434d8c0dfc2bf33c92a0585ce17a003f2de352fb2164b54e976b78d89",
+      "semantic_hash": "23a13b26f038e8b36435e206abafd9ff63ce850ae7eeaef6005f473fb8dd3a2e",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000568:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -18097,12 +17956,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "8607881e003a2a466ea417580505e8d5289b392cd24477d3f2fd073b6ffb7511",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "07a97d51819c411147f8825695f4606be4e50352528f0b65121d43478c712fb1",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000572:4",
@@ -18112,16 +17969,19 @@
       "rule_id": "000000572:4",
       "rule_name": "Whirling Death",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-fixed-advance",
+        "catalog-ir:dice-result-override"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "3b89d96c897ef1bb7898a6950db817afb9f5f65bbd97c1f0e8276d04d1e91e61",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000572:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000572:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -18153,12 +18013,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "d6027f89d9125945fb332fdb60de9aa58a0f684b26b10100a5ab2071015fc8aa",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "474733a56c59051562b54572289264c426d87d8be7ad7b2c59341954ac9d6f42",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000574:3",
@@ -18168,25 +18026,25 @@
       "rule_id": "000000574:3",
       "rule_name": "Burning Lance",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-weapon-range-modifier"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "0ee5772db0d02214b8c1eed5c2d1a529f8bd6fbd88ecccc0cca6aa1f1e44ac0f",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "30770509278eee72652ba293bd74abafa2666063f2d8e77ffb0093ba8ecda136",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "f71b247201ab8ce305df925c0e8a03bb00236557e3c694b3a687f4b1d31f756f",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000574:4",
@@ -18196,16 +18054,18 @@
       "rule_id": "000000574:4",
       "rule_name": "Unquenchable Resolve",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:first-death-return"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "f085bcfb3cacd3af11447f624c338dab9c8986a65a58374838dd76cd0b75aa8f",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000574:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -18321,12 +18181,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "cd77788a1259be71c3502a444cc23ee40f09be516ea042cf87006c7e3806c2ff",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "088fdcd0e39c9548f36fc7261a7e032bf7eb48c7936a47c9324fa2601aa9d39e",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000577:3",
@@ -18337,17 +18195,18 @@
       "rule_name": "Superlative Strategist",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:advance-roll-reroll"
+        "catalog-ir:advance-roll-reroll",
+        "catalog-ir:agile-manoeuvre-roll-reroll"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "2b4e540c5f0bd590072dc7490b5073687dd705aeef35280d43f8fa2ba7a10c25",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000577:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -18714,12 +18573,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "32a9091213633ecd8f0b778cfb4b9ef540aea722c55c4e68d59834ca696874f0",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "c2f23465641313a740b758b630965aff1243be338b2c0859580b054abf07a1b5",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000588:3",
@@ -18729,16 +18586,18 @@
       "rule_id": "000000588:3",
       "rule_name": "Spiritseer",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-ability:lone-operative"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "c42c7b8eda8ba89c95a3f9b8379cf90780dae7641d50c4893abb57d7b7a2677f",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -18770,12 +18629,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "abd2ec0e68f7f999372db28d24f59a9186296ee5f073f95b24ea6abf6ec1fda5",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "b19de911818a0635fc007184d73cd561d6d3a0096e6e4ab2dd6c99dece2e109b",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000588:5",
@@ -18785,16 +18642,18 @@
       "rule_id": "000000588:5",
       "rule_name": "Tears of Isha (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:command-restoration"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "fd5b714a3efd8362f188f9a000d36d9cbe93ddbcefe0b2a74040aa6c075c6bb3",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000588:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19082,12 +18941,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "0b7c0ebf395be10fc1da99a8f7a25a109786ad3fe7f133960b9bb80085ce34b7",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "ff32d95e895e17198afd98eb8e79af729f27bfa23ef521fd64471eb41e3bd50c",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000594:3",
@@ -19098,17 +18955,18 @@
       "rule_name": "Acrobatic",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:can-advance-and-charge"
+        "catalog-ir:can-advance-and-charge",
+        "catalog-ir:can-fallback-and-charge"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "7e5d2d2a53deeb56ee7854464a2e3e15c0dc3ee046e68d7d7421ec91e3d8685f",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000594:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19200,12 +19058,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "60c31d397e080f270e30be4149545c48b4fde98c878eaadedb18c7edbd6c4d1a",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "eeb940a20947e14740a075ea4040e3f94b6951d88b0b881cbf9691c974fe9230",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000596:2",
@@ -19221,14 +19077,14 @@
         "catalog-ir:wound-roll-reroll"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "5764cb5c242a50e185fc370d30f096747d1c6a0cc76aca6d68b5e2858247d990",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000596:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19319,12 +19175,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1bbf0af91aae918deaa097370cfa06cfca0d498e63f0121dcf56e04ef3324703",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2ba3acd75cba28de9b23f143bdffc5a719854edec2a0be7ddf2420baa69cd909",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000598:1",
@@ -19334,16 +19188,18 @@
       "rule_id": "000000598:1",
       "rule_name": "Malevolent Souls",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:fight-on-death-source"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "57203f41cbeba5a45766958f9fcd7b06426bd70aaafcf84236888afb9950f534",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:1"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000598:1:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19406,8 +19262,8 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "c768561213058bea021af6579d5364e40b8c9da67841e0c7d23110139ca6ccde",
-      "execution_status": "generic_ir_executable",
+      "equivalence_hash": "13a7e51caa19395fbd919fedeaacdfb5c1548b89d726ad8c54365d5ed1c63990",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000599:3",
@@ -19417,25 +19273,25 @@
       "rule_id": "000000599:3",
       "rule_name": "Wave Serpent Shield",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:wound-roll-modifier"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "8564643e21d1dc004cd7a49d7601fcdb98f4d772b01e2f52b5f9cec3686c7ea4",
+      "semantic_hash": "d3b311f9a962289f029814c553be12c179c4aece47487a9981e86fa7c865eaa0",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000599:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000599:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "2b85e63c8854adea2552412b316273506e4ab6ee696c8d86f5e59193a3520bed",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "23ac5138ebf90d25589911bacff25f702731830f6b1226d1efb31c0ed25dabc8",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000600:3",
@@ -19445,16 +19301,18 @@
       "rule_id": "000000600:3",
       "rule_name": "Grenade Pack Flyover",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:unit-move-completed-mortal-wounds"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "8709325636d8af11e5e60f195b49203a7d1521b86f1ad8ed30faf907162884fe",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000600:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19488,12 +19346,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4bd55c946f36f9fcfafb6f093ef663416122fbd77533151b543feba58c7f27b5",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "0c8ac03dbd72183cc1d862419dc9d0d62337d1d7fe251249adcc759b204f989e",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000601:3",
@@ -19503,16 +19359,18 @@
       "rule_id": "000000601:3",
       "rule_name": "Flickerjump",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-action-grant"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "dea3c2af3115843456ba315bed80e3ad9b9f48b02a7f48e57f6a01b138892679",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000601:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19546,12 +19404,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "de89e876835fdb2baeae13de55e9a490a7ed49a8042974f130b9324d9b69c584",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "32ef2daaca85735edd1b7b8d13bceddbfa58b30224f28d45d038486b4f8f658f",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000602:2",
@@ -19561,16 +19417,18 @@
       "rule_id": "000000602:2",
       "rule_name": "Extreme Mobility",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-transit-permission"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "dd4fba358bcb3de46efd568115121ae61aad4c256271497f986170a924e02efe",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000602:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19628,12 +19486,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "35fc5eafa7c5b91fc677012709335bc49e3ac813b4d354a01fe979547d5698ce",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "64a2e05898a076b174a430a61f0f60f9f83b78ad1ddd04b63e956342a1e16faf",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000605:3",
@@ -19643,16 +19499,18 @@
       "rule_id": "000000605:3",
       "rule_name": "Harassment Fire",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "9d8700628039a2310fd63132882688d9388c50ddb5b90749493dcf5f03c6fcf6",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000605:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000605:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -19794,12 +19652,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "a7d58976ecae19111cd00c36b077abbace20a9993161981e6987cb9fe0665b11",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "5e79b08dbbba156b51c4ce1430c76671bb22943b96e35ea52b8b74ae3cf1bd5f",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000611:3",
@@ -19809,25 +19665,25 @@
       "rule_id": "000000611:3",
       "rule_name": "Monofilament Web",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "bccaf997ff080b273d3592896a1a6ae96e0c417c6da30af73ffef86813ba3a01",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000611:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000611:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "33d3fc761404210b1fe201122db1ed8687439f3369b8f835972deceea7ed0f47",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "8a823700cedc77f1abcd4f739bd6663342c95322fca3f572c33d8e4eaf1b1d53",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000612:3",
@@ -19837,25 +19693,25 @@
       "rule_id": "000000612:3",
       "rule_name": "Crystalline Targeting",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "b8907c584cfea36a3127649c775af7556e0ed261fed4e83a89e3233e6aadb23d",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000612:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000612:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "58b8ece89160318a6a65cfbf3c81449be937d6a5ab35083a6f423cdf98611ee3",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "a9f286731f09490d1e989a68a700ce2d6a9ee4afd5062cb8c02d3b3696a7c823",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000613:2",
@@ -19867,26 +19723,25 @@
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
         "catalog-ir:hit-roll-reroll",
+        "catalog-ir:start-battle-keyword-choice",
         "catalog-ir:wound-roll-reroll"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "09b62b27f3109c355526345f8261c962f7e7f5c6f367b40eec74ef2c663bbfbb",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "999d7d82e191a96f4ab286023fb40cf47e2c2ee26d94c754b9f32212e1126367",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2f0ff77b0fec7edfc1da98f04dd7b274a43b55a4d4bc68304a589567b7453f01",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000000613:3",
@@ -19896,16 +19751,20 @@
       "rule_id": "000000613:3",
       "rule_name": "Psychic Guidance",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:ballistic-skill-characteristic-modifier",
+        "catalog-ir:leadership-characteristic-query",
+        "catalog-ir:weapon-skill-characteristic-modifier"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "d6229c52a92daf5abc4975a5f5b0aa18a7ffdfc99d614dbaa8c7890dfcf969ac",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000613:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -30088,12 +29947,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "71c7ce56d0dd7cf109faa338bd0cc714dc285afbd46959fc0233d6b7b6e0e62f",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "7779d8fdb5d1340de30f5799897129d9ef3aefd5b35640b20748438876aefea3",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001148:5",
@@ -30103,25 +29960,25 @@
       "rule_id": "000001148:5",
       "rule_name": "The Dark Master (Aura)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:shadow-of-chaos-aura"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "55bf2a2ec92567556412a1f272eb3773fe4504dbfd2131fa502e219436e8ed3c",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001148:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001148:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "04df59c7adbeba4b615763799b22a352fb46904498cad963a2be1fc5f73a55d7",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "a2eddc6eb27001718f60d89a7a8874da244df0c25c944ffa3c920946d8e5efce",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001148:6",
@@ -30131,25 +29988,25 @@
       "rule_id": "000001148:6",
       "rule_name": "Shadow Form",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:shadow-form-choice"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "39443ea79e4072c3bff353966a3b308d7ffda37a2df26f78985a50834c7d535e",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001148:6"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001148:6:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "01e216c873728ba7a3284f2cd458d7fe3ff036c156f26249fd96129708a8227c",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "3192bbae7544458fc1684bde2e100efd93e92b7d32baadb451c7423ad6da371a",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001149:4",
@@ -30159,25 +30016,25 @@
       "rule_id": "000001149:4",
       "rule_name": "Daemonic Lord",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-ability:lone-operative"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "b5d45025355a62c4e177f3de4c62f1474e4cc8aaf6817b94e9bcf83f99032763",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001149:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001149:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "273a5ed6fb4b91a423c8b723c9844546c1edf1dc815a1f9909827af0654d890e",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "056cca2075237bc5bb31c938b33b56560ae6aba44fd36e7b3f9127049866c1dc",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001149:5",
@@ -30187,23 +30044,25 @@
       "rule_id": "000001149:5",
       "rule_name": "Prince of Darkness (Aura)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:aura-ability:stealth"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "0d3ebee4072ea1535ba6ae98f0af98063f9ac3ecfdf6a4439862ef0b956b7f6d",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001149:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001149:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "b3c55382b5b019bb73e6845cfda9a3218eed840f5d358f61f6d601d991ccda4a",
-      "execution_status": "generic_ir_executable",
+      "equivalence_hash": "0a1b3d4a5f3cd6ca9a1492a8887b0cdbd7ba007b6e53516c7f0c7cfd474050fc",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001149:6",
@@ -30213,16 +30072,18 @@
       "rule_id": "000001149:6",
       "rule_name": "Unholy Vigour",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:once-per-battle-ability"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "36ec35d540160aadc312f20ea123b92188c55cc56b634129511e4f4f6edf9667",
+      "semantic_hash": "f77070cefdb88acca97c1a940b795a3e52717058287c80339fe4a0e41662d288",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001149:6"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001149:6:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -40612,12 +40473,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "b6397c7362da615cf39d7870b830b5f36913c9f0e2cdc20c34937a8028505077",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "c274c79a224c79f811d5523a26b53fb5fd5efc9fb5a5741b0b6abcc07ce12f9e",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000002531:3",
@@ -40628,17 +40487,18 @@
       "rule_name": "Reavers of the Void",
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [
-        "catalog-ir:hit-roll-reroll"
+        "catalog-ir:hit-roll-reroll",
+        "catalog-ir:passive-hit-reroll"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "5a74632048b3ce5df372d8b2d3263e7e78a85f3db19e921a219dbff35dc1a910",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002531:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002531:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -40701,12 +40561,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4ddc058d2cd843a19f01f934ef248f2b5de26f371eabd821f16cd18125d45054",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2c9ea70009eb47c34f5554a3d34b573028d3eb81c512cc5023ea9b714602492d",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000002532:4",
@@ -40716,16 +40574,18 @@
       "rule_id": "000002532:4",
       "rule_name": "Channeller Stones",
       "rules_surface": "wargear",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:first-failed-save-damage-replacement"
+      ],
       "semantic_context_hash": "7b3b9ac81e8844a8727c61ffe130fcb9e838c7367d49dc67c37e64c90299f83f",
-      "semantic_hash": null,
+      "semantic_hash": "35e6a804f950c108a76dee9b494dd2df91962cadd31cedd4333b612b010a0705",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002532:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -40786,12 +40646,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ee1b758031ccd3bb922ec0cdb8397ab27f9d18be150ef3210feb16fda666ca8c",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "623ce8ce8d874ccd81cff17aed40292f6e514d098b47e63398fa125232465a7c",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000002533:4",
@@ -40805,14 +40663,14 @@
         "catalog-ir:post-shoot-hit-target-status"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "ef800ad3b8cd4ebadd85bbe34bf8b920d4574ca23179930836feff92f7551c4a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002533:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002533:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -47429,12 +47287,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1fb40ef0c07e7f9c8b893c6f311976f682d38abb07165bb5271e7e658228c469",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2001b49577e227e8f0b9412011349723dffe2736a43c3ec5e8a6064734d8b8fb",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000002758:4",
@@ -47444,16 +47300,18 @@
       "rule_id": "000002758:4",
       "rule_name": "Malefic Destruction",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:once-per-battle-ability"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "2ddefbb14cfcdb0ab6775b5cbfcbb30d688ba38644ee64a8a528470ab738c9b2",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002758:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002758:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -47485,12 +47343,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "2067a68f86e6cbc1decb6d1d66eaa2775f0f1baf518f6d0356aaaea4ead4392c",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "add40ed7f2da16e6ee356f4202fc770cce6eeee81de3ca0167041a3c55213c51",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000002759:4",
@@ -47500,16 +47356,18 @@
       "rule_id": "000002759:4",
       "rule_name": "Indomitable Strength of Will",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:faction-resource-refund-roll"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "33ff08063499f267287cf153a6011fbc60e69772584343da5e73e1820d05cf4e",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002759:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002759:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -52937,12 +52795,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "90078197501de09dbedc45b8e98516e7b65ad63e4622105a2e69d40fea57449d",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2ad7d29e1552f9d7b99b81e6e2900d3023a1be8c2822a48bc7d1148bb54c7ea5",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000003909:4",
@@ -52952,16 +52808,18 @@
       "rule_id": "000003909:4",
       "rule_name": "Empyric Ambush",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-leading-charge-after-movement-action"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "03773c90183494e64e870c3767c3aadd988bef53eb47fb19b3c02227a29eb63b",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003909:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -56918,12 +56776,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "3974a6e67b140c616ef2ccfd3e77a885681ba4695e0af3e951fc05f74509e122",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2bb26df6053c9dc3842195c8f78369b08f826f70f2e2318438014e77a0ec582d",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004077:4",
@@ -56933,25 +56789,27 @@
       "rule_id": "000004077:4",
       "rule_name": "Daemonic Poisons",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:poisoned-command-mortal-wounds",
+        "catalog-ir:post-fight-hit-target-effect",
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "35e6e5dcbb1e943d392e90ff7479f86289a80bdfe2c27e55c71043f51473b080",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "9f53cb2cdb597b905003663ffd04c08a6075ba1695dc0faf269df68639422fd1",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "010a2980590166d7e439d428be3d3af9993b089a66e084403f08b1e89826a547",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004077:5",
@@ -56961,25 +56819,25 @@
       "rule_id": "000004077:5",
       "rule_name": "Daemon Primarch of Slaanesh",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:command-phase-ability-mode"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "534c9b6007e0691c44454869d1cf57c08746a503e466802824516c8240d73eca",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "e259bceb1f121bf243524ca0dd47783509152f616438ddb1e2a847be81a34724",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "35730ad5de56978d09e0e27925440dfb4912d316985caee393d219ace2d114b6",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004077:6",
@@ -56989,16 +56847,18 @@
       "rule_id": "000004077:6",
       "rule_name": "Serpentine",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-transit-permission"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "39f3ebab44dda2a80c2e2bd7cf7a7a05e7dbb725b2fa6a0fcdae6a3f613a5b7e",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:6"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004077:6:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -57031,12 +56891,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "bf71a495232805f0d41342b9b4eeee300b248b6893fbd004d9050354675fba53",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "046fd107efe229a3a4e81f5f0ec64028845b08826f41c504c1bd1f035cdd013e",
+      "execution_status": "generic_ir_executable",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004078:4",
@@ -57046,9 +56904,11 @@
       "rule_id": "000004078:4",
       "rule_name": "Euphoric Strikes",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:once-per-battle-ability"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "cc58640d3251f5c6407e43990c82c9826595a1cb94e474b751383faa6179d9ff",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004078:4"
       ],
@@ -57059,12 +56919,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "b140409bd3838afe0b0d743ee7bbb788ab660a6474ae91f194a876538458043c",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "3b5d15144685bca9dba9f729d9c6cc07966135eb4ba2566c9f9d63235d6855df",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004079:3",
@@ -57074,25 +56932,25 @@
       "rule_id": "000004079:3",
       "rule_name": "Objective Defiled",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:command-end-sticky-objective-control"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "c75f28f9e52154250960ed8a0805c53747b56590734d187e2166b24a70449d73",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004079:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004079:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "2669a8607a744c6f0f895d97b1854181fe01b58d57953b9cffaac5c061fbb981",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004079:4",
@@ -57102,25 +56960,25 @@
       "rule_id": "000004079:4",
       "rule_name": "Icon of Excess",
       "rules_surface": "wargear",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:command-point-gain"
+      ],
       "semantic_context_hash": "7b3b9ac81e8844a8727c61ffe130fcb9e838c7367d49dc67c37e64c90299f83f",
-      "semantic_hash": null,
+      "semantic_hash": "ab0440bfca3149a7e7814afaf67d02dba987eed108eaa5fe9057167aaf859e34",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004079:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004079:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "7758786d25bf1f54496a79196e5a2837e11e9519aa47f25806e1c7a73cf604a8",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "a88719befbf09de64c09ccfdc02449a38e086ccaea80c05192329c14010035f2",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004080:3",
@@ -57130,25 +56988,25 @@
       "rule_id": "000004080:3",
       "rule_name": "Excessive Assault",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:wound-roll-reroll"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "2718d6546c3de6cd63db9f89a15de70ec2c4b113b6432d01ee4539eabf62404c",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004080:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004080:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "2669a8607a744c6f0f895d97b1854181fe01b58d57953b9cffaac5c061fbb981",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "46e313b74ae2d115b59a3cc9c825a04c4fd301d8c9e8974005a6e8bdc82c73e1",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004080:4",
@@ -57158,16 +57016,18 @@
       "rule_id": "000004080:4",
       "rule_name": "Icon of Excess",
       "rules_surface": "wargear",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:command-point-gain"
+      ],
       "semantic_context_hash": "7b3b9ac81e8844a8727c61ffe130fcb9e838c7367d49dc67c37e64c90299f83f",
-      "semantic_hash": null,
+      "semantic_hash": "ab0440bfca3149a7e7814afaf67d02dba987eed108eaa5fe9057167aaf859e34",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004080:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004080:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -57229,7 +57089,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "b5b44e6694030a2505703cbc3fe64a4156f636a222fcf35157ee873ab0b877ba",
+      "equivalence_hash": "24e26c3259533203f86e18c4df53d65034477d01809ba49f6f18a493672ea60c",
       "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
@@ -57245,7 +57105,7 @@
         "catalog-ir:wound-roll-reroll"
       ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "5499e6b081e5ae45334f75281e8a5c07897d2cc78551e79b658f5177ac0c0c0b",
+      "semantic_hash": "cdc5389f1bf9b19a855aab8e1154bed20c7eb2d2d998c202907258bac5aeb13a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004083:5"
       ],
@@ -57256,12 +57116,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "11a57105a1e82cc4231fcc6a9df01d27cb233c6ae6af28db9308c4fa6bd9eeb5",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "b5f9eadf8acb7c726a9d0dcd4d9811d7dcc9a171b2051dc25bef532ae5b2cfb2",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004083:6",
@@ -57271,16 +57129,18 @@
       "rule_id": "000004083:6",
       "rule_name": "Duellist's Hubris",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:conditional-not-leading-ability:fights-first"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "42e412bb25e67cafce9fe6112add04b148f2d26f405e57f1103fe586c880ed21",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004083:6"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004083:6:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -57622,12 +57482,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ffd07148f4ea725da1df41ae12172dab73e0c11d8e526a8ba48db22c82f97768",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "d42857c1f7c7fec310af1c3186b970550b8d60cabca9366cc231de15acafcaf5",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004091:3",
@@ -57637,16 +57495,19 @@
       "rule_id": "000004091:3",
       "rule_name": "Glutton for Punishment",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-modifier",
+        "catalog-ir:wound-roll-modifier"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "c0ce5fba1592fb4554163e3f6ed0cb290dcba085efcdb41bee3292142239b472",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004091:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004091:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -63113,12 +62974,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4e6f96e273e1025cc8953952cc5c8bfd0b5a7a155a66f47abe495d0502e798ee",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "3e9234e89e6bf97da06f46a0dcb703943159c255bb914f16bfd8aef37b56a9a8",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000004193:5",
@@ -63128,25 +62987,25 @@
       "rule_id": "000004193:5",
       "rule_name": "Prince of Corsairs",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:prebattle-redeploy-permission"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "c8806c87a370c9007ccc6dadda803e0c143e40c9d32e30013ae76668353c7ee1",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004193:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004193:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "470603891948f0007abd20c299436afad075a398e4a60db29dae1ee1bec4fdb2",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "e3caea40162b65fefe6607d45a71930124de9589375df38dbe6119507050d82f",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000004194:4",
@@ -63156,25 +63015,25 @@
       "rule_id": "000004194:4",
       "rule_name": "Aethersense (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:reserve-arrival-restriction"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "e472682d72101e9e3e1fe2adf83e27fed9ee2caf29f07a987597250eb4738ced",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "740b195b7662e77c605d4edc40453110b5736fc1df6ab3bac54f70386f2f3cf4",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "43e8fe8a3bcf148fd6bce9252a308e0b4d20c612e0875bf2ab3378737ba38fce",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000004194:5",
@@ -63184,25 +63043,25 @@
       "rule_id": "000004194:5",
       "rule_name": "Fury of the Void (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "283c6f7b8a0a94f7098a723b51332c31bcbe28450c41b695a177c99ec79f38e8",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004194:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "41b4d917ffcbdc3a5961f66795fd2120f14283f88a454936af317f23f643f006",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "03e153938a79ff0a33c3a6077200a188024e33879039a68e0779bd209c2836d2",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000004195:4",
@@ -63212,25 +63071,25 @@
       "rule_id": "000004195:4",
       "rule_name": "Hallucinogen Grenades",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:shooting-start-selected-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "92a16afd52500348d93de68a3fbee354d3929e785eb5880feb188129fe7dc832",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004195:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004195:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "3b5f46ac35e5aafa3f807bee087743977013690d280c5953faa5f54e70428987",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "7b3c44a4ed8433bfd347f7a666e1a4120623fd482f2902be9aaeb53c1c4d0796",
+      "execution_status": "engine_consumed",
       "faction_id": "aeldari",
       "faction_name": "Aeldari",
       "member_id": "datasheet-ability:000004196:4",
@@ -63240,16 +63099,18 @@
       "rule_id": "000004196:4",
       "rule_name": "Raid and Run",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:fight-end-triggered-movement"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "ac48de61bb8da945a24c07a0646327b25c0379cc4839db25dca6253f083a0fd3",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004196:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004196:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -122144,8 +122005,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "eed83e34b252cdc06ae1abd320d4e2cdd035a8f54608b6f11a0648d8f74c08ce",
+  "source_payload_checksum_sha256": "61e673d0d37721c4de32d632f3ba08baa37904c3427a6b088ede79e9fa6057d0",
   "source_text_unavailable_member_count": 111,
-  "structured_member_count": 755,
+  "structured_member_count": 797,
   "upstream_execution_checksum_sha256": "834125acc90177293fe986b60d1caa75c6fb47bef2aa6d9bf0571d0a54fd9347"
 }

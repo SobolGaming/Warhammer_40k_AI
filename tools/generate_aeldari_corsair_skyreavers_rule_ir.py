@@ -3,6 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING or __package__:
+    from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
+else:
+    from faction_rule_ir_bundle import generate_registered_rule_ir_shard
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
@@ -28,9 +34,10 @@ OUTPUT_PATH = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
-    / "aeldari_corsair_skyreavers_2026_06"
+    / "faction_pack_rule_ir"
     / "artifacts"
-    / "rule_ir.json"
+    / "shards"
+    / "aeldari.json"
 )
 PDF_PATH = (
     REPO_ROOT
@@ -42,6 +49,7 @@ PDF_PATH = (
 
 ARTIFACT_SCHEMA = "core-v2-corsair-skyreavers-datasheet-rule-ir-v1"
 SOURCE_PACKAGE_ID = "gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09"
+SHARD_ID = "aeldari"
 PARSER_VERSION = "manual-source-backed-rule-ir:v1"
 DATASHEET_ID = "000004196"
 DATASHEET_NAME = "Corsair Skyreavers"
@@ -56,9 +64,7 @@ RAID_AND_RUN_TEXT = (
 
 
 def main() -> None:
-    payload = generated_artifact_payload()
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    generate_registered_rule_ir_shard(shard_id=SHARD_ID)
 
 
 def generated_artifact_payload() -> dict[str, object]:

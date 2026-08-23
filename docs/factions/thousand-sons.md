@@ -195,6 +195,31 @@ This table reports component evidence generated from exact source text and struc
 | Defiler (`000001030`) | Destroyer of Futures (`000001030:destroyer-of-futures`) | `datasheet` | `engine_consumed` | `datasheet.counteroffensive.phase_use_exception`, `datasheet.counteroffensive.cost_modifier` | `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception`, `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount` | None |
 | Defiler (`000001030`) | Scuttling Walker (`000001030:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
 
+### Maulerfiend Cross-faction Support
+
+The shared name and generic engine mechanics do not make these records one datasheet. Support is keyed by exact faction_id plus datasheet_id; profiles, source rules, geometry bindings, and faction integration remain faction-local.
+
+The machine-readable report is `data/generated/ability_coverage/maulerfiend_cross_faction_support.json`.
+
+#### Reusable generic mechanics
+
+| Mechanic | Scope | Certification limit |
+| --- | --- | --- |
+| `counted-wargear-replacement` | `content_neutral_engine_mechanic` | The parser and unit factory preserve the counted replacement for all four exact current-source variants; that reuse does not certify their faction-local rules bundles. |
+| `deterministic-weapon-copy-identity` | `content_neutral_engine_mechanic` | Both equipped copies receive stable identities for all four exact current-source variants; identity support alone does not certify faction-local ability execution. |
+| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The contract is generic, but the checked-in end-to-end regression currently certifies only Emperor's Children datasheet 000004091. |
+
+#### Exact faction variants
+
+| Faction / exact key | Source treatment | Generated component evidence | Faction-local source rules | Conclusion |
+| --- | --- | --- | --- | --- |
+| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | Not selected | Siege Crawler (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Thousand Sons / `thousand-sons:000001029` | `rules_update` | Not selected | Snarling Protector (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+| World Eaters / `world-eaters:000002639` | `rules_update` | Not selected | Savage Exaltation (`blocked_structured_semantics`)<br>The Scent of Blood (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+
+**Death Guard:** The exhaustive current Death Guard Faction Pack review contains no Maulerfiend datasheet row; no synthetic support row is emitted.
+
 ## Cross-source Semantic Equivalence
 
 This section is generated from the repository-wide semantic audit. It audits portable structured RuleIR and exact-text equivalence; it is not a complete view of source-local runtime wiring. A `blocked_structured_semantics` label means this audit cannot transfer that source text through shared RuleIR. A source-local named runtime consumer can still provide execution evidence in the sections above.

@@ -339,6 +339,24 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     )
     ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
 
+    for faction_id in {
+        "chaos-space-marines",
+        "death-guard",
+        "emperors-children",
+        "thousand-sons",
+        "world-eaters",
+    }:
+        maulerfiend_section = markdown_by_filename[f"{faction_id}.md"].split(
+            "### Maulerfiend Cross-faction Support",
+            1,
+        )[1]
+        assert "`chaos-space-marines:000000968`" in maulerfiend_section
+        assert "`emperors-children:000004091`" in maulerfiend_section
+        assert "`thousand-sons:000001029`" in maulerfiend_section
+        assert "`world-eaters:000002639`" in maulerfiend_section
+        assert "Death Guard" in maulerfiend_section
+        assert "no synthetic support row is emitted" in maulerfiend_section
+
     non_daemons_rows = tuple(row for row in support_rows if row.faction_id != "chaos-daemons")
     assert {(row.faction_id, row.datasheet_id, row.overall) for row in non_daemons_rows} == {
         ("aeldari", "000000577", "Playable"),

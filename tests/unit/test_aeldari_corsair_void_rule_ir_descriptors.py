@@ -28,8 +28,10 @@ from warhammer40k_core.engine.wargear_selections import (
     WargearSelection,
 )
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleParameter
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_corsair_void_units_2026_06 as void_units_package,
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
+
+void_units_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-corsair-void-units-datasheets-2026-06-14"
 )
 
 VOIDREAVERS_ID = "000002531"
