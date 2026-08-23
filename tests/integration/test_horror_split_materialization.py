@@ -2733,6 +2733,7 @@ def _attack_sequence(
     profile = wargear.weapon_profiles[0]
     pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id=f"weapon-instance:test:{attacker.own_models[0].model_instance_id}",
         wargear_id=wargear.wargear_id,
         weapon_profile_id=profile.profile_id,
         weapon_profile=profile,

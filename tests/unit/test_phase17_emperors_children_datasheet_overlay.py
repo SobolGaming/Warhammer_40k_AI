@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from dataclasses import replace
@@ -31,6 +32,12 @@ from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
 from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
     generated_artifact_payload as generated_infractors_tormentors_rule_ir_artifact_payload,
 )
+from tools.generate_emperors_children_lord_exultant_maulerfiend_spawn_rule_ir import (
+    OUTPUT_PATH as LORD_MAULERFIEND_SPAWN_RULE_IR_OUTPUT_PATH,
+)
+from tools.generate_emperors_children_lord_exultant_maulerfiend_spawn_rule_ir import (
+    generated_artifact_payload as generated_lord_maulerfiend_spawn_rule_ir_artifact_payload,
+)
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -40,6 +47,7 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentTargetEligibility,
 )
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.datasheet import DamagedEffectKind
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -65,7 +73,12 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
 )
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
-from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence import (
+    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+    AttackSequence,
+    AttackSequenceStep,
+)
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -90,10 +103,20 @@ from warhammer40k_core.engine.catalog_command_point_runtime import (
 from warhammer40k_core.engine.catalog_command_point_support import (
     CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_conditional_leader_queries import (
+    conditional_granted_ability_effects_for_rules_unit,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_runtime import (
+    CatalogMovementEndReactiveNormalMoveRuntime,
+)
+from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
+    CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT,
+    CatalogOncePerBattleRuntime,
 )
 from warhammer40k_core.engine.catalog_poisoned_status_runtime import (
     CATALOG_POISONED_COMMAND_RESOLVED_EVENT,
@@ -165,12 +188,14 @@ from warhammer40k_core.engine.damage_allocation import (
     is_mortal_wound_feel_no_pain_request,
     mortal_wound_feel_no_pain_source_context,
 )
+from warhammer40k_core.engine.damaged_effects import CatalogDamagedEffectRuntime
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
+from warhammer40k_core.engine.deployment_ability_queries import rules_unit_has_infiltrators
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
@@ -191,6 +216,10 @@ from warhammer40k_core.engine.faction_content.events import (
 )
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
+)
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    FightPhaseStartRequestContext,
+    FightPhaseStartResultContext,
 )
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -214,6 +243,10 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
+)
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeContext,
+    MovementEndSurgeDistanceKind,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -251,7 +284,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
+    WoundRollModifierContext,
 )
+from warhammer40k_core.engine.scout_abilities import scout_ability_instances_for_rules_unit
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     SequencingDecision,
@@ -286,11 +321,13 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
     WeaponDeclaration,
 )
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instances_for_model
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules import wahapedia_static_rule_ir
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
-from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_ir import RuleIR, parameter_payload
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
     apply_source_release_overlays,
@@ -303,6 +340,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_infractors_tormentors_2026_08 as infractors_tormentors_source_package,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_lord_exultant_maulerfiend_spawn_2026_08 as lord_spawn_source_package,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    mfm_2026_07 as mfm_source_package,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
     ModelHeightOverride,
@@ -338,6 +381,7 @@ _REQUIRED_TABLES = (
 )
 _EC_DATASHEET_IDS = (
     "000004077",
+    "000004078",
     "000004079",
     "000004080",
     "000004081",
@@ -347,11 +391,13 @@ _EC_DATASHEET_IDS = (
     "000004088",
     "000004089",
     "000004090",
+    "000004091",
     "000004092",
     "000004093",
 )
 _BRIDGE_SUPPORTED_EC_DATASHEET_IDS = (
     "000004077",
+    "000004078",
     "000004079",
     "000004080",
     "000004083",
@@ -359,6 +405,7 @@ _BRIDGE_SUPPORTED_EC_DATASHEET_IDS = (
     "000004088",
     "000004089",
     "000004090",
+    "000004091",
     "000004092",
 )
 _FULGRIM_ID = "000004077"
@@ -406,6 +453,7 @@ _RUNTIME_FIXTURE_DATASHEET_IDS = (
     "000004208",
     "000004209",
     _FULGRIM_ID,
+    "000004078",
     "000004079",
     "000004080",
     "000004081",
@@ -413,6 +461,8 @@ _RUNTIME_FIXTURE_DATASHEET_IDS = (
     "000004084",
     "000004088",
     "000004089",
+    "000004090",
+    "000004091",
 )
 
 
@@ -1720,7 +1770,7 @@ def test_lord_kakophonist_doom_siren_resumes_after_feel_no_pain_choice(
     if lethal_continuation:
         state.game_id = "kakophonist-doom-siren-lethal-fnp-continuation"
     else:
-        state.game_id = "kakophonist-doom-siren-explicit-628"
+        state.game_id = "kakophonist-doom-siren-explicit-100"
     source_a = FeelNoPainSource(source_id="doom-siren-fnp-a", threshold=5)
     source_b = FeelNoPainSource(source_id="doom-siren-fnp-b", threshold=6)
     feel_no_pain_model_id = (
@@ -2312,6 +2362,1326 @@ def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -
         )
 
 
+def test_lord_maulerfiend_spawn_generated_rule_ir_is_complete_and_source_bound() -> None:
+    committed = cast(
+        dict[str, Any],
+        json.loads(LORD_MAULERFIEND_SPAWN_RULE_IR_OUTPUT_PATH.read_text(encoding="utf-8")),
+    )
+
+    assert committed == generated_lord_maulerfiend_spawn_rule_ir_artifact_payload()
+    assert lord_spawn_source_package.supported_datasheet_source_row_ids() == (
+        "000004078:4",
+        "000004078:5",
+        "000004090:3",
+        "000004091:3",
+    )
+    assert committed["package_hash"] == lord_spawn_source_package.PACKAGE_HASH
+    assert committed["official_document_pages"] == [9]
+    assert lord_spawn_source_package.DATASHEET_REVIEWS == {
+        "000004078": (
+            "Lord Exultant",
+            "source:000004078",
+            "unchanged_predecessor",
+            None,
+        ),
+        "000004090": (
+            "Chaos Spawn",
+            "source:000004090",
+            "rules_update",
+            "Rules Updates, physical PDF page 9",
+        ),
+        "000004091": (
+            "Maulerfiend",
+            "source:000004091",
+            "unchanged_predecessor",
+            None,
+        ),
+    }
+    for source_row_id in lord_spawn_source_package.supported_datasheet_source_row_ids():
+        assert wahapedia_static_rule_ir.datasheet_rule_ir_payload_by_source_row_id(
+            source_row_id
+        ) == lord_spawn_source_package.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
+
+    semantic_drift = cast(dict[str, Any], json.loads(json.dumps(committed)))
+    records = cast(dict[str, Any], semantic_drift["records"])
+    euphoric_record = cast(dict[str, Any], records["000004078:4"])
+    euphoric_rule = RuleIR.from_payload(euphoric_record["rule_ir"])
+    euphoric_clause = euphoric_rule.clauses[0]
+    attacks_effect = euphoric_clause.effects[0]
+    drifted_effect = replace(
+        attacks_effect,
+        parameters=tuple(
+            replace(parameter, value=30) if parameter.key == "delta" else parameter
+            for parameter in attacks_effect.parameters
+        ),
+    )
+    drifted_rule = replace(
+        euphoric_rule,
+        clauses=(
+            replace(
+                euphoric_clause,
+                effects=(drifted_effect, *euphoric_clause.effects[1:]),
+            ),
+        ),
+    )
+    euphoric_record["rule_ir"] = drifted_rule.to_payload()
+    semantic_drift["package_hash"] = ""
+    semantic_drift["package_hash"] = hashlib.sha256(
+        json.dumps(semantic_drift, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    with pytest.raises(
+        lord_spawn_source_package.EmperorsChildrenLordMaulerfiendSpawnRuleIrArtifactError,
+        match="reviewed pin",
+    ):
+        lord_spawn_source_package.validate_generated_artifact_bytes(
+            json.dumps(semantic_drift).encode()
+        )
+
+    committed["package_hash"] = "0" * 64
+    with pytest.raises(
+        lord_spawn_source_package.EmperorsChildrenLordMaulerfiendSpawnRuleIrArtifactError,
+        match="hash is stale",
+    ):
+        lord_spawn_source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
+
+
+def test_lord_maulerfiend_spawn_rule_ir_shapes_and_consumers_are_exact() -> None:
+    expected_consumers = {
+        "000004078:4": {"catalog-ir:once-per-battle-ability"},
+        "000004078:5": {
+            "catalog-ir:conditional-leading-ability:infiltrators",
+            "catalog-ir:conditional-leading-ability:scouts",
+        },
+        "000004090:3": {"catalog-ir:movement-end-reactive-normal-move"},
+        "000004091:3": {
+            "catalog-ir:hit-roll-modifier",
+            "catalog-ir:wound-roll-modifier",
+        },
+    }
+    for source_row_id, consumer_ids in expected_consumers.items():
+        rule_ir = _lord_maulerfiend_spawn_rule_ir(source_row_id)
+        assert rule_ir.is_supported
+        assert not rule_ir.diagnostics
+        assert all(not clause.diagnostics for clause in rule_ir.clauses)
+        assert set(catalog_rule_ir_consumers_for_rule(rule_ir)) == consumer_ids
+
+    euphoric = _lord_maulerfiend_spawn_rule_ir("000004078:4")
+    assert len(euphoric.clauses) == 1
+    euphoric_clause = euphoric.clauses[0]
+    assert euphoric_clause.trigger is not None
+    assert parameter_payload(euphoric_clause.trigger.parameters) == {
+        "edge": "start",
+        "phase": "fight",
+    }
+    assert parameter_payload(euphoric_clause.conditions[0].parameters) == {
+        "activation_kind": "optional_ability_use",
+        "max_uses": 1,
+        "scope": "battle",
+        "usage_subject": "this_model",
+    }
+    assert [parameter_payload(effect.parameters) for effect in euphoric_clause.effects] == [
+        {"characteristic": "attacks", "delta": 3, "weapon_scope": "melee"},
+        {
+            "characteristic": "armor_penetration",
+            "delta": -1,
+            "weapon_scope": "melee",
+        },
+    ]
+    assert euphoric_clause.duration is not None
+    assert parameter_payload(euphoric_clause.duration.parameters) == {
+        "boundary": "end",
+        "endpoint": "phase",
+    }
+
+    lord_of_the_host = _lord_maulerfiend_spawn_rule_ir("000004078:5")
+    assert len(lord_of_the_host.clauses) == 2
+    lord_effects = {
+        cast(str, parameter_payload(clause.effects[0].parameters)["ability"]): parameter_payload(
+            clause.effects[0].parameters
+        )
+        for clause in lord_of_the_host.clauses
+    }
+    assert lord_effects == {
+        "infiltrators": {"ability": "infiltrators", "target_scope": "this_model"},
+        "scouts": {
+            "ability": "scouts",
+            "distance_inches": 6,
+            "target_scope": "this_model",
+        },
+    }
+    for clause in lord_of_the_host.clauses:
+        assert clause.template_id == "phase17m:conditional-leading-bodyguard-ability-grant"
+        assert parameter_payload(clause.conditions[0].parameters) == {
+            "relationship": "this_model_leading_unit"
+        }
+        assert parameter_payload(clause.conditions[1].parameters) == {
+            "gate_subject": "bodyguard_unit",
+            "required_keyword": "BATTLELINE",
+        }
+
+    scuttling_horrors = _lord_maulerfiend_spawn_rule_ir("000004090:3")
+    assert len(scuttling_horrors.clauses) == 1
+    scuttling_clause = scuttling_horrors.clauses[0]
+    assert scuttling_clause.trigger is not None
+    assert scuttling_clause.trigger.kind.value == "timing_window"
+    assert parameter_payload(scuttling_clause.trigger.parameters) == {
+        "edge": "after",
+        "owner": "opponent",
+        "phase": "movement",
+        "subject": "enemy_unit",
+        "timing_window": "enemy_unit_move_end",
+    }
+    assert scuttling_clause.target is not None
+    assert scuttling_clause.target.kind.value == "this_unit"
+    assert parameter_payload(scuttling_clause.target.parameters) == {}
+    assert tuple(
+        (condition.kind.value, parameter_payload(condition.parameters))
+        for condition in scuttling_clause.conditions
+    ) == (
+        (
+            "distance_predicate",
+            {
+                "distance_inches": 8,
+                "object_kind": "unit",
+                "object_reference": "this",
+                "predicate": "within",
+                "qualifier": None,
+                "range_kind": "numeric_range",
+                "subject": "enemy_unit",
+            },
+        ),
+        (
+            "distance_predicate",
+            {
+                "distance_inches": None,
+                "negated": True,
+                "object_allegiance": "enemy",
+                "object_kind": "unit",
+                "object_quantity": "one_or_more",
+                "predicate": "within_engagement_range",
+                "qualifier": None,
+                "range_kind": "engagement_range",
+                "subject": "this_unit",
+            },
+        ),
+    )
+    assert parameter_payload(scuttling_clause.effects[0].parameters) == {
+        "action": "move",
+        "action_group": "movement_end_reactive_normal_move",
+        "distance_inches": 6,
+        "movement_kind": "triggered",
+        "movement_mode": "normal",
+        "optional": True,
+    }
+
+    glutton = _lord_maulerfiend_spawn_rule_ir("000004091:3")
+    assert len(glutton.clauses) == 2
+    for clause, roll_type, strength_constraint in (
+        (glutton.clauses[0], "hit", "source_unit_below_starting_strength"),
+        (glutton.clauses[1], "wound", "source_unit_below_half_strength"),
+    ):
+        assert clause.trigger is not None
+        assert parameter_payload(clause.trigger.parameters) == {"roll_type": roll_type}
+        assert parameter_payload(clause.conditions[0].parameters) == {
+            "gate_subject": "source_unit",
+            "relationship": "this_model_makes_attack",
+            "target_constraint": strength_constraint,
+        }
+        assert parameter_payload(clause.effects[0].parameters) == {
+            "delta": 1,
+            "roll_type": roll_type,
+        }
+    assert glutton.clauses[1].target is not None
+    assert glutton.clauses[1].target.source_span is not None
+    assert glutton.clauses[1].target.source_span.start == 102
+
+
+def test_lord_exultant_chaos_spawn_maulerfiend_catalog_is_exact() -> None:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    expected_datasheets = {
+        "000004078": {
+            "name": "Lord Exultant",
+            "model_profile_id": "000004078:lord-exultant",
+            "composition": (1, 1),
+            "characteristics": {
+                "ballistic_skill": ("source_dash", 0),
+                "invulnerable_save": ("numeric", 4),
+                "leadership": ("numeric", 6),
+                "movement": ("numeric", 7),
+                "objective_control": ("numeric", 1),
+                "save": ("numeric", 3),
+                "toughness": ("numeric", 4),
+                "weapon_skill": ("source_dash", 0),
+                "wounds": ("numeric", 5),
+            },
+            "base": ("circular", 40.0, None, None),
+            "height": 2.5,
+            "keywords": (
+                "CHAOS",
+                "CHARACTER",
+                "GRENADES",
+                "INFANTRY",
+                "LORD EXULTANT",
+                "SLAANESH",
+            ),
+            "abilities": (
+                "Euphoric Strikes",
+                "LORD OF THE HOST",
+                "Leader",
+                "Perfectionists",
+                "Thrill Seekers",
+            ),
+        },
+        "000004090": {
+            "name": "Chaos Spawn",
+            "model_profile_id": "000004090:chaos-spawn",
+            "composition": (2, 2),
+            "characteristics": {
+                "ballistic_skill": ("source_dash", 0),
+                "invulnerable_save": ("source_dash", 0),
+                "leadership": ("numeric", 7),
+                "movement": ("numeric", 10),
+                "objective_control": ("numeric", 1),
+                "save": ("numeric", 4),
+                "toughness": ("numeric", 5),
+                "weapon_skill": ("source_dash", 0),
+                "wounds": ("numeric", 4),
+            },
+            "base": ("circular", 50.0, None, None),
+            "height": 2.25,
+            "keywords": ("BEAST", "CHAOS", "CHAOS SPAWN", "SLAANESH"),
+            "abilities": ("Feel No Pain", "Scuttling Horrors", "Thrill Seekers"),
+        },
+        "000004091": {
+            "name": "Maulerfiend",
+            "model_profile_id": "000004091:maulerfiend",
+            "composition": (1, 1),
+            "characteristics": {
+                "ballistic_skill": ("source_dash", 0),
+                "invulnerable_save": ("numeric", 5),
+                "leadership": ("numeric", 6),
+                "movement": ("numeric", 10),
+                "objective_control": ("numeric", 3),
+                "save": ("numeric", 3),
+                "toughness": ("numeric", 10),
+                "weapon_skill": ("source_dash", 0),
+                "wounds": ("numeric", 12),
+            },
+            "base": ("oval", None, 120.0, 92.0),
+            "height": 90.0 / 25.4,
+            "keywords": ("CHAOS", "DAEMON", "MAULERFIEND", "SLAANESH", "VEHICLE", "WALKER"),
+            "abilities": ("Deadly Demise", "Glutton for Punishment", "Thrill Seekers"),
+        },
+    }
+    for datasheet_id, expected in expected_datasheets.items():
+        datasheet = catalog.datasheet_by_id(datasheet_id)
+        model_profile = datasheet.model_profiles[0]
+        composition = datasheet.composition[0]
+        geometry = next(
+            record
+            for record in package.model_geometries
+            if record.model_profile_id == model_profile.model_profile_id
+        )
+        assert datasheet.name == expected["name"]
+        assert model_profile.model_profile_id == expected["model_profile_id"]
+        assert (composition.min_models, composition.max_models) == expected["composition"]
+        assert {
+            value.characteristic.value: (value.value_kind.value, value.final)
+            for value in model_profile.characteristics
+        } == expected["characteristics"]
+        assert (
+            model_profile.base_size.kind.value,
+            model_profile.base_size.diameter_mm,
+            model_profile.base_size.length_mm,
+            model_profile.base_size.width_mm,
+        ) == expected["base"]
+        assert math.isclose(
+            geometry.height.height_inches,
+            cast(float, expected["height"]),
+            abs_tol=1e-12,
+        )
+        assert tuple(sorted(datasheet.keywords.keywords)) == expected["keywords"]
+        assert datasheet.keywords.faction_keywords == ("EMPEROR'S CHILDREN",)
+        assert (
+            tuple(sorted(ability.name for ability in datasheet.abilities)) == expected["abilities"]
+        )
+
+    assert tuple(
+        (effect.effect_kind, effect.modifier, effect.wounds_min, effect.wounds_max)
+        for effect in catalog.datasheet_by_id("000004091").damaged_effects
+    ) == ((DamagedEffectKind.HIT_ROLL_MODIFIER, -1, 1, 4),)
+
+    lord = catalog.datasheet_by_id("000004078")
+    assert tuple(
+        (eligibility.role.value, target.bodyguard_datasheet_id)
+        for eligibility in lord.attachment_eligibilities
+        for target in eligibility.targets
+    ) == (("leader", "000004079"), ("leader", "000004080"))
+
+    expected_weapon_profiles = {
+        ("000004078", "Bolt pistol"): ("distance", 12, 1, None, 2, 4, 0, 1, None, ("Pistol",), ()),
+        ("000004078", "Close combat weapon"): ("melee", None, 6, None, 2, 4, 0, 1, None, (), ()),
+        ("000004078", "Master-crafted power sword"): (
+            "melee",
+            None,
+            5,
+            None,
+            2,
+            5,
+            -2,
+            2,
+            None,
+            ("Precision",),
+            (),
+        ),
+        ("000004078", "Phoenix power spear"): (
+            "melee",
+            None,
+            5,
+            None,
+            2,
+            7,
+            -2,
+            2,
+            None,
+            ("Lance",),
+            (),
+        ),
+        ("000004078", "Plasma pistol - standard"): (
+            "distance",
+            12,
+            1,
+            None,
+            2,
+            7,
+            -2,
+            1,
+            None,
+            ("Pistol",),
+            (),
+        ),
+        ("000004078", "Plasma pistol - supercharge"): (
+            "distance",
+            12,
+            1,
+            None,
+            2,
+            8,
+            -3,
+            2,
+            None,
+            ("Hazardous", "Pistol"),
+            (),
+        ),
+        ("000004078", "Power fist"): ("melee", None, 5, None, 2, 8, -2, 2, None, (), ()),
+        ("000004078", "Rapture lash"): (
+            "melee",
+            None,
+            4,
+            None,
+            2,
+            4,
+            -1,
+            1,
+            None,
+            ("Extra Attacks",),
+            (),
+        ),
+        ("000004078", "Screamer pistol"): (
+            "distance",
+            12,
+            3,
+            None,
+            2,
+            5,
+            -1,
+            2,
+            None,
+            ("Ignores Cover", "Pistol"),
+            (),
+        ),
+        ("000004090", "Hideous mutations"): (
+            "melee",
+            None,
+            None,
+            (1, 6, 2),
+            4,
+            5,
+            -1,
+            2,
+            None,
+            (),
+            (),
+        ),
+        ("000004091", "Lasher tendrils"): (
+            "melee",
+            None,
+            6,
+            None,
+            3,
+            7,
+            -1,
+            1,
+            None,
+            ("Extra Attacks",),
+            (),
+        ),
+        ("000004091", "Magma cutters"): (
+            "distance",
+            6,
+            2,
+            None,
+            3,
+            9,
+            -4,
+            None,
+            (1, 6, 0),
+            ("Melta",),
+            ("melta:2",),
+        ),
+        ("000004091", "Maulerfiend fists"): (
+            "melee",
+            None,
+            6,
+            None,
+            3,
+            14,
+            -2,
+            None,
+            (1, 6, 1),
+            (),
+            (),
+        ),
+    }
+    assert {
+        key: _weapon_profile_signature(_weapon_profile(*key)) for key in expected_weapon_profiles
+    } == expected_weapon_profiles
+
+    mfm = mfm_source_package.faction_record("emperors-children")
+    assert {
+        unit_id: tuple(
+            (
+                bracket.unit_number_min,
+                bracket.unit_number_max,
+                tuple((row.model_count, row.points) for row in bracket.rows),
+            )
+            for bracket in mfm.unit_by_id(unit_id).cost_brackets
+        )
+        for unit_id in ("lord-exultant", "chaos-spawn", "maulerfiend")
+    } == {
+        "lord-exultant": ((1, 2, ((1, 80),)), (3, None, ((1, 90),))),
+        "chaos-spawn": ((1, None, ((2, 70),)),),
+        "maulerfiend": ((1, 2, ((1, 120),)), (3, None, ((1, 130),))),
+    }
+
+
+def test_lord_exultant_and_maulerfiend_loadouts_materialize_exact_counts() -> None:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    lord = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004078",
+        selection_id="lord-exultant-default-loadout",
+    )
+    spawn = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004090",
+        selection_id="chaos-spawn-default-loadout",
+    )
+    maulerfiend = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004091",
+        selection_id="maulerfiend-default-loadout",
+    )
+    assert lord.own_models[0].wargear_ids == (
+        "000004078:bolt-pistol",
+        "000004078:plasma-pistol",
+        "000004078:close-combat-weapon",
+        "000004078:phoenix-power-spear",
+    )
+    assert tuple(model.wargear_ids for model in spawn.own_models) == (
+        ("000004090:hideous-mutations",),
+        ("000004090:hideous-mutations",),
+    )
+    assert maulerfiend.own_models[0].wargear_ids == (
+        "000004091:lasher-tendrils",
+        "000004091:maulerfiend-fists",
+    )
+
+    for option_id, replacement, replaced in (
+        (
+            "000004078:plasma-pistol-power-fist:option-1",
+            "000004078:power-fist",
+            "000004078:plasma-pistol",
+        ),
+        (
+            "000004078:plasma-pistol-rapture-lash:option-1",
+            "000004078:rapture-lash",
+            "000004078:plasma-pistol",
+        ),
+        (
+            "000004078:phoenix-power-spear-master-crafted-power-sword:option-2",
+            "000004078:master-crafted-power-sword",
+            "000004078:phoenix-power-spear",
+        ),
+        (
+            "000004078:phoenix-power-spear-screamer-pistol:option-2",
+            "000004078:screamer-pistol",
+            "000004078:phoenix-power-spear",
+        ),
+    ):
+        replaced_lord = _instantiate_with_wargear_option(
+            factory=factory,
+            army_id="army-a",
+            datasheet_id="000004078",
+            selection_id=f"lord-exultant:{replacement.rsplit(':', 1)[-1]}",
+            option_id=option_id,
+            wargear_id=replacement,
+        )
+        wargear_ids = replaced_lord.own_models[0].wargear_ids
+        assert wargear_ids.count(replacement) == 1
+        assert replaced not in wargear_ids
+
+    magma_maulerfiend = _instantiate_with_wargear_option(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004091",
+        selection_id="maulerfiend:magma-cutters",
+        option_id="000004091:magma-cutters:option-1",
+        wargear_id="000004091:magma-cutters",
+    )
+    assert magma_maulerfiend.own_models[0].wargear_ids == (
+        "000004091:maulerfiend-fists",
+        "000004091:magma-cutters",
+        "000004091:magma-cutters",
+    )
+
+
+def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> None:
+    game_id = "maulerfiend-magma-cutter-copy-identity"
+    session, maulerfiend, target = _maulerfiend_magma_cutter_shooting_session(
+        game_id=game_id,
+        extra_target=False,
+    )
+    declaration_request = _advance_maulerfiend_to_shooting_declaration(
+        session=session,
+        source=maulerfiend,
+    )
+    round_tripped_request = DecisionRequest.from_payload(
+        json.loads(json.dumps(declaration_request.to_payload(), sort_keys=True))
+    )
+    assert round_tripped_request == declaration_request
+    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(declaration_request)
+    assert len(magma_cutter_rows) == 2
+    assert {cast(str, row["model_instance_id"]) for row in magma_cutter_rows} == {
+        maulerfiend.own_models[0].model_instance_id
+    }
+    assert {cast(str, row["weapon_profile_id"]) for row in magma_cutter_rows} == {
+        "000004091:magma-cutters:standard"
+    }
+    weapon_instance_ids = tuple(cast(str, row["weapon_instance_id"]) for row in magma_cutter_rows)
+    assert len(set(weapon_instance_ids)) == 2
+
+    declarations = _weapon_declarations_for_available_rows(
+        rows=magma_cutter_rows,
+        target_unit_instance_ids=(target.unit_instance_id, target.unit_instance_id),
+    )
+    valid_proposal = _shooting_proposal_for_declarations(
+        proposal_request=proposal_request,
+        declarations=declarations,
+    )
+    decisions = session.lifecycle.decision_controller
+    before_records = len(decisions.records)
+    before_queue = decisions.queue.pending_requests
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    duplicate_proposal = replace(
+        valid_proposal,
+        declarations=(declarations[0], declarations[0]),
+    )
+    duplicate_status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id="maulerfiend-magma-duplicate-copy",
+        payload=cast(JsonValue, duplicate_proposal.to_payload()),
+    )
+    assert duplicate_status.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_violation_code(duplicate_status) == "duplicate_weapon_declaration"
+    assert len(decisions.records) == before_records
+    assert decisions.queue.pending_requests == before_queue
+    assert session.lifecycle.to_payload() == initial_lifecycle_payload
+
+    invented_proposal = replace(
+        valid_proposal,
+        declarations=(
+            replace(
+                declarations[0],
+                weapon_instance_id=f"invented:{declarations[0].weapon_instance_id}",
+            ),
+        ),
+    )
+    invented_status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id="maulerfiend-magma-invented-copy",
+        payload=cast(JsonValue, invented_proposal.to_payload()),
+    )
+    assert invented_status.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_violation_code(invented_status) == "weapon_declaration_unavailable"
+    assert len(decisions.records) == before_records
+    assert decisions.queue.pending_requests == before_queue
+    assert session.lifecycle.to_payload() == initial_lifecycle_payload
+
+    declaration_result_id = "maulerfiend-magma-both-copies"
+    status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id=declaration_result_id,
+        payload=cast(JsonValue, valid_proposal.to_payload()),
+    )
+    assert status.status_kind not in {
+        LifecycleStatusKind.INVALID,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    declaration_record = next(
+        record for record in decisions.records if record.result.result_id == declaration_result_id
+    )
+    recorded_declarations = cast(
+        list[dict[str, JsonValue]],
+        cast(dict[str, JsonValue], declaration_record.result.payload)["declarations"],
+    )
+    assert (
+        tuple(cast(str, declaration["weapon_instance_id"]) for declaration in recorded_declarations)
+        == weapon_instance_ids
+    )
+
+    accepted_payload = next(
+        cast(dict[str, JsonValue], record.payload)
+        for record in decisions.event_log.records
+        if record.event_type == "shooting_declaration_accepted"
+        and cast(dict[str, JsonValue], record.payload)["result_id"] == declaration_result_id
+    )
+    attack_pools = cast(list[dict[str, JsonValue]], accepted_payload["attack_pools"])
+    assert len(attack_pools) == 2
+    assert tuple(cast(str, pool["weapon_instance_id"]) for pool in attack_pools) == (
+        weapon_instance_ids
+    )
+    assert tuple(cast(int, pool["attacks"]) for pool in attack_pools) == (2, 2)
+
+    group_record = next(
+        record
+        for record in decisions.records
+        if record.request.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE
+        and record.result.result_id.endswith(":auto-result")
+    )
+    gathered_group = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], group_record.result.payload)["gathered_group"],
+    )
+    contributions = cast(
+        list[dict[str, JsonValue]],
+        gathered_group["contributions"],
+    )
+    assert gathered_group["total_attacks"] == 4
+    assert (
+        tuple(cast(str, contribution["weapon_instance_id"]) for contribution in contributions)
+        == weapon_instance_ids
+    )
+    assert tuple(cast(int, contribution["attacks"]) for contribution in contributions) == (2, 2)
+
+    _advance_maulerfiend_shooting_through_phase(
+        session=session,
+        status=status,
+    )
+    hit_events = tuple(
+        record
+        for record in decisions.event_log.records
+        if record.event_type == "attack_sequence_step"
+        and cast(dict[str, JsonValue], record.payload)["sequence_id"]
+        == f"attack-sequence:{declaration_result_id}"
+        and cast(dict[str, JsonValue], record.payload)["step"] == AttackSequenceStep.HIT.value
+    )
+    assert len(hit_events) == 4
+
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id=game_id,
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_artifact = ReplayArtifact.from_payload(replay_payload)
+    replay_declaration_record = next(
+        record
+        for record in replay_artifact.decision_records
+        if record.result.result_id == declaration_result_id
+    )
+    replay_declarations = cast(
+        list[dict[str, JsonValue]],
+        cast(dict[str, JsonValue], replay_declaration_record.result.payload)["declarations"],
+    )
+    assert (
+        tuple(cast(str, declaration["weapon_instance_id"]) for declaration in replay_declarations)
+        == weapon_instance_ids
+    )
+    replay_result = ReplayRunner(replay_artifact).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_maulerfiend_magma_cutter_copies_can_split_legal_targets() -> None:
+    session, maulerfiend, target = _maulerfiend_magma_cutter_shooting_session(
+        game_id="maulerfiend-magma-cutter-split-targets",
+        extra_target=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    extra_target = _unit_from_state(state, "army-b:extra-target-battleline")
+    declaration_request = _advance_maulerfiend_to_shooting_declaration(
+        session=session,
+        source=maulerfiend,
+    )
+    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(declaration_request)
+    weapon_instance_ids = tuple(cast(str, row["weapon_instance_id"]) for row in magma_cutter_rows)
+    assert len(magma_cutter_rows) == 2
+    assert len(set(weapon_instance_ids)) == 2
+    declarations = _weapon_declarations_for_available_rows(
+        rows=magma_cutter_rows,
+        target_unit_instance_ids=(target.unit_instance_id, extra_target.unit_instance_id),
+    )
+    proposal = _shooting_proposal_for_declarations(
+        proposal_request=proposal_request,
+        declarations=declarations,
+    )
+
+    status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id="maulerfiend-magma-split-declaration",
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    target_request = _decision_request(status)
+    assert target_request.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE
+    assert {option.option_id for option in target_request.options} == {
+        f"resolve-target:{target.unit_instance_id}",
+        f"resolve-target:{extra_target.unit_instance_id}",
+    }
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    assert tuple(
+        (pool.weapon_instance_id, pool.target_unit_instance_id, pool.attacks)
+        for pool in shooting_state.attack_pools
+    ) == (
+        (weapon_instance_ids[0], target.unit_instance_id, 2),
+        (weapon_instance_ids[1], extra_target.unit_instance_id, 2),
+    )
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(lifecycle_payload)
+    restored_state = restored.state
+    assert restored_state is not None
+    restored_shooting_state = restored_state.shooting_phase_state
+    assert restored_shooting_state is not None
+    assert tuple(
+        (pool.weapon_instance_id, pool.target_unit_instance_id, pool.attacks)
+        for pool in restored_shooting_state.attack_pools
+    ) == (
+        (weapon_instance_ids[0], target.unit_instance_id, 2),
+        (weapon_instance_ids[1], extra_target.unit_instance_id, 2),
+    )
+
+
+@pytest.mark.parametrize(
+    ("bodyguard_datasheet_id", "has_infiltrators", "scout_model_count"),
+    [
+        pytest.param("000004079", True, 0, id="tormentors-infiltrators"),
+        pytest.param("000004080", False, 6, id="infractors-scouts"),
+    ],
+)
+def test_lord_of_the_host_grants_source_backed_abilities_to_lord_exultant(
+    bodyguard_datasheet_id: str,
+    has_infiltrators: bool,
+    scout_model_count: int,
+) -> None:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    lord = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004078",
+        selection_id=f"lord-exultant:{bodyguard_datasheet_id}",
+    )
+    bodyguard = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id=bodyguard_datasheet_id,
+        selection_id=f"bodyguard:{bodyguard_datasheet_id}",
+    )
+    target = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id="000004091",
+        selection_id=f"target-maulerfiend:{bodyguard_datasheet_id}",
+    )
+    attached_id = f"attached-unit:army-a:lord-exultant:{bodyguard_datasheet_id}"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(lord.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, lord.unit_instance_id))
+        ),
+        source_id=f"test:{attached_id}:formation",
+        attachment_source_ids=(f"test:{attached_id}:leader-eligibility",),
+    )
+    armies = (
+        _army(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(lord, bodyguard),
+            attached_units=(formation,),
+        ),
+        _army(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="emperors-children",
+            units=(target,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+        game_id=f"lord-of-the-host:{bodyguard_datasheet_id}",
+    )
+    CatalogDatasheetRuleRuntime(
+        _catalog_indexes(catalog=catalog, armies=armies),
+        armies,
+    ).record_static_sources(state=state)
+    source_rule_id = _lord_maulerfiend_spawn_rule_ir("000004078:5").source_id
+    lord_of_the_host_effects = tuple(
+        effect for effect in state.persisting_effects if effect.source_rule_id == source_rule_id
+    )
+    assert len(lord_of_the_host_effects) == 2
+    assert all(
+        effect.target_unit_instance_ids == (lord.unit_instance_id,)
+        for effect in lord_of_the_host_effects
+    )
+    assert (
+        len(
+            conditional_granted_ability_effects_for_rules_unit(
+                state=state,
+                rules_unit_instance_id=attached_id,
+                ability="infiltrators",
+            )
+        )
+        == 1
+    )
+    assert (
+        len(
+            conditional_granted_ability_effects_for_rules_unit(
+                state=state,
+                rules_unit_instance_id=attached_id,
+                ability="scouts",
+            )
+        )
+        == 1
+    )
+
+    view = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    assert rules_unit_has_infiltrators(state=state, view=view) is has_infiltrators
+    scout_instances = scout_ability_instances_for_rules_unit(
+        state=state,
+        view=view,
+        army_catalog=catalog,
+    )
+    assert len(scout_instances) == scout_model_count
+    if scout_instances:
+        assert {instance.distance_inches for instance in scout_instances} == {6.0}
+        assert {instance.model_instance_id for instance in scout_instances} == {
+            model.model_instance_id for model in view.alive_models()
+        }
+
+
+def test_euphoric_strikes_activates_once_and_modifies_only_lord_melee_weapons() -> None:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    lord = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004078",
+        selection_id="euphoric-lord-exultant",
+    )
+    target = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id="000004090",
+        selection_id="euphoric-target-spawn",
+    )
+    armies = (
+        _army(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(lord,),
+        ),
+        _army(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="emperors-children",
+            units=(target,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+        game_id="lord-exultant-euphoric-strikes",
+    )
+    runtime = CatalogOncePerBattleRuntime(
+        _catalog_indexes(catalog=catalog, armies=armies),
+        armies,
+    )
+    decisions = DecisionController()
+    request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["ability_name"] == "Euphoric Strikes"
+    assert request_payload["source_rule_id"] == next(
+        ability.source_id
+        for ability in catalog.datasheet_by_id("000004078").abilities
+        if ability.name == "Euphoric Strikes"
+    )
+    use_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["activate"] is True
+    )
+    actor_drift = replace(
+        DecisionResult.for_request(
+            result_id="euphoric-strikes:actor-drift",
+            request=request,
+            selected_option_id=use_option.option_id,
+        ),
+        actor_id="player-b",
+    )
+    invalid = runtime.apply_fight_phase_start_result(
+        FightPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=actor_drift,
+        )
+    )
+    assert type(invalid) is LifecycleStatus
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, JsonValue], invalid.payload)["invalid_reason"] == (
+        "once_per_battle_actor_drift"
+    )
+    assert not state.persisting_effects
+
+    activation_request = runtime.fight_phase_start_request(
+        FightPhaseStartRequestContext(state=state, decisions=decisions)
+    )
+    assert activation_request is not None
+    queued = decisions.request_decision(activation_request)
+    use_option = next(
+        option
+        for option in queued.options
+        if cast(dict[str, JsonValue], option.payload)["activate"] is True
+    )
+    result = DecisionResult.for_request(
+        result_id="euphoric-strikes:activated",
+        request=queued,
+        selected_option_id=use_option.option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        runtime.apply_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=queued,
+                result=result,
+            )
+        )
+        is True
+    )
+    source_rule_id = _lord_maulerfiend_spawn_rule_ir("000004078:4").source_id
+    assert len(state.persisting_effects) == 2
+    assert {effect.source_rule_id for effect in state.persisting_effects} == {source_rule_id}
+    assert all(
+        effect.target_unit_instance_ids == (lord.unit_instance_id,)
+        for effect in state.persisting_effects
+    )
+    assert decisions.event_log.records[-1].event_type == (
+        CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT
+    )
+
+    registry = RuntimeModifierRegistry.empty()
+    spear = _weapon_profile("000004078", "Phoenix power spear")
+    modified_spear = registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=lord.unit_instance_id,
+            attacker_model_instance_id=lord.own_models[0].model_instance_id,
+            target_unit_instance_id=target.unit_instance_id,
+            weapon_profile=spear,
+        )
+    )
+    assert modified_spear.attack_profile.fixed_attacks == 8
+    assert modified_spear.armor_penetration.final == -3
+    bolt_pistol = _weapon_profile("000004078", "Bolt pistol")
+    assert (
+        registry.modified_weapon_profile(
+            WeaponProfileModifierContext(
+                state=state,
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id=lord.unit_instance_id,
+                attacker_model_instance_id=lord.own_models[0].model_instance_id,
+                target_unit_instance_id=target.unit_instance_id,
+                weapon_profile=bolt_pistol,
+            )
+        )
+        == bolt_pistol
+    )
+    assert (
+        runtime.fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_maulerfiend_glutton_for_punishment_uses_live_source_strength_gates() -> None:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    maulerfiend = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004091",
+        selection_id="glutton-maulerfiend",
+    )
+    target = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id="000004090",
+        selection_id="glutton-target-spawn",
+    )
+    armies = (
+        _army(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(maulerfiend,),
+        ),
+        _army(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="emperors-children",
+            units=(target,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+        game_id="maulerfiend-glutton-for-punishment",
+    )
+    CatalogDatasheetRuleRuntime(
+        _catalog_indexes(catalog=catalog, armies=armies),
+        armies,
+    ).record_static_sources(state=state)
+    source_rule_id = _lord_maulerfiend_spawn_rule_ir("000004091:3").source_id
+    glutton_effects = tuple(
+        effect for effect in state.persisting_effects if effect.source_rule_id == source_rule_id
+    )
+    assert len(glutton_effects) == 2
+    assert all(
+        effect.target_unit_instance_ids == (maulerfiend.unit_instance_id,)
+        for effect in glutton_effects
+    )
+    fists = _weapon_profile("000004091", "Maulerfiend fists")
+    model_id = maulerfiend.own_models[0].model_instance_id
+    registry = RuntimeModifierRegistry.from_bindings(
+        hit_roll_modifier_bindings=CatalogDamagedEffectRuntime(armies).hit_roll_bindings(),
+    )
+
+    def current_modifiers() -> tuple[int, int]:
+        hit = registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id=maulerfiend.unit_instance_id,
+                attacker_model_instance_id=model_id,
+                target_unit_instance_id=target.unit_instance_id,
+                weapon_profile=fists,
+                source_phase=BattlePhase.FIGHT,
+            )
+        )
+        wound = registry.wound_roll_modifier(
+            WoundRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id=maulerfiend.unit_instance_id,
+                attacker_model_instance_id=model_id,
+                target_unit_instance_id=target.unit_instance_id,
+                weapon_profile=fists,
+                strength=fists.strength.final,
+                toughness=5,
+            )
+        )
+        return hit, wound
+
+    assert current_modifiers() == (0, 0)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=maulerfiend.unit_instance_id,
+        model_instance_id=model_id,
+        damage=1,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert (
+        _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].wounds_remaining == 11
+    )
+    assert current_modifiers() == (1, 0)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=maulerfiend.unit_instance_id,
+        model_instance_id=model_id,
+        damage=6,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].wounds_remaining == 5
+    assert current_modifiers() == (1, 1)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=maulerfiend.unit_instance_id,
+        model_instance_id=model_id,
+        damage=1,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert _unit_from_state(state, maulerfiend.unit_instance_id).own_models[0].wounds_remaining == 4
+    assert current_modifiers() == (0, 1)
+
+
+def test_chaos_spawn_scuttling_horrors_grants_fixed_six_inch_reaction() -> None:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    spawn = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004090",
+        selection_id="scuttling-horrors-spawn",
+    )
+    triggering_unit = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id="000004091",
+        selection_id="scuttling-horrors-trigger",
+    )
+    armies = (
+        _army(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(spawn,),
+        ),
+        _army(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="emperors-children",
+            units=(triggering_unit,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-b",
+        game_id="chaos-spawn-scuttling-horrors",
+    )
+    _move_unit(state, spawn.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, triggering_unit.unit_instance_id, x=20.0, y=10.0)
+    runtime = CatalogMovementEndReactiveNormalMoveRuntime(
+        _catalog_indexes(catalog=catalog, armies=armies),
+        armies,
+    )
+    bindings = runtime.bindings()
+    assert len(bindings) == 1
+
+    def grants() -> tuple[Any, ...]:
+        return bindings[0].handler(
+            MovementEndSurgeContext(
+                state=state,
+                ruleset_descriptor=state.runtime_ruleset_descriptor(),
+                triggering_unit_instance_id=triggering_unit.unit_instance_id,
+                triggering_player_id="player-b",
+                reacting_player_id="player-a",
+                trigger_event_id="event:scuttling-horrors:enemy-move-ended",
+                movement_phase_action="normal_move",
+                trigger_event_payload={
+                    "unit_instance_id": triggering_unit.unit_instance_id,
+                },
+            )
+        )
+
+    reaction_grants = grants()
+    assert len(reaction_grants) == 1
+    grant = reaction_grants[0]
+    assert grant.unit_instance_id == spawn.unit_instance_id
+    assert grant.descriptor_source_rule_id == next(
+        ability.source_id
+        for ability in catalog.datasheet_by_id("000004090").abilities
+        if ability.name == "Scuttling Horrors"
+    )
+    assert grant.distance_spec.kind is MovementEndSurgeDistanceKind.FIXED
+    assert grant.distance_spec.fixed_distance_inches == 6.0
+    assert grant.distance_spec.dice_expression is None
+    assert grant.max_distance_bonus_inches == 0
+    assert grant.movement_kind.value == "triggered"
+    assert grant.allow_battle_shocked is True
+    assert grant.one_per_phase is False
+    assert grant.independent_unit_reaction is True
+    replay_payload = cast(dict[str, JsonValue], grant.replay_payload)
+    assert replay_payload["distance_spec"] == {
+        "kind": "fixed",
+        "fixed_distance_inches": 6.0,
+        "dice_expression": None,
+    }
+    assert replay_payload["trigger_event_id"] == "event:scuttling-horrors:enemy-move-ended"
+
+    _move_unit(state, triggering_unit.unit_instance_id, x=30.0, y=10.0)
+    assert grants() == ()
+
+
 def test_infractors_tormentors_generated_rule_ir_and_catalog_are_complete() -> None:
     committed = cast(
         dict[str, Any],
@@ -2437,7 +3807,7 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
     ("within_objective_range", "game_id", "expected_wound_value"),
     [
         (True, "phase18j-excessive-inside-0001", 6),
-        (False, "phase18j-excessive-outside-refreshed-00", 1),
+        (False, "phase18j-excessive-outside-v3-003", 1),
     ],
 )
 def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
@@ -2525,7 +3895,7 @@ def test_infractors_excessive_assault_does_not_enter_ranged_reroll_path() -> Non
         source_datasheet_id="000004080",
         phase=BattlePhase.SHOOTING,
         with_icon=False,
-        game_id="infractors-excessive-assault-ranged-lifecycle-1",
+        game_id="infractors-excessive-assault-ranged-v3-000",
     )
     state = session.lifecycle.state
     assert state is not None
@@ -2635,7 +4005,7 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     [
         ("icon-lifecycle-outcome-1", False, True, "applied"),
         ("icon-of-excess-fail-0", False, False, None),
-        ("icon-cap-outcome-2", True, True, "capped"),
+        ("icon-cap-outcome-3", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
@@ -5186,6 +6556,7 @@ def _battleline_lifecycle_session(
     single_target_model: bool = False,
     extra_target: bool = False,
     attached_source: bool = False,
+    source_wargear_option_id: str | None = None,
 ) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
     package = _catalog_package()
     base_catalog = package.army_catalog
@@ -5242,6 +6613,11 @@ def _battleline_lifecycle_session(
                 unit_datasheet_ids=(
                     "000004079",
                     "000004080",
+                    *(
+                        (source_datasheet_id,)
+                        if source_datasheet_id not in {"000004079", "000004080"}
+                        else ()
+                    ),
                     *(("000004083",) if attached_source else ()),
                 ),
                 force_disposition_ids=("take-and-hold", "purge-the-foe"),
@@ -5341,6 +6717,8 @@ def _battleline_lifecycle_session(
         datasheet_id=source_datasheet_id,
         unit_selection_id="source-battleline",
     )
+    if with_icon and source_wargear_option_id is not None:
+        raise AssertionError("Battleline lifecycle fixture accepts one wargear option family.")
     if with_icon:
         source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
         icon_option = next(
@@ -5355,6 +6733,23 @@ def _battleline_lifecycle_session(
                     option_id=icon_option.option_id,
                     model_profile_id=icon_option.model_profile_id,
                     wargear_ids=icon_option.allowed_wargear_ids,
+                ),
+            ),
+        )
+    if source_wargear_option_id is not None:
+        source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
+        source_option = next(
+            option
+            for option in source_datasheet.wargear_options
+            if option.option_id == source_wargear_option_id
+        )
+        source_selection = replace(
+            source_selection,
+            wargear_selections=(
+                WargearSelection(
+                    option_id=source_option.option_id,
+                    model_profile_id=source_option.model_profile_id,
+                    wargear_ids=source_option.allowed_wargear_ids,
                 ),
             ),
         )
@@ -5482,6 +6877,175 @@ def _battleline_lifecycle_session(
         )
     )
     return LocalGameSession(lifecycle=lifecycle), source, target
+
+
+def _maulerfiend_magma_cutter_shooting_session(
+    *,
+    game_id: str,
+    extra_target: bool,
+) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
+    session, maulerfiend, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004091",
+        phase=BattlePhase.SHOOTING,
+        with_icon=False,
+        game_id=game_id,
+        extra_target=extra_target,
+        source_wargear_option_id="000004091:magma-cutters:option-1",
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    _move_unit(state, maulerfiend.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=15.0, y=10.0)
+    if extra_target:
+        _move_unit(
+            state,
+            "army-b:extra-target-battleline",
+            x=10.0,
+            y=15.0,
+        )
+    return session, maulerfiend, target
+
+
+def _advance_maulerfiend_to_shooting_declaration(
+    *,
+    session: LocalGameSession,
+    source: UnitInstance,
+) -> DecisionRequest:
+    state = session.lifecycle.state
+    assert state is not None
+    source_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source.unit_instance_id,
+    ).unit_instance_id
+    status = session.advance_until_decision_or_terminal()
+    for index in range(64):
+        request = _decision_request(status)
+        if request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
+            return request
+        result_id = f"maulerfiend-shooting-setup-{index:03d}"
+        if request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
+            assert source_rules_unit_id in {option.option_id for option in request.options}
+            option_id = source_rules_unit_id
+        elif request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
+            option_id = ShootingType.NORMAL.value
+        elif request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Maulerfiend decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Maulerfiend did not reach its shooting declaration request.")
+
+
+def _magma_cutter_available_weapon_rows(
+    request: DecisionRequest,
+) -> tuple[dict[str, JsonValue], tuple[dict[str, JsonValue], ...]]:
+    assert request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    proposal_request = cast(dict[str, JsonValue], request_payload["proposal_request"])
+    available_weapons = cast(
+        list[dict[str, JsonValue]],
+        proposal_request["available_weapons"],
+    )
+    rows = tuple(
+        weapon for weapon in available_weapons if weapon["wargear_id"] == "000004091:magma-cutters"
+    )
+    return proposal_request, rows
+
+
+def _weapon_declarations_for_available_rows(
+    *,
+    rows: tuple[dict[str, JsonValue], ...],
+    target_unit_instance_ids: tuple[str, ...],
+) -> tuple[WeaponDeclaration, ...]:
+    assert len(rows) == len(target_unit_instance_ids)
+    return tuple(
+        WeaponDeclaration(
+            attacker_model_instance_id=cast(str, row["model_instance_id"]),
+            weapon_instance_id=cast(str, row["weapon_instance_id"]),
+            wargear_id=cast(str, row["wargear_id"]),
+            weapon_profile_id=cast(str, row["weapon_profile_id"]),
+            target_unit_instance_id=target_unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+        )
+        for row, target_unit_instance_id in zip(
+            rows,
+            target_unit_instance_ids,
+            strict=True,
+        )
+    )
+
+
+def _shooting_proposal_for_declarations(
+    *,
+    proposal_request: dict[str, JsonValue],
+    declarations: tuple[WeaponDeclaration, ...],
+) -> ShootingDeclarationProposal:
+    return ShootingDeclarationProposal(
+        proposal_request_id=cast(str, proposal_request["request_id"]),
+        proposal_kind=cast(str, proposal_request["proposal_kind"]),
+        player_id=cast(str, proposal_request["active_player_id"]),
+        battle_round=cast(int, proposal_request["battle_round"]),
+        unit_instance_id=cast(str, proposal_request["unit_instance_id"]),
+        source_decision_request_id=cast(
+            str,
+            proposal_request["source_decision_request_id"],
+        ),
+        source_decision_result_id=cast(
+            str,
+            proposal_request["source_decision_result_id"],
+        ),
+        declarations=declarations,
+        firing_deck_selection=None,
+        visibility_cache_key=cast(str, proposal_request["visibility_cache_key"]),
+    )
+
+
+def _first_proposal_violation_code(status: LifecycleStatus) -> str:
+    payload = cast(dict[str, JsonValue], status.payload)
+    validation = cast(dict[str, JsonValue], payload["proposal_validation"])
+    violations = cast(list[dict[str, JsonValue]], validation["violations"])
+    assert violations
+    return cast(str, violations[0]["violation_code"])
+
+
+def _advance_maulerfiend_shooting_through_phase(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    state = session.lifecycle.state
+    assert state is not None
+    for index in range(256):
+        if state.current_battle_phase is not BattlePhase.SHOOTING:
+            return status
+        request = _decision_request(status)
+        result_id = f"maulerfiend-shooting-resolution-{index:03d}"
+        if request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Maulerfiend resolution {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Maulerfiend shooting phase did not complete.")
 
 
 def _advance_battleline_fight_to_source_reroll(
@@ -5766,6 +7330,7 @@ def _advance_battleline_shooting_to_damage_allocation_request(
             declarations = tuple(
                 WeaponDeclaration(
                     attacker_model_instance_id=cast(str, weapon["model_instance_id"]),
+                    weapon_instance_id=cast(str, weapon["weapon_instance_id"]),
                     wargear_id=cast(str, weapon["wargear_id"]),
                     weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
                     target_unit_instance_id=target.unit_instance_id,
@@ -5901,6 +7466,40 @@ def _instantiate_minimum_composition_unit(
     )
 
 
+def _instantiate_with_wargear_option(
+    *,
+    factory: UnitFactory,
+    army_id: str,
+    datasheet_id: str,
+    selection_id: str,
+    option_id: str,
+    wargear_id: str,
+) -> UnitInstance:
+    datasheet = factory.catalog.datasheet_by_id(datasheet_id)
+    model_profile = datasheet.model_profiles[0]
+    return factory.instantiate_unit(
+        army_id=army_id,
+        datasheet=datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id=selection_id,
+            datasheet_id=datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile.model_profile_id,
+                    datasheet.composition[0].min_models,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=option_id,
+                    model_profile_id=model_profile.model_profile_id,
+                    wargear_ids=(wargear_id,),
+                ),
+            ),
+        ),
+    )
+
+
 def _army(
     *,
     catalog: Any,
@@ -5924,6 +7523,18 @@ def _army(
         units=units,
         attached_units=attached_units,
     )
+
+
+def _catalog_indexes(
+    *,
+    catalog: Any,
+    armies: tuple[ArmyDefinition, ...],
+) -> dict[str, AbilityCatalogIndex]:
+    records = catalog_ability_records_from_catalog(catalog)
+    return {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
 
 
 def _battle_state(
@@ -5981,6 +7592,32 @@ def _weapon_profile(datasheet_id: str, profile_name: str) -> WeaponProfile:
     )
 
 
+def _weapon_profile_signature(profile: WeaponProfile) -> tuple[object, ...]:
+    attack_dice = profile.attack_profile.dice_expression
+    damage_dice = profile.damage_profile.dice_expression
+    return (
+        profile.range_profile.kind.value,
+        profile.range_profile.distance_inches,
+        profile.attack_profile.fixed_attacks,
+        (
+            None
+            if attack_dice is None
+            else (attack_dice.quantity, attack_dice.sides, attack_dice.modifier)
+        ),
+        profile.skill.final,
+        profile.strength.final,
+        profile.armor_penetration.final,
+        profile.damage_profile.fixed_damage,
+        (
+            None
+            if damage_dice is None
+            else (damage_dice.quantity, damage_dice.sides, damage_dice.modifier)
+        ),
+        tuple(keyword.value for keyword in profile.keywords),
+        tuple(ability.ability_id for ability in profile.abilities),
+    )
+
+
 def _attack_pool(
     attacker: UnitInstance,
     target: UnitInstance,
@@ -5989,9 +7626,17 @@ def _attack_pool(
     target_unit_instance_id: str | None = None,
 ) -> RangedAttackPool:
     target_model_ids = target.own_model_ids()
+    attacker_model = attacker.own_models[0]
+    wargear_id = profile.profile_id.rsplit(":", 1)[0]
+    weapon_instance_id = next(
+        weapon.weapon_instance_id
+        for weapon in equipped_weapon_instances_for_model(attacker_model)
+        if weapon.wargear_id == wargear_id
+    )
     return RangedAttackPool(
-        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
-        wargear_id=profile.profile_id.rsplit(":", 1)[0],
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        weapon_instance_id=weapon_instance_id,
+        wargear_id=wargear_id,
         weapon_profile_id=profile.profile_id,
         weapon_profile=profile,
         target_unit_instance_id=(
@@ -6109,6 +7754,12 @@ def _fulgrim_rule_ir(source_row_id: str) -> RuleIR:
     return RuleIR.from_payload(payload)
 
 
+def _lord_maulerfiend_spawn_rule_ir(source_row_id: str) -> RuleIR:
+    payload = lord_spawn_source_package.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
+    assert payload is not None
+    return RuleIR.from_payload(payload)
+
+
 @lru_cache(maxsize=1)
 def _overlay_artifacts() -> tuple[OverlaySourceArtifact, ...]:
     return apply_source_release_overlays(
@@ -6203,6 +7854,7 @@ def _keyword_set(value: str) -> set[str]:
 def _ec_height_overrides() -> tuple[ModelHeightOverride, ...]:
     return (
         _height_override("000004077", "Fulgrim - EPIC HERO", 5.5),
+        _height_override("000004078", "Lord Exultant", 2.5),
         _height_override("000004083", "Lucius the Eternal - EPIC HERO", 2.25),
         _height_override("000004084", "Lord Kakophonist", 2.5),
         _height_override("000004088", "Disharmonist", 2.0),
@@ -6216,17 +7868,29 @@ def _ec_height_overrides() -> tuple[ModelHeightOverride, ...]:
         _height_override("000004082", "Chaos Land Raider", 3.0),
         _height_override("000004089", "Flawless Blades", 2.0),
         _height_override("000004090", "Chaos Spawn", 2.25),
+        _height_override(
+            "000004091",
+            "Maulerfiend",
+            90.0,
+            height_units=GeometrySourceUnits.MILLIMETERS,
+        ),
         _height_override("000004092", "Heldrake", 6.0),
         _height_override("000004093", "Chaos Rhino", 2.5),
     )
 
 
-def _height_override(datasheet_id: str, model_name: str, height: float) -> ModelHeightOverride:
+def _height_override(
+    datasheet_id: str,
+    model_name: str,
+    height: float,
+    *,
+    height_units: GeometrySourceUnits = GeometrySourceUnits.INCHES,
+) -> ModelHeightOverride:
     return ModelHeightOverride(
         datasheet_id=datasheet_id,
         model_name=model_name,
         height=height,
-        height_units=GeometrySourceUnits.INCHES,
+        height_units=height_units,
         height_source_id=f"geometry-review:emperors-children:{datasheet_id}:height",
         height_document_reference="Emperor's Children datasheet overlay bridge regression fixture",
     )

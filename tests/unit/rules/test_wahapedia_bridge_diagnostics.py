@@ -19,12 +19,18 @@ from tests.support.wahapedia_source_fixtures import (
 )
 
 from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
     CatalogAbilitySupport,
 )
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometrySourceUnits,
 )
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.wahapedia_ability_source import (
+    WahapediaAbilitySourceError,
+    catalog_ability_source_kind_from_wahapedia_type,
+    supported_catalog_ability_source_kind_from_wahapedia_type,
+)
 from warhammer40k_core.rules.wahapedia_bridge import (
     ModelHeightOverride,
     WahapediaBridgeError,
@@ -120,6 +126,31 @@ def test_phase17k_bridge_rejects_unsupported_datasheet_ability_type() -> None:
                 ),
             ),
         )
+
+
+@pytest.mark.parametrize(
+    "ability_type",
+    ["Datasheet", "Primarch", "Special (right column)", "Fortification (левая колонка)"],
+)
+def test_phase17k_datasheet_ability_surfaces_share_one_source_kind_classifier(
+    ability_type: str,
+) -> None:
+    assert (
+        catalog_ability_source_kind_from_wahapedia_type(ability_type)
+        is CatalogAbilitySourceKind.DATASHEET
+    )
+
+
+@pytest.mark.parametrize("ability_type", ["", " Datasheet", "Unknown surface", None])
+def test_phase17k_ability_source_classifier_rejects_malformed_surfaces(
+    ability_type: object,
+) -> None:
+    with pytest.raises(WahapediaAbilitySourceError):
+        catalog_ability_source_kind_from_wahapedia_type(ability_type)
+
+
+def test_phase17k_support_audit_classifier_skips_non_gameplay_surfaces() -> None:
+    assert supported_catalog_ability_source_kind_from_wahapedia_type("Без заголовка") is None
 
 
 def test_phase17k_bridge_preserves_unsupported_rule_ir_diagnostics() -> None:

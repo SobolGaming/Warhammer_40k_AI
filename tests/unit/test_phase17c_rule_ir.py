@@ -49,6 +49,8 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
 )
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
     CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+    effect_is_movement_end_reactive_normal_move,
+    movement_end_reactive_normal_move_descriptor,
 )
 from warhammer40k_core.engine.catalog_movement_transit import (
     movement_mode_tokens_or_none as _movement_mode_tokens_or_none,
@@ -137,6 +139,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     RuleUnsupportedReason,
     parameter_payload,
+    parameters_from_pairs,
     rule_condition_kind_from_token,
     rule_duration_kind_from_token,
     rule_effect_kind_from_token,
@@ -558,6 +561,56 @@ def test_phase17c_movement_end_reactive_normal_move_compiles_to_generic_rule_ir(
     assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
         CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
     )
+    descriptor = movement_end_reactive_normal_move_descriptor(clause)
+    assert descriptor.fixed_distance_inches is None
+    assert descriptor.distance_dice_quantity == 1
+    assert descriptor.distance_dice_sides == 6
+
+
+def test_phase17c_fixed_movement_end_reactive_normal_move_compiles_fail_closed_union() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17c:test:fixed-movement-end-reactive-normal-move",
+            raw_text=(
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                'enemy units, this unit can make a Normal move of up to 6".'
+            ),
+        )
+    ).rule_ir
+
+    assert rule_ir.is_supported is True
+    clause = rule_ir.clauses[0]
+    effect = clause.effects[0]
+    assert parameter_payload(effect.parameters) == {
+        "action": "move",
+        "action_group": "movement_end_reactive_normal_move",
+        "distance_inches": 6,
+        "movement_kind": "triggered",
+        "movement_mode": "normal",
+        "optional": True,
+    }
+    descriptor = movement_end_reactive_normal_move_descriptor(clause)
+    assert descriptor.fixed_distance_inches == 6.0
+    assert descriptor.distance_dice_quantity is None
+    assert descriptor.distance_dice_sides is None
+    assert descriptor.distance_bonus == 0
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+    )
+
+    hybrid_effect = replace(
+        effect,
+        parameters=parameters_from_pairs(
+            (
+                *tuple((parameter.key, parameter.value) for parameter in effect.parameters),
+                ("distance_bonus", 0),
+                ("distance_dice_quantity", 1),
+                ("distance_dice_sides", 6),
+            )
+        ),
+    )
+    assert not effect_is_movement_end_reactive_normal_move(hybrid_effect)
 
 
 def test_phase17c_movement_end_reactive_parser_rejects_semantic_drift() -> None:

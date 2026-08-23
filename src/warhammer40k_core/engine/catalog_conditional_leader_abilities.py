@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
-    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
@@ -189,7 +189,7 @@ class CatalogConditionalLeaderAbilityRuntime:
         for army in self.armies:
             index = self.ability_indexes_by_player_id[army.player_id]
             for record in index.all_records():
-                if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+                if not ability_record_is_active_generic_rule_ir(record):
                     continue
                 rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
                 for unit in army.units:

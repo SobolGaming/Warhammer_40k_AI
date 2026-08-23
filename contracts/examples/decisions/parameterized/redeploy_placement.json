@@ -34,5 +34,5 @@
     "unit_instance_id": "army-alpha:unit-1"
   },
   "result_id": "phase18d-redeploy_placement-result-000001",
-  "schema_version": "parameterized-submission-v1"
+  "schema_version": "parameterized-submission-v2-weapon-instances"
 }

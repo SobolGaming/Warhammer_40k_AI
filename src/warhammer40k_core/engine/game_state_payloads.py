@@ -131,6 +131,7 @@ class DedicatedTransportSetupConsequencePayload(TypedDict):
 
 
 class OneShotWeaponUseRecordPayload(TypedDict):
+    weapon_instance_id: str
     model_instance_id: str
     wargear_id: str
     weapon_profile_id: str

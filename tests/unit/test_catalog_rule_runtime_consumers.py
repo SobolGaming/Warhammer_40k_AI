@@ -39,6 +39,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityDefinition,
     AbilitySourceKind,
     AbilityTimingDescriptor,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
 from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
@@ -70,6 +71,12 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacedArmy,
     UnitPlacement,
     geometry_model_for_placement,
+)
+from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
+    CatalogAnyPhaseOncePerBattleRuntime,
+)
+from warhammer40k_core.engine.catalog_attack_condition_classification import (
+    clause_effect_is_supported_this_model_attack_roll_modifier,
 )
 from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     CatalogBattleShockRerollRuntime,
@@ -183,6 +190,9 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
 from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
     CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
 )
+from warhammer40k_core.engine.catalog_static_attack_modifier_runtime import (
+    CatalogStaticAttackModifierRuntime,
+)
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
     catalog_unit_move_completed_battle_shock_hook_bindings,
 )
@@ -235,6 +245,8 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
+    MovementEndSurgeDistanceKind,
+    MovementEndSurgeDistanceSpec,
     MovementEndSurgeGrant,
 )
 from warhammer40k_core.engine.phase import (
@@ -2177,6 +2189,7 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
             attack_pools=(
                 RangedAttackPool(
                     attacker_model_instance_id=source_model_id,
+                    weapon_instance_id=f"weapon-instance:test:{sequence_id}",
                     wargear_id=f"wargear:{sequence_id}",
                     weapon_profile_id=profile.profile_id,
                     weapon_profile=profile,
@@ -2412,6 +2425,7 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_model_id,
+                weapon_instance_id="weapon-instance:test:post-shoot:negative-hit",
                 wargear_id="wargear:post-shoot:negative-hit",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,
@@ -2677,6 +2691,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
             attack_pools=(
                 RangedAttackPool(
                     attacker_model_instance_id=source_model_id,
+                    weapon_instance_id=f"weapon-instance:test:post-shoot:{suffix}",
                     wargear_id="wargear:post-shoot:attack",
                     weapon_profile_id=profile.profile_id,
                     weapon_profile=profile,
@@ -3106,6 +3121,7 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:post-shoot-battle-shock",
                 wargear_id="catalog-post-shoot-test-wargear",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,
@@ -3170,6 +3186,54 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
     assert "battle_shock_test_resolved" in event_types
     assert "catalog_selected_target_battle_shock_resolved" in event_types
     assert CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT in event_types
+
+
+def test_catalog_once_per_battle_runtimes_ignore_disabled_records_before_parsing() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    active = _once_per_battle_record(source_unit=source_unit)
+    disabled = replace(
+        active,
+        definition=replace(
+            active.definition,
+            replay_payload={"disabled": True},
+        ),
+        disabled=True,
+    )
+    assert ability_record_is_active_generic_rule_ir(active)
+    assert not ability_record_is_active_generic_rule_ir(disabled)
+    with pytest.raises(GameLifecycleError, match="requires AbilityCatalogRecord"):
+        ability_record_is_active_generic_rule_ir(cast(AbilityCatalogRecord, object()))
+    indexes = {
+        source_army.player_id: AbilityCatalogIndex.from_records((disabled,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+    armies = (source_army, target_army)
+    once_runtime = CatalogOncePerBattleRuntime(indexes, armies)
+    assert once_runtime.fight_phase_start_bindings() == ()
+    state = _state_with_battlefield(
+        armies=armies,
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=10.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=20.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    assert (
+        once_runtime.fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=DecisionController())
+        )
+        is None
+    )
+    any_phase_runtime = CatalogAnyPhaseOncePerBattleRuntime(indexes, armies)
+    assert any_phase_runtime.event_handler_bindings() == ()
+    assert any_phase_runtime.event_subscriptions() == ()
 
 
 def test_catalog_once_per_battle_runtime_declines_then_activates_once_with_replay() -> None:
@@ -6600,6 +6664,239 @@ def test_catalog_advance_and_fall_back_runtime_exposes_all_source_backed_permiss
         )
 
 
+def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
+    supported_condition = _condition(
+        RuleConditionKind.TARGET_CONSTRAINT,
+        ("gate_subject", "source_unit"),
+        ("relationship", "this_model_makes_attack"),
+        ("target_constraint", "source_unit_below_starting_strength"),
+    )
+
+    def clause_for(
+        *,
+        trigger_roll_type: str,
+        effect_roll_type: str,
+        conditions: tuple[RuleCondition, ...] = (supported_condition,),
+        delta: RuleParameterValue = 1,
+    ) -> RuleClause:
+        return RuleClause(
+            clause_id=f"test:static-attack-modifier:{trigger_roll_type}:{effect_roll_type}",
+            source_span=_span(),
+            trigger=RuleTrigger(
+                kind=RuleTriggerKind.DICE_ROLL,
+                source_span=_span(),
+                parameters=_parameters(("roll_type", trigger_roll_type)),
+            ),
+            conditions=conditions,
+            target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+            effects=(
+                _effect(
+                    RuleEffectKind.MODIFY_DICE_ROLL,
+                    ("delta", delta),
+                    ("roll_type", effect_roll_type),
+                ),
+            ),
+        )
+
+    for roll_type in ("hit", "wound"):
+        clause = clause_for(trigger_roll_type=roll_type, effect_roll_type=roll_type)
+        assert clause_effect_is_supported_this_model_attack_roll_modifier(
+            clause,
+            clause.effects[0],
+        )
+        compiler_authored = replace(
+            clause,
+            trigger=replace(
+                cast(RuleTrigger, clause.trigger),
+                parameters=_parameters(
+                    ("actor", "this_model"),
+                    ("roll_type", roll_type),
+                    ("target_allegiance", "enemy"),
+                    ("timing_window", f"attack_sequence.{roll_type}"),
+                ),
+            ),
+        )
+        assert clause_effect_is_supported_this_model_attack_roll_modifier(
+            compiler_authored,
+            compiler_authored.effects[0],
+        )
+
+    supported = clause_for(trigger_roll_type="hit", effect_roll_type="hit")
+    unsupported_shapes = (
+        replace(
+            supported,
+            duration=RuleDuration(
+                kind=RuleDurationKind.WHILE_CONDITION_TRUE,
+                source_span=_span(),
+            ),
+        ),
+        replace(
+            supported,
+            target=replace(
+                cast(RuleTargetSpec, supported.target),
+                parameters=_parameters(("attack_role", "attacker")),
+            ),
+        ),
+        replace(
+            supported,
+            trigger=replace(
+                cast(RuleTrigger, supported.trigger),
+                parameters=_parameters(
+                    ("roll_type", "hit"),
+                    ("timing_window", "attack_roll"),
+                ),
+            ),
+        ),
+        replace(
+            supported,
+            effects=(supported.effects[0], supported.effects[0]),
+        ),
+        replace(
+            supported,
+            effects=(
+                replace(
+                    supported.effects[0],
+                    parameters=(
+                        *supported.effects[0].parameters,
+                        *_parameters(("scope", "attack")),
+                    ),
+                ),
+            ),
+        ),
+    )
+    for clause in unsupported_shapes:
+        assert not clause_effect_is_supported_this_model_attack_roll_modifier(
+            clause,
+            clause.effects[0],
+        )
+
+    for unsupported_roll_type in (
+        "attack_sequence.hit",
+        "attack_sequence.wound",
+        "hit_roll",
+        "wound_roll",
+        "charge",
+    ):
+        clause = clause_for(
+            trigger_roll_type=unsupported_roll_type,
+            effect_roll_type=unsupported_roll_type,
+        )
+        assert not clause_effect_is_supported_this_model_attack_roll_modifier(
+            clause,
+            clause.effects[0],
+        )
+
+    mismatched = clause_for(trigger_roll_type="hit", effect_roll_type="wound")
+    assert not clause_effect_is_supported_this_model_attack_roll_modifier(
+        mismatched,
+        mismatched.effects[0],
+    )
+    invalid_delta = clause_for(
+        trigger_roll_type="hit",
+        effect_roll_type="hit",
+        delta="1",
+    )
+    assert not clause_effect_is_supported_this_model_attack_roll_modifier(
+        invalid_delta,
+        invalid_delta.effects[0],
+    )
+    unsupported_condition = _condition(
+        RuleConditionKind.TARGET_CONSTRAINT,
+        ("gate_subject", "source_unit"),
+        ("relationship", "this_model_makes_attack"),
+        ("target_constraint", "source_unit_unknown_state"),
+    )
+    for conditions in (
+        (),
+        (unsupported_condition,),
+        (supported_condition, unsupported_condition),
+    ):
+        clause = clause_for(
+            trigger_roll_type="hit",
+            effect_roll_type="hit",
+            conditions=conditions,
+        )
+        assert not clause_effect_is_supported_this_model_attack_roll_modifier(
+            clause,
+            clause.effects[0],
+        )
+
+
+def test_catalog_static_attack_modifiers_ignore_disabled_records() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    armies = (source_army, target_army)
+    clause = RuleClause(
+        clause_id="test:disabled-static-attack-modifier:clause",
+        source_span=_span(),
+        trigger=RuleTrigger(
+            kind=RuleTriggerKind.DICE_ROLL,
+            source_span=_span(),
+            parameters=_parameters(("roll_type", "hit")),
+        ),
+        conditions=(
+            _condition(
+                RuleConditionKind.TARGET_CONSTRAINT,
+                ("gate_subject", "source_unit"),
+                ("relationship", "this_model_makes_attack"),
+                ("target_constraint", "source_unit_below_starting_strength"),
+            ),
+        ),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.MODIFY_DICE_ROLL,
+                ("delta", 1),
+                ("roll_type", "hit"),
+            ),
+        ),
+    )
+    rule_ir = _rule_ir(
+        source_id="test:disabled-static-attack-modifier",
+        clauses=(clause,),
+    )
+    active_record = _ability_record(
+        record_id="record:disabled-static-attack-modifier",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        datasheet_id=source_unit.datasheet_id,
+    )
+    disabled_record = replace(
+        active_record,
+        definition=replace(active_record.definition, replay_payload={"disabled": True}),
+        disabled=True,
+    )
+
+    def runtime_for(record: AbilityCatalogRecord) -> CatalogStaticAttackModifierRuntime:
+        return CatalogStaticAttackModifierRuntime(
+            ability_indexes_by_player_id={
+                source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+                target_army.player_id: AbilityCatalogIndex.from_records(()),
+            },
+            armies=armies,
+        )
+
+    def state_for_armies() -> GameState:
+        state = _state_without_battlefield(
+            active_player_id=source_army.player_id,
+            phase=BattlePhase.SHOOTING,
+        )
+        for army in armies:
+            state.record_army_definition(army)
+        return state
+
+    disabled_state = state_for_armies()
+    assert runtime_for(disabled_record).record_static_effects(state=disabled_state) == ()
+    assert all(
+        effect.source_rule_id != rule_ir.source_id for effect in disabled_state.persisting_effects
+    )
+
+    active_state = state_for_armies()
+    active_effects = runtime_for(active_record).record_static_effects(state=active_state)
+    assert len(active_effects) == len(source_unit.own_models)
+    assert {effect.source_rule_id for effect in active_effects} == {rule_ir.source_id}
+
+
 def test_catalog_runtime_choice_descriptors_reject_domain_drift() -> None:
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
@@ -6652,6 +6949,7 @@ def test_catalog_runtime_choice_descriptors_reject_domain_drift() -> None:
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:catalog-choice-contracts",
                 wargear_id="wargear:catalog-choice-contracts",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,
@@ -7573,22 +7871,72 @@ def test_catalog_movement_end_reactive_normal_move_runtime_enforces_range(
     assert replay_payload["trigger_event_id"] == "event:enemy-move-completed"
 
 
-def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_binding() -> None:
+def test_catalog_movement_end_reactive_runtime_ignores_disabled_records_before_parsing() -> None:
     source_army, triggering_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
-            source_id="test:aeldari:rangers:path-of-the-outcast:bundle",
+            source_id="test:movement-end-reactive-normal-move:disabled",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
                 "of this unit, if this unit is not within Engagement Range of one or more "
-                'enemy units, this unit can make a Normal move of up to D6".'
+                'enemy units, this unit can make a Normal move of up to 6".'
+            ),
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    active = _ability_record(
+        record_id="record:movement-end-reactive-normal-move:disabled",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        datasheet_id=source_unit.datasheet_id,
+        phase=BattlePhaseKind.MOVEMENT,
+    )
+    disabled = replace(
+        active,
+        definition=replace(active.definition, replay_payload={"disabled": True}),
+        disabled=True,
+    )
+    runtime = CatalogMovementEndReactiveNormalMoveRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((disabled,)),
+            triggering_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, triggering_army),
+    )
+
+    assert runtime.bindings() == ()
+
+
+@pytest.mark.parametrize(
+    ("distance_expression", "expected_kind", "expected_fixed_distance", "expects_roll"),
+    [
+        ("D6", "dice", None, True),
+        ("6", "fixed", 6.0, False),
+    ],
+)
+def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_binding(
+    distance_expression: str,
+    expected_kind: str,
+    expected_fixed_distance: float | None,
+    expects_roll: bool,
+) -> None:
+    source_army, triggering_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id=f"test:movement-end-reactive-normal-move:bundle:{expected_kind}",
+            raw_text=(
+                "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
+                "of this unit, if this unit is not within Engagement Range of one or more "
+                "enemy units, this unit can make a Normal move of up to "
+                f'{distance_expression}".'
             ),
         ),
         source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
     record = _ability_record(
-        record_id="record:aeldari:rangers:path-of-the-outcast:bundle",
+        record_id=f"record:movement-end-reactive-normal-move:bundle:{expected_kind}",
         rule_ir=rule_ir,
         trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
         datasheet_id=source_unit.datasheet_id,
@@ -7660,7 +8008,13 @@ def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_b
     assert descriptor["allow_battle_shocked"] is True
     assert descriptor["allow_within_engagement_range"] is False
     assert descriptor["one_per_phase"] is False
-    assert 1.0 <= cast(float, descriptor["max_distance_inches"]) <= 6.0
+    if expected_fixed_distance is None:
+        assert 1.0 <= cast(float, descriptor["max_distance_inches"]) <= 6.0
+    else:
+        assert descriptor["max_distance_inches"] == expected_fixed_distance
+    assert sum(event.event_type == "dice_rolled" for event in decisions.event_log.records) == int(
+        expects_roll
+    )
     triggered_event = next(
         event
         for event in decisions.event_log.records
@@ -7669,6 +8023,44 @@ def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_b
     triggered_payload = cast(dict[str, JsonValue], triggered_event.payload)
     assert triggered_payload["trigger_event_id"] == trigger_event.event_id
     assert isinstance(triggered_payload["reaction_group_key"], list)
+    distance_resolution = cast(
+        dict[str, JsonValue],
+        triggered_payload["distance_resolution"],
+    )
+    assert distance_resolution["kind"] == expected_kind
+    assert distance_resolution["max_distance_inches"] == descriptor["max_distance_inches"]
+    if expects_roll:
+        assert isinstance(distance_resolution["roll_state"], dict)
+        assert isinstance(triggered_payload["surge_distance_roll"], dict)
+    else:
+        assert distance_resolution["roll_state"] is None
+        assert triggered_payload["surge_distance_roll"] is None
+    grants_payload = cast(list[JsonValue], triggered_payload["grants"])
+    grant_payload = cast(dict[str, JsonValue], grants_payload[0])
+    distance_spec = cast(dict[str, JsonValue], grant_payload["distance_spec"])
+    assert distance_spec["kind"] == expected_kind
+    assert distance_spec["fixed_distance_inches"] == expected_fixed_distance
+
+
+def test_movement_end_surge_distance_spec_rejects_mixed_fixed_and_dice_semantics() -> None:
+    with pytest.raises(
+        GameLifecycleError,
+        match="must not include a dice expression",
+    ):
+        MovementEndSurgeDistanceSpec(
+            kind=MovementEndSurgeDistanceKind.FIXED,
+            fixed_distance_inches=6.0,
+            dice_expression=DiceExpression(quantity=1, sides=6),
+        )
+
+    with pytest.raises(GameLifecycleError, match="must not include a distance bonus"):
+        MovementEndSurgeGrant(
+            hook_id="test:fixed-distance",
+            source_id="test:fixed-distance",
+            unit_instance_id="test-unit",
+            distance_spec=MovementEndSurgeDistanceSpec.fixed(6.0),
+            max_distance_bonus_inches=1,
+        )
 
 
 def test_movement_end_reactive_units_have_independent_processed_windows() -> None:
@@ -7677,6 +8069,7 @@ def test_movement_end_reactive_units_have_independent_processed_windows() -> Non
             hook_id=CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
             source_id=CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
             unit_instance_id=unit_instance_id,
+            distance_spec=MovementEndSurgeDistanceSpec.dice(quantity=1, sides=6),
             descriptor_source_rule_id="source:aeldari:rangers:path-of-the-outcast",
             movement_kind=TriggeredMovementKind.TRIGGERED,
             allow_battle_shocked=True,

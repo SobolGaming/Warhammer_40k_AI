@@ -471,6 +471,8 @@ def _validate_grouped_request_context_matches_sequence(
         raise GameLifecycleError(f"{context_name} grouped attack context ID drift.")
     if attack_context["pool_index"] != attack_sequence.pool_index:
         raise GameLifecycleError(f"{context_name} pool index drift.")
+    if attack_context["weapon_instance_id"] != attack_sequence.current_pool().weapon_instance_id:
+        raise GameLifecycleError(f"{context_name} weapon instance drift.")
     if attack_context["attack_index"] != 0:
         raise GameLifecycleError(f"{context_name} grouped attack index drift.")
     if attack_context["generated_hit_index"] != 0:
@@ -503,6 +505,8 @@ def _validate_attack_context_matches_sequence(
         raise GameLifecycleError(f"{context_name} attack context ID drift.")
     if attack_context["pool_index"] != attack_sequence.pool_index:
         raise GameLifecycleError(f"{context_name} pool index drift.")
+    if attack_context["weapon_instance_id"] != attack_sequence.current_pool().weapon_instance_id:
+        raise GameLifecycleError(f"{context_name} weapon instance drift.")
     if attack_context["attack_index"] != attack_sequence.attack_index:
         raise GameLifecycleError(f"{context_name} attack index drift.")
     if attack_context["generated_hit_index"] != attack_sequence.generated_hit_index:
@@ -532,6 +536,7 @@ def _attack_context_matches_pending_grouped_damage(
     return (
         attack_context["attack_context_id"] == current_context["attack_context_id"]
         and attack_context["source_phase"] == current_context["source_phase"]
+        and attack_context["weapon_instance_id"] == current_context["weapon_instance_id"]
         and attack_context["attack_index"] == current_context["attack_index"]
         and attack_context["generated_hit_index"] == current_context["generated_hit_index"]
     )

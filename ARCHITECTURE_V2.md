@@ -6334,7 +6334,7 @@ Required tests:
 Priority: P1 for hosted backends.
 
 Status: Complete. The reference adapter server can use the Phase 18L durable
-store to write one closed, content-addressed `session-persistence-v2-phase18l`
+store to write one closed, content-addressed `session-persistence-v3-weapon-instances`
 operator artifact. First boot is an explicit initialization operation that
 exclusively reserves a new database path and transactionally installs the exact
 schema plus initial empty-server root; ordinary server construction with a store

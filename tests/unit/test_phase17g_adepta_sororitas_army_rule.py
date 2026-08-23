@@ -1324,6 +1324,7 @@ def _attack_pool_for_triumph_test(
     defender_model_ids = tuple(model.model_instance_id for model in defender.own_models)
     return RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id=f"weapon-instance:test:{weapon_profile.profile_id}",
         wargear_id=f"{weapon_profile.profile_id}:wargear",
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -17,6 +20,8 @@ from warhammer40k_core.rules.rule_ir import RuleConditionKind, RuleTargetKind
 TARGET_ALLEGIANCE_ENEMY = "enemy"
 TARGET_ALLEGIANCE_FRIENDLY = "friendly"
 TARGET_CONSTRAINT_NOT_BELOW_HALF_STRENGTH = "target_not_below_half_strength"
+TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH = "source_unit_below_starting_strength"
+TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH = "source_unit_below_half_strength"
 
 
 def generic_rule_parameters_from_effect_payload(
@@ -265,6 +270,25 @@ def generic_rule_target_constraints_apply(
             ):
                 return False
             continue
+        if constraint in {
+            TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH,
+            TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
+        }:
+            source_strength = _source_unit_strength_context(
+                state=state,
+                attacking_unit_instance_id=attacking_unit_instance_id,
+            )
+            if (
+                constraint == TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH
+                and not source_strength.is_below_starting_strength
+            ):
+                return False
+            if (
+                constraint == TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH
+                and not source_strength.is_below_half_strength
+            ):
+                return False
+            continue
         raise GameLifecycleError("Unsupported generic RuleIR target_constraint.")
     return True
 
@@ -392,12 +416,43 @@ def _target_is_not_below_half_strength(
     )
     context = BelowHalfStrengthContext.from_rules_unit(
         rules_unit=target_rules_unit,
-        starting_strength=state.starting_strength_record_for_unit(target_unit_id),
+        starting_strength=state.starting_strength_record_for_unit(
+            target_rules_unit.unit_instance_id
+        ),
         current_model_ids=tuple(
             model.model_instance_id for model in target_rules_unit.alive_models()
         ),
     )
     return not context.is_below_half_strength
+
+
+def _source_unit_strength_context(
+    *,
+    state: object,
+    attacking_unit_instance_id: str,
+) -> BelowHalfStrengthContext:
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR source-strength gate requires GameState.")
+    attacking_unit_id = _validate_identifier(
+        "attacking_unit_instance_id",
+        attacking_unit_instance_id,
+    )
+    source_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=attacking_unit_id,
+    )
+    return BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=source_rules_unit,
+        starting_strength=state.starting_strength_record_for_unit(
+            source_rules_unit.unit_instance_id
+        ),
+        current_model_ids=tuple(
+            model.model_instance_id for model in source_rules_unit.alive_models()
+        ),
+    )
 
 
 def _enemy_unit_ids_for_player(*, state: object, player_id: str) -> tuple[str, ...]:

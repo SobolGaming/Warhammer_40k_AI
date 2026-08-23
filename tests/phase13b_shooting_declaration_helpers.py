@@ -1167,6 +1167,7 @@ def _proposal_from_request(
     declarations = [
         WeaponDeclaration(
             attacker_model_instance_id=cast(str, selected_weapon["model_instance_id"]),
+            weapon_instance_id=cast(str, selected_weapon["weapon_instance_id"]),
             wargear_id=cast(str, selected_weapon["wargear_id"]),
             weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
             target_unit_instance_id=target_unit_id,
@@ -1187,6 +1188,7 @@ def _proposal_from_request(
         declarations.append(
             WeaponDeclaration(
                 attacker_model_instance_id=cast(str, passenger_profile["model_instance_id"]),
+                weapon_instance_id=cast(str, passenger_profile["weapon_instance_id"]),
                 wargear_id=passenger_wargear_id,
                 weapon_profile_id=cast(str, passenger_profile["weapon_profile_id"]),
                 target_unit_instance_id=target_unit_id,
@@ -1204,6 +1206,7 @@ def _proposal_from_request(
                 FiringDeckWeaponSelection(
                     embarked_unit_instance_id=firing_deck_unit.unit_instance_id,
                     model_instance_id=passenger_model.model_instance_id,
+                    weapon_instance_id=cast(str, passenger_profile["weapon_instance_id"]),
                     wargear_id=passenger_wargear_id,
                     weapon_profile=WeaponProfile.from_payload(
                         cast(WeaponProfilePayload, passenger_profile["weapon_profile"])
@@ -1366,6 +1369,7 @@ def _weapon_payload_to_declaration_payload(
 ) -> WeaponDeclarationPayload:
     payload: WeaponDeclarationPayload = {
         "attacker_model_instance_id": cast(str, weapon["model_instance_id"]),
+        "weapon_instance_id": cast(str, weapon["weapon_instance_id"]),
         "wargear_id": cast(str, weapon["wargear_id"]),
         "weapon_profile_id": cast(str, weapon["weapon_profile_id"]),
         "target_unit_instance_id": target_unit_id,
@@ -1726,6 +1730,7 @@ def _attack_pool_for_test(
     defender_model_ids = tuple(model.model_instance_id for model in defender.own_models)
     return RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id=f"weapon-instance:test:{weapon_profile.profile_id}",
         wargear_id=attacker.wargear_selections[0].wargear_ids[0],
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
@@ -1814,6 +1819,7 @@ def _destroyed_transport_attack_context_for_test(
         "attacker_player_id": "player-a",
         "defender_player_id": "player-b",
         "attacking_unit_instance_id": attacker.unit_instance_id,
+        "weapon_instance_id": f"weapon-instance:test:{weapon_profile.profile_id}",
         "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
         "target_unit_instance_id": transport.unit_instance_id,
         "weapon_profile_id": weapon_profile.profile_id,

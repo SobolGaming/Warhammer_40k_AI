@@ -113,6 +113,7 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instances_for_model
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -189,8 +190,12 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
         active_player_id=ENEMY_PLAYER_ID,
     )
     first_model_id = destroyed_unit.own_models[0].model_instance_id
+    first_weapon_instance_id = equipped_weapon_instances_for_model(destroyed_unit.own_models[0])[
+        0
+    ].weapon_instance_id
     state.record_one_shot_weapon_selected(
         model_instance_id=first_model_id,
+        weapon_instance_id=first_weapon_instance_id,
         wargear_id=ONE_SHOT_WARGEAR_ID,
         weapon_profile_id=ONE_SHOT_PROFILE_ID,
         source_phase=BattlePhase.SHOOTING,
@@ -235,11 +240,15 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
     assert all(model.wounds_remaining == model.starting_wounds for model in replacement.own_models)
     assert not state.one_shot_weapon_available(
         model_instance_id=first_model_id,
+        weapon_instance_id=first_weapon_instance_id,
         wargear_id=ONE_SHOT_WARGEAR_ID,
         weapon_profile_id=ONE_SHOT_PROFILE_ID,
     )
     assert state.one_shot_weapon_available(
         model_instance_id=replacement.own_models[0].model_instance_id,
+        weapon_instance_id=equipped_weapon_instances_for_model(replacement.own_models[0])[
+            0
+        ].weapon_instance_id,
         wargear_id=ONE_SHOT_WARGEAR_ID,
         weapon_profile_id=ONE_SHOT_PROFILE_ID,
     )

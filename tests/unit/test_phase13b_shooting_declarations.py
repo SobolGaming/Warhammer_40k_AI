@@ -2261,6 +2261,16 @@ def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
     assert remaining.post_roll_attack_pools.active_player_id == "player-a"
     assert remaining.post_roll_attack_pools.selected_pool is None
     assert len(remaining.post_roll_attack_pools.unresolved_pools) == 2
+    missing_identity_payload = json.loads(json.dumps(remaining.to_payload(), sort_keys=True))
+    del missing_identity_payload["post_roll_attack_contexts"][0]["weapon_instance_id"]
+    with pytest.raises(GameLifecycleError, match="post-roll weapon_instance_id"):
+        AttackSequence.from_payload(missing_identity_payload)
+    drifted_identity_payload = json.loads(json.dumps(remaining.to_payload(), sort_keys=True))
+    drifted_identity_payload["post_roll_attack_contexts"][0]["weapon_instance_id"] = (
+        "weapon-instance:forged"
+    )
+    with pytest.raises(GameLifecycleError, match="weapon instance drift"):
+        AttackSequence.from_payload(drifted_identity_payload)
     assert tuple(
         cast(dict[str, object], event["payload"])["unmodified_roll"]
         for event in _attack_step_payloads(lifecycle, AttackSequenceStep.WOUND)
@@ -2629,6 +2639,7 @@ def test_phase13d_precision_decline_or_no_visible_character_uses_bodyguard_alloc
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=hidden_attacker.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:precision-hidden-character",
                 wargear_id=hidden_attacker.wargear_selections[0].wargear_ids[0],
                 weapon_profile_id=precision_profile.profile_id,
                 weapon_profile=precision_profile,
@@ -3832,6 +3843,7 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         "attacker_player_id": "player-a",
         "defender_player_id": "player-b",
         "attacking_unit_instance_id": attacker.unit_instance_id,
+        "weapon_instance_id": sequence.current_pool().weapon_instance_id,
         "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
         "target_unit_instance_id": defender.unit_instance_id,
         "weapon_profile_id": weapon_profile.profile_id,
@@ -3864,8 +3876,71 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         allocation_context_payload=allocation_context.to_payload(),
         allocated_model_ids=(),
     )
+    pending_sequence = sequence.with_pending_grouped_damage(pending)
 
     assert PendingGroupedDamage.from_payload(pending.to_payload()) == pending
+    assert (
+        AttackSequence.from_payload(
+            json.loads(json.dumps(pending_sequence.to_payload(), sort_keys=True))
+        )
+        == pending_sequence
+    )
+
+    missing_identity_payload = cast(
+        dict[str, Any], json.loads(json.dumps(pending_sequence.to_payload(), sort_keys=True))
+    )
+    missing_pending_payload = cast(
+        dict[str, Any], missing_identity_payload["pending_grouped_damage"]
+    )
+    missing_save_die = cast(dict[str, Any], missing_pending_payload["sorted_save_dice"][0])
+    del cast(dict[str, Any], missing_save_die["attack_context"])["weapon_instance_id"]
+    with pytest.raises(GameLifecycleError, match="pending grouped damage weapon_instance_id"):
+        AttackSequence.from_payload(cast(Any, missing_identity_payload))
+
+    forged_identity_payload = cast(
+        dict[str, Any], json.loads(json.dumps(pending_sequence.to_payload(), sort_keys=True))
+    )
+    forged_pending_payload = cast(dict[str, Any], forged_identity_payload["pending_grouped_damage"])
+    forged_save_die = cast(dict[str, Any], forged_pending_payload["sorted_save_dice"][0])
+    cast(dict[str, Any], forged_save_die["attack_context"])["weapon_instance_id"] = (
+        "weapon-instance:forged"
+    )
+    with pytest.raises(GameLifecycleError, match=r"pending grouped damage.*weapon instance drift"):
+        AttackSequence.from_payload(cast(Any, forged_identity_payload))
+
+    second_pool = replace(
+        sequence.attack_pools[0],
+        weapon_instance_id="weapon-instance:test:phase14h-pending-copy-002",
+    )
+    gathered_sequence = AttackSequence.start(
+        sequence_id=sequence.sequence_id,
+        attacker_player_id=sequence.attacker_player_id,
+        attacking_unit_instance_id=sequence.attacking_unit_instance_id,
+        attack_pools=(*sequence.attack_pools, second_pool),
+    ).with_selected_target_unit(defender.unit_instance_id)
+    gathered_group = gathered_attack_groups_for_target(
+        attack_sequence=gathered_sequence,
+        target_unit_instance_id=defender.unit_instance_id,
+    )[0]
+    gathered_sequence = gathered_sequence.with_current_gathered_group(gathered_group)
+    synthetic_context = cast(
+        AttackResolutionContextPayload,
+        {
+            **attack_context,
+            "weapon_instance_id": gathered_sequence.current_pool().weapon_instance_id,
+        },
+    )
+    synthetic_pending = replace(
+        pending,
+        sorted_save_dice=({**save_entry, "attack_context": synthetic_context},),
+    )
+    gathered_pending_sequence = gathered_sequence.with_pending_grouped_damage(synthetic_pending)
+    assert gathered_pending_sequence.current_pool().weapon_instance_id.startswith(
+        "gathered-weapon-instance:"
+    )
+    assert AttackSequence.from_payload(gathered_pending_sequence.to_payload()) == (
+        gathered_pending_sequence
+    )
 
     with pytest.raises(GameLifecycleError, match="sorted_save_dice must be a tuple"):
         PendingGroupedDamage(
@@ -6095,6 +6170,7 @@ def test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_
     )
     pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id="weapon-instance:test:phase13d-indirect",
         wargear_id=attacker.wargear_selections[0].wargear_ids[0],
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
@@ -6263,6 +6339,7 @@ def test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail
     )
     pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id="weapon-instance:test:phase13d-indirect-stationary",
         wargear_id=attacker.wargear_selections[0].wargear_ids[0],
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
@@ -8175,6 +8252,7 @@ def test_phase13c_no_ability_sequence_resolves_and_emits_ordered_hooks() -> None
     )
     pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id="weapon-instance:test:phase13c-fixed-dice",
         wargear_id=attacker.wargear_selections[0].wargear_ids[0],
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
@@ -8621,6 +8699,7 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
     second_pool = replace(
         first_pool,
+        weapon_instance_id="weapon-instance:test:phase14l:copy-002",
         attacks=4,
     )
     sequence = AttackSequence.start(
@@ -8639,6 +8718,10 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     assert groups[0].pool_indices == (0, 1)
     assert groups[0].group_id.startswith("attack-group:")
     assert groups[0].group_id.count(":") == 1
+    assert tuple(contribution.weapon_instance_id for contribution in groups[0].contributions) == (
+        first_pool.weapon_instance_id,
+        second_pool.weapon_instance_id,
+    )
     assert "attacks" not in identical_attack_signature(first_pool).to_payload()
     assert groups[0].signature.attacker_model_instance_id == first_pool.attacker_model_instance_id
     assert groups[0].signature.target_visible_model_ids == first_pool.target_visible_model_ids
@@ -8647,6 +8730,17 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
         groups[0].signature
     )
     assert GatheredAttackGroup.from_payload(groups[0].to_payload()) == groups[0]
+    assert tuple(
+        pool.weapon_instance_id
+        for pool in AttackSequence.from_payload(sequence.to_payload()).attack_pools
+    ) == (first_pool.weapon_instance_id, second_pool.weapon_instance_id)
+    fast_dice = FastDiceGroup.evaluate(
+        group_id="phase14l-identical-gather-fast-dice",
+        pools=(first_pool, second_pool),
+        allocation_order_can_affect_random_damage=False,
+    )
+    assert fast_dice.allowed
+    assert len(set(fast_dice.attack_pool_ids)) == 2
     synthetic_pool = (
         sequence.with_selected_target_unit(defender.unit_instance_id)
         .with_current_gathered_group(groups[0])
@@ -8654,6 +8748,7 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
     )
     assert synthetic_pool.attacks == 6
     assert synthetic_pool.attacker_model_instance_id == first_pool.attacker_model_instance_id
+    assert synthetic_pool.weapon_instance_id == (f"gathered-weapon-instance:{groups[0].group_id}")
     assert synthetic_pool.wargear_id == f"gathered-wargear:{groups[0].group_id}"
     assert synthetic_pool.weapon_profile_id == f"gathered-profile:{groups[0].group_id}"
     assert synthetic_pool.weapon_profile.profile_id == synthetic_pool.weapon_profile_id
@@ -8915,6 +9010,7 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
     bolt_pools = (
         RangedAttackPool(
             attacker_model_instance_id=safe_attacker_model_id,
+            weapon_instance_id="weapon-instance:test:phase14l:bolt:001",
             wargear_id="phase14l-test1-bolt-identical",
             weapon_profile_id=boltgun_profile.profile_id,
             weapon_profile=boltgun_profile,
@@ -8926,6 +9022,7 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
         ),
         RangedAttackPool(
             attacker_model_instance_id=safe_attacker_model_id,
+            weapon_instance_id="weapon-instance:test:phase14l:bolt:002",
             wargear_id="phase14l-test1-bolt-identical",
             weapon_profile_id=boltgun_profile.profile_id,
             weapon_profile=boltgun_profile,
@@ -8937,6 +9034,7 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
         ),
         RangedAttackPool(
             attacker_model_instance_id=safe_attacker_model_id,
+            weapon_instance_id="weapon-instance:test:phase14l:pistol:001",
             wargear_id="phase14l-test1-bolt-pistol",
             weapon_profile_id=bolt_pistol_profile.profile_id,
             weapon_profile=bolt_pistol_profile,
@@ -8949,6 +9047,7 @@ def test_phase14l_shooting_test1_gathered_save_order_regression() -> None:
     )
     heavy_pool = RangedAttackPool(
         attacker_model_instance_id=safe_attacker_model_id,
+        weapon_instance_id="weapon-instance:test:phase14l:heavy:001",
         wargear_id="phase14l-test1-heavy-bolter",
         weapon_profile_id=heavy_bolter_profile.profile_id,
         weapon_profile=heavy_bolter_profile,
@@ -9141,6 +9240,7 @@ def test_phase14l_gathered_attack_state_fails_fast_on_malformed_shapes() -> None
     with pytest.raises(GameLifecycleError, match="Firing Deck source unit and model"):
         type(contribution)(
             pool_index=contribution.pool_index,
+            weapon_instance_id=contribution.weapon_instance_id,
             attacker_model_instance_id=contribution.attacker_model_instance_id,
             wargear_id=contribution.wargear_id,
             weapon_profile_id=contribution.weapon_profile_id,
@@ -11940,7 +12040,9 @@ def test_phase14h_pending_destroyed_transport_state_round_trips_and_rejects_drif
             ),
         ),
     ).with_pending_destroyed_transport_disembark(pending)
-    rehydrated = AttackSequence.from_payload(sequence.to_payload())
+    rehydrated = AttackSequence.from_payload(
+        json.loads(json.dumps(sequence.to_payload(), sort_keys=True))
+    )
     without_pending = rehydrated.without_pending_destroyed_transport_disembark()
     non_destroyed_damage = DamageApplication(
         target_unit_instance_id=transport.unit_instance_id,
@@ -11969,6 +12071,27 @@ def test_phase14h_pending_destroyed_transport_state_round_trips_and_rejects_drif
     assert PendingDestroyedTransportDisembark.from_payload(pending.to_payload()) == pending
     assert rehydrated.pending_destroyed_transport_disembark == pending
     assert without_pending.pending_destroyed_transport_disembark is None
+    missing_identity_payload = cast(
+        dict[str, Any], json.loads(json.dumps(sequence.to_payload(), sort_keys=True))
+    )
+    missing_pending_payload = cast(
+        dict[str, Any], missing_identity_payload["pending_destroyed_transport_disembark"]
+    )
+    del cast(dict[str, Any], missing_pending_payload["attack_context"])["weapon_instance_id"]
+    with pytest.raises(GameLifecycleError, match="pending destroyed Transport weapon_instance_id"):
+        AttackSequence.from_payload(cast(Any, missing_identity_payload))
+
+    forged_identity_payload = cast(
+        dict[str, Any], json.loads(json.dumps(sequence.to_payload(), sort_keys=True))
+    )
+    forged_pending_payload = cast(
+        dict[str, Any], forged_identity_payload["pending_destroyed_transport_disembark"]
+    )
+    cast(dict[str, Any], forged_pending_payload["attack_context"])["weapon_instance_id"] = (
+        "weapon-instance:forged"
+    )
+    with pytest.raises(GameLifecycleError, match=r"pending destroyed Transport.*weapon instance"):
+        AttackSequence.from_payload(cast(Any, forged_identity_payload))
     with pytest.raises(GameLifecycleError, match="attack_context must be an object"):
         PendingDestroyedTransportDisembark(
             attack_context=cast(AttackResolutionContextPayload, "not-a-context"),

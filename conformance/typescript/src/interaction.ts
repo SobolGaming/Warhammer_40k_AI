@@ -104,7 +104,7 @@ export function constructInteractionSubmission(
     throw new Error("Parameterized interaction requires an actor.");
   }
   return {
-    schema_version: "parameterized-submission-v1",
+    schema_version: "parameterized-submission-v2-weapon-instances",
     actor_id: request.actor_id,
     payload: input.proposalPayload,
     result_id: input.resultId,

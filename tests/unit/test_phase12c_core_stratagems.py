@@ -3215,6 +3215,7 @@ def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> N
         declarations=(
             WeaponDeclaration(
                 attacker_model_instance_id=cast(str, selected_weapon["model_instance_id"]),
+                weapon_instance_id=cast(str, selected_weapon["weapon_instance_id"]),
                 wargear_id=cast(str, selected_weapon["wargear_id"]),
                 weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
                 target_unit_instance_id="army-beta:enemy-unit-2",
@@ -5790,6 +5791,7 @@ def _shooting_declaration_from_request(
         declarations=(
             WeaponDeclaration(
                 attacker_model_instance_id=cast(str, selected_weapon["model_instance_id"]),
+                weapon_instance_id=cast(str, selected_weapon["weapon_instance_id"]),
                 wargear_id=cast(str, selected_weapon["wargear_id"]),
                 weapon_profile_id=cast(str, selected_weapon["weapon_profile_id"]),
                 target_unit_instance_id=target_unit_id,

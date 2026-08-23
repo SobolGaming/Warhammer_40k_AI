@@ -27,5 +27,5 @@
     "submission_kind": "submit_return_on_death_placement"
   },
   "result_id": "phase18d-submit_return_on_death_placement-result-000001",
-  "schema_version": "parameterized-submission-v1"
+  "schema_version": "parameterized-submission-v2-weapon-instances"
 }

@@ -28,6 +28,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
@@ -53,6 +54,7 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
 from warhammer40k_core.engine.catalog_conditional_leading_runtime import (
     CatalogConditionalLeadingRuntime,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
     CATALOG_MOVEMENT_TARGET_PAIR_SELECTED_EVENT,
     SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
@@ -61,6 +63,9 @@ from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
+)
+from warhammer40k_core.engine.catalog_static_attack_modifier_runtime import (
+    record_catalog_static_rule_effects,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartRequestContext,
@@ -96,6 +101,7 @@ from warhammer40k_core.engine.phases.movement import (
     PendingMovementActionSelection,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -302,6 +308,63 @@ def test_live_leader_rules_fix_advance_extend_melta_and_allow_flickerjump_charge
         )
         is None
     )
+
+
+def test_disabled_conditional_rule_is_ignored_by_aggregate_static_registration() -> None:
+    source_row_id = "000000574:3"
+    source_rule_id = _rule_ir(source_row_id).source_id
+    active_fixture = _fixture(phase=BattlePhase.SHOOTING)
+    active_effects = record_catalog_static_rule_effects(
+        state=active_fixture.state,
+        ability_indexes_by_player_id=_single_rule_indexes(
+            active_fixture,
+            source_row_id=source_row_id,
+            disabled=False,
+        ),
+        armies=active_fixture.armies,
+    )
+    assert len(active_effects) == 1
+    assert active_effects[0].source_rule_id == source_rule_id
+
+    disabled_fixture = _fixture(phase=BattlePhase.SHOOTING)
+    disabled_effects = record_catalog_static_rule_effects(
+        state=disabled_fixture.state,
+        ability_indexes_by_player_id=_single_rule_indexes(
+            disabled_fixture,
+            source_row_id=source_row_id,
+            disabled=True,
+        ),
+        armies=disabled_fixture.armies,
+    )
+    assert disabled_effects == ()
+    assert all(
+        effect.source_rule_id != source_rule_id
+        for effect in disabled_fixture.state.persisting_effects
+    )
+
+
+def test_disabled_datasheet_rule_does_not_create_non_static_bindings() -> None:
+    source_row_id = "000000588:3"
+    fixture = _fixture(phase=BattlePhase.SHOOTING)
+    active_runtime = CatalogDatasheetRuleRuntime(
+        _single_rule_indexes(
+            fixture,
+            source_row_id=source_row_id,
+            disabled=False,
+        ),
+        fixture.armies,
+    )
+    disabled_runtime = CatalogDatasheetRuleRuntime(
+        _single_rule_indexes(
+            fixture,
+            source_row_id=source_row_id,
+            disabled=True,
+        ),
+        fixture.armies,
+    )
+
+    assert len(active_runtime.shooting_target_restriction_bindings()) == 1
+    assert disabled_runtime.shooting_target_restriction_bindings() == ()
 
 
 def test_spirit_mark_uses_finite_decision_current_state_validation_and_target_gate() -> None:
@@ -1186,6 +1249,27 @@ def _rule_ir(source_row_id: str) -> RuleIR:
     payload = source_package.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
     assert payload is not None
     return RuleIR.from_payload(payload)
+
+
+def _single_rule_indexes(
+    fixture: _Fixture,
+    *,
+    source_row_id: str,
+    disabled: bool,
+) -> dict[str, AbilityCatalogIndex]:
+    source_rule_id = _rule_ir(source_row_id).source_id
+    matching_records = tuple(
+        record
+        for record in fixture.indexes["player-a"].all_records()
+        if rule_ir_from_execution_payload(record.definition.replay_payload).source_id
+        == source_rule_id
+    )
+    assert len(matching_records) == 1
+    record = replace(matching_records[0], disabled=disabled)
+    return {
+        "player-a": AbilityCatalogIndex.from_records((record,)),
+        "player-b": AbilityCatalogIndex.from_records(()),
+    }
 
 
 def _characteristics(profile: Any) -> tuple[int, ...]:

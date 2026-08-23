@@ -60,6 +60,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_rule_effects import (
     embark_transport_forbidden_effect_source_ids,
 )
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instance_by_id
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
@@ -119,6 +120,7 @@ class TransportOperationViolationCode(StrEnum):
     FIRING_DECK_UNIT_NOT_EMBARKED = "firing_deck_unit_not_embarked"
     FIRING_DECK_UNIT_ALREADY_SHOT = "firing_deck_unit_already_shot"
     FIRING_DECK_MODEL_DRIFT = "firing_deck_model_drift"
+    FIRING_DECK_WEAPON_INSTANCE_DRIFT = "firing_deck_weapon_instance_drift"
     FIRING_DECK_DUPLICATE_MODEL_SELECTION = "firing_deck_duplicate_model_selection"
     FIRING_DECK_MELEE_WEAPON = "firing_deck_melee_weapon"
     FIRING_DECK_ONE_SHOT_WEAPON = "firing_deck_one_shot_weapon"
@@ -253,6 +255,7 @@ class TransportHazardMortalWoundsPayload(TypedDict):
 
 
 class FiringDeckWeaponSelectionPayload(TypedDict):
+    weapon_instance_id: str
     embarked_unit_instance_id: str
     model_instance_id: str
     wargear_id: str
@@ -1707,39 +1710,30 @@ class TransportHazardMortalWounds:
 
 @dataclass(frozen=True, slots=True)
 class FiringDeckWeaponSelection:
+    weapon_instance_id: str
     embarked_unit_instance_id: str
     model_instance_id: str
     wargear_id: str
     weapon_profile: WeaponProfile
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "embarked_unit_instance_id",
-            _validate_identifier(
-                "FiringDeckWeaponSelection embarked_unit_instance_id",
-                self.embarked_unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "model_instance_id",
-            _validate_identifier(
-                "FiringDeckWeaponSelection model_instance_id", self.model_instance_id
-            ),
-        )
-        object.__setattr__(
-            self,
-            "wargear_id",
-            _validate_identifier("FiringDeckWeaponSelection wargear_id", self.wargear_id),
-        )
-        if type(self.weapon_profile) is not WeaponProfile:
-            raise GameLifecycleError(
-                "FiringDeckWeaponSelection weapon_profile must be a WeaponProfile."
+        for field_name, value in (
+            ("weapon_instance_id", self.weapon_instance_id),
+            ("embarked_unit_instance_id", self.embarked_unit_instance_id),
+            ("model_instance_id", self.model_instance_id),
+            ("wargear_id", self.wargear_id),
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                _validate_identifier(f"Firing Deck {field_name}", value),
             )
+        if type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Firing Deck weapon_profile must be a WeaponProfile.")
 
     def to_payload(self) -> FiringDeckWeaponSelectionPayload:
         return {
+            "weapon_instance_id": self.weapon_instance_id,
             "embarked_unit_instance_id": self.embarked_unit_instance_id,
             "model_instance_id": self.model_instance_id,
             "wargear_id": self.wargear_id,
@@ -1749,6 +1743,7 @@ class FiringDeckWeaponSelection:
     @classmethod
     def from_payload(cls, payload: FiringDeckWeaponSelectionPayload) -> Self:
         return cls(
+            weapon_instance_id=payload["weapon_instance_id"],
             embarked_unit_instance_id=payload["embarked_unit_instance_id"],
             model_instance_id=payload["model_instance_id"],
             wargear_id=payload["wargear_id"],
@@ -1780,7 +1775,7 @@ class FiringDeckSelection:
             self,
             "transport_unit_instance_id",
             _validate_identifier(
-                "FiringDeckSelection transport_unit_instance_id",
+                "Firing Deck transport_unit_instance_id",
                 self.transport_unit_instance_id,
             ),
         )
@@ -1793,7 +1788,7 @@ class FiringDeckSelection:
             self,
             "weapon_selections",
             _validate_firing_deck_weapon_selection_tuple(
-                "FiringDeckSelection weapon_selections",
+                "Firing Deck weapon_selections",
                 self.weapon_selections,
             ),
         )
@@ -1801,7 +1796,7 @@ class FiringDeckSelection:
             self,
             "already_shot_unit_instance_ids",
             _validate_identifier_tuple(
-                "FiringDeckSelection already_shot_unit_instance_ids",
+                "Firing Deck already_shot_unit_instance_ids",
                 self.already_shot_unit_instance_ids,
             ),
         )
@@ -1852,9 +1847,7 @@ class FiringDeckResolution:
         profiles = tuple(self.temporary_weapon_profiles)
         for profile in profiles:
             if type(profile) is not WeaponProfile:
-                raise GameLifecycleError(
-                    "FiringDeckResolution temporary_weapon_profiles must contain WeaponProfile."
-                )
+                raise GameLifecycleError("Firing Deck profiles must contain WeaponProfile.")
         object.__setattr__(self, "temporary_weapon_profiles", profiles)
         object.__setattr__(
             self,
@@ -2630,9 +2623,15 @@ def resolve_firing_deck_selection(
                     unit_instance_id=weapon_selection.embarked_unit_instance_id,
                 )
             )
-        if weapon_selection.model_instance_id not in {
-            model.model_instance_id for model in unit.own_models
-        }:
+        model = next(
+            (
+                model
+                for model in unit.own_models
+                if model.model_instance_id == weapon_selection.model_instance_id
+            ),
+            None,
+        )
+        if model is None:
             violations.append(
                 TransportOperationViolation(
                     violation_code=TransportOperationViolationCode.FIRING_DECK_MODEL_DRIFT,
@@ -2641,6 +2640,22 @@ def resolve_firing_deck_selection(
                     model_instance_id=weapon_selection.model_instance_id,
                 )
             )
+        else:
+            weapon_instance = equipped_weapon_instance_by_id(
+                model=model,
+                weapon_instance_id=weapon_selection.weapon_instance_id,
+            )
+            if weapon_instance is None or weapon_instance.wargear_id != weapon_selection.wargear_id:
+                violations.append(
+                    TransportOperationViolation(
+                        violation_code=(
+                            TransportOperationViolationCode.FIRING_DECK_WEAPON_INSTANCE_DRIFT
+                        ),
+                        message="Firing Deck weapon instance is not equipped by this model.",
+                        unit_instance_id=weapon_selection.embarked_unit_instance_id,
+                        model_instance_id=weapon_selection.model_instance_id,
+                    )
+                )
         if weapon_selection.weapon_profile.range_profile.kind is RangeProfileKind.MELEE:
             violations.append(
                 TransportOperationViolation(
@@ -3437,6 +3452,7 @@ def _validate_firing_deck_weapon_selection_tuple(
             key=lambda selection: (
                 selection.embarked_unit_instance_id,
                 selection.model_instance_id,
+                selection.weapon_instance_id,
                 selection.wargear_id,
                 selection.weapon_profile.profile_id,
             ),

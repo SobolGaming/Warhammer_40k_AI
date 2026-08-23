@@ -24,6 +24,7 @@ from warhammer40k_core.core.weapon_profiles import (
     canonical_weapon_keyword_tokens,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.engine import catalog_attack_condition_classification as _attack_conditions
 from warhammer40k_core.engine import catalog_command_point_support as _command_points
 from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
 from warhammer40k_core.engine import catalog_datasheet_rule_support as _datasheet
@@ -45,6 +46,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilitySourceKind,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -4408,7 +4410,7 @@ def _unit_scoped_generic_records(
     return tuple(
         record
         for record in ability_index.records_for(trigger_kind)
-        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
+        if ability_record_is_active_generic_rule_ir(record)
         and _record_source_matches_unit(
             record=record,
             unit=unit,
@@ -4426,7 +4428,7 @@ def _unit_scoped_generic_records_for_all_timings(
     return tuple(
         record
         for record in ability_index.all_records()
-        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
+        if ability_record_is_active_generic_rule_ir(record)
         and _record_source_matches_unit(
             record=record,
             unit=unit,
@@ -4849,41 +4851,9 @@ def _clause_is_supported_this_model_attack_roll_modifier(
     clause: RuleClause,
     effect: RuleEffectSpec,
 ) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog rule consumer classification requires RuleClause.")
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
-    if not clause.is_supported:
-        return False
-    if clause.target is None or clause.target.kind is not RuleTargetKind.THIS_MODEL:
-        return False
-    if effect.kind is not RuleEffectKind.MODIFY_DICE_ROLL:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    roll_type = parameters.get("roll_type")
-    if type(roll_type) is not str:
-        return False
-    if not _clause_has_roll_trigger(clause, roll_type=roll_type):
-        return False
-    return any(
-        _condition_is_supported_this_model_attack_half_strength_gate(condition)
-        for condition in clause.conditions
-    )
-
-
-def _condition_is_supported_this_model_attack_half_strength_gate(
-    condition: RuleCondition,
-) -> bool:
-    if type(condition) is not RuleCondition:
-        raise GameLifecycleError("Catalog rule consumer requires RuleCondition values.")
-    if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
-        return False
-    parameters = parameter_payload(condition.parameters)
-    return (
-        parameters.get("relationship") == "this_model_makes_attack"
-        and parameters.get("gate_subject") == "attack_target"
-        and parameters.get("target_allegiance") == "enemy"
-        and parameters.get("target_constraint") == "target_not_below_half_strength"
+    return _attack_conditions.clause_effect_is_supported_this_model_attack_roll_modifier(
+        clause,
+        effect,
     )
 
 

@@ -46,5 +46,5 @@
     "unit_instance_id": "army-alpha:horrors-1"
   },
   "result_id": "phase18d-model_materialization_placement-result-000001",
-  "schema_version": "parameterized-submission-v1"
+  "schema_version": "parameterized-submission-v2-weapon-instances"
 }

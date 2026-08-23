@@ -16,8 +16,8 @@ export interface paths {
         parameters: {
             query?: never; header?: never; path?: never; cookie?: never;
         };
-        get?: never; put?: never; post: operations["createAuthoritativeSession"]; delete?: never; options?: never;
-        head?: never; patch?: never; trace?: never;
+        get?: never; put?: never; post: operations["createAuthoritativeSession"]; delete?: never; options?: never; head?: never;
+        patch?: never; trace?: never;
     };
     "/sessions/{session_id}": {
         parameters: {
@@ -30,15 +30,15 @@ export interface paths {
         parameters: {
             query?: never; header?: never; path?: never; cookie?: never;
         };
-        get?: never; put?: never; post: operations["executeSessionCommand"]; delete?: never; options?: never;
-        head?: never; patch?: never; trace?: never;
+        get?: never; put?: never; post: operations["executeSessionCommand"]; delete?: never; options?: never; head?: never;
+        patch?: never; trace?: never;
     };
     "/sessions/{session_id}/projection": {
         parameters: {
             query?: never; header?: never; path?: never; cookie?: never;
         };
-        get: operations["getSessionProjection"]; put?: never; post?: never; delete?: never; options?: never;
-        head?: never; patch?: never; trace?: never;
+        get: operations["getSessionProjection"]; put?: never; post?: never; delete?: never; options?: never; head?: never;
+        patch?: never; trace?: never;
     };
     "/sessions/{session_id}/catalog": {
         parameters: {
@@ -58,8 +58,8 @@ export interface paths {
         parameters: {
             query?: never; header?: never; path?: never; cookie?: never;
         };
-        get: operations["exportSessionReplay"]; put?: never; post?: never; delete?: never; options?: never;
-        head?: never; patch?: never; trace?: never;
+        get: operations["exportSessionReplay"]; put?: never; post?: never; delete?: never; options?: never; head?: never;
+        patch?: never; trace?: never;
     };
 }
 export type webhooks = Record<string, never>;
@@ -80,8 +80,7 @@ export interface components {
             schema_version: "error-envelope-v1";
         };
         "rules-catalog--base_size.schema": {
-            base_size_id: string; diameter_mm: number | null; kind: string; length_mm: number | null;
-            width_mm: number | null;
+            base_size_id: string; diameter_mm: number | null; kind: string; length_mm: number | null; width_mm: number | null;
         };
         "rules-catalog--army_rule_display.schema": {
             ability_descriptor_ids: string[]; army_rule_id: string; content_scope: string; display_name: string;
@@ -122,9 +121,8 @@ export interface components {
                 [key: string]: components["schemas"]["rules-catalog--display_record.schema"];
             };
             /** @constant */
-            projection_schema: "rules-catalog-view-v2";
-            ruleset_id: components["schemas"]["rules-catalog--json_value.schema"]; source_hash: string;
-            source_package_id: string;
+            projection_schema: "rules-catalog-view-v2"; ruleset_id: components["schemas"]["rules-catalog--json_value.schema"];
+            source_hash: string; source_package_id: string;
             stratagem_display_by_id: {
                 [key: string]: components["schemas"]["rules-catalog--stratagem_display.schema"];
             };
@@ -165,8 +163,8 @@ export interface components {
             /** @constant */
             coordinate_frame: "model_centered_z_up"; evidence_id: string;
             /** @enum {string} */
-            footprint_kind: "circular" | "oval" | "rectangular" | "hull"; offset_x_inches: number;
-            offset_y_inches: number; part_id: string; radius_x_inches: number; radius_y_inches: number;
+            footprint_kind: "circular" | "oval" | "rectangular" | "hull"; offset_x_inches: number; offset_y_inches: number;
+            part_id: string; radius_x_inches: number; radius_y_inches: number;
             /** @enum {string} */
             source_units: "millimeters" | "inches";
             /** @enum {string} */
@@ -228,8 +226,8 @@ export interface components {
                 }[];
             } | null;
             model_geometries?: components["schemas"]["create-session--model_geometry_catalog_record.schema"][];
-            player_ids: string[]; reserve_unit_points: Record<string, never>[];
-            ruleset_descriptor: Record<string, never>; tactical_secondary_draw_count: number; turn_order: string[];
+            player_ids: string[]; reserve_unit_points: Record<string, never>[]; ruleset_descriptor: Record<string, never>;
+            tactical_secondary_draw_count: number; turn_order: string[];
         };
         /** CORE V2 Authenticated SessionCreatePayload */
         "session-create.schema": {
@@ -268,7 +266,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v10-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v11-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -326,8 +324,7 @@ export interface components {
             /** @constant */
             movement_phase_action: "charge_move";
             /** @constant */
-            proposal_kind: "charge_move";
-            proposal_request_id: components["schemas"]["proposal-payload--identifier.schema"];
+            proposal_kind: "charge_move"; proposal_request_id: components["schemas"]["proposal-payload--identifier.schema"];
             unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
             witness: components["schemas"]["proposal-payload--path_witness.schema"];
         };
@@ -411,8 +408,7 @@ export interface components {
             game_id: components["schemas"]["proposal-payload--identifier.schema"];
             player_id: components["schemas"]["proposal-payload--identifier.schema"];
             /** @constant */
-            proposal_kind: "scout_move";
-            proposal_request_id: components["schemas"]["proposal-payload--identifier.schema"];
+            proposal_kind: "scout_move"; proposal_request_id: components["schemas"]["proposal-payload--identifier.schema"];
             ruleset_descriptor_hash: components["schemas"]["proposal-payload--identifier.schema"];
             scout_distance_inches: number;
             /** @constant */
@@ -421,6 +417,72 @@ export interface components {
             unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
             witness: components["schemas"]["proposal-payload--path_witness.schema"];
         };
+        "proposal-payload--ability_parameter.schema": {
+            name: components["schemas"]["proposal-payload--identifier.schema"]; value: boolean | number | string;
+        };
+        "proposal-payload--ability_descriptor.schema": {
+            ability_id: components["schemas"]["proposal-payload--identifier.schema"];
+            ability_kind: components["schemas"]["proposal-payload--identifier.schema"]; condition: string | null;
+            name: components["schemas"]["proposal-payload--identifier.schema"];
+            parameters: components["schemas"]["proposal-payload--ability_parameter.schema"][];
+            target_keywords: components["schemas"]["proposal-payload--identifier_array.schema"]; timing: string | null;
+        };
+        "proposal-payload--characteristic_value.schema": {
+            applied_modifier_ids: components["schemas"]["proposal-payload--identifier_array.schema"]; base: number;
+            characteristic: components["schemas"]["proposal-payload--identifier.schema"]; final: number; raw: number;
+            /** @enum {string} */
+            value_kind: "numeric" | "replacement_dash" | "source_dash";
+        };
+        "proposal-payload--dice_expression.schema": {
+            modifier: number; quantity: number; sides: number;
+        };
+        "proposal-payload--attack_profile.schema": {
+            dice_expression: null; fixed_attacks: number;
+        } | {
+            dice_expression: components["schemas"]["proposal-payload--dice_expression.schema"]; fixed_attacks: null;
+        };
+        "proposal-payload--damage_profile.schema": {
+            dice_expression: null; fixed_damage: number;
+        } | {
+            dice_expression: components["schemas"]["proposal-payload--dice_expression.schema"]; fixed_damage: null;
+        };
+        "proposal-payload--range_profile.schema": {
+            distance_inches: number;
+            /** @constant */
+            kind: "distance";
+        } | {
+            distance_inches: null;
+            /** @constant */
+            kind: "melee";
+        };
+        "proposal-payload--weapon_profile.schema": {
+            abilities: components["schemas"]["proposal-payload--ability_descriptor.schema"][];
+            armor_penetration: components["schemas"]["proposal-payload--characteristic_value.schema"];
+            attack_profile: components["schemas"]["proposal-payload--attack_profile.schema"];
+            damage_profile: components["schemas"]["proposal-payload--damage_profile.schema"];
+            keywords: components["schemas"]["proposal-payload--identifier_array.schema"];
+            name: components["schemas"]["proposal-payload--identifier.schema"];
+            profile_id: components["schemas"]["proposal-payload--identifier.schema"];
+            range_profile: components["schemas"]["proposal-payload--range_profile.schema"];
+            skill: components["schemas"]["proposal-payload--characteristic_value.schema"];
+            source_ids: components["schemas"]["proposal-payload--identifier_array.schema"];
+            strength: components["schemas"]["proposal-payload--characteristic_value.schema"];
+        };
+        "proposal-payload--firing_deck_weapon_selection.schema": {
+            embarked_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            model_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            wargear_id: components["schemas"]["proposal-payload--identifier.schema"];
+            weapon_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            weapon_profile: components["schemas"]["proposal-payload--weapon_profile.schema"];
+        };
+        "proposal-payload--firing_deck_selection.schema": {
+            already_shot_unit_instance_ids: components["schemas"]["proposal-payload--identifier_array.schema"];
+            battle_round: number; firing_deck_value: number;
+            player_id: components["schemas"]["proposal-payload--identifier.schema"];
+            transport_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            weapon_selections: components["schemas"]["proposal-payload--firing_deck_weapon_selection.schema"][];
+        };
+        "proposal-payload--nullable_firing_deck_selection.schema": components["schemas"]["proposal-payload--firing_deck_selection.schema"] | null;
         "proposal-payload--shooting_declaration.schema": {
             battle_round: number;
             declarations: {
@@ -430,9 +492,10 @@ export interface components {
                 shooting_type: components["schemas"]["proposal-payload--identifier.schema"];
                 target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 wargear_id: components["schemas"]["proposal-payload--identifier.schema"];
+                weapon_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 weapon_profile_id: components["schemas"]["proposal-payload--identifier.schema"];
             }[];
-            firing_deck_selection: components["schemas"]["proposal-payload--json_value.schema"];
+            firing_deck_selection: components["schemas"]["proposal-payload--nullable_firing_deck_selection.schema"];
             player_id: components["schemas"]["proposal-payload--identifier.schema"];
             /** @constant */
             proposal_kind: "shooting_declaration";
@@ -447,8 +510,7 @@ export interface components {
             declarations: {
                 attacker_model_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 target_allocations: {
-                    attacks?: number;
-                    target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+                    attacks?: number; target_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
                 }[];
                 wargear_id: components["schemas"]["proposal-payload--identifier.schema"];
                 weapon_profile_id: components["schemas"]["proposal-payload--identifier.schema"];
@@ -472,8 +534,7 @@ export interface components {
                 active_player_id: string | null; battle_round: number;
                 game_id: components["schemas"]["proposal-payload--identifier.schema"];
                 phase: components["schemas"]["proposal-payload--identifier.schema"];
-                player_id: components["schemas"]["proposal-payload--identifier.schema"];
-                timing_window_id: string | null;
+                player_id: components["schemas"]["proposal-payload--identifier.schema"]; timing_window_id: string | null;
                 trigger_kind: components["schemas"]["proposal-payload--identifier.schema"];
                 trigger_payload?: components["schemas"]["proposal-payload--json_value.schema"];
             };
@@ -483,9 +544,8 @@ export interface components {
             proposal_kind: "stratagem_target_binding";
             request_id?: components["schemas"]["proposal-payload--identifier.schema"];
             target_binding: null | {
-                target_kind: components["schemas"]["proposal-payload--identifier.schema"];
-                target_player_id: string | null; target_secondary_mission_id?: string | null;
-                target_unit_instance_id: string | null;
+                target_kind: components["schemas"]["proposal-payload--identifier.schema"]; target_player_id: string | null;
+                target_secondary_mission_id?: string | null; target_unit_instance_id: string | null;
             };
         };
         "proposal-payload--cult_ambush_marker_point.schema": {
@@ -520,12 +580,11 @@ export interface components {
         "session-command-envelope.schema": {
             command_id: string; expected_session_revision: number; request_id: string | null; result_id: string | null;
             /** @constant */
-            schema_version: "session-command-envelope-v1"; session_id: string;
+            schema_version: "session-command-envelope-v2-weapon-instances"; session_id: string;
             submission: components["schemas"]["session-command-envelope--start_submission.schema"] | components["schemas"]["session-command-envelope--advance_submission.schema"] | components["schemas"]["session-command-envelope--close_submission.schema"] | components["schemas"]["session-command-envelope--finite_submission.schema"] | components["schemas"]["session-command-envelope--parameterized_submission.schema"];
         } & unknown;
         "session-command-outcome--checkpoint.schema": {
-            event_cursor: string; projection_state_hash: string; session_revision: number;
-            viewer_player_id: string | null;
+            event_cursor: string; projection_state_hash: string; session_revision: number; viewer_player_id: string | null;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
         };
@@ -542,8 +601,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v10-contract";
-            session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v11-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -572,9 +630,9 @@ export interface components {
         "battlefield-view--shape.schema": {
             center: components["schemas"]["battlefield-view--point.schema"] | null;
             /** @enum {string} */
-            kind: "circle" | "ellipse" | "rectangle" | "polygon"; length_inches: number | null;
-            radius_inches: number | null; rotation_degrees: number;
-            vertices: components["schemas"]["battlefield-view--point.schema"][]; width_inches: number | null;
+            kind: "circle" | "ellipse" | "rectangle" | "polygon"; length_inches: number | null; radius_inches: number | null;
+            rotation_degrees: number; vertices: components["schemas"]["battlefield-view--point.schema"][];
+            width_inches: number | null;
         } & (unknown & unknown & unknown);
         "battlefield-view--region_shape.schema": {
             circle_cutouts: components["schemas"]["battlefield-view--shape.schema"][];
@@ -596,8 +654,7 @@ export interface components {
             height_inches: number; geometry_source_id: string | null; geometry_source_kind: string;
             height_source_id: string | null; height_source_kind: string;
             /** @enum {string} */
-            measurement_basis: "base" | "hull";
-            measurement_shapes: components["schemas"]["battlefield-view--shape.schema"][];
+            measurement_basis: "base" | "hull"; measurement_shapes: components["schemas"]["battlefield-view--shape.schema"][];
             support_shape: components["schemas"]["battlefield-view--shape.schema"];
         };
         "battlefield-view--position.schema": {
@@ -616,14 +673,12 @@ export interface components {
             pose: components["schemas"]["battlefield-view--pose.schema"] | null;
             /** @enum {string} */
             state: "placed" | "destroyed" | "embarked" | "reserves" | "removed" | "undeployed";
-            state_context: components["schemas"]["battlefield-view--model_state_context.schema"];
-            unit_instance_id: string;
+            state_context: components["schemas"]["battlefield-view--model_state_context.schema"]; unit_instance_id: string;
         };
         "battlefield-view--objective.schema": {
             /** @constant */
             entity_kind: "objective"; marker_diameter_inches: number; measurement_anchor: string; objective_id: string;
-            objective_role: string; position: components["schemas"]["battlefield-view--position.schema"];
-            source_id: string;
+            objective_role: string; position: components["schemas"]["battlefield-view--position.schema"]; source_id: string;
         };
         "battlefield-view--terrain_area.schema": {
             classification: string;
@@ -680,8 +735,8 @@ export interface components {
             reference_kind: "decision_option";
         };
         "battlefield-view--measurement_overlay.schema": {
-            distance_inches: number; end: components["schemas"]["battlefield-view--position.schema"];
-            overlay_id: string; start: components["schemas"]["battlefield-view--position.schema"];
+            distance_inches: number; end: components["schemas"]["battlefield-view--position.schema"]; overlay_id: string;
+            start: components["schemas"]["battlefield-view--position.schema"];
         };
         "battlefield-view--path_segment.schema": {
             end: components["schemas"]["battlefield-view--pose.schema"];
@@ -714,9 +769,8 @@ export interface components {
         };
         /** CORE V2 BattlefieldViewPayload */
         "battlefield-view.schema": {
-            authoritative: components["schemas"]["battlefield-view--authoritative.schema"];
-            authoritative_geometry_hash: string; battlefield_id: string;
-            bounds: components["schemas"]["battlefield-view--bounds.schema"];
+            authoritative: components["schemas"]["battlefield-view--authoritative.schema"]; authoritative_geometry_hash: string;
+            battlefield_id: string; bounds: components["schemas"]["battlefield-view--bounds.schema"];
             /** @constant */
             coordinate_space: "battlefield_inches_right_handed_z_up";
             /** @constant */
@@ -744,8 +798,7 @@ export interface components {
             [key: string]: unknown;
         };
         "game-view--base_size.schema": {
-            base_size_id: string; diameter_mm: number | null; kind: string; length_mm: number | null;
-            width_mm: number | null;
+            base_size_id: string; diameter_mm: number | null; kind: string; length_mm: number | null; width_mm: number | null;
         };
         "game-view--model_display.schema": {
             base_characteristics: {
@@ -800,8 +853,7 @@ export interface components {
             [key: string]: components["schemas"]["decision-request-view--json_value.schema"];
         };
         "decision-request-view--decision_option.schema": {
-            label: string; option_id: string;
-            payload: components["schemas"]["decision-request-view--json_value.schema"];
+            label: string; option_id: string; payload: components["schemas"]["decision-request-view--json_value.schema"];
         };
         /** CORE V2 DecisionRequestViewPayload */
         "decision-request-view.schema": {
@@ -815,14 +867,12 @@ export interface components {
             [key: string]: components["schemas"]["annotated-decision-request--json_value.schema"];
         };
         "annotated-decision-request--decision_option.schema": {
-            label: string; option_id: string;
-            payload: components["schemas"]["annotated-decision-request--json_value.schema"];
+            label: string; option_id: string; payload: components["schemas"]["annotated-decision-request--json_value.schema"];
         };
         /** CORE V2 InteractionAnnotatedDecisionRequestPayload */
         "annotated-decision-request.schema": {
-            actor_id: string; decision_type: string;
-            interaction: components["schemas"]["interaction-descriptor.schema"]; is_parameterized: boolean;
-            options: components["schemas"]["annotated-decision-request--decision_option.schema"][];
+            actor_id: string; decision_type: string; interaction: components["schemas"]["interaction-descriptor.schema"];
+            is_parameterized: boolean; options: components["schemas"]["annotated-decision-request--decision_option.schema"][];
             payload: components["schemas"]["annotated-decision-request--json_value.schema"]; request_id: string;
             /** @constant */
             schema_version: "annotated-decision-request-v2-primary-assignments";
@@ -855,8 +905,7 @@ export interface components {
             created_battle_round: components["schemas"]["game-view--primary_nullable_positive_integer.schema"];
             created_phase: components["schemas"]["game-view--primary_nullable_identifier.schema"];
             created_active_player_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
-            source_event_id: string;
-            source_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
+            source_event_id: string; source_result_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
             source_action_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
             source_destruction_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
             source_designation_id: components["schemas"]["game-view--primary_nullable_identifier.schema"];
@@ -883,8 +932,8 @@ export interface components {
             source_event_id: string;
         };
         "game-view--primary_consecration_designation_state.schema": {
-            designation_id: string; game_id: string; owner_player_id: string; mission_id: string;
-            source_rule_id: string; source_descriptor_id: string; rules_unit_instance_id: string;
+            designation_id: string; game_id: string; owner_player_id: string; mission_id: string; source_rule_id: string;
+            source_descriptor_id: string; rules_unit_instance_id: string;
             component_unit_instance_ids: components["schemas"]["game-view--primary_identifier_array.schema"];
             source_destruction_id: string; created_battle_round: number; created_phase: string;
             created_active_player_id: string; source_event_id: string;
@@ -910,9 +959,8 @@ export interface components {
         "game-view--rules_catalog_reference.schema": {
             catalog_id: string;
             /** @constant */
-            projection_schema: "rules-catalog-view-v2";
-            ruleset_id: components["schemas"]["game-view--json_value.schema"]; source_hash: string;
-            source_package_id: string;
+            projection_schema: "rules-catalog-view-v2"; ruleset_id: components["schemas"]["game-view--json_value.schema"];
+            source_hash: string; source_package_id: string;
         };
         "game-view--unit_display.schema": {
             datasheet_id: string | null; model_instance_ids: string[]; owner_player_id: string | null;
@@ -924,16 +972,14 @@ export interface components {
         "game-view.schema": {
             active_player_id: string | null; battle_round: number;
             battlefield_state: components["schemas"]["game-view--json_value.schema"];
-            battlefield_view?: components["schemas"]["battlefield-view.schema"] | null;
-            current_battle_phase: string | null; current_setup_step: string | null; game_id: string;
-            mission_setup: components["schemas"]["mission_setup"];
+            battlefield_view?: components["schemas"]["battlefield-view.schema"] | null; current_battle_phase: string | null;
+            current_setup_step: string | null; game_id: string; mission_setup: components["schemas"]["mission_setup"];
             model_display_by_id: {
                 [key: string]: components["schemas"]["game-view--model_display.schema"];
             };
             pending_decision: components["schemas"]["decision-request-view.schema"] | null;
             pending_proposal: components["schemas"]["game-view--json_value.schema"];
-            nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
-            player_ids: string[];
+            nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][]; player_ids: string[];
             /** @constant */
             projection_schema: "game-view-v11-phase17n-step4"; projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
@@ -970,25 +1016,21 @@ export interface components {
         /** CORE V2 Role-Bound SessionEventDeltaPayload */
         "event-delta.schema": {
             command_id: string | null; events: components["schemas"]["event-delta--event_record.schema"][];
-            from_revision: number; game_id: string; has_more: boolean; next_cursor: string;
-            projection_state_hash: string;
+            from_revision: number; game_id: string; has_more: boolean; next_cursor: string; projection_state_hash: string;
             /** @enum {unknown} */
             resync_reason: null | "malformed" | "expired" | "ahead" | "wrong_session" | "wrong_viewer" | "revision_mismatch" | "projection_hash_mismatch";
             resync_required: boolean; retention_limit: number; revision_retention_limit: number;
             /** @constant */
-            schema_version: "event-delta-v5-phase17n-step4"; session_id: string; supplied_cursor: string;
-            to_revision: number;
+            schema_version: "event-delta-v5-phase17n-step4"; session_id: string; supplied_cursor: string; to_revision: number;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
         };
-        "replay-metadata--nullable_identifier.schema": string | null;
-        "replay-metadata--identifier_array.schema": string[];
+        "replay-metadata--nullable_identifier.schema": string | null; "replay-metadata--identifier_array.schema": string[];
         "replay-metadata--mission_action_state.schema": {
-            action_id: string; mission_action_id: string; player_id: string; unit_instance_id: string;
-            target_id: string;
-            condition_target_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
-            mission_id: string; battle_round_started: number; phase_started: string; start_timing: string;
-            completion_timing: string; eligible_unit_instance_ids: string[];
+            action_id: string; mission_action_id: string; player_id: string; unit_instance_id: string; target_id: string;
+            condition_target_id: components["schemas"]["replay-metadata--nullable_identifier.schema"]; mission_id: string;
+            battle_round_started: number; phase_started: string; start_timing: string; completion_timing: string;
+            eligible_unit_instance_ids: string[];
             interruption_conditions: components["schemas"]["replay-metadata--identifier_array.schema"];
             scoring_source_id: string; victory_points: number;
             /** @enum {string} */
@@ -1094,16 +1136,15 @@ export interface components {
         /** @description One content-addressed state snapshot required for every ordinary or end-of-battle boundary with an applicable assigned-Primary rule, including zero-award evaluations. */
         "replay-metadata--primary_scoring_state_evidence.schema": {
             /** @constant */
-            schema_version: "primary-scoring-state-evidence-v1"; game_id: string; battlefield_id: string;
-            battle_round: number; active_player_id: string;
+            schema_version: "primary-scoring-state-evidence-v1"; game_id: string; battlefield_id: string; battle_round: number;
+            active_player_id: string;
             /** @enum {string} */
             phase: "command" | "movement" | "shooting" | "charge" | "fight";
             /** @enum {string} */
             timing: "turn_start" | "phase_end" | "turn_end";
             /** @enum {string} */
             scoring_boundary_kind: "ordinary" | "end_of_battle"; objective_control_record_id: string;
-            objective_control_record_hash: string; scoring_commit_checkpoint_id: string;
-            scoring_commit_checkpoint_hash: string;
+            objective_control_record_hash: string; scoring_commit_checkpoint_id: string; scoring_commit_checkpoint_hash: string;
             primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
             primary_mission_action_states: components["schemas"]["replay-metadata--mission_action_state.schema"][];
             primary_battlefield_departure_states: components["schemas"]["replay-metadata--primary_battlefield_departure_state.schema"][];
@@ -1153,8 +1194,7 @@ export interface components {
             rules_unit_instance_id: string;
         };
         "replay-metadata--primary_unit_destruction_state.schema": {
-            active_player_id: string; battle_round: number; destroyed_player_id: string;
-            destroyed_unit_instance_id: string;
+            active_player_id: string; battle_round: number; destroyed_player_id: string; destroyed_unit_instance_id: string;
             destroying_player_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
             destruction_attribution: components["schemas"]["replay-metadata--model_destruction_attribution.schema"] | null;
             destruction_id: string; game_id: string; phase: string;
@@ -1186,8 +1226,8 @@ export interface components {
         };
         "replay-metadata--source_identity.schema": {
             catalog_hash: string; catalog_id: string; game_config_hash: string; game_id: string;
-            ruleset_descriptor_hash: string; rules_overlay_ids: string[]; source_ids: string[];
-            source_package_id: string; mission_pack_id: string | null; mission_source_package_hash: string | null;
+            ruleset_descriptor_hash: string; rules_overlay_ids: string[]; source_ids: string[]; source_package_id: string;
+            mission_pack_id: string | null; mission_source_package_hash: string | null;
         } & ({
             mission_pack_id?: null; mission_source_package_hash?: null;
         } | {
@@ -1222,13 +1262,13 @@ export interface components {
         "interaction-conformance.schema": {
             cases: components["schemas"]["interaction-conformance--case.schema"][];
             /** @constant */
-            schema_version: "interaction-conformance-v2-primary-assignments";
+            schema_version: "interaction-conformance-v3-weapon-instances";
         };
         /** CORE V2 ParameterizedSubmissionPayload */
         "parameterized-submission.schema": {
             actor_id: string; payload: components["schemas"]["proposal-payload.schema"]; result_id: string;
             /** @constant */
-            schema_version: "parameterized-submission-v1";
+            schema_version: "parameterized-submission-v2-weapon-instances";
         };
     };
     responses: {

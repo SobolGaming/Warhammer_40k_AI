@@ -7,14 +7,15 @@ from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
-    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
     CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
+    CatalogMovementEndReactiveNormalMoveDescriptor,
     clause_is_movement_end_reactive_normal_move,
     movement_end_reactive_normal_move_descriptor,
 )
@@ -27,6 +28,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_order import unit_is_currently_engaged
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
+    MovementEndSurgeDistanceSpec,
     MovementEndSurgeGrant,
     MovementEndSurgeHookBinding,
 )
@@ -50,6 +52,8 @@ class _MovementEndReactiveCandidate:
     record: AbilityCatalogRecord
     clause: RuleClause
     trigger_distance_inches: float
+    distance_spec: MovementEndSurgeDistanceSpec
+    distance_bonus_inches: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,6 +105,8 @@ class CatalogMovementEndReactiveNormalMoveRuntime:
                 hook_id=CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
                 source_id=CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
                 unit_instance_id=candidate.rules_unit.unit_instance_id,
+                distance_spec=candidate.distance_spec,
+                max_distance_bonus_inches=candidate.distance_bonus_inches,
                 descriptor_source_rule_id=candidate.record.definition.source_id,
                 movement_kind=TriggeredMovementKind.TRIGGERED,
                 allow_battle_shocked=True,
@@ -124,6 +130,11 @@ class CatalogMovementEndReactiveNormalMoveRuntime:
                     "trigger_event_id": context.trigger_event_id,
                     "movement_phase_action": context.movement_phase_action,
                     "trigger_distance_inches": candidate.trigger_distance_inches,
+                    "distance_spec": cast(
+                        JsonValue,
+                        candidate.distance_spec.to_payload(),
+                    ),
+                    "distance_bonus_inches": candidate.distance_bonus_inches,
                 },
             )
             for candidate in candidates
@@ -165,7 +176,7 @@ class CatalogMovementEndReactiveNormalMoveRuntime:
                 if not current_model_ids:
                     continue
                 for record in index.records_for(TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE):
-                    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+                    if not ability_record_is_active_generic_rule_ir(record):
                         continue
                     if (
                         record.definition.timing.trigger_kind
@@ -200,6 +211,8 @@ class CatalogMovementEndReactiveNormalMoveRuntime:
                                 record=record,
                                 clause=clause,
                                 trigger_distance_inches=trigger_distance,
+                                distance_spec=_movement_end_reactive_distance_spec(semantic),
+                                distance_bonus_inches=semantic.distance_bonus,
                             )
                         )
         return tuple(
@@ -241,7 +254,7 @@ def _has_supported_records(
             if not current_model_ids:
                 continue
             for record in index.records_for(TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE):
-                if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+                if not ability_record_is_active_generic_rule_ir(record):
                     continue
                 if (
                     record.definition.timing.trigger_kind
@@ -335,3 +348,20 @@ def _validate_armies(value: tuple[ArmyDefinition, ...]) -> tuple[ArmyDefinition,
     if len(set(player_ids)) != len(player_ids):
         raise GameLifecycleError("Catalog movement-end reaction armies duplicate player ids.")
     return tuple(sorted(value, key=lambda army: army.player_id))
+
+
+def _movement_end_reactive_distance_spec(
+    descriptor: CatalogMovementEndReactiveNormalMoveDescriptor,
+) -> MovementEndSurgeDistanceSpec:
+    if type(descriptor) is not CatalogMovementEndReactiveNormalMoveDescriptor:
+        raise GameLifecycleError(
+            "Catalog movement-end reaction distance requires a semantic descriptor."
+        )
+    if descriptor.fixed_distance_inches is not None:
+        return MovementEndSurgeDistanceSpec.fixed(descriptor.fixed_distance_inches)
+    if descriptor.distance_dice_quantity is None or descriptor.distance_dice_sides is None:
+        raise GameLifecycleError("Catalog movement-end reaction dice distance is incomplete.")
+    return MovementEndSurgeDistanceSpec.dice(
+        quantity=descriptor.distance_dice_quantity,
+        sides=descriptor.distance_dice_sides,
+    )

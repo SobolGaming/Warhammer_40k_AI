@@ -17,9 +17,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.abilities import (
-    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilitySourceKind,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveContext,
@@ -255,15 +255,16 @@ class CatalogDatasheetRuleRuntime:
         return tuple(sorted(recorded, key=lambda item: (item[0], item[1].source_id)))
 
     def record_static_sources(self, *, state: GameState) -> None:
-        from warhammer40k_core.engine.catalog_conditional_leader_abilities import (
-            CatalogConditionalLeaderAbilityRuntime,
+        from warhammer40k_core.engine.catalog_static_attack_modifier_runtime import (
+            record_catalog_static_rule_effects,
         )
 
         self.record_static_destruction_reaction_sources(state=state)
-        CatalogConditionalLeaderAbilityRuntime(
-            self.ability_indexes_by_player_id,
-            self.armies,
-        ).record_static_effects(state=state)
+        record_catalog_static_rule_effects(
+            state=state,
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+        )
 
     def event_handler_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
         from warhammer40k_core.engine.catalog_conditional_leader_abilities import (
@@ -573,7 +574,7 @@ class CatalogDatasheetRuleRuntime:
         for army in self.armies:
             index = self.ability_indexes_by_player_id[army.player_id]
             for record in index.all_records():
-                if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+                if not ability_record_is_active_generic_rule_ir(record):
                     continue
                 rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
                 for unit in army.units:

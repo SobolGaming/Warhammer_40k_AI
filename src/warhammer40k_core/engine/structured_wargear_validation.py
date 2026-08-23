@@ -43,7 +43,9 @@ def validate_replace_wargear_effect_count(
         if selected_wargear_count < 1:
             raise error_type("WargearSelection does not activate a structured wargear removal.")
         return
-    if selected_wargear_count != effect.wargear_count:
+    # A WargearSelection activates a replacement by selecting its unique wargear ID once.
+    # The typed effect's wargear_count is the number of copies UnitFactory materializes.
+    if selected_wargear_count != 1:
         raise error_type(
             "WargearSelection does not satisfy a structured wargear option replacement count."
         )

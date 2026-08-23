@@ -315,7 +315,7 @@ function lifecycleEnvelope(
   submissionKind: "start_session" | "advance_session" | "close_session",
 ): SessionCommandEnvelope {
   return {
-    schema_version: "session-command-envelope-v1",
+    schema_version: "session-command-envelope-v2-weapon-instances",
     command_id: commandId,
     session_id: sessionId,
     expected_session_revision: expectedRevision,
@@ -336,7 +336,7 @@ function finiteEnvelope(
     throw new Error("Finite request did not publish an option.");
   }
   return {
-    schema_version: "session-command-envelope-v1",
+    schema_version: "session-command-envelope-v2-weapon-instances",
     command_id: commandId,
     session_id: sessionId,
     expected_session_revision: expectedRevision,
@@ -354,7 +354,7 @@ function parameterizedEnvelope(
   payload: DeploymentPlacementPayload,
 ): SessionCommandEnvelope {
   return {
-    schema_version: "session-command-envelope-v1",
+    schema_version: "session-command-envelope-v2-weapon-instances",
     command_id: commandId,
     session_id: sessionId,
     expected_session_revision: expectedRevision,
@@ -383,7 +383,7 @@ async function assertMalformedCommand(
 ): Promise<void> {
   const response = await clients.administrator.probeMalformedSessionCommand(
     sessionParameters(sessionId),
-    { schema_version: "session-command-envelope-v1", unexpected: true },
+    { schema_version: "session-command-envelope-v2-weapon-instances", unexpected: true },
   );
   equal(response.status, 400, "malformed command is rejected before mutation", assertions);
   const error = registry.validate<ErrorEnvelope>("error-envelope.schema.json", response.body);

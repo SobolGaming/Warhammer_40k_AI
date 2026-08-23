@@ -163,7 +163,7 @@ stale in-memory state cannot overwrite an ambiguous successful commit.
 
 ## Persistence, recovery, and authority
 
-`session-persistence-v2-phase18l` is a closed operator-only artifact. It is not
+`session-persistence-v3-weapon-instances` is a closed operator-only artifact. It is not
 an HTTP request or response and is never a client mutation surface. Its root
 binds the server, engine build, external-contract, and persistence-schema
 versions to the authorization bindings, protected cursor codec, retention

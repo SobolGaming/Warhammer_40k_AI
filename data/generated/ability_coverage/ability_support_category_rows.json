@@ -644,6 +644,14 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/core/000008339/none",
+        "datasheet_id": "000004091",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
         "datasheet_id": "000000611",
         "datasheet_name": "Night Spinner",
@@ -695,7 +703,7 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 17,
+    "coverage_row_count": 18,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
@@ -708,6 +716,7 @@
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004077/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001120/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004091/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
@@ -723,6 +732,7 @@
       "Defiler",
       "Fulgrim",
       "Lord of Change",
+      "Maulerfiend",
       "Night Spinner",
       "Soul Grinder",
       "Starfangs",
@@ -735,7 +745,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 17
+      "core": 18
     },
     "support_stages": [
       "engine_consumed"
@@ -743,6 +753,14 @@
   },
   {
     "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008338",
+        "ability_name": "Feel No Pain",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004090/core/000008338/none",
+        "datasheet_id": "000004090",
+        "datasheet_name": "Chaos Spawn",
+        "source_kind": "core"
+      },
       {
         "ability_id": "000008338",
         "ability_name": "Feel No Pain",
@@ -757,11 +775,13 @@
     ],
     "category_id": "core.feel_no_pain",
     "category_name": "Core Feel No Pain",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004090/core/000008338/none",
       "chaos-daemons-bridge-catalog/000004083/core/000008338/none"
     ],
     "datasheet_names": [
+      "Chaos Spawn",
       "Lucius the Eternal"
     ],
     "runtime_consumer_ids": [
@@ -769,7 +789,7 @@
       "descriptor:lost-wound:feel-no-pain-source"
     ],
     "source_kind_counts": {
-      "core": 1
+      "core": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1524,29 +1544,41 @@
         "datasheet_id": "000004077",
         "datasheet_name": "Fulgrim",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004091:glutton-for-punishment",
+        "ability_name": "Glutton for Punishment",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
+        "datasheet_id": "000004091",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
       "Beguiling Form",
+      "Glutton for Punishment",
       "Revel in Desecration"
     ],
     "category_id": "datasheet.roll_modifier.hit.this_model",
     "category_name": "Datasheet Roll Modifier Hit This Model",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none",
-      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:beguiling-form/none"
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:beguiling-form/none",
+      "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none"
     ],
     "datasheet_names": [
       "Defiler",
-      "Fulgrim"
+      "Fulgrim",
+      "Maulerfiend"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:command-phase-ability-mode",
-      "catalog-ir:hit-roll-modifier"
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:wound-roll-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -1655,6 +1687,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004091:glutton-for-punishment",
+        "ability_name": "Glutton for Punishment",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
+        "datasheet_id": "000004091",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000599:wave-serpent-shield",
         "ability_name": "Wave Serpent Shield",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000599/datasheet/000000599:wave-serpent-shield/none",
@@ -1664,22 +1704,26 @@
       }
     ],
     "ability_names": [
+      "Glutton for Punishment",
       "Wave Serpent Shield"
     ],
     "category_id": "datasheet.roll_modifier.wound.this_model",
     "category_name": "Datasheet Roll Modifier Wound This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
       "chaos-daemons-bridge-catalog/000000599/datasheet/000000599:wave-serpent-shield/none"
     ],
     "datasheet_names": [
+      "Maulerfiend",
       "Wave Serpent"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
       "catalog-ir:wound-roll-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1899,6 +1943,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004078:lord-of-the-host",
+        "ability_name": "LORD OF THE HOST",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:lord-of-the-host/none",
+        "datasheet_id": "000004078",
+        "datasheet_name": "Lord Exultant",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004083:duellists-hubris",
         "ability_name": "Duellist's Hubris",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
@@ -1929,17 +1981,19 @@
       "Daemonic Lord",
       "Daemonic Speed",
       "Duellist's Hubris",
+      "LORD OF THE HOST",
       "Malevolent Souls",
       "Spiritseer"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 7,
+    "coverage_row_count": 8,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
+      "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:lord-of-the-host/none",
       "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
       "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
@@ -1948,6 +2002,7 @@
       "Autarch",
       "Daemon Prince of Chaos",
       "Fulgrim",
+      "Lord Exultant",
       "Lucius the Eternal",
       "Spiritseer",
       "Wraithblades"
@@ -1963,7 +2018,7 @@
       "catalog-ir:fight-on-death-source"
     ],
     "source_kind_counts": {
-      "datasheet": 7
+      "datasheet": 8
     },
     "support_stages": [
       "engine_consumed"
@@ -2051,6 +2106,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004078:perfectionists",
+        "ability_name": "Perfectionists",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:perfectionists/none",
+        "datasheet_id": "000004078",
+        "datasheet_name": "Lord Exultant",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004084:obsessive-annunciation",
         "ability_name": "Obsessive Annunciation",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004084/datasheet/000004084:obsessive-annunciation/none",
@@ -2069,26 +2132,30 @@
     ],
     "ability_names": [
       "Obsessive Annunciation",
+      "Perfectionists",
       "Piratical Hero"
     ],
     "category_id": "datasheet.rule_ir.grant_weapon_ability.selected_unit",
     "category_name": "Datasheet Rule Ir Grant Weapon Ability Selected Unit",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:perfectionists/none",
       "chaos-daemons-bridge-catalog/000004084/datasheet/000004084:obsessive-annunciation/none",
       "chaos-daemons-bridge-catalog/000004193/datasheet/000004193:piratical-hero/none"
     ],
     "datasheet_names": [
+      "Lord Exultant",
       "Lord Kakophonist",
       "Prince Yriel"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:hit-roll-modifier",
       "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:lethal-hits",
       "catalog-ir:weapon-keyword-grant:sustained-hits"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -2466,6 +2533,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004078:euphoric-strikes",
+        "ability_name": "Euphoric Strikes",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:euphoric-strikes/none",
+        "datasheet_id": "000004078",
+        "datasheet_name": "Lord Exultant",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000613:psychic-guidance",
         "ability_name": "Psychic Guidance",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:psychic-guidance/none",
@@ -2479,12 +2554,13 @@
       "Daemon Prince of Nurgle",
       "Daemon Prince of Slaanesh",
       "Daemon Prince of Tzeentch",
+      "Euphoric Strikes",
       "Malefic Destruction",
       "Psychic Guidance"
     ],
     "category_id": "datasheet.rule_ir.modify_characteristic.this_model",
     "category_name": "Datasheet Rule Ir Modify Characteristic This Model",
-    "coverage_row_count": 10,
+    "coverage_row_count": 11,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-khorne/none",
       "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-nurgle/none",
@@ -2495,11 +2571,13 @@
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-nurgle/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-slaanesh/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-tzeentch/none",
+      "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:euphoric-strikes/none",
       "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:psychic-guidance/none"
     ],
     "datasheet_names": [
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
+      "Lord Exultant",
       "Wraithlord"
     ],
     "runtime_consumer_ids": [
@@ -2513,9 +2591,10 @@
       "catalog-ir:weapon-skill-characteristic-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 10
+      "datasheet": 11
     },
     "support_stages": [
+      "generic_ir_executable",
       "engine_consumed"
     ]
   },
@@ -2888,6 +2967,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004090:scuttling-horrors",
+        "ability_name": "Scuttling Horrors",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004090/datasheet/000004090:scuttling-horrors/none",
+        "datasheet_id": "000004090",
+        "datasheet_name": "Chaos Spawn",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004196:raid-and-run",
         "ability_name": "Raid and Run",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/datasheet/000004196:raid-and-run/none",
@@ -2906,16 +2993,19 @@
     ],
     "ability_names": [
       "Path of the Outcast",
-      "Raid and Run"
+      "Raid and Run",
+      "Scuttling Horrors"
     ],
     "category_id": "datasheet.rule_ir.out_of_phase_action.this_unit",
     "category_name": "Datasheet Rule Ir Out Of Phase Action This Unit",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004090/datasheet/000004090:scuttling-horrors/none",
       "chaos-daemons-bridge-catalog/000004196/datasheet/000004196:raid-and-run/none",
       "chaos-daemons-bridge-catalog/000000592/datasheet/000000592:path-of-the-outcast/none"
     ],
     "datasheet_names": [
+      "Chaos Spawn",
       "Corsair Skyreavers",
       "Rangers"
     ],
@@ -2924,7 +3014,7 @@
       "catalog-ir:movement-end-reactive-normal-move"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -4024,6 +4114,14 @@
       {
         "ability_id": "000009994",
         "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004090/faction/000009994/none",
+        "datasheet_id": "000004090",
+        "datasheet_name": "Chaos Spawn",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
         "datasheet_id": "000004081",
         "datasheet_name": "Chaos Terminators",
@@ -4072,6 +4170,14 @@
       {
         "ability_id": "000009994",
         "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/faction/000009994/none",
+        "datasheet_id": "000004078",
+        "datasheet_name": "Lord Exultant",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004084/faction/000009994/none",
         "datasheet_id": "000004084",
         "datasheet_name": "Lord Kakophonist",
@@ -4083,6 +4189,14 @@
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/faction/000009994/none",
         "datasheet_id": "000004083",
         "datasheet_name": "Lucius the Eternal",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/faction/000009994/none",
+        "datasheet_id": "000004091",
+        "datasheet_name": "Maulerfiend",
         "source_kind": "faction"
       },
       {
@@ -4107,28 +4221,34 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 10,
+    "coverage_row_count": 13,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004090/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
       "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004080/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004078/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004084/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004083/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004091/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004088/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004079/faction/000009994/none"
     ],
     "datasheet_names": [
+      "Chaos Spawn",
       "Chaos Terminators",
       "Defiler",
       "Emperor's Children",
       "Flawless Blades",
       "Fulgrim",
       "Infractors",
+      "Lord Exultant",
       "Lord Kakophonist",
       "Lucius the Eternal",
+      "Maulerfiend",
       "Noise Marines",
       "Tormentors"
     ],
@@ -4139,7 +4259,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 10
+      "faction": 13
     },
     "support_stages": [
       "engine_consumed"
@@ -4742,6 +4862,14 @@
       {
         "ability_id": "000008346",
         "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/core/000008346/none",
+        "datasheet_id": "000004078",
+        "datasheet_name": "Lord Exultant",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004084/core/000008346/none",
         "datasheet_id": "000004084",
         "datasheet_name": "Lord Kakophonist",
@@ -4769,7 +4897,7 @@
     ],
     "category_id": "core.leader",
     "category_name": "Leader",
-    "coverage_row_count": 10,
+    "coverage_row_count": 11,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
       "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
@@ -4778,6 +4906,7 @@
       "chaos-daemons-bridge-catalog/000000572/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
       "chaos-daemons-bridge-catalog/000003909/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000004078/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004084/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004083/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004193/core/000008346/none"
@@ -4790,6 +4919,7 @@
       "Jain Zar",
       "Kharseth",
       "Lhykhis",
+      "Lord Exultant",
       "Lord Kakophonist",
       "Lucius the Eternal",
       "Prince Yriel"
@@ -4798,7 +4928,7 @@
       "descriptor:army-mustering:leader-attachment"
     ],
     "source_kind_counts": {
-      "core": 10
+      "core": 11
     },
     "support_stages": [
       "engine_consumed"

@@ -41,6 +41,10 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
+from warhammer40k_core.rules.wahapedia_ability_source import (
+    WahapediaAbilitySourceError,
+    catalog_ability_source_kind_from_wahapedia_type,
+)
 from warhammer40k_core.rules.wahapedia_base_size_bridge import (
     EventCompanionBaseSizesByKey,
     base_size_evidence,
@@ -810,7 +814,7 @@ def _bridge_abilities(
         else:
             ability_id = f"{datasheet_id}:{_slug(name)}"
         parameter = _raw_or_field(row, "parameter")
-        source_kind = _ability_source_kind(ability_type)
+        source_kind = ability_source_kind(ability_type)
         source_wargear_id = ""
         rule_ir_payload = ""
         rule_ir_diagnostics = ""
@@ -1315,7 +1319,9 @@ def _bridge_single_replacement_option(
     match: re.Match[str],
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> None:
-    _positive_int_from_text("replacement_count", match.group("replacement_count"))
+    replacement_count = _positive_int_from_text(
+        "replacement_count", match.group("replacement_count")
+    )
     replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
     replacement_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replacement"))
     bridged_rows["Datasheets_options"].append(
@@ -1338,7 +1344,7 @@ def _bridge_single_replacement_option(
             "effect_wargear_id": replacement_wargear_id,
             "effect_replaced_wargear_id": replaced_wargear_id,
             "effect_model_count": "1",
-            "effect_wargear_count": "1",
+            "effect_wargear_count": str(replacement_count),
             "source_ids": _joined(_source_ids(row)),
         }
     )
@@ -1736,19 +1742,11 @@ def _source_text_id(*, row: NormalizedSourceRow, column_name: str) -> str:
     return f"{row.stable_source_id()}:{column_name}"
 
 
-def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
-    normalized = _validate_identifier("ability_type", ability_type).lower()
-    if normalized == "core":
-        return CatalogAbilitySourceKind.CORE
-    if normalized == "faction":
-        return CatalogAbilitySourceKind.FACTION
-    if normalized == "datasheet":
-        return CatalogAbilitySourceKind.DATASHEET
-    if normalized in {"wargear", "wargear profile"}:
-        return CatalogAbilitySourceKind.WARGEAR
-    if normalized == "primarch" or normalized.startswith(("special", "fortification")):
-        return CatalogAbilitySourceKind.DATASHEET
-    raise WahapediaBridgeError("Unsupported datasheet ability type.")
+def ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
+    try:
+        return catalog_ability_source_kind_from_wahapedia_type(ability_type)
+    except WahapediaAbilitySourceError as exc:
+        raise WahapediaBridgeError("Unsupported datasheet ability type.") from exc
 
 
 def _is_wargear_profile_ability_type(ability_type: str) -> bool:

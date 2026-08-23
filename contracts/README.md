@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `10.2.0`
+Contract version: `11.0.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -16,7 +16,22 @@ decision-family coverage inventory distinguishes real session-derived
 `live_scenario` examples from `envelope_only` entries; inventory presence alone
 is not an executable-coverage claim.
 
-Contract 10 retains Contract 9's public, directed
+Contract 11 makes every equipped ranged-weapon copy externally addressable by a
+deterministic `weapon_instance_id`. Shooting availability rows, declaration
+submissions, attack pools, accepted decision/event payloads, persistence, and
+replay preserve that identity. Distinct copies may choose distinct legal
+targets. The same physical-copy/profile/Firing-Deck-source declaration key may
+appear only once, while catalog-defined independently selectable multi-profile
+groups such as C'tan Powers may expose distinct legal profiles that share one
+physical-copy ID, subject to the engine-emitted selection limits.
+The identifier is newly required in the closed shooting-declaration proposal,
+so Contract 11 deliberately does not accept Contract 10 shooting declarations.
+The proposal, parameterized-submission, session-command-envelope,
+interaction-conformance, formal session wrapper, and persistence families
+advance with this major boundary; no missing-field inference or copy-one
+fallback is provided.
+
+Contract 10 retained Contract 9's public, directed
 `primary_mission_assignments`, group-aware historical evidence, required
 `primary_mission_progress_state`, and engine-enumerated
 `select_primary_mission_choice` finite family. It adds the required
@@ -60,7 +75,7 @@ references without inferring rules interactions from `decision_type` or display
 text. Hidden decisions expose `interaction: null` and no nested interaction
 requests. The typed `nested_interaction_requests` field publishes nested choices
 without forcing clients to inspect arbitrary proposal JSON.
-Contract 10 retains the pending-decision and lifecycle-status families at
+Contract 11 retains the pending-decision and lifecycle-status families at
 `decision-request-view-v5-phase17n-step4` and
 `lifecycle-status-v4-phase17n-step4`. Primary Mission finite requests, their
 options, and their waiting statuses are public; existing hidden Declare Battle
@@ -68,10 +83,10 @@ Formations choices retain the shared viewer-redaction boundary.
 The full reconnect wrapper uses `session-projection-v7-phase17n-step4`.
 In-process integer-cursor deltas use `event-delta-v4-phase17n-step4`, while
 authenticated HTTP deltas use `event-delta-v5-phase17n-step4`. Formal session
-metadata, command results, and command outcomes use their `v10-contract`
-families because metadata declares the Contract 10 server major. Other session
+metadata, command results, and command outcomes use their `v11-contract`
+families because metadata declares the Contract 11 server major. Other session
 and viewer projection families are unchanged.
-Phase 18J adds the optional `battlefield_view` game-view member. Contract 10
+Phase 18J adds the optional `battlefield_view` game-view member. Contract 11
 publishes the Step 4 progress additions as
 `game-view-v11-phase17n-step4`; the nested
 `battlefield-view-v4-phase17n-step3` family is unchanged. Roster/datacard
@@ -111,7 +126,7 @@ record identity/hash, Primary progress, qualifying Action/departure history,
 current rules-unit memberships, and frozen per-player table-quarter, territory,
 and opponent-territory-objective evidence. Runtime import accepts only that exact
 discriminator; v7 artifacts require the retained 9.x deployment and fail with
-a typed unsupported-version error on the 10.x runtime. The runtime never
+a typed unsupported-version error on the current runtime. The runtime never
 infers a missing directed
 assignment, grouped position history, destruction source, departure record,
 marker, condemned selection, consecration designation, or scoring-state row.
@@ -170,6 +185,13 @@ HTTP request, response, replay-viewer feed, or alternate mutation API. Existing
 Contract 10.1 HTTP payload families and operations are unchanged; the additive
 bundle minor lets deployment and conformance tooling discover the new schema
 and deterministic example without making it safe to expose.
+
+Contract 11 advances that operator artifact to
+`session-persistence-v3-weapon-instances`. Its command journal now requires the
+v2 physical-weapon-aware command envelope and v11 outcome/metadata families,
+and its root binds `external_contract_version: "11.0.0"`. Recovery rejects a v2
+artifact before session registration; it does not infer weapon-copy identity in
+historical shooting submissions or rewrite stored command fingerprints.
 
 The artifact hash, revision commitments, SQLite content hash, and runtime-tree
 fingerprint provide deterministic internal consistency and build-drift checks.

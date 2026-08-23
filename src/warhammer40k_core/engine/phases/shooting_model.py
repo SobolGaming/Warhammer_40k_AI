@@ -152,6 +152,7 @@ class ShootingDeclarationDecisionPayload(TypedDict):
 
 
 class _AvailableWeapon(TypedDict):
+    weapon_instance_id: str
     model_instance_id: str
     wargear_id: str
     weapon_profile: WeaponProfile

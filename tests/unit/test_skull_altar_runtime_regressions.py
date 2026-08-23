@@ -878,6 +878,7 @@ def test_fortification_cover_ignores_destroyed_attacker_placements() -> None:
     profile = _first_catalog_weapon_profile()
     pool = RangedAttackPool(
         attacker_model_instance_id=attacker_unit.own_models[0].model_instance_id,
+        weapon_instance_id="weapon-instance:test:dead-attacker-fortification-cover",
         wargear_id="dead-attacker-fortification-cover-wargear",
         weapon_profile_id=profile.profile_id,
         weapon_profile=profile,
@@ -1023,6 +1024,7 @@ def _successful_shooting_sequence(
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:post-shoot-battle-shock-reroll",
                 wargear_id="post-shoot-battle-shock-reroll-wargear",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,

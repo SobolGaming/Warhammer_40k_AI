@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/proposal-payload.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/proposal-payload.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "CORE V2 ParameterizedProposalPayload",
   "oneOf": [
@@ -34,6 +34,219 @@
           "type": "object"
         }
       ]
+    },
+    "ability_parameter": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {"$ref": "#/$defs/identifier"},
+        "value": {"type": ["boolean", "number", "string"]}
+      },
+      "required": ["name", "value"],
+      "type": "object"
+    },
+    "ability_descriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "ability_id": {"$ref": "#/$defs/identifier"},
+        "ability_kind": {"$ref": "#/$defs/identifier"},
+        "condition": {"type": ["string", "null"]},
+        "name": {"$ref": "#/$defs/identifier"},
+        "parameters": {
+          "items": {"$ref": "#/$defs/ability_parameter"},
+          "type": "array"
+        },
+        "target_keywords": {"$ref": "#/$defs/identifier_array"},
+        "timing": {"type": ["string", "null"]}
+      },
+      "required": [
+        "ability_id",
+        "name",
+        "ability_kind",
+        "parameters",
+        "target_keywords",
+        "timing",
+        "condition"
+      ],
+      "type": "object"
+    },
+    "attack_profile": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dice_expression": {"type": "null"},
+            "fixed_attacks": {"minimum": 1, "type": "integer"}
+          },
+          "required": ["fixed_attacks", "dice_expression"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dice_expression": {"$ref": "#/$defs/dice_expression"},
+            "fixed_attacks": {"type": "null"}
+          },
+          "required": ["fixed_attacks", "dice_expression"],
+          "type": "object"
+        }
+      ]
+    },
+    "characteristic_value": {
+      "additionalProperties": false,
+      "properties": {
+        "applied_modifier_ids": {"$ref": "#/$defs/identifier_array"},
+        "base": {"type": "integer"},
+        "characteristic": {"$ref": "#/$defs/identifier"},
+        "final": {"type": "integer"},
+        "raw": {"type": "integer"},
+        "value_kind": {
+          "enum": ["numeric", "replacement_dash", "source_dash"],
+          "type": "string"
+        }
+      },
+      "required": [
+        "characteristic",
+        "value_kind",
+        "raw",
+        "base",
+        "final",
+        "applied_modifier_ids"
+      ],
+      "type": "object"
+    },
+    "damage_profile": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dice_expression": {"type": "null"},
+            "fixed_damage": {"minimum": 1, "type": "integer"}
+          },
+          "required": ["fixed_damage", "dice_expression"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dice_expression": {"$ref": "#/$defs/dice_expression"},
+            "fixed_damage": {"type": "null"}
+          },
+          "required": ["fixed_damage", "dice_expression"],
+          "type": "object"
+        }
+      ]
+    },
+    "dice_expression": {
+      "additionalProperties": false,
+      "properties": {
+        "modifier": {"type": "integer"},
+        "quantity": {"minimum": 1, "type": "integer"},
+        "sides": {"minimum": 2, "type": "integer"}
+      },
+      "required": ["quantity", "sides", "modifier"],
+      "type": "object"
+    },
+    "firing_deck_selection": {
+      "additionalProperties": false,
+      "properties": {
+        "already_shot_unit_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "firing_deck_value": {"minimum": 1, "type": "integer"},
+        "player_id": {"$ref": "#/$defs/identifier"},
+        "transport_unit_instance_id": {"$ref": "#/$defs/identifier"},
+        "weapon_selections": {
+          "items": {"$ref": "#/$defs/firing_deck_weapon_selection"},
+          "type": "array"
+        }
+      },
+      "required": [
+        "player_id",
+        "battle_round",
+        "transport_unit_instance_id",
+        "firing_deck_value",
+        "weapon_selections",
+        "already_shot_unit_instance_ids"
+      ],
+      "type": "object"
+    },
+    "firing_deck_weapon_selection": {
+      "additionalProperties": false,
+      "properties": {
+        "embarked_unit_instance_id": {"$ref": "#/$defs/identifier"},
+        "model_instance_id": {"$ref": "#/$defs/identifier"},
+        "wargear_id": {"$ref": "#/$defs/identifier"},
+        "weapon_instance_id": {"$ref": "#/$defs/identifier"},
+        "weapon_profile": {"$ref": "#/$defs/weapon_profile"}
+      },
+      "required": [
+        "weapon_instance_id",
+        "embarked_unit_instance_id",
+        "model_instance_id",
+        "wargear_id",
+        "weapon_profile"
+      ],
+      "type": "object"
+    },
+    "nullable_firing_deck_selection": {
+      "oneOf": [
+        {"$ref": "#/$defs/firing_deck_selection"},
+        {"type": "null"}
+      ]
+    },
+    "range_profile": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "distance_inches": {"minimum": 1, "type": "integer"},
+            "kind": {"const": "distance", "type": "string"}
+          },
+          "required": ["kind", "distance_inches"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "distance_inches": {"type": "null"},
+            "kind": {"const": "melee", "type": "string"}
+          },
+          "required": ["kind", "distance_inches"],
+          "type": "object"
+        }
+      ]
+    },
+    "weapon_profile": {
+      "additionalProperties": false,
+      "properties": {
+        "abilities": {
+          "items": {"$ref": "#/$defs/ability_descriptor"},
+          "type": "array"
+        },
+        "armor_penetration": {"$ref": "#/$defs/characteristic_value"},
+        "attack_profile": {"$ref": "#/$defs/attack_profile"},
+        "damage_profile": {"$ref": "#/$defs/damage_profile"},
+        "keywords": {"$ref": "#/$defs/identifier_array"},
+        "name": {"$ref": "#/$defs/identifier"},
+        "profile_id": {"$ref": "#/$defs/identifier"},
+        "range_profile": {"$ref": "#/$defs/range_profile"},
+        "skill": {"$ref": "#/$defs/characteristic_value"},
+        "source_ids": {"$ref": "#/$defs/identifier_array"},
+        "strength": {"$ref": "#/$defs/characteristic_value"}
+      },
+      "required": [
+        "profile_id",
+        "name",
+        "range_profile",
+        "attack_profile",
+        "skill",
+        "strength",
+        "armor_penetration",
+        "damage_profile",
+        "keywords",
+        "abilities",
+        "source_ids"
+      ],
+      "type": "object"
     },
     "pose": {
       "additionalProperties": false,
@@ -407,11 +620,13 @@
               "shooting_type": {"$ref": "#/$defs/identifier"},
               "target_unit_instance_id": {"$ref": "#/$defs/identifier"},
               "wargear_id": {"$ref": "#/$defs/identifier"},
+              "weapon_instance_id": {"$ref": "#/$defs/identifier"},
               "weapon_profile_id": {"$ref": "#/$defs/identifier"}
             },
             "required": [
               "attacker_model_instance_id",
               "wargear_id",
+              "weapon_instance_id",
               "weapon_profile_id",
               "target_unit_instance_id",
               "shooting_type",
@@ -423,7 +638,7 @@
           },
           "type": "array"
         },
-        "firing_deck_selection": {"$ref": "#/$defs/json_value"},
+        "firing_deck_selection": {"$ref": "#/$defs/nullable_firing_deck_selection"},
         "player_id": {"$ref": "#/$defs/identifier"},
         "proposal_kind": {"const": "shooting_declaration", "type": "string"},
         "proposal_request_id": {"$ref": "#/$defs/identifier"},

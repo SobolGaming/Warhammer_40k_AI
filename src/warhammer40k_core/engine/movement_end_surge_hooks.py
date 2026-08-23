@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict
+from enum import StrEnum
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
-from warhammer40k_core.core.dice import RerollPermission, RerollPermissionPayload
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceExpressionPayload,
+    RerollPermission,
+    RerollPermissionPayload,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
@@ -16,10 +23,17 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
+class MovementEndSurgeDistanceSpecPayload(TypedDict):
+    kind: str
+    fixed_distance_inches: float | None
+    dice_expression: DiceExpressionPayload | None
+
+
 class MovementEndSurgeGrantPayload(TypedDict):
     hook_id: str
     source_id: str
     unit_instance_id: str
+    distance_spec: MovementEndSurgeDistanceSpecPayload
     max_distance_bonus_inches: int
     descriptor_source_rule_id: str | None
     movement_kind: str
@@ -35,6 +49,77 @@ type MovementEndSurgeHandler = Callable[
     ["MovementEndSurgeContext"],
     tuple["MovementEndSurgeGrant", ...],
 ]
+
+
+class MovementEndSurgeDistanceKind(StrEnum):
+    FIXED = "fixed"
+    DICE = "dice"
+
+
+@dataclass(frozen=True, slots=True)
+class MovementEndSurgeDistanceSpec:
+    kind: MovementEndSurgeDistanceKind
+    fixed_distance_inches: float | None = None
+    dice_expression: DiceExpression | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.kind) is not MovementEndSurgeDistanceKind:
+            raise GameLifecycleError(
+                "Movement-end surge distance kind must be MovementEndSurgeDistanceKind."
+            )
+        if self.kind is MovementEndSurgeDistanceKind.FIXED:
+            fixed_distance = self.fixed_distance_inches
+            if type(fixed_distance) not in {int, float}:
+                raise GameLifecycleError("Fixed movement-end surge distance must be a number.")
+            fixed_distance_inches = float(cast(int | float, fixed_distance))
+            if not math.isfinite(fixed_distance_inches) or fixed_distance_inches <= 0.0:
+                raise GameLifecycleError(
+                    "Fixed movement-end surge distance must be positive and finite."
+                )
+            if self.dice_expression is not None:
+                raise GameLifecycleError(
+                    "Fixed movement-end surge distance must not include a dice expression."
+                )
+            object.__setattr__(self, "fixed_distance_inches", fixed_distance_inches)
+            return
+        if self.fixed_distance_inches is not None:
+            raise GameLifecycleError(
+                "Dice movement-end surge distance must not include a fixed distance."
+            )
+        if type(self.dice_expression) is not DiceExpression:
+            raise GameLifecycleError("Dice movement-end surge distance requires a DiceExpression.")
+        if (
+            type(self.dice_expression.quantity) is not int
+            or self.dice_expression.quantity < 1
+            or type(self.dice_expression.sides) is not int
+            or self.dice_expression.sides < 2
+            or type(self.dice_expression.modifier) is not int
+            or self.dice_expression.modifier != 0
+        ):
+            raise GameLifecycleError("Movement-end surge distance dice expression is invalid.")
+
+    @classmethod
+    def fixed(cls, distance_inches: float) -> Self:
+        return cls(
+            kind=MovementEndSurgeDistanceKind.FIXED,
+            fixed_distance_inches=distance_inches,
+        )
+
+    @classmethod
+    def dice(cls, *, quantity: int, sides: int) -> Self:
+        return cls(
+            kind=MovementEndSurgeDistanceKind.DICE,
+            dice_expression=DiceExpression(quantity=quantity, sides=sides),
+        )
+
+    def to_payload(self) -> MovementEndSurgeDistanceSpecPayload:
+        return {
+            "kind": self.kind.value,
+            "fixed_distance_inches": self.fixed_distance_inches,
+            "dice_expression": (
+                None if self.dice_expression is None else self.dice_expression.to_payload()
+            ),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,6 +188,7 @@ class MovementEndSurgeGrant:
     hook_id: str
     source_id: str
     unit_instance_id: str
+    distance_spec: MovementEndSurgeDistanceSpec
     max_distance_bonus_inches: int = 0
     descriptor_source_rule_id: str | None = None
     movement_kind: TriggeredMovementKind = TriggeredMovementKind.SURGE
@@ -121,6 +207,10 @@ class MovementEndSurgeGrant:
             "unit_instance_id",
             _validate_identifier("unit_instance_id", self.unit_instance_id),
         )
+        if type(self.distance_spec) is not MovementEndSurgeDistanceSpec:
+            raise GameLifecycleError(
+                "Movement-end surge hook distance_spec must be MovementEndSurgeDistanceSpec."
+            )
         object.__setattr__(
             self,
             "max_distance_bonus_inches",
@@ -129,6 +219,13 @@ class MovementEndSurgeGrant:
                 self.max_distance_bonus_inches,
             ),
         )
+        if (
+            self.distance_spec.kind is MovementEndSurgeDistanceKind.FIXED
+            and self.max_distance_bonus_inches != 0
+        ):
+            raise GameLifecycleError(
+                "Fixed movement-end surge distance must not include a distance bonus."
+            )
         if self.descriptor_source_rule_id is not None:
             object.__setattr__(
                 self,
@@ -162,12 +259,20 @@ class MovementEndSurgeGrant:
             raise GameLifecycleError(
                 "Movement-end surge distance reroll permission must be RerollPermission."
             )
+        if (
+            self.distance_reroll_permission is not None
+            and self.distance_spec.kind is not MovementEndSurgeDistanceKind.DICE
+        ):
+            raise GameLifecycleError(
+                "Fixed movement-end surge distance cannot grant a reroll permission."
+            )
 
     def to_payload(self) -> MovementEndSurgeGrantPayload:
         return {
             "hook_id": self.hook_id,
             "source_id": self.source_id,
             "unit_instance_id": self.unit_instance_id,
+            "distance_spec": self.distance_spec.to_payload(),
             "max_distance_bonus_inches": self.max_distance_bonus_inches,
             "descriptor_source_rule_id": self.descriptor_source_rule_id,
             "movement_kind": self.movement_kind.value,

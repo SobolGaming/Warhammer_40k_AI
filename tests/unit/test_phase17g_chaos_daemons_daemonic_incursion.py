@@ -4277,6 +4277,7 @@ def _attack_pool(
     target_model_ids = tuple(model.model_instance_id for model in target.own_models)
     return RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id=f"weapon-instance:test:{weapon_profile.profile_id}",
         wargear_id="phase17g-daemonic-incursion-test-wargear",
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,

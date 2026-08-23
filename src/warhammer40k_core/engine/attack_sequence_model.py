@@ -325,6 +325,7 @@ class AttackResolutionContextPayload(TypedDict):
     attacker_player_id: str
     defender_player_id: str
     attacking_unit_instance_id: str
+    weapon_instance_id: str
     attacker_model_instance_id: str
     target_unit_instance_id: str
     weapon_profile_id: str
@@ -434,6 +435,7 @@ class IdenticalAttackSignaturePayload(TypedDict):
 
 class GatheredAttackContributionPayload(TypedDict):
     pool_index: int
+    weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -1268,6 +1270,7 @@ class IdenticalAttackSignature:
 @dataclass(frozen=True, slots=True)
 class GatheredAttackContribution:
     pool_index: int
+    weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -1281,6 +1284,14 @@ class GatheredAttackContribution:
             self,
             "pool_index",
             _validate_non_negative_int("GatheredAttackContribution pool_index", self.pool_index),
+        )
+        object.__setattr__(
+            self,
+            "weapon_instance_id",
+            _validate_identifier(
+                "GatheredAttackContribution weapon_instance_id",
+                self.weapon_instance_id,
+            ),
         )
         object.__setattr__(
             self,
@@ -1343,6 +1354,7 @@ class GatheredAttackContribution:
     def to_payload(self) -> GatheredAttackContributionPayload:
         return {
             "pool_index": self.pool_index,
+            "weapon_instance_id": self.weapon_instance_id,
             "attacker_model_instance_id": self.attacker_model_instance_id,
             "wargear_id": self.wargear_id,
             "weapon_profile_id": self.weapon_profile_id,
@@ -1356,6 +1368,7 @@ class GatheredAttackContribution:
     def from_payload(cls, payload: GatheredAttackContributionPayload) -> Self:
         return cls(
             pool_index=payload["pool_index"],
+            weapon_instance_id=payload["weapon_instance_id"],
             attacker_model_instance_id=payload["attacker_model_instance_id"],
             wargear_id=payload["wargear_id"],
             weapon_profile_id=payload["weapon_profile_id"],

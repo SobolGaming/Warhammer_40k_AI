@@ -252,10 +252,7 @@ def _fast_dice_pool_key(pool: RangedAttackPool) -> tuple[object, ...]:
 
 
 def _pool_id(pool: RangedAttackPool) -> str:
-    return (
-        f"{pool.attacker_model_instance_id}:{pool.wargear_id}:"
-        f"{pool.weapon_profile_id}:{pool.target_unit_instance_id}"
-    )
+    return f"{pool.weapon_instance_id}:{pool.weapon_profile_id}:{pool.target_unit_instance_id}"
 
 
 def _resolve_target_option_id(target_unit_instance_id: str) -> str:
@@ -305,6 +302,7 @@ def _gathered_attack_contribution(
 ) -> GatheredAttackContribution:
     return GatheredAttackContribution(
         pool_index=pool_index,
+        weapon_instance_id=pool.weapon_instance_id,
         attacker_model_instance_id=pool.attacker_model_instance_id,
         wargear_id=pool.wargear_id,
         weapon_profile_id=pool.weapon_profile_id,
@@ -347,15 +345,18 @@ def _synthetic_pool_for_gathered_group(
     wargear_id = base_pool.wargear_id
     weapon_profile = base_pool.weapon_profile
     weapon_profile_id = base_pool.weapon_profile_id
+    weapon_instance_id = base_pool.weapon_instance_id
     if len(gathered_group.pool_indices) > 1:
         wargear_id = f"gathered-wargear:{gathered_group.group_id}"
         weapon_profile_id = f"gathered-profile:{gathered_group.group_id}"
+        weapon_instance_id = f"gathered-weapon-instance:{gathered_group.group_id}"
         weapon_profile = replace(
             base_pool.weapon_profile,
             profile_id=weapon_profile_id,
             name=f"Gathered weapon pool {gathered_group.group_id}",
         )
     return RangedAttackPool(
+        weapon_instance_id=weapon_instance_id,
         attacker_model_instance_id=base_pool.attacker_model_instance_id,
         wargear_id=wargear_id,
         weapon_profile_id=weapon_profile_id,

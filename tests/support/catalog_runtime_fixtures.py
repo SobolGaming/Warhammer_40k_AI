@@ -392,6 +392,7 @@ def completed_post_shoot_attack_sequence(
     attack_pools = tuple(
         RangedAttackPool(
             attacker_model_instance_id=attacker_model_id,
+            weapon_instance_id=f"weapon-instance:test:{attacker_model_id}",
             wargear_id=wargear_id,
             weapon_profile_id=bolt_profile.profile_id,
             weapon_profile=bolt_profile,

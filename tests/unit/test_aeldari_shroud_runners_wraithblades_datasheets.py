@@ -1426,6 +1426,7 @@ def _attack_sequence(
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                weapon_instance_id=f"weapon-instance:test:{sequence_id}",
                 wargear_id=f"test:{profile.profile_id}:wargear",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,
@@ -1475,6 +1476,7 @@ def _ranged_pool(
     target_ids = target.own_model_ids()
     return RangedAttackPool(
         attacker_model_instance_id=attacker.model_instance_id,
+        weapon_instance_id=f"weapon-instance:test:{profile.profile_id}",
         wargear_id=f"test:{profile.profile_id}:wargear",
         weapon_profile_id=profile.profile_id,
         weapon_profile=profile,

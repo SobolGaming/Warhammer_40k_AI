@@ -1591,6 +1591,7 @@ def test_shooting_dice_reroll_branch_accepts_source_backed_wound_payload() -> No
     target_model_ids = tuple(model.model_instance_id for model in defender.own_models)
     attack_pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id="weapon-instance:test:drukhari:pain-token:001",
         wargear_id=wargear_id,
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,
@@ -1713,6 +1714,7 @@ def test_source_backed_attack_reroll_revalidates_current_source_context() -> Non
     target_model_ids = tuple(model.model_instance_id for model in defender.own_models)
     attack_pool = RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id="weapon-instance:test:drukhari:pain-token:002",
         wargear_id=wargear_id,
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,

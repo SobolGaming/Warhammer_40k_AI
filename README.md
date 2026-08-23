@@ -99,7 +99,7 @@ encoding matrix shard names in the protection rule.
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,
 interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).
-Phase 18L adds the closed `session-persistence-v2-phase18l` operator-only
+Phase 18L adds the closed `session-persistence-v3-weapon-instances` operator-only
 persistence checkpoint contract and fail-closed recovery semantics. Its
 runtime-tree build fingerprint, explicit first-boot initialization, locked and
 verified SQLite v2 transaction, and unpruned per-revision commitment chain keep

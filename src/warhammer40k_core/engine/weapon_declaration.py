@@ -6,7 +6,11 @@ from typing import NotRequired, Self, TypedDict, cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import RandomCharacteristicTiming
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.core.weapon_profiles import WeaponProfile, WeaponProfilePayload
+from warhammer40k_core.core.weapon_profiles import (
+    WeaponProfile,
+    WeaponProfileError,
+    WeaponProfilePayload,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
@@ -16,6 +20,7 @@ SHOOTING_DECLARATION_PROPOSAL_KIND = "shooting_declaration"
 
 
 class WeaponDeclarationPayload(TypedDict):
+    weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -40,6 +45,7 @@ class ShootingDeclarationProposalPayload(TypedDict):
 
 
 class RangedAttackPoolPayload(TypedDict):
+    weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -71,6 +77,7 @@ class ShootingProposalValidationResultPayload(TypedDict):
 
 
 class AvailableWeaponPayload(TypedDict):
+    weapon_instance_id: str
     model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -81,6 +88,7 @@ class AvailableWeaponPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class WeaponDeclaration:
+    weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -91,6 +99,14 @@ class WeaponDeclaration:
     firing_deck_source_model_instance_id: str | None = None
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "weapon_instance_id",
+            _validate_identifier(
+                "WeaponDeclaration weapon_instance_id",
+                self.weapon_instance_id,
+            ),
+        )
         object.__setattr__(
             self,
             "attacker_model_instance_id",
@@ -158,6 +174,7 @@ class WeaponDeclaration:
 
     def to_payload(self) -> WeaponDeclarationPayload:
         return {
+            "weapon_instance_id": self.weapon_instance_id,
             "attacker_model_instance_id": self.attacker_model_instance_id,
             "wargear_id": self.wargear_id,
             "weapon_profile_id": self.weapon_profile_id,
@@ -174,6 +191,7 @@ class WeaponDeclaration:
         if missing is not None:
             raise GameLifecycleError(f"WeaponDeclaration payload missing {missing}.")
         return cls(
+            weapon_instance_id=payload["weapon_instance_id"],
             attacker_model_instance_id=payload["attacker_model_instance_id"],
             wargear_id=payload["wargear_id"],
             weapon_profile_id=payload["weapon_profile_id"],
@@ -375,7 +393,7 @@ class ShootingDeclarationProposal:
             firing_deck_selection=(
                 None
                 if firing_deck_payload is None
-                else FiringDeckSelection.from_payload(firing_deck_payload)
+                else _firing_deck_selection_from_json(firing_deck_payload)
             ),
             visibility_cache_key=payload["visibility_cache_key"],
         )
@@ -383,6 +401,7 @@ class ShootingDeclarationProposal:
 
 @dataclass(frozen=True, slots=True)
 class RangedAttackPool:
+    weapon_instance_id: str
     attacker_model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -399,6 +418,14 @@ class RangedAttackPool:
     firing_deck_source_model_instance_id: str | None = None
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "weapon_instance_id",
+            _validate_identifier(
+                "RangedAttackPool weapon_instance_id",
+                self.weapon_instance_id,
+            ),
+        )
         object.__setattr__(
             self,
             "attacker_model_instance_id",
@@ -510,6 +537,7 @@ class RangedAttackPool:
         if type(declaration) is not WeaponDeclaration:
             raise GameLifecycleError("RangedAttackPool requires a WeaponDeclaration.")
         return cls(
+            weapon_instance_id=declaration.weapon_instance_id,
             attacker_model_instance_id=declaration.attacker_model_instance_id,
             wargear_id=declaration.wargear_id,
             weapon_profile_id=declaration.weapon_profile_id,
@@ -528,6 +556,7 @@ class RangedAttackPool:
 
     def to_payload(self) -> RangedAttackPoolPayload:
         return {
+            "weapon_instance_id": self.weapon_instance_id,
             "attacker_model_instance_id": self.attacker_model_instance_id,
             "wargear_id": self.wargear_id,
             "weapon_profile_id": self.weapon_profile_id,
@@ -547,6 +576,7 @@ class RangedAttackPool:
     @classmethod
     def from_payload(cls, payload: RangedAttackPoolPayload) -> Self:
         return cls(
+            weapon_instance_id=payload["weapon_instance_id"],
             attacker_model_instance_id=payload["attacker_model_instance_id"],
             wargear_id=payload["wargear_id"],
             weapon_profile_id=payload["weapon_profile_id"],
@@ -790,6 +820,7 @@ def _weapon_declaration_missing_field(payload: object) -> str | None:
         return "declaration"
     raw_payload = cast(dict[str, object], payload)
     required_fields = (
+        "weapon_instance_id",
         "attacker_model_instance_id",
         "wargear_id",
         "weapon_profile_id",
@@ -814,6 +845,51 @@ def shooting_declaration_proposal_from_json(payload: object) -> ShootingDeclarat
     if type(declarations) is not list:
         raise GameLifecycleError("Shooting declaration declarations must be a list.")
     return ShootingDeclarationProposal.from_payload(raw_payload)
+
+
+def _firing_deck_selection_from_json(payload: object) -> FiringDeckSelection:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Firing Deck selection must be an object.")
+    raw_payload = cast(dict[str, object], payload)
+    required_fields = (
+        "player_id",
+        "battle_round",
+        "transport_unit_instance_id",
+        "firing_deck_value",
+        "weapon_selections",
+        "already_shot_unit_instance_ids",
+    )
+    for field in required_fields:
+        if field not in raw_payload:
+            raise GameLifecycleError(f"Firing Deck selection payload missing {field}.")
+    weapon_selections = raw_payload["weapon_selections"]
+    if type(weapon_selections) is not list:
+        raise GameLifecycleError("Firing Deck weapon_selections must be a list.")
+    if type(raw_payload["already_shot_unit_instance_ids"]) is not list:
+        raise GameLifecycleError("Firing Deck already_shot_unit_instance_ids must be a list.")
+    required_weapon_fields = (
+        "weapon_instance_id",
+        "embarked_unit_instance_id",
+        "model_instance_id",
+        "wargear_id",
+        "weapon_profile",
+    )
+    for index, selection in enumerate(cast(list[object], weapon_selections)):
+        if not isinstance(selection, dict):
+            raise GameLifecycleError(f"Firing Deck weapon_selections[{index}] must be an object.")
+        for field in required_weapon_fields:
+            if field not in selection:
+                raise GameLifecycleError(
+                    f"Firing Deck weapon_selections[{index}] payload missing {field}."
+                )
+        if not isinstance(selection["weapon_profile"], dict):
+            raise GameLifecycleError(
+                f"Firing Deck weapon_selections[{index}] weapon_profile must be an object."
+            )
+    try:
+        return FiringDeckSelection.from_payload(cast(FiringDeckSelectionPayload, raw_payload))
+    except (KeyError, TypeError, WeaponProfileError) as exc:
+        raise GameLifecycleError("Firing Deck selection payload is schema-invalid.") from exc
 
 
 def fixed_attacks_for_profile(weapon_profile: WeaponProfile) -> int:

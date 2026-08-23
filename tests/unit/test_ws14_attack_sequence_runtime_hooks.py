@@ -798,7 +798,7 @@ def test_ws14_attached_target_half_strength_uses_complete_rules_unit_strength() 
     )
 
 
-def test_ws14_attached_this_model_effect_does_not_leak_between_components() -> None:
+def test_ws14_attached_component_targeted_this_model_effect_is_group_aware() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     bodyguard, leader, formation = _attached_units(catalog)
     defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
@@ -816,13 +816,14 @@ def test_ws14_attached_this_model_effect_does_not_leak_between_components() -> N
         _generic_effect(
             effect_id="ws14:attached-this-model",
             owner_player_id="player-a",
-            target_unit_instance_ids=(formation.attached_unit_instance_id,),
+            target_unit_instance_ids=(leader.unit_instance_id,),
             target_kind="this_model",
             effect_kind="modify_dice_roll",
             parameters={"roll_type": "hit", "delta": 1, "attack_role": "attacker"},
             source_model_instance_id=leader.own_models[0].model_instance_id,
         )
     )
+    assert not state.persisting_effects_for_unit(formation.attached_unit_instance_id)
 
     assert (
         _hit_modifier(
@@ -1104,6 +1105,127 @@ def test_ws14_generic_this_model_half_strength_hit_modifier_gates_target() -> No
     _replace_unit(state, _unit_with_model_wounds(defender, wounds_remaining=below_half_wounds))
 
     assert registry.hit_roll_modifier(context) == 0
+
+
+def test_ws14_generic_this_model_attack_modifiers_use_source_rules_unit_strength() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+    source_model_id = attacker.own_models[0].model_instance_id
+
+    for roll_type, strength_constraint in (
+        ("hit", "source_unit_below_starting_strength"),
+        ("wound", "source_unit_below_half_strength"),
+    ):
+        state.record_persisting_effect(
+            _generic_effect(
+                effect_id=f"ws14:this-model-source-strength-{roll_type}-bonus",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                target_kind="this_model",
+                effect_kind="modify_dice_roll",
+                parameters={"roll_type": roll_type, "delta": 1},
+                conditions=(
+                    {
+                        "kind": "target_constraint",
+                        "parameters": [
+                            {"key": "gate_subject", "value": "source_unit"},
+                            {"key": "relationship", "value": "this_model_makes_attack"},
+                            {"key": "target_constraint", "value": strength_constraint},
+                        ],
+                    },
+                ),
+                source_model_instance_id=source_model_id,
+            )
+        )
+
+    hit_context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        source_phase=BattlePhase.SHOOTING,
+    )
+    wound_context = WoundRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        source_phase=BattlePhase.SHOOTING,
+        strength=profile.strength.final,
+        toughness=4,
+    )
+
+    assert registry.hit_roll_modifier(hit_context) == 0
+    assert registry.wound_roll_modifier(wound_context) == 0
+
+    attacker = _unit_with_model_wounds(
+        attacker,
+        wounds_remaining=attacker.own_models[0].starting_wounds - 1,
+    )
+    _replace_unit(state, attacker)
+    assert registry.hit_roll_modifier(hit_context) == 1
+    assert registry.wound_roll_modifier(wound_context) == 0
+
+    attacker = _unit_with_model_wounds(
+        attacker,
+        wounds_remaining=_below_half_wounds(attacker.own_models[0].starting_wounds),
+    )
+    _replace_unit(state, attacker)
+    assert registry.hit_roll_modifier(hit_context) == 1
+    assert registry.wound_roll_modifier(wound_context) == 1
+
+
+def test_ws14_generic_source_strength_constraint_rejects_unknown_state() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    source_model_id = attacker.own_models[0].model_instance_id
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:this-model-source-strength-drift",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_model",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "hit", "delta": 1},
+            conditions=(
+                {
+                    "kind": "target_constraint",
+                    "parameters": [
+                        {"key": "gate_subject", "value": "source_unit"},
+                        {"key": "relationship", "value": "this_model_makes_attack"},
+                        {"key": "target_constraint", "value": "source_unit_unknown_state"},
+                    ],
+                },
+            ),
+            source_model_instance_id=source_model_id,
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="Unsupported generic RuleIR target_constraint"):
+        RuntimeModifierRegistry.empty().hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=source_model_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=_weapon_profile(catalog, attacker.own_models[0].wargear_ids[0]),
+                source_phase=BattlePhase.SHOOTING,
+            )
+        )
 
 
 def _unit(*, catalog: ArmyCatalog, army_id: str, unit_selection_id: str) -> UnitInstance:

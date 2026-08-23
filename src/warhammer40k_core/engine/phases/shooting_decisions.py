@@ -358,6 +358,7 @@ def _record_one_shot_weapon_uses_for_attack_pools(
         )
         records.append(
             state.record_one_shot_weapon_selected(
+                weapon_instance_id=pool.weapon_instance_id,
                 model_instance_id=model_instance_id,
                 wargear_id=pool.wargear_id,
                 weapon_profile_id=pool.weapon_profile_id,

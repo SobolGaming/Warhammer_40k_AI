@@ -8,10 +8,10 @@ from typing import cast
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
-    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilitySourceKind,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_once_per_battle_support import (
@@ -449,7 +449,7 @@ def _has_fight_start_once_per_battle_records(
         clause_is_fight_start_once_per_battle_activation(clause)
         for index in indexes.values()
         for record in index.all_records()
-        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
+        if ability_record_is_active_generic_rule_ir(record)
         for clause in catalog_rule_clauses_from_record(record)
     )
 
