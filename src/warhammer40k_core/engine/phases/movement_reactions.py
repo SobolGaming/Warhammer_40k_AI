@@ -7,6 +7,10 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     request_catalog_setup_reactive_shoot_charge_if_available,
 )
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeDistanceKind,
+    MovementEndSurgeDistanceSpec,
+)
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -40,6 +44,7 @@ __all__ = (
     "_movement_end_surge_distance_roll_spec",
     "_movement_end_surge_event_already_processed",
     "_movement_end_surge_grant_distance_bonus",
+    "_movement_end_surge_grant_distance_spec",
     "_request_end_movement_active_player_stratagem_if_available",
     "_request_end_opponent_movement_reaction_if_available",
     "_request_fire_overwatch_reaction_if_available",
@@ -732,22 +737,50 @@ def _request_movement_end_surge_if_available(
                 ):
                     continue
                 first_grant = reaction_grants[0]
+                distance_spec = _movement_end_surge_grant_distance_spec(reaction_grants)
                 max_distance_bonus_inches = _movement_end_surge_grant_distance_bonus(
                     reaction_grants
                 )
                 descriptor_source_rule_id = (
                     first_grant.descriptor_source_rule_id or first_grant.source_id
                 )
-                roll_state = _dice_roll_manager_for_state(
-                    state=state,
-                    decisions=decisions,
-                ).roll(
-                    _movement_end_surge_distance_roll_spec(
-                        source_rule_id=descriptor_source_rule_id,
-                        player_id=reacting_player_id,
-                        triggering_unit_instance_id=triggering_unit_id,
-                        trigger_event_id=record.event_id,
+                roll_state: DiceRollState | None = None
+                if distance_spec.kind is MovementEndSurgeDistanceKind.DICE:
+                    dice_expression = distance_spec.dice_expression
+                    if dice_expression is None:
+                        raise GameLifecycleError(
+                            "Dice movement-end surge distance is missing its expression."
+                        )
+                    roll_state = _dice_roll_manager_for_state(
+                        state=state,
+                        decisions=decisions,
+                    ).roll(
+                        _movement_end_surge_distance_roll_spec(
+                            source_rule_id=descriptor_source_rule_id,
+                            player_id=reacting_player_id,
+                            triggering_unit_instance_id=triggering_unit_id,
+                            trigger_event_id=record.event_id,
+                            distance_expression=dice_expression,
+                        )
                     )
+                    max_distance_inches = float(
+                        roll_state.current_total + max_distance_bonus_inches
+                    )
+                else:
+                    fixed_distance_inches = distance_spec.fixed_distance_inches
+                    if fixed_distance_inches is None:
+                        raise GameLifecycleError(
+                            "Fixed movement-end surge distance is missing its value."
+                        )
+                    max_distance_inches = fixed_distance_inches
+                distance_resolution = validate_json_value(
+                    {
+                        "kind": distance_spec.kind.value,
+                        "distance_spec": distance_spec.to_payload(),
+                        "roll_state": (None if roll_state is None else roll_state.to_payload()),
+                        "bonus_inches": max_distance_bonus_inches,
+                        "max_distance_inches": max_distance_inches,
+                    }
                 )
                 descriptor = TriggeredMovementDescriptor(
                     movement_kind=first_grant.movement_kind,
@@ -758,7 +791,7 @@ def _request_movement_end_surge_if_available(
                         source_step=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE.value,
                         source_event_id=record.event_id,
                     ),
-                    max_distance_inches=float(roll_state.current_total + max_distance_bonus_inches),
+                    max_distance_inches=max_distance_inches,
                     movement_mode=MovementMode.NORMAL,
                     allow_battle_shocked=first_grant.allow_battle_shocked,
                     allow_within_engagement_range=False,
@@ -788,7 +821,10 @@ def _request_movement_end_surge_if_available(
                         "trigger_event_id": record.event_id,
                         "reaction_group_key": list(reaction_group_key),
                         "movement_phase_action": movement_action,
-                        "surge_distance_roll": roll_state.to_payload(),
+                        "surge_distance_roll": (
+                            None if roll_state is None else roll_state.to_payload()
+                        ),
+                        "distance_resolution": distance_resolution,
                         "max_distance_bonus_inches": max_distance_bonus_inches,
                         "descriptor": descriptor.to_payload(),
                         "grants": [grant.to_payload() for grant in reaction_grants],
@@ -818,9 +854,12 @@ def _movement_end_surge_distance_roll_spec(
     player_id: str,
     triggering_unit_instance_id: str,
     trigger_event_id: str,
+    distance_expression: DiceExpression,
 ) -> DiceRollSpec:
+    if type(distance_expression) is not DiceExpression:
+        raise GameLifecycleError("Movement-end surge distance roll requires a DiceExpression.")
     return DiceRollSpec(
-        expression=DiceExpression(quantity=1, sides=6),
+        expression=distance_expression,
         reason=(
             "Movement-end surge distance "
             f"{source_rule_id} for {triggering_unit_instance_id} from {trigger_event_id}"
@@ -833,11 +872,20 @@ def _movement_end_surge_distance_roll_spec(
 def _eligible_triggered_movement_units_from_grants(
     *,
     grants: tuple[MovementEndSurgeGrant, ...],
-    roll_state: DiceRollState,
+    roll_state: DiceRollState | None,
     distance_bonus_inches: int,
 ) -> tuple[TriggeredMovementEligibleUnit, ...]:
     units: list[TriggeredMovementEligibleUnit] = []
     for grant in grants:
+        eligible_roll_state: DiceRollState | None = None
+        eligible_roll_bonus_inches = 0
+        if grant.distance_reroll_permission is not None:
+            if roll_state is None:
+                raise GameLifecycleError(
+                    "Movement-end surge distance reroll requires a dice roll state."
+                )
+            eligible_roll_state = roll_state
+            eligible_roll_bonus_inches = distance_bonus_inches
         units.append(
             TriggeredMovementEligibleUnit(
                 unit_instance_id=grant.unit_instance_id,
@@ -845,12 +893,8 @@ def _eligible_triggered_movement_units_from_grants(
                 source_id=grant.descriptor_source_rule_id or grant.source_id,
                 replay_payload=grant.replay_payload,
                 decision_effect_payload=grant.decision_effect_payload,
-                distance_roll_state=(
-                    roll_state if grant.distance_reroll_permission is not None else None
-                ),
-                distance_roll_bonus_inches=(
-                    distance_bonus_inches if grant.distance_reroll_permission is not None else 0
-                ),
+                distance_roll_state=eligible_roll_state,
+                distance_roll_bonus_inches=eligible_roll_bonus_inches,
                 distance_reroll_permission=grant.distance_reroll_permission,
             )
         )
@@ -871,6 +915,24 @@ def _movement_end_surge_grant_distance_bonus(
     if len(bonuses) != 1:
         raise GameLifecycleError("Movement-end surge grants must share one distance bonus.")
     return bonuses.pop()
+
+
+def _movement_end_surge_grant_distance_spec(
+    grants: tuple[MovementEndSurgeGrant, ...],
+) -> MovementEndSurgeDistanceSpec:
+    if type(grants) is not tuple or not grants:
+        raise GameLifecycleError(
+            "Movement-end surge distance specification requires a non-empty grant tuple."
+        )
+    for grant in grants:
+        if type(grant) is not MovementEndSurgeGrant:
+            raise GameLifecycleError(
+                "Movement-end surge distance specification requires MovementEndSurgeGrant values."
+            )
+    distance_specs = {grant.distance_spec for grant in grants}
+    if len(distance_specs) != 1:
+        raise GameLifecycleError("Movement-end surge grants must share one distance specification.")
+    return distance_specs.pop()
 
 
 def _movement_end_surge_event_already_processed(

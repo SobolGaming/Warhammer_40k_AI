@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import cast
 
@@ -23,8 +24,9 @@ CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID = (
 class CatalogMovementEndReactiveNormalMoveDescriptor:
     effect: RuleEffectSpec
     trigger_distance_inches: float
-    distance_dice_quantity: int
-    distance_dice_sides: int
+    fixed_distance_inches: float | None
+    distance_dice_quantity: int | None
+    distance_dice_sides: int | None
     distance_bonus: int
 
     def __post_init__(self) -> None:
@@ -32,17 +34,45 @@ class CatalogMovementEndReactiveNormalMoveDescriptor:
             raise GameLifecycleError("Movement-end reactive move effect is invalid.")
         if type(self.trigger_distance_inches) not in {int, float}:
             raise GameLifecycleError("Movement-end reactive trigger distance is invalid.")
-        if float(self.trigger_distance_inches) <= 0.0:
+        if (
+            not math.isfinite(float(self.trigger_distance_inches))
+            or float(self.trigger_distance_inches) <= 0.0
+        ):
             raise GameLifecycleError("Movement-end reactive trigger distance must be positive.")
         object.__setattr__(self, "trigger_distance_inches", float(self.trigger_distance_inches))
-        for field_name, value in (
-            ("distance_dice_quantity", self.distance_dice_quantity),
-            ("distance_dice_sides", self.distance_dice_sides),
-            ("distance_bonus", self.distance_bonus),
-        ):
-            minimum = 0 if field_name == "distance_bonus" else 1
-            if type(value) is not int or value < minimum:
-                raise GameLifecycleError(f"Movement-end reactive move {field_name} is invalid.")
+        if type(self.distance_bonus) is not int or self.distance_bonus < 0:
+            raise GameLifecycleError("Movement-end reactive move distance_bonus is invalid.")
+        has_fixed_distance = self.fixed_distance_inches is not None
+        has_dice_distance = (
+            self.distance_dice_quantity is not None or self.distance_dice_sides is not None
+        )
+        if has_fixed_distance == has_dice_distance:
+            raise GameLifecycleError(
+                "Movement-end reactive move requires exactly one fixed or dice distance."
+            )
+        if has_fixed_distance:
+            fixed_distance = self.fixed_distance_inches
+            if type(fixed_distance) not in {int, float}:
+                raise GameLifecycleError(
+                    "Movement-end reactive move fixed_distance_inches is invalid."
+                )
+            fixed_distance_inches = float(cast(int | float, fixed_distance))
+            if not math.isfinite(fixed_distance_inches) or fixed_distance_inches <= 0.0:
+                raise GameLifecycleError(
+                    "Movement-end reactive move fixed_distance_inches is invalid."
+                )
+            if self.distance_bonus != 0:
+                raise GameLifecycleError(
+                    "Movement-end reactive fixed distance must not include a bonus."
+                )
+            object.__setattr__(self, "fixed_distance_inches", fixed_distance_inches)
+            return
+        if type(self.distance_dice_quantity) is not int or self.distance_dice_quantity < 1:
+            raise GameLifecycleError(
+                "Movement-end reactive move distance_dice_quantity is invalid."
+            )
+        if type(self.distance_dice_sides) is not int or self.distance_dice_sides < 2:
+            raise GameLifecycleError("Movement-end reactive move distance_dice_sides is invalid.")
 
 
 def clause_is_movement_end_reactive_normal_move(clause: RuleClause) -> bool:
@@ -68,17 +98,41 @@ def effect_is_movement_end_reactive_normal_move(effect: RuleEffectSpec) -> bool:
     if effect.kind is not RuleEffectKind.OUT_OF_PHASE_ACTION:
         return False
     parameters = parameter_payload(effect.parameters)
-    expected = {
+    common = {
         "action": "move",
         "action_group": "movement_end_reactive_normal_move",
-        "distance_bonus": 0,
-        "distance_dice_quantity": 1,
-        "distance_dice_sides": 6,
         "movement_kind": "triggered",
         "movement_mode": "normal",
         "optional": True,
     }
-    return parameters == expected
+    distance_parameters = {key: value for key, value in parameters.items() if key not in common}
+    if {key: parameters.get(key) for key in common} != common:
+        return False
+    if set(parameters) == {*common, "distance_inches"}:
+        distance_inches = distance_parameters.get("distance_inches")
+        return (
+            type(distance_inches) in {int, float}
+            and math.isfinite(float(cast(int | float, distance_inches)))
+            and float(cast(int | float, distance_inches)) > 0.0
+        )
+    if set(parameters) != {
+        *common,
+        "distance_bonus",
+        "distance_dice_quantity",
+        "distance_dice_sides",
+    }:
+        return False
+    distance_bonus = distance_parameters.get("distance_bonus")
+    dice_quantity = distance_parameters.get("distance_dice_quantity")
+    dice_sides = distance_parameters.get("distance_dice_sides")
+    return (
+        type(distance_bonus) is int
+        and distance_bonus >= 0
+        and type(dice_quantity) is int
+        and dice_quantity >= 1
+        and type(dice_sides) is int
+        and dice_sides >= 2
+    )
 
 
 def _descriptor_or_none(
@@ -150,10 +204,22 @@ def _descriptor_or_none(
     if not effect_is_movement_end_reactive_normal_move(effect):
         return None
     effect_parameters = parameter_payload(effect.parameters)
+    fixed_distance = effect_parameters.get("distance_inches")
+    if fixed_distance is not None:
+        fixed_distance_inches: float | None = float(cast(int | float, fixed_distance))
+        distance_dice_quantity: int | None = None
+        distance_dice_sides: int | None = None
+        distance_bonus = 0
+    else:
+        fixed_distance_inches = None
+        distance_dice_quantity = cast(int, effect_parameters["distance_dice_quantity"])
+        distance_dice_sides = cast(int, effect_parameters["distance_dice_sides"])
+        distance_bonus = cast(int, effect_parameters["distance_bonus"])
     return CatalogMovementEndReactiveNormalMoveDescriptor(
         effect=effect,
         trigger_distance_inches=float(numeric_distance_inches),
-        distance_dice_quantity=cast(int, effect_parameters["distance_dice_quantity"]),
-        distance_dice_sides=cast(int, effect_parameters["distance_dice_sides"]),
-        distance_bonus=cast(int, effect_parameters["distance_bonus"]),
+        fixed_distance_inches=fixed_distance_inches,
+        distance_dice_quantity=distance_dice_quantity,
+        distance_dice_sides=distance_dice_sides,
+        distance_bonus=distance_bonus,
     )

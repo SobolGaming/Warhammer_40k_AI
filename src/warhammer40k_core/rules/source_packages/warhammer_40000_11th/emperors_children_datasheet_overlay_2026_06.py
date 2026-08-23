@@ -209,6 +209,11 @@ def _blank_keyword_supersede_operations() -> tuple[SourceOverlayOperation, ...]:
             "000004093:blank-keyword:global:true:14826",
             "9afb97df7e2885eb6c28fcc2e8a04311a7b78e94a3b985ae6cbb436754070eff",
         ),
+        (
+            180,
+            "000004078:blank-keyword:global:true:14708",
+            "543accd3da8543e8cfb75645ed3a3dfce9244b2f75209bb213829cf6e8a93bfe",
+        ),
     )
     return tuple(
         _supersede_row(

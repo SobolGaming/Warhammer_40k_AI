@@ -100,6 +100,7 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
 )
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
+    MovementEndSurgeDistanceSpec,
     MovementEndSurgeGrant,
 )
 from warhammer40k_core.engine.objective_control import (
@@ -884,6 +885,7 @@ def _blood_legion_murdercall_grants(
                 hook_id=blood_legion_ir.MURDERCALL_HOOK_ID,
                 source_id=blood_legion_ir.BLOOD_LEGION_SOURCE_RULE_ID,
                 unit_instance_id=unit.unit_instance_id,
+                distance_spec=MovementEndSurgeDistanceSpec.dice(quantity=1, sides=6),
                 replay_payload=_blood_legion_murdercall_replay_payload(
                     context=context,
                     source=source,

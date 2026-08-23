@@ -1,0 +1,742 @@
+{
+  "artifact_schema": "core-v2-emperors-children-lord-exultant-maulerfiend-chaos-spawn-rule-ir-v1",
+  "datasheets": [
+    {
+      "datasheet_id": "000004078",
+      "datasheet_name": "Lord Exultant",
+      "pdf_page_reference": null,
+      "review_row_id": "source:000004078",
+      "review_treatment": "unchanged_predecessor"
+    },
+    {
+      "datasheet_id": "000004090",
+      "datasheet_name": "Chaos Spawn",
+      "pdf_page_reference": "Rules Updates, physical PDF page 9",
+      "review_row_id": "source:000004090",
+      "review_treatment": "rules_update"
+    },
+    {
+      "datasheet_id": "000004091",
+      "datasheet_name": "Maulerfiend",
+      "pdf_page_reference": null,
+      "review_row_id": "source:000004091",
+      "review_treatment": "unchanged_predecessor"
+    }
+  ],
+  "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+  "official_document_pages": [
+    9
+  ],
+  "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+  "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
+  "package_hash": "75d5b1641bf61b66f81d855c7c8f1acea4b2c5868f1ebe0cc35c31fbd4420ef9",
+  "records": {
+    "000004078:4": {
+      "ability_name": "Euphoric Strikes",
+      "datasheet_id": "000004078",
+      "datasheet_name": "Lord Exultant",
+      "normalized_text_sha256": "25e0b51ee3dd0032335245b2395c002487584b176310f4567aeb17cfeca3c061",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:4:clause:001",
+            "conditions": [
+              {
+                "kind": "frequency_limit",
+                "parameters": [
+                  {
+                    "key": "activation_kind",
+                    "value": "optional_ability_use"
+                  },
+                  {
+                    "key": "max_uses",
+                    "value": 1
+                  },
+                  {
+                    "key": "scope",
+                    "value": "battle"
+                  },
+                  {
+                    "key": "usage_subject",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 81,
+                  "start": 0,
+                  "text": "Once per battle, at the start of the Fight phase, this model can use this ability"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "boundary",
+                  "value": "end"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                }
+              ],
+              "source_span": {
+                "end": 121,
+                "start": 95,
+                "text": "until the end of the phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "attacks"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 3
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "melee"
+                  }
+                ],
+                "source_span": {
+                  "end": 198,
+                  "start": 123,
+                  "text": "add 3 to the Attacks characteristic of melee weapons equipped by this model"
+                }
+              },
+              {
+                "kind": "modify_characteristic",
+                "parameters": [
+                  {
+                    "key": "characteristic",
+                    "value": "armor_penetration"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  },
+                  {
+                    "key": "weapon_scope",
+                    "value": "melee"
+                  }
+                ],
+                "source_span": {
+                  "end": 270,
+                  "start": 203,
+                  "text": "improve the Armour Penetration characteristic of those weapons by 1"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 271,
+              "start": 0,
+              "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of melee weapons equipped by this model and improve the Armour Penetration characteristic of those weapons by 1."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 60,
+                "start": 50,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:characteristic-modifier",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "start"
+                },
+                {
+                  "key": "phase",
+                  "value": "fight"
+                }
+              ],
+              "source_span": {
+                "end": 48,
+                "start": 17,
+                "text": "at the start of the Fight phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "3513e95b2f28a2018b8df4197c713dfd80df50ff87e216c0e2eb4846a8769899",
+        "normalized_text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of melee weapons equipped by this model and improve the Armour Penetration characteristic of those weapons by 1.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004078:4"
+      }
+    },
+    "000004078:5": {
+      "ability_name": "LORD OF THE HOST",
+      "datasheet_id": "000004078",
+      "datasheet_name": "Lord Exultant",
+      "normalized_text_sha256": "3c17e8920f6d33be40be6a0c40a296b7b08f99f86d3123e2f675bd8daa01d129",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:5:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 108,
+                  "start": 0,
+                  "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "bodyguard_unit"
+                  },
+                  {
+                    "key": "required_keyword",
+                    "value": "BATTLELINE"
+                  }
+                ],
+                "source_span": {
+                  "end": 61,
+                  "start": 51,
+                  "text": "Battleline"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 108,
+                "start": 0,
+                "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "infiltrators"
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 141,
+                  "start": 129,
+                  "text": "Infiltrators"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 166,
+              "start": 0,
+              "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6\" abilities."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 13,
+                "start": 3,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:5:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "relationship",
+                    "value": "this_model_leading_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 108,
+                  "start": 0,
+                  "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+                }
+              },
+              {
+                "kind": "keyword_gate",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "bodyguard_unit"
+                  },
+                  {
+                    "key": "required_keyword",
+                    "value": "BATTLELINE"
+                  }
+                ],
+                "source_span": {
+                  "end": 61,
+                  "start": 51,
+                  "text": "Battleline"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": {
+              "kind": "while_condition_true",
+              "parameters": [],
+              "source_span": {
+                "end": 108,
+                "start": 0,
+                "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "scouts"
+                  },
+                  {
+                    "key": "distance_inches",
+                    "value": 6
+                  },
+                  {
+                    "key": "target_scope",
+                    "value": "this_model"
+                  }
+                ],
+                "source_span": {
+                  "end": 155,
+                  "start": 146,
+                  "text": "Scouts 6\""
+                }
+              }
+            ],
+            "source_span": {
+              "end": 166,
+              "start": 0,
+              "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6\" abilities."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 13,
+                "start": 3,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "eadbaac9c124f1788aef83230108737e367b1d377048efd94df0687befbdba05",
+        "normalized_text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6\" abilities.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004078:5"
+      }
+    },
+    "000004090:3": {
+      "ability_name": "Scuttling Horrors",
+      "datasheet_id": "000004090",
+      "datasheet_name": "Chaos Spawn",
+      "normalized_text_sha256": "877148143367d60a89ab8b522fff000e992d80ace19a4cae9f0a07029eb9ee3c",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004090:3:clause:001",
+            "conditions": [
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": 8
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "object_reference",
+                    "value": "this"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within"
+                  },
+                  {
+                    "key": "qualifier",
+                    "value": null
+                  },
+                  {
+                    "key": "range_kind",
+                    "value": "numeric_range"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "enemy_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 86,
+                  "start": 64,
+                  "text": "within 8\" of this unit"
+                }
+              },
+              {
+                "kind": "distance_predicate",
+                "parameters": [
+                  {
+                    "key": "distance_inches",
+                    "value": null
+                  },
+                  {
+                    "key": "negated",
+                    "value": true
+                  },
+                  {
+                    "key": "object_allegiance",
+                    "value": "enemy"
+                  },
+                  {
+                    "key": "object_kind",
+                    "value": "unit"
+                  },
+                  {
+                    "key": "object_quantity",
+                    "value": "one_or_more"
+                  },
+                  {
+                    "key": "predicate",
+                    "value": "within_engagement_range"
+                  },
+                  {
+                    "key": "qualifier",
+                    "value": null
+                  },
+                  {
+                    "key": "range_kind",
+                    "value": "engagement_range"
+                  },
+                  {
+                    "key": "subject",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 158,
+                  "start": 88,
+                  "text": "if this unit is not within Engagement Range of one or more enemy units"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "out_of_phase_action",
+                "parameters": [
+                  {
+                    "key": "action",
+                    "value": "move"
+                  },
+                  {
+                    "key": "action_group",
+                    "value": "movement_end_reactive_normal_move"
+                  },
+                  {
+                    "key": "distance_inches",
+                    "value": 6
+                  },
+                  {
+                    "key": "movement_kind",
+                    "value": "triggered"
+                  },
+                  {
+                    "key": "movement_mode",
+                    "value": "normal"
+                  },
+                  {
+                    "key": "optional",
+                    "value": true
+                  }
+                ],
+                "source_span": {
+                  "end": 204,
+                  "start": 160,
+                  "text": "this unit can make a Normal move of up to 6\""
+                }
+              }
+            ],
+            "source_span": {
+              "end": 205,
+              "start": 0,
+              "text": "In your opponent's Movement phase, if an enemy unit ends a move within 8\" of this unit, if this unit is not within Engagement Range of one or more enemy units, this unit can make a Normal move of up to 6\"."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 169,
+                "start": 160,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17c:out-of-phase-action",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "opponent"
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "enemy_unit"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "enemy_unit_move_end"
+                }
+              ],
+              "source_span": {
+                "end": 63,
+                "start": 0,
+                "text": "In your opponent's Movement phase, if an enemy unit ends a move"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "ed6c147d77c4e8d47a403b4ee64465328469c52901c2fc2c7b5eff476ef268f1",
+        "normalized_text": "In your opponent's Movement phase, if an enemy unit ends a move within 8\" of this unit, if this unit is not within Engagement Range of one or more enemy units, this unit can make a Normal move of up to 6\".",
+        "parser_version": "phase17c-rule-parser-v4",
+        "rule_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004090:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004090:3"
+      }
+    },
+    "000004091:3": {
+      "ability_name": "Glutton for Punishment",
+      "datasheet_id": "000004091",
+      "datasheet_name": "Maulerfiend",
+      "normalized_text_sha256": "e4815aa8797fcc8c40a1551d5a84913b7fb74ea541ab58fee1cc3ae8232ae618",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004091:3:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "this_model_makes_attack"
+                  },
+                  {
+                    "key": "target_constraint",
+                    "value": "source_unit_below_starting_strength"
+                  }
+                ],
+                "source_span": {
+                  "end": 74,
+                  "start": 38,
+                  "text": "if it is below its Starting Strength"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit"
+                  }
+                ],
+                "source_span": {
+                  "end": 97,
+                  "start": 76,
+                  "text": "add 1 to the Hit roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 98,
+              "start": 0,
+              "text": "Each time this model makes an attack, if it is below its Starting Strength, add 1 to the Hit roll."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 20,
+                "start": 10,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:dice-roll-modifier",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "roll_type",
+                  "value": "hit"
+                }
+              ],
+              "source_span": {
+                "end": 36,
+                "start": 0,
+                "text": "Each time this model makes an attack"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004091:3:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "this_model_makes_attack"
+                  },
+                  {
+                    "key": "target_constraint",
+                    "value": "source_unit_below_half_strength"
+                  }
+                ],
+                "source_span": {
+                  "end": 140,
+                  "start": 99,
+                  "text": "If this model is also Below Half-strength"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "wound"
+                  }
+                ],
+                "source_span": {
+                  "end": 165,
+                  "start": 142,
+                  "text": "add 1 to the Wound roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 174,
+              "start": 99,
+              "text": "If this model is also Below Half-strength, add 1 to the Wound roll as well."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 112,
+                "start": 102,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17c:dice-roll-modifier",
+            "trigger": {
+              "kind": "dice_roll",
+              "parameters": [
+                {
+                  "key": "roll_type",
+                  "value": "wound"
+                }
+              ],
+              "source_span": {
+                "end": 36,
+                "start": 0,
+                "text": "Each time this model makes an attack"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "abba09fc7a6a441815862f6140db8985a4c05cb58834fd11abf1019eef887ab8",
+        "normalized_text": "Each time this model makes an attack, if it is below its Starting Strength, add 1 to the Hit roll. If this model is also Below Half-strength, add 1 to the Wound roll as well.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004091:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004091:3"
+      }
+    }
+  },
+  "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+  "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

@@ -747,7 +747,7 @@ def _matching_generic_attack_effects(
     matches: list[_GenericAttackEffect] = []
     seen: set[tuple[str, AttackRole]] = set()
     for role, unit_id in role_unit_ids:
-        for persisting_effect in state.persisting_effects_for_unit(unit_id):
+        for effect_unit_id, persisting_effect in rules_unit_persisting_effects(state, unit_id):
             generic_effect = _generic_attack_effect_or_none(
                 persisting_effect=persisting_effect,
                 role=role,
@@ -758,8 +758,8 @@ def _matching_generic_attack_effects(
             if not _generic_effect_role_applies(
                 effect=generic_effect,
                 role=role,
-                attacking_unit_instance_id=attacker_id,
-                target_unit_instance_id=target_id,
+                attacking_unit_instance_id=(effect_unit_id if role == "attacker" else attacker_id),
+                target_unit_instance_id=(effect_unit_id if role == "target" else target_id),
                 legacy_attacker_role_allowed=legacy_attacker_role_allowed,
                 legacy_target_role_allowed=legacy_target_role_allowed,
             ):

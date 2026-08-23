@@ -402,6 +402,14 @@ class AbilityCatalogRecord:
         )
 
 
+def ability_record_is_active_generic_rule_ir(record: AbilityCatalogRecord) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Generic RuleIR ability lookup requires AbilityCatalogRecord.")
+    return (
+        not record.disabled and record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class AbilityCatalogIndex:
     _records_by_trigger: Mapping[TimingTriggerKind, tuple[AbilityCatalogRecord, ...]]

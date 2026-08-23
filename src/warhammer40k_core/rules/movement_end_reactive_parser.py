@@ -40,7 +40,8 @@ _MOVEMENT_END_REACTIVE_NORMAL_MOVE_RE = re.compile(
     r"(?P<engagement>if\s+this\s+unit\s+is\s+not\s+within\s+Engagement\s+Range\s+of\s+"
     r"one\s+or\s+more\s+enemy\s+units),\s+"
     r"(?P<effect>(?P<target>this\s+unit)\s+can\s+make\s+a\s+Normal\s+move\s+of\s+up\s+"
-    r"to\s+(?P<quantity>\d*)D(?P<sides>\d+)\")\.?\s*$",
+    r"to\s+(?:(?P<quantity>\d*)D(?P<sides>\d+)|"
+    r"(?P<fixed_distance>\d+(?:\.\d+)?))\")\.?\s*$",
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -55,9 +56,20 @@ def compile_movement_end_reactive_normal_move_clause(
     if match is None:
         return None
     distance_inches = _numeric_value(match.group("distance"))
-    quantity_text = match.group("quantity")
-    dice_quantity = 1 if quantity_text == "" else int(quantity_text)
-    dice_sides = int(match.group("sides"))
+    fixed_distance_text = match.group("fixed_distance")
+    if fixed_distance_text is None:
+        quantity_text = match.group("quantity")
+        sides_text = match.group("sides")
+        if quantity_text is None or sides_text is None:
+            raise RuleIRError("Movement-end reactive move dice expression is missing.")
+        dice_quantity = 1 if quantity_text == "" else int(quantity_text)
+        effect_distance_parameters: tuple[tuple[str, RuleParameterValue], ...] = (
+            ("distance_bonus", 0),
+            ("distance_dice_quantity", dice_quantity),
+            ("distance_dice_sides", int(sides_text)),
+        )
+    else:
+        effect_distance_parameters = (("distance_inches", _numeric_value(fixed_distance_text)),)
     clause_id = f"{source_id}:clause:{clause_index:03d}"
     return RuleClause(
         clause_id=clause_id,
@@ -121,9 +133,7 @@ def compile_movement_end_reactive_normal_move_clause(
                     (
                         ("action", "move"),
                         ("action_group", "movement_end_reactive_normal_move"),
-                        ("distance_bonus", 0),
-                        ("distance_dice_quantity", dice_quantity),
-                        ("distance_dice_sides", dice_sides),
+                        *effect_distance_parameters,
                         ("movement_kind", "triggered"),
                         ("movement_mode", "normal"),
                         ("optional", True),

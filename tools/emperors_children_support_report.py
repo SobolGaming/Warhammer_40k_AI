@@ -77,17 +77,19 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Lord Exultant",
         datasheet_id="000004078",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Leader, the Perfectionists led-unit Lethal Hits grant, and the Thrill Seekers "
-            "army-rule handler are implemented paths. Perfectionists is engine-consumed through "
-            "the same content-neutral RuleIR used by equivalent leader abilities."
+            "Leader, Perfectionists led-unit Lethal Hits, once-per-battle Euphoric Strikes "
+            "melee Attacks and Armour Penetration modifiers, Lord of the Host conditional "
+            "Infiltrators and Scouts 6-inch grants, and the Thrill Seekers army-rule handler "
+            "are implemented source-backed generic or faction paths."
         ),
-        semantics_needed=(
-            "Once-per-battle Euphoric Strikes Attacks and Armour Penetration modifiers; "
-            "conditional Lord of the Host Infiltrators and Scouts 6-inch grants."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Lord Exultant blocker; catalog, model geometry, wargear, "
+            "weapon-keyword, datasheet-ability, and Thrill Seekers component evidence is "
+            "complete."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -272,30 +274,35 @@ _DATASHEET_REVIEW_ROWS = (
         group=_VEHICLES_GROUP,
         datasheet="Chaos Spawn",
         datasheet_id="000004090",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Feel No Pain 5+ and the Thrill Seekers army-rule handler are implemented paths; "
-            "the source overlay applies the updated Scuttling Horrors trigger text."
+            "Feel No Pain 5+, the fixed 6-inch PathWitness-backed Scuttling Horrors Normal "
+            "move after an enemy move ends within 8 inches, and the Thrill Seekers army-rule "
+            "handler are implemented source-backed paths; the source overlay applies the "
+            "official updated trigger text."
         ),
-        semantics_needed=(
-            "Scuttling Horrors once-per-turn enemy-move trigger and PathWitness-backed Normal "
-            "move of up to 6 inches."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Chaos Spawn blocker; catalog, model geometry, wargear, weapon-keyword, "
+            "datasheet-ability, and Thrill Seekers component evidence is complete."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_VEHICLES_GROUP,
         datasheet="Maulerfiend",
         datasheet_id="000004091",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths."
+            "Deadly Demise D3, Glutton for Punishment's source-unit Hit modifier below "
+            "Starting Strength and Wound modifier Below Half-strength, and the Thrill Seekers "
+            "army-rule handler are implemented source-backed paths."
         ),
-        semantics_needed=(
-            "Glutton for Punishment Hit modifier below Starting Strength and additional Wound "
-            "modifier while Below Half-strength."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Maulerfiend blocker; catalog, model geometry, counted replacement "
+            "wargear, weapon-keyword, datasheet-ability, and Thrill Seekers component evidence "
+            "is complete."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_VEHICLES_GROUP,
@@ -866,6 +873,7 @@ def emperors_children_datasheet_support_markdown(
     if generated_support_datasheet_ids != frozenset(
         {
             "000004077",
+            "000004078",
             "000004079",
             "000004080",
             "000004081",
@@ -873,6 +881,8 @@ def emperors_children_datasheet_support_markdown(
             "000004084",
             "000004088",
             "000004089",
+            "000004090",
+            "000004091",
             "000004208",
         }
     ):

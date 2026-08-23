@@ -787,7 +787,13 @@ through a deterministic `surge:<unit_instance_id>` or
 `triggered:<unit_instance_id>` option according to the source movement kind.
 The option payload identifies the selected rules unit, source hook, source rule,
 triggering unit, triggering move event, optional engine-owned decision effect
-payload, and engine-rolled maximum movement distance. Independently triggering
+payload, and engine-resolved maximum movement distance. The source-linked grant
+also carries a typed distance specification whose `kind` is exactly `dice` or
+`fixed`. The replay event `movement_end_surge_triggered` exposes a typed
+`distance_resolution` with that kind, the resolved `max_distance_inches`, the
+distance specification, the applied bonus, and a nullable `roll_state`. Fixed
+distance reactions have a null roll state and do not consume RNG; dice distance
+reactions retain the engine-authored roll state. Independently triggering
 datasheet abilities may emit a separate decision window for each eligible rules
 unit and for each triggering enemy move. Selecting a unit records that finite
 choice, records any source-backed decision effect, and immediately emits a
@@ -795,10 +801,12 @@ parameterized `submit_movement_proposal` request with proposal kind
 `surge_move`. Aeldari Rangers' source-backed Path of the Outcast RuleIR uses
 this contract after an enemy unit ends a move within 8 inches: the engine
 excludes engaged Rangers rules units, rolls D6, and offers an optional Normal
-Move through a PathWitness-validated proposal. Adapters must not roll the D6
-locally, invent candidate units, move models from the finite option payload,
-spend source resources locally, or continue the Movement phase while either
-request is pending.
+Move through a PathWitness-validated proposal. Emperor's Children Chaos Spawn's
+Scuttling Horrors uses the same decision and proposal path with an engine-resolved
+fixed 6-inch maximum and no distance roll. Adapters must not roll or resolve the
+distance locally, invent candidate units, move models from the finite option
+payload, spend source resources locally, or continue the Movement phase while
+either request is pending.
 
 When a selected triggered movement carries a source-backed whole-roll reroll,
 the finite selection does not proceed directly to the movement proposal. The

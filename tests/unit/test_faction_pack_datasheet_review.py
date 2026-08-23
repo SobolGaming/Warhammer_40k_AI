@@ -53,7 +53,11 @@ from tools.generate_aeldari_datasheet_semantic_coverage import (
     generated_aeldari_datasheet_semantic_coverage,
 )
 
-from warhammer40k_core.engine.ability_coverage import AbilityCoverageSupportStage
+from warhammer40k_core.engine.ability_coverage import (
+    DEADLY_DEMISE_DESCRIPTOR_RUNTIME_CONSUMER_IDS,
+    FEEL_NO_PAIN_DESCRIPTOR_RUNTIME_CONSUMER_IDS,
+    AbilityCoverageSupportStage,
+)
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
     CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
 )
@@ -64,10 +68,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
+    CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,
     CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
 )
 from warhammer40k_core.engine.core_descriptor_consumption import (
     CORE_INFILTRATORS_PREBATTLE_CONSUMER_ID,
@@ -75,6 +81,9 @@ from warhammer40k_core.engine.core_descriptor_consumption import (
     CORE_SCOUTS_PREBATTLE_CONSUMER_ID,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    army_rule as emperors_children_army_rule,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     faction_pdf_records,
@@ -363,6 +372,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("chaos-space-marines", "000000969", "Playable"),
         ("death-guard", "000004209", "Playable"),
         ("emperors-children", "000004077", "Playable"),
+        ("emperors-children", "000004078", "Playable"),
         ("emperors-children", "000004079", "Playable"),
         ("emperors-children", "000004080", "Playable"),
         ("emperors-children", "000004081", "Playable"),
@@ -370,6 +380,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("emperors-children", "000004084", "Playable"),
         ("emperors-children", "000004088", "Playable"),
         ("emperors-children", "000004089", "Playable"),
+        ("emperors-children", "000004090", "Playable"),
+        ("emperors-children", "000004091", "Playable"),
         ("emperors-children", "000004208", "Playable"),
         ("thousand-sons", "000001030", "Playable"),
         ("world-eaters", "000004207", "Playable"),
@@ -428,6 +440,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
             )
             if row.faction_id == "aeldari" or row.datasheet_id in {
                 "000004077",
+                "000004078",
                 "000004079",
                 "000004080",
                 "000004081",
@@ -435,6 +448,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 "000004084",
                 "000004088",
                 "000004089",
+                "000004090",
+                "000004091",
                 "000004208",
             }:
                 assert "| All consumed |" in rendered_row
@@ -489,6 +504,113 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     assert chaos_terminator_abilities["Lethal Obsession"].runtime_consumer_ids == (
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     )
+
+    newly_supported_emperors_children = {
+        row.datasheet_id: row
+        for row in non_daemons_rows
+        if row.datasheet_id in {"000004078", "000004090", "000004091"}
+    }
+    assert set(newly_supported_emperors_children) == {
+        "000004078",
+        "000004090",
+        "000004091",
+    }
+    expected_component_statuses = {
+        "000004078": ("Full", "Full", "Full", "Full", "Playable", "Partial"),
+        "000004090": ("Full", "Full", "Full", "None", "Full", "Partial"),
+        "000004091": ("Full", "Full", "Full", "Full", "Full", "Partial"),
+    }
+    for datasheet_id, expected_statuses in expected_component_statuses.items():
+        support = newly_supported_emperors_children[datasheet_id]
+        assert support.overall == "Playable"
+        assert (
+            support.catalog_status,
+            support.model_geometry_status,
+            support.wargear_status,
+            support.weapon_keyword_status,
+            support.datasheet_ability_status,
+            support.faction_interaction_status,
+        ) == expected_statuses
+
+    thrill_seekers_consumers = (
+        emperors_children_army_rule.ADVANCE_ELIGIBILITY_HOOK_ID,
+        emperors_children_army_rule.CHARGE_TARGET_RESTRICTION_HOOK_ID,
+        emperors_children_army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID,
+        emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,
+    )
+    expected_ability_evidence = {
+        "000004078": {
+            "Leader": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                (CORE_LEADER_ATTACHMENT_CONSUMER_ID,),
+            ),
+            "Euphoric Strikes": (
+                AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
+                (CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,),
+            ),
+            "LORD OF THE HOST": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                (
+                    "catalog-ir:conditional-leading-ability:infiltrators",
+                    "catalog-ir:conditional-leading-ability:scouts",
+                ),
+            ),
+            "Perfectionists": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                (
+                    CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+                    "catalog-ir:weapon-keyword-grant:lethal-hits",
+                ),
+            ),
+            "Thrill Seekers": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                thrill_seekers_consumers,
+            ),
+        },
+        "000004090": {
+            "Feel No Pain": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                FEEL_NO_PAIN_DESCRIPTOR_RUNTIME_CONSUMER_IDS,
+            ),
+            "Scuttling Horrors": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                (CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,),
+            ),
+            "Thrill Seekers": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                thrill_seekers_consumers,
+            ),
+        },
+        "000004091": {
+            "Deadly Demise": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                DEADLY_DEMISE_DESCRIPTOR_RUNTIME_CONSUMER_IDS,
+            ),
+            "Glutton for Punishment": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                (
+                    CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+                    CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+                ),
+            ),
+            "Thrill Seekers": (
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                thrill_seekers_consumers,
+            ),
+        },
+    }
+    for datasheet_id, expected_rows in expected_ability_evidence.items():
+        support = newly_supported_emperors_children[datasheet_id]
+        actual_rows = {
+            ability_rows_by_id[row_id].ability_name: ability_rows_by_id[row_id]
+            for row_id in support.ability_coverage_row_ids
+        }
+        assert set(actual_rows) == set(expected_rows)
+        assert {
+            ability_name: (row.support_stage, row.runtime_consumer_ids)
+            for ability_name, row in actual_rows.items()
+        } == expected_rows
+        assert all(not row.diagnostic_reasons for row in actual_rows.values())
 
     emperors_children_defiler_support = next(
         row for row in non_daemons_rows if row.datasheet_id == "000004208"

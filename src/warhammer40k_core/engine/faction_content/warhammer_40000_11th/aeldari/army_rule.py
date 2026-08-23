@@ -42,6 +42,7 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import BattleSize
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
+    MovementEndSurgeDistanceSpec,
     MovementEndSurgeGrant,
     MovementEndSurgeHookBinding,
 )
@@ -427,6 +428,7 @@ def opportunity_seized_surge_grants(
                 hook_id=OPPORTUNITY_SEIZED_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 unit_instance_id=unit.unit_instance_id,
+                distance_spec=MovementEndSurgeDistanceSpec.dice(quantity=1, sides=6),
                 max_distance_bonus_inches=_AGILE_SURGE_DISTANCE_BONUS_INCHES,
                 replay_payload={
                     "effect_kind": AGILE_MANOEUVRE_EFFECT_KIND,

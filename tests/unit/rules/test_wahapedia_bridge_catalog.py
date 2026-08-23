@@ -35,6 +35,7 @@ from tests.support.wahapedia_source_fixtures import (
     catalog_package_id,
     catalog_version,
     optional_artifact_rows,
+    source_artifacts_with_datasheet_option_description,
     source_ids_from_row,
     support_attachment_source_artifacts,
     unit_resource_wargear_source_artifacts,
@@ -117,6 +118,7 @@ from warhammer40k_core.rules.wahapedia_bridge import (
     EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
     EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
     ModelHeightOverride,
+    WahapediaBridgeError,
     build_wahapedia_canonical_bridge_artifacts,
 )
 from warhammer40k_core.rules.wahapedia_bridge_defaults import DEFAULT_HEIGHT_OVERRIDES
@@ -485,6 +487,7 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     assert bileblade_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
     assert bileblade_option.effects[0].wargear_id == bileblade_id
     assert bileblade_option.effects[0].replaced_wargear_id == plague_flail_id
+    assert bileblade_option.effects[0].wargear_count == 1
     assert doomsday_bell_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
     assert doomsday_bell_option.effects[0].wargear_id == doomsday_bell_id
     assert doomsday_bell_option.effects[0].replaced_wargear_id == bilesword_id
@@ -582,6 +585,119 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     }
     assert "Reverberating Summons" not in default_records_by_name
     assert doomsday_records_by_name["Reverberating Summons"].wargear_id == doomsday_bell_id
+
+
+def test_phase17k_maulerfiend_single_replacement_preserves_wargear_count() -> None:
+    height_overrides = (
+        ModelHeightOverride(
+            datasheet_id="000004091",
+            model_name="Maulerfiend",
+            height=4.0,
+            height_units=GeometrySourceUnits.INCHES,
+            height_source_id="geometry-review:test:maulerfiend:height",
+            height_document_reference="Maulerfiend cardinality regression fixture",
+        ),
+    )
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=wahapedia_source_artifacts(),
+        bridge_package_id=bridge_package_id(),
+        datasheet_ids=("000004091",),
+        height_overrides=height_overrides,
+    )
+    option_rows = artifact_by_table(bridge_artifacts, "Datasheets_options").rows
+
+    assert len(option_rows) == 1
+    option_fields = option_rows[0].runtime_fields_payload()
+    assert option_fields["option_id"] == "000004091:magma-cutters:option-1"
+    assert option_fields["max_selections"] == "1"
+    assert option_fields["effect_wargear_count"] == "2"
+
+    package = build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000004091")
+    option = next(
+        option
+        for option in datasheet.wargear_options
+        if option.option_id == "000004091:magma-cutters:option-1"
+    )
+    magma_cutters_id = "000004091:magma-cutters"
+    lasher_tendrils_id = "000004091:lasher-tendrils"
+    maulerfiend_fists_id = "000004091:maulerfiend-fists"
+
+    assert option.max_selections == 1
+    assert option.effects[0].wargear_count == 2
+
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+    default_unit = factory.instantiate_unit(
+        army_id="army-emperors-children",
+        selection=UnitMusterSelection(
+            unit_selection_id="maulerfiend-default",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000004091:maulerfiend",
+                    model_count=1,
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+    selected_unit = factory.instantiate_unit(
+        army_id="army-emperors-children",
+        selection=UnitMusterSelection(
+            unit_selection_id="maulerfiend-magma-cutters",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000004091:maulerfiend",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=option.option_id,
+                    model_profile_id=option.model_profile_id,
+                    wargear_ids=(magma_cutters_id,),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+    assert default_unit.own_models[0].wargear_ids == (
+        lasher_tendrils_id,
+        maulerfiend_fists_id,
+    )
+    assert selected_unit.own_models[0].wargear_ids == (
+        maulerfiend_fists_id,
+        magma_cutters_id,
+        magma_cutters_id,
+    )
+
+    with pytest.raises(ListValidationError, match="must not contain duplicates"):
+        WargearSelection(
+            option_id=option.option_id,
+            model_profile_id=option.model_profile_id,
+            wargear_ids=(magma_cutters_id, magma_cutters_id),
+        )
+
+    with pytest.raises(WahapediaBridgeError, match="replacement_count must be at least 1"):
+        build_wahapedia_canonical_bridge_artifacts(
+            source_artifacts=source_artifacts_with_datasheet_option_description(
+                datasheet_id="000004091",
+                option_row_id="000004091:1",
+                description=("This model's lasher tendrils can be replaced with 0 magma cutters."),
+            ),
+            bridge_package_id=bridge_package_id(),
+            datasheet_ids=("000004091",),
+            height_overrides=height_overrides,
+        )
 
 
 def test_phase17k_keeper_of_secrets_bridge_supports_optional_one_of_wargear() -> None:

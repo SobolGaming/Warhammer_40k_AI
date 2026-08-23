@@ -3676,6 +3676,106 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/core/000008346/none",
+    "datasheet_id": "000004078",
+    "datasheet_name": "Lord Exultant",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004078:euphoric-strikes",
+    "ability_name": "Euphoric Strikes",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:euphoric-strikes/none",
+    "datasheet_id": "000004078",
+    "datasheet_name": "Lord Exultant",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:once-per-battle-ability"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "generic_ir_executable"
+  },
+  {
+    "ability_id": "000004078:lord-of-the-host",
+    "ability_name": "LORD OF THE HOST",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:lord-of-the-host/none",
+    "datasheet_id": "000004078",
+    "datasheet_name": "Lord Exultant",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-leading-ability:infiltrators",
+      "catalog-ir:conditional-leading-ability:scouts"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004078:perfectionists",
+    "ability_name": "Perfectionists",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:perfectionists/none",
+    "datasheet_id": "000004078",
+    "datasheet_name": "Lord Exultant",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:lethal-hits"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_weapon_ability.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004078/faction/000009994/none",
+    "datasheet_id": "000004078",
+    "datasheet_name": "Lord Exultant",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008345",
     "ability_name": "Infiltrators",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -4165,6 +4265,130 @@
     "coverage_row_id": "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
     "datasheet_id": "000004089",
     "datasheet_name": "Flawless Blades",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008338",
+    "ability_name": "Feel No Pain",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004090/core/000008338/none",
+    "datasheet_id": "000004090",
+    "datasheet_name": "Chaos Spawn",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:lost-wound:feel-no-pain-source",
+      "descriptor:lost-wound:feel-no-pain-resolution"
+    ],
+    "semantic_categories": [
+      "core.feel_no_pain"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004090:scuttling-horrors",
+    "ability_name": "Scuttling Horrors",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004090/datasheet/000004090:scuttling-horrors/none",
+    "datasheet_id": "000004090",
+    "datasheet_name": "Chaos Spawn",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-end-reactive-normal-move"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.out_of_phase_action.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004090/faction/000009994/none",
+    "datasheet_id": "000004090",
+    "datasheet_name": "Chaos Spawn",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/core/000008339/none",
+    "datasheet_id": "000004091",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004091:glutton-for-punishment",
+    "ability_name": "Glutton for Punishment",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
+    "datasheet_id": "000004091",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:wound-roll-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.hit.this_model",
+      "datasheet.roll_modifier.wound.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/faction/000009994/none",
+    "datasheet_id": "000004091",
+    "datasheet_name": "Maulerfiend",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",

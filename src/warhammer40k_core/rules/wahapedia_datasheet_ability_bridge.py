@@ -22,6 +22,10 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
+from warhammer40k_core.rules.wahapedia_ability_source import (
+    WahapediaAbilitySourceError,
+    catalog_ability_source_kind_from_wahapedia_type,
+)
 from warhammer40k_core.rules.wahapedia_bridge_rows import (
     BridgeSourceArtifact,
     bridge_rows_by_table,
@@ -287,18 +291,10 @@ def _mustering_warlord_value(normalized_description: str) -> str | None:
 
 
 def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
-    normalized = ability_type.strip().casefold()
-    if normalized == "core":
-        return CatalogAbilitySourceKind.CORE
-    if normalized == "faction":
-        return CatalogAbilitySourceKind.FACTION
-    if normalized == "datasheet":
-        return CatalogAbilitySourceKind.DATASHEET
-    if normalized in {"wargear", "wargear profile"}:
-        return CatalogAbilitySourceKind.WARGEAR
-    if normalized == "primarch" or normalized.startswith(("special", "fortification")):
-        return CatalogAbilitySourceKind.DATASHEET
-    raise WahapediaDatasheetAbilityBridgeError("Unsupported datasheet ability type.")
+    try:
+        return catalog_ability_source_kind_from_wahapedia_type(ability_type)
+    except WahapediaAbilitySourceError as exc:
+        raise WahapediaDatasheetAbilityBridgeError("Unsupported datasheet ability type.") from exc
 
 
 def _rows_matching(

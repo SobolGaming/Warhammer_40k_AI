@@ -7,9 +7,9 @@ from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
 from warhammer40k_core.engine.abilities import (
-    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_once_per_battle_support import (
@@ -171,7 +171,7 @@ class CatalogAnyPhaseOncePerBattleRuntime:
         for army in self.armies:
             index = self.ability_indexes_by_player_id[army.player_id]
             for record in index.records_for(TimingTriggerKind.START_PHASE):
-                if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+                if not ability_record_is_active_generic_rule_ir(record):
                     continue
                 rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
                 for clause in catalog_rule_clauses_from_record(record):
