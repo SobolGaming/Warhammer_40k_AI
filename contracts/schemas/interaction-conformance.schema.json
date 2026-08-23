@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v4/interaction-conformance.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v5/interaction-conformance.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -10,7 +10,7 @@
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "interaction-conformance-v2-primary-assignments",
+      "const": "interaction-conformance-v3-weapon-instances",
       "type": "string"
     }
   },
@@ -24,7 +24,7 @@
         "case_id": {"minLength": 1, "type": "string"},
         "proposal_payload": {
           "oneOf": [
-            {"$ref": "https://warhammer40k-core.local/contracts/v1/proposal-payload.schema.json"},
+            {"$ref": "https://warhammer40k-core.local/contracts/v2/proposal-payload.schema.json"},
             {"type": "null"}
           ]
         },

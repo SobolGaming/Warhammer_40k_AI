@@ -177,9 +177,10 @@ dispatch registry, the documented nested family, and every parameterized
 proposal fixture. The TypeScript test consumes the generated request and
 submission models, constructs every case, and validates the wrapper plus exact
 proposal schema without importing Python or switching on decision type.
-Because Contract 7 changes the nested annotated-request family, this wrapper is
-also versioned as `interaction-conformance-v2-primary-assignments`; strict
-Contract 6 consumers must not accept it as the former v1 wrapper.
+Because Contract 11 makes physical ranged-weapon identity mandatory in the
+canonical shooting proposal, this wrapper is versioned as
+`interaction-conformance-v3-weapon-instances`. Contract 10 consumers must not
+accept it as the former v2 wrapper.
 
 Interaction descriptors are part of viewer projection hashes and replay
 checkpoints. The same pending engine request therefore selects the same renderer
@@ -473,7 +474,9 @@ reference server currently requires:
   requires exactly two public, directed `primary_mission_assignments` and
   explicit logical terrain-area identities;
 - `finite-submission-v1` for finite option submissions;
-- `parameterized-submission-v1` for proposal submissions;
+- `parameterized-submission-v2-weapon-instances` for proposal submissions whose
+  shooting declarations require one engine-emitted physical weapon instance ID
+  per declared ranged weapon copy;
 - `lifecycle-status-v4-phase17n-step4` for server lifecycle responses whose
   public Primary Mission choices and unresolved viewer-scoped Declare Battle
   Formations state use the shared redaction boundary;
@@ -491,11 +494,12 @@ reference server currently requires:
   with explicit terrain-area logical identity and terrain area and feature
   classifications, plus viewer-scoped model formation state before reveal;
 - `session-projection-v7-phase17n-step4` for full role-scoped reconnect projections;
-- `session-create-v4`, `session-metadata-v10-contract`,
-  `session-command-result-v10-contract`, and `session-command-outcome-v10-contract` for the
+- `session-create-v4`, `session-metadata-v11-contract`,
+  `session-command-envelope-v2-weapon-instances`,
+  `session-command-result-v11-contract`, and `session-command-outcome-v11-contract` for the
   authenticated formal session protocol;
-- `session-persistence-v2-phase18l` for the closed operator-only durable server
-  artifact. It is included in the Contract 10.2 schema bundle and examples but
+- `session-persistence-v3-weapon-instances` for the closed operator-only durable server
+  artifact. It is included in the Contract 11 schema bundle and examples but
   deliberately absent from OpenAPI operations and client payloads;
 - `capability-manifest-v2-directed-primary` inside
   `support-profile-v4-directed-primary` for viewer-scoped capability evidence
@@ -518,7 +522,12 @@ bundle to Contract 10.2 because trusted deployment tooling gains a new schema
 and normative recovery semantics; all existing Contract 10.1 HTTP families keep
 their current shapes and discriminators.
 
-The Contract 10 replay loader accepts only `replay-artifact-v8-phase17n-step5a`;
+Contract 11 advances the parameterized shooting proposal and command wrappers
+because `weapon_instance_id` is now required, and advances the persistence
+artifact because stored command envelopes and outcomes carry those new family
+identities. No Contract 10 shooting or persistence payload is reinterpreted.
+
+The Contract 11 replay loader accepts only `replay-artifact-v8-phase17n-step5a`;
 v7 artifacts require the retained 9.x deployment. It never infers directed
 Primary Mission assignments, grouped position history, destruction sources,
 battlefield departures, persistent markers, condemned selections,
@@ -1508,19 +1517,19 @@ Phase 13B implements attacker selection and declaration with these adapter-visib
 - `select_shooting_unit`: finite active-player choice. Option IDs are either the selected rules-unit `unit_instance_id` or `complete_shooting_phase`; for an active attached formation, the engine emits the attached rules-unit ID once and does not expose Bodyguard, Leader, or Support component IDs as separate shooting units. Unit option payloads include the selected `unit_instance_id`. The completion option uses `submission_kind: "complete_shooting_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player units that completion will skip.
 - `select_shooting_unit_grant`: finite active-player choice emitted after `select_shooting_unit` and before `select_shooting_type` when runtime content exposes legal selected-to-shoot grants. Option IDs are deterministic source hook IDs, plus `decline_shooting_unit_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate reroll permissions locally. Out-of-phase shooting declarations such as Fire Overwatch use the same grant surface before their constrained `submit_shooting_declaration` proposal. Drukhari `Power from Pain: Hatred Eternal` uses this surface to spend one Pain token and record a Shooting-phase hit-reroll empowerment before the unit declares its ranged attacks; Chaos Space Marines `Dark Pacts` and Chaos Daemons Shadow Legion `Disciples of Be'lakor` use it to record Lethal Hits or Sustained Hits 1 for the selected shooting unit.
 - `select_shooting_type`: finite active-player choice emitted after `select_shooting_unit` and any selected-to-shoot grant window, before in-phase `submit_shooting_declaration`. Option IDs are engine-enumerated shooting type IDs such as `normal`, `assault`, `close_quarters`, or `indirect`. The request payload includes `game_id`, `battle_round`, `phase`, `active_player_id`, `unit_instance_id`, source unit-selection request/result IDs, and `legal_shooting_types`. Option payloads include `submission_kind: "select_shooting_type"`, the same source context, and the selected `shooting_type`. Stale, drifted, wrong-actor, or wrong-option submissions reject before queue pop and before mutation.
-- `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`. In-phase requests include `payload.proposal_request.selected_shooting_type`; target candidate `shooting_types` are constrained to that selected type. Out-of-phase Fire Overwatch bypasses the in-phase type decision and emits a constrained `submit_shooting_declaration` request with source-forced `snap` shooting.
-- `submit_shooting_declaration.payload.proposal_request.available_weapons`: current JSON-safe weapon options, including model ID, wargear ID, full weapon-profile payload, and optional Firing Deck source unit/model IDs. `[ONE SHOT]` weapons already selected earlier in the battle are omitted from this list, and stale proposals attempting to redeclare them reject before queue pop.
+- `submit_shooting_declaration`: parameterized active-player choice. The request contains one `submit_parameterized_payload` option and `payload.proposal_request` with `proposal_kind: "shooting_declaration"`. Its weapon-allocation interaction metadata identifies `attacking_model`, `weapon_instance`, and `target_unit` entity kinds. In-phase requests include `payload.proposal_request.selected_shooting_type`; target candidate `shooting_types` are constrained to that selected type. Out-of-phase Fire Overwatch bypasses the in-phase type decision and emits a constrained `submit_shooting_declaration` request with source-forced `snap` shooting.
+- `submit_shooting_declaration.payload.proposal_request.available_weapons`: current JSON-safe physical weapon-copy options, including the deterministic `weapon_instance_id`, model ID, wargear ID, full weapon-profile payload, and optional Firing Deck source unit/model IDs. Each equipped copy has a distinct ID even when every catalog field is otherwise identical. A Firing Deck row identifies the embarked source model's physical weapon copy rather than creating a transport-owned copy. `[ONE SHOT]` weapons already selected earlier in the battle are omitted from this list, and stale proposals attempting to redeclare them reject before queue pop.
 - `submit_shooting_declaration.payload.proposal_request.shooting_weapon_selection_limits`: current JSON-safe per-model caps for source-backed weapon groups represented by canonical weapon keywords. Each entry includes `unit_instance_id`, `model_instance_id`, `weapon_keyword`, `max_selections`, `baseline_max_selections`, `damaged_effect_id`, `source_id`, `damaged_profile_active`, and the affected `weapon_profile_ids`. Tesseract Vault `C'tan Power` profiles are capped at the baseline limit when not damaged and at the DAMAGED limit when its active wounds profile applies. Adapters must not infer additional C'tan Power declarations beyond the emitted cap.
 - `submit_shooting_declaration.payload.proposal_request.firing_deck_value`: the selected Transport's descriptor-sourced Firing Deck value, or `null` when the unit has no Firing Deck descriptor.
-- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe target candidates with legality, violation diagnostics, visible-and-in-range target model IDs, line-of-sight witness, visibility cache key, engine-enumerated `shooting_types`, hit modifier, targeting rule IDs, and `required_weapon_ability_selections` for adapter-visible duplicate `[ANTI]` descriptor choices when a selected weapon profile has more than one matching Anti descriptor for that target. Slash-separated Anti keyword groups match if the target has any listed keyword, while `match_mode: "missing_keyword"` descriptors match only when the target has none of the listed keywords. `[HUNTER X]` is represented as target eligibility: candidates for non-matching targets use violation code `hunter_target_keyword_mismatch`, and legal matching candidates carry `weapon-ability:hunter` in `targeting_rule_ids`.
+- `submit_shooting_declaration.payload.proposal_request.target_candidates`: current JSON-safe per-copy target candidates carrying the selected `weapon_instance_id`, legality, violation diagnostics, visible-and-in-range target model IDs, line-of-sight witness, visibility cache key, engine-enumerated `shooting_types`, hit modifier, targeting rule IDs, and `required_weapon_ability_selections` for adapter-visible duplicate `[ANTI]` descriptor choices when a selected weapon profile has more than one matching Anti descriptor for that target. Slash-separated Anti keyword groups match if the target has any listed keyword, while `match_mode: "missing_keyword"` descriptors match only when the target has none of the listed keywords. `[HUNTER X]` is represented as target eligibility: candidates for non-matching targets use violation code `hunter_target_keyword_mismatch`, and legal matching candidates carry `weapon-ability:hunter` in `targeting_rule_ids`.
 
 Phase 13B shooting declaration submissions must use `selected_option_id: "submit_parameterized_payload"` and a `ShootingDeclarationProposal` payload containing:
 
 - `proposal_request_id`, `proposal_kind: "shooting_declaration"`, player ID, battle round, acting unit ID, source request/result IDs, and visibility cache key;
-- one or more `WeaponDeclaration` entries with attacker model ID, wargear ID, weapon profile ID, target unit ID, engine-enumerated `shooting_type`, selected duplicate weapon ability descriptor IDs in `selected_weapon_ability_ids`, and optional Firing Deck source unit/model IDs;
-- optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, selected embarked unit/model/wargear/profile bindings, and already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
+- one or more `WeaponDeclaration` entries with attacker model ID, the exact engine-emitted `weapon_instance_id`, wargear ID, weapon profile ID, target unit ID, engine-enumerated `shooting_type`, selected duplicate weapon ability descriptor IDs in `selected_weapon_ability_ids`, and optional Firing Deck source unit/model IDs. Distinct physical copies may select the same or different otherwise-legal targets. The same physical-copy/profile/Firing-Deck-source declaration key may appear only once. Catalog-defined independently selectable multi-profile groups such as Tesseract Vault C'tan Powers may expose distinct legal profiles that share one `weapon_instance_id`; those distinct rows remain independently declarable subject to `shooting_weapon_selection_limits`;
+- optional `FiringDeckSelection` evidence with the Transport ID, descriptor-sourced Firing Deck value, and selected embarked unit/model/`weapon_instance_id`/wargear/profile bindings plus already-shot embarked unit IDs. At most the descriptor value's number of distinct embarked models may be selected, and each selected embarked model may contribute at most one non-One-Shot ranged weapon.
 
-Accepted Phase 13B/14F declarations emit deterministic attack-pool payloads, including the selected `shooting_type` and selected duplicate weapon ability IDs, and `shooting_declaration_accepted` events with any `one_shot_weapon_use_records` created for selected `[ONE SHOT]` ranged weapons plus a `ranged_attack_history_record` for the shooting rules unit. Legal shooting types are engine-enumerated values: `normal`, `assault`, `close_quarters`, `indirect`, or source-provided values such as `snap`. Adapters must submit the pending `select_shooting_type` option before an in-phase declaration, then select one of the declaration request target candidate's current `shooting_types`; they must not invent a shooting type, infer one from weapon keywords, synthesize duplicate weapon ability IDs, locally clear one-shot usage, or locally maintain ranged-attack history. Phase 13C/14E then consumes the declared `RangedAttackPool` records through the grouped Shooting phase lifecycle and may emit attacker target/group selection, attacker Precision, defender allocation-order, save, Feel No Pain, or destruction-reaction decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, invalid-duplicate-weapon-ability-selection, invalid-Firing-Deck, or used `[ONE SHOT]` submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
+Accepted Phase 13B/14F declarations emit one deterministic attack-pool payload per declared physical weapon copy/profile row, preserving `weapon_instance_id`, the selected `shooting_type`, and selected duplicate weapon ability IDs. The accepted proposal, `DecisionRecord`, `shooting_declaration_accepted` event, attack-pool state, persistence payload, and replay round-trip retain that same copy identity. Accepted events also include any `one_shot_weapon_use_records` created for selected `[ONE SHOT]` ranged weapons plus a `ranged_attack_history_record` for the shooting rules unit. Legal shooting types are engine-enumerated values: `normal`, `assault`, `close_quarters`, `indirect`, or source-provided values such as `snap`. Adapters must submit the pending `select_shooting_type` option before an in-phase declaration, then select one of the declaration request target candidate's current `shooting_types`; they must not invent weapon instance IDs or reuse an exact engine-emitted physical-copy/profile/Firing-Deck-source declaration key, invent a shooting type, infer one from weapon keywords, synthesize duplicate weapon ability IDs, locally clear one-shot usage, or locally maintain ranged-attack history. Phase 13C/14E then consumes the declared `RangedAttackPool` records through the grouped Shooting phase lifecycle and may emit attacker target/group selection, attacker Precision, defender allocation-order, save, Feel No Pain, or destruction-reaction decisions before returning to the next shooting-unit selection. Rejected stale, malformed, drifted, `duplicate_weapon_declaration`, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-visibility, invalid-duplicate-weapon-ability-selection, invalid-Firing-Deck, or used `[ONE SHOT]` submissions return typed invalid diagnostics before the pending request is popped and before a `DecisionRecord` is created.
 
 Phase 14L implements the ranged-only rulebook Resolve Attacks layer before the
 existing hit/wound/allocation/save/damage resolver. It adds these
@@ -1689,7 +1698,7 @@ If a shooting declaration is parameterized, the request must embed a typed propo
 - the ruleset descriptor hash and line-of-sight/cache evidence required by target validation;
 - visible viewer payloads that do not leak hidden opponent information.
 
-Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B/14F does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate the previously selected shooting type, target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Close-quarters/Pistol, Blast engagement bans, Assault/Advanced weapon gating, Indirect per-weapon `[INDIRECT FIRE]` eligibility, Indirect visibility and no-Hit-reroll policy, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
+Shooting proposals must reject stale, drifted, malformed, schema-invalid, wrong-actor, wrong-unit, wrong-phase, `duplicate_weapon_declaration`, invalid-shooting-type, invalid-target, invalid-weapon, invalid-profile, invalid-Firing-Deck, or stale-visibility submissions before queue pop unless the exact proposal contract explicitly allows a rule-invalid but well-formed rejected attempt and emits a fresh pending request for retry. Phase 13B/14F does not allow recorded rule-invalid retry attempts for attacker declarations. Accepted submissions validate the engine-emitted physical weapon instance and its profile/source declaration key, previously selected shooting type, target legality, range, visibility, Lone Operative, Locked in Combat, Big Guns Never Tire, Close-quarters/Pistol, Blast engagement bans, Assault/Advanced weapon gating, Indirect per-weapon `[INDIRECT FIRE]` eligibility, Indirect visibility and no-Hit-reroll policy, Firing Deck, one-shot, Hazardous declaration obligations, and ruleset-specific targeting restrictions before mutation.
 
 Hidden target validation is engine-owned. The 11th Edition ruleset descriptor
 uses a 15" base Detection Range for Hidden and a 3" Gone to Ground detection
@@ -1718,7 +1727,7 @@ so Light as well as Dense terrain can grant it.
 
 Defender allocation/save/defensive/destruction-reaction decisions may auto-resolve only when the rules leave exactly one legal outcome and no optional player choice. Otherwise the defending or destroyed-model controlling player is the `DecisionRequest.actor_id`, even though they may not be the active player. Adapters must not infer that Shooting phase decisions always belong to the active player. Stale, drifted, wrong-actor, wrong-option, or payload-mismatched destruction-reaction submissions return typed invalid diagnostics before queue pop and before a `DecisionRecord` is created.
 
-Shooting decision records, attack-resolution events, line-of-sight witnesses, cover results, allocation records, save records, and damage/removal records must be deterministic and JSON-safe. Phase 13B normal shooting unit/declaration requests are public because they concern table-visible units, weapons, targets, and Transport Firing Deck use. Viewer-scoped projections and event deltas must not leak hidden information through option counts, target lists, payload metadata, rejected-proposal diagnostics, or derived fields.
+Shooting decision records, attack-resolution events, line-of-sight witnesses, cover results, allocation records, save records, and damage/removal records must be deterministic and JSON-safe. Physical `weapon_instance_id` values are replay-safe identifiers and must remain stable across request, decision, pool, event, persistence, and replay serialization. Phase 13B normal shooting unit/declaration requests are public because they concern table-visible units, weapons, targets, and Transport Firing Deck use. Viewer-scoped projections and event deltas must not leak hidden information through option counts, target lists, payload metadata, rejected-proposal diagnostics, or derived fields.
 
 Phase 13D supports these shooting-coupled Core Stratagem target proposals:
 
@@ -3878,8 +3887,8 @@ use the replay route as a live information feed.
 ## Formal Phase 18L Persistence and Recovery
 
 The reference server persists one closed
-`session-persistence-v2-phase18l` operator artifact. The root contains exact
-server/engine-build/external-contract/persistence-schema identities, the
+`session-persistence-v3-weapon-instances` operator artifact. The root contains
+exact server/engine-build/external-contract/persistence-schema identities, the
 principal binding set and authorization epoch, protected cursor secret and
 token registry, retention policy, complete authoritative sessions, and the
 game/session index. A canonical `content_hash` covers every preceding state

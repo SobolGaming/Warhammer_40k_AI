@@ -1,12 +1,15 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/parameterized-submission.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/parameterized-submission.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "actor_id": {"minLength": 1, "type": "string"},
     "payload": {"$ref": "proposal-payload.schema.json"},
     "result_id": {"minLength": 1, "type": "string"},
-    "schema_version": {"const": "parameterized-submission-v1", "type": "string"}
+    "schema_version": {
+      "const": "parameterized-submission-v2-weapon-instances",
+      "type": "string"
+    }
   },
   "required": [
     "schema_version",

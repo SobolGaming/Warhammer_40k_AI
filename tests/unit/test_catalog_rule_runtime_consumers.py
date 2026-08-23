@@ -2189,6 +2189,7 @@ def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_eff
             attack_pools=(
                 RangedAttackPool(
                     attacker_model_instance_id=source_model_id,
+                    weapon_instance_id=f"weapon-instance:test:{sequence_id}",
                     wargear_id=f"wargear:{sequence_id}",
                     weapon_profile_id=profile.profile_id,
                     weapon_profile=profile,
@@ -2424,6 +2425,7 @@ def test_catalog_post_shoot_roleless_negative_modifier_is_normalized_to_attacker
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_model_id,
+                weapon_instance_id="weapon-instance:test:post-shoot:negative-hit",
                 wargear_id="wargear:post-shoot:negative-hit",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,
@@ -2689,6 +2691,7 @@ def test_catalog_post_shoot_wargear_model_effect_is_limited_to_current_bearer() 
             attack_pools=(
                 RangedAttackPool(
                     attacker_model_instance_id=source_model_id,
+                    weapon_instance_id=f"weapon-instance:test:post-shoot:{suffix}",
                     wargear_id="wargear:post-shoot:attack",
                     weapon_profile_id=profile.profile_id,
                     weapon_profile=profile,
@@ -3118,6 +3121,7 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:post-shoot-battle-shock",
                 wargear_id="catalog-post-shoot-test-wargear",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,
@@ -6945,6 +6949,7 @@ def test_catalog_runtime_choice_descriptors_reject_domain_drift() -> None:
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:catalog-choice-contracts",
                 wargear_id="wargear:catalog-choice-contracts",
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,

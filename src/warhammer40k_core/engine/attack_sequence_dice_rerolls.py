@@ -393,6 +393,7 @@ def _roll_hit_and_wound(
             unit_instance_id=pool.target_unit_instance_id,
         ),
         "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+        "weapon_instance_id": pool.weapon_instance_id,
         "attacker_model_instance_id": pool.attacker_model_instance_id,
         "target_unit_instance_id": pool.target_unit_instance_id,
         "weapon_profile_id": pool.weapon_profile_id,

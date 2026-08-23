@@ -823,7 +823,6 @@ def _unit_has_indirect_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCa
     for model in unit.own_models:
         for weapon in _available_weapons_for_model(
             model=model,
-            unit=unit,
             army_catalog=army_catalog,
         ):
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE):

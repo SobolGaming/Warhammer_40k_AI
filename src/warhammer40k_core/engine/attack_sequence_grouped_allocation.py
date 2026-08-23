@@ -878,6 +878,7 @@ def _grouped_attack_context_payload(
         "attack_index": 0,
         "generated_hit_index": 0,
         "defender_player_id": _validate_identifier("defender_player_id", defender_player_id),
+        "weapon_instance_id": pool.weapon_instance_id,
         "target_unit_instance_id": pool.target_unit_instance_id,
         "allocation": None,
         "save_options": [],

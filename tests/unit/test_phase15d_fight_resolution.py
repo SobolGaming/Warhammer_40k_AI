@@ -2020,6 +2020,12 @@ def test_phase15d_melee_rejects_multiple_primary_weapons_per_model() -> None:
     )
     attacker = replace(
         attacker,
+        own_models=tuple(
+            replace(model, wargear_ids=("core-leader-blade", "core-second-blade"))
+            if model.model_profile_id == "core-character-leader"
+            else model
+            for model in attacker.own_models
+        ),
         wargear_selections=(
             WargearSelection(
                 option_id="phase15d-two-primary-weapons",
@@ -2313,6 +2319,12 @@ def test_phase15d_available_melee_weapons_fail_fast_on_missing_catalog_wargear()
     )
     attacker = replace(
         attacker,
+        own_models=tuple(
+            replace(model, wargear_ids=("core-missing-blade",))
+            if model.model_profile_id == "core-character-leader"
+            else model
+            for model in attacker.own_models
+        ),
         wargear_selections=(
             WargearSelection(
                 option_id="phase15d-missing-catalog-wargear",
@@ -5495,6 +5507,12 @@ def _melee_fixture(
         )
         attacker = replace(
             attacker,
+            own_models=tuple(
+                replace(model, wargear_ids=selected_wargear_ids)
+                if model.model_profile_id == attacker_model_profile_id
+                else model
+                for model in attacker.own_models
+            ),
             wargear_selections=(
                 WargearSelection(
                     option_id="phase15d-attacker-wargear",

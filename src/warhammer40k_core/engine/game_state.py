@@ -332,6 +332,7 @@ from warhammer40k_core.engine.victory_point_policy_validation import (
     validate_victory_point_ledger_policy_sources,
     validate_victory_point_ledgers,
 )
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instance_by_id
 
 
 class SecondaryMissionMode(StrEnum):
@@ -918,6 +919,7 @@ class DedicatedTransportSetupConsequence:
 
 @dataclass(frozen=True, slots=True)
 class OneShotWeaponUseRecord:
+    weapon_instance_id: str
     model_instance_id: str
     wargear_id: str
     weapon_profile_id: str
@@ -926,6 +928,14 @@ class OneShotWeaponUseRecord:
     selection_id: str
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "weapon_instance_id",
+            _validate_identifier(
+                "OneShotWeaponUseRecord weapon_instance_id",
+                self.weapon_instance_id,
+            ),
+        )
         object.__setattr__(
             self,
             "model_instance_id",
@@ -964,11 +974,17 @@ class OneShotWeaponUseRecord:
         )
 
     @property
-    def weapon_key(self) -> tuple[str, str, str]:
-        return (self.model_instance_id, self.wargear_id, self.weapon_profile_id)
+    def weapon_key(self) -> tuple[str, str, str, str]:
+        return (
+            self.model_instance_id,
+            self.wargear_id,
+            self.weapon_profile_id,
+            self.weapon_instance_id,
+        )
 
     def to_payload(self) -> OneShotWeaponUseRecordPayload:
         return {
+            "weapon_instance_id": self.weapon_instance_id,
             "model_instance_id": self.model_instance_id,
             "wargear_id": self.wargear_id,
             "weapon_profile_id": self.weapon_profile_id,
@@ -980,6 +996,7 @@ class OneShotWeaponUseRecord:
     @classmethod
     def from_payload(cls, payload: OneShotWeaponUseRecordPayload) -> Self:
         return cls(
+            weapon_instance_id=payload["weapon_instance_id"],
             model_instance_id=payload["model_instance_id"],
             wargear_id=payload["wargear_id"],
             weapon_profile_id=payload["weapon_profile_id"],
@@ -1759,6 +1776,7 @@ class GameState:
     def one_shot_weapon_available(
         self,
         *,
+        weapon_instance_id: str,
         model_instance_id: str,
         wargear_id: str,
         weapon_profile_id: str,
@@ -1768,12 +1786,14 @@ class GameState:
             model_id,
             _validate_identifier("wargear_id", wargear_id),
             _validate_identifier("weapon_profile_id", weapon_profile_id),
+            _validate_identifier("weapon_instance_id", weapon_instance_id),
         )
         return key not in {record.weapon_key for record in self.one_shot_weapon_use_records}
 
     def one_shot_weapon_use_record(
         self,
         *,
+        weapon_instance_id: str,
         model_instance_id: str,
         wargear_id: str,
         weapon_profile_id: str,
@@ -1782,6 +1802,7 @@ class GameState:
             _validate_identifier("model_instance_id", model_instance_id),
             _validate_identifier("wargear_id", wargear_id),
             _validate_identifier("weapon_profile_id", weapon_profile_id),
+            _validate_identifier("weapon_instance_id", weapon_instance_id),
         )
         for record in self.one_shot_weapon_use_records:
             if record.weapon_key == key:
@@ -1791,6 +1812,7 @@ class GameState:
     def record_one_shot_weapon_selected(
         self,
         *,
+        weapon_instance_id: str,
         model_instance_id: str,
         wargear_id: str,
         weapon_profile_id: str,
@@ -1802,6 +1824,7 @@ class GameState:
             model_instance_id=model_instance_id,
         )
         record = OneShotWeaponUseRecord(
+            weapon_instance_id=weapon_instance_id,
             model_instance_id=model_id,
             wargear_id=wargear_id,
             weapon_profile_id=weapon_profile_id,
@@ -1811,6 +1834,7 @@ class GameState:
         )
         if (
             self.one_shot_weapon_use_record(
+                weapon_instance_id=record.weapon_instance_id,
                 model_instance_id=record.model_instance_id,
                 wargear_id=record.wargear_id,
                 weapon_profile_id=record.weapon_profile_id,
@@ -5985,16 +6009,29 @@ def _validate_one_shot_weapon_use_records(
 ) -> list[OneShotWeaponUseRecord]:
     if not isinstance(values, list):
         raise GameLifecycleError("GameState one-shot weapon use records must be a list.")
-    known_model_ids = _model_instance_ids(army_definitions)
+    model_by_id = {
+        model.model_instance_id: model
+        for army in army_definitions
+        for unit in army.units
+        for model in unit.own_models
+    }
     records: list[OneShotWeaponUseRecord] = []
-    seen: set[tuple[str, str, str]] = set()
+    seen: set[tuple[str, str, str, str]] = set()
     for value in cast(list[object], values):
         if type(value) is not OneShotWeaponUseRecord:
             raise GameLifecycleError(
                 "GameState one-shot weapon use records must contain OneShotWeaponUseRecord values."
             )
-        if known_model_ids and value.model_instance_id not in known_model_ids:
+        model = model_by_id.get(value.model_instance_id)
+        if model_by_id and model is None:
             raise GameLifecycleError("One-shot weapon use model is unknown.")
+        if model is not None:
+            weapon_instance = equipped_weapon_instance_by_id(
+                model=model,
+                weapon_instance_id=value.weapon_instance_id,
+            )
+            if weapon_instance is None or weapon_instance.wargear_id != value.wargear_id:
+                raise GameLifecycleError("One-shot weapon instance is not equipped by its model.")
         if value.weapon_key in seen:
             raise GameLifecycleError("One-shot weapon use records must not duplicate weapons.")
         seen.add(value.weapon_key)

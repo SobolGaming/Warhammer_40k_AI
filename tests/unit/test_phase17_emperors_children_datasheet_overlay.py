@@ -73,7 +73,12 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
 )
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
-from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
+from warhammer40k_core.engine.attack_sequence import (
+    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+    AttackSequence,
+    AttackSequenceStep,
+)
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -316,6 +321,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
     WeaponDeclaration,
 )
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instances_for_model
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules import wahapedia_static_rule_ir
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
@@ -2953,6 +2959,247 @@ def test_lord_exultant_and_maulerfiend_loadouts_materialize_exact_counts() -> No
         "000004091:maulerfiend-fists",
         "000004091:magma-cutters",
         "000004091:magma-cutters",
+    )
+
+
+def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> None:
+    game_id = "maulerfiend-magma-cutter-copy-identity"
+    session, maulerfiend, target = _maulerfiend_magma_cutter_shooting_session(
+        game_id=game_id,
+        extra_target=False,
+    )
+    declaration_request = _advance_maulerfiend_to_shooting_declaration(
+        session=session,
+        source=maulerfiend,
+    )
+    round_tripped_request = DecisionRequest.from_payload(
+        json.loads(json.dumps(declaration_request.to_payload(), sort_keys=True))
+    )
+    assert round_tripped_request == declaration_request
+    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(declaration_request)
+    assert len(magma_cutter_rows) == 2
+    assert {cast(str, row["model_instance_id"]) for row in magma_cutter_rows} == {
+        maulerfiend.own_models[0].model_instance_id
+    }
+    assert {cast(str, row["weapon_profile_id"]) for row in magma_cutter_rows} == {
+        "000004091:magma-cutters:standard"
+    }
+    weapon_instance_ids = tuple(cast(str, row["weapon_instance_id"]) for row in magma_cutter_rows)
+    assert len(set(weapon_instance_ids)) == 2
+
+    declarations = _weapon_declarations_for_available_rows(
+        rows=magma_cutter_rows,
+        target_unit_instance_ids=(target.unit_instance_id, target.unit_instance_id),
+    )
+    valid_proposal = _shooting_proposal_for_declarations(
+        proposal_request=proposal_request,
+        declarations=declarations,
+    )
+    decisions = session.lifecycle.decision_controller
+    before_records = len(decisions.records)
+    before_queue = decisions.queue.pending_requests
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    duplicate_proposal = replace(
+        valid_proposal,
+        declarations=(declarations[0], declarations[0]),
+    )
+    duplicate_status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id="maulerfiend-magma-duplicate-copy",
+        payload=cast(JsonValue, duplicate_proposal.to_payload()),
+    )
+    assert duplicate_status.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_violation_code(duplicate_status) == "duplicate_weapon_declaration"
+    assert len(decisions.records) == before_records
+    assert decisions.queue.pending_requests == before_queue
+    assert session.lifecycle.to_payload() == initial_lifecycle_payload
+
+    invented_proposal = replace(
+        valid_proposal,
+        declarations=(
+            replace(
+                declarations[0],
+                weapon_instance_id=f"invented:{declarations[0].weapon_instance_id}",
+            ),
+        ),
+    )
+    invented_status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id="maulerfiend-magma-invented-copy",
+        payload=cast(JsonValue, invented_proposal.to_payload()),
+    )
+    assert invented_status.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_violation_code(invented_status) == "weapon_declaration_unavailable"
+    assert len(decisions.records) == before_records
+    assert decisions.queue.pending_requests == before_queue
+    assert session.lifecycle.to_payload() == initial_lifecycle_payload
+
+    declaration_result_id = "maulerfiend-magma-both-copies"
+    status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id=declaration_result_id,
+        payload=cast(JsonValue, valid_proposal.to_payload()),
+    )
+    assert status.status_kind not in {
+        LifecycleStatusKind.INVALID,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    declaration_record = next(
+        record for record in decisions.records if record.result.result_id == declaration_result_id
+    )
+    recorded_declarations = cast(
+        list[dict[str, JsonValue]],
+        cast(dict[str, JsonValue], declaration_record.result.payload)["declarations"],
+    )
+    assert (
+        tuple(cast(str, declaration["weapon_instance_id"]) for declaration in recorded_declarations)
+        == weapon_instance_ids
+    )
+
+    accepted_payload = next(
+        cast(dict[str, JsonValue], record.payload)
+        for record in decisions.event_log.records
+        if record.event_type == "shooting_declaration_accepted"
+        and cast(dict[str, JsonValue], record.payload)["result_id"] == declaration_result_id
+    )
+    attack_pools = cast(list[dict[str, JsonValue]], accepted_payload["attack_pools"])
+    assert len(attack_pools) == 2
+    assert tuple(cast(str, pool["weapon_instance_id"]) for pool in attack_pools) == (
+        weapon_instance_ids
+    )
+    assert tuple(cast(int, pool["attacks"]) for pool in attack_pools) == (2, 2)
+
+    group_record = next(
+        record
+        for record in decisions.records
+        if record.request.decision_type == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE
+        and record.result.result_id.endswith(":auto-result")
+    )
+    gathered_group = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], group_record.result.payload)["gathered_group"],
+    )
+    contributions = cast(
+        list[dict[str, JsonValue]],
+        gathered_group["contributions"],
+    )
+    assert gathered_group["total_attacks"] == 4
+    assert (
+        tuple(cast(str, contribution["weapon_instance_id"]) for contribution in contributions)
+        == weapon_instance_ids
+    )
+    assert tuple(cast(int, contribution["attacks"]) for contribution in contributions) == (2, 2)
+
+    _advance_maulerfiend_shooting_through_phase(
+        session=session,
+        status=status,
+    )
+    hit_events = tuple(
+        record
+        for record in decisions.event_log.records
+        if record.event_type == "attack_sequence_step"
+        and cast(dict[str, JsonValue], record.payload)["sequence_id"]
+        == f"attack-sequence:{declaration_result_id}"
+        and cast(dict[str, JsonValue], record.payload)["step"] == AttackSequenceStep.HIT.value
+    )
+    assert len(hit_events) == 4
+
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id=game_id,
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_artifact = ReplayArtifact.from_payload(replay_payload)
+    replay_declaration_record = next(
+        record
+        for record in replay_artifact.decision_records
+        if record.result.result_id == declaration_result_id
+    )
+    replay_declarations = cast(
+        list[dict[str, JsonValue]],
+        cast(dict[str, JsonValue], replay_declaration_record.result.payload)["declarations"],
+    )
+    assert (
+        tuple(cast(str, declaration["weapon_instance_id"]) for declaration in replay_declarations)
+        == weapon_instance_ids
+    )
+    replay_result = ReplayRunner(replay_artifact).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_maulerfiend_magma_cutter_copies_can_split_legal_targets() -> None:
+    session, maulerfiend, target = _maulerfiend_magma_cutter_shooting_session(
+        game_id="maulerfiend-magma-cutter-split-targets",
+        extra_target=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    extra_target = _unit_from_state(state, "army-b:extra-target-battleline")
+    declaration_request = _advance_maulerfiend_to_shooting_declaration(
+        session=session,
+        source=maulerfiend,
+    )
+    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(declaration_request)
+    weapon_instance_ids = tuple(cast(str, row["weapon_instance_id"]) for row in magma_cutter_rows)
+    assert len(magma_cutter_rows) == 2
+    assert len(set(weapon_instance_ids)) == 2
+    declarations = _weapon_declarations_for_available_rows(
+        rows=magma_cutter_rows,
+        target_unit_instance_ids=(target.unit_instance_id, extra_target.unit_instance_id),
+    )
+    proposal = _shooting_proposal_for_declarations(
+        proposal_request=proposal_request,
+        declarations=declarations,
+    )
+
+    status = session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        result_id="maulerfiend-magma-split-declaration",
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    target_request = _decision_request(status)
+    assert target_request.decision_type == SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE
+    assert {option.option_id for option in target_request.options} == {
+        f"resolve-target:{target.unit_instance_id}",
+        f"resolve-target:{extra_target.unit_instance_id}",
+    }
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    assert tuple(
+        (pool.weapon_instance_id, pool.target_unit_instance_id, pool.attacks)
+        for pool in shooting_state.attack_pools
+    ) == (
+        (weapon_instance_ids[0], target.unit_instance_id, 2),
+        (weapon_instance_ids[1], extra_target.unit_instance_id, 2),
+    )
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(lifecycle_payload)
+    restored_state = restored.state
+    assert restored_state is not None
+    restored_shooting_state = restored_state.shooting_phase_state
+    assert restored_shooting_state is not None
+    assert tuple(
+        (pool.weapon_instance_id, pool.target_unit_instance_id, pool.attacks)
+        for pool in restored_shooting_state.attack_pools
+    ) == (
+        (weapon_instance_ids[0], target.unit_instance_id, 2),
+        (weapon_instance_ids[1], extra_target.unit_instance_id, 2),
     )
 
 
@@ -6309,6 +6556,7 @@ def _battleline_lifecycle_session(
     single_target_model: bool = False,
     extra_target: bool = False,
     attached_source: bool = False,
+    source_wargear_option_id: str | None = None,
 ) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
     package = _catalog_package()
     base_catalog = package.army_catalog
@@ -6365,6 +6613,11 @@ def _battleline_lifecycle_session(
                 unit_datasheet_ids=(
                     "000004079",
                     "000004080",
+                    *(
+                        (source_datasheet_id,)
+                        if source_datasheet_id not in {"000004079", "000004080"}
+                        else ()
+                    ),
                     *(("000004083",) if attached_source else ()),
                 ),
                 force_disposition_ids=("take-and-hold", "purge-the-foe"),
@@ -6464,6 +6717,8 @@ def _battleline_lifecycle_session(
         datasheet_id=source_datasheet_id,
         unit_selection_id="source-battleline",
     )
+    if with_icon and source_wargear_option_id is not None:
+        raise AssertionError("Battleline lifecycle fixture accepts one wargear option family.")
     if with_icon:
         source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
         icon_option = next(
@@ -6478,6 +6733,23 @@ def _battleline_lifecycle_session(
                     option_id=icon_option.option_id,
                     model_profile_id=icon_option.model_profile_id,
                     wargear_ids=icon_option.allowed_wargear_ids,
+                ),
+            ),
+        )
+    if source_wargear_option_id is not None:
+        source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
+        source_option = next(
+            option
+            for option in source_datasheet.wargear_options
+            if option.option_id == source_wargear_option_id
+        )
+        source_selection = replace(
+            source_selection,
+            wargear_selections=(
+                WargearSelection(
+                    option_id=source_option.option_id,
+                    model_profile_id=source_option.model_profile_id,
+                    wargear_ids=source_option.allowed_wargear_ids,
                 ),
             ),
         )
@@ -6605,6 +6877,175 @@ def _battleline_lifecycle_session(
         )
     )
     return LocalGameSession(lifecycle=lifecycle), source, target
+
+
+def _maulerfiend_magma_cutter_shooting_session(
+    *,
+    game_id: str,
+    extra_target: bool,
+) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
+    session, maulerfiend, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004091",
+        phase=BattlePhase.SHOOTING,
+        with_icon=False,
+        game_id=game_id,
+        extra_target=extra_target,
+        source_wargear_option_id="000004091:magma-cutters:option-1",
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    _move_unit(state, maulerfiend.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=15.0, y=10.0)
+    if extra_target:
+        _move_unit(
+            state,
+            "army-b:extra-target-battleline",
+            x=10.0,
+            y=15.0,
+        )
+    return session, maulerfiend, target
+
+
+def _advance_maulerfiend_to_shooting_declaration(
+    *,
+    session: LocalGameSession,
+    source: UnitInstance,
+) -> DecisionRequest:
+    state = session.lifecycle.state
+    assert state is not None
+    source_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source.unit_instance_id,
+    ).unit_instance_id
+    status = session.advance_until_decision_or_terminal()
+    for index in range(64):
+        request = _decision_request(status)
+        if request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
+            return request
+        result_id = f"maulerfiend-shooting-setup-{index:03d}"
+        if request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
+            assert source_rules_unit_id in {option.option_id for option in request.options}
+            option_id = source_rules_unit_id
+        elif request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
+            option_id = ShootingType.NORMAL.value
+        elif request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Maulerfiend decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Maulerfiend did not reach its shooting declaration request.")
+
+
+def _magma_cutter_available_weapon_rows(
+    request: DecisionRequest,
+) -> tuple[dict[str, JsonValue], tuple[dict[str, JsonValue], ...]]:
+    assert request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    proposal_request = cast(dict[str, JsonValue], request_payload["proposal_request"])
+    available_weapons = cast(
+        list[dict[str, JsonValue]],
+        proposal_request["available_weapons"],
+    )
+    rows = tuple(
+        weapon for weapon in available_weapons if weapon["wargear_id"] == "000004091:magma-cutters"
+    )
+    return proposal_request, rows
+
+
+def _weapon_declarations_for_available_rows(
+    *,
+    rows: tuple[dict[str, JsonValue], ...],
+    target_unit_instance_ids: tuple[str, ...],
+) -> tuple[WeaponDeclaration, ...]:
+    assert len(rows) == len(target_unit_instance_ids)
+    return tuple(
+        WeaponDeclaration(
+            attacker_model_instance_id=cast(str, row["model_instance_id"]),
+            weapon_instance_id=cast(str, row["weapon_instance_id"]),
+            wargear_id=cast(str, row["wargear_id"]),
+            weapon_profile_id=cast(str, row["weapon_profile_id"]),
+            target_unit_instance_id=target_unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+        )
+        for row, target_unit_instance_id in zip(
+            rows,
+            target_unit_instance_ids,
+            strict=True,
+        )
+    )
+
+
+def _shooting_proposal_for_declarations(
+    *,
+    proposal_request: dict[str, JsonValue],
+    declarations: tuple[WeaponDeclaration, ...],
+) -> ShootingDeclarationProposal:
+    return ShootingDeclarationProposal(
+        proposal_request_id=cast(str, proposal_request["request_id"]),
+        proposal_kind=cast(str, proposal_request["proposal_kind"]),
+        player_id=cast(str, proposal_request["active_player_id"]),
+        battle_round=cast(int, proposal_request["battle_round"]),
+        unit_instance_id=cast(str, proposal_request["unit_instance_id"]),
+        source_decision_request_id=cast(
+            str,
+            proposal_request["source_decision_request_id"],
+        ),
+        source_decision_result_id=cast(
+            str,
+            proposal_request["source_decision_result_id"],
+        ),
+        declarations=declarations,
+        firing_deck_selection=None,
+        visibility_cache_key=cast(str, proposal_request["visibility_cache_key"]),
+    )
+
+
+def _first_proposal_violation_code(status: LifecycleStatus) -> str:
+    payload = cast(dict[str, JsonValue], status.payload)
+    validation = cast(dict[str, JsonValue], payload["proposal_validation"])
+    violations = cast(list[dict[str, JsonValue]], validation["violations"])
+    assert violations
+    return cast(str, violations[0]["violation_code"])
+
+
+def _advance_maulerfiend_shooting_through_phase(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    state = session.lifecycle.state
+    assert state is not None
+    for index in range(256):
+        if state.current_battle_phase is not BattlePhase.SHOOTING:
+            return status
+        request = _decision_request(status)
+        result_id = f"maulerfiend-shooting-resolution-{index:03d}"
+        if request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Maulerfiend resolution {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Maulerfiend shooting phase did not complete.")
 
 
 def _advance_battleline_fight_to_source_reroll(
@@ -6889,6 +7330,7 @@ def _advance_battleline_shooting_to_damage_allocation_request(
             declarations = tuple(
                 WeaponDeclaration(
                     attacker_model_instance_id=cast(str, weapon["model_instance_id"]),
+                    weapon_instance_id=cast(str, weapon["weapon_instance_id"]),
                     wargear_id=cast(str, weapon["wargear_id"]),
                     weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
                     target_unit_instance_id=target.unit_instance_id,
@@ -7184,9 +7626,17 @@ def _attack_pool(
     target_unit_instance_id: str | None = None,
 ) -> RangedAttackPool:
     target_model_ids = target.own_model_ids()
+    attacker_model = attacker.own_models[0]
+    wargear_id = profile.profile_id.rsplit(":", 1)[0]
+    weapon_instance_id = next(
+        weapon.weapon_instance_id
+        for weapon in equipped_weapon_instances_for_model(attacker_model)
+        if weapon.wargear_id == wargear_id
+    )
     return RangedAttackPool(
-        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
-        wargear_id=profile.profile_id.rsplit(":", 1)[0],
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        weapon_instance_id=weapon_instance_id,
+        wargear_id=wargear_id,
         weapon_profile_id=profile.profile_id,
         weapon_profile=profile,
         target_unit_instance_id=(

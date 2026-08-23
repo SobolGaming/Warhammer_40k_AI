@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`10.2.0`, declared in `openapi.yaml`, `manifest.json`, and
+`11.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,10 +27,10 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/10.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `10`, preserving the
+   its current major, currently `compatibility/11.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `11`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
-   2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, and 9.0.0 baselines
+   2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, 9.0.0, and 10.0.0 baselines
    remain committed as historical compatibility anchors.
 3. Every released baseline present on the base commit must retain the exact
    decoded UTF-8 text after line-ending normalization.
@@ -47,10 +47,22 @@ must be reviewed in the same change.
 
 ## Support window
 
-The reference server supports one contract major at a time. Contract 10 retains
-Contract 9's directed Primary assignments, grouped historical evidence,
-persistent Primary Mission progress, public Primary choices, and viewer-facing
-projection families. It adds the required engine-private
+The reference server supports one contract major at a time. Contract 11 makes
+`weapon_instance_id` mandatory for every equipped ranged-weapon copy exposed or
+submitted through the shooting-declaration contract. Availability rows,
+declarations, attack pools, accepted decisions/events, persistence, and replay
+retain the same deterministic identity. Distinct physical copies remain
+independently targetable, and an exact physical-copy/profile/Firing-Deck-source
+declaration key may appear only once. Catalog-defined independently selectable
+multi-profile groups such as C'tan Powers may expose distinct legal profiles
+with the same physical-copy ID, subject to the engine-emitted selection limits.
+Contract 10 payloads without that identifier are not inferred as copy one and
+are not accepted by the Contract 11 proposal or command-envelope schemas.
+
+Contract 11 otherwise retains Contract 10's directed Primary assignments,
+grouped historical evidence, persistent Primary Mission progress, public
+Primary choices, and viewer-facing projection families. It retains the required
+engine-private
 `objective_control_record_authorities`,
 `primary_scoring_state_evidence_records`, and
 `primary_scoring_boundary_lifecycles` replay state. Objective-control
@@ -69,7 +81,7 @@ The registry is exactly inverse-complete over applicable assigned-Primary
 rules: every required ordinary or end-of-battle evaluation boundary has one
 row even when evaluation awards zero VP, every row maps back to such a
 boundary, and every awarded transaction matches deterministic re-evaluation.
-Contract 10 therefore rejects removal of transactions together with their
+Contract 11 therefore rejects removal of transactions together with their
 evidence when the underlying applicable Objective Control boundary remains.
 
 Contract 10.1 adds the optional `active_secondary_mission_card_jsons`,
@@ -98,10 +110,27 @@ do not authenticate storage against a malicious writer and cannot detect
 replacement by an older, internally valid artifact without an external trusted
 anchor.
 
+Contract 11 advances the proposal payload, parameterized-submission,
+session-command-envelope, interaction-conformance, session metadata/result/
+outcome, and persistence families. The closed
+`session-persistence-v3-weapon-instances` artifact binds the v2 command envelope,
+v11 outcome/metadata, and `external_contract_version: "11.0.0"`; recovery does
+not load or rewrite a v2 artifact. HTTP clients upgrading from Contract 10 must
+regenerate their models, copy engine-emitted weapon instance IDs into every
+shooting declaration, and discard cached Contract 10 request, command, session,
+and interaction-conformance payloads.
+
+Deployers upgrading a hosted 10.x service must retain a separately deployed
+10.x adapter through at least 2027-08-23 and one released 11.x minor line,
+whichever is later. The Contract 11 reference server does not provide content
+negotiation or parallel Contract 10 endpoints. Contract 10 persistence and
+shooting-declaration artifacts remain valid only against that retained 10.x
+deployment. See `migrations/10-to-11.md`.
+
 Deployers upgrading a hosted 9.x service must retain a separately deployed 9.x
 adapter through at least 2027-08-16 and one released 10.x minor line, whichever
 is later. The retained adapter is a separate deployment pinned to a 9.x build;
-the repository's Contract 10 reference server does not provide content
+the retained Contract 10 server does not provide content
 negotiation or parallel 9.x endpoints. Contract 10 clients must regenerate from
 the Contract 10 schemas, discard cached Contract 9 session metadata, command
 results/outcomes, replay metadata, and replay checkpoints, and fetch fresh

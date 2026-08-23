@@ -404,14 +404,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_ten_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_eleven_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "10.2.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "9.3.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "11.0.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "10.2.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -459,7 +459,7 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     assert "session-persistence.schema.json" not in json.dumps(openapi, sort_keys=True)
 
 
-def test_contract_ten_advances_only_affected_session_wrapper_families() -> None:
+def test_contract_eleven_advances_only_affected_session_wrapper_families() -> None:
     metadata = _json_object(
         _read_json(REPO_ROOT / Path("contracts/schemas/session-metadata.schema.json"))
     )
@@ -474,28 +474,28 @@ def test_contract_ten_advances_only_affected_session_wrapper_families() -> None:
     )
 
     assert metadata["$id"] == (
-        "https://warhammer40k-core.local/contracts/v10/session-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v11/session-metadata.schema.json"
     )
     assert result["$id"] == (
-        "https://warhammer40k-core.local/contracts/v10/session-command-result.schema.json"
+        "https://warhammer40k-core.local/contracts/v11/session-command-result.schema.json"
     )
     assert outcome["$id"] == (
-        "https://warhammer40k-core.local/contracts/v10/session-command-outcome.schema.json"
+        "https://warhammer40k-core.local/contracts/v11/session-command-outcome.schema.json"
     )
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v10-contract"
+        == "session-metadata-v11-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v10-contract"
+        == "session-command-result-v11-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v10-contract"
+        == "session-command-outcome-v11-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]
@@ -1542,7 +1542,18 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
 
     assert shooting["proposal_kind"] == "shooting_declaration"
     shooting_declarations = _json_list(shooting["declarations"])
-    assert _json_object(shooting_declarations[0])["target_unit_instance_id"] == UNIT_BETA
+    shooting_declaration = _json_object(shooting_declarations[0])
+    assert shooting_declaration["target_unit_instance_id"] == UNIT_BETA
+    assert _json_string(shooting_declaration["weapon_instance_id"]).startswith("weapon-instance:")
+    shooting_without_instance = json.loads(json.dumps(shooting))
+    del _json_object(_json_list(shooting_without_instance["declarations"])[0])["weapon_instance_id"]
+    proposal_schema = cast(
+        Schema,
+        _read_json(REPO_ROOT / "contracts/schemas/proposal-payload.schema.json"),
+    )
+    proposal_validator = cast(_PayloadValidator, Draft202012Validator(proposal_schema))
+    with pytest.raises(ValidationError):
+        proposal_validator.validate(shooting_without_instance)
 
     assert melee["proposal_kind"] == "melee_declaration"
     melee_declarations = _json_list(melee["declarations"])
@@ -1566,6 +1577,129 @@ def test_proposal_examples_cover_engine_facing_payload_families() -> None:
     assert _json_object(opportunity["selected_option_payload"])["submission_kind"] == (
         "opportunity_action"
     )
+
+
+def test_shooting_proposal_schema_closes_firing_deck_weapon_copy_identity() -> None:
+    proposal_schema_payload = _json_object(
+        _read_json(REPO_ROOT / "contracts/schemas/proposal-payload.schema.json")
+    )
+    proposal_schema = cast(Schema, proposal_schema_payload)
+    definitions = _json_object(proposal_schema_payload["$defs"])
+    selection_schema = _json_object(definitions["firing_deck_selection"])
+    selection_properties = _json_object(selection_schema["properties"])
+    weapon_selection_schema = _json_object(definitions["firing_deck_weapon_selection"])
+    weapon_selection_properties = _json_object(weapon_selection_schema["properties"])
+
+    assert selection_schema["additionalProperties"] is False
+    assert set(selection_properties) == {
+        "player_id",
+        "battle_round",
+        "transport_unit_instance_id",
+        "firing_deck_value",
+        "weapon_selections",
+        "already_shot_unit_instance_ids",
+    }
+    assert set(_json_list(selection_schema["required"])) == set(selection_properties)
+    assert weapon_selection_schema["additionalProperties"] is False
+    assert set(weapon_selection_properties) == {
+        "weapon_instance_id",
+        "embarked_unit_instance_id",
+        "model_instance_id",
+        "wargear_id",
+        "weapon_profile",
+    }
+    assert set(_json_list(weapon_selection_schema["required"])) == set(weapon_selection_properties)
+
+    validator = cast(_PayloadValidator, Draft202012Validator(proposal_schema))
+    shooting = _proposal_example("shooting_target_selection.json")
+    validator.validate(shooting)
+
+    with_firing_deck = json.loads(json.dumps(shooting))
+    _json_object(with_firing_deck)["firing_deck_selection"] = validate_json_value(
+        cast(
+            JsonValue,
+            {
+                "player_id": PLAYER_A,
+                "battle_round": 1,
+                "transport_unit_instance_id": "army-alpha:transport-1",
+                "firing_deck_value": 2,
+                "weapon_selections": [
+                    {
+                        "weapon_instance_id": "weapon-instance:firing-deck-copy-000001",
+                        "embarked_unit_instance_id": "army-alpha:embarked-unit-1",
+                        "model_instance_id": "army-alpha:embarked-unit-1:model-1",
+                        "wargear_id": "core-bolt-rifle",
+                        "weapon_profile": {
+                            "profile_id": "core-bolt-rifle:standard",
+                            "name": "Bolt rifle",
+                            "range_profile": {"kind": "distance", "distance_inches": 24},
+                            "attack_profile": {"fixed_attacks": 2, "dice_expression": None},
+                            "skill": {
+                                "characteristic": "ballistic_skill",
+                                "value_kind": "numeric",
+                                "raw": 3,
+                                "base": 3,
+                                "final": 3,
+                                "applied_modifier_ids": [],
+                            },
+                            "strength": {
+                                "characteristic": "strength",
+                                "value_kind": "numeric",
+                                "raw": 4,
+                                "base": 4,
+                                "final": 4,
+                                "applied_modifier_ids": [],
+                            },
+                            "armor_penetration": {
+                                "characteristic": "armor_penetration",
+                                "value_kind": "numeric",
+                                "raw": -1,
+                                "base": -1,
+                                "final": -1,
+                                "applied_modifier_ids": [],
+                            },
+                            "damage_profile": {"fixed_damage": 1, "dice_expression": None},
+                            "keywords": [],
+                            "abilities": [],
+                            "source_ids": ["core-bolt-rifle-source"],
+                        },
+                    }
+                ],
+                "already_shot_unit_instance_ids": [],
+            },
+        )
+    )
+    validator.validate(with_firing_deck)
+
+    missing_weapon_instance = json.loads(json.dumps(with_firing_deck))
+    missing_selection = _json_object(
+        _json_list(
+            _json_object(_json_object(missing_weapon_instance)["firing_deck_selection"])[
+                "weapon_selections"
+            ]
+        )[0]
+    )
+    missing_selection.pop("weapon_instance_id")
+    with pytest.raises(ValidationError):
+        validator.validate(missing_weapon_instance)
+
+    extra_selection_field = json.loads(json.dumps(with_firing_deck))
+    _json_object(_json_object(extra_selection_field)["firing_deck_selection"])[
+        "adapter_owned_state"
+    ] = True
+    with pytest.raises(ValidationError):
+        validator.validate(extra_selection_field)
+
+    extra_weapon_field = json.loads(json.dumps(with_firing_deck))
+    _json_object(
+        _json_list(
+            _json_object(_json_object(extra_weapon_field)["firing_deck_selection"])[
+                "weapon_selections"
+            ]
+        )[0]
+    )["copy_index"] = 0
+    with pytest.raises(ValidationError):
+        validator.validate(extra_weapon_field)
 
 
 def test_decision_family_coverage_uses_registry_metadata_and_real_scenarios() -> None:

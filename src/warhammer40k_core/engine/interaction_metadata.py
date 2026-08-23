@@ -334,7 +334,7 @@ _PARAMETERIZED_INTERACTION_SPECS = MappingProxyType(
         ),
         "submit_shooting_declaration": InteractionSpec(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
-            ("attacking_model", "target_unit"),
+            ("attacking_model", "weapon_instance", "target_unit"),
         ),
         "submit_stratagem_target_proposal": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,

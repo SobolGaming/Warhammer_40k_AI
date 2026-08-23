@@ -229,6 +229,7 @@ def _request_shooting_declaration(
                 candidate=cast(dict[str, JsonValue], candidate.to_payload()),
                 unit=attacker_unit,
                 rules_unit=rules_unit,
+                weapon=weapon,
                 weapon_profile=profile,
                 player_id=active_selection.player_id,
                 army_catalog=army_catalog,
@@ -466,6 +467,7 @@ def _target_candidate_payload_for_request(
     candidate: dict[str, JsonValue],
     unit: UnitInstance,
     rules_unit: RulesUnitView,
+    weapon: _AvailableWeapon,
     weapon_profile: WeaponProfile,
     player_id: str,
     army_catalog: ArmyCatalog,
@@ -473,13 +475,16 @@ def _target_candidate_payload_for_request(
     forced_shooting_type: ShootingType | None,
 ) -> JsonValue:
     payload = dict(candidate)
+    payload["weapon_instance_id"] = weapon["weapon_instance_id"]
     payload["required_weapon_ability_selections"] = _required_weapon_ability_selections_for_target(
         state=state,
         proposal_request_id=_embedded_weapon_ability_request_prefix(
             state=state,
             attacker_unit_id=rules_unit.unit_instance_id,
+            weapon_instance_id=weapon["weapon_instance_id"],
             weapon_profile=weapon_profile,
         ),
+        weapon_instance_id=weapon["weapon_instance_id"],
         weapon_profile=weapon_profile,
         target_unit_id=_payload_string(
             cast(dict[str, object], payload), key="target_unit_instance_id"
@@ -508,15 +513,20 @@ def _embedded_weapon_ability_request_prefix(
     *,
     state: GameState,
     attacker_unit_id: str,
+    weapon_instance_id: str,
     weapon_profile: WeaponProfile,
 ) -> str:
-    return f"{state.game_id}:shooting-declaration:{attacker_unit_id}:{weapon_profile.profile_id}"
+    return (
+        f"{state.game_id}:shooting-declaration:{attacker_unit_id}:"
+        f"{weapon_instance_id}:{weapon_profile.profile_id}"
+    )
 
 
 def _required_weapon_ability_selections_for_target(
     *,
     state: GameState,
     proposal_request_id: str,
+    weapon_instance_id: str,
     weapon_profile: WeaponProfile,
     target_unit_id: str,
     player_id: str,
@@ -530,6 +540,7 @@ def _required_weapon_ability_selections_for_target(
         request_id=f"{proposal_request_id}:{target_unit_id}:anti-keyword",
         source_context={
             "phase": BattlePhase.SHOOTING.value,
+            "weapon_instance_id": weapon_instance_id,
             "target_unit_instance_id": target_unit_id,
         },
     )

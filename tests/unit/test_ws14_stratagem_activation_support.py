@@ -483,6 +483,7 @@ def test_ws14_armour_of_contempt_fight_window_applies_and_expires_with_attack_se
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:armour-of-contempt",
                 wargear_id=attacker.own_models[0].wargear_ids[0],
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,

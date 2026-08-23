@@ -97,5 +97,5 @@
     "unit_instance_id": "army-beta:intercessor-unit-2"
   },
   "result_id": "phase18d-deployment_placement-result-000001",
-  "schema_version": "parameterized-submission-v1"
+  "schema_version": "parameterized-submission-v2-weapon-instances"
 }

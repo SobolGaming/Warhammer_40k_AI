@@ -268,7 +268,7 @@ def _attack_pools_or_validation(
         target_unit_ids=proposal_target_unit_ids,
     )
     attack_pools: list[RangedAttackPool] = []
-    seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
+    seen_declaration_keys: set[tuple[str, str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
     shooting_weapon_selection_counts: dict[tuple[str, str, WeaponKeyword, str], int] = {}
     snap_target_unit_ids: set[str] = set()
@@ -278,7 +278,7 @@ def _attack_pools_or_validation(
             return ShootingProposalValidationResult.invalid(
                 proposal_request_id=proposal.proposal_request_id,
                 violation_code="duplicate_weapon_declaration",
-                message="Each model/wargear/profile/source declaration may be used once.",
+                message="Each physical weapon copy/profile declaration may be used once.",
                 field="declarations",
             )
         seen_declaration_keys.add(key)

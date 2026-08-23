@@ -852,7 +852,7 @@ def _write_interaction_conformance_examples() -> None:
     _write_json(
         DECISION_EXAMPLE_DIR / "interaction-conformance.json",
         {
-            "schema_version": "interaction-conformance-v2-primary-assignments",
+            "schema_version": "interaction-conformance-v3-weapon-instances",
             "cases": sorted(
                 cases,
                 key=lambda case: _required_string(_json_object(case, "case"), "case_id"),

@@ -13,6 +13,10 @@ from warhammer40k_core.engine.phases.shooting_unit_selection import *
 from warhammer40k_core.engine.phases.shooting_decisions import *
 from warhammer40k_core.engine.phases.shooting_declaration_validation import *
 from warhammer40k_core.engine.phases.shooting_targeting import *
+from warhammer40k_core.engine.weapon_instances import (
+    equipped_weapon_instance_by_id,
+    equipped_weapon_profile_instances_for_model,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -136,6 +140,7 @@ def _validate_firing_deck_selection(
         )
     weapon_selection_keys = {
         (
+            weapon_selection.weapon_instance_id,
             weapon_selection.embarked_unit_instance_id,
             weapon_selection.model_instance_id,
             weapon_selection.wargear_id,
@@ -145,6 +150,7 @@ def _validate_firing_deck_selection(
     }
     declaration_keys = {
         (
+            declaration.weapon_instance_id,
             declaration.firing_deck_source_unit_instance_id,
             declaration.firing_deck_source_model_instance_id,
             declaration.wargear_id,
@@ -213,7 +219,18 @@ def _validate_firing_deck_weapon_against_catalog(
             message="Firing Deck selected model is not in the embarked unit.",
             field="firing_deck_selection",
         )
-    if not _model_has_wargear_id(embarked_unit, model, weapon_selection.wargear_id):
+    weapon_instance = equipped_weapon_instance_by_id(
+        model=model,
+        weapon_instance_id=weapon_selection.weapon_instance_id,
+    )
+    if weapon_instance is None:
+        return ShootingProposalValidationResult.invalid(
+            proposal_request_id=proposal_request_id,
+            violation_code="firing_deck_weapon_instance_drift",
+            message="Firing Deck selected weapon instance is not equipped by the model.",
+            field="firing_deck_selection",
+        )
+    if weapon_instance.wargear_id != weapon_selection.wargear_id:
         return ShootingProposalValidationResult.invalid(
             proposal_request_id=proposal_request_id,
             violation_code="firing_deck_wargear_drift",
@@ -242,7 +259,7 @@ def _available_weapon_by_declaration_key_for_rules_unit(
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
     selected_shooting_type: ShootingType | None = None,
-) -> dict[tuple[str, str, str, str | None, str | None], _AvailableWeapon]:
+) -> dict[tuple[str, str, str, str, str | None, str | None], _AvailableWeapon]:
     return {
         _available_weapon_key(weapon): weapon
         for weapon in _available_weapons_for_rules_unit(
@@ -257,8 +274,9 @@ def _available_weapon_by_declaration_key_for_rules_unit(
 
 def _available_weapon_key(
     weapon: _AvailableWeapon,
-) -> tuple[str, str, str, str | None, str | None]:
+) -> tuple[str, str, str, str, str | None, str | None]:
     return (
+        weapon["weapon_instance_id"],
         weapon["model_instance_id"],
         weapon["wargear_id"],
         weapon["weapon_profile"].profile_id,
@@ -301,8 +319,9 @@ def _component_unit_by_id(*, rules_unit: RulesUnitView, unit_instance_id: str) -
 
 def _declaration_available_weapon_key(
     declaration: WeaponDeclaration,
-) -> tuple[str, str, str, str | None, str | None]:
+) -> tuple[str, str, str, str, str | None, str | None]:
     return (
+        declaration.weapon_instance_id,
         declaration.attacker_model_instance_id,
         declaration.wargear_id,
         declaration.weapon_profile_id,
@@ -396,6 +415,7 @@ def _available_weapons_for_unit(
                 weapon["model_instance_id"],
                 weapon["wargear_id"],
                 weapon["weapon_profile"].profile_id,
+                weapon["weapon_instance_id"],
             ),
         )
     )
@@ -479,6 +499,7 @@ def _available_weapons_for_rules_unit(
                 weapon["model_instance_id"],
                 weapon["wargear_id"],
                 weapon["weapon_profile"].profile_id,
+                weapon["weapon_instance_id"],
             ),
         )
     )
@@ -487,25 +508,24 @@ def _available_weapons_for_rules_unit(
 def _available_weapons_for_model(
     *,
     model: ModelInstance,
-    unit: UnitInstance,
     army_catalog: ArmyCatalog,
 ) -> tuple[_AvailableWeapon, ...]:
     weapons: list[_AvailableWeapon] = []
-    for selection in unit.wargear_selections:
-        if selection.model_profile_id != model.model_profile_id:
+    for equipped_profile in equipped_weapon_profile_instances_for_model(
+        model=model,
+        army_catalog=army_catalog,
+    ):
+        profile = equipped_profile.weapon_profile
+        if profile.range_profile.kind is RangeProfileKind.MELEE:
             continue
-        for wargear_id in selection.wargear_ids:
-            wargear = _wargear_by_id(army_catalog=army_catalog, wargear_id=wargear_id)
-            for profile in wargear.weapon_profiles:
-                if profile.range_profile.kind is RangeProfileKind.MELEE:
-                    continue
-                weapons.append(
-                    {
-                        "model_instance_id": model.model_instance_id,
-                        "wargear_id": wargear_id,
-                        "weapon_profile": profile,
-                    }
-                )
+        weapons.append(
+            {
+                "weapon_instance_id": equipped_profile.weapon_instance_id,
+                "model_instance_id": model.model_instance_id,
+                "wargear_id": equipped_profile.wargear_id,
+                "weapon_profile": profile,
+            }
+        )
     return tuple(weapons)
 
 
@@ -526,7 +546,6 @@ def _available_own_weapons_for_model(
     weapons: list[_AvailableWeapon] = []
     for weapon in _available_weapons_for_model(
         model=model,
-        unit=unit,
         army_catalog=army_catalog,
     ):
         weapon_profile = weapon_profile_with_ranged_keyword_effects(
@@ -536,6 +555,7 @@ def _available_own_weapons_for_model(
         )
         if has_weapon_keyword(weapon_profile, WeaponKeyword.ONE_SHOT) and not (
             state.one_shot_weapon_available(
+                weapon_instance_id=weapon["weapon_instance_id"],
                 model_instance_id=weapon["model_instance_id"],
                 wargear_id=weapon["wargear_id"],
                 weapon_profile_id=weapon_profile.profile_id,
@@ -544,6 +564,7 @@ def _available_own_weapons_for_model(
             continue
         weapons.append(
             {
+                "weapon_instance_id": weapon["weapon_instance_id"],
                 "model_instance_id": weapon["model_instance_id"],
                 "wargear_id": weapon["wargear_id"],
                 "weapon_profile": weapon_profile,
@@ -574,13 +595,13 @@ def _available_firing_deck_weapons(
         for source_model in embarked_unit.own_models:
             for weapon in _available_weapons_for_model(
                 model=source_model,
-                unit=embarked_unit,
                 army_catalog=army_catalog,
             ):
                 if WeaponKeyword.ONE_SHOT in weapon["weapon_profile"].keywords:
                     continue
                 weapons.append(
                     {
+                        "weapon_instance_id": weapon["weapon_instance_id"],
                         "model_instance_id": transport_model.model_instance_id,
                         "wargear_id": weapon["wargear_id"],
                         "weapon_profile": weapon["weapon_profile"],
@@ -599,6 +620,7 @@ def _transport_firing_deck_model(unit: UnitInstance) -> ModelInstance:
 
 def _available_weapon_to_payload(weapon: _AvailableWeapon) -> AvailableWeaponPayload:
     payload: AvailableWeaponPayload = {
+        "weapon_instance_id": weapon["weapon_instance_id"],
         "model_instance_id": weapon["model_instance_id"],
         "wargear_id": weapon["wargear_id"],
         "weapon_profile_id": weapon["weapon_profile"].profile_id,

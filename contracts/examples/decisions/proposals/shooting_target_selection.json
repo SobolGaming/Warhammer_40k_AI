@@ -9,6 +9,7 @@
       "shooting_type": "normal",
       "target_unit_instance_id": "army-beta:intercessor-unit-2",
       "wargear_id": "core-bolt-rifle",
+      "weapon_instance_id": "weapon-instance:ab98bf1f1a9c97c8bbc4e816fbb2a9bb2e6587a2d6863c9f20c7ed599b384c9e",
       "weapon_profile_id": "core-bolt-rifle:standard"
     }
   ],

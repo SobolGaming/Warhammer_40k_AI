@@ -11,6 +11,7 @@
         "shooting_type": "normal",
         "target_unit_instance_id": "army-beta:intercessor-unit-2",
         "wargear_id": "core-bolt-rifle",
+        "weapon_instance_id": "weapon-instance:ab98bf1f1a9c97c8bbc4e816fbb2a9bb2e6587a2d6863c9f20c7ed599b384c9e",
         "weapon_profile_id": "core-bolt-rifle:standard"
       }
     ],
@@ -24,5 +25,5 @@
     "visibility_cache_key": "ui-contract-visibility-cache-000001"
   },
   "result_id": "phase18d-shooting_declaration-result-000001",
-  "schema_version": "parameterized-submission-v1"
+  "schema_version": "parameterized-submission-v2-weapon-instances"
 }

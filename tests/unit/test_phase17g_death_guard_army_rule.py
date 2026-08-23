@@ -1445,6 +1445,7 @@ def _attack_pool_for_test(
     )
     return RangedAttackPool(
         attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_instance_id=f"weapon-instance:test:{weapon_profile.profile_id}",
         wargear_id=attacker.wargear_selections[0].wargear_ids[0],
         weapon_profile_id=weapon_profile.profile_id,
         weapon_profile=weapon_profile,

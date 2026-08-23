@@ -133,6 +133,10 @@ from warhammer40k_core.engine.weapon_declaration import (
     WeaponDeclaration,
     fixed_attacks_for_profile,
 )
+from warhammer40k_core.engine.weapon_instances import (
+    equipped_weapon_instances_for_model,
+    weapon_instance_id_for_copy,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -922,6 +926,7 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
     with pytest.raises(GameLifecycleError, match="Firing Deck source unit and model"):
         WeaponDeclaration(
             attacker_model_instance_id="model-1",
+            weapon_instance_id="weapon-instance:test:model-1",
             wargear_id="wargear-1",
             weapon_profile_id="profile-1",
             target_unit_instance_id="target-1",
@@ -2371,6 +2376,60 @@ def test_mixed_close_quarters_and_non_close_quarters_declarations_reject_before_
     assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
 
 
+def test_malformed_firing_deck_weapon_selection_is_invalid_without_mutation() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("passenger-1", "transport-1"),
+        alpha_datasheets={
+            "passenger-1": ("core-intercessor-like-infantry", "core-intercessor-like", 5),
+            "transport-1": ("core-transport", "core-transport", 1),
+        },
+        embarked_unit_ids=("passenger-1",),
+    )
+    state = _state(lifecycle)
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=units["transport-1"].unit_instance_id,
+        selection_result_id="phase13b-select-malformed-firing-deck",
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        firing_deck_unit=units["passenger-1"],
+    )
+    malformed_payload = proposal.to_payload()
+    firing_deck_payload = cast(dict[str, object], malformed_payload["firing_deck_selection"])
+    weapon_selections = cast(list[dict[str, object]], firing_deck_payload["weapon_selections"])
+    del weapon_selections[0]["weapon_instance_id"]
+    before_state_payload = state.to_payload()
+    before_records = lifecycle.decision_controller.records
+
+    status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=malformed_payload,
+        result_id="phase13b-malformed-firing-deck-instance",
+    )
+    validation = cast(
+        dict[str, object],
+        cast(dict[str, object], status.payload)["proposal_validation"],
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert (
+        cast(list[dict[str, object]], validation["violations"])[0]["violation_code"]
+        == "proposal_schema_invalid"
+    )
+    assert "weapon_instance_id" in cast(
+        str,
+        cast(list[dict[str, object]], validation["violations"])[0]["message"],
+    )
+    assert lifecycle.decision_controller.records == before_records
+    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
+    assert state.to_payload() == before_state_payload
+
+
 def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligible() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("passenger-1", "transport-1"),
@@ -2402,6 +2461,11 @@ def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligi
     assert proposal_request["firing_deck_value"] == 2
     assert proposal.firing_deck_selection is not None
     assert proposal.firing_deck_selection.firing_deck_value == 2
+    firing_deck_declaration = next(
+        declaration for declaration in proposal.declarations if declaration.uses_firing_deck
+    )
+    firing_deck_selection = proposal.firing_deck_selection.weapon_selections[0]
+    assert firing_deck_selection.weapon_instance_id == (firing_deck_declaration.weapon_instance_id)
     status = _submit_payload(
         lifecycle,
         request=declaration_request,
@@ -2425,6 +2489,9 @@ def test_firing_deck_declaration_consumes_embarked_weapon_and_marks_unit_ineligi
     ]
     assert firing_deck_pools[0]["firing_deck_source_unit_instance_id"] == (
         units["passenger-1"].unit_instance_id
+    )
+    assert firing_deck_pools[0]["weapon_instance_id"] == (
+        firing_deck_declaration.weapon_instance_id
     )
     if state.shooting_phase_state is not None:
         assert units["passenger-1"].unit_instance_id in state.shooting_phase_state.shot_unit_ids
@@ -2494,6 +2561,7 @@ def test_firing_deck_exposes_all_weapons_and_rejects_two_from_one_embarked_model
             FiringDeckWeaponSelection(
                 embarked_unit_instance_id=units["passenger-1"].unit_instance_id,
                 model_instance_id=passenger_model_id,
+                weapon_instance_id=cast(str, weapon["weapon_instance_id"]),
                 wargear_id=cast(str, weapon["wargear_id"]),
                 weapon_profile=WeaponProfile.from_payload(
                     cast(WeaponProfilePayload, weapon["weapon_profile"])
@@ -2850,8 +2918,33 @@ def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence
 
     assert ShootingDeclarationProposal.from_payload(encoded["proposal"]) == proposal
     assert RangedAttackPool.from_payload(encoded["pool"]) == pool
+    assert encoded["proposal"]["declarations"][0]["weapon_instance_id"] == (
+        declaration.weapon_instance_id
+    )
+    assert encoded["pool"]["weapon_instance_id"] == declaration.weapon_instance_id
+    assert pool.weapon_instance_id == declaration.weapon_instance_id
     assert pool.target_visible_model_ids == ("army-beta:enemy:model-001",)
     assert pool.target_in_range_model_ids == ("army-beta:enemy:model-001",)
+
+
+def test_weapon_instance_identity_is_deterministic_and_delimiter_safe() -> None:
+    first = weapon_instance_id_for_copy(
+        model_instance_id="model:a",
+        wargear_id="weapon:b",
+        copy_ordinal=1,
+    )
+
+    assert first == weapon_instance_id_for_copy(
+        model_instance_id="model:a",
+        wargear_id="weapon:b",
+        copy_ordinal=1,
+    )
+    assert first != weapon_instance_id_for_copy(
+        model_instance_id="model",
+        wargear_id="a:weapon:b",
+        copy_ordinal=1,
+    )
+    assert first.startswith("weapon-instance:")
 
 
 def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None:
@@ -2872,10 +2965,23 @@ def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None
     )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
-    used_model = attacker.own_models[0]
     used_wargear_id = attacker.wargear_selections[0].wargear_ids[0]
+    used_model = replace(
+        attacker.own_models[0],
+        wargear_ids=(used_wargear_id, used_wargear_id),
+    )
+    attacker = replace(attacker, own_models=(used_model, *attacker.own_models[1:]))
+    units["intercessor-1"] = attacker
+    _replace_unit_instance_in_state(state=state, replacement=attacker)
+    one_shot_instances = tuple(
+        instance
+        for instance in equipped_weapon_instances_for_model(used_model)
+        if instance.wargear_id == used_wargear_id
+    )
+    assert len(one_shot_instances) == 2
     state.record_one_shot_weapon_selected(
         model_instance_id=used_model.model_instance_id,
+        weapon_instance_id=one_shot_instances[0].weapon_instance_id,
         wargear_id=used_wargear_id,
         weapon_profile_id=one_shot_profile.profile_id,
         source_phase=BattlePhase.SHOOTING,
@@ -2886,6 +2992,13 @@ def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None
     restored_state = GameState.from_payload(encoded_state)
     assert not restored_state.one_shot_weapon_available(
         model_instance_id=used_model.model_instance_id,
+        weapon_instance_id=one_shot_instances[0].weapon_instance_id,
+        wargear_id=used_wargear_id,
+        weapon_profile_id=one_shot_profile.profile_id,
+    )
+    assert restored_state.one_shot_weapon_available(
+        model_instance_id=used_model.model_instance_id,
+        weapon_instance_id=one_shot_instances[1].weapon_instance_id,
         wargear_id=used_wargear_id,
         weapon_profile_id=one_shot_profile.profile_id,
     )
@@ -2901,11 +3014,15 @@ def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None
     proposal_request = cast(dict[str, object], request_payload["proposal_request"])
     weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
 
-    assert all(
-        weapon["model_instance_id"] != used_model.model_instance_id
+    used_model_one_shot_weapons = [
+        weapon
         for weapon in weapons
-        if weapon["weapon_profile_id"] == one_shot_profile.profile_id
-    )
+        if weapon["model_instance_id"] == used_model.model_instance_id
+        and weapon["weapon_profile_id"] == one_shot_profile.profile_id
+    ]
+    assert [weapon["weapon_instance_id"] for weapon in used_model_one_shot_weapons] == [
+        one_shot_instances[1].weapon_instance_id
+    ]
 
     proposal = _proposal_from_request(
         request=declaration_request,
@@ -2914,6 +3031,9 @@ def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None
     )
     stale_payload = proposal.to_payload()
     stale_payload["declarations"][0]["attacker_model_instance_id"] = used_model.model_instance_id
+    stale_payload["declarations"][0]["weapon_instance_id"] = one_shot_instances[
+        0
+    ].weapon_instance_id
     invalid_status = _submit_payload(
         lifecycle,
         request=declaration_request,
@@ -3175,6 +3295,7 @@ def _ctan_power_proposal_from_request(
     declarations = tuple(
         WeaponDeclaration(
             attacker_model_instance_id=cast(str, weapon["model_instance_id"]),
+            weapon_instance_id=cast(str, weapon["weapon_instance_id"]),
             wargear_id=cast(str, weapon["wargear_id"]),
             weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
             target_unit_instance_id=target_unit_id,

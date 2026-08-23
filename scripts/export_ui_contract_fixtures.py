@@ -90,6 +90,7 @@ from warhammer40k_core.engine.weapon_declaration import (
     ShootingDeclarationProposal,
     WeaponDeclaration,
 )
+from warhammer40k_core.engine.weapon_instances import weapon_instance_id_for_copy
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 from warhammer40k_core.rules.mission_pack_import import (
@@ -708,6 +709,11 @@ def _shooting_declaration_example_payload() -> JsonValue:
                 WeaponDeclaration(
                     attacker_model_instance_id=MODEL_ALPHA_1,
                     wargear_id="core-bolt-rifle",
+                    weapon_instance_id=weapon_instance_id_for_copy(
+                        model_instance_id=MODEL_ALPHA_1,
+                        wargear_id="core-bolt-rifle",
+                        copy_ordinal=1,
+                    ),
                     weapon_profile_id="core-bolt-rifle:standard",
                     target_unit_instance_id=UNIT_BETA,
                     shooting_type=ShootingType.NORMAL,

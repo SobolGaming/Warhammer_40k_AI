@@ -116,7 +116,7 @@ try {
 }
 
 function compactSingleLinePropertyRuns(source) {
-  const maximumLineLength = 120;
+  const maximumLineLength = 128;
   const trailingNewline = source.endsWith("\n");
   const lines = source.split("\n");
   if (trailingNewline) {

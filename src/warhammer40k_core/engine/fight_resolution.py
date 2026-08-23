@@ -13,7 +13,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     movement_mode_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.battlefield_state import (
@@ -110,6 +109,9 @@ from warhammer40k_core.engine.weapon_declaration import (
     RangedAttackPool,
     WeaponDeclaration,
     attacks_for_profile,
+)
+from warhammer40k_core.engine.weapon_instances import (
+    equipped_weapon_profile_instances_for_model,
 )
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
@@ -1435,14 +1437,15 @@ def validate_melee_declaration_rules(
                 field="declarations",
             )
         declared_weapon_keys.add(key)
-        profile = available.get(key)
-        if profile is None:
+        available_weapon = available.get(key)
+        if available_weapon is None:
             return _invalid_melee_validation(
                 request=request,
                 violation_code="melee_weapon_not_available",
                 message="Melee declaration selected a weapon that is not available.",
                 field="declarations",
             )
+        profile = available_weapon["weapon_profile"]
         if profile.range_profile.kind is not RangeProfileKind.MELEE:
             return _invalid_melee_validation(
                 request=request,
@@ -1534,7 +1537,8 @@ def melee_attack_sequence_from_proposal(
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pools: list[RangedAttackPool] = []
     for declaration_index, declaration in enumerate(proposal.declarations):
-        profile = available[declaration.weapon_key]
+        available_weapon = available[declaration.weapon_key]
+        profile = available_weapon["weapon_profile"]
         profile = _epic_challenge_profile_if_applicable(
             state=state,
             unit_instance_id=proposal.unit_instance_id,
@@ -1607,6 +1611,7 @@ def melee_attack_sequence_from_proposal(
             pools.append(
                 RangedAttackPool.from_declaration(
                     declaration=WeaponDeclaration(
+                        weapon_instance_id=available_weapon["weapon_instance_id"],
                         attacker_model_instance_id=declaration.attacker_model_instance_id,
                         wargear_id=declaration.wargear_id,
                         weapon_profile_id=declaration.weapon_profile_id,
@@ -1647,13 +1652,15 @@ def record_one_shot_melee_weapon_uses(
     )
     records: list[OneShotWeaponUseRecord] = []
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
-        profile = available.get(declaration.weapon_key)
-        if profile is None:
+        available_weapon = available.get(declaration.weapon_key)
+        if available_weapon is None:
             raise GameLifecycleError("Accepted melee declaration references an unknown weapon.")
+        profile = available_weapon["weapon_profile"]
         if not has_weapon_keyword(profile, WeaponKeyword.ONE_SHOT):
             continue
         records.append(
             state.record_one_shot_weapon_selected(
+                weapon_instance_id=available_weapon["weapon_instance_id"],
                 model_instance_id=declaration.attacker_model_instance_id,
                 wargear_id=declaration.wargear_id,
                 weapon_profile_id=declaration.weapon_profile_id,
@@ -2644,13 +2651,13 @@ def _required_primary_melee_model_ids(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit: UnitInstance,
-    available: dict[tuple[str, str, str], WeaponProfile],
+    available: dict[tuple[str, str, str], _AvailableMeleeWeapon],
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> set[str]:
     model_ids_with_primary: set[str] = set()
-    for weapon_key, profile in available.items():
-        if not _is_extra_attacks_weapon(profile):
+    for weapon_key, weapon in available.items():
+        if not _is_extra_attacks_weapon(weapon["weapon_profile"]):
             model_ids_with_primary.add(weapon_key[0])
     required: set[str] = set()
     for model in unit.own_models:
@@ -2749,13 +2756,13 @@ def _available_melee_weapons_by_key(
     army_catalog: ArmyCatalog,
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
-) -> dict[tuple[str, str, str], WeaponProfile]:
+) -> dict[tuple[str, str, str], _AvailableMeleeWeapon]:
     return {
         (
             weapon["model_instance_id"],
             weapon["wargear_id"],
             weapon["weapon_profile"].profile_id,
-        ): weapon["weapon_profile"]
+        ): weapon
         for weapon in _available_melee_weapons_for_unit(
             unit=unit,
             army_catalog=army_catalog,
@@ -2766,6 +2773,7 @@ def _available_melee_weapons_by_key(
 
 
 class _AvailableMeleeWeapon(TypedDict):
+    weapon_instance_id: str
     model_instance_id: str
     wargear_id: str
     weapon_profile: WeaponProfile
@@ -2797,40 +2805,33 @@ def _available_melee_weapons_for_unit(
             model_instance_id=model.model_instance_id,
         ):
             continue
-        for selection in unit.wargear_selections:
-            if selection.model_profile_id != model.model_profile_id:
+        for equipped_profile in equipped_weapon_profile_instances_for_model(
+            model=model,
+            army_catalog=army_catalog,
+        ):
+            profile = equipped_profile.weapon_profile
+            if profile.range_profile.kind is not RangeProfileKind.MELEE:
                 continue
-            for wargear_id in selection.wargear_ids:
-                wargear = _wargear_by_id(army_catalog=army_catalog, wargear_id=wargear_id)
-                for profile in wargear.weapon_profiles:
-                    if profile.range_profile.kind is not RangeProfileKind.MELEE:
-                        continue
-                    if (
-                        state is not None
-                        and has_weapon_keyword(profile, WeaponKeyword.ONE_SHOT)
-                        and not state.one_shot_weapon_available(
-                            model_instance_id=model.model_instance_id,
-                            wargear_id=wargear_id,
-                            weapon_profile_id=profile.profile_id,
-                        )
-                    ):
-                        continue
-                    weapons.append(
-                        {
-                            "model_instance_id": model.model_instance_id,
-                            "wargear_id": wargear_id,
-                            "weapon_profile": profile,
-                        }
-                    )
+            if (
+                state is not None
+                and has_weapon_keyword(profile, WeaponKeyword.ONE_SHOT)
+                and not state.one_shot_weapon_available(
+                    weapon_instance_id=equipped_profile.weapon_instance_id,
+                    model_instance_id=model.model_instance_id,
+                    wargear_id=equipped_profile.wargear_id,
+                    weapon_profile_id=profile.profile_id,
+                )
+            ):
+                continue
+            weapons.append(
+                {
+                    "weapon_instance_id": equipped_profile.weapon_instance_id,
+                    "model_instance_id": model.model_instance_id,
+                    "wargear_id": equipped_profile.wargear_id,
+                    "weapon_profile": profile,
+                }
+            )
     return tuple(weapons)
-
-
-def _wargear_by_id(*, army_catalog: ArmyCatalog, wargear_id: str) -> Wargear:
-    requested_wargear_id = _validate_identifier("wargear_id", wargear_id)
-    for wargear in army_catalog.wargear:
-        if wargear.wargear_id == requested_wargear_id:
-            return wargear
-    raise GameLifecycleError("Melee wargear_id is not in the ArmyCatalog.")
 
 
 def _validate_melee_target_allocations(
@@ -3318,6 +3319,4 @@ def _validate_terrain_path_legality_results(
 
 def _key_error_field(error: KeyError) -> str:
     raw = error.args[0]
-    if type(raw) is str:
-        return raw
-    return "payload"
+    return raw if type(raw) is str else "payload"

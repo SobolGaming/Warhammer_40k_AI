@@ -145,6 +145,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.engine.weapon_instances import equipped_weapon_instances_for_model
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
@@ -2986,6 +2987,11 @@ def test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligi
             FiringDeckWeaponSelection(
                 embarked_unit_instance_id=passenger.unit_instance_id,
                 model_instance_id=passenger.own_models[0].model_instance_id,
+                weapon_instance_id=next(
+                    instance.weapon_instance_id
+                    for instance in equipped_weapon_instances_for_model(passenger.own_models[0])
+                    if instance.wargear_id == passenger.wargear_selections[0].wargear_ids[0]
+                ),
                 wargear_id=passenger.wargear_selections[0].wargear_ids[0],
                 weapon_profile=profile,
             ),
@@ -3022,6 +3028,19 @@ def test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligi
         ),
         embarked_units=(passenger,),
     )
+    forged_instance_result = resolve_firing_deck_selection(
+        cargo_state=cargo_state,
+        selection=replace(
+            selection,
+            weapon_selections=(
+                replace(
+                    selection.weapon_selections[0],
+                    weapon_instance_id="weapon-instance:forged",
+                ),
+            ),
+        ),
+        embarked_units=(passenger,),
+    )
 
     assert result.is_valid
     assert result.temporary_weapon_profiles == (profile,)
@@ -3031,6 +3050,9 @@ def test_firing_deck_selects_ranged_non_one_shot_weapons_and_marks_units_ineligi
     }
     assert TransportOperationViolationCode.FIRING_DECK_ONE_SHOT_WEAPON in {
         violation.violation_code for violation in one_shot_result.violations
+    }
+    assert TransportOperationViolationCode.FIRING_DECK_WEAPON_INSTANCE_DRIFT in {
+        violation.violation_code for violation in forged_instance_result.violations
     }
 
 
@@ -3055,12 +3077,14 @@ def test_firing_deck_reports_capacity_membership_shot_model_and_melee_failures()
                 FiringDeckWeaponSelection(
                     embarked_unit_instance_id="army-alpha:not-embarked",
                     model_instance_id="army-alpha:not-embarked:model-001",
+                    weapon_instance_id="weapon-instance:test:not-embarked:001",
                     wargear_id="core-bolt-rifle",
                     weapon_profile=ranged_profile,
                 ),
                 FiringDeckWeaponSelection(
                     embarked_unit_instance_id=passenger.unit_instance_id,
                     model_instance_id="army-alpha:passenger-unit:model-999",
+                    weapon_instance_id="weapon-instance:test:unknown-model:001",
                     wargear_id="core-leader-blade",
                     weapon_profile=melee_profile,
                 ),
@@ -3110,6 +3134,11 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
             FiringDeckWeaponSelection(
                 embarked_unit_instance_id=passenger.unit_instance_id,
                 model_instance_id=passenger.own_models[0].model_instance_id,
+                weapon_instance_id=next(
+                    instance.weapon_instance_id
+                    for instance in equipped_weapon_instances_for_model(passenger.own_models[0])
+                    if instance.wargear_id == passenger.wargear_selections[0].wargear_ids[0]
+                ),
                 wargear_id=passenger.wargear_selections[0].wargear_ids[0],
                 weapon_profile=profile,
             ),
@@ -3312,6 +3341,11 @@ def test_resolution_payloads_reject_destroyed_transport_and_firing_deck_drift() 
                 FiringDeckWeaponSelection(
                     embarked_unit_instance_id=passenger.unit_instance_id,
                     model_instance_id=passenger.own_models[0].model_instance_id,
+                    weapon_instance_id=next(
+                        instance.weapon_instance_id
+                        for instance in equipped_weapon_instances_for_model(passenger.own_models[0])
+                        if instance.wargear_id == passenger.wargear_selections[0].wargear_ids[0]
+                    ),
                     wargear_id=passenger.wargear_selections[0].wargear_ids[0],
                     weapon_profile=profile,
                 ),

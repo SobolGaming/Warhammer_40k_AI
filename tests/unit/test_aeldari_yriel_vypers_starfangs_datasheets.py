@@ -818,6 +818,7 @@ def test_harassment_fire_targets_one_attached_rules_unit_and_suppresses_both_com
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=vypers.own_models[0].model_instance_id,
+                weapon_instance_id="weapon-instance:test:harassment-fire:bright-lance",
                 wargear_id="wargear:harassment-fire:bright-lance",
                 weapon_profile_id=_weapon_profile(VYPERS_ID, "Bright lance").profile_id,
                 weapon_profile=_weapon_profile(VYPERS_ID, "Bright lance"),
@@ -1487,6 +1488,7 @@ def _resolved_attack_hit_modifier(
         attack_pools=(
             RangedAttackPool(
                 attacker_model_instance_id=attacker_model_id,
+                weapon_instance_id=f"weapon-instance:test:{sequence_id}",
                 wargear_id=wargear_id,
                 weapon_profile_id=profile.profile_id,
                 weapon_profile=profile,

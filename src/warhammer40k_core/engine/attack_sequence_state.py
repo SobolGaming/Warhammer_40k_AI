@@ -180,13 +180,20 @@ class AttackSequence:
                 raise GameLifecycleError(
                     "AttackSequence post-roll pools require a gathered attack group."
                 )
-            context_ids = tuple(
-                _validate_identifier(
-                    "AttackSequence post-roll attack_context_id",
-                    context["attack_context_id"],
+            expected_weapon_instance_id = self.current_pool().weapon_instance_id
+            context_ids: list[str] = []
+            for context in self.post_roll_attack_contexts:
+                raw_context = _validate_persisted_attack_context_weapon_instance_id(
+                    value=context,
+                    expected_weapon_instance_id=expected_weapon_instance_id,
+                    context_name="post-roll",
                 )
-                for context in self.post_roll_attack_contexts
-            )
+                context_ids.append(
+                    _validate_identifier(
+                        "AttackSequence post-roll attack_context_id",
+                        raw_context.get("attack_context_id"),
+                    )
+                )
             if len(set(context_ids)) != len(context_ids):
                 raise GameLifecycleError("AttackSequence post-roll attack contexts must be unique.")
             if set(context_ids) != set(self.post_roll_attack_pools.all_attack_context_ids):
@@ -243,6 +250,20 @@ class AttackSequence:
                 raise GameLifecycleError("Generated hit continuation requires a successful hit.")
         elif self.current_hit_roll is not None:
             raise GameLifecycleError("Initial attack must not store a current hit roll.")
+        expected_weapon_instance_id = self.current_pool().weapon_instance_id
+        if self.pending_grouped_damage is not None:
+            for save_die in self.pending_grouped_damage.sorted_save_dice:
+                _validate_persisted_attack_context_weapon_instance_id(
+                    value=save_die["attack_context"],
+                    expected_weapon_instance_id=expected_weapon_instance_id,
+                    context_name="pending grouped damage",
+                )
+        if self.pending_destroyed_transport_disembark is not None:
+            _validate_persisted_attack_context_weapon_instance_id(
+                value=self.pending_destroyed_transport_disembark.attack_context,
+                expected_weapon_instance_id=expected_weapon_instance_id,
+                context_name="pending destroyed Transport",
+            )
 
     @classmethod
     def start(
@@ -722,6 +743,26 @@ class AttackSequence:
             ),
             post_roll_attack_contexts=tuple(payload["post_roll_attack_contexts"]),
         )
+
+
+def _validate_persisted_attack_context_weapon_instance_id(
+    *,
+    value: object,
+    expected_weapon_instance_id: str,
+    context_name: str,
+) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"AttackSequence {context_name} attack context must be an object.")
+    raw_context = cast(dict[str, object], value)
+    weapon_instance_id = _validate_identifier(
+        f"AttackSequence {context_name} weapon_instance_id",
+        raw_context.get("weapon_instance_id"),
+    )
+    if weapon_instance_id != expected_weapon_instance_id:
+        raise GameLifecycleError(
+            f"AttackSequence {context_name} attack context weapon instance drift."
+        )
+    return raw_context
 
 
 @dataclass(frozen=True, slots=True)
