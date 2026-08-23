@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fce9a1f44e705a4077001c6dae95777a2909955e7d0fc0c3126a709cee981769",
-  "fingerprint": "fce9a1f44e705a4077001c6dae95777a2909955e7d0fc0c3126a709cee981769",
-  "resource_count": 2414,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:47edd755a69e03c054b623a7c789b536e1c5977c8e1729ce6ff607b9f6d93019",
+  "fingerprint": "47edd755a69e03c054b623a7c789b536e1c5977c8e1729ce6ff607b9f6d93019",
+  "resource_count": 2374,
   "resources": [
     {
       "byte_length": 113,
@@ -11005,171 +11005,6 @@
       "sha256": "8c549929c0d825c962bfcdc80b84491717200a99970be67691909871d10f0558"
     },
     {
-      "byte_length": 2102,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_aspect_warriors_2026_06/__init__.py",
-      "sha256": "628f77da361afc70cbd3a093b3d05346376dc13a036cf94b7069141540d513eb"
-    },
-    {
-      "byte_length": 6580,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_aspect_warriors_2026_06/_artifacts.py",
-      "sha256": "50002f4a10a86a7cc839f4c154d6c60ba67b16fb51af76abbc16c88c0f4ec192"
-    },
-    {
-      "byte_length": 20266,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_aspect_warriors_2026_06/artifacts/rule_ir.json",
-      "sha256": "dcdfb5fe0ba261bdef19d2da5a513340a95a6ea2604877602c9f331c74d3645a"
-    },
-    {
-      "byte_length": 2039,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_autarchs_2026_06/__init__.py",
-      "sha256": "3e92fc4f25dc6809ecfbe6704714d37b67e33e7dc89bd6e6ee8d87c3836f16f2"
-    },
-    {
-      "byte_length": 6305,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_autarchs_2026_06/_artifacts.py",
-      "sha256": "b6f006057220947b705ee4adcde9d6a5c7162def9c6a579af13a0362ddc068c8"
-    },
-    {
-      "byte_length": 22778,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_autarchs_2026_06/artifacts/rule_ir.json",
-      "sha256": "b76bcb0204c18e5449cfa16b110979d3bc0f649df7f117d6aec5ae771a4080ac"
-    },
-    {
-      "byte_length": 2237,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshees_phoenix_lords_spiritseer_2026_06/__init__.py",
-      "sha256": "362c52fe7984d1939f7d6694d66ba09dfec546b5a352733d026f870ca3432d60"
-    },
-    {
-      "byte_length": 6843,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshees_phoenix_lords_spiritseer_2026_06/_artifacts.py",
-      "sha256": "526eb72e499cdb4a254dbceecaf247c4addaad0917e3f5144c421321a5bed3ee"
-    },
-    {
-      "byte_length": 50708,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_banshees_phoenix_lords_spiritseer_2026_06/artifacts/rule_ir.json",
-      "sha256": "689a2f3804afaa70b673f03bc04368427d1a472528fec47389991d7e8207f09a"
-    },
-    {
-      "byte_length": 2104,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_corsair_skyreavers_2026_06/__init__.py",
-      "sha256": "b0454bb86cc25076c3b49e3b940510aa26164a9ba79c0915d468b5143614e230"
-    },
-    {
-      "byte_length": 6091,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_corsair_skyreavers_2026_06/_artifacts.py",
-      "sha256": "f503dd3427b946959eece1a47d7e4c6d6e7b3d533ef64647f7505beec267ef24"
-    },
-    {
-      "byte_length": 6819,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_corsair_skyreavers_2026_06/artifacts/rule_ir.json",
-      "sha256": "3faee1570907731f25e3747c58115c2d7636e76eb62e32321df8887a0a08da4f"
-    },
-    {
-      "byte_length": 2052,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_corsair_void_units_2026_06/__init__.py",
-      "sha256": "bb22400580e02378c6176b1b8bd0a7a464c3d4ae5c3017ee00c20f01e6059710"
-    },
-    {
-      "byte_length": 6482,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_corsair_void_units_2026_06/_artifacts.py",
-      "sha256": "63f864cde0dc643dce023f36083142697d5653a31b7a06ef2d22e1058e8521f0"
-    },
-    {
-      "byte_length": 20383,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_corsair_void_units_2026_06/artifacts/rule_ir.json",
-      "sha256": "1f1cfae481cf9fd75f4a1803ffc7eaa4e258d4be8217f1897e0a9fa2c89f3b2a"
-    },
-    {
-      "byte_length": 2010,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_kharseth_2026_06/__init__.py",
-      "sha256": "f9229667274894c97691a3dc0119ed50161078bbc0b156bdc120c84fadb934c9"
-    },
-    {
-      "byte_length": 5433,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_kharseth_2026_06/_artifacts.py",
-      "sha256": "fb81e0f9c8fc4102e96647a679150c6da8af857523873e02be89b032f676d7f1"
-    },
-    {
-      "byte_length": 10676,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_kharseth_2026_06/artifacts/rule_ir.json",
-      "sha256": "14e3b3c49d6d6c61ff59ef520326c7fb8e6dc74a517d99c6213276319b64ecb4"
-    },
-    {
-      "byte_length": 2080,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_night_spinner_2026_06/__init__.py",
-      "sha256": "034d008a26c234b3ba543d34b49065828a4d8590e13ba6b0a3f33d60c396e760"
-    },
-    {
-      "byte_length": 6084,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_night_spinner_2026_06/_artifacts.py",
-      "sha256": "f6755aef5254c52c25752631b096698cc2f5f3953cc6325458267083e7770e9a"
-    },
-    {
-      "byte_length": 8092,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_night_spinner_2026_06/artifacts/rule_ir.json",
-      "sha256": "e6a81bee788a3e1761e757a1a7784641a5e2aeb7882a501f1cd9ccdb2442fd4a"
-    },
-    {
-      "byte_length": 2079,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_shroud_runners_wraithblades_2026_06/__init__.py",
-      "sha256": "378d2ead959e3d889d0b00db97acaee83939cf1c49110a141dcb64e655f60bcd"
-    },
-    {
-      "byte_length": 6443,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_shroud_runners_wraithblades_2026_06/_artifacts.py",
-      "sha256": "a01a3a748ee126f0e47b20b7208017ba2a84bfb9af3ddae147974743ca4499f7"
-    },
-    {
-      "byte_length": 11978,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_shroud_runners_wraithblades_2026_06/artifacts/rule_ir.json",
-      "sha256": "f47a6cadedc0a08f9556d19673cd14ef72a7ca845c3f729fedff250895113a51"
-    },
-    {
-      "byte_length": 2167,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_war_walkers_wraithlord_2026_06/__init__.py",
-      "sha256": "66e2deaccaadbbcc3e7e62c2c842fdab252524974cf3beba39560bed73d681dc"
-    },
-    {
-      "byte_length": 6921,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_war_walkers_wraithlord_2026_06/_artifacts.py",
-      "sha256": "e933de84b23a916488ef6bd09a381f8fb83c983067b7a0b52dc4b7eeb7f839c8"
-    },
-    {
-      "byte_length": 17623,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_war_walkers_wraithlord_2026_06/artifacts/rule_ir.json",
-      "sha256": "ebdcb51fdc7264be21d91be7ff062bc970e2416c52f12d476b7da44547046d1f"
-    },
-    {
-      "byte_length": 2102,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_2026_06/__init__.py",
-      "sha256": "a1befe0364eb223626d36b1d8c9e95a657054e424b3ed03dfc4273fe096213a4"
-    },
-    {
-      "byte_length": 6757,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_2026_06/_artifacts.py",
-      "sha256": "b54cb6079d09b4cc9a4efa59a54dbb55655c04bbce50cd4aff1a3bd5e48c3873"
-    },
-    {
-      "byte_length": 19247,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_2026_06/artifacts/rule_ir.json",
-      "sha256": "8ff538e141a06d4f30eeaa84984c4e2c88f4e37f35613e1fb8927f62f87afa6a"
-    },
-    {
-      "byte_length": 2016,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_yriel_vypers_starfangs_2026_06/__init__.py",
-      "sha256": "3179e8e10855c838e55b4a0588e2441ed8e76c1418c3b2702557883f5a947a95"
-    },
-    {
-      "byte_length": 6880,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_yriel_vypers_starfangs_2026_06/_artifacts.py",
-      "sha256": "126b85d8ad11eeaae211939922f3b92dc79b770fd0629dbb0b0329bd426f9c7d"
-    },
-    {
-      "byte_length": 24824,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/aeldari_yriel_vypers_starfangs_2026_06/artifacts/rule_ir.json",
-      "sha256": "be83dcee3990751b4ef62507cab720bd0089640f4e9751bdaec6f9e23dfd996f"
-    },
-    {
       "byte_length": 5110,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/app_core_rules_hidden_2026_08_09/__init__.py",
       "sha256": "e8e052edae95c438071f3405d6dd4f474e0762beca221b9ed88360641d7abf5f"
@@ -11183,11 +11018,6 @@
       "byte_length": 2007,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/app_core_rules_hidden_2026_08_09/artifacts/hidden.json",
       "sha256": "808b7ad12c18f500efc84a21cdd91d5e7db98d6f8290c6610f1f5377765c5ceb"
-    },
-    {
-      "byte_length": 41902,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_datasheet_ir_support_2026_27.py",
-      "sha256": "d05926690824211f317352d58dceb714797ad5e529e52b41b7bccc90e8565f5a"
     },
     {
       "byte_length": 9708,
@@ -11253,66 +11083,6 @@
       "byte_length": 10761,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_datasheet_overlay_2026_06.py",
       "sha256": "8adf705f3c37b9c74984689bc127857eb456391c212de04557ac23014d3dd107"
-    },
-    {
-      "byte_length": 2323,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_fulgrim_2026_07/__init__.py",
-      "sha256": "bd2cc585cbcdf87329c2e37656ed9cb8a5d3387785e9fad569737739dcacec57"
-    },
-    {
-      "byte_length": 6773,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_fulgrim_2026_07/_artifacts.py",
-      "sha256": "95315c21f0d20df90767b5aa34835e5f08ef1316bab7454a75c96ddb5370fc1e"
-    },
-    {
-      "byte_length": 25386,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_fulgrim_2026_07/artifacts/rule_ir.json",
-      "sha256": "f24453e6ecb68dc541591dce0a931a1af7862b24fdade8813bf5ffdac4a2ec26"
-    },
-    {
-      "byte_length": 2334,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_infractors_tormentors_2026_08/__init__.py",
-      "sha256": "3ff87c7b361983fe6e3842400961ac814ee7a1d5e77d33454f0be5a7bc644c58"
-    },
-    {
-      "byte_length": 7514,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_infractors_tormentors_2026_08/_artifacts.py",
-      "sha256": "5e17523cc31c6d1d59f81f2ebceb6324d5e4206a0381ab05aff41b25a9bf2aa6"
-    },
-    {
-      "byte_length": 26104,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_infractors_tormentors_2026_08/artifacts/rule_ir.json",
-      "sha256": "43f33eecd3bc3d0fa97dde65bca74cbe6f17915ea10436f5259bf605a6ad7d88"
-    },
-    {
-      "byte_length": 2788,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_lord_exultant_maulerfiend_spawn_2026_08/__init__.py",
-      "sha256": "92b7e61b5e1808e9a39585e67a1697ccf4787e89e10fb9ab81badf6e9e73c469"
-    },
-    {
-      "byte_length": 12280,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_lord_exultant_maulerfiend_spawn_2026_08/_artifacts.py",
-      "sha256": "6bb85e5b7fc54ec686790f0d537540fbd72c8a7790bd8acda38973b0794fced8"
-    },
-    {
-      "byte_length": 26337,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_lord_exultant_maulerfiend_spawn_2026_08/artifacts/rule_ir.json",
-      "sha256": "d5efb27da8fe5f542c7059042071039b6a1f71a3db49bd070f9affefeeff5653"
-    },
-    {
-      "byte_length": 2654,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_lucius_2026_07/__init__.py",
-      "sha256": "99b4fc0f1f0f47199d6fadf09e725e88b7b75b50953717e0d9899266fef3bac3"
-    },
-    {
-      "byte_length": 7164,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_lucius_2026_07/_artifacts.py",
-      "sha256": "1e455e799ec814f098b90285b7d55a718bdab3675903fa33b716edcfce2a4406"
-    },
-    {
-      "byte_length": 9088,
-      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/emperors_children_lucius_2026_07/artifacts/rule_ir.json",
-      "sha256": "5d3ea6855fc7ca115334446583f44b2665366a334b2df2bf2bf99038a0800736"
     },
     {
       "byte_length": 86897,
@@ -11468,6 +11238,36 @@
       "byte_length": 13425,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_named_handler_budget_2026_27.py",
       "sha256": "b92eba0018058626c6d3ddebb1d47805fb5cd7cda5416782067c8bfaa09413dc"
+    },
+    {
+      "byte_length": 14480,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py",
+      "sha256": "3babf6b3b049b9656f7f4e68ddacb0b5044245233cff24b4467ba9127ec42e3e"
+    },
+    {
+      "byte_length": 42921,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py",
+      "sha256": "86a98df34272306f77031855bbb84ff38cfd0d73129b77e40a8829deda7c9021"
+    },
+    {
+      "byte_length": 4892,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json",
+      "sha256": "ccf9eb34c2de2874dcd68477df9136161f69e7836c16f749ced57503223fc26e"
+    },
+    {
+      "byte_length": 239968,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/aeldari.json",
+      "sha256": "e4cbae65ec4cf20d6a51df7d78c3a1e8e8c47f0f6cbaadf82fb9daa19d4a0451"
+    },
+    {
+      "byte_length": 180149,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json",
+      "sha256": "0f42df67de162c702a1348ab0ece0867bd4d06d1581a940d42e95d789dbac607"
+    },
+    {
+      "byte_length": 97774,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/emperors-children.json",
+      "sha256": "91a4d20e66ca027bec6808c488a4ec9c5acbdbf434c51ad66cbf9ebea144deff"
     },
     {
       "byte_length": 675,
@@ -12050,9 +11850,9 @@
       "sha256": "40d686c16f05828b179ae7cea45364d2fcec702a613f8c5fdadaf40930faf51e"
     },
     {
-      "byte_length": 4943,
+      "byte_length": 653,
       "path": "warhammer40k_core/rules/wahapedia_static_rule_ir.py",
-      "sha256": "2c97da285587b26b1c36b7bdad3b493bbd0d7c1ecd60e058af86a9e2a217a571"
+      "sha256": "314a1247693073eccb18c11515d60ab4cde2ac11a4f6a2070c3fa402742dc56e"
     },
     {
       "byte_length": 2142,

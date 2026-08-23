@@ -10,7 +10,6 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_aeldari_banshees_phoenix_lords_spiritseer_rule_ir import (
-    OUTPUT_PATH,
     RULE_TEXT_BY_SOURCE_ROW_ID,
     generated_artifact_payload,
 )
@@ -116,11 +115,13 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import RuleIR
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_banshees_phoenix_lords_spiritseer_2026_06 as source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_BANSHEES_PHOENIX_LORDS_SPIRITSEER_HEIGHT_OVERRIDES,
+)
+
+source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-banshees-phoenix-lords-spiritseer-2026-06-14"
 )
 
 HOWLING_BANSHEES_ID = "000000594"
@@ -145,17 +146,17 @@ def _package() -> Any:
 
 
 def test_generated_artifact_is_current_source_bound_and_fail_fast() -> None:
-    committed = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    committed = source_package.payload()
 
     assert committed == generated_artifact_payload()
     assert source_package.supported_datasheet_source_row_ids() == tuple(
         sorted(RULE_TEXT_BY_SOURCE_ROW_ID)
     )
-    assert committed["package_hash"] == source_package.PACKAGE_HASH
+    assert committed["package_hash"] == source_package.package_hash
 
     committed["package_hash"] = "0" * 64
     with pytest.raises(
-        source_package.AeldariBansheesPhoenixLordsSpiritseerRuleIrArtifactError,
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
         match="hash is stale",
     ):
         source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())

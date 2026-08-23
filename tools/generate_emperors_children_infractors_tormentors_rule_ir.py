@@ -3,6 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING or __package__:
+    from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
+else:
+    from faction_rule_ir_bundle import generate_registered_rule_ir_shard
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
@@ -37,11 +43,12 @@ OFFICIAL_PDF_PATH = (
 OUTPUT_PATH = (
     REPO_ROOT
     / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
-    / "emperors_children_infractors_tormentors_2026_08/artifacts/rule_ir.json"
+    / "faction_pack_rule_ir/artifacts/shards/emperors-children.json"
 )
 
 ARTIFACT_SCHEMA = "core-v2-emperors-children-infractors-tormentors-rule-ir-v1"
 SOURCE_PACKAGE_ID = "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08"
+SHARD_ID = "emperors-children"
 PARSER_VERSION = "manual-source-backed-rule-ir:v1"
 DATASHEETS = {"000004079": "Tormentors", "000004080": "Infractors"}
 ABILITY_NAMES = {
@@ -53,9 +60,7 @@ ABILITY_NAMES = {
 
 
 def main() -> None:
-    payload = generated_artifact_payload()
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    generate_registered_rule_ir_shard(shard_id=SHARD_ID)
 
 
 def generated_artifact_payload() -> dict[str, object]:

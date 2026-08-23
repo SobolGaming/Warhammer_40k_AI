@@ -21,19 +21,10 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_emperors_children_fulgrim_rule_ir import (
-    OUTPUT_PATH as FULGRIM_RULE_IR_OUTPUT_PATH,
-)
-from tools.generate_emperors_children_fulgrim_rule_ir import (
     generated_artifact_payload as generated_fulgrim_rule_ir_artifact_payload,
 )
 from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
-    OUTPUT_PATH as INFRACTORS_TORMENTORS_RULE_IR_OUTPUT_PATH,
-)
-from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
     generated_artifact_payload as generated_infractors_tormentors_rule_ir_artifact_payload,
-)
-from tools.generate_emperors_children_lord_exultant_maulerfiend_spawn_rule_ir import (
-    OUTPUT_PATH as LORD_MAULERFIEND_SPAWN_RULE_IR_OUTPUT_PATH,
 )
 from tools.generate_emperors_children_lord_exultant_maulerfiend_spawn_rule_ir import (
     generated_artifact_payload as generated_lord_maulerfiend_spawn_rule_ir_artifact_payload,
@@ -335,15 +326,7 @@ from warhammer40k_core.rules.source_overlay import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_datasheet_overlay_2026_06 as ec_overlay,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    emperors_children_fulgrim_2026_07 as fulgrim_source_package,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    emperors_children_infractors_tormentors_2026_08 as infractors_tormentors_source_package,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    emperors_children_lord_exultant_maulerfiend_spawn_2026_08 as lord_spawn_source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     mfm_2026_07 as mfm_source_package,
 )
@@ -355,6 +338,16 @@ from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaJsonArtifact,
     WahapediaJsonArtifactPayload,
+)
+
+fulgrim_source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-emperors-children-fulgrim-datasheet-2026-07"
+)
+infractors_tormentors_source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08"
+)
+lord_spawn_source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08"
 )
 
 _WAHAPEDIA_10E_JSON = (
@@ -2295,20 +2288,17 @@ def test_lord_kakophonist_and_noise_marines_alternative_loadouts_instantiate() -
 
 
 def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -> None:
-    committed = cast(
-        dict[str, Any],
-        json.loads(FULGRIM_RULE_IR_OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed = fulgrim_source_package.payload()
 
     assert committed == generated_fulgrim_rule_ir_artifact_payload()
     assert fulgrim_source_package.supported_datasheet_source_row_ids() == tuple(
         f"{_FULGRIM_ID}:{line}" for line in range(4, 10)
     )
-    assert committed["package_hash"] == fulgrim_source_package.PACKAGE_HASH
+    assert committed["package_hash"] == fulgrim_source_package.package_hash
     assert committed["official_document_pages"] == [8, 9]
 
     committed["package_hash"] = "0" * 64
-    with pytest.raises(fulgrim_source_package.FulgrimRuleIrArtifactError, match="hash is stale"):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="hash is stale"):
         fulgrim_source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
 
     package = _catalog_package()
@@ -2363,10 +2353,7 @@ def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -
 
 
 def test_lord_maulerfiend_spawn_generated_rule_ir_is_complete_and_source_bound() -> None:
-    committed = cast(
-        dict[str, Any],
-        json.loads(LORD_MAULERFIEND_SPAWN_RULE_IR_OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed = lord_spawn_source_package.payload()
 
     assert committed == generated_lord_maulerfiend_spawn_rule_ir_artifact_payload()
     assert lord_spawn_source_package.supported_datasheet_source_row_ids() == (
@@ -2375,28 +2362,31 @@ def test_lord_maulerfiend_spawn_generated_rule_ir_is_complete_and_source_bound()
         "000004090:3",
         "000004091:3",
     )
-    assert committed["package_hash"] == lord_spawn_source_package.PACKAGE_HASH
+    assert committed["package_hash"] == lord_spawn_source_package.package_hash
     assert committed["official_document_pages"] == [9]
-    assert lord_spawn_source_package.DATASHEET_REVIEWS == {
-        "000004078": (
-            "Lord Exultant",
-            "source:000004078",
-            "unchanged_predecessor",
-            None,
-        ),
-        "000004090": (
-            "Chaos Spawn",
-            "source:000004090",
-            "rules_update",
-            "Rules Updates, physical PDF page 9",
-        ),
-        "000004091": (
-            "Maulerfiend",
-            "source:000004091",
-            "unchanged_predecessor",
-            None,
-        ),
-    }
+    assert committed["datasheets"] == [
+        {
+            "datasheet_id": "000004078",
+            "datasheet_name": "Lord Exultant",
+            "pdf_page_reference": None,
+            "review_row_id": "source:000004078",
+            "review_treatment": "unchanged_predecessor",
+        },
+        {
+            "datasheet_id": "000004090",
+            "datasheet_name": "Chaos Spawn",
+            "pdf_page_reference": "Rules Updates, physical PDF page 9",
+            "review_row_id": "source:000004090",
+            "review_treatment": "rules_update",
+        },
+        {
+            "datasheet_id": "000004091",
+            "datasheet_name": "Maulerfiend",
+            "pdf_page_reference": None,
+            "review_row_id": "source:000004091",
+            "review_treatment": "unchanged_predecessor",
+        },
+    ]
     for source_row_id in lord_spawn_source_package.supported_datasheet_source_row_ids():
         assert wahapedia_static_rule_ir.datasheet_rule_ir_payload_by_source_row_id(
             source_row_id
@@ -2430,8 +2420,8 @@ def test_lord_maulerfiend_spawn_generated_rule_ir_is_complete_and_source_bound()
         json.dumps(semantic_drift, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
     with pytest.raises(
-        lord_spawn_source_package.EmperorsChildrenLordMaulerfiendSpawnRuleIrArtifactError,
-        match="reviewed pin",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="registry pin",
     ):
         lord_spawn_source_package.validate_generated_artifact_bytes(
             json.dumps(semantic_drift).encode()
@@ -2439,7 +2429,7 @@ def test_lord_maulerfiend_spawn_generated_rule_ir_is_complete_and_source_bound()
 
     committed["package_hash"] = "0" * 64
     with pytest.raises(
-        lord_spawn_source_package.EmperorsChildrenLordMaulerfiendSpawnRuleIrArtifactError,
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
         match="hash is stale",
     ):
         lord_spawn_source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
@@ -3683,10 +3673,7 @@ def test_chaos_spawn_scuttling_horrors_grants_fixed_six_inch_reaction() -> None:
 
 
 def test_infractors_tormentors_generated_rule_ir_and_catalog_are_complete() -> None:
-    committed = cast(
-        dict[str, Any],
-        json.loads(INFRACTORS_TORMENTORS_RULE_IR_OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed = infractors_tormentors_source_package.payload()
     assert committed == generated_infractors_tormentors_rule_ir_artifact_payload()
     assert infractors_tormentors_source_package.supported_datasheet_source_row_ids() == (
         "000004079:3",
@@ -3694,12 +3681,12 @@ def test_infractors_tormentors_generated_rule_ir_and_catalog_are_complete() -> N
         "000004080:3",
         "000004080:4",
     )
-    assert committed["package_hash"] == infractors_tormentors_source_package.PACKAGE_HASH
+    assert committed["package_hash"] == infractors_tormentors_source_package.package_hash
     assert committed["official_document_pages"] == [9]
 
     committed["package_hash"] = "0" * 64
     with pytest.raises(
-        infractors_tormentors_source_package.InfractorsTormentorsRuleIrArtifactError,
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
         match="hash is stale",
     ):
         infractors_tormentors_source_package.validate_generated_artifact_bytes(

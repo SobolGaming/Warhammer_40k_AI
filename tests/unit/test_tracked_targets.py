@@ -114,10 +114,10 @@ from warhammer40k_core.rules.rule_ir import (
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chaos_daemons_datasheet_ir_support_2026_27 as belakor_ir_source,
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+    faction_pack_rule_ir,
 )
 
 PREY_TARGET_TEXT = (
@@ -129,6 +129,19 @@ PREY_TARGET_TEXT = (
 SOURCE_KEYWORD_SEQUENCE_PARTS = (
     datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
 )
+BELAKOR_SOURCE_PACKAGE_ID = "gw-11e-chaos-daemons-datasheet-ir-2026-27"
+BELAKOR_DARK_MASTER_ROW_ID = "000001148:5"
+BELAKOR_SHADOW_FORM_ROW_ID = "000001148:6"
+BELAKOR_WREATHED_IN_SHADOWS_ROW_ID = "000001148:8"
+BELAKOR_PALL_OF_DESPAIR_ROW_ID = "000001148:9"
+BELAKOR_SHADOW_LORD_ROW_ID = "000001148:10"
+BELAKOR_SHADOW_FORM_SOURCE_ID = (
+    f"{BELAKOR_SOURCE_PACKAGE_ID}:datasheet:{BELAKOR_SHADOW_FORM_ROW_ID}"
+)
+BELAKOR_WREATHED_IN_SHADOWS_SOURCE_ID = (
+    f"{BELAKOR_SOURCE_PACKAGE_ID}:datasheet:{BELAKOR_WREATHED_IN_SHADOWS_ROW_ID}"
+)
+belakor_source_package = faction_pack_rule_ir.source_package_artifact(BELAKOR_SOURCE_PACKAGE_ID)
 MIXED_QUARRY_TARGET_TEXT = (
     "At the start of the first battle round, select one enemy unit to be this model's "
     "quarry. Each time this model makes a melee attack that targets its quarry, "
@@ -242,13 +255,13 @@ def test_catalog_shadow_form_runtime_records_selection_and_event() -> None:
     assert request.actor_id == "player-a"
     assert isinstance(request.payload, dict)
     assert request.payload["submission_kind"] == CATALOG_SHADOW_FORM_SUBMISSION_KIND
-    assert request.payload["source_rule_id"] == belakor_ir_source.BELAKOR_SHADOW_FORM_SOURCE_ID
+    assert request.payload["source_rule_id"] == BELAKOR_SHADOW_FORM_SOURCE_ID
     selected_option = next(
         option
         for option in request.options
         if isinstance(option.payload, dict)
         and option.payload["selected_shadow_form_source_id"]
-        == belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_SOURCE_ID
+        == BELAKOR_WREATHED_IN_SHADOWS_SOURCE_ID
     )
     result = DecisionResult.for_request(
         result_id="result:shadow-form",
@@ -362,11 +375,11 @@ def test_catalog_contextual_status_consumption_classifies_belakor_rule_ir() -> N
     consumer_ids: set[str] = set()
     hook_ids: set[str] = set()
     for row_id in (
-        belakor_ir_source.BELAKOR_DARK_MASTER_ROW_ID,
-        belakor_ir_source.BELAKOR_SHADOW_FORM_ROW_ID,
-        belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
-        belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
-        belakor_ir_source.BELAKOR_SHADOW_LORD_ROW_ID,
+        BELAKOR_DARK_MASTER_ROW_ID,
+        BELAKOR_SHADOW_FORM_ROW_ID,
+        BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
+        BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+        BELAKOR_SHADOW_LORD_ROW_ID,
     ):
         rule_ir = _belakor_rule_ir(row_id)
         for clause in rule_ir.clauses:
@@ -419,7 +432,7 @@ def test_catalog_battle_shock_runtime_detects_forced_test_effects() -> None:
     state = _battle_state_with_scenario()
     source_unit = state.army_definitions[0].units[0]
     target_unit = state.army_definitions[1].units[0]
-    pall_rule_ir = _belakor_rule_ir(belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID)
+    pall_rule_ir = _belakor_rule_ir(BELAKOR_PALL_OF_DESPAIR_ROW_ID)
     forced_effect = next(
         effect
         for clause in pall_rule_ir.clauses
@@ -447,7 +460,7 @@ def test_catalog_battle_shock_runtime_detects_forced_test_effects() -> None:
     )
     records = (
         _belakor_catalog_record(
-            row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+            row_id=BELAKOR_PALL_OF_DESPAIR_ROW_ID,
             ability_id="ability:pall-of-despair",
             name="Pall of Despair",
         ),
@@ -494,7 +507,7 @@ def test_catalog_battle_shock_failed_heal_resolves_generic_rule_ir_effect() -> N
     decisions = DecisionController()
     source_unit = state.army_definitions[0].units[0]
     target_unit = state.army_definitions[1].units[0]
-    pall_rule_ir = _belakor_rule_ir(belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID)
+    pall_rule_ir = _belakor_rule_ir(BELAKOR_PALL_OF_DESPAIR_ROW_ID)
     heal_effect = next(
         effect
         for clause in pall_rule_ir.clauses
@@ -591,7 +604,7 @@ def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
     state = _battle_state_with_scenario()
     source_unit = state.army_definitions[0].units[0]
     target_unit = state.army_definitions[1].units[0]
-    pall_rule_ir = _belakor_rule_ir(belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID)
+    pall_rule_ir = _belakor_rule_ir(BELAKOR_PALL_OF_DESPAIR_ROW_ID)
     forced_effect = next(
         effect
         for clause in pall_rule_ir.clauses
@@ -646,7 +659,7 @@ def test_catalog_battle_shock_runtime_noops_and_fail_fast_paths() -> None:
 
     records = (
         _belakor_catalog_record(
-            row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+            row_id=BELAKOR_PALL_OF_DESPAIR_ROW_ID,
             ability_id="ability:pall-of-despair",
             name="Pall of Despair",
         ),
@@ -2242,25 +2255,25 @@ def _belakor_shadow_form_records(
 ) -> tuple[AbilityCatalogRecord, ...]:
     return (
         _belakor_catalog_record(
-            row_id=belakor_ir_source.BELAKOR_SHADOW_FORM_ROW_ID,
+            row_id=BELAKOR_SHADOW_FORM_ROW_ID,
             ability_id="ability:shadow-form",
             name="Shadow Form",
             datasheet_id=datasheet_id,
         ),
         _belakor_catalog_record(
-            row_id=belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
+            row_id=BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
             ability_id="ability:wreathed-in-shadows",
             name="Wreathed in Shadows",
             datasheet_id=datasheet_id,
         ),
         _belakor_catalog_record(
-            row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
+            row_id=BELAKOR_PALL_OF_DESPAIR_ROW_ID,
             ability_id="ability:pall-of-despair",
             name="Pall of Despair",
             datasheet_id=datasheet_id,
         ),
         _belakor_catalog_record(
-            row_id=belakor_ir_source.BELAKOR_SHADOW_LORD_ROW_ID,
+            row_id=BELAKOR_SHADOW_LORD_ROW_ID,
             ability_id="ability:shadow-lord",
             name="Shadow Lord",
             datasheet_id=datasheet_id,
@@ -2269,7 +2282,7 @@ def _belakor_shadow_form_records(
 
 
 def _belakor_rule_ir(row_id: str) -> RuleIR:
-    payload = belakor_ir_source.datasheet_rule_ir_payload_by_source_row_id(row_id)
+    payload = belakor_source_package.datasheet_rule_ir_payload_by_source_row_id(row_id)
     if payload is None:
         raise AssertionError(f"Missing Be'lakor RuleIR payload for row: {row_id}.")
     return RuleIR.from_payload(payload)

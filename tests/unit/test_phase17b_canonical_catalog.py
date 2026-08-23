@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from copy import deepcopy
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
@@ -54,6 +55,9 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTargetKind,
     RuleTargetSpec,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_pack_rule_ir,
+)
 from warhammer40k_core.rules.wahapedia_schema import WahapediaCsvTable, WahapediaJsonArtifact
 
 _DEATH_GUARD_PDF = (
@@ -64,6 +68,29 @@ _DEATH_GUARD_PDF = (
     / "eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvmsh0op.pdf"
 )
 _DEATH_GUARD_SHA256 = "5430fe8d89047644aab0102d0265783db725655c4535ad6600c3925f2cf32885"
+_FACTION_PACK_RULE_IR_ARTIFACT_ROOT = (
+    Path(__file__).resolve().parents[2]
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "faction_pack_rule_ir"
+    / "artifacts"
+)
+
+
+def _registry_artifact_payload(relative_path: str) -> dict[str, Any]:
+    return cast(
+        dict[str, Any],
+        json.loads(
+            (_FACTION_PACK_RULE_IR_ARTIFACT_ROOT / relative_path).read_text(encoding="utf-8")
+        ),
+    )
+
+
+def _json_bytes(payload: object) -> bytes:
+    return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
 
 
 def test_phase17b_representative_datasheets_generate_deterministic_catalog_records() -> None:
@@ -538,6 +565,178 @@ def test_phase17b_generic_rule_ir_payloads_are_validated_at_source_package_load(
                 ),
             ),
         )
+
+
+def test_phase17b_faction_pack_rule_ir_registry_indexes_exact_source_identities() -> None:
+    source_package_id = (
+        "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08"
+    )
+    source_row_id = "000004091:3"
+
+    assert faction_pack_rule_ir.supported_shard_ids() == (
+        "aeldari",
+        "chaos-daemons",
+        "emperors-children",
+    )
+    assert faction_pack_rule_ir.supported_faction_ids() == (
+        "aeldari",
+        "chaos-daemons",
+        "emperors-children",
+        "thousand-sons",
+    )
+    assert len(faction_pack_rule_ir.supported_datasheet_source_row_ids()) == 82
+    assert source_row_id in faction_pack_rule_ir.supported_datasheet_source_row_ids(
+        "emperors-children"
+    )
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000004091") == (
+        source_package_id,
+    )
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000000968") == ()
+    assert faction_pack_rule_ir.source_faction_id_by_datasheet_id("000004127") == ("thousand-sons")
+    assert "000004127" in faction_pack_rule_ir.supported_datasheet_ids("thousand-sons")
+    assert "000004127" not in faction_pack_rule_ir.supported_datasheet_ids("chaos-daemons")
+    assert "000004127" in faction_pack_rule_ir.supported_datasheet_ids_by_shard_id("chaos-daemons")
+    payload = faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id(source_row_id)
+    assert payload is not None
+    assert payload["source_id"] == f"{source_package_id}:datasheet:{source_row_id}"
+    assert faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id("missing:1") is None
+
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="source_package_id",
+    ):
+        faction_pack_rule_ir.source_package_artifact("missing-source-package")
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="faction_id"):
+        faction_pack_rule_ir.supported_datasheet_ids("missing-faction")
+
+
+def test_phase17b_faction_pack_rule_ir_component_payload_is_copied_and_exactly_pinned() -> None:
+    source_package_id = (
+        "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08"
+    )
+    artifact = faction_pack_rule_ir.source_package_artifact(source_package_id)
+    original_payload = artifact.payload()
+    artifact.validate_generated_artifact_bytes(_json_bytes(original_payload))
+
+    returned_payload = artifact.payload()
+    returned_payload["source_package_id"] = "mutated-copy"
+    assert artifact.payload()["source_package_id"] == source_package_id
+
+    rehashed_drift = artifact.payload()
+    rehashed_drift["review_manifest_sha256"] = "0" * 64
+    rehashed_drift["package_hash"] = faction_pack_rule_ir.canonical_package_hash(rehashed_drift)
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="registry pin"):
+        artifact.validate_generated_artifact_bytes(_json_bytes(rehashed_drift))
+
+
+def test_phase17b_faction_pack_rule_ir_manifest_rejects_shape_and_inventory_drift() -> None:
+    manifest_payload = _registry_artifact_payload("package.json")
+    assert faction_pack_rule_ir.manifest_from_json_bytes(
+        _json_bytes(manifest_payload)
+    ).package_hash == (faction_pack_rule_ir.PACKAGE_HASH)
+
+    stale_hash = deepcopy(manifest_payload)
+    stale_hash["package_hash"] = "0" * 64
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="package_hash is stale",
+    ):
+        faction_pack_rule_ir.manifest_from_json_bytes(_json_bytes(stale_hash))
+
+    unknown_field = deepcopy(manifest_payload)
+    unknown_field["unexpected"] = True
+    unknown_field["package_hash"] = faction_pack_rule_ir.canonical_package_hash(unknown_field)
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="manifest is invalid",
+    ):
+        faction_pack_rule_ir.manifest_from_json_bytes(_json_bytes(unknown_field))
+
+    duplicate_source_package = deepcopy(manifest_payload)
+    references = cast(dict[str, Any], duplicate_source_package["shard_artifacts"])
+    aeldari_reference = cast(dict[str, Any], references["aeldari"])
+    emperors_children_reference = cast(dict[str, Any], references["emperors-children"])
+    source_package_ids = cast(list[str], emperors_children_reference["source_package_ids"])
+    source_package_ids.append(cast(list[str], aeldari_reference["source_package_ids"])[0])
+    source_package_ids.sort()
+    duplicate_source_package["package_hash"] = faction_pack_rule_ir.canonical_package_hash(
+        duplicate_source_package
+    )
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="globally unique",
+    ):
+        faction_pack_rule_ir.manifest_from_json_bytes(_json_bytes(duplicate_source_package))
+
+
+def test_phase17b_faction_pack_rule_ir_physical_shard_rejects_component_drift() -> None:
+    shard_payload = _registry_artifact_payload("shards/emperors-children.json")
+    assert (
+        faction_pack_rule_ir.shard_artifact_from_json_bytes(_json_bytes(shard_payload)).shard_id
+        == "emperors-children"
+    )
+
+    unknown_record_field = deepcopy(shard_payload)
+    source_packages = cast(dict[str, Any], unknown_record_field["source_packages"])
+    source_package = cast(
+        dict[str, Any],
+        source_packages[
+            "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08"
+        ],
+    )
+    records = cast(dict[str, Any], source_package["records"])
+    record = cast(dict[str, Any], records["000004091:3"])
+    record["unexpected"] = "drift"
+    source_package["package_hash"] = faction_pack_rule_ir.canonical_package_hash(source_package)
+    unknown_record_field["package_hash"] = faction_pack_rule_ir.canonical_package_hash(
+        unknown_record_field
+    )
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="unsupported fields",
+    ):
+        faction_pack_rule_ir.shard_artifact_from_json_bytes(_json_bytes(unknown_record_field))
+
+    mismatched_mapping_key = deepcopy(shard_payload)
+    source_packages = cast(dict[str, Any], mismatched_mapping_key["source_packages"])
+    source_package = source_packages.pop("gw-11e-emperors-children-lucius-datasheet-2026-07")
+    source_packages["gw-11e-emperors-children-lucius-datasheet-2026-07-drift"] = source_package
+    mismatched_mapping_key["package_hash"] = faction_pack_rule_ir.canonical_package_hash(
+        mismatched_mapping_key
+    )
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="mapping key",
+    ):
+        faction_pack_rule_ir.shard_artifact_from_json_bytes(_json_bytes(mismatched_mapping_key))
+
+
+@pytest.mark.parametrize(
+    ("field_name", "value", "message"),
+    [
+        ("source_pdf_sha256", 7, "invalid typed shape"),
+        ("unexpected_component_field", True, "invalid typed shape"),
+        ("artifact_schema", "unknown-component-schema", "schema is unsupported"),
+        ("source_pdf_filename", "replacement-source.pdf", "reviewed pin"),
+    ],
+)
+def test_phase17b_faction_pack_rule_ir_component_envelopes_are_typed_and_pinned(
+    field_name: str,
+    value: object,
+    message: str,
+) -> None:
+    shard_payload = _registry_artifact_payload("shards/aeldari.json")
+    source_packages = cast(dict[str, Any], shard_payload["source_packages"])
+    source_package = cast(
+        dict[str, Any],
+        source_packages["gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09"],
+    )
+    source_package[field_name] = value
+    source_package["package_hash"] = faction_pack_rule_ir.canonical_package_hash(source_package)
+    shard_payload["package_hash"] = faction_pack_rule_ir.canonical_package_hash(shard_payload)
+
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match=message):
+        faction_pack_rule_ir.shard_artifact_from_json_bytes(_json_bytes(shard_payload))
 
 
 def test_phase17b_catalog_package_tuple_validation_is_strict() -> None:

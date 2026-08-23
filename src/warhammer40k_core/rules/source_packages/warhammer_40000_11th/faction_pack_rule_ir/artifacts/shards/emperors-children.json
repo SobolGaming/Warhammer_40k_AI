@@ -1,0 +1,2466 @@
+{
+  "artifact_schema": "core-v2-faction-pack-rule-ir-shard-v1",
+  "datasheet_faction_ids": {
+    "000004077": "emperors-children",
+    "000004078": "emperors-children",
+    "000004079": "emperors-children",
+    "000004080": "emperors-children",
+    "000004083": "emperors-children",
+    "000004090": "emperors-children",
+    "000004091": "emperors-children"
+  },
+  "datasheet_faction_ids_provenance": {
+    "source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
+    "source_snapshot_filename": "Datasheets.json",
+    "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
+  },
+  "edition": 11,
+  "package_hash": "fce2b73ac5becf507d89a25e565024bd1f5f00611bcf36028f9724e47cdd2412",
+  "shard_id": "emperors-children",
+  "source_packages": {
+    "gw-11e-emperors-children-fulgrim-datasheet-2026-07": {
+      "artifact_schema": "core-v2-emperors-children-fulgrim-rule-ir-v1",
+      "datasheet_id": "000004077",
+      "datasheet_name": "Fulgrim",
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+      "official_document_pages": [
+        8,
+        9
+      ],
+      "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+      "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
+      "package_hash": "90b27e3a76f6a2c5b0b5cd3ad678ea284f202ac8f072ef35126d0762792a6d09",
+      "records": {
+        "000004077:4": {
+          "ability_name": "Daemonic Poisons",
+          "normalized_text_sha256": "ed6e82c65c733f6e0beef6f8eeeba69d65fc7497edebd7d4d167a374471839d6",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [],
+                "source_span": {
+                  "end": 22,
+                  "start": 0,
+                  "text": "In your Shooting phase"
+                },
+                "target": {
+                  "kind": "enemy_unit",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "enemy"
+                    },
+                    {
+                      "key": "target_relationship",
+                      "value": "hit_by_those_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 115,
+                    "start": 101,
+                    "text": "one enemy unit"
+                  }
+                },
+                "template_id": "phase17c:selected-target-constraint",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "attacker_model_reference",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "edge",
+                      "value": "after"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "shooting"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "target_relationship",
+                      "value": "hit_by_those_attacks"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "just_after_friendly_unit_has_shot"
+                    },
+                    {
+                      "key": "weapon_names",
+                      "value": [
+                        "Daemonic blades - strike",
+                        "Daemonic blades - sweep",
+                        "Malefic lash",
+                        "Serpentine tail"
+                      ]
+                    }
+                  ],
+                  "source_span": {
+                    "end": 92,
+                    "start": 44,
+                    "text": "after this model has finished making its attacks"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:002",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 180,
+                    "start": 153,
+                    "text": "Until the end of the battle"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "command_phase_mortal_wounds",
+                        "value": "D3"
+                      },
+                      {
+                        "key": "command_phase_roll_threshold",
+                        "value": 4
+                      },
+                      {
+                        "key": "command_phase_timing",
+                        "value": "start_each_players_command_phase"
+                      },
+                      {
+                        "key": "status",
+                        "value": "poisoned"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 209,
+                      "start": 182,
+                      "text": "that enemy unit is poisoned"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 42,
+                  "start": 0,
+                  "text": "In your Shooting phase and the Fight phase"
+                },
+                "target": {
+                  "kind": "selected_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 197,
+                    "start": 182,
+                    "text": "that enemy unit"
+                  }
+                },
+                "template_id": "phase17k:persistent-selected-target-status",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:003",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [],
+                "source_span": {
+                  "end": 42,
+                  "start": 27,
+                  "text": "the Fight phase"
+                },
+                "target": {
+                  "kind": "enemy_unit",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "enemy"
+                    },
+                    {
+                      "key": "target_relationship",
+                      "value": "hit_by_those_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 115,
+                    "start": 101,
+                    "text": "one enemy unit"
+                  }
+                },
+                "template_id": "phase17c:selected-target-constraint",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "attacker_model_reference",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "edge",
+                      "value": "after"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "attacking_model_controller"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "target_relationship",
+                      "value": "hit_by_those_attacks"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "just_after_friendly_model_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 92,
+                    "start": 44,
+                    "text": "after this model has finished making its attacks"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:004",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 180,
+                    "start": 153,
+                    "text": "Until the end of the battle"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "command_phase_mortal_wounds",
+                        "value": "D3"
+                      },
+                      {
+                        "key": "command_phase_roll_threshold",
+                        "value": 4
+                      },
+                      {
+                        "key": "command_phase_timing",
+                        "value": "start_each_players_command_phase"
+                      },
+                      {
+                        "key": "status",
+                        "value": "poisoned"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 209,
+                      "start": 182,
+                      "text": "that enemy unit is poisoned"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 210,
+                  "start": 153,
+                  "text": "Until the end of the battle, that enemy unit is poisoned."
+                },
+                "target": {
+                  "kind": "selected_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 197,
+                    "start": 182,
+                    "text": "that enemy unit"
+                  }
+                },
+                "template_id": "phase17k:persistent-selected-target-status",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "1e369dc921d603721b2f0624ab485350e16f252512c8ab4d0414703d95a17aed",
+            "normalized_text": "In your Shooting phase and the Fight phase, after this model has finished making its attacks, select one enemy unit hit by one or more of those attacks. Until the end of the battle, that enemy unit is poisoned. At the start of each player's Command phase, roll one D6 for each poisoned enemy unit on the battlefield: on a 4+,that enemy unit suffers D3 mortal wounds.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:4"
+          }
+        },
+        "000004077:5": {
+          "ability_name": "Daemon Primarch of Slaanesh",
+          "normalized_text_sha256": "d6371a6970e67fdc559b1dd5e59c2e4b81b59f699b6d31597c33e3e85f88ac43",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:5:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "battle_round_offset",
+                      "value": 1
+                    },
+                    {
+                      "key": "boundary",
+                      "value": "start"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "opponent"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "command"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 172,
+                    "start": 119,
+                    "text": "Until the start of your opponent's next Command phase"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "select_one_self_ability_mode"
+                      },
+                      {
+                        "key": "option_source_rule_ids",
+                        "value": [
+                          "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:7",
+                          "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:8",
+                          "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:9"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 117,
+                      "start": 47,
+                      "text": "select one of the abilities in the Daemon Primarch of Slaanesh section"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 202,
+                  "start": 0,
+                  "text": "At the start of your opponent's Command phase, select one of the abilities in the Daemon Primarch of Slaanesh section. Until the start of your opponent's next Command phase, this model has that ability."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 184,
+                    "start": 174,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17k:command-phase-self-ability-choice",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "start"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "opponent"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "command"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "start_opponents_command_phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 45,
+                    "start": 0,
+                    "text": "At the start of your opponent's Command phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "2a0620dae48ca13cf2a4702498baafa516056d590fc4d1be918e71f0e29f2738",
+            "normalized_text": "At the start of your opponent's Command phase, select one of the abilities in the Daemon Primarch of Slaanesh section. Until the start of your opponent's next Command phase, this model has that ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:5"
+          }
+        },
+        "000004077:6": {
+          "ability_name": "Serpentine",
+          "normalized_text_sha256": "f0d95df44df5a9eda03d2ca38ef8292a6c85d7d748846c0c4a993139cd34410a",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:6:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "movement_transit_permission",
+                    "parameters": [
+                      {
+                        "key": "movement_modes",
+                        "value": [
+                          "normal",
+                          "advance",
+                          "fall_back"
+                        ]
+                      },
+                      {
+                        "key": "permission",
+                        "value": "move_over_as_if_not_there"
+                      },
+                      {
+                        "key": "terrain_height_max_inches",
+                        "value": 4.0
+                      },
+                      {
+                        "key": "terrain_scope",
+                        "value": "terrain_features"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 139,
+                      "start": 71,
+                      "text": "move over sections of terrain features that are 4\" or less in height"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 140,
+                  "start": 0,
+                  "text": "Each time this model makes a Normal, Advance or Fall Back move, it can move over sections of terrain features that are 4\" or less in height."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 20,
+                    "start": 10,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17k:model-terrain-height-transit",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "during"
+                    },
+                    {
+                      "key": "movement_modes",
+                      "value": [
+                        "normal",
+                        "advance",
+                        "fall_back"
+                      ]
+                    },
+                    {
+                      "key": "phase",
+                      "value": "movement"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "model_makes_move"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 62,
+                    "start": 0,
+                    "text": "Each time this model makes a Normal, Advance or Fall Back move"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "a2b9852dabed5009928bd7e7123b5b558ec309604d7f52808ae35809b20b11d3",
+            "normalized_text": "Each time this model makes a Normal, Advance or Fall Back move, it can move over sections of terrain features that are 4\" or less in height.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:6"
+          }
+        },
+        "000004077:7": {
+          "ability_name": "Beguiling Form",
+          "normalized_text_sha256": "b1d72de189090371262e4a02612769a0dd06ae044981c6baf2f883812d0c6739",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:7:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "attack_role",
+                        "value": "target"
+                      },
+                      {
+                        "key": "delta",
+                        "value": -1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "hit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 87,
+                      "start": 59,
+                      "text": "subtract 1 from the Hit roll"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 88,
+                  "start": 0,
+                  "text": "Each time a model makes an attack that targets this model, subtract 1 from the Hit roll."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 57,
+                    "start": 47,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17k:selectable-self-ability-option",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "0e4d1e2f522a01e3466f05c2ffdaef5f71889540780f8d576c5beec013890bf3",
+            "normalized_text": "Each time a model makes an attack that targets this model, subtract 1 from the Hit roll.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:7",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:7"
+          }
+        },
+        "000004077:8": {
+          "ability_name": "Daemonic Speed",
+          "normalized_text_sha256": "0a3e79a2525c27a8a9e8529cfb2cf708c9a9b68d015a79edcb63c064245b59e0",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:8:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "fights_first"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 39,
+                      "start": 19,
+                      "text": "Fights First ability"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 40,
+                  "start": 0,
+                  "text": "This model has the Fights First ability."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 10,
+                    "start": 0,
+                    "text": "This model"
+                  }
+                },
+                "template_id": "phase17k:selectable-self-ability-option",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "170626f05d330817cbe21375ed5c7a06b40633b02ffd6029e0e88dfdd2b4e743",
+            "normalized_text": "This model has the Fights First ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:8",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:8"
+          }
+        },
+        "000004077:9": {
+          "ability_name": "Enthralling Hypnosis (Aura)",
+          "normalized_text_sha256": "a4ea46fbde811946433ad6c0f8e82eb3e643dfeff6594625de877ba398e49a45",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:9:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "aura_range_inches",
+                        "value": 6.0
+                      },
+                      {
+                        "key": "failure_effect",
+                        "value": "remain_stationary"
+                      },
+                      {
+                        "key": "status",
+                        "value": "fall_back_leadership_test_denial"
+                      },
+                      {
+                        "key": "test_characteristic",
+                        "value": "leadership"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 202,
+                      "start": 0,
+                      "text": "While an enemy unit is within 6\" of this model, each time that unit is selected to Fall Back, it must take a Leadership test. If that test is failed, that unit must Remain Stationary this phase instead."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 202,
+                  "start": 0,
+                  "text": "While an enemy unit is within 6\" of this model, each time that unit is selected to Fall Back, it must take a Leadership test. If that test is failed, that unit must Remain Stationary this phase instead."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 46,
+                    "start": 36,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17k:selectable-self-ability-option",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "cfcf2a14b012da3b02d59acd6ca67502db38ce8e8aebe120e6f361619de3caa2",
+            "normalized_text": "While an enemy unit is within 6\" of this model, each time that unit is selected to Fall Back, it must take a Leadership test. If that test is failed, that unit must Remain Stationary this phase instead.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:9",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:9"
+          }
+        }
+      },
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    },
+    "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08": {
+      "artifact_schema": "core-v2-emperors-children-infractors-tormentors-rule-ir-v1",
+      "datasheets": {
+        "000004079": "Tormentors",
+        "000004080": "Infractors"
+      },
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+      "official_document_pages": [
+        9
+      ],
+      "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+      "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
+      "package_hash": "076824923ec39f2ce539c6e2dbd1c763143797c688fb36abebfd4104d8f38059",
+      "records": {
+        "000004079:3": {
+          "ability_name": "Objective Defiled",
+          "normalized_text_sha256": "39388fff1412b450acbc8496290358669a2198a41ca9cf399f48a9a1a0b39def",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:3:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "source_unit_within_controlled_objective"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 97,
+                      "start": 34,
+                      "text": "if this unit is within range of an objective marker you control"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "objective_scope",
+                        "value": "controlled_objective_within_source_unit_range"
+                      },
+                      {
+                        "key": "retention_end_condition",
+                        "value": "opponent_level_of_control_greater_than_source_player"
+                      },
+                      {
+                        "key": "status",
+                        "value": "sticky_objective_control"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 147,
+                      "start": 99,
+                      "text": "that objective marker remains under your control"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 258,
+                  "start": 0,
+                  "text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 46,
+                    "start": 37,
+                    "text": "this unit"
+                  }
+                },
+                "template_id": "phase17n:command-end-sticky-objective-control",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "end"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "command"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_unit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 32,
+                    "start": 0,
+                    "text": "At the end of your Command phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "0cf6502fe3a7e3b845b0090879ff32232c9000e0bf9b158e23b9f28c745e3f15",
+            "normalized_text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004079:3"
+          }
+        },
+        "000004079:4": {
+          "ability_name": "Icon of Excess",
+          "normalized_text_sha256": "55e822c45196f1a2cb7d3950d1771c90e6d1410b69fa4aba0872b43ab3729923",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:4:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "source_unit_destroyed_enemy_unit_this_phase"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 119,
+                      "start": 54,
+                      "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "comparison",
+                        "value": "greater_or_equal"
+                      },
+                      {
+                        "key": "roll_count",
+                        "value": 2
+                      },
+                      {
+                        "key": "roll_expression",
+                        "value": "2D6"
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "leadership"
+                      },
+                      {
+                        "key": "success_threshold_source",
+                        "value": "target_leadership"
+                      },
+                      {
+                        "key": "test_target",
+                        "value": "this_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 162,
+                      "start": 121,
+                      "text": "the bearer's unit takes a Leadership test"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_command_points",
+                    "parameters": [
+                      {
+                        "key": "affected_player",
+                        "value": "source_player"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "operation",
+                        "value": "gain"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 200,
+                      "start": 192,
+                      "text": "gain 1CP"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 201,
+                  "start": 0,
+                  "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+                },
+                "target": {
+                  "kind": "player",
+                  "parameters": [
+                    {
+                      "key": "relationship",
+                      "value": "source_player"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 200,
+                    "start": 188,
+                    "text": "you gain 1CP"
+                  }
+                },
+                "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "end"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "shooting"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_unit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 52,
+                    "start": 0,
+                    "text": "At the end of your Shooting phase or the Fight phase"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:4:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "source_unit_destroyed_enemy_unit_this_phase"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 119,
+                      "start": 54,
+                      "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "comparison",
+                        "value": "greater_or_equal"
+                      },
+                      {
+                        "key": "roll_count",
+                        "value": 2
+                      },
+                      {
+                        "key": "roll_expression",
+                        "value": "2D6"
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "leadership"
+                      },
+                      {
+                        "key": "success_threshold_source",
+                        "value": "target_leadership"
+                      },
+                      {
+                        "key": "test_target",
+                        "value": "this_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 162,
+                      "start": 121,
+                      "text": "the bearer's unit takes a Leadership test"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_command_points",
+                    "parameters": [
+                      {
+                        "key": "affected_player",
+                        "value": "source_player"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "operation",
+                        "value": "gain"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 200,
+                      "start": 192,
+                      "text": "gain 1CP"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 201,
+                  "start": 0,
+                  "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+                },
+                "target": {
+                  "kind": "player",
+                  "parameters": [
+                    {
+                      "key": "relationship",
+                      "value": "source_player"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 200,
+                    "start": 188,
+                    "text": "you gain 1CP"
+                  }
+                },
+                "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "end"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_unit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 52,
+                    "start": 0,
+                    "text": "At the end of your Shooting phase or the Fight phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "c0353aae99491963228d2feb844cdecf080074eab588b8a1fbf565edbab07653",
+            "normalized_text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004079:4"
+          }
+        },
+        "000004080:3": {
+          "ability_name": "Excessive Assault",
+          "normalized_text_sha256": "fd3b20edc41911d2b5121ab8b3c9b03122d36bea66a976a737ba8aaf44d1071b",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17n:emperors-children:battleline:datasheet:000004080:3:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "reroll_permission",
+                    "parameters": [
+                      {
+                        "key": "attack_kind",
+                        "value": "melee"
+                      },
+                      {
+                        "key": "full_reroll_if_target_within_objective_range",
+                        "value": true
+                      },
+                      {
+                        "key": "reroll_unmodified_value",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "wound"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 99,
+                      "start": 74,
+                      "text": "re-roll a Wound roll of 1"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 199,
+                  "start": 0,
+                  "text": "Each time a model in this unit targets an enemy unit with a melee attack, re-roll a Wound roll of 1. If that enemy unit is within range of an objective marker, you can re-roll the Wound roll instead."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 30,
+                    "start": 21,
+                    "text": "this unit"
+                  }
+                },
+                "template_id": "phase17n:conditional-objective-wound-reroll",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "033ad9d00c59237d4028f6387c66a432b1daaaad6e6e3aa436800543839fcb5c",
+            "normalized_text": "Each time a model in this unit targets an enemy unit with a melee attack, re-roll a Wound roll of 1. If that enemy unit is within range of an objective marker, you can re-roll the Wound roll instead.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17n:emperors-children:battleline:datasheet:000004080:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004080:3"
+          }
+        },
+        "000004080:4": {
+          "ability_name": "Icon of Excess",
+          "normalized_text_sha256": "55e822c45196f1a2cb7d3950d1771c90e6d1410b69fa4aba0872b43ab3729923",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17n:emperors-children:battleline:datasheet:000004080:4:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "source_unit_destroyed_enemy_unit_this_phase"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 119,
+                      "start": 54,
+                      "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "comparison",
+                        "value": "greater_or_equal"
+                      },
+                      {
+                        "key": "roll_count",
+                        "value": 2
+                      },
+                      {
+                        "key": "roll_expression",
+                        "value": "2D6"
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "leadership"
+                      },
+                      {
+                        "key": "success_threshold_source",
+                        "value": "target_leadership"
+                      },
+                      {
+                        "key": "test_target",
+                        "value": "this_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 162,
+                      "start": 121,
+                      "text": "the bearer's unit takes a Leadership test"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_command_points",
+                    "parameters": [
+                      {
+                        "key": "affected_player",
+                        "value": "source_player"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "operation",
+                        "value": "gain"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 200,
+                      "start": 192,
+                      "text": "gain 1CP"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 201,
+                  "start": 0,
+                  "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+                },
+                "target": {
+                  "kind": "player",
+                  "parameters": [
+                    {
+                      "key": "relationship",
+                      "value": "source_player"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 200,
+                    "start": 188,
+                    "text": "you gain 1CP"
+                  }
+                },
+                "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "end"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "shooting"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_unit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 52,
+                    "start": 0,
+                    "text": "At the end of your Shooting phase or the Fight phase"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17n:emperors-children:battleline:datasheet:000004080:4:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "source_unit_destroyed_enemy_unit_this_phase"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 119,
+                      "start": 54,
+                      "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "comparison",
+                        "value": "greater_or_equal"
+                      },
+                      {
+                        "key": "roll_count",
+                        "value": 2
+                      },
+                      {
+                        "key": "roll_expression",
+                        "value": "2D6"
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "leadership"
+                      },
+                      {
+                        "key": "success_threshold_source",
+                        "value": "target_leadership"
+                      },
+                      {
+                        "key": "test_target",
+                        "value": "this_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 162,
+                      "start": 121,
+                      "text": "the bearer's unit takes a Leadership test"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_command_points",
+                    "parameters": [
+                      {
+                        "key": "affected_player",
+                        "value": "source_player"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "operation",
+                        "value": "gain"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 200,
+                      "start": 192,
+                      "text": "gain 1CP"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 201,
+                  "start": 0,
+                  "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+                },
+                "target": {
+                  "kind": "player",
+                  "parameters": [
+                    {
+                      "key": "relationship",
+                      "value": "source_player"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 200,
+                    "start": 188,
+                    "text": "you gain 1CP"
+                  }
+                },
+                "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "end"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_unit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 52,
+                    "start": 0,
+                    "text": "At the end of your Shooting phase or the Fight phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "65227dbab2d999a1ad7c4b7b2b2bb4eedfa3a52d8f45f3a3cb891995fd7b5ef5",
+            "normalized_text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17n:emperors-children:battleline:datasheet:000004080:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004080:4"
+          }
+        }
+      },
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    },
+    "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08": {
+      "artifact_schema": "core-v2-emperors-children-lord-exultant-maulerfiend-chaos-spawn-rule-ir-v1",
+      "datasheets": [
+        {
+          "datasheet_id": "000004078",
+          "datasheet_name": "Lord Exultant",
+          "pdf_page_reference": null,
+          "review_row_id": "source:000004078",
+          "review_treatment": "unchanged_predecessor"
+        },
+        {
+          "datasheet_id": "000004090",
+          "datasheet_name": "Chaos Spawn",
+          "pdf_page_reference": "Rules Updates, physical PDF page 9",
+          "review_row_id": "source:000004090",
+          "review_treatment": "rules_update"
+        },
+        {
+          "datasheet_id": "000004091",
+          "datasheet_name": "Maulerfiend",
+          "pdf_page_reference": null,
+          "review_row_id": "source:000004091",
+          "review_treatment": "unchanged_predecessor"
+        }
+      ],
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+      "official_document_pages": [
+        9
+      ],
+      "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+      "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
+      "package_hash": "75d5b1641bf61b66f81d855c7c8f1acea4b2c5868f1ebe0cc35c31fbd4420ef9",
+      "records": {
+        "000004078:4": {
+          "ability_name": "Euphoric Strikes",
+          "datasheet_id": "000004078",
+          "datasheet_name": "Lord Exultant",
+          "normalized_text_sha256": "25e0b51ee3dd0032335245b2395c002487584b176310f4567aeb17cfeca3c061",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:4:clause:001",
+                "conditions": [
+                  {
+                    "kind": "frequency_limit",
+                    "parameters": [
+                      {
+                        "key": "activation_kind",
+                        "value": "optional_ability_use"
+                      },
+                      {
+                        "key": "max_uses",
+                        "value": 1
+                      },
+                      {
+                        "key": "scope",
+                        "value": "battle"
+                      },
+                      {
+                        "key": "usage_subject",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 81,
+                      "start": 0,
+                      "text": "Once per battle, at the start of the Fight phase, this model can use this ability"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 121,
+                    "start": 95,
+                    "text": "until the end of the phase"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "attacks"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 3
+                      },
+                      {
+                        "key": "weapon_scope",
+                        "value": "melee"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 198,
+                      "start": 123,
+                      "text": "add 3 to the Attacks characteristic of melee weapons equipped by this model"
+                    }
+                  },
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "armor_penetration"
+                      },
+                      {
+                        "key": "delta",
+                        "value": -1
+                      },
+                      {
+                        "key": "weapon_scope",
+                        "value": "melee"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 270,
+                      "start": 203,
+                      "text": "improve the Armour Penetration characteristic of those weapons by 1"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 271,
+                  "start": 0,
+                  "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of melee weapons equipped by this model and improve the Armour Penetration characteristic of those weapons by 1."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 60,
+                    "start": 50,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:characteristic-modifier",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "start"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 48,
+                    "start": 17,
+                    "text": "at the start of the Fight phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "3513e95b2f28a2018b8df4197c713dfd80df50ff87e216c0e2eb4846a8769899",
+            "normalized_text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of melee weapons equipped by this model and improve the Armour Penetration characteristic of those weapons by 1.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004078:4"
+          }
+        },
+        "000004078:5": {
+          "ability_name": "LORD OF THE HOST",
+          "datasheet_id": "000004078",
+          "datasheet_name": "Lord Exultant",
+          "normalized_text_sha256": "3c17e8920f6d33be40be6a0c40a296b7b08f99f86d3123e2f675bd8daa01d129",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:5:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "relationship",
+                        "value": "this_model_leading_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 108,
+                      "start": 0,
+                      "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "bodyguard_unit"
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "BATTLELINE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 61,
+                      "start": 51,
+                      "text": "Battleline"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 108,
+                    "start": 0,
+                    "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "infiltrators"
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 141,
+                      "start": 129,
+                      "text": "Infiltrators"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 166,
+                  "start": 0,
+                  "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6\" abilities."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 13,
+                    "start": 3,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:5:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "relationship",
+                        "value": "this_model_leading_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 108,
+                      "start": 0,
+                      "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "bodyguard_unit"
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "BATTLELINE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 61,
+                      "start": 51,
+                      "text": "Battleline"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 108,
+                    "start": 0,
+                    "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "scouts"
+                      },
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 155,
+                      "start": 146,
+                      "text": "Scouts 6\""
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 166,
+                  "start": 0,
+                  "text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6\" abilities."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 13,
+                    "start": 3,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17m:conditional-leading-bodyguard-ability-grant",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "eadbaac9c124f1788aef83230108737e367b1d377048efd94df0687befbdba05",
+            "normalized_text": "If this model is attached to an Emperor's Children Battleline unit during the Declare Battle Formations step, this model has the Infiltrators and Scouts 6\" abilities.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004078:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004078:5"
+          }
+        },
+        "000004090:3": {
+          "ability_name": "Scuttling Horrors",
+          "datasheet_id": "000004090",
+          "datasheet_name": "Chaos Spawn",
+          "normalized_text_sha256": "877148143367d60a89ab8b522fff000e992d80ace19a4cae9f0a07029eb9ee3c",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004090:3:clause:001",
+                "conditions": [
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 8
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      },
+                      {
+                        "key": "qualifier",
+                        "value": null
+                      },
+                      {
+                        "key": "range_kind",
+                        "value": "numeric_range"
+                      },
+                      {
+                        "key": "subject",
+                        "value": "enemy_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 86,
+                      "start": 64,
+                      "text": "within 8\" of this unit"
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": null
+                      },
+                      {
+                        "key": "negated",
+                        "value": true
+                      },
+                      {
+                        "key": "object_allegiance",
+                        "value": "enemy"
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_quantity",
+                        "value": "one_or_more"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within_engagement_range"
+                      },
+                      {
+                        "key": "qualifier",
+                        "value": null
+                      },
+                      {
+                        "key": "range_kind",
+                        "value": "engagement_range"
+                      },
+                      {
+                        "key": "subject",
+                        "value": "this_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 88,
+                      "text": "if this unit is not within Engagement Range of one or more enemy units"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "out_of_phase_action",
+                    "parameters": [
+                      {
+                        "key": "action",
+                        "value": "move"
+                      },
+                      {
+                        "key": "action_group",
+                        "value": "movement_end_reactive_normal_move"
+                      },
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "movement_kind",
+                        "value": "triggered"
+                      },
+                      {
+                        "key": "movement_mode",
+                        "value": "normal"
+                      },
+                      {
+                        "key": "optional",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 204,
+                      "start": 160,
+                      "text": "this unit can make a Normal move of up to 6\""
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 205,
+                  "start": 0,
+                  "text": "In your opponent's Movement phase, if an enemy unit ends a move within 8\" of this unit, if this unit is not within Engagement Range of one or more enemy units, this unit can make a Normal move of up to 6\"."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 169,
+                    "start": 160,
+                    "text": "this unit"
+                  }
+                },
+                "template_id": "phase17c:out-of-phase-action",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "after"
+                    },
+                    {
+                      "key": "owner",
+                      "value": "opponent"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "movement"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "enemy_unit"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "enemy_unit_move_end"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 63,
+                    "start": 0,
+                    "text": "In your opponent's Movement phase, if an enemy unit ends a move"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "ed6c147d77c4e8d47a403b4ee64465328469c52901c2fc2c7b5eff476ef268f1",
+            "normalized_text": "In your opponent's Movement phase, if an enemy unit ends a move within 8\" of this unit, if this unit is not within Engagement Range of one or more enemy units, this unit can make a Normal move of up to 6\".",
+            "parser_version": "phase17c-rule-parser-v4",
+            "rule_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004090:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004090:3"
+          }
+        },
+        "000004091:3": {
+          "ability_name": "Glutton for Punishment",
+          "datasheet_id": "000004091",
+          "datasheet_name": "Maulerfiend",
+          "normalized_text_sha256": "e4815aa8797fcc8c40a1551d5a84913b7fb74ea541ab58fee1cc3ae8232ae618",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004091:3:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "this_model_makes_attack"
+                      },
+                      {
+                        "key": "target_constraint",
+                        "value": "source_unit_below_starting_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 74,
+                      "start": 38,
+                      "text": "if it is below its Starting Strength"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "hit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 97,
+                      "start": 76,
+                      "text": "add 1 to the Hit roll"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 98,
+                  "start": 0,
+                  "text": "Each time this model makes an attack, if it is below its Starting Strength, add 1 to the Hit roll."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 20,
+                    "start": 10,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:dice-roll-modifier",
+                "trigger": {
+                  "kind": "dice_roll",
+                  "parameters": [
+                    {
+                      "key": "roll_type",
+                      "value": "hit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 36,
+                    "start": 0,
+                    "text": "Each time this model makes an attack"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004091:3:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "this_model_makes_attack"
+                      },
+                      {
+                        "key": "target_constraint",
+                        "value": "source_unit_below_half_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 140,
+                      "start": 99,
+                      "text": "If this model is also Below Half-strength"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "wound"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 165,
+                      "start": 142,
+                      "text": "add 1 to the Wound roll"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 174,
+                  "start": 99,
+                  "text": "If this model is also Below Half-strength, add 1 to the Wound roll as well."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 112,
+                    "start": 102,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:dice-roll-modifier",
+                "trigger": {
+                  "kind": "dice_roll",
+                  "parameters": [
+                    {
+                      "key": "roll_type",
+                      "value": "wound"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 36,
+                    "start": 0,
+                    "text": "Each time this model makes an attack"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "abba09fc7a6a441815862f6140db8985a4c05cb58834fd11abf1019eef887ab8",
+            "normalized_text": "Each time this model makes an attack, if it is below its Starting Strength, add 1 to the Hit roll. If this model is also Below Half-strength, add 1 to the Wound roll as well.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:lord-exultant-maulerfiend-spawn:datasheet:000004091:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08:datasheet:000004091:3"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    },
+    "gw-11e-emperors-children-lucius-datasheet-2026-07": {
+      "artifact_schema": "core-v2-emperors-children-lucius-rule-ir-v1",
+      "datasheet_id": "000004083",
+      "datasheet_name": "Lucius the Eternal",
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+      "official_document_pages": [],
+      "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+      "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
+      "package_hash": "7c770c35c173b33b320af89cc878ca4398567976741160f7ff4873272118877f",
+      "records": {
+        "000004083:5": {
+          "ability_name": "A Challenge Worthy of Skill",
+          "normalized_text_sha256": "31eb5d190f8abb050ce85cbe9e1ed86c92880c9f7c0cbcee2960abf60ab8b641",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:lucius:datasheet:000004083:5:clause:001",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "attack_target"
+                      },
+                      {
+                        "key": "required_keyword_any",
+                        "value": [
+                          "CHARACTER",
+                          "MONSTER",
+                          "WALKER"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 85,
+                      "start": 52,
+                      "text": "CHARACTER, MONSTER or WALKER unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "reroll_permission",
+                    "parameters": [
+                      {
+                        "key": "roll_type",
+                        "value": "hit_roll"
+                      },
+                      {
+                        "key": "selection",
+                        "value": "whole_roll"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 115,
+                      "start": 95,
+                      "text": "re-roll the Hit roll"
+                    }
+                  },
+                  {
+                    "kind": "reroll_permission",
+                    "parameters": [
+                      {
+                        "key": "roll_type",
+                        "value": "wound_roll"
+                      },
+                      {
+                        "key": "selection",
+                        "value": "whole_roll"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 150,
+                      "start": 128,
+                      "text": "re-roll the Wound roll"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 151,
+                  "start": 0,
+                  "text": "Each time this model makes an attack that targets a CHARACTER, MONSTER or WALKER unit, you can re-roll the Hit roll and you can re-roll the Wound roll."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 20,
+                    "start": 10,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17k:conditional-target-keyword-attack-rerolls",
+                "trigger": {
+                  "kind": "dice_roll",
+                  "parameters": [
+                    {
+                      "key": "actor",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "roll_types",
+                      "value": [
+                        "hit",
+                        "wound"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "attack_sequence"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 36,
+                    "start": 0,
+                    "text": "Each time this model makes an attack"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "b8335b5c1ffd758eaa665e6be525109549e4b3a475f76fee1700e22c6a2ecd19",
+            "normalized_text": "Each time this model makes an attack that targets a CHARACTER, MONSTER or WALKER unit, you can re-roll the Hit roll and you can re-roll the Wound roll.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:lucius:datasheet:000004083:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-lucius-datasheet-2026-07:datasheet:000004083:5"
+          }
+        },
+        "000004083:6": {
+          "ability_name": "Duellist's Hubris",
+          "normalized_text_sha256": "d15af38220a2bd28959436a000b272b46209dc877ab6ef09bf4d73ee665a1941",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:lucius:datasheet:000004083:6:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "relationship",
+                        "value": "this_model_not_leading_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 68,
+                      "start": 33,
+                      "text": "if this model is not leading a unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 96,
+                    "start": 70,
+                    "text": "until the end of the phase"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "fights_first"
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 129,
+                      "start": 98,
+                      "text": "it has the Fights First ability"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 130,
+                  "start": 0,
+                  "text": "At the start of the Fight phase; if this model is not leading a unit, until the end of the phase, it has the Fights First ability."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 46,
+                    "start": 36,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17k:conditional-not-leading-self-ability-grant",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "start"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "start_fight_phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 31,
+                    "start": 0,
+                    "text": "At the start of the Fight phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "d067ea5f9fe9bebf3c09657e609e128e282074663e73e9d6a4a725fbf69a2296",
+            "normalized_text": "At the start of the Fight phase; if this model is not leading a unit, until the end of the phase, it has the Fights First ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:lucius:datasheet:000004083:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-lucius-datasheet-2026-07:datasheet:000004083:6"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "review_row_id": "source:000004083",
+      "review_treatment": "unchanged_predecessor",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-emperors-children-lucius-datasheet-2026-07",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    }
+  }
+}

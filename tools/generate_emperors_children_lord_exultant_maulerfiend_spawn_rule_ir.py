@@ -8,8 +8,10 @@ from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING or __package__:
     from tools.canonical_json_hash import canonical_json_sha256
+    from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
 else:
     from canonical_json_hash import canonical_json_sha256
+    from faction_rule_ir_bundle import generate_registered_rule_ir_shard
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
@@ -73,15 +75,17 @@ OUTPUT_PATH = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
-    / "emperors_children_lord_exultant_maulerfiend_spawn_2026_08"
+    / "faction_pack_rule_ir"
     / "artifacts"
-    / "rule_ir.json"
+    / "shards"
+    / "emperors-children.json"
 )
 
 ARTIFACT_SCHEMA = "core-v2-emperors-children-lord-exultant-maulerfiend-chaos-spawn-rule-ir-v1"
 SOURCE_PACKAGE_ID = (
     "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08"
 )
+SHARD_ID = "emperors-children"
 MANUAL_PARSER_VERSION = "manual-source-backed-rule-ir:v1"
 
 LORD_EXULTANT_DATASHEET_ID = "000004078"
@@ -147,15 +151,7 @@ def main() -> None:
         help="Fail when the committed artifact differs from generated output.",
     )
     args = parser.parse_args()
-    rendered = json.dumps(generated_artifact_payload(), indent=2, sort_keys=True) + "\n"
-    if args.check:
-        if not OUTPUT_PATH.is_file() or OUTPUT_PATH.read_text(encoding="utf-8") != rendered:
-            raise SystemExit(
-                "Grouped Emperor's Children datasheet RuleIR artifact is stale; regenerate it."
-            )
-        return
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(rendered, encoding="utf-8")
+    generate_registered_rule_ir_shard(shard_id=SHARD_ID, check=args.check)
 
 
 def generated_artifact_payload() -> dict[str, object]:

@@ -11,7 +11,6 @@ from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_aeldari_corsair_skyreavers_rule_ir import (
-    OUTPUT_PATH,
     RAID_AND_RUN_ROW_ID,
     generated_artifact_payload,
 )
@@ -61,11 +60,13 @@ from warhammer40k_core.rules.rule_ir import (
     RuleUnsupportedReason,
     parameter_payload,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_corsair_skyreavers_2026_06 as skyreavers_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
+)
+
+skyreavers_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-corsair-skyreavers-datasheet-2026-06-09"
 )
 
 SKYREAVERS_DATASHEET_ID = "000004196"
@@ -75,27 +76,24 @@ SKYREAVER_PROFILE_ID = "000004196:skyreavers"
 
 
 def test_skyreavers_generated_rule_ir_artifact_is_current_and_source_bound() -> None:
-    committed_payload = cast(
-        dict[str, Any],
-        json.loads(OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed_payload = skyreavers_package.payload()
 
     assert committed_payload == generated_artifact_payload()
-    assert skyreavers_package.SOURCE_PDF_SHA256 == SKYREAVERS_PDF_SHA256
-    assert skyreavers_package.SOURCE_PAGE_NUMBERS == (20, 21)
-    assert skyreavers_package.DATASHEET_ID == SKYREAVERS_DATASHEET_ID
-    assert skyreavers_package.DATASHEET_NAME == "Corsair Skyreavers"
+    assert committed_payload["source_pdf_sha256"] == SKYREAVERS_PDF_SHA256
+    assert committed_payload["source_page_numbers"] == [20, 21]
+    assert committed_payload["datasheet_id"] == SKYREAVERS_DATASHEET_ID
+    assert committed_payload["datasheet_name"] == "Corsair Skyreavers"
     assert skyreavers_package.supported_datasheet_source_row_ids() == (RAID_AND_RUN_ROW_ID,)
-    assert committed_payload["package_hash"] == skyreavers_package.PACKAGE_HASH
+    assert committed_payload["package_hash"] == skyreavers_package.package_hash
 
 
 def test_skyreavers_generated_rule_ir_loader_rejects_package_hash_drift() -> None:
-    payload = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    payload = skyreavers_package.payload()
     payload["package_hash"] = "0" * 64
 
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
-        match="package hash is stale",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="package_hash is stale",
     ):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
@@ -103,13 +101,17 @@ def test_skyreavers_generated_rule_ir_loader_rejects_package_hash_drift() -> Non
 @pytest.mark.parametrize(
     ("field_name", "value", "message"),
     [
-        ("artifact_schema", "unknown", "schema is unsupported"),
+        ("artifact_schema", "unknown", "package_hash does not match its registry pin"),
         ("source_package_id", "", "source_package_id must be non-empty"),
-        ("source_pdf_filename", " invalid ", "source_pdf_filename must be non-empty"),
-        ("source_pdf_sha256", "invalid", "source_pdf_sha256 must be lowercase SHA-256"),
-        ("source_page_numbers", [19, 20], "source page provenance drifted"),
-        ("datasheet_id", "000000000", "datasheet identity drifted"),
-        ("records", {}, "source-row inventory drifted"),
+        (
+            "source_pdf_filename",
+            " invalid ",
+            "package_hash does not match its registry pin",
+        ),
+        ("source_pdf_sha256", "invalid", "package_hash does not match its registry pin"),
+        ("source_page_numbers", [19, 20], "package_hash does not match its registry pin"),
+        ("datasheet_id", "000000000", "references an undeclared datasheet_id"),
+        ("records", {}, "records must be a non-empty object"),
     ],
 )
 def test_skyreavers_generated_rule_ir_loader_rejects_provenance_drift(
@@ -121,14 +123,14 @@ def test_skyreavers_generated_rule_ir_loader_rejects_provenance_drift(
     payload[field_name] = value
     _rehash_artifact(payload)
 
-    with pytest.raises(skyreavers_package.CorsairSkyreaversRuleIrArtifactError, match=message):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match=message):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
 
 def test_skyreavers_generated_rule_ir_loader_rejects_invalid_json_and_record_drift() -> None:
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
-        match="artifact is invalid",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="is not valid JSON",
     ):
         skyreavers_package.validate_generated_artifact_bytes(b"{")
 
@@ -137,7 +139,7 @@ def test_skyreavers_generated_rule_ir_loader_rejects_invalid_json_and_record_dri
     record["ability_name"] = ""
     _rehash_artifact(payload)
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
         match="ability_name must be non-empty",
     ):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
@@ -147,8 +149,8 @@ def test_skyreavers_generated_rule_ir_loader_rejects_invalid_json_and_record_dri
     record["normalized_text_sha256"] = "0" * 64
     _rehash_artifact(payload)
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
-        match="normalized rule text hash is stale",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="normalized_text_sha256 is stale",
     ):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
@@ -157,8 +159,8 @@ def test_skyreavers_generated_rule_ir_loader_rejects_invalid_json_and_record_dri
     record["rule_ir"] = {}
     _rehash_artifact(payload)
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
-        match="RuleIR payload is invalid",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="record contains invalid RuleIR",
     ):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
@@ -167,8 +169,8 @@ def test_skyreavers_generated_rule_ir_loader_rejects_invalid_json_and_record_dri
     record["rule_ir"] = replace(_raid_and_run_rule_ir(), source_id="drifted:source").to_payload()
     _rehash_artifact(payload)
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
-        match="source identity drifted",
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="source identity does not match its source package",
     ):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
@@ -193,7 +195,7 @@ def test_skyreavers_generated_rule_ir_loader_rejects_invalid_json_and_record_dri
     ).to_payload()
     _rehash_artifact(payload)
     with pytest.raises(
-        skyreavers_package.CorsairSkyreaversRuleIrArtifactError,
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
         match="must be fully supported",
     ):
         skyreavers_package.validate_generated_artifact_bytes(json.dumps(payload).encode())

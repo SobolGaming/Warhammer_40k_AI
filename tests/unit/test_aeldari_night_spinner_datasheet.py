@@ -11,7 +11,6 @@ from tools.generate_ability_support_matrix import (
 )
 from tools.generate_aeldari_night_spinner_rule_ir import (
     MONOFILAMENT_WEB_ROW_ID,
-    OUTPUT_PATH,
     generated_artifact_payload,
 )
 
@@ -81,11 +80,13 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
     parameters_from_pairs,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_night_spinner_2026_06 as source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES,
+)
+
+source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-night-spinner-datasheet-2026-06-14"
 )
 
 NIGHT_SPINNER_ID = "000000611"
@@ -98,14 +99,14 @@ def _package() -> CanonicalCatalogPackage:
 
 
 def test_generated_rule_ir_artifact_is_current_source_bound_and_fail_fast() -> None:
-    committed = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    committed = source_package.payload()
 
     assert committed == generated_artifact_payload()
     assert source_package.supported_datasheet_source_row_ids() == (MONOFILAMENT_WEB_ROW_ID,)
-    assert committed["package_hash"] == source_package.PACKAGE_HASH
+    assert committed["package_hash"] == source_package.package_hash
 
     committed["package_hash"] = "0" * 64
-    with pytest.raises(source_package.NightSpinnerRuleIrArtifactError, match="hash is stale"):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="hash is stale"):
         source_package.validate_generated_artifact_bytes(json.dumps(committed).encode())
 
 

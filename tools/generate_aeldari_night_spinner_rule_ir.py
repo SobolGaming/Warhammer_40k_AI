@@ -3,6 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING or __package__:
+    from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
+else:
+    from faction_rule_ir_bundle import generate_registered_rule_ir_shard
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.rules.parsed_tokens import TextSpan
@@ -39,13 +45,15 @@ OUTPUT_PATH = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
-    / "aeldari_night_spinner_2026_06"
+    / "faction_pack_rule_ir"
     / "artifacts"
-    / "rule_ir.json"
+    / "shards"
+    / "aeldari.json"
 )
 
 ARTIFACT_SCHEMA = "core-v2-aeldari-night-spinner-rule-ir-v1"
 SOURCE_PACKAGE_ID = "gw-11e-aeldari-night-spinner-datasheet-2026-06-14"
+SHARD_ID = "aeldari"
 PARSER_VERSION = "manual-source-backed-rule-ir:v1"
 
 NIGHT_SPINNER_DATASHEET_ID = "000000611"
@@ -60,9 +68,7 @@ MONOFILAMENT_WEB_NORMALIZED_TEXT = MONOFILAMENT_WEB_SOURCE_TEXT
 
 
 def main() -> None:
-    payload = generated_artifact_payload()
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    generate_registered_rule_ir_shard(shard_id=SHARD_ID)
 
 
 def generated_artifact_payload() -> dict[str, object]:

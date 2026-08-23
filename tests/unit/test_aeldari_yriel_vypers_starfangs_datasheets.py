@@ -12,7 +12,6 @@ from tools.generate_ability_support_matrix import (
 from tools.generate_aeldari_yriel_vypers_starfangs_rule_ir import (
     HALLUCINOGEN_GRENADES_ROW_ID,
     HARASSMENT_FIRE_ROW_ID,
-    OUTPUT_PATH,
     PIRATICAL_HERO_ROW_ID,
     PRINCE_OF_CORSAIRS_ROW_ID,
     generated_artifact_payload,
@@ -131,11 +130,13 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     parameter_payload,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_yriel_vypers_starfangs_2026_06 as source_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES,
+)
+
+source_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09"
 )
 
 PRINCE_YRIEL_ID = "000004193"
@@ -148,29 +149,41 @@ PDF_SHA256 = "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739b03f0a9"
 
 
 def test_generated_rule_ir_artifact_is_current_and_source_bound() -> None:
-    committed_payload = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    committed_payload = source_package.payload()
 
     assert committed_payload == generated_artifact_payload()
-    assert source_package.SOURCE_PDF_SHA256 == PDF_SHA256
-    assert source_package.DATASHEET_SOURCE_PAGES == {
-        PRINCE_YRIEL_ID: (12, 13),
-        VYPERS_ID: (16, 17),
-        STARFANGS_ID: (18, 19),
-    }
+    assert committed_payload["source_pdf_sha256"] == PDF_SHA256
+    assert committed_payload["datasheets"] == [
+        {
+            "datasheet_id": PRINCE_YRIEL_ID,
+            "datasheet_name": "Prince Yriel",
+            "source_page_numbers": [12, 13],
+        },
+        {
+            "datasheet_id": VYPERS_ID,
+            "datasheet_name": "Vypers",
+            "source_page_numbers": [16, 17],
+        },
+        {
+            "datasheet_id": STARFANGS_ID,
+            "datasheet_name": "Starfangs",
+            "source_page_numbers": [18, 19],
+        },
+    ]
     assert source_package.supported_datasheet_source_row_ids() == (
         HARASSMENT_FIRE_ROW_ID,
         PIRATICAL_HERO_ROW_ID,
         PRINCE_OF_CORSAIRS_ROW_ID,
         HALLUCINOGEN_GRENADES_ROW_ID,
     )
-    assert committed_payload["package_hash"] == source_package.PACKAGE_HASH
+    assert committed_payload["package_hash"] == source_package.package_hash
 
 
 def test_generated_rule_ir_loader_rejects_package_hash_drift() -> None:
-    payload = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    payload = source_package.payload()
     payload["package_hash"] = "0" * 64
 
-    with pytest.raises(source_package.AeldariDatasheetRuleIrArtifactError, match="hash is stale"):
+    with pytest.raises(faction_pack_rule_ir.FactionPackRuleIrRegistryError, match="hash is stale"):
         source_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
 

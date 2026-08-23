@@ -11,7 +11,6 @@ from tools.generate_ability_support_matrix import (
 from tools.generate_aeldari_kharseth_rule_ir import (
     AETHERSENSE_ROW_ID,
     FURY_OF_THE_VOID_ROW_ID,
-    OUTPUT_PATH,
     generated_artifact_payload,
 )
 
@@ -32,11 +31,13 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     parameter_payload,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    aeldari_kharseth_2026_06 as kharseth_package,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_pack_rule_ir
 from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_KHARSETH_HEIGHT_OVERRIDES,
+)
+
+kharseth_package = faction_pack_rule_ir.source_package_artifact(
+    "gw-11e-aeldari-kharseth-datasheet-2026-06-09"
 )
 
 KHARSETH_DATASHEET_ID = "000004194"
@@ -44,28 +45,28 @@ KHARSETH_PDF_SHA256 = "48cf09f605dc29b42555d5800c239879c1fc590f85a6a45b0a1f14739
 
 
 def test_kharseth_generated_rule_ir_artifact_is_current_and_source_bound() -> None:
-    committed_payload = cast(
-        dict[str, Any],
-        json.loads(OUTPUT_PATH.read_text(encoding="utf-8")),
-    )
+    committed_payload = kharseth_package.payload()
 
     assert committed_payload == generated_artifact_payload()
-    assert kharseth_package.SOURCE_PDF_SHA256 == KHARSETH_PDF_SHA256
-    assert kharseth_package.SOURCE_PAGE_NUMBERS == (14, 15)
-    assert kharseth_package.DATASHEET_ID == KHARSETH_DATASHEET_ID
-    assert kharseth_package.DATASHEET_NAME == "Kharseth"
+    assert committed_payload["source_pdf_sha256"] == KHARSETH_PDF_SHA256
+    assert committed_payload["source_page_numbers"] == [14, 15]
+    assert committed_payload["datasheet_id"] == KHARSETH_DATASHEET_ID
+    assert committed_payload["datasheet_name"] == "Kharseth"
     assert kharseth_package.supported_datasheet_source_row_ids() == (
         AETHERSENSE_ROW_ID,
         FURY_OF_THE_VOID_ROW_ID,
     )
-    assert committed_payload["package_hash"] == kharseth_package.PACKAGE_HASH
+    assert committed_payload["package_hash"] == kharseth_package.package_hash
 
 
 def test_kharseth_generated_rule_ir_loader_rejects_package_hash_drift() -> None:
-    payload = cast(dict[str, Any], json.loads(OUTPUT_PATH.read_text(encoding="utf-8")))
+    payload = kharseth_package.payload()
     payload["package_hash"] = "0" * 64
 
-    with pytest.raises(kharseth_package.KharsethRuleIrArtifactError, match="package hash is stale"):
+    with pytest.raises(
+        faction_pack_rule_ir.FactionPackRuleIrRegistryError,
+        match="package_hash is stale",
+    ):
         kharseth_package.validate_generated_artifact_bytes(json.dumps(payload).encode())
 
 

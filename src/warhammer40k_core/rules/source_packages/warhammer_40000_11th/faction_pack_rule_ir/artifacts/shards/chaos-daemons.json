@@ -1,0 +1,3821 @@
+{
+  "artifact_schema": "core-v2-faction-pack-rule-ir-shard-v1",
+  "datasheet_faction_ids": {
+    "000001148": "chaos-daemons",
+    "000001149": "chaos-daemons",
+    "000001151": "chaos-daemons",
+    "000002583": "chaos-daemons",
+    "000002584": "chaos-daemons",
+    "000002758": "chaos-daemons",
+    "000004127": "thousand-sons",
+    "000004128": "thousand-sons"
+  },
+  "datasheet_faction_ids_provenance": {
+    "source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
+    "source_snapshot_filename": "Datasheets.json",
+    "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
+  },
+  "edition": 11,
+  "package_hash": "d47110fd332f40cb3a3830d638115b1d8dfa58cf08820d10d424e7a222e7eaa3",
+  "shard_id": "chaos-daemons",
+  "source_packages": {
+    "gw-11e-chaos-daemons-datasheet-ir-2026-27": {
+      "artifact_schema": "core-v2-chaos-daemons-datasheet-rule-ir-v1",
+      "datasheet_source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
+      "datasheet_source_snapshot_filename": "Datasheets.json",
+      "datasheet_source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32",
+      "datasheets": {
+        "000001148": "Be'lakor",
+        "000001149": "Daemon Prince of Chaos",
+        "000001151": "Soul Grinder",
+        "000002583": "Blue Horrors",
+        "000002584": "Pink Horrors",
+        "000002758": "Daemon Prince Of Chaos With Wings",
+        "000004127": "Pink Horrors",
+        "000004128": "Blue Horrors"
+      },
+      "package_hash": "b0a9d9c6e9d8bd96d578bb17751362b2a3cd9aff531940c59b35498668b72754",
+      "records": {
+        "000001148:10": {
+          "ability_name": "Shadow Lord (Aura, Psychic)",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "normalized_text_sha256": "cdb3eefc2b4b57178b528e08e6366737ab79943d2ac742ac9dc53c07d015e9c4",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "belakor-shadow-lord-legiones-daemonica",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "LEGIONES DAEMONICA"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 158,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "reroll_permission",
+                    "parameters": [
+                      {
+                        "key": "attack_role",
+                        "value": "attacker"
+                      },
+                      {
+                        "key": "reroll_unmodified_value",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "hit"
+                      },
+                      {
+                        "key": "timing_window",
+                        "value": "attack_sequence.hit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 158,
+                  "start": 0,
+                  "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 158,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "belakor-shadow-lord-shadow-legion",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "SHADOW LEGION"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 158,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "reroll_permission",
+                    "parameters": [
+                      {
+                        "key": "attack_role",
+                        "value": "attacker"
+                      },
+                      {
+                        "key": "reroll_unmodified_value",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "hit"
+                      },
+                      {
+                        "key": "timing_window",
+                        "value": "attack_sequence.hit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 158,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 158,
+                  "start": 0,
+                  "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 158,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "191ed42d21ac8314e407ce1112a924f337a68e146ad5bcb295c68085bafb3580",
+            "normalized_text": "While a friendly Legiones Daemonica or Shadow Legion unit is within 6\" of this model, each time a model in that unit makes an attack, re-roll a Hit roll of 1.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001148:10",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:10"
+          }
+        },
+        "000001148:5": {
+          "ability_name": "The Dark Master (Aura)",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "normalized_text_sha256": "dffa6c685a6aabc3ec4b25207148790f618397f02e1392312fb9595705433e73",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "belakor-dark-master-shadow-of-chaos-aura",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 90,
+                      "start": 0,
+                      "text": "The area of the battlefield within 6\" of this model is within your army's Shadow of Chaos."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 90,
+                      "start": 0,
+                      "text": "The area of the battlefield within 6\" of this model is within your army's Shadow of Chaos."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "owner",
+                        "value": "your_army"
+                      },
+                      {
+                        "key": "rules_context",
+                        "value": "shadow_of_chaos"
+                      },
+                      {
+                        "key": "status",
+                        "value": "within_shadow_of_chaos"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 90,
+                      "start": 0,
+                      "text": "The area of the battlefield within 6\" of this model is within your army's Shadow of Chaos."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 90,
+                  "start": 0,
+                  "text": "The area of the battlefield within 6\" of this model is within your army's Shadow of Chaos."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 90,
+                    "start": 0,
+                    "text": "The area of the battlefield within 6\" of this model is within your army's Shadow of Chaos."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "8ace0f6bab0a48cb218b6e06549c9852b335c4b01ca77f638b16394723d1ffe6",
+            "normalized_text": "The area of the battlefield within 6\" of this model is within your army's Shadow of Chaos.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001148:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:5"
+          }
+        },
+        "000001148:6": {
+          "ability_name": "Shadow Form",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "normalized_text_sha256": "69bf441bfd79d0d344e22cdba32b024ea0ba7266a66e41126860997d396059f7",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "belakor-shadow-form-battle-round-selection",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 141,
+                    "start": 0,
+                    "text": "At the start of the battle round, select one Shadow Form ability (see below). Until the end of the battle round, this model has that ability."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "rules_context",
+                        "value": "shadow_form"
+                      },
+                      {
+                        "key": "selectable_source_ids",
+                        "value": [
+                          "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:8",
+                          "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:9",
+                          "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:10"
+                        ]
+                      },
+                      {
+                        "key": "status",
+                        "value": "catalog_shadow_form_selection"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 141,
+                      "start": 0,
+                      "text": "At the start of the battle round, select one Shadow Form ability (see below). Until the end of the battle round, this model has that ability."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 141,
+                  "start": 0,
+                  "text": "At the start of the battle round, select one Shadow Form ability (see below). Until the end of the battle round, this model has that ability."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 141,
+                    "start": 0,
+                    "text": "At the start of the battle round, select one Shadow Form ability (see below). Until the end of the battle round, this model has that ability."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "start"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "battle_round"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "battle_round_start"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 141,
+                    "start": 0,
+                    "text": "At the start of the battle round, select one Shadow Form ability (see below). Until the end of the battle round, this model has that ability."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "5061a93bfa9c482434bea1aefad6416d637ba56aafb6e5d43720dad13adb1690",
+            "normalized_text": "At the start of the battle round, select one Shadow Form ability (see below). Until the end of the battle round, this model has that ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001148:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:6"
+          }
+        },
+        "000001148:8": {
+          "ability_name": "Wreathed in Shadows (Aura, Psychic)",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "normalized_text_sha256": "187e2d925d59ce3117a7fd9183db6cee6bc0eaf663917b4d7a7248576695fefe",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "belakor-wreathed-in-shadows-legiones-daemonica",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "LEGIONES DAEMONICA"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 178,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "rules_context",
+                        "value": "targeting"
+                      },
+                      {
+                        "key": "source_effect_kind",
+                        "value": "wreathed_in_shadows"
+                      },
+                      {
+                        "key": "status",
+                        "value": "shooting_target_range_restriction"
+                      },
+                      {
+                        "key": "targeting_max_range_inches",
+                        "value": 18
+                      }
+                    ],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 178,
+                  "start": 0,
+                  "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 178,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "belakor-wreathed-in-shadows-shadow-legion",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "SHADOW LEGION"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 178,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "rules_context",
+                        "value": "targeting"
+                      },
+                      {
+                        "key": "source_effect_kind",
+                        "value": "wreathed_in_shadows"
+                      },
+                      {
+                        "key": "status",
+                        "value": "shooting_target_range_restriction"
+                      },
+                      {
+                        "key": "targeting_max_range_inches",
+                        "value": 18
+                      }
+                    ],
+                    "source_span": {
+                      "end": 178,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 178,
+                  "start": 0,
+                  "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 178,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\"."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "327588bd760fce4351ec1f1098482c69f9ab88ff50e981ff03ccb30041626456",
+            "normalized_text": "While a friendly Legiones Daemonica unit or Shadow Legion unit is within 6\" of this model, that unit can only be targeted by a ranged attack if the attacking model is within 18\".",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001148:8",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:8"
+          }
+        },
+        "000001148:9": {
+          "ability_name": "Pall of Despair (Aura, Psychic)",
+          "datasheet_id": "000001148",
+          "datasheet_name": "Be'lakor",
+          "normalized_text_sha256": "14327c48789aecf28c7bd91fef0eaa559cb3e91d2cd36809c2d9c0e074ad8464",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "belakor-pall-of-despair-01-forced-battle-shock",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 473,
+                      "start": 0,
+                      "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 9
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 473,
+                      "start": 0,
+                      "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 473,
+                    "start": 0,
+                    "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_contextual_status",
+                    "parameters": [
+                      {
+                        "key": "force_battle_shock_below_starting_strength",
+                        "value": true
+                      },
+                      {
+                        "key": "rules_context",
+                        "value": "battle_shock"
+                      },
+                      {
+                        "key": "single_model_lost_wounds_counts_below_starting_strength",
+                        "value": true
+                      },
+                      {
+                        "key": "status",
+                        "value": "battle_shock_forced_below_starting_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 473,
+                      "start": 0,
+                      "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 473,
+                  "start": 0,
+                  "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "enemy"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 473,
+                    "start": 0,
+                    "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "belakor-pall-of-despair-02-failed-battle-shock-heal",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 473,
+                      "start": 0,
+                      "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 9
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 473,
+                      "start": 0,
+                      "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "battle round"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 473,
+                    "start": 0,
+                    "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "restore_lost_wounds",
+                    "parameters": [
+                      {
+                        "key": "amount",
+                        "value": "D3"
+                      },
+                      {
+                        "key": "source_reference",
+                        "value": "aura_source"
+                      },
+                      {
+                        "key": "trigger",
+                        "value": "target_failed_battle_shock"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 473,
+                      "start": 0,
+                      "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 473,
+                  "start": 0,
+                  "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "enemy"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 473,
+                    "start": 0,
+                    "text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "c0e8975676f7e78c641bc730fa6f4f0262e110e94d0e6c90558bba4e7d73397a",
+            "normalized_text": "In the Battle-shock step of your opponent's Command phase, if an enemy unit that is below its Starting Strength is within 9\" of this model, that unit must take a Battle-shock test. For the purposes of this ability, if a unit has a Starting Strength of 1, it is considered to be below its Starting Strength while it has lost one or more wounds. In addition, for each enemy unit that fails a Battle-shock test within 9\" of this model, this model regains up to D3 lost wounds.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001148:9",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001148:9"
+          }
+        },
+        "000001149:10": {
+          "ability_name": "Daemon Prince of Nurgle",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "8f51bcf20fff88f3366bde2a2142f4281af5c3e896fede56dba94eec35d33d99",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000001149-10-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "NURGLE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 85,
+                      "start": 0,
+                      "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 85,
+                    "start": 0,
+                    "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "toughness"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "NURGLE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 85,
+                      "start": 0,
+                      "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 85,
+                  "start": 0,
+                  "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 85,
+                    "start": 0,
+                    "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "f9e97fcb2bc40f1671bf6fb4d1d66f0ba15e940abda0312013451a4f3b8ca682",
+            "normalized_text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:10",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:10"
+          }
+        },
+        "000001149:11": {
+          "ability_name": "Daemon Prince of Slaanesh",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "07edfcbbde2c8352c2329de431533a0634473d61f675ff7b5eecc1d41ca34ce6",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000001149-11-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "SLAANESH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 83,
+                      "start": 0,
+                      "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 83,
+                    "start": 0,
+                    "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "movement"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 2
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "SLAANESH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 83,
+                      "start": 0,
+                      "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 83,
+                  "start": 0,
+                  "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 83,
+                    "start": 0,
+                    "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "392b72eace4bb9fc20d0a3e2ccf578364f40582d8aec8d36b804e12af7c857e5",
+            "normalized_text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:11",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:11"
+          }
+        },
+        "000001149:4": {
+          "ability_name": "Daemonic Lord",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "4f6884d3f1b2638b4a36de0e85300492b0497a9856806743c89e422bb7a358b1",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-daemonic-lord",
+                "conditions": [
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "allegiance",
+                        "value": "friendly"
+                      },
+                      {
+                        "key": "distance_inches",
+                        "value": 3
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      },
+                      {
+                        "key": "required_keyword_sequence",
+                        "value": [
+                          "LEGIONES DAEMONICA",
+                          "INFANTRY"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 131,
+                      "start": 0,
+                      "text": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 131,
+                    "start": 0,
+                    "text": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "lone_operative"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 131,
+                      "start": 0,
+                      "text": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 131,
+                  "start": 0,
+                  "text": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 131,
+                    "start": 0,
+                    "text": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "3b92769ecb49dd744a5f08a2a7c46b1c6009697de4fe414ae958c1aaa1534bc3",
+            "normalized_text": "While this model is within 3\" of one or more friendly Legiones Daemonica Infantry units, this model has the Lone Operative ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:4"
+          }
+        },
+        "000001149:5": {
+          "ability_name": "Prince of Darkness (Aura)",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "8969877c1ef4ea7a7d16c135c4ed50ea05d299ecd2c18d330b1505bcce8d2198",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-prince-of-darkness",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 114,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 114,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "LEGIONES DAEMONICA"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 114,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 114,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "stealth"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 114,
+                      "start": 0,
+                      "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 114,
+                  "start": 0,
+                  "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 114,
+                    "start": 0,
+                    "text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability."
+                  }
+                },
+                "template_id": "phase17c:aura",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "35768215da461730791e690952d8e98d3bbf4d019241a496459d93226b57e1aa",
+            "normalized_text": "While a friendly Legiones Daemonica unit is within 6\" of this model, models in that unit have the Stealth ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:5"
+          }
+        },
+        "000001149:6": {
+          "ability_name": "Unholy Vigour",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "bee73dc9ce5041855d2cc81505afcc691f8ec834bf1db58262d46c6141841e71",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000001149-6-once-per-battle",
+                "conditions": [
+                  {
+                    "kind": "frequency_limit",
+                    "parameters": [
+                      {
+                        "key": "activation_kind",
+                        "value": "optional_ability_use"
+                      },
+                      {
+                        "key": "max_uses",
+                        "value": 1
+                      },
+                      {
+                        "key": "scope",
+                        "value": "battle"
+                      },
+                      {
+                        "key": "usage_subject",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 155,
+                      "start": 0,
+                      "text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 155,
+                    "start": 0,
+                    "text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "set_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "invulnerable_save"
+                      },
+                      {
+                        "key": "value",
+                        "value": 3
+                      }
+                    ],
+                    "source_span": {
+                      "end": 155,
+                      "start": 0,
+                      "text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 155,
+                  "start": 0,
+                  "text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 155,
+                    "start": 0,
+                    "text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "start"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "any"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 155,
+                    "start": 0,
+                    "text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "9bff52ed4cd605b512f5a90a8eb15115686e6ea2c539eb8797a8af04278fb68a",
+            "normalized_text": "Once per battle, at the start of any phase, this model can use this ability. If it does, until the end of the phase, this model has a 3+ invulnerable save.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:6"
+          }
+        },
+        "000001149:7": {
+          "ability_name": "DAEMONIC ALLEGIANCE",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "f2f536dfff9ce76c021d5f77abeb50b4579ad180f476f4e515994774ac75326a",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemonic-allegiance-000001149-7",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 251,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "mustering_selection",
+                    "parameters": [
+                      {
+                        "key": "required",
+                        "value": true
+                      },
+                      {
+                        "key": "selection_group_id",
+                        "value": "000001149:daemonic-allegiance"
+                      },
+                      {
+                        "key": "selection_option_ids",
+                        "value": [
+                          "000001149:daemonic-allegiance:khorne",
+                          "000001149:daemonic-allegiance:tzeentch",
+                          "000001149:daemonic-allegiance:nurgle",
+                          "000001149:daemonic-allegiance:slaanesh"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 251,
+                      "start": 0,
+                      "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 251,
+                  "start": 0,
+                  "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 251,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "setup",
+                  "parameters": [
+                    {
+                      "key": "timing_window",
+                      "value": "army_mustering"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 251,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "d47c7db2c1babd058b2f269081faebfe4be9e5ce918f3b60520b280926611eb7",
+            "normalized_text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:7",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:7"
+          }
+        },
+        "000001149:8": {
+          "ability_name": "Daemon Prince of Khorne",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "48505773956878d631dc9c0832f170f38a4e4e2c7643a5e3ad441769c8b29cb3",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000001149-8-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "KHORNE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 110,
+                      "start": 0,
+                      "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 110,
+                    "start": 0,
+                    "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "strength"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 2
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "KHORNE"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Hellforged weapons - strike",
+                          "Hellforged weapons - sweep"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 110,
+                      "start": 0,
+                      "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 110,
+                  "start": 0,
+                  "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 110,
+                    "start": 0,
+                    "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "b6f5bdbef18795a5a0d5b4585cce26cfb9393812125b8b41488d29f6bb904cae",
+            "normalized_text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:8",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:8"
+          }
+        },
+        "000001149:9": {
+          "ability_name": "Daemon Prince of Tzeentch",
+          "datasheet_id": "000001149",
+          "datasheet_name": "Daemon Prince of Chaos",
+          "normalized_text_sha256": "893005e2027622b7f0f0b66516a3738bd5d4bf3a0441d219a6d843d32faf95fa",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000001149-9-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "TZEENTCH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 108,
+                      "start": 0,
+                      "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 108,
+                    "start": 0,
+                    "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "attacks"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 3
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "TZEENTCH"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Infernal cannon"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 108,
+                      "start": 0,
+                      "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 108,
+                  "start": 0,
+                  "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 108,
+                    "start": 0,
+                    "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "6ebe09ba85c3e5f92a655261252aa9588ec502c560d026b7b768a3dd4585a695",
+            "normalized_text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001149:9",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001149:9"
+          }
+        },
+        "000001151:5": {
+          "ability_name": "DAEMONIC ALLEGIANCE",
+          "datasheet_id": "000001151",
+          "datasheet_name": "Soul Grinder",
+          "normalized_text_sha256": "01352b5402ec6c45740349715e708002e3ed533892e391be72a1b96ede3717af",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemonic-allegiance-000001151-5",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 489,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below:\nKHORNE - This model is additionally equipped with: torrent of burning blood\nTZEENTCH - This model is additionally equipped with: warp gaze\nNURGLE - This model is additionally equipped with: phlegm bombardment\nSLAANESH - This model is additionally equipped with: scream of despair"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "mustering_selection",
+                    "parameters": [
+                      {
+                        "key": "required",
+                        "value": true
+                      },
+                      {
+                        "key": "selection_group_id",
+                        "value": "000001151:daemonic-allegiance"
+                      },
+                      {
+                        "key": "selection_option_ids",
+                        "value": [
+                          "000001151:daemonic-allegiance:khorne",
+                          "000001151:daemonic-allegiance:tzeentch",
+                          "000001151:daemonic-allegiance:nurgle",
+                          "000001151:daemonic-allegiance:slaanesh"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 489,
+                      "start": 0,
+                      "text": "When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below:\nKHORNE - This model is additionally equipped with: torrent of burning blood\nTZEENTCH - This model is additionally equipped with: warp gaze\nNURGLE - This model is additionally equipped with: phlegm bombardment\nSLAANESH - This model is additionally equipped with: scream of despair"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 489,
+                  "start": 0,
+                  "text": "When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below:\nKHORNE - This model is additionally equipped with: torrent of burning blood\nTZEENTCH - This model is additionally equipped with: warp gaze\nNURGLE - This model is additionally equipped with: phlegm bombardment\nSLAANESH - This model is additionally equipped with: scream of despair"
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 489,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below:\nKHORNE - This model is additionally equipped with: torrent of burning blood\nTZEENTCH - This model is additionally equipped with: warp gaze\nNURGLE - This model is additionally equipped with: phlegm bombardment\nSLAANESH - This model is additionally equipped with: scream of despair"
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "setup",
+                  "parameters": [
+                    {
+                      "key": "timing_window",
+                      "value": "army_mustering"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 489,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below:\nKHORNE - This model is additionally equipped with: torrent of burning blood\nTZEENTCH - This model is additionally equipped with: warp gaze\nNURGLE - This model is additionally equipped with: phlegm bombardment\nSLAANESH - This model is additionally equipped with: scream of despair"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "35dcc98c090a4de96734da8aaf0c79c49781b57c50822f0b0dd0e6eecef6a186",
+            "normalized_text": "When you select this model to include in your army, you must select one of the keywords below. Until the end of the battle, this model has that keyword and the additional wargear stated for that keyword below:\nKHORNE - This model is additionally equipped with: torrent of burning blood\nTZEENTCH - This model is additionally equipped with: warp gaze\nNURGLE - This model is additionally equipped with: phlegm bombardment\nSLAANESH - This model is additionally equipped with: scream of despair",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000001151:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000001151:5"
+          }
+        },
+        "000002583:4": {
+          "ability_name": "Split",
+          "datasheet_id": "000002583",
+          "datasheet_name": "Blue Horrors",
+          "normalized_text_sha256": "81b4f20d2bdaaa46e2e77b45f8a5700b5a7b5462e6724488faf53ee90bc81bdc",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "000002583-split-blue-into-brimstone",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "source_rules_unit_not_destroyed",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 0,
+                      "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "roll_expression",
+                        "value": "D6"
+                      },
+                      {
+                        "key": "success_threshold",
+                        "value": 4
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 0,
+                      "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 227,
+                    "start": 0,
+                    "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "materialize_models",
+                    "parameters": [
+                      {
+                        "key": "destroyed_model_profile_ids",
+                        "value": [
+                          "000002583:blue-horrors"
+                        ]
+                      },
+                      {
+                        "key": "excluded_materialization_descriptor_ids",
+                        "value": [
+                          "horror-materialization:brimstone-horror"
+                        ]
+                      },
+                      {
+                        "key": "placement_trigger_kind",
+                        "value": "model_placed_on_battlefield"
+                      },
+                      {
+                        "key": "result_base_size_datasheet_id",
+                        "value": "000002583"
+                      },
+                      {
+                        "key": "result_count",
+                        "value": 1
+                      },
+                      {
+                        "key": "result_materialization_descriptor_id",
+                        "value": "horror-materialization:brimstone-horror"
+                      },
+                      {
+                        "key": "result_model_name",
+                        "value": "Brimstone Horror"
+                      },
+                      {
+                        "key": "result_model_profile_id",
+                        "value": "000002583:blue-horrors"
+                      },
+                      {
+                        "key": "result_wargear_ids",
+                        "value": [
+                          "000002583:coruscating-yellow-flames",
+                          "000002583:yellow-claws"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 0,
+                      "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 227,
+                  "start": 0,
+                  "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 227,
+                    "start": 0,
+                    "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destruction_source_kinds",
+                      "value": [
+                        "attack",
+                        "hazardous"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 227,
+                    "start": 0,
+                    "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "dd7621dc832df363b204ed39ee715f85d1dadce1083309592c225755697f0a17",
+            "normalized_text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002583:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002583:4"
+          }
+        },
+        "000002584:5": {
+          "ability_name": "Split",
+          "datasheet_id": "000002584",
+          "datasheet_name": "Pink Horrors",
+          "normalized_text_sha256": "9de8e8326f52691dc37209c1e93256a6c2aa8330a03bbfa1e7df07f82ffe2d46",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "000002584-split-blue-into-brimstone",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "source_rules_unit_not_destroyed",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "roll_expression",
+                        "value": "D6"
+                      },
+                      {
+                        "key": "success_threshold",
+                        "value": 4
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "materialize_models",
+                    "parameters": [
+                      {
+                        "key": "destroyed_model_profile_ids",
+                        "value": [
+                          "000002584:blue-horror-brimstone-horror"
+                        ]
+                      },
+                      {
+                        "key": "placement_trigger_kind",
+                        "value": "model_placed_on_battlefield"
+                      },
+                      {
+                        "key": "required_materialization_descriptor_id",
+                        "value": "horror-materialization:blue-horror"
+                      },
+                      {
+                        "key": "result_base_size_datasheet_id",
+                        "value": "000002583"
+                      },
+                      {
+                        "key": "result_count",
+                        "value": 1
+                      },
+                      {
+                        "key": "result_materialization_descriptor_id",
+                        "value": "horror-materialization:brimstone-horror"
+                      },
+                      {
+                        "key": "result_model_name",
+                        "value": "Brimstone Horror"
+                      },
+                      {
+                        "key": "result_model_profile_id",
+                        "value": "000002584:blue-horror-brimstone-horror"
+                      },
+                      {
+                        "key": "result_wargear_ids",
+                        "value": [
+                          "000002584:coruscating-yellow-flames",
+                          "000002584:yellow-claws"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 337,
+                  "start": 0,
+                  "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destruction_source_kinds",
+                      "value": [
+                        "attack",
+                        "hazardous"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "000002584-split-pink-into-blue",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "source_rules_unit_not_destroyed",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "roll_expression",
+                        "value": "D6"
+                      },
+                      {
+                        "key": "success_threshold",
+                        "value": 4
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "materialize_models",
+                    "parameters": [
+                      {
+                        "key": "destroyed_model_profile_ids",
+                        "value": [
+                          "000002584:pink-horrors"
+                        ]
+                      },
+                      {
+                        "key": "placement_trigger_kind",
+                        "value": "model_placed_on_battlefield"
+                      },
+                      {
+                        "key": "result_base_size_datasheet_id",
+                        "value": "000002583"
+                      },
+                      {
+                        "key": "result_count",
+                        "value": 2
+                      },
+                      {
+                        "key": "result_materialization_descriptor_id",
+                        "value": "horror-materialization:blue-horror"
+                      },
+                      {
+                        "key": "result_model_name",
+                        "value": "Blue Horror"
+                      },
+                      {
+                        "key": "result_model_profile_id",
+                        "value": "000002584:blue-horror-brimstone-horror"
+                      },
+                      {
+                        "key": "result_wargear_ids",
+                        "value": [
+                          "000002584:coruscating-blue-flames",
+                          "000002584:blue-claws"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 337,
+                  "start": 0,
+                  "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destruction_source_kinds",
+                      "value": [
+                        "attack",
+                        "hazardous"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "b032f560fc2557e5b6a8d705d684ea52db2e8f17f52f9d8ce97ce3cdfb3b1857",
+            "normalized_text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002584:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002584:5"
+          }
+        },
+        "000002584:6": {
+          "ability_name": "HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+          "datasheet_id": "000002584",
+          "datasheet_name": "Pink Horrors",
+          "normalized_text_sha256": "7c989d8572801669de281a20ae788e452d2ee2708ca20aca1ea1c675cb5b0ff8",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "000002584-handoff-to-000002583",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "required_absent_model_profile_ids",
+                        "value": [
+                          "000002584:pink-horrors"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 293,
+                      "start": 0,
+                      "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 293,
+                    "start": 0,
+                    "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "replace_unit_datasheet",
+                    "parameters": [
+                      {
+                        "key": "pruned_model_profile_ids",
+                        "value": [
+                          "000002584:pink-horrors"
+                        ]
+                      },
+                      {
+                        "key": "replacement_datasheet_id",
+                        "value": "000002583"
+                      },
+                      {
+                        "key": "replacement_model_profile_id",
+                        "value": "000002583:blue-horrors"
+                      },
+                      {
+                        "key": "replacement_model_variant_1_materialization_descriptor_id",
+                        "value": "horror-materialization:blue-horror"
+                      },
+                      {
+                        "key": "replacement_model_variant_1_wargear_ids",
+                        "value": [
+                          "000002583:coruscating-blue-flames",
+                          "000002583:blue-claws"
+                        ]
+                      },
+                      {
+                        "key": "replacement_model_variant_2_materialization_descriptor_id",
+                        "value": "horror-materialization:brimstone-horror"
+                      },
+                      {
+                        "key": "replacement_model_variant_2_wargear_ids",
+                        "value": [
+                          "000002583:coruscating-yellow-flames",
+                          "000002583:yellow-claws"
+                        ]
+                      },
+                      {
+                        "key": "replacement_model_variant_count",
+                        "value": 2
+                      }
+                    ],
+                    "source_span": {
+                      "end": 293,
+                      "start": 0,
+                      "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 293,
+                  "start": 0,
+                  "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 293,
+                    "start": 0,
+                    "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "timing_window",
+                      "value": "after_model_state_changed"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 293,
+                    "start": 0,
+                    "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "08456b25accc35c2d431b906134916543ff56eb7f38793464d004f600b078c9b",
+            "normalized_text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002584:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002584:6"
+          }
+        },
+        "000002758:10": {
+          "ability_name": "Daemon Prince of Slaanesh",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "07edfcbbde2c8352c2329de431533a0634473d61f675ff7b5eecc1d41ca34ce6",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000002758-10-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "SLAANESH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 83,
+                      "start": 0,
+                      "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 83,
+                    "start": 0,
+                    "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "movement"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 2
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "SLAANESH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 83,
+                      "start": 0,
+                      "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 83,
+                  "start": 0,
+                  "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 83,
+                    "start": 0,
+                    "text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "9d68929f2c422dcc3413b31afb5012a0d6984cfcbf76d0b8ae87db068b64b5e9",
+            "normalized_text": "If this model has the SLAANESH keyword, add 2\" to this model's Move characteristic.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:10",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:10"
+          }
+        },
+        "000002758:4": {
+          "ability_name": "Malefic Destruction",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "681219791ce7e730a9634ac9a4a61ec364854f72462e9967a6841b43007c9e96",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000002758-4-once-per-battle",
+                "conditions": [
+                  {
+                    "kind": "frequency_limit",
+                    "parameters": [
+                      {
+                        "key": "activation_kind",
+                        "value": "optional_ability_use"
+                      },
+                      {
+                        "key": "max_uses",
+                        "value": 1
+                      },
+                      {
+                        "key": "scope",
+                        "value": "battle"
+                      },
+                      {
+                        "key": "usage_subject",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 194,
+                      "start": 0,
+                      "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 194,
+                    "start": 0,
+                    "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "attacks"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 3
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Hellforged weapons - strike",
+                          "Hellforged weapons - sweep"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 194,
+                      "start": 0,
+                      "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 194,
+                  "start": 0,
+                  "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 194,
+                    "start": 0,
+                    "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "start"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 194,
+                    "start": 0,
+                    "text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "a1a9daffef8ffc38e175afbc7f87d826d4263ef10db109d46e4f21e13ec6ae80",
+            "normalized_text": "Once per battle, at the start of the Fight phase, this model can use this ability. If it does, until the end of the phase, add 3 to the Attacks characteristic of this model's hellforged weapons.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:4"
+          }
+        },
+        "000002758:5": {
+          "ability_name": "Harbinger of Death",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "9c21e8b88a53d4d362c79b638ea18ba4fefbe014fe402c831289645a2a9857f0",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-harbinger-of-death",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "boundary",
+                      "value": "end"
+                    },
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 211,
+                    "start": 0,
+                    "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_weapon_ability",
+                    "parameters": [
+                      {
+                        "key": "selection_group_id",
+                        "value": "harbinger_of_death"
+                      },
+                      {
+                        "key": "selection_kind",
+                        "value": "select_one"
+                      },
+                      {
+                        "key": "selection_option_id",
+                        "value": "lethal_hits"
+                      },
+                      {
+                        "key": "selection_option_index",
+                        "value": 1
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "weapon_ability",
+                        "value": "Lethal Hits"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Hellforged weapons - strike",
+                          "Hellforged weapons - sweep"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 211,
+                      "start": 0,
+                      "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                    }
+                  },
+                  {
+                    "kind": "grant_weapon_ability",
+                    "parameters": [
+                      {
+                        "key": "selection_group_id",
+                        "value": "harbinger_of_death"
+                      },
+                      {
+                        "key": "selection_kind",
+                        "value": "select_one"
+                      },
+                      {
+                        "key": "selection_option_id",
+                        "value": "precision"
+                      },
+                      {
+                        "key": "selection_option_index",
+                        "value": 2
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "weapon_ability",
+                        "value": "Precision"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Hellforged weapons - strike",
+                          "Hellforged weapons - sweep"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 211,
+                      "start": 0,
+                      "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                    }
+                  },
+                  {
+                    "kind": "grant_weapon_ability",
+                    "parameters": [
+                      {
+                        "key": "selection_group_id",
+                        "value": "harbinger_of_death"
+                      },
+                      {
+                        "key": "selection_kind",
+                        "value": "select_one"
+                      },
+                      {
+                        "key": "selection_option_id",
+                        "value": "sustained_hits_1"
+                      },
+                      {
+                        "key": "selection_option_index",
+                        "value": 3
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "weapon_ability",
+                        "value": "Sustained Hits"
+                      },
+                      {
+                        "key": "weapon_ability_value",
+                        "value": 1
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Hellforged weapons - strike",
+                          "Hellforged weapons - sweep"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 211,
+                      "start": 0,
+                      "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 211,
+                  "start": 0,
+                  "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 211,
+                    "start": 0,
+                    "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "unit_selected",
+                  "parameters": [
+                    {
+                      "key": "phase",
+                      "value": "fight"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "selected_to_fight"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 211,
+                    "start": 0,
+                    "text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "023a1cf08045b164689dce20f0131524ea0cc0b1dc41cb0a76c3bb552bcb1001",
+            "normalized_text": "Each time this model is selected to fight, select one of the following abilities. Until the end of the phase, this model's hellforged weapons have that ability:\n- [LETHAL HITS]\n- [PRECISION]\n- [SUSTAINED HITS 1]",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:5"
+          }
+        },
+        "000002758:6": {
+          "ability_name": "DAEMONIC ALLEGIANCE",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "f2f536dfff9ce76c021d5f77abeb50b4579ad180f476f4e515994774ac75326a",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemonic-allegiance-000002758-6",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 251,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "mustering_selection",
+                    "parameters": [
+                      {
+                        "key": "required",
+                        "value": true
+                      },
+                      {
+                        "key": "selection_group_id",
+                        "value": "000002758:daemonic-allegiance"
+                      },
+                      {
+                        "key": "selection_option_ids",
+                        "value": [
+                          "000002758:daemonic-allegiance:khorne",
+                          "000002758:daemonic-allegiance:tzeentch",
+                          "000002758:daemonic-allegiance:nurgle",
+                          "000002758:daemonic-allegiance:slaanesh"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 251,
+                      "start": 0,
+                      "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 251,
+                  "start": 0,
+                  "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 251,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "setup",
+                  "parameters": [
+                    {
+                      "key": "timing_window",
+                      "value": "army_mustering"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 251,
+                    "start": 0,
+                    "text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "e778bba78c1a68759aa6e3cce3e330b851220ffb87fe9f092b0c28a810db9600",
+            "normalized_text": "When you select this model to include in your army, you must select one of the following keywords for it to gain:\n- KHORNE\n- TZEENTCH\n- NURGLE\n- SLAANESH\nThe keyword you select will also affect some of this model's characteristics, as stated overleaf.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:6"
+          }
+        },
+        "000002758:7": {
+          "ability_name": "Daemon Prince of Khorne",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "48505773956878d631dc9c0832f170f38a4e4e2c7643a5e3ad441769c8b29cb3",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000002758-7-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "KHORNE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 110,
+                      "start": 0,
+                      "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 110,
+                    "start": 0,
+                    "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "strength"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 2
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "KHORNE"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Hellforged weapons - strike",
+                          "Hellforged weapons - sweep"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 110,
+                      "start": 0,
+                      "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 110,
+                  "start": 0,
+                  "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 110,
+                    "start": 0,
+                    "text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "2a7abab11c41688c38bb82e0ba82e755d472aa14b40dd81a02053a610b1d272f",
+            "normalized_text": "If this model has the KHORNE keyword, add 2 to the Strength characteristic of this model's hellforged weapons.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:7",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:7"
+          }
+        },
+        "000002758:8": {
+          "ability_name": "Daemon Prince of Tzeentch",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "893005e2027622b7f0f0b66516a3738bd5d4bf3a0441d219a6d843d32faf95fa",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000002758-8-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "TZEENTCH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 108,
+                      "start": 0,
+                      "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 108,
+                    "start": 0,
+                    "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "attacks"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 3
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "TZEENTCH"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Infernal cannon"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 108,
+                      "start": 0,
+                      "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 108,
+                  "start": 0,
+                  "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 108,
+                    "start": 0,
+                    "text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "d75fdd0d0740dc52b36abe5851af3f7575889dc3a804a385ebe281b9ddc9dfcd",
+            "normalized_text": "If this model has the TZEENTCH keyword, add 3 to the Attacks characteristic of this model's infernal cannon.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:8",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:8"
+          }
+        },
+        "000002758:9": {
+          "ability_name": "Daemon Prince of Nurgle",
+          "datasheet_id": "000002758",
+          "datasheet_name": "Daemon Prince Of Chaos With Wings",
+          "normalized_text_sha256": "8f51bcf20fff88f3366bde2a2142f4281af5c3e896fede56dba94eec35d33d99",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "daemon-prince-000002758-9-modifier",
+                "conditions": [
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "NURGLE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 85,
+                      "start": 0,
+                      "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 85,
+                    "start": 0,
+                    "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "toughness"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "NURGLE"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 85,
+                      "start": 0,
+                      "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 85,
+                  "start": 0,
+                  "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 85,
+                    "start": 0,
+                    "text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic."
+                  }
+                },
+                "template_id": null,
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "a7700783e970818f99ac9e13efd99d465bc5eabfdac512265d3dfef39decc8c6",
+            "normalized_text": "If this model has the NURGLE keyword, add 1 to this model's Toughness characteristic.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000002758:9",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000002758:9"
+          }
+        },
+        "000004127:3": {
+          "ability_name": "Split",
+          "datasheet_id": "000004127",
+          "datasheet_name": "Pink Horrors",
+          "normalized_text_sha256": "9de8e8326f52691dc37209c1e93256a6c2aa8330a03bbfa1e7df07f82ffe2d46",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "000004127-split-blue-into-brimstone",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "source_rules_unit_not_destroyed",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "roll_expression",
+                        "value": "D6"
+                      },
+                      {
+                        "key": "success_threshold",
+                        "value": 4
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "materialize_models",
+                    "parameters": [
+                      {
+                        "key": "destroyed_model_profile_ids",
+                        "value": [
+                          "000004127:blue-horror-brimstone-horror"
+                        ]
+                      },
+                      {
+                        "key": "placement_trigger_kind",
+                        "value": "model_placed_on_battlefield"
+                      },
+                      {
+                        "key": "required_materialization_descriptor_id",
+                        "value": "horror-materialization:blue-horror"
+                      },
+                      {
+                        "key": "result_base_size_datasheet_id",
+                        "value": "000004128"
+                      },
+                      {
+                        "key": "result_count",
+                        "value": 1
+                      },
+                      {
+                        "key": "result_materialization_descriptor_id",
+                        "value": "horror-materialization:brimstone-horror"
+                      },
+                      {
+                        "key": "result_model_name",
+                        "value": "Brimstone Horror"
+                      },
+                      {
+                        "key": "result_model_profile_id",
+                        "value": "000004127:blue-horror-brimstone-horror"
+                      },
+                      {
+                        "key": "result_wargear_ids",
+                        "value": [
+                          "000004127:coruscating-yellow-flames",
+                          "000004127:yellow-claws"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 337,
+                  "start": 0,
+                  "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destruction_source_kinds",
+                      "value": [
+                        "attack",
+                        "hazardous"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "000004127-split-pink-into-blue",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "source_rules_unit_not_destroyed",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "roll_expression",
+                        "value": "D6"
+                      },
+                      {
+                        "key": "success_threshold",
+                        "value": 4
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "materialize_models",
+                    "parameters": [
+                      {
+                        "key": "destroyed_model_profile_ids",
+                        "value": [
+                          "000004127:pink-horrors"
+                        ]
+                      },
+                      {
+                        "key": "placement_trigger_kind",
+                        "value": "model_placed_on_battlefield"
+                      },
+                      {
+                        "key": "result_base_size_datasheet_id",
+                        "value": "000004128"
+                      },
+                      {
+                        "key": "result_count",
+                        "value": 2
+                      },
+                      {
+                        "key": "result_materialization_descriptor_id",
+                        "value": "horror-materialization:blue-horror"
+                      },
+                      {
+                        "key": "result_model_name",
+                        "value": "Blue Horror"
+                      },
+                      {
+                        "key": "result_model_profile_id",
+                        "value": "000004127:blue-horror-brimstone-horror"
+                      },
+                      {
+                        "key": "result_wargear_ids",
+                        "value": [
+                          "000004127:coruscating-blue-flames",
+                          "000004127:blue-claws"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 337,
+                      "start": 0,
+                      "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 337,
+                  "start": 0,
+                  "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destruction_source_kinds",
+                      "value": [
+                        "attack",
+                        "hazardous"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 337,
+                    "start": 0,
+                    "text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "64e03557e432b8c60b2efe22cd6219b1085ec0e3985d4971855b77f23d61a550",
+            "normalized_text": "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000004127:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000004127:3"
+          }
+        },
+        "000004127:6": {
+          "ability_name": "HORRORS ARE PINK. HORRORS ARE BLUE. WHEREONCE THERE WAS ONE, NOW THERE ARE TWO.",
+          "datasheet_id": "000004127",
+          "datasheet_name": "Pink Horrors",
+          "normalized_text_sha256": "7c989d8572801669de281a20ae788e452d2ee2708ca20aca1ea1c675cb5b0ff8",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "000004127-handoff-to-000004128",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "required_absent_model_profile_ids",
+                        "value": [
+                          "000004127:pink-horrors"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 293,
+                      "start": 0,
+                      "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 293,
+                    "start": 0,
+                    "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "replace_unit_datasheet",
+                    "parameters": [
+                      {
+                        "key": "pruned_model_profile_ids",
+                        "value": [
+                          "000004127:pink-horrors"
+                        ]
+                      },
+                      {
+                        "key": "replacement_datasheet_id",
+                        "value": "000004128"
+                      },
+                      {
+                        "key": "replacement_model_profile_id",
+                        "value": "000004128:blue-horrors"
+                      },
+                      {
+                        "key": "replacement_model_variant_1_materialization_descriptor_id",
+                        "value": "horror-materialization:blue-horror"
+                      },
+                      {
+                        "key": "replacement_model_variant_1_wargear_ids",
+                        "value": [
+                          "000004128:coruscating-blue-flames",
+                          "000004128:blue-claws"
+                        ]
+                      },
+                      {
+                        "key": "replacement_model_variant_2_materialization_descriptor_id",
+                        "value": "horror-materialization:brimstone-horror"
+                      },
+                      {
+                        "key": "replacement_model_variant_2_wargear_ids",
+                        "value": [
+                          "000004128:coruscating-yellow-flames",
+                          "000004128:yellow-claws"
+                        ]
+                      },
+                      {
+                        "key": "replacement_model_variant_count",
+                        "value": 2
+                      }
+                    ],
+                    "source_span": {
+                      "end": 293,
+                      "start": 0,
+                      "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 293,
+                  "start": 0,
+                  "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 293,
+                    "start": 0,
+                    "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "timing_window",
+                      "value": "after_model_state_changed"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 293,
+                    "start": 0,
+                    "text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "d0353218a4c0cee72d73815b5c3d9d880da23ee4434dc05d07e3ee4d664298aa",
+            "normalized_text": "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE HORRORS datasheet do not apply to this unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000004127:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000004127:6"
+          }
+        },
+        "000004128:4": {
+          "ability_name": "Split",
+          "datasheet_id": "000004128",
+          "datasheet_name": "Blue Horrors",
+          "normalized_text_sha256": "81b4f20d2bdaaa46e2e77b45f8a5700b5a7b5462e6724488faf53ee90bc81bdc",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "000004128-split-blue-into-brimstone",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "source_rules_unit_not_destroyed",
+                        "value": true
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 0,
+                      "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  },
+                  {
+                    "kind": "dice_roll_gate",
+                    "parameters": [
+                      {
+                        "key": "roll_expression",
+                        "value": "D6"
+                      },
+                      {
+                        "key": "success_threshold",
+                        "value": 4
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 0,
+                      "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 227,
+                    "start": 0,
+                    "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "materialize_models",
+                    "parameters": [
+                      {
+                        "key": "destroyed_model_profile_ids",
+                        "value": [
+                          "000004128:blue-horrors"
+                        ]
+                      },
+                      {
+                        "key": "excluded_materialization_descriptor_ids",
+                        "value": [
+                          "horror-materialization:brimstone-horror"
+                        ]
+                      },
+                      {
+                        "key": "placement_trigger_kind",
+                        "value": "model_placed_on_battlefield"
+                      },
+                      {
+                        "key": "result_base_size_datasheet_id",
+                        "value": "000004128"
+                      },
+                      {
+                        "key": "result_count",
+                        "value": 1
+                      },
+                      {
+                        "key": "result_materialization_descriptor_id",
+                        "value": "horror-materialization:brimstone-horror"
+                      },
+                      {
+                        "key": "result_model_name",
+                        "value": "Brimstone Horror"
+                      },
+                      {
+                        "key": "result_model_profile_id",
+                        "value": "000004128:blue-horrors"
+                      },
+                      {
+                        "key": "result_wargear_ids",
+                        "value": [
+                          "000004128:coruscating-yellow-flames",
+                          "000004128:yellow-claws"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 0,
+                      "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 227,
+                  "start": 0,
+                  "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 227,
+                    "start": 0,
+                    "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "template_id": null,
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destruction_source_kinds",
+                      "value": [
+                        "attack",
+                        "hazardous"
+                      ]
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 227,
+                    "start": 0,
+                    "text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit."
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "2df486ac882f1ca7ed9d127958d19a4ed3a7edaa7f90e4372660468fe970051c",
+            "normalized_text": "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has finished making its attacks, if this unit is not destroyed, roll one D6 for that model. On a 4+, add one BRIMSTONE HORROR model to this unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-daemons:datasheet:000004128:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27:datasheet:000004128:4"
+          }
+        }
+      },
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-chaos-daemons-datasheet-ir-2026-27",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    }
+  }
+}

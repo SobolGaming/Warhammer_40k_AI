@@ -27,7 +27,7 @@ from warhammer40k_core.engine.semantic_equivalence import (
     semantic_member_without_source_text,
 )
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
+from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
@@ -307,6 +307,13 @@ def semantic_equivalence_markdown(audit: CrossSourceSemanticAudit) -> str:
             "handler execution is also local evidence and is never promoted across sources. "
             "Only fully consumed datasheet RuleIR with content-neutral runtime consumers is "
             "marked transferable."
+        ),
+        "",
+        (
+            "A registered static RuleIR is eligible for this audit when its normalized text "
+            "exactly matches the current source row. Eligibility is independent of effect kind; "
+            "the resulting structured clauses and registered consumers determine execution and "
+            "transfer evidence."
         ),
         "",
         "## Inventory",
@@ -704,20 +711,7 @@ def _compile_source_text(
     )
     static_payload = None if source_row_id is None else payload_by_source_row_id(source_row_id)
     static_rule_ir = None if static_payload is None else RuleIR.from_payload(static_payload)
-    supports_materialization = static_rule_ir is not None and any(
-        effect.kind
-        in {
-            RuleEffectKind.MATERIALIZE_MODELS,
-            RuleEffectKind.REPLACE_UNIT_DATASHEET,
-        }
-        for clause in static_rule_ir.clauses
-        for effect in clause.effects
-    )
-    if (
-        static_rule_ir is None
-        or static_rule_ir.normalized_text != source.normalized_text
-        or not supports_materialization
-    ):
+    if static_rule_ir is None or static_rule_ir.normalized_text != source.normalized_text:
         rule_ir = compile_rule_source_text(
             source,
             source_keyword_sequence_parts=(
