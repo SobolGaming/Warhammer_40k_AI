@@ -45,9 +45,16 @@ The fail-closed currentness check is:
 uv run python tools/generate_faction_rule_ir_bundles.py --check
 ```
 
-The aggregate generator owns the manifest. Running one of the retained
-source-specific builder commands regenerates its complete physical shard and the
-same aggregate manifest; it never recreates the old source-package directory.
+The aggregate generator owns the manifest. Every aggregate or retained
+source-specific builder command regenerates or checks the complete physical shard
+set. Writes are staged, publish every shard before `package.json`, and restore the
+original artifact set if final validation fails. Before returning success, the
+generator verifies every manifest SHA against the bytes that remain on disk and
+loads the result through the real fail-fast registry loader, including its reviewed
+package and component pins. A source-specific command therefore cannot certify a
+manifest built from an unwritten sibling shard, including when a change to the
+shared `Datasheets.json` provenance affects every shard. These commands never
+recreate the old source-package directories.
 
 Release and document packages remain separate when the publication is itself the
 authoritative boundary. The Munitorum Field Manual, Rules Updates, Event

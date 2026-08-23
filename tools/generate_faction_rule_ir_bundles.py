@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import subprocess
+import sys
+import tempfile
 from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -38,6 +42,7 @@ if TYPE_CHECKING or __package__:
         canonical_package_hash,
         check_json_artifact,
         datasheet_faction_ids_from_source_snapshot,
+        render_json_artifact,
         rendered_artifact_sha256,
         write_json_artifact,
     )
@@ -65,6 +70,7 @@ else:
         canonical_package_hash,
         check_json_artifact,
         datasheet_faction_ids_from_source_snapshot,
+        render_json_artifact,
         rendered_artifact_sha256,
         write_json_artifact,
     )
@@ -145,6 +151,10 @@ PACKAGE_ARTIFACT_SCHEMA = "core-v2-faction-pack-rule-ir-package-v1"
 REGISTRY_ID = "warhammer-40000-11th-faction-pack-rule-ir"
 
 
+class RuleIrPackageGenerationError(RuntimeError):
+    """Raised when a complete RuleIR package cannot be published safely."""
+
+
 def generated_rule_ir_shard_artifacts() -> dict[Path, dict[str, object]]:
     return generated_rule_ir_shard_artifacts_for_shards(
         shard_ids=tuple(sorted(_OUTPUT_PATH_BY_SHARD_ID))
@@ -155,16 +165,10 @@ def generated_rule_ir_shard_artifacts_for_shards(
     *, shard_ids: Iterable[str]
 ) -> dict[Path, dict[str, object]]:
     artifacts: dict[Path, dict[str, object]] = {}
-    requested_shard_ids = tuple(sorted(shard_ids))
-    if not requested_shard_ids:
-        raise ValueError("At least one RuleIR shard artifact must be selected.")
-    if len(set(requested_shard_ids)) != len(requested_shard_ids):
-        raise ValueError("RuleIR shard artifact selection contains duplicate shard IDs.")
+    requested_shard_ids = _validated_registered_shard_ids(shard_ids)
     for shard_id in requested_shard_ids:
-        output_path = _OUTPUT_PATH_BY_SHARD_ID.get(shard_id)
-        factories = _SOURCE_PACKAGE_FACTORIES_BY_SHARD_ID.get(shard_id)
-        if output_path is None or factories is None:
-            raise ValueError(f"RuleIR shard artifact is not registered: {shard_id}.")
+        output_path = _OUTPUT_PATH_BY_SHARD_ID[shard_id]
+        factories = _SOURCE_PACKAGE_FACTORIES_BY_SHARD_ID[shard_id]
         source_packages = _generated_source_packages(factories)
         datasheet_ids = tuple(
             sorted(
@@ -327,35 +331,186 @@ def _generated_source_packages(
     return tuple(factory() for factory in factories)
 
 
-def generate_rule_ir_shard_artifacts(
+def generate_rule_ir_package_artifacts(
     *,
-    shard_ids: Iterable[str],
+    requested_shard_ids: Iterable[str],
     check: bool,
 ) -> None:
-    all_shard_artifacts = generated_rule_ir_shard_artifacts()
-    selected_shard_ids = tuple(shard_ids)
-    if not selected_shard_ids:
-        raise ValueError("At least one RuleIR shard artifact must be selected.")
-    selected_paths: set[Path] = set()
-    for shard_id in selected_shard_ids:
-        output_path = _OUTPUT_PATH_BY_SHARD_ID.get(shard_id)
-        if output_path is None:
-            raise ValueError(f"RuleIR shard artifact is not registered: {shard_id}.")
-        if output_path in selected_paths:
-            raise ValueError("RuleIR shard artifact selection contains duplicate shard IDs.")
-        selected_paths.add(output_path)
-    artifacts = {
-        output_path: payload
-        for output_path, payload in all_shard_artifacts.items()
-        if output_path in selected_paths
+    _validated_registered_shard_ids(requested_shard_ids)
+    artifacts = generated_rule_ir_artifacts()
+    shard_output_paths = tuple(
+        _OUTPUT_PATH_BY_SHARD_ID[shard_id] for shard_id in sorted(_OUTPUT_PATH_BY_SHARD_ID)
+    )
+    if check:
+        for output_path in shard_output_paths:
+            check_json_artifact(output_path=output_path, payload=artifacts[output_path])
+        check_json_artifact(
+            output_path=PACKAGE_OUTPUT_PATH,
+            payload=artifacts[PACKAGE_OUTPUT_PATH],
+        )
+        _verify_persisted_rule_ir_package(package_artifact=artifacts[PACKAGE_OUTPUT_PATH])
+        _validate_persisted_package_with_real_loader()
+        return
+    _publish_rule_ir_package_artifacts(
+        artifacts=artifacts,
+        shard_output_paths=shard_output_paths,
+    )
+
+
+def _publish_rule_ir_package_artifacts(
+    *,
+    artifacts: dict[Path, dict[str, object]],
+    shard_output_paths: tuple[Path, ...],
+) -> None:
+    output_paths = (*shard_output_paths, PACKAGE_OUTPUT_PATH)
+    original_bytes = {
+        output_path: output_path.read_bytes() if output_path.is_file() else None
+        for output_path in output_paths
     }
-    artifacts[PACKAGE_OUTPUT_PATH] = generated_package_artifact(all_shard_artifacts)
-    for output_path in sorted(artifacts):
-        payload = artifacts[output_path]
-        if check:
-            check_json_artifact(output_path=output_path, payload=payload)
+    PACKAGE_OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(
+        dir=PACKAGE_OUTPUT_PATH.parent,
+        prefix=".faction-rule-ir-stage-",
+    ) as staging_directory_value:
+        staging_directory = Path(staging_directory_value)
+        staged_paths: dict[Path, Path] = {}
+        for output_path in output_paths:
+            relative_path = output_path.relative_to(PACKAGE_OUTPUT_PATH.parent)
+            staged_path = staging_directory / relative_path
+            write_json_artifact(output_path=staged_path, payload=artifacts[output_path])
+            staged_paths[output_path] = staged_path
+        _verify_rule_ir_package_bytes(
+            manifest_bytes=staged_paths[PACKAGE_OUTPUT_PATH].read_bytes(),
+            shard_bytes_by_id={
+                shard_id: staged_paths[_OUTPUT_PATH_BY_SHARD_ID[shard_id]].read_bytes()
+                for shard_id in sorted(_OUTPUT_PATH_BY_SHARD_ID)
+            },
+            package_artifact=artifacts[PACKAGE_OUTPUT_PATH],
+        )
+        try:
+            for output_path in output_paths:
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                _replace_staged_artifact(staged_paths[output_path], output_path)
+            _verify_persisted_rule_ir_package(package_artifact=artifacts[PACKAGE_OUTPUT_PATH])
+            _validate_persisted_package_with_real_loader()
+        except (OSError, RuleIrPackageGenerationError) as exc:
+            try:
+                _restore_rule_ir_package_artifacts(original_bytes)
+            except OSError as restore_exc:
+                raise ExceptionGroup(
+                    "RuleIR package publication and rollback both failed.",
+                    (exc, restore_exc),
+                ) from exc
+            raise RuleIrPackageGenerationError(
+                "RuleIR package publication failed; the original artifact set was restored."
+            ) from exc
+
+
+def _replace_staged_artifact(staged_path: Path, output_path: Path) -> None:
+    staged_path.replace(output_path)
+
+
+def _restore_rule_ir_package_artifacts(original_bytes: dict[Path, bytes | None]) -> None:
+    for output_path, content in original_bytes.items():
+        if content is None:
+            output_path.unlink(missing_ok=True)
         else:
-            write_json_artifact(output_path=output_path, payload=payload)
+            output_path.write_bytes(content)
+
+
+def _validate_persisted_package_with_real_loader() -> None:
+    completed = subprocess.run(
+        (
+            sys.executable,
+            "-c",
+            (
+                "from warhammer40k_core.rules.source_packages.warhammer_40000_11th "
+                "import faction_pack_rule_ir as registry; "
+                "assert registry.PACKAGE_HASH == registry.EXPECTED_PACKAGE_HASH"
+            ),
+        ),
+        cwd=REPO_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        details = completed.stderr.strip() or completed.stdout.strip()
+        raise RuleIrPackageGenerationError(
+            "Generated RuleIR package failed the real runtime loader validation.\n" + details
+        )
+
+
+def _verify_persisted_rule_ir_package(*, package_artifact: dict[str, object]) -> None:
+    if not PACKAGE_OUTPUT_PATH.is_file():
+        raise RuleIrPackageGenerationError(
+            f"Generated RuleIR package manifest is missing: {PACKAGE_OUTPUT_PATH}"
+        )
+    shard_bytes_by_id: dict[str, bytes] = {}
+    for shard_id in sorted(_OUTPUT_PATH_BY_SHARD_ID):
+        output_path = _OUTPUT_PATH_BY_SHARD_ID[shard_id]
+        if not output_path.is_file():
+            raise RuleIrPackageGenerationError(
+                f"Generated RuleIR shard artifact is missing: {output_path}"
+            )
+        shard_bytes_by_id[shard_id] = output_path.read_bytes()
+    _verify_rule_ir_package_bytes(
+        manifest_bytes=PACKAGE_OUTPUT_PATH.read_bytes(),
+        shard_bytes_by_id=shard_bytes_by_id,
+        package_artifact=package_artifact,
+    )
+
+
+def _verify_rule_ir_package_bytes(
+    *,
+    manifest_bytes: bytes,
+    shard_bytes_by_id: dict[str, bytes],
+    package_artifact: dict[str, object],
+) -> None:
+    if manifest_bytes != render_json_artifact(package_artifact):
+        raise RuleIrPackageGenerationError(
+            "Generated RuleIR package manifest bytes differ from the generated payload."
+        )
+    shard_artifacts_value = package_artifact.get("shard_artifacts")
+    if not isinstance(shard_artifacts_value, dict):
+        raise TypeError("RuleIR package manifest shard_artifacts must be an object.")
+    shard_artifacts = cast(dict[str, object], shard_artifacts_value)
+    if set(shard_artifacts) != set(_OUTPUT_PATH_BY_SHARD_ID):
+        raise ValueError("RuleIR package manifest must reference every registered shard.")
+    if set(shard_bytes_by_id) != set(_OUTPUT_PATH_BY_SHARD_ID):
+        raise ValueError("RuleIR package bytes must include every registered shard.")
+    for shard_id in sorted(_OUTPUT_PATH_BY_SHARD_ID):
+        reference_value = shard_artifacts[shard_id]
+        if not isinstance(reference_value, dict):
+            raise TypeError("RuleIR package manifest shard reference must be an object.")
+        reference = cast(dict[str, object], reference_value)
+        output_path = _OUTPUT_PATH_BY_SHARD_ID[shard_id]
+        expected_relative_path = output_path.relative_to(PACKAGE_OUTPUT_PATH.parent).as_posix()
+        if reference.get("path") != expected_relative_path:
+            raise ValueError("RuleIR package manifest shard path does not match its output path.")
+        expected_sha256 = reference.get("sha256")
+        if type(expected_sha256) is not str:
+            raise TypeError("RuleIR package manifest shard sha256 must be text.")
+        actual_sha256 = hashlib.sha256(shard_bytes_by_id[shard_id]).hexdigest()
+        if actual_sha256 != expected_sha256:
+            raise RuleIrPackageGenerationError(
+                f"Generated RuleIR package manifest references stale shard artifact: {output_path}"
+            )
+
+
+def _validated_registered_shard_ids(shard_ids: Iterable[str]) -> tuple[str, ...]:
+    requested_shard_ids = tuple(sorted(shard_ids))
+    if not requested_shard_ids:
+        raise ValueError("At least one RuleIR shard artifact must be requested.")
+    if len(set(requested_shard_ids)) != len(requested_shard_ids):
+        raise ValueError("RuleIR shard artifact request contains duplicate shard IDs.")
+    for shard_id in requested_shard_ids:
+        if (
+            shard_id not in _OUTPUT_PATH_BY_SHARD_ID
+            or shard_id not in _SOURCE_PACKAGE_FACTORIES_BY_SHARD_ID
+        ):
+            raise ValueError(f"RuleIR shard artifact is not registered: {shard_id}.")
+    return requested_shard_ids
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -372,13 +527,19 @@ def main(argv: Sequence[str] | None = None) -> None:
         action="append",
         choices=tuple(sorted(_OUTPUT_PATH_BY_SHARD_ID)),
         dest="shard_ids",
-        help="Generate/check only this physical shard; repeat to select more than one.",
+        help=(
+            "Identify the requesting physical shard; the command still generates/checks the "
+            "complete package. Repeat only to validate multiple requesting shard IDs."
+        ),
     )
     args = parser.parse_args(argv)
     shard_ids = (
         tuple(sorted(_OUTPUT_PATH_BY_SHARD_ID)) if args.shard_ids is None else tuple(args.shard_ids)
     )
-    generate_rule_ir_shard_artifacts(shard_ids=shard_ids, check=args.check)
+    generate_rule_ir_package_artifacts(
+        requested_shard_ids=shard_ids,
+        check=args.check,
+    )
 
 
 if __name__ == "__main__":

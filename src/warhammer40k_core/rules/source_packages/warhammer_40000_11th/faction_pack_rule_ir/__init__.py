@@ -40,29 +40,25 @@ def _artifact_bytes(relative_path: str) -> bytes:
         ) from exc
 
 
-def _load_manifest() -> FactionPackRuleIrManifestArtifact:
+def _manifest_bytes() -> bytes:
     try:
-        raw = package_artifact_bytes(__name__, _MANIFEST_PATH)
+        return package_artifact_bytes(__name__, _MANIFEST_PATH)
     except SourcePackageArtifactError as exc:
         raise FactionPackRuleIrRegistryError(
             "Faction-pack RuleIR generated data package manifest could not be loaded."
         ) from exc
-    manifest = manifest_from_json_bytes(raw)
-    if manifest.package_hash != EXPECTED_PACKAGE_HASH:
-        raise FactionPackRuleIrRegistryError(
-            "Faction-pack RuleIR package manifest hash drifted from its reviewed pin."
-        )
-    return manifest
 
 
 def _load_shard_artifacts(
     manifest: FactionPackRuleIrManifestArtifact,
+    *,
+    shard_bytes_by_path: Mapping[str, bytes],
 ) -> Mapping[str, FactionPackRuleIrShardArtifact]:
     artifacts: dict[str, FactionPackRuleIrShardArtifact] = {}
     seen_source_package_ids: set[str] = set()
     seen_source_row_ids: set[str] = set()
     for shard_id, reference in manifest.shard_artifacts.items():
-        raw = _artifact_bytes(reference.path)
+        raw = shard_bytes_by_path[reference.path]
         if hashlib.sha256(raw).hexdigest() != reference.sha256:
             raise FactionPackRuleIrRegistryError(
                 "Faction-pack RuleIR shard artifact SHA-256 drifted from its manifest pin."
@@ -96,6 +92,51 @@ def _load_shard_artifacts(
         seen_source_row_ids.update(reference.source_row_ids)
         artifacts[shard_id] = artifact
     return MappingProxyType(artifacts)
+
+
+def _validated_registry_artifact_set(
+    *,
+    manifest: FactionPackRuleIrManifestArtifact,
+    shard_bytes_by_path: Mapping[str, bytes],
+    expected_package_hash: str,
+) -> tuple[
+    Mapping[str, FactionPackRuleIrShardArtifact],
+    tuple[
+        Mapping[str, SourcePackageRuleIrArtifact],
+        Mapping[str, SourcePackageRuleIrArtifact],
+        Mapping[str, tuple[str, ...]],
+        Mapping[str, str],
+    ],
+]:
+    if manifest.package_hash != expected_package_hash:
+        raise FactionPackRuleIrRegistryError(
+            "Faction-pack RuleIR package manifest hash drifted from its reviewed pin."
+        )
+    expected_shard_paths = {reference.path for reference in manifest.shard_artifacts.values()}
+    if set(shard_bytes_by_path) != expected_shard_paths:
+        raise FactionPackRuleIrRegistryError(
+            "Faction-pack RuleIR shard bytes must exactly match the manifest paths."
+        )
+    shard_artifacts = _load_shard_artifacts(
+        manifest,
+        shard_bytes_by_path=shard_bytes_by_path,
+    )
+    return shard_artifacts, _source_package_indexes(shard_artifacts)
+
+
+def validate_package_artifact_set(
+    *,
+    manifest_bytes: bytes,
+    shard_bytes_by_path: Mapping[str, bytes],
+    expected_package_hash: str,
+) -> None:
+    """Apply the real registry loader contract to one complete artifact byte set."""
+    manifest = manifest_from_json_bytes(manifest_bytes)
+    _validated_registry_artifact_set(
+        manifest=manifest,
+        shard_bytes_by_path=shard_bytes_by_path,
+        expected_package_hash=expected_package_hash,
+    )
 
 
 def _source_package_indexes(
@@ -161,14 +202,35 @@ def _source_package_indexes(
     )
 
 
-_MANIFEST: Final = _load_manifest()
-_SHARD_ARTIFACTS: Final = _load_shard_artifacts(_MANIFEST)
+def _load_registry_artifact_set() -> tuple[
+    FactionPackRuleIrManifestArtifact,
+    Mapping[str, FactionPackRuleIrShardArtifact],
+    tuple[
+        Mapping[str, SourcePackageRuleIrArtifact],
+        Mapping[str, SourcePackageRuleIrArtifact],
+        Mapping[str, tuple[str, ...]],
+        Mapping[str, str],
+    ],
+]:
+    manifest = manifest_from_json_bytes(_manifest_bytes())
+    shard_artifacts, indexes = _validated_registry_artifact_set(
+        manifest=manifest,
+        shard_bytes_by_path={
+            reference.path: _artifact_bytes(reference.path)
+            for reference in manifest.shard_artifacts.values()
+        },
+        expected_package_hash=EXPECTED_PACKAGE_HASH,
+    )
+    return manifest, shard_artifacts, indexes
+
+
+_MANIFEST, _SHARD_ARTIFACTS, _SOURCE_PACKAGE_INDEXES = _load_registry_artifact_set()
 (
     _SOURCE_PACKAGE_BY_ID,
     _SOURCE_PACKAGE_BY_SOURCE_ROW_ID,
     _SOURCE_PACKAGE_IDS_BY_DATASHEET_ID,
     _FACTION_ID_BY_DATASHEET_ID,
-) = _source_package_indexes(_SHARD_ARTIFACTS)
+) = _SOURCE_PACKAGE_INDEXES
 
 ARTIFACT_SCHEMA: Final = FACTION_PACK_RULE_IR_PACKAGE_ARTIFACT_SCHEMA
 SHARD_ARTIFACT_SCHEMA: Final = FACTION_PACK_RULE_IR_SHARD_ARTIFACT_SCHEMA
@@ -303,4 +365,5 @@ __all__ = (
     "supported_faction_ids",
     "supported_shard_ids",
     "supported_source_package_ids",
+    "validate_package_artifact_set",
 )

@@ -32,7 +32,7 @@ class _AggregateGenerator(Protocol):
     def __call__(
         self,
         *,
-        shard_ids: Iterable[str],
+        requested_shard_ids: Iterable[str],
         check: bool,
     ) -> None: ...
 
@@ -240,15 +240,15 @@ def committed_source_package_payload(
 
 
 def generate_registered_rule_ir_shard(*, shard_id: str, check: bool = False) -> None:
-    """Delegate a source-specific command to its registered physical shard."""
+    """Validate a source-specific request and regenerate/check the complete package."""
     module_name = (
         "tools.generate_faction_rule_ir_bundles"
         if __package__
         else "generate_faction_rule_ir_bundles"
     )
     module = importlib.import_module(module_name)
-    generate = cast(_AggregateGenerator, module.generate_rule_ir_shard_artifacts)
-    generate(shard_ids=(shard_id,), check=check)
+    generate = cast(_AggregateGenerator, module.generate_rule_ir_package_artifacts)
+    generate(requested_shard_ids=(shard_id,), check=check)
 
 
 def _validate_shard_id(shard_id: object) -> str:
