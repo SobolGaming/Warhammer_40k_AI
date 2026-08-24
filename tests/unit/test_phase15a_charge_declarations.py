@@ -142,6 +142,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     reposition_destruction_policy,
 )
@@ -153,9 +154,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.stratagem_catalog import (
     eleventh_edition_core_stratagem_catalog_records,
-    eleventh_edition_stratagem_index,
 )
-from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
     stratagem_phase_use_exception,
 )
@@ -163,7 +162,6 @@ from warhammer40k_core.engine.stratagems import (
     HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-    StratagemCatalogRecord,
     StratagemTargetBinding,
     StratagemTargetKind,
     StratagemTargetProposal,
@@ -394,62 +392,80 @@ def test_generated_thousand_sons_maulerfiend_charge_reroll_loads_through_bundle(
     assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
 
 
-def test_end_charge_heroic_reaction_requires_source_backed_phase_use_exception() -> None:
-    lifecycle, _units = _generated_snarling_protector_charge_lifecycle(
-        game_id="phase15a-ordinary-core-heroic-not-automatically-orchestrated"
+def test_end_charge_heroic_ordinary_opportunity_is_independent_of_snarling_state() -> None:
+    without_source, without_source_units = _end_charge_heroic_session(
+        game_id="phase15a-ordinary-heroic-without-snarling",
+        maulerfiend_selection_ids=(),
+        ordinary_selection_ids=("ordinary",),
+        command_points=1,
     )
-    state = _state(lifecycle)
-    state.active_player_id = "player-b"
-    state.gain_command_points(
-        player_id="player-a",
-        amount=1,
-        source_id="phase15a:ordinary-core-heroic:command-points",
-        source_kind=CommandPointSourceKind.OTHER,
+    with_source, with_source_units = _end_charge_heroic_session(
+        game_id="phase15a-ordinary-heroic-with-snarling",
+        maulerfiend_selection_ids=("maulerfiend",),
+        ordinary_selection_ids=("ordinary",),
+        command_points=1,
     )
+    cases: list[tuple[str, LocalGameSession, dict[str, UnitInstance]]] = [
+        ("absent", without_source, without_source_units),
+        ("eligible", with_source.fork(), with_source_units),
+        ("engaged", with_source.fork(), with_source_units),
+        ("out_of_range", with_source.fork(), with_source_units),
+        ("unplaced", with_source.fork(), with_source_units),
+        ("destroyed", with_source.fork(), with_source_units),
+    ]
+    opportunity_signatures: list[tuple[str, str, str | None]] = []
 
-    status = request_end_opponent_charge_heroic_intervention_if_available(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        reaction_queue=lifecycle.reaction_queue,
-        stratagem_index=eleventh_edition_stratagem_index(),
-        stratagem_cost_modifier_registry=StratagemCostModifierRegistry.empty(),
-    )
+    for source_state, session, units in cases:
+        state = _state(session.lifecycle)
+        source = units.get("maulerfiend")
+        if source is not None:
+            _set_snarling_source_state_for_heroic_test(
+                state=state,
+                unit=source,
+                source_state=source_state,
+            )
+        request = _decision_request(session.advance_until_decision_or_terminal())
+        proposal = _heroic_proposal_from_request(request)
+        opportunity_signatures.append(
+            (
+                request.decision_type,
+                proposal.stratagem_id,
+                proposal.context.timing_window_id,
+            )
+        )
 
-    assert status is None
-    assert lifecycle.reaction_queue.frames == ()
-    assert lifecycle.decision_controller.queue.pending_requests == ()
+        assert request.actor_id == "player-a"
+        assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+        if source is not None and source_state not in {"eligible"}:
+            invalid_result_id = f"phase15a-{source_state}-snarling-target-invalid"
+            invalid = _submit_end_charge_heroic_target(
+                session,
+                request=request,
+                target_unit_instance_id=source.unit_instance_id,
+                result_id=invalid_result_id,
+            )
+            assert invalid.status_kind is LifecycleStatusKind.INVALID
+            assert session.lifecycle.pending_decision_request() == request
+            assert all(use.result_id != invalid_result_id for use in state.stratagem_use_records)
 
+        ordinary_result_id = f"phase15a-{source_state}-ordinary-heroic-selected"
+        movement_status = _submit_end_charge_heroic_target(
+            session,
+            request=request,
+            target_unit_instance_id=units["ordinary"].unit_instance_id,
+            result_id=ordinary_result_id,
+        )
+        ordinary_use = _stratagem_use_for_result_id(
+            state,
+            result_id=ordinary_result_id,
+        )
 
-def test_end_charge_heroic_affordability_skips_unplaced_exception_unit() -> None:
-    lifecycle, units = _generated_snarling_protector_charge_lifecycle(
-        game_id="phase15a-unplaced-snarling-protector-not-eligible"
-    )
-    state = _state(lifecycle)
-    state.active_player_id = "player-b"
-    state.gain_command_points(
-        player_id="player-a",
-        amount=1,
-        source_id="phase15a:unplaced-snarling-protector:command-points",
-        source_kind=CommandPointSourceKind.OTHER,
-    )
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.without_unit_placement(
-        units["maulerfiend"].unit_instance_id
-    )
-    bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
-    assert isinstance(bundle, RuntimeContentBundle)
+        assert _decision_request(movement_status).decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+        assert ordinary_use.command_point_cost == 1
+        assert ordinary_use.command_point_modifier_ids == ()
+        assert state.command_point_total("player-a") == 0
 
-    status = request_end_opponent_charge_heroic_intervention_if_available(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        reaction_queue=lifecycle.reaction_queue,
-        stratagem_index=bundle.stratagem_indexes_by_player_id["player-a"],
-        stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
-    )
-
-    assert status is None
-    assert lifecycle.reaction_queue.frames == ()
-    assert lifecycle.decision_controller.queue.pending_requests == ()
+    assert len(set(opportunity_signatures)) == 1
 
 
 @pytest.mark.parametrize("enemy_context", ["unplaced", "out_of_range"])
@@ -505,48 +521,18 @@ def test_end_charge_heroic_reaction_requires_concrete_legal_affordable_target(
 
 
 def test_generated_snarling_protector_heroic_uses_charge_adapter_and_replay_path() -> None:
-    lifecycle, units = _generated_snarling_protector_charge_lifecycle(
-        game_id="phase15a-generated-snarling-protector-heroic"
+    session, units = _end_charge_heroic_session(
+        game_id="phase15a-generated-snarling-protector-heroic",
+        maulerfiend_selection_ids=("maulerfiend",),
+        ordinary_selection_ids=("ordinary",),
+        command_points=1,
     )
+    lifecycle = session.lifecycle
     state = _state(lifecycle)
     maulerfiend = units["maulerfiend"]
-    psyker_anchor = units["psyker-anchor"]
-    enemy = units["enemy"]
+    ordinary = units["ordinary"]
     assert maulerfiend.datasheet_id == "000001029"
-    assert state.command_point_total("player-a") == 0
-    state.active_player_id = "player-b"
-    state.replace_charge_phase_state(
-        ChargePhaseState(
-            battle_round=state.battle_round,
-            active_player_id="player-b",
-        ).with_phase_complete()
-    )
-    assert state.battlefield_state is not None
-    state.replace_battlefield_state(
-        state.battlefield_state.with_unit_placement(
-            _unit_placement_at(
-                maulerfiend,
-                army_id="army-alpha",
-                player_id="player-a",
-                poses=(Pose.at(12.0, 20.0),),
-            )
-        )
-    )
-    state.record_persisting_effect(
-        PersistingEffect(
-            effect_id="phase15a-generated-snarling-protector-enemy-charge-move",
-            source_rule_id="phase15a:generated-snarling-protector:enemy-charge-move",
-            owner_player_id="player-b",
-            target_unit_instance_ids=(enemy.unit_instance_id,),
-            started_battle_round=state.battle_round,
-            started_phase=BattlePhase.CHARGE,
-            expiration=EffectExpiration.end_turn(
-                battle_round=state.battle_round,
-                player_id="player-b",
-            ),
-            effect_payload={"effect_kind": "charge_grants_fights_first"},
-        )
-    )
+    assert state.command_point_total("player-a") == 1
     bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
     assert isinstance(bundle, RuntimeContentBundle)
     heroic = next(
@@ -557,18 +543,7 @@ def test_generated_snarling_protector_heroic_uses_charge_adapter_and_replay_path
     exception = stratagem_phase_use_exception(heroic.definition)
     assert exception is not None
     assert exception.eligible_datasheet_ids == ("000001029",)
-    state.record_stratagem_use(
-        _seeded_heroic_intervention_use(
-            record=heroic,
-            player_id="player-a",
-            active_player_id="player-b",
-            target_unit_id=psyker_anchor.unit_instance_id,
-        )
-    )
-
-    session = LocalGameSession(lifecycle=lifecycle)
     request = _decision_request(session.advance_until_decision_or_terminal())
-    decline_session = session.fork()
     request_payload = cast(dict[str, JsonValue], request.payload)
     proposal = StratagemTargetProposal.from_payload(
         cast(StratagemTargetProposalPayload, request_payload["proposal_request"])
@@ -586,42 +561,13 @@ def test_generated_snarling_protector_heroic_uses_charge_adapter_and_replay_path
     timing_window = cast(dict[str, JsonValue], reaction_window["timing_window"])
     assert timing_window["window_id"] == proposal.context.timing_window_id
     assert parent["step"] == "charge_phase_end_reactions"
-
-    selected = proposal.with_binding(
-        StratagemTargetBinding(
-            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
-            target_player_id="player-a",
-            target_unit_instance_id=maulerfiend.unit_instance_id,
-        ),
-        effect_selection={
-            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND
-        },
-    )
-    movement_status = session.submit_parameterized_payload(
-        request_id=request.request_id,
-        payload=validate_json_value({"proposal": selected.to_payload()}),
-        result_id="phase15a-generated-snarling-protector-heroic-selected",
-    )
-    movement_request = _decision_request(movement_status)
-    selected_use = next(
-        use
-        for use in state.stratagem_use_records
-        if use.result_id == "phase15a-generated-snarling-protector-heroic-selected"
-    )
-
-    assert movement_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-    assert selected_use.target_binding.target_unit_instance_id == maulerfiend.unit_instance_id
-    assert selected_use.command_point_cost == 0
-    assert selected_use.command_point_transaction_id is None
-    assert selected_use.command_point_modifier_source_ids == (exception.source_id,)
-    assert state.command_point_total("player-a") == 0
-    assert _event_payloads(lifecycle, "heroic_intervention_charge_move_requested")
     checkpoint = session.to_persistence_payload()
     restored = LocalGameSession.from_persistence_payload(checkpoint)
     assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
-    assert restored.lifecycle.pending_decision_request() == movement_request
+    assert restored.lifecycle.pending_decision_request() == request
     assert "<" not in json.dumps(checkpoint, sort_keys=True)
 
+    decline_session = restored.fork()
     decline_request = decline_session.lifecycle.pending_decision_request()
     assert decline_request is not None
     assert decline_request == request
@@ -639,6 +585,148 @@ def test_generated_snarling_protector_heroic_uses_charge_adapter_and_replay_path
         pending.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
         for pending in decline_session.lifecycle.decision_controller.queue.pending_requests
     )
+
+    targets = {
+        "ordinary": ordinary.unit_instance_id,
+        "snarling": maulerfiend.unit_instance_id,
+    }
+    expected_costs = {"ordinary": 1, "snarling": 0}
+    for order in (("ordinary", "snarling"), ("snarling", "ordinary")):
+        branch = restored.fork()
+        first_kind, second_kind = order
+        first_result_id = f"phase15a-generated-heroic-{first_kind}-first"
+        first_movement = _submit_end_charge_heroic_target(
+            branch,
+            request=_require_pending_request(branch),
+            target_unit_instance_id=targets[first_kind],
+            result_id=first_result_id,
+        )
+        first_movement_request = _decision_request(first_movement)
+        first_use = _stratagem_use_for_result_id(
+            _state(branch.lifecycle),
+            result_id=first_result_id,
+        )
+        assert first_use.request_id == request.request_id
+        assert first_use.command_point_cost == expected_costs[first_kind]
+        assert first_use.command_point_modifier_source_ids == (
+            () if first_kind == "ordinary" else (exception.source_id,)
+        )
+        if first_kind == "ordinary":
+            branch = LocalGameSession.from_persistence_payload(branch.to_persistence_payload())
+            assert (
+                _stratagem_use_for_result_id(
+                    _state(branch.lifecycle),
+                    result_id=first_result_id,
+                )
+                == first_use
+            )
+            assert _require_pending_request(branch) == first_movement_request
+            first_movement_request = _require_pending_request(branch)
+        second_window_status = _submit_heroic_intervention_no_move(
+            branch,
+            movement_request=first_movement_request,
+            result_id=f"phase15a-generated-heroic-{first_kind}-first-no-move",
+        )
+        second_request = _decision_request(second_window_status)
+        second_proposal = _heroic_proposal_from_request(second_request)
+        assert second_proposal.context.timing_window_id == proposal.context.timing_window_id
+
+        second_result_id = f"phase15a-generated-heroic-{second_kind}-second"
+        second_movement = _submit_end_charge_heroic_target(
+            branch,
+            request=second_request,
+            target_unit_instance_id=targets[second_kind],
+            result_id=second_result_id,
+        )
+        second_use = _stratagem_use_for_result_id(
+            _state(branch.lifecycle),
+            result_id=second_result_id,
+        )
+        assert second_use.command_point_cost == expected_costs[second_kind]
+        assert second_use.command_point_modifier_source_ids == (
+            () if second_kind == "ordinary" else (exception.source_id,)
+        )
+        completed = _submit_heroic_intervention_no_move(
+            branch,
+            movement_request=_decision_request(second_movement),
+            result_id=f"phase15a-generated-heroic-{second_kind}-second-no-move",
+        )
+        branch_state = _state(branch.lifecycle)
+        assert completed.status_kind is not LifecycleStatusKind.INVALID
+        assert branch_state.current_battle_phase is BattlePhase.FIGHT
+        assert branch_state.command_point_total("player-a") == 0
+        assert branch.lifecycle.reaction_queue.frames == ()
+        replay = ReplayRunner.from_payload(
+            branch.replay_artifact(
+                artifact_id=f"replay:phase15a:heroic:{first_kind}-then-{second_kind}"
+            )
+        ).run()
+        assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+def test_end_charge_heroic_two_snarling_units_each_use_exception_once() -> None:
+    session, units = _end_charge_heroic_session(
+        game_id="phase15a-two-snarling-protectors",
+        maulerfiend_selection_ids=("maulerfiend-1", "maulerfiend-2"),
+        ordinary_selection_ids=(),
+        command_points=0,
+    )
+    state = _state(session.lifecycle)
+    first_request = _decision_request(session.advance_until_decision_or_terminal())
+    first_result_id = "phase15a-two-snarling-first-selected"
+    first_movement = _submit_end_charge_heroic_target(
+        session,
+        request=first_request,
+        target_unit_instance_id=units["maulerfiend-1"].unit_instance_id,
+        result_id=first_result_id,
+    )
+    second_window_status = _submit_heroic_intervention_no_move(
+        session,
+        movement_request=_decision_request(first_movement),
+        result_id="phase15a-two-snarling-first-no-move",
+    )
+    second_request = _decision_request(second_window_status)
+    records_before_repeat = len(session.lifecycle.decision_controller.records)
+
+    repeated = _submit_end_charge_heroic_target(
+        session,
+        request=second_request,
+        target_unit_instance_id=units["maulerfiend-1"].unit_instance_id,
+        result_id="phase15a-two-snarling-first-repeated",
+    )
+
+    assert repeated.status_kind is LifecycleStatusKind.INVALID
+    assert repeated.payload == {"invalid_reason": "source_ability_once_per_phase_per_unit"}
+    assert session.lifecycle.pending_decision_request() == second_request
+    assert len(session.lifecycle.decision_controller.records) == records_before_repeat
+    assert len(state.stratagem_use_records) == 1
+
+    second_result_id = "phase15a-two-snarling-second-selected"
+    second_movement = _submit_end_charge_heroic_target(
+        session,
+        request=second_request,
+        target_unit_instance_id=units["maulerfiend-2"].unit_instance_id,
+        result_id=second_result_id,
+    )
+    completed = _submit_heroic_intervention_no_move(
+        session,
+        movement_request=_decision_request(second_movement),
+        result_id="phase15a-two-snarling-second-no-move",
+    )
+    uses = tuple(
+        _stratagem_use_for_result_id(state, result_id=result_id)
+        for result_id in (first_result_id, second_result_id)
+    )
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert state.current_battle_phase is BattlePhase.FIGHT
+    assert tuple(use.command_point_cost for use in uses) == (0, 0)
+    assert tuple(use.target_binding.target_unit_instance_id for use in uses) == (
+        units["maulerfiend-1"].unit_instance_id,
+        units["maulerfiend-2"].unit_instance_id,
+    )
+    assert state.command_point_total("player-a") == 0
+    assert session.lifecycle.reaction_queue.frames == ()
 
 
 def test_source_backed_conditional_charge_rejects_stale_selected_anchor() -> None:
@@ -3428,6 +3516,10 @@ def _conditional_charge_lifecycle(
 def _generated_snarling_protector_charge_lifecycle(
     *,
     game_id: str,
+    maulerfiend_selection_ids: tuple[str, ...] = ("maulerfiend",),
+    ordinary_selection_ids: tuple[str, ...] = ("psyker-anchor",),
+    alpha_origins: dict[str, Pose] | None = None,
+    enemy_origin: Pose | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     generated = _ability_support_catalog_package(datasheet_ids=("000001029",)).army_catalog
     generated_maulerfiend = generated.datasheet_by_id("000001029")
@@ -3472,19 +3564,25 @@ def _generated_snarling_protector_charge_lifecycle(
         wargear=(*base_catalog.wargear, *generated.wargear),
         detachments=(*base_catalog.detachments, thousand_sons_detachment),
     )
-    return _charge_lifecycle(
-        alpha_unit_ids=("maulerfiend", "psyker-anchor"),
-        alpha_datasheet_ids_by_selection_id={
-            "maulerfiend": "000001029",
-            "psyker-anchor": anchor_datasheet_id,
-        },
-        alpha_origins={
+    resolved_alpha_origins = (
+        {
             "maulerfiend": Pose.at(6.0, 20.0),
             "psyker-anchor": Pose.at(18.0, 20.0),
+        }
+        if alpha_origins is None
+        else alpha_origins
+    )
+    resolved_enemy_origin = Pose.at(18.0, 21.05) if enemy_origin is None else enemy_origin
+    return _charge_lifecycle(
+        alpha_unit_ids=(*maulerfiend_selection_ids, *ordinary_selection_ids),
+        alpha_datasheet_ids_by_selection_id={
+            **dict.fromkeys(maulerfiend_selection_ids, "000001029"),
+            **dict.fromkeys(ordinary_selection_ids, anchor_datasheet_id),
         },
+        alpha_origins=resolved_alpha_origins,
         enemy_unit_ids=("enemy",),
         enemy_model_poses=_compact_test_unit_poses(
-            origin=Pose.at(18.0, 21.05),
+            origin=resolved_enemy_origin,
             model_count=5,
         ),
         game_id=game_id,
@@ -3492,37 +3590,181 @@ def _generated_snarling_protector_charge_lifecycle(
     )
 
 
-def _seeded_heroic_intervention_use(
+def _end_charge_heroic_session(
     *,
-    record: StratagemCatalogRecord,
-    player_id: str,
-    active_player_id: str,
-    target_unit_id: str,
+    game_id: str,
+    maulerfiend_selection_ids: tuple[str, ...],
+    ordinary_selection_ids: tuple[str, ...],
+    command_points: int,
+) -> tuple[LocalGameSession, dict[str, UnitInstance]]:
+    maulerfiend_origins = (Pose.at(24.0, 30.0), Pose.at(42.0, 30.0))
+    if len(maulerfiend_selection_ids) > len(maulerfiend_origins):
+        raise AssertionError("Heroic Intervention fixture supports at most two Maulerfiends.")
+    alpha_origins = {
+        **{
+            selection_id: maulerfiend_origins[index]
+            for index, selection_id in enumerate(maulerfiend_selection_ids)
+        },
+        **{
+            selection_id: Pose.at(30.0, 24.0 - (index * 8.0))
+            for index, selection_id in enumerate(ordinary_selection_ids)
+        },
+    }
+    lifecycle, units = _generated_snarling_protector_charge_lifecycle(
+        game_id=game_id,
+        maulerfiend_selection_ids=maulerfiend_selection_ids,
+        ordinary_selection_ids=ordinary_selection_ids,
+        alpha_origins=alpha_origins,
+        enemy_origin=Pose.at(30.0, 30.0),
+    )
+    state = _state(lifecycle)
+    state.active_player_id = "player-b"
+    state.replace_charge_phase_state(
+        ChargePhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-b",
+        ).with_phase_complete()
+    )
+    enemy = units["enemy"]
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id=f"{game_id}:enemy-charge-move",
+            source_rule_id=f"{game_id}:enemy-charge-move-source",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(enemy.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhase.CHARGE,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id="player-b",
+            ),
+            effect_payload={"effect_kind": "charge_grants_fights_first"},
+        )
+    )
+    if command_points:
+        state.gain_command_points(
+            player_id="player-a",
+            amount=command_points,
+            source_id=f"{game_id}:command-points",
+            source_kind=CommandPointSourceKind.OTHER,
+        )
+    return LocalGameSession(lifecycle=lifecycle), units
+
+
+def _set_snarling_source_state_for_heroic_test(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    source_state: str,
+) -> None:
+    if source_state == "eligible":
+        return
+    if source_state == "destroyed":
+        _destroy_unit_models_for_test(state, unit_instance_id=unit.unit_instance_id)
+        return
+    if state.battlefield_state is None:
+        raise AssertionError("Heroic Intervention source fixture requires battlefield state.")
+    if source_state == "unplaced":
+        state.replace_battlefield_state(
+            state.battlefield_state.without_unit_placement(unit.unit_instance_id)
+        )
+        return
+    origins = {
+        "engaged": Pose.at(30.0, 27.0),
+        "out_of_range": Pose.at(5.0, 5.0),
+    }
+    origin = origins.get(source_state)
+    if origin is None:
+        raise AssertionError(f"Unsupported Snarling Protector fixture state: {source_state}")
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(
+            _unit_placement_at(
+                unit,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=_compact_test_unit_poses(
+                    origin=origin,
+                    model_count=len(unit.own_models),
+                ),
+            )
+        )
+    )
+
+
+def _heroic_proposal_from_request(request: DecisionRequest) -> StratagemTargetProposal:
+    payload = request.payload
+    assert isinstance(payload, dict)
+    return StratagemTargetProposal.from_payload(
+        cast(StratagemTargetProposalPayload, payload["proposal_request"])
+    )
+
+
+def _submit_end_charge_heroic_target(
+    session: LocalGameSession,
+    *,
+    request: DecisionRequest,
+    target_unit_instance_id: str,
+    result_id: str,
+) -> LifecycleStatus:
+    selected = _heroic_proposal_from_request(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id=request.actor_id,
+            target_unit_instance_id=target_unit_instance_id,
+        ),
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND
+        },
+    )
+    return session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=validate_json_value({"proposal": selected.to_payload()}),
+        result_id=result_id,
+    )
+
+
+def _submit_heroic_intervention_no_move(
+    session: LocalGameSession,
+    *,
+    movement_request: DecisionRequest,
+    result_id: str,
+) -> LifecycleStatus:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        movement_request.payload
+    )
+    return session.submit_parameterized_payload(
+        request_id=movement_request.request_id,
+        payload=validate_json_value(
+            ChargeMoveProposal(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                unit_instance_id=proposal_request.unit_instance_id,
+                movement_phase_action="charge_move",
+                movement_mode=MovementMode.CHARGE,
+                charge_target_unit_instance_ids=(),
+                witness=None,
+            ).to_payload()
+        ),
+        result_id=result_id,
+    )
+
+
+def _stratagem_use_for_result_id(
+    state: GameState,
+    *,
+    result_id: str,
 ) -> StratagemUseRecord:
-    binding = StratagemTargetBinding(
-        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
-        target_player_id=player_id,
-        target_unit_instance_id=target_unit_id,
-    )
-    return StratagemUseRecord(
-        use_id="stratagem-use:phase15a:seeded-heroic-intervention",
-        player_id=player_id,
-        stratagem_id=record.definition.stratagem_id,
-        source_id=record.definition.source_id,
-        battle_round=1,
-        phase=BattlePhase.CHARGE,
-        active_player_id=active_player_id,
-        timing_window_id="phase15a-seeded-heroic-intervention-window",
-        request_id="phase15a-seeded-heroic-intervention-request",
-        result_id="phase15a-seeded-heroic-intervention-result",
-        selected_option_id="submit-parameterized-payload",
-        target_binding=binding,
-        targeted_unit_instance_ids=(target_unit_id,),
-        affected_unit_instance_ids=(target_unit_id,),
-        command_point_cost=0,
-        command_point_transaction_id=None,
-        handler_id=record.definition.handler_id,
-    )
+    matches = tuple(use for use in state.stratagem_use_records if use.result_id == result_id)
+    if len(matches) != 1:
+        raise AssertionError("Expected exactly one Stratagem use for result ID.")
+    return matches[0]
+
+
+def _require_pending_request(session: LocalGameSession) -> DecisionRequest:
+    request = session.lifecycle.pending_decision_request()
+    if request is None:
+        raise AssertionError("Heroic Intervention session requires a pending request.")
+    return request
 
 
 def _conditional_charge_pair_options(

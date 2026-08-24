@@ -14,9 +14,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
-from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
-    player_has_stratagem_phase_use_exception_unit,
-)
 from warhammer40k_core.engine.stratagems import (
     CORE_HEROIC_INTERVENTION_HANDLER_ID,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -79,12 +76,6 @@ def request_end_opponent_charge_heroic_intervention_if_available(
             require_legal_affordable_target=True,
         )
         if proposal is None:
-            continue
-        if not player_has_stratagem_phase_use_exception_unit(
-            state=state,
-            player_id=player_id,
-            definition=proposal.catalog_record.definition,
-        ):
             continue
         reaction_window = ReactionWindow(
             timing_window=TimingWindow(

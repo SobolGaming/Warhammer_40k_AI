@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8591eb7190308b85627f9755aa37809f21d6f5635e153bd5aac28436ee6c4ef4",
-  "fingerprint": "8591eb7190308b85627f9755aa37809f21d6f5635e153bd5aac28436ee6c4ef4",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:69332c9d693adfdaa0b0e6eb8a3e6b39bbd42a2565e6c9f3389e9a73f57d14a4",
+  "fingerprint": "69332c9d693adfdaa0b0e6eb8a3e6b39bbd42a2565e6c9f3389e9a73f57d14a4",
   "resource_count": 2387,
   "resources": [
     {
@@ -9390,9 +9390,9 @@
       "sha256": "39ed37abd27dc08743ea42dce0c3136d680d0d060430f170094623331604ed5e"
     },
     {
-      "byte_length": 6106,
+      "byte_length": 5772,
       "path": "warhammer40k_core/engine/phases/charge_reactions.py",
-      "sha256": "2bb6ad418f7ab24489574704d5124ee84ae369c52ddcb5e5846a09169a326b97"
+      "sha256": "9090677872cf4ea63f5daf9492516125198b5525ce4c39fc790332c30fc1aa9d"
     },
     {
       "byte_length": 56002,
@@ -10385,9 +10385,9 @@
       "sha256": "c6a0f6911815830b8f50772f6332aa2084dd32d87e65ab7970f3670f6ab20c4d"
     },
     {
-      "byte_length": 9337,
+      "byte_length": 8618,
       "path": "warhammer40k_core/engine/stratagem_phase_use_exceptions.py",
-      "sha256": "dd2e3e4ffee3712e9ad291fa1b517884c28972cfc263c6e785af8cfb7bbed811"
+      "sha256": "5313ca7012e37857b1ac8019f662f0b9180707b862973cca1946829d7951220b"
     },
     {
       "byte_length": 14575,

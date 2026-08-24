@@ -1439,17 +1439,26 @@ Phase 15E adds these Stratagem-coupled Charge/Fight decisions:
 - Counteroffensive and Epic Challenge are `submit_stratagem_target_proposal` requests emitted from Fight-step timing hooks. Counteroffensive target proposals are reaction-window requests for the opponent after an enemy unit has resolved attacks. Epic Challenge target proposals are declinable requests for the player whose CHARACTER unit has just been selected to fight.
 - Crushing Impact is a Charge-phase `submit_stratagem_target_proposal` after a friendly MONSTER/VEHICLE ends a Charge Move. Its nested enemy/model selections are carried in `effect_selection`, not in adapter-owned state.
 
-Source-backed per-unit exceptions to Counteroffensive's same-Stratagem-per-phase
-restriction retain this proposal shape and the `core:counteroffensive` handler.
+Core Heroic Intervention timing is hosted at the end of every opponent Charge
+phase whenever the reacting player has at least one concrete legal and affordable
+target. The timing window is not gated by possession of a source-backed exception
+unit. Source-overlaid Stratagem records retain the ordinary parameterized proposal
+shape and `core:heroic-intervention` handler; target-specific validation applies
+the normal once-per-phase restriction and cost to ordinary targets or the
+source-backed phase-use exception and cost modifier to a qualifying target.
+
+Source-backed per-unit exceptions to Heroic Intervention's or
+Counteroffensive's same-Stratagem-per-phase restriction retain the corresponding
+Core proposal shape and handler.
 When such a source is active, the embedded catalog record's
 `definition.effect_payload.stratagem_phase_use_exception` contains the stable
 source ability ID, runtime descriptor ID, exact eligible datasheet IDs,
 `frequency_scope: "phase_per_unit"`, and the two non-blocking phase-use flags.
 The engine may therefore keep the parameterized opportunity available after an
-earlier Counteroffensive use when the actor owns a qualifying unit. Adapters
+earlier use when a concrete qualifying target remains legal and affordable. Adapters
 must treat this payload as engine-owned availability context: they must not
 infer qualifying units from display names or rule text, suppress the opportunity
-because another unit used Counteroffensive, or synthesize an additional use.
+because another unit used the same Stratagem, or synthesize an additional use.
 Target-specific validation rejects a second use by the same qualifying unit
 with `source_ability_once_per_phase_per_unit`. Accepted qualifying uses still
 follow the ordinary proposal, CP transaction, `StratagemUseRecord`,
