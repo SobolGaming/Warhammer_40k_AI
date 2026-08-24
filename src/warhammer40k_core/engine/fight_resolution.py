@@ -70,10 +70,7 @@ from warhammer40k_core.engine.fight_geometry import (
 from warhammer40k_core.engine.fight_geometry import (
     unit_id_for_fight_model as _unit_id_for_model,
 )
-from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_restricted_model_ids_for_activation,
-    model_is_present_on_battlefield,
-)
+from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1333,7 +1330,7 @@ def available_melee_weapons_payloads(
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> tuple[JsonValue, ...]:
-    payloads = tuple(
+    return tuple(
         validate_json_value(
             {
                 "model_instance_id": weapon["model_instance_id"],
@@ -1361,21 +1358,6 @@ def available_melee_weapons_payloads(
             state=state,
             source_decision_result_id=source_decision_result_id,
         )
-    )
-    restricted_model_ids = (
-        None
-        if state is None or source_decision_result_id is None
-        else fight_on_death_restricted_model_ids_for_activation(
-            state=state,
-            activation_result_id=source_decision_result_id,
-        )
-    )
-    if restricted_model_ids is None:
-        return payloads
-    return tuple(
-        payload
-        for payload in payloads
-        if isinstance(payload, dict) and payload.get("engaged_target_unit_instance_ids")
     )
 
 
@@ -2786,18 +2768,9 @@ def _available_melee_weapons_for_unit(
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> tuple[_AvailableMeleeWeapon, ...]:
-    restricted_model_ids = (
-        None
-        if state is None or source_decision_result_id is None
-        else fight_on_death_restricted_model_ids_for_activation(
-            state=state,
-            activation_result_id=source_decision_result_id,
-        )
-    )
+    del source_decision_result_id
     weapons: list[_AvailableMeleeWeapon] = []
     for model in unit.own_models:
-        if restricted_model_ids is not None and model.model_instance_id not in restricted_model_ids:
-            continue
         if state is None and not model.is_alive:
             continue
         if state is not None and not model_is_present_on_battlefield(

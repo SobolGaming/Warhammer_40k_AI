@@ -42,7 +42,10 @@ from warhammer40k_core.engine.attack_sequence import (
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookRegistry,
 )
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    fight_present_rules_unit_views,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
@@ -83,7 +86,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
 )
 from warhammer40k_core.engine.fight_activation_units import (
     active_fight_activation_rules_unit,
-    finalize_rule_destruction_after_fight_activation,
+    finalize_rule_destructions_after_fight_activation,
     split_attached_rules_unit_after_fight_activation,
 )
 from warhammer40k_core.engine.fight_attack_completion import (
@@ -201,13 +204,13 @@ from warhammer40k_core.engine.phases.fight_attack_sequence_selection import (
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
-    apply_rule_destruction_reaction_and_schedule_fight_on_death,
+    apply_rule_destruction_fight_on_death_reaction,
     fight_on_death_completion_requires_rule_finalization,
-    remove_rule_fight_on_death_models_for_completed_activation,
-    schedule_attack_sequence_fight_on_death_after_completed_activation,
+    finalize_next_rule_fight_on_death_at_phase_end,
+    remove_remaining_fight_on_death_models_at_phase_end,
+    remove_rule_fight_on_death_contexts_for_completed_activation,
 )
 from warhammer40k_core.engine.rules_units import (
-    placed_alive_rules_unit_views,
     rules_unit_identity_ids,
     rules_unit_view_by_id,
 )
@@ -483,12 +486,11 @@ class FightPhaseHandler:
         if result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
             request = decisions.record_for_result(result).request
             if rule_model_destruction.is_rule_model_destruction_reaction_request(request):
-                apply_rule_destruction_reaction_and_schedule_fight_on_death(
+                return apply_rule_destruction_fight_on_death_reaction(
                     state=state,
                     decisions=decisions,
                     result=result,
                 )
-                return None
         if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
             return _apply_fight_attack_sequence_decision(
                 handler=self,
@@ -657,6 +659,18 @@ def _advance_fight_phase_body(
         )
         if phase_end_status is not None:
             return phase_end_status
+        fight_on_death_status = finalize_next_rule_fight_on_death_at_phase_end(
+            state=state,
+            decisions=decisions,
+        )
+        if type(fight_on_death_status) is LifecycleStatus:
+            return fight_on_death_status
+        if fight_on_death_status:
+            return None
+        remove_remaining_fight_on_death_models_at_phase_end(
+            state=state,
+            decisions=decisions,
+        )
         state.replace_fight_phase_state(fight_state.with_phase_complete())
         return None
     raise GameLifecycleError("Fight phase body has unsupported current_step.")
@@ -701,7 +715,6 @@ def _advance_fight_attack_sequence(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=continuation,
-        unit_attacked=True,
     )
 
 
@@ -730,7 +743,6 @@ def _resolve_completed_fight_attack_sequence_continuation(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=continuation,
-        unit_attacked=True,
     )
 
 
@@ -897,7 +909,6 @@ def _complete_active_fight_activation_without_melee_declaration(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=activation,
-        unit_attacked=False,
     )
 
 
@@ -909,7 +920,6 @@ def _complete_active_fight_activation(
     reaction_queue: ReactionQueue | None,
     policy: FightPolicyDescriptor,
     activation: FightActivationSelection,
-    unit_attacked: bool,
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
     activation_rules_unit_instance_id = rules_unit_view_by_id(
@@ -917,13 +927,12 @@ def _complete_active_fight_activation(
         unit_instance_id=activation.unit_instance_id,
     ).unit_instance_id
     state.replace_fight_phase_state(fight_state.with_active_activation(None))
-    fight_on_death_completion = remove_rule_fight_on_death_models_for_completed_activation(
+    fight_on_death_completions = remove_rule_fight_on_death_contexts_for_completed_activation(
         state=state,
         decisions=decisions,
         activation=activation,
-        unit_attacked=unit_attacked,
     )
-    if fight_on_death_completion is None:
+    if not fight_on_death_completions:
         split_attached_rules_unit_after_fight_activation(
             state=state,
             event_log=decisions.event_log,
@@ -941,24 +950,18 @@ def _complete_active_fight_activation(
             }
         ),
     )
-    if fight_on_death_completion is not None and (
-        fight_on_death_completion_requires_rule_finalization(fight_on_death_completion)
-    ):
-        finalization_status = finalize_rule_destruction_after_fight_activation(
+    for fight_on_death_completion in fight_on_death_completions:
+        if not fight_on_death_completion_requires_rule_finalization(fight_on_death_completion):
+            raise GameLifecycleError("Fight On Death completion finalization kind drift.")
+    if fight_on_death_completions:
+        finalization_status = finalize_rule_destructions_after_fight_activation(
             state=state,
             decisions=decisions,
-            context=fight_on_death_completion,
+            contexts=fight_on_death_completions,
             rules_unit_instance_id=activation_rules_unit_instance_id,
         )
         if finalization_status is not None:
             return finalization_status
-    if schedule_attack_sequence_fight_on_death_after_completed_activation(
-        state=state,
-        decisions=decisions,
-        completed_activation=activation,
-        completed_fight_on_death_context=fight_on_death_completion,
-    ):
-        return None
     counteroffensive_status = _request_counteroffensive_if_available(
         handler=handler,
         state=state,
@@ -1950,7 +1953,7 @@ def _eligible_fight_movement_unit_ids(
     scenario = _battlefield_scenario(state)
     rules_units = tuple(
         rules_unit
-        for rules_unit in placed_alive_rules_unit_views(state=state)
+        for rules_unit in fight_present_rules_unit_views(state=state)
         if rules_unit.owner_player_id == player_id
     )
     charged_unit_ids = set(fight_state.fight_order_state.fights_first_registry.charged_unit_ids())

@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 from functools import cache
 from typing import Any, cast
 
+import pytest
 from tests.phase15c_fight_order_helpers import fight_lifecycle
 from tools import generate_emperors_children_daemon_prince_rule_ir as generator
 from tools.generate_ability_support_matrix import (
@@ -61,6 +62,7 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
@@ -488,7 +490,7 @@ def test_ecstatic_death_registers_idempotent_serializable_two_plus_model_source(
     )
 
 
-def test_ecstatic_death_melee_destruction_fights_then_removes_through_adapter_replay() -> None:
+def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() -> None:
     session, attacker, target = _ecstatic_death_fight_session()
     state = session.lifecycle.state
     assert state is not None
@@ -570,6 +572,41 @@ def test_ecstatic_death_melee_destruction_fights_then_removes_through_adapter_re
         event.event_type == "fight_on_death_model_awaiting_attack"
         for event in session.lifecycle.decision_controller.event_log.records
     )
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.active_activation is None
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_fight_activation"
+    assert not any(
+        event.event_type == "fight_on_death_activation_started"
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type="select_fight_activation",
+        result_id_prefix="ecstatic-death:after-attacker",
+    )
+    selection_request = status.decision_request
+    assert selection_request is not None
+    target_option_id = next(
+        option.option_id
+        for option in selection_request.options
+        if target.unit_instance_id in option.option_id
+    )
+    checkpoint = json.loads(json.dumps(session.to_persistence_payload(), sort_keys=True))
+    restored = LocalGameSession.from_persistence_payload(checkpoint)
+    assert restored.to_persistence_payload() == checkpoint
+    status = session.submit_option(
+        request_id=selection_request.request_id,
+        option_id=target_option_id,
+        result_id="ecstatic-death:target-activation",
+    )
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.active_activation is not None
+    assert fight_state.active_activation.unit_instance_id == target.unit_instance_id
 
     _advance_ecstatic_death_until_model_removed(
         session=session,
@@ -582,17 +619,32 @@ def test_ecstatic_death_melee_destruction_fights_then_removes_through_adapter_re
         state=state,
         model_instance_id=target_model_id,
     )
+    attacker_model_id = attacker.own_models[0].model_instance_id
+    assert not model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=attacker_model_id,
+    )
+    assert all(
+        cast(dict[str, JsonValue], event.payload)["model_instance_id"] != attacker_model_id
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "destruction_reaction_trigger_rolled"
+    )
     cleanup_payload = next(
         cast(dict[str, JsonValue], event.payload)
         for event in reversed(session.lifecycle.decision_controller.event_log.records)
         if event.event_type == "fight_on_death_models_removed"
     )
     assert cleanup_payload["model_instance_ids"] == [target_model_id]
-    assert cleanup_payload["reason"] == "unit_attacked"
+    assert cleanup_payload["reason"] == "unit_fight_completed"
     activation_payload = next(
         cast(dict[str, JsonValue], event.payload)
         for event in session.lifecycle.decision_controller.event_log.records
-        if event.event_type == "fight_on_death_activation_started"
+        if event.event_type == "fight_activation_selected"
+        and cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], event.payload)["activation_selection"],
+        )["result_id"]
+        == "ecstatic-death:target-activation"
     )
     activation_selection = cast(
         dict[str, JsonValue],
@@ -600,7 +652,7 @@ def test_ecstatic_death_melee_destruction_fights_then_removes_through_adapter_re
     )
     assert activation_selection["player_id"] == "player-b"
     assert activation_selection["unit_instance_id"] == target.unit_instance_id
-    assert activation_selection["result_id"] == "ecstatic-death:accept"
+    assert activation_selection["result_id"] == "ecstatic-death:target-activation"
 
     replay_payload = json.loads(
         json.dumps(
@@ -612,21 +664,203 @@ def test_ecstatic_death_melee_destruction_fights_then_removes_through_adapter_re
     assert replay.status is ReplayRunStatus.REPRODUCED
 
 
-def _ecstatic_death_fight_session() -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
-    catalog = replace(
-        _package().army_catalog,
-        detachments=(
-            DetachmentDefinition(
-                detachment_id="daemon-prince-rule-ir-test",
-                name="Daemon Prince RuleIR Test",
-                faction_id="EC",
-                detachment_point_cost=1,
-                unit_datasheet_ids=(DAEMON_PRINCE_ID,),
-                force_disposition_ids=("purge-the-foe",),
-                source_ids=("test:emperors-children:daemon-prince-rule-ir-detachment",),
-            ),
-        ),
+@pytest.mark.parametrize(
+    ("corruption", "expected_message"),
+    [
+        ("context_kind", "completion context kind is unsupported"),
+        ("model_destroyed_event", "one authoritative model_destroyed event"),
+        ("missing_reaction_record", "must match one destruction reaction record"),
+        ("orphan_result", "activation result decision binding drift"),
+        ("wrong_decision", "activation result decision binding drift"),
+    ],
+)
+def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
+    corruption: str,
+    expected_message: str,
+) -> None:
+    session, attacker, _target = _ecstatic_death_fight_session(game_id="ecstatic-integrity-002")
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=session.advance_until_decision_or_terminal(),
+        stop_at_decision_type="select_fight_activation",
+        result_id_prefix="ecstatic-death-integrity:before-attacker",
     )
+    activation_request = status.decision_request
+    assert activation_request is not None
+    status = session.submit_option(
+        request_id=activation_request.request_id,
+        option_id=next(
+            option.option_id
+            for option in activation_request.options
+            if attacker.unit_instance_id in option.option_id
+        ),
+        result_id="ecstatic-death-integrity:attacker-activation",
+    )
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        result_id_prefix="ecstatic-death-integrity:attacker",
+        melee_profile_suffix=":strike",
+    )
+    reaction_request = status.decision_request
+    assert reaction_request is not None
+    session.submit_option(
+        request_id=reaction_request.request_id,
+        option_id=next(
+            option.option_id
+            for option in reaction_request.options
+            if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+        ),
+        result_id="ecstatic-death-integrity:accept",
+    )
+    payload = json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True))
+    awaiting_effect = next(
+        effect
+        for effect in payload["state"]["persisting_effects"]
+        if effect["effect_payload"].get("effect_kind") == "fight_on_death_awaiting_attack"
+    )
+    effect_payload = awaiting_effect["effect_payload"]
+    context = effect_payload["completion_context"]
+    if corruption == "context_kind":
+        context["context_kind"] = "unsupported_destroyed_context"
+    elif corruption == "model_destroyed_event":
+        context["model_destroyed_event_id"] = "event-999999"
+    elif corruption == "missing_reaction_record":
+        assert payload["decisions"]["records"][-1]["result"]["result_id"] == (
+            "ecstatic-death-integrity:accept"
+        )
+        payload["decisions"]["records"].pop()
+    elif corruption == "orphan_result":
+        effect_payload["activation_result_id"] = "orphaned-fight-on-death-result"
+    elif corruption == "wrong_decision":
+        effect_payload["activation_result_id"] = "ecstatic-death-integrity:attacker-activation"
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        GameLifecycle.from_payload(payload)
+
+
+def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() -> None:
+    session, attacker, retained, child = _ecstatic_death_chain_session()
+    state = session.lifecycle.state
+    assert state is not None
+
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=session.advance_until_decision_or_terminal(),
+        stop_at_decision_type="select_fight_activation",
+        result_id_prefix="ecstatic-death-chain:before-attacker",
+    )
+    request = status.decision_request
+    assert request is not None
+    attacker_option_id = next(
+        option.option_id
+        for option in request.options
+        if attacker.unit_instance_id in option.option_id
+    )
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=attacker_option_id,
+        result_id="ecstatic-death-chain:attacker-activation",
+    )
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        result_id_prefix="ecstatic-death-chain:attacker",
+        melee_profile_suffix=":strike",
+        melee_target_unit_instance_id=retained.unit_instance_id,
+    )
+    reaction_request = status.decision_request
+    assert reaction_request is not None
+    status = session.submit_option(
+        request_id=reaction_request.request_id,
+        option_id=next(
+            option.option_id
+            for option in reaction_request.options
+            if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+        ),
+        result_id="ecstatic-death-chain:retained-accept",
+    )
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation is None
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_fight_activation"
+
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type="select_fight_activation",
+        result_id_prefix="ecstatic-death-chain:after-attacker",
+    )
+    request = status.decision_request
+    assert request is not None
+    retained_option_id = next(
+        option.option_id
+        for option in request.options
+        if retained.unit_instance_id in option.option_id
+    )
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=retained_option_id,
+        result_id="ecstatic-death-chain:retained-activation",
+    )
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        result_id_prefix="ecstatic-death-chain:retained",
+        melee_profile_suffix=":strike",
+        melee_target_unit_instance_id=child.unit_instance_id,
+    )
+    reaction_request = status.decision_request
+    assert reaction_request is not None
+    status = session.submit_option(
+        request_id=reaction_request.request_id,
+        option_id=next(
+            option.option_id
+            for option in reaction_request.options
+            if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+        ),
+        result_id="ecstatic-death-chain:child-accept",
+    )
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation is None
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_fight_activation"
+    assert not any(
+        event.event_type == "fight_on_death_activation_started"
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type="select_fight_activation",
+        result_id_prefix="ecstatic-death-chain:after-retained",
+    )
+    request = status.decision_request
+    assert request is not None
+    assert request.actor_id == "player-a"
+    assert any(child.unit_instance_id in option.option_id for option in request.options)
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.active_activation is None
+    assert [
+        selection.unit_instance_id
+        for selection in fight_state.fight_order_state.activation_selections
+    ] == [attacker.unit_instance_id, retained.unit_instance_id]
+    assert model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=child.own_models[0].model_instance_id,
+    )
+
+
+def _ecstatic_death_fight_session(
+    *,
+    game_id: str = "ecstatic-reciprocal-002",
+) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
+    catalog = _ecstatic_death_test_catalog()
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("attacker",),
         enemy_unit_ids=("target",),
@@ -634,7 +868,7 @@ def _ecstatic_death_fight_session() -> tuple[LocalGameSession, UnitInstance, Uni
             "attacker": Pose.at(x=10.0, y=20.0),
             "target": Pose.at(x=11.0, y=20.0),
         },
-        game_id="ecstatic-proto-2",
+        game_id=game_id,
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",
         model_count=1,
@@ -648,17 +882,80 @@ def _ecstatic_death_fight_session() -> tuple[LocalGameSession, UnitInstance, Uni
     assert state is not None
     attacker = units["attacker"]
     target = units["target"]
-    target_model = target.own_models[0]
-    setup_damage = apply_damage_to_model(
-        state=state,
-        target_unit_instance_id=target.unit_instance_id,
-        model_instance_id=target_model.model_instance_id,
-        damage=target_model.wounds_remaining - 1,
-        damage_kind=DamageKind.NORMAL,
-    )
-    assert setup_damage.final_wounds_remaining == 1
-    assert not setup_damage.destroyed
+    for unit in (attacker, target):
+        model = unit.own_models[0]
+        setup_damage = apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining - 1,
+            damage_kind=DamageKind.NORMAL,
+        )
+        assert setup_damage.final_wounds_remaining == 1
+        assert not setup_damage.destroyed
     return LocalGameSession(lifecycle=lifecycle), attacker, target
+
+
+def _ecstatic_death_chain_session() -> tuple[
+    LocalGameSession,
+    UnitInstance,
+    UnitInstance,
+    UnitInstance,
+]:
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("attacker", "child"),
+        enemy_unit_ids=("retained",),
+        origins={
+            "attacker": Pose.at(x=10.0, y=20.0),
+            "retained": Pose.at(x=11.0, y=20.0),
+            "child": Pose.at(x=12.0, y=20.0),
+        },
+        game_id="ecstatic-death-ordinary-chain",
+        datasheet_id=DAEMON_PRINCE_ID,
+        model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",
+        model_count=1,
+        catalog=_ecstatic_death_test_catalog(),
+        alpha_faction_id="EC",
+        alpha_detachment_ids=("daemon-prince-rule-ir-test",),
+        enemy_faction_id="EC",
+        enemy_detachment_ids=("daemon-prince-rule-ir-test",),
+    )
+    state = lifecycle.state
+    assert state is not None
+    for unit in units.values():
+        model = unit.own_models[0]
+        setup_damage = apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining - 1,
+            damage_kind=DamageKind.NORMAL,
+        )
+        assert setup_damage.final_wounds_remaining == 1
+        assert not setup_damage.destroyed
+    return (
+        LocalGameSession(lifecycle=lifecycle),
+        units["attacker"],
+        units["retained"],
+        units["child"],
+    )
+
+
+def _ecstatic_death_test_catalog() -> Any:
+    return replace(
+        _package().army_catalog,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="daemon-prince-rule-ir-test",
+                name="Daemon Prince RuleIR Test",
+                faction_id="EC",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(DAEMON_PRINCE_ID,),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:emperors-children:daemon-prince-rule-ir-detachment",),
+            ),
+        ),
+    )
 
 
 def _advance_ecstatic_death_session(
@@ -668,6 +965,7 @@ def _advance_ecstatic_death_session(
     stop_at_decision_type: str,
     result_id_prefix: str,
     melee_profile_suffix: str = ":sweep",
+    melee_target_unit_instance_id: str | None = None,
 ) -> LifecycleStatus:
     current = status
     for result_index in range(1, 129):
@@ -693,6 +991,7 @@ def _advance_ecstatic_death_session(
                 session=session,
                 status=current,
                 profile_suffix=melee_profile_suffix,
+                target_unit_instance_id=melee_target_unit_instance_id,
                 result_id=f"{result_id_prefix}:melee-{result_index:03d}",
             )
             continue
@@ -746,7 +1045,7 @@ def _advance_ecstatic_death_until_model_removed(
             current = _submit_ecstatic_death_melee(
                 session=session,
                 status=current,
-                profile_suffix=":sweep",
+                profile_suffix=":strike",
                 result_id=f"{result_id_prefix}:melee-{result_index:03d}",
             )
             continue
@@ -791,6 +1090,7 @@ def _submit_ecstatic_death_melee(
     session: LocalGameSession,
     status: LifecycleStatus,
     profile_suffix: str,
+    target_unit_instance_id: str | None = None,
     result_id: str,
 ) -> LifecycleStatus:
     request = status.decision_request
@@ -804,7 +1104,10 @@ def _submit_ecstatic_death_melee(
         )
     )
     target_ids = cast(list[str], profile["engaged_target_unit_instance_ids"])
-    assert len(target_ids) == 1
+    selected_target_id = (
+        target_ids[0] if target_unit_instance_id is None else target_unit_instance_id
+    )
+    assert selected_target_id in target_ids
     return session.submit_parameterized_payload(
         request_id=request.request_id,
         result_id=result_id,
@@ -822,7 +1125,7 @@ def _submit_ecstatic_death_melee(
                     "wargear_id": profile["wargear_id"],
                     "weapon_profile_id": profile["weapon_profile_id"],
                     "target_allocations": [
-                        {"target_unit_instance_id": target_ids[0]},
+                        {"target_unit_instance_id": selected_target_id},
                     ],
                 }
             ],

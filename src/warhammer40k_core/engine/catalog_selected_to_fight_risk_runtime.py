@@ -39,6 +39,9 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import (
+    fight_on_death_pending_rule_source_effect_ids,
+)
 from warhammer40k_core.engine.fight_phase_end_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
     FightPhaseEndHookBinding,
@@ -455,6 +458,9 @@ class CatalogSelectedToFightRiskRuntime:
                         continue
                     existing[6].append(effect)
         candidates: list[_FightEndCandidate] = []
+        pending_fight_on_death_source_ids = set(
+            fight_on_death_pending_rule_source_effect_ids(state=state)
+        )
         for (
             owner_id,
             unit_id,
@@ -465,6 +471,14 @@ class CatalogSelectedToFightRiskRuntime:
             effects,
         ) in candidates_by_key.values():
             effect_tuple = tuple(sorted(effects, key=lambda item: item.effect_id))
+            effect_ids = {effect.effect_id for effect in effect_tuple}
+            pending_ids = effect_ids.intersection(pending_fight_on_death_source_ids)
+            if pending_ids:
+                if pending_ids != effect_ids:
+                    raise GameLifecycleError(
+                        "Selected-to-fight risk Fight On Death liability binding is partial."
+                    )
+                continue
             if _enemy_model_was_destroyed_by_unit_attacks(
                 state=state,
                 records=records,

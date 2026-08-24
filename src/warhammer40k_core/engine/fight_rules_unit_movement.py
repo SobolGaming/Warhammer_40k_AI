@@ -9,6 +9,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -43,7 +44,6 @@ from warhammer40k_core.engine.movement_proposals import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    placed_alive_rules_unit_views,
     rules_unit_identity_ids,
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
@@ -1023,7 +1023,7 @@ def _enemy_geometry_models(
 ) -> tuple[GeometryModel, ...]:
     return tuple(
         model
-        for rules_unit in placed_alive_rules_unit_views(state=state)
+        for rules_unit in fight_present_rules_unit_views(state=state)
         if rules_unit.owner_player_id != player_id
         for model in _geometry_models_for_rules_unit(
             scenario=scenario,
@@ -1278,7 +1278,7 @@ def _enemy_rules_units(
 ) -> tuple[RulesUnitView, ...]:
     return tuple(
         view
-        for view in placed_alive_rules_unit_views(state=state)
+        for view in fight_present_rules_unit_views(state=state)
         if view.owner_player_id != rules_unit.owner_player_id
     )
 

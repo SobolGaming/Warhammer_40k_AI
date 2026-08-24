@@ -11513,6 +11513,7 @@ def test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit() -
         enemy_pose=Pose.at(11.0, 35.0),
     )
     state = _state(lifecycle)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
     battlefield = state.battlefield_state

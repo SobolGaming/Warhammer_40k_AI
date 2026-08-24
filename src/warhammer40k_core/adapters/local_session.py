@@ -27,6 +27,7 @@ from warhammer40k_core.adapters.replay import submit_replay_record
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload, build_support_profile
 from warhammer40k_core.core.rng import RandomSource, RandomSourceError, RandomSourcePayload
 from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.event_log import (
     EventLogError,
@@ -617,7 +618,14 @@ def _verify_persistence_replay(
             raise LocalGameSessionPersistenceError(
                 "LocalGameSession persistence replay event tail drifted."
             )
-        for record in artifact.decision_records:
+        for record_offset, record in enumerate(artifact.decision_records):
+            absolute_record_index = initial_decision_count + record_offset
+            if _persistence_replay_record_already_reproduced(
+                lifecycle=replay_session.lifecycle,
+                expected_record=record,
+                absolute_record_index=absolute_record_index,
+            ):
+                continue
             status = submit_replay_record(session=replay_session, record=record)
             if status.status_kind is LifecycleStatusKind.ADVANCED:
                 status = replay_session.advance_until_decision_or_terminal()
@@ -625,6 +633,14 @@ def _verify_persistence_replay(
                     raise LocalGameSessionPersistenceError(
                         "LocalGameSession replay did not reach a visible lifecycle boundary."
                     )
+            if not _persistence_replay_record_already_reproduced(
+                lifecycle=replay_session.lifecycle,
+                expected_record=record,
+                absolute_record_index=absolute_record_index,
+            ):
+                raise LocalGameSessionPersistenceError(
+                    "LocalGameSession persistence replay did not reproduce its decision record."
+                )
     except (DecisionError, GameLifecycleError) as exc:
         raise LocalGameSessionPersistenceError(
             "LocalGameSession persistence replay submission failed."
@@ -636,6 +652,30 @@ def _verify_persistence_replay(
         raise LocalGameSessionPersistenceError(
             "LocalGameSession persistence replay lifecycle drifted."
         )
+
+
+def _persistence_replay_record_already_reproduced(
+    *,
+    lifecycle: GameLifecycle,
+    expected_record: DecisionRecord,
+    absolute_record_index: int,
+) -> bool:
+    records = lifecycle.decision_controller.records
+    if len(records) < absolute_record_index:
+        raise LocalGameSessionPersistenceError(
+            "LocalGameSession persistence replay decision record sequence drifted."
+        )
+    if len(records) == absolute_record_index:
+        return False
+    actual_record = records[absolute_record_index]
+    if not _payloads_match_exactly(
+        cast(JsonValue, actual_record.to_payload()),
+        cast(JsonValue, expected_record.to_payload()),
+    ):
+        raise LocalGameSessionPersistenceError(
+            "LocalGameSession persistence automatically reproduced decision record drifted."
+        )
+    return True
 
 
 def _require_payload_hash(*, field_name: str, stored: object, actual: str) -> None:

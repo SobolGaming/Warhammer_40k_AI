@@ -15,6 +15,7 @@ from warhammer40k_core.engine import (
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
+from warhammer40k_core.engine import fight_activation_history_integrity as _fahi
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
@@ -3534,6 +3535,7 @@ def _validate_payload_consistency(
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)
+    _fahi.validate_restore(state, event_records, decision_records)
     validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
@@ -3785,7 +3787,7 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
         record.attached_unit_instance_id: record.player_id
         for record in state.starting_attached_unit_records
     }
-    known_unit_ids = set(unit_owner_by_id)
+    known_unit_ids = set(unit_owner_by_id) | set(historical_attached_owner_by_id)
     for unit_id in (
         *fight_order_state.engaged_at_fight_step_start_unit_ids,
         *fight_order_state.selected_to_fight_unit_ids,

@@ -803,7 +803,7 @@ def test_furys_cage_fight_on_death_uses_same_activation_then_removes_and_splits(
     assert activation_payload["result_id"] == original_activation_result_id
     removed_payload = _event_payload(decisions, "fight_on_death_models_removed")
     assert removed_payload["model_instance_ids"] == [bearer_model_id]
-    assert removed_payload["reason"] == "unit_attacked"
+    assert removed_payload["reason"] == "unit_fight_completed"
     finalized_payload = _event_payload(
         decisions,
         RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,

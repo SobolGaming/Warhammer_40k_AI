@@ -12,7 +12,7 @@ from warhammer40k_core.engine.attached_unit_reconciliation import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_model_ids_for_activation,
+    fight_on_death_model_ids_for_rules_unit,
     model_is_present_on_battlefield,
 )
 from warhammer40k_core.engine.fight_order import FightActivationSelection
@@ -40,14 +40,12 @@ def active_fight_activation_rules_unit(
         state=state,
         unit_instance_id=activation.unit_instance_id,
     )
-    awaiting_model_ids = fight_on_death_model_ids_for_activation(
+    awaiting_model_ids = fight_on_death_model_ids_for_rules_unit(
         state=state,
-        activation_result_id=activation.result_id,
+        unit_instance_id=rules_unit.unit_instance_id,
     )
     rules_unit_model_ids = frozenset(model.model_instance_id for model in rules_unit.own_models)
-    if awaiting_model_ids is not None and not set(awaiting_model_ids).issubset(
-        rules_unit_model_ids
-    ):
+    if not set(awaiting_model_ids).issubset(rules_unit_model_ids):
         raise GameLifecycleError("Fight On Death awaiting model is outside its activation unit.")
     present_model_ids = frozenset(
         model.model_instance_id
@@ -68,7 +66,7 @@ def active_fight_activation_rules_unit(
     )
     if missing_alive_ids:
         raise GameLifecycleError("Active fight rules unit has unplaced living models.")
-    if awaiting_model_ids is not None and not set(awaiting_model_ids).issubset(present_model_ids):
+    if not set(awaiting_model_ids).issubset(present_model_ids):
         raise GameLifecycleError("Fight On Death awaiting model is not placed.")
     return rules_unit
 
@@ -196,24 +194,52 @@ def finalize_rule_destruction_after_fight_activation(
     context: dict[str, JsonValue],
     rules_unit_instance_id: str,
 ) -> LifecycleStatus | None:
+    return finalize_rule_destructions_after_fight_activation(
+        state=state,
+        decisions=decisions,
+        contexts=(context,),
+        rules_unit_instance_id=rules_unit_instance_id,
+    )
+
+
+def finalize_rule_destructions_after_fight_activation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    contexts: tuple[dict[str, JsonValue], ...],
+    rules_unit_instance_id: str,
+) -> LifecycleStatus | None:
+    if not contexts:
+        raise GameLifecycleError("Rule Fight On Death finalization requires contexts.")
+    continuation_indexes = tuple(
+        index
+        for index, context in enumerate(contexts)
+        if context.get("completion_continuation") is not None
+    )
+    if len(continuation_indexes) > 1 or (
+        continuation_indexes and continuation_indexes[0] != len(contexts) - 1
+    ):
+        raise GameLifecycleError("Rule Fight On Death continuation ordering drift.")
     surviving_unit_ids = attached_rules_unit_split_survivor_ids(
         state=state,
         rules_unit_instance_id=rules_unit_instance_id,
     )
-    split_is_deferred = defer_attached_split_from_rule_destruction_context(context)
-    status = rule_model_destruction.finalize_rule_model_destruction(
-        state=state,
-        decisions=decisions,
-        context=context,
-    )
-    if split_is_deferred:
-        split_survivor_ids = split_attached_rules_unit_if_required(
+    status = None
+    for context in contexts:
+        defer_attached_split_from_rule_destruction_context(context)
+        status = rule_model_destruction.finalize_rule_model_destruction(
             state=state,
-            event_log=decisions.event_log,
-            rules_unit_instance_id=rules_unit_instance_id,
+            decisions=decisions,
+            context=context,
+            defer_attached_split_until_return=True,
         )
-        if split_survivor_ids != surviving_unit_ids:
-            raise GameLifecycleError("Deferred attached-unit split survivor drift.")
+    split_survivor_ids = split_attached_rules_unit_if_required(
+        state=state,
+        event_log=decisions.event_log,
+        rules_unit_instance_id=rules_unit_instance_id,
+    )
+    if split_survivor_ids != surviving_unit_ids:
+        raise GameLifecycleError("Deferred attached-unit split survivor drift.")
     reconcile_fight_phase_state_after_attached_split(
         state=state,
         attached_unit_instance_id=rules_unit_instance_id,
@@ -240,6 +266,7 @@ def _replace_fight_unit_identity(
 __all__ = (
     "active_fight_activation_rules_unit",
     "finalize_rule_destruction_after_fight_activation",
+    "finalize_rule_destructions_after_fight_activation",
     "reconcile_fight_phase_state_after_attached_split",
     "split_attached_rules_unit_after_fight_activation",
 )

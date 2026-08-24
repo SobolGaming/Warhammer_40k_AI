@@ -24,7 +24,11 @@ from tools.generate_aeldari_shroud_runners_wraithblades_rule_ir import (
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
-from warhammer40k_core.core.ruleset_descriptor import FightEligibilityKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    FightEligibilityKind,
+    FightPhaseStepKind,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     DamageProfile,
@@ -90,6 +94,10 @@ from warhammer40k_core.engine.fight_order import (
     FightActivationSelection,
     FightPhaseState,
     FightsFirstRegistry,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
@@ -546,7 +554,7 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         trigger_roll=3,
         attacks=attacks,
         damage_per_attack=damage_per_attack,
-        placed_model_count=3,
+        placed_model_count=5,
     )
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -559,6 +567,22 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
     attack_context = cast(dict[str, JsonValue], context["attack_context"])
     assert attack_context["attack_index"] == expected_attack_index
+
+    fight_state = fixture.state.fight_phase_state
+    assert fight_state is not None
+    attacker_activation = FightActivationSelection(
+        player_id="player-b",
+        battle_round=fixture.state.battle_round,
+        unit_instance_id=fixture.enemy_one.unit_instance_id,
+        ordering_band=fight_state.current_ordering_band,
+        fight_type=fixture.state.runtime_ruleset_descriptor().fight_policy.fight_types[0],
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="request:malevolent-souls:attacker-activation",
+        result_id="result:malevolent-souls:attacker-activation",
+    )
+    fixture.state.replace_fight_phase_state(
+        fight_state.with_activation(attacker_activation).with_active_activation(attacker_activation)
+    )
 
     replayed = GameLifecycle.from_payload(
         battle_lifecycle_payload(
@@ -593,6 +617,35 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     )
     accepted = replayed.submit_decision(result)
     assert accepted.status_kind is not LifecycleStatusKind.INVALID
+    handler = FightPhaseHandler(
+        ruleset_descriptor=replayed_state.runtime_ruleset_descriptor(),
+        army_catalog=_package().army_catalog,
+    )
+    for decision_index in range(16):
+        if not replayed.decision_controller.queue.pending_requests:
+            break
+        pending = replayed.decision_controller.queue.peek_next()
+        assert pending.options
+        selected_option_id = next(
+            (option.option_id for option in pending.options if "decline" in option.option_id),
+            pending.options[0].option_id,
+        )
+        pending_result = DecisionResult.for_request(
+            result_id=f"result:malevolent-souls:finish-attacker:{decision_index:02d}",
+            request=pending,
+            selected_option_id=selected_option_id,
+        )
+        replayed.decision_controller.submit_result(pending_result)
+        pending_status = handler.apply_decision(
+            state=replayed_state,
+            decisions=replayed.decision_controller,
+            result=pending_result,
+        )
+        assert pending_status is None or (
+            pending_status.status_kind is not LifecycleStatusKind.INVALID
+        )
+    else:
+        raise AssertionError("Malevolent Souls attacker decisions did not finish.")
 
     assert model_is_present_on_battlefield(
         state=replayed_state,
@@ -603,47 +656,105 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         for event in replayed.decision_controller.event_log.records
     )
     policy = replayed_state.runtime_ruleset_descriptor().fight_policy
-    activation = FightActivationSelection(
-        player_id="player-a",
-        battle_round=replayed_state.battle_round,
-        unit_instance_id=fixture.wraith_swords.unit_instance_id,
-        ordering_band=replayed_fight_state.current_ordering_band,
-        fight_type=policy.fight_types[0],
-        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
-        request_id="request:malevolent-souls-fight-on-death-activation",
-        result_id="result:malevolent-souls-fight-on-death-activation",
-    )
+    current_fight_state = replayed_state.fight_phase_state
+    assert current_fight_state is not None
+    assert current_fight_state.attack_sequence is not None
+    assert current_fight_state.attack_sequence.is_complete
     replayed_state.replace_fight_phase_state(
         replace(
-            replayed_fight_state,
-            active_activation=activation,
+            current_fight_state.with_current_step(
+                current_step=FightPhaseStepKind.FIGHT,
+                policy=policy,
+            ),
             attack_sequence=None,
         )
     )
     assert (
         _complete_active_fight_activation(
-            handler=FightPhaseHandler(
-                ruleset_descriptor=replayed_state.runtime_ruleset_descriptor()
-            ),
+            handler=handler,
             state=replayed_state,
             decisions=replayed.decision_controller,
             reaction_queue=None,
             policy=policy,
-            activation=activation,
-            unit_attacked=True,
+            activation=attacker_activation,
         )
         is None
     )
-    assert not model_is_present_on_battlefield(
+    selection_status = handler.begin_phase(
+        state=replayed_state,
+        decisions=replayed.decision_controller,
+    )
+    selection_request = selection_status.decision_request
+    assert selection_request is not None
+    assert selection_request.decision_type == "select_fight_activation"
+    target_option_id = next(
+        option.option_id
+        for option in selection_request.options
+        if fixture.wraith_swords.unit_instance_id in option.option_id
+    )
+    replayed.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="result:malevolent-souls-normal-activation",
+            request=selection_request,
+            selected_option_id=target_option_id,
+        )
+    )
+    selected_status = handler.apply_decision(
+        state=replayed_state,
+        decisions=replayed.decision_controller,
+        result=replayed.decision_controller.records[-1].result,
+    )
+    assert selected_status is None
+    selected_fight_state = replayed_state.fight_phase_state
+    assert selected_fight_state is not None
+    assert selected_fight_state.active_activation is not None
+    assert selected_fight_state.active_activation.unit_instance_id == (
+        fixture.wraith_swords.unit_instance_id
+    )
+    assert selected_fight_state.fight_order_state.activation_selections[-1] == (
+        selected_fight_state.active_activation
+    )
+    assert not any(
+        event.event_type == "fight_on_death_activation_started"
+        for event in replayed.decision_controller.event_log.records
+    )
+    assert model_is_present_on_battlefield(
         state=replayed_state,
         model_instance_id=target_model.model_instance_id,
     )
-    cleanup_event = next(
-        event
-        for event in reversed(replayed.decision_controller.event_log.records)
-        if event.event_type == "fight_on_death_models_removed"
+    melee_status = handler.begin_phase(
+        state=replayed_state,
+        decisions=replayed.decision_controller,
     )
-    assert cast(dict[str, JsonValue], cleanup_event.payload)["reason"] == "unit_attacked"
+    melee_request = melee_status.decision_request
+    assert melee_request is not None
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    melee_proposal = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    available_model_ids = {
+        cast(str, row["model_instance_id"])
+        for row in melee_proposal.available_weapons
+        if isinstance(row, dict)
+        and row.get("is_extra_attacks") is False
+        and bool(row.get("engaged_target_unit_instance_ids"))
+    }
+    present_model_ids = {
+        model.model_instance_id
+        for model in fixture.wraith_swords.own_models
+        if model_is_present_on_battlefield(
+            state=replayed_state,
+            model_instance_id=model.model_instance_id,
+        )
+    }
+    living_model_ids = {
+        model.model_instance_id
+        for model in fixture.wraith_swords.own_models
+        if model.is_alive and model.model_instance_id in present_model_ids
+    }
+    assert target_model.model_instance_id in available_model_ids
+    assert living_model_ids
+    assert present_model_ids == available_model_ids
+    replayed_payload = replayed.to_payload()
+    assert GameLifecycle.from_payload(replayed_payload).to_payload() == replayed_payload
 
 
 @pytest.mark.parametrize(
@@ -744,6 +855,87 @@ def test_malevolent_souls_does_not_open_for_failed_ranged_or_already_fought_dest
         if event.event_type == "destruction_reaction_trigger_rolled"
     )
     assert len(trigger_events) == (1 if trigger_roll == 2 else 0)
+
+
+def test_malevolent_souls_rejects_descendant_of_attached_unit_that_already_fought() -> None:
+    fixture = _runtime_fixture(attach_shroud_to_wraith=True)
+    fixture.runtime.record_static_destruction_reaction_sources(state=fixture.state)
+    formation = fixture.armies[0].attached_units[0]
+    attached_id = formation.attached_unit_instance_id
+    policy = fixture.state.runtime_ruleset_descriptor().fight_policy
+    phases = tuple(fixture.state.battle_phase_sequence)
+    fixture.state.battle_phase_index = phases.index(BattlePhase.FIGHT)
+    fight_state = FightPhaseState.start(
+        battle_round=fixture.state.battle_round,
+        active_player_id="player-a",
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(attached_id,),
+        fights_first_registry=FightsFirstRegistry(),
+    )
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=fixture.state.battle_round,
+        unit_instance_id=attached_id,
+        ordering_band=fight_state.current_ordering_band,
+        fight_type=policy.fight_types[0],
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="request:malevolent-souls:attached-fight",
+        result_id="result:malevolent-souls:attached-fight",
+    )
+    fixture.state.fight_phase_state = fight_state.with_activation(activation)
+
+    for model in fixture.shroud.own_models:
+        damage = apply_damage_to_model(
+            state=fixture.state,
+            target_unit_instance_id=fixture.shroud.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+        assert damage.destroyed
+    decisions = DecisionController()
+    fixture.state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(fixture.wraith_shields.unit_instance_id,),
+        event_log=decisions.event_log,
+    )
+    checkpoint = battle_lifecycle_payload(
+        state=fixture.state,
+        decisions=decisions,
+    )
+    lifecycle = GameLifecycle.from_payload(checkpoint)
+    assert lifecycle.to_payload() == checkpoint
+    state = lifecycle.state
+    assert state is not None
+    restored_fight_state = state.fight_phase_state
+    assert restored_fight_state is not None
+    assert restored_fight_state.fight_order_state.selected_to_fight_unit_ids == (attached_id,)
+
+    target_model = fixture.wraith_shields.own_models[0]
+    source = state.destruction_reaction_sources_for_model(
+        model_instance_id=target_model.model_instance_id
+    )[0]
+    descriptor = cast(dict[str, JsonValue], source.payload)
+    assert descriptor["requires_not_fought_this_phase"] is True
+    target_damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=fixture.wraith_shields.unit_instance_id,
+        model_instance_id=target_model.model_instance_id,
+        damage=target_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+        remove_destroyed_model=False,
+    )
+    assert target_damage.destroyed
+    assert not optional_destruction_reaction_trigger_conditions_met(
+        state=state,
+        destruction_provenance=DestructionProvenance.for_attack(
+            weapon_profile=_profile(WRAITHBLADES_ID, "Ghostaxe"),
+            attack_context_id="attack-context:malevolent-souls:attached-lineage",
+        ),
+        damage=target_damage,
+        descriptor=descriptor,
+    )
 
 
 def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight() -> None:

@@ -77,9 +77,6 @@ from warhammer40k_core.engine.fight_phase_end_hooks import (
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
 )
-from warhammer40k_core.engine.fight_resolution import (
-    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
-)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
     FightUnitSelectedTimedEffect,
@@ -126,8 +123,8 @@ from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
     defer_attached_split_from_rule_destruction_context,
 )
 from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
-    apply_rule_destruction_reaction_and_schedule_fight_on_death,
-    remove_rule_fight_on_death_models_for_completed_activation,
+    apply_rule_destruction_fight_on_death_reaction,
+    remove_rule_fight_on_death_contexts_for_completed_activation,
 )
 from warhammer40k_core.engine.rule_model_destruction_source_liabilities import (
     consume_rule_destruction_source_liabilities,
@@ -1120,7 +1117,7 @@ def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_u
     assert not state.persisting_effects
 
 
-def test_selected_to_fight_risk_fight_on_death_defers_attached_split_until_activation() -> None:
+def test_selected_to_fight_risk_fight_on_death_cleans_at_phase_end_then_splits() -> None:
     state, runtime, decisions, bodyguard, leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
             pre_split=False,
@@ -1196,7 +1193,63 @@ def test_selected_to_fight_risk_fight_on_death_defers_attached_split_until_activ
         for army in state.army_definitions
         for formation in army.attached_units
     )
-    assert state.persisting_effects
+    assert state.battlefield_state is not None
+    assert model_id in state.battlefield_state.placed_model_ids()
+    checkpoint = cast(
+        GameLifecyclePayload,
+        {
+            "config": None,
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": decisions.to_payload(),
+            "reaction_queue": {"frames": []},
+        },
+    )
+    checkpoint = GameLifecycle.from_payload(checkpoint).to_payload()
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    liability_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    awaiting_effect = next(
+        effect
+        for effect in liability_drift["state"]["persisting_effects"]
+        if cast(dict[str, JsonValue], effect["effect_payload"]).get("effect_kind")
+        == "fight_on_death_awaiting_attack"
+    )
+    completion_context = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], awaiting_effect["effect_payload"])["completion_context"],
+    )
+    source_effect_ids = cast(list[str], completion_context["source_effect_ids"])
+    assert source_effect_ids
+    liability_drift["state"]["persisting_effects"] = [
+        effect
+        for effect in liability_drift["state"]["persisting_effects"]
+        if effect["effect_id"] != source_effect_ids[0]
+    ]
+    with pytest.raises(GameLifecycleError, match="source liability drift"):
+        GameLifecycle.from_payload(liability_drift)
+    context_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_awaiting_effect = next(
+        effect
+        for effect in context_drift["state"]["persisting_effects"]
+        if cast(dict[str, JsonValue], effect["effect_payload"]).get("effect_kind")
+        == "fight_on_death_awaiting_attack"
+    )
+    cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], drifted_awaiting_effect["effect_payload"])["completion_context"],
+    )["battle_round"] = state.battle_round + 1
+    with pytest.raises(GameLifecycleError, match="model_destroyed event drift"):
+        GameLifecycle.from_payload(context_drift)
+    assert not any(
+        event.event_type == "fight_on_death_activation_started"
+        for event in decisions.event_log.records
+    )
 
     completed = handler.begin_phase(state=state, decisions=decisions)
 
@@ -1212,9 +1265,12 @@ def test_selected_to_fight_risk_fight_on_death_defers_attached_split_until_activ
     assert not state.persisting_effects
     assert state.battlefield_state is not None
     assert model_id not in state.battlefield_state.placed_model_ids()
+    removed = _last_event_payload(decisions, "fight_on_death_models_removed")
+    assert removed["model_instance_ids"] == [model_id]
+    assert removed["reason"] == "phase_end"
 
 
-def test_standalone_fight_on_death_after_prior_fight_is_model_only() -> None:
+def test_fight_end_fight_on_death_does_not_grant_second_activation() -> None:
     state, runtime, decisions, bodyguard, _leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
             pre_split=False,
@@ -1303,19 +1359,23 @@ def test_standalone_fight_on_death_after_prior_fight_is_model_only() -> None:
         is None
     )
 
-    melee_status = handler.begin_phase(state=state, decisions=decisions)
+    completed = handler.begin_phase(state=state, decisions=decisions)
 
-    assert melee_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert melee_status.decision_request is not None
-    assert melee_status.decision_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
-    payload = cast(dict[str, JsonValue], melee_status.decision_request.payload)
-    proposal_request = cast(dict[str, JsonValue], payload["proposal_request"])
-    available_weapons = cast(list[JsonValue], proposal_request["available_weapons"])
-    assert available_weapons
-    assert {
-        cast(str, cast(dict[str, JsonValue], weapon)["model_instance_id"])
-        for weapon in available_weapons
-    } == {model_id}
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    restored_fight_state = state.fight_phase_state
+    assert restored_fight_state is not None
+    assert restored_fight_state.fight_order_state.activation_selections == (prior_activation,)
+    assert state.battlefield_state is not None
+    assert model_id not in state.battlefield_state.placed_model_ids()
+    assert bodyguard.own_models[0].model_instance_id in (state.battlefield_state.placed_model_ids())
+    assert not state.persisting_effects
+    assert not any(
+        event.event_type == "fight_on_death_activation_started"
+        for event in decisions.event_log.records
+    )
+    removed = _last_event_payload(decisions, "fight_on_death_models_removed")
+    assert removed["model_instance_ids"] == [model_id]
+    assert removed["reason"] == "phase_end"
 
 
 def test_deadly_demise_targets_attached_rules_unit_once() -> None:
@@ -2109,7 +2169,7 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
         )
     )
 
-    apply_rule_destruction_reaction_and_schedule_fight_on_death(
+    apply_rule_destruction_fight_on_death_reaction(
         state=state,
         decisions=decisions,
         result=record.result,
@@ -2130,13 +2190,13 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
     )
 
     state.replace_fight_phase_state(state.fight_phase_state.with_active_activation(None))
-    completion_context = remove_rule_fight_on_death_models_for_completed_activation(
+    completion_contexts = remove_rule_fight_on_death_contexts_for_completed_activation(
         state=state,
         decisions=decisions,
         activation=activation,
-        unit_attacked=True,
     )
-    assert completion_context is not None
+    assert len(completion_contexts) == 1
+    completion_context = completion_contexts[0]
     assert (
         finalize_rule_destruction_after_fight_activation(
             state=state,
@@ -2158,7 +2218,7 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
     }
     removed = _last_event_payload(decisions, "fight_on_death_models_removed")
     assert removed["model_instance_ids"] == [model.model_instance_id]
-    assert removed["reason"] == "unit_attacked"
+    assert removed["reason"] == "unit_fight_completed"
 
 
 @pytest.mark.parametrize(

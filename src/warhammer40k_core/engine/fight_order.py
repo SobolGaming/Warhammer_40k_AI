@@ -17,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequencePayload
+from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fights_first import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND as CHARGE_FIGHTS_FIRST_EFFECT_KIND,
@@ -37,7 +38,6 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    placed_alive_rules_unit_views,
     rules_unit_identity_history_contains,
     rules_unit_view_by_id,
 )
@@ -1319,7 +1319,7 @@ def eligible_fight_contexts_for_player(
     requested_player_id = _validate_identifier("player_id", player_id)
     if state.army_definition_for_player(requested_player_id) is None:
         raise GameLifecycleError("Fight phase requires mustered army definitions.")
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
+    placed_rules_units = fight_present_rules_unit_views(state=state)
     player_rules_units = tuple(
         rules_unit
         for rules_unit in placed_rules_units
@@ -1382,7 +1382,7 @@ def unit_is_currently_engaged(*, state: GameState, unit_instance_id: str) -> boo
         state=state,
         unit_instance_id=requested_unit_id,
     )
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
+    placed_rules_units = fight_present_rules_unit_views(state=state)
     return _unit_is_engaged(
         state=state,
         rules_unit=rules_unit,
@@ -1425,7 +1425,7 @@ def engaged_unit_ids_at_fight_start(
     policy: FightPolicyDescriptor,
 ) -> tuple[str, ...]:
     del policy
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
+    placed_rules_units = fight_present_rules_unit_views(state=state)
     engaged: set[str] = set()
     for rules_unit in placed_rules_units:
         if _unit_is_engaged(
@@ -1609,7 +1609,7 @@ def fight_eligibility_reasons_for_unit(
         state=state,
         unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
     )
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
+    placed_rules_units = fight_present_rules_unit_views(state=state)
     return _fight_eligibility_reasons_for_rules_unit(
         state=state,
         fight_state=fight_state,
