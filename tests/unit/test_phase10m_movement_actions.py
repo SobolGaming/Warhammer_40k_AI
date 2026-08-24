@@ -14,8 +14,21 @@ from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.detachment import DetachmentDefinition
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -26,10 +39,11 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionOption,
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -38,7 +52,12 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import MOVEMENT_PROPOSAL_DECISION_TYPE
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -51,11 +70,19 @@ from warhammer40k_core.engine.phases.movement import (
     resolve_normal_move,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.runtime_modifiers import (
+    AdvanceRollModifierBinding,
+    AdvanceRollModifierContext,
+    MovementBudgetModifierBinding,
+    MovementBudgetModifierContext,
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     stratagem_decline_payload,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -75,6 +102,18 @@ from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
     warhammer_event_companion_2026_07_mission_pack,
 )
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleDuration,
+    RuleDurationKind,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleTargetKind,
+    RuleTargetSpec,
+    parameters_from_pairs,
+)
 
 
 def test_action_options_outside_engagement_are_remain_normal_and_advance() -> None:
@@ -89,6 +128,164 @@ def test_action_options_outside_engagement_are_remain_normal_and_advance() -> No
     assert MovementPhaseActionKind.FALL_BACK.value not in {
         option.option_id for option in action_request.options
     }
+
+
+@pytest.mark.parametrize(
+    ("ignored_kind", "expected_movement_inches", "expected_advance_modifier_ids"),
+    [
+        (
+            "movement_characteristic",
+            6.0,
+            ("test:modifier-ignore:advance-penalty",),
+        ),
+        ("advance_roll", 4.0, ()),
+    ],
+)
+def test_movement_action_modifier_ignore_subsets_use_finite_lifecycle_and_round_trip(
+    ignored_kind: str,
+    expected_movement_inches: float,
+    expected_advance_modifier_ids: tuple[str, ...],
+) -> None:
+    config = replace(
+        _infantry_config(),
+        game_id=f"phase10m-modifier-ignore-{ignored_kind}",
+    )
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    ability_index = AbilityCatalogIndex.from_records((_movement_modifier_ignore_ability_record(),))
+    registry = _movement_modifier_ignore_registry()
+    _install_movement_modifier_ignore_runtime(
+        lifecycle,
+        ability_index=ability_index,
+        registry=registry,
+    )
+    action_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=_decision_request(movement_status),
+            option_id="army-alpha:intercessor-unit-1",
+            result_id=f"phase10m-modifier-ignore-{ignored_kind}-select-unit",
+        )
+    )
+    advance_options = tuple(
+        option
+        for option in action_request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("movement_phase_action") == MovementPhaseActionKind.ADVANCE.value
+    )
+    assert len(advance_options) == 4
+    selected_option = next(
+        option for option in advance_options if _ignored_modifier_kinds(option) == (ignored_kind,)
+    )
+    restored_request = DecisionRequest.from_payload(
+        json.loads(json.dumps(action_request.to_payload(), sort_keys=True))
+    )
+    assert restored_request == action_request
+
+    status = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=selected_option.option_id,
+        result_id=f"phase10m-modifier-ignore-{ignored_kind}-select-action",
+    )
+    state = lifecycle.state
+    assert state is not None
+    source_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == "army-alpha:intercessor-unit-1"
+    )
+    model_id = source_unit.own_model_ids()[0]
+    assert (
+        registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id="army-alpha:intercessor-unit-1",
+                model_instance_id=model_id,
+                base_movement_inches=6.0,
+                current_movement_inches=6.0,
+            )
+        )
+        == expected_movement_inches
+    )
+    advance_event = next(
+        event
+        for event in reversed(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "advance_roll_resolved"
+    )
+    assert isinstance(advance_event.payload, dict)
+    advance_roll = cast(dict[str, object], advance_event.payload["advance_roll"])
+    advance_request = cast(dict[str, object], advance_roll["request"])
+    roll_modifiers = cast(list[dict[str, object]], advance_request["roll_modifiers"])
+    assert tuple(cast(str, item["modifier_id"]) for item in roll_modifiers) == (
+        expected_advance_modifier_ids
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.decision_controller.records[-1].result.payload == selected_option.payload
+    modifier_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "modifier_ignores_selected"
+    )
+    assert len(modifier_events) == 1
+    assert isinstance(modifier_events[0].payload, dict)
+    effect_payload = cast(
+        dict[str, object],
+        cast(dict[str, object], modifier_events[0].payload)["modifier_ignore_effect"],
+    )
+    assert effect_payload["effect_id"] == (
+        f"phase10m-modifier-ignore-{ignored_kind}-select-action:modifier-ignore-selection"
+    )
+    lifecycle_payload = json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True))
+    assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+    assert "object at 0x" not in json.dumps(lifecycle_payload, sort_keys=True)
+
+
+def test_movement_modifier_ignore_option_drift_rejects_before_queue_pop() -> None:
+    config = replace(_infantry_config(), game_id="phase10m-modifier-ignore-stale")
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    ability_index = AbilityCatalogIndex.from_records((_movement_modifier_ignore_ability_record(),))
+    _install_movement_modifier_ignore_runtime(
+        lifecycle,
+        ability_index=ability_index,
+        registry=_movement_modifier_ignore_registry(),
+    )
+    action_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=_decision_request(movement_status),
+            option_id="army-alpha:intercessor-unit-1",
+            result_id="phase10m-modifier-ignore-stale-select-unit",
+        )
+    )
+    stale_option = next(
+        option
+        for option in action_request.options
+        if _ignored_modifier_kinds(option) == ("advance_roll",)
+    )
+    _install_movement_modifier_ignore_runtime(
+        lifecycle,
+        ability_index=ability_index,
+        registry=RuntimeModifierRegistry.empty(),
+    )
+    record_count = len(lifecycle.decision_controller.records)
+
+    status = _submit_result(
+        lifecycle,
+        request=action_request,
+        option_id=stale_option.option_id,
+        result_id="phase10m-modifier-ignore-stale-select-action",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    assert status.payload["invalid_reason"] == "movement_action_option_drift"
+    assert lifecycle.decision_controller.queue.pending_requests == (action_request,)
+    assert len(lifecycle.decision_controller.records) == record_count
+    assert all(
+        event.event_type != "modifier_ignores_selected"
+        for event in lifecycle.decision_controller.event_log.records
+    )
 
 
 def test_action_options_inside_engagement_are_remain_and_fall_back() -> None:
@@ -664,6 +861,142 @@ def test_normal_move_rejects_witness_model_set_drift() -> None:
             unit_placement=unit_placement,
             path_witness=witness,
         )
+
+
+def _movement_modifier_ignore_ability_record() -> AbilityCatalogRecord:
+    text = "This model can ignore any or all modifiers to Move, Advance and Charge."
+    span = TextSpan(text=text, start=0, end=len(text))
+    clause = RuleClause(
+        clause_id="test:modifier-ignore:movement-clause",
+        source_span=span,
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=span),
+        effects=(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("ability", "modifier_ignore_permission"),
+                        (
+                            "modifier_kinds",
+                            (
+                                "movement_characteristic",
+                                "advance_roll",
+                                "charge_roll",
+                            ),
+                        ),
+                        ("selection", "any_or_all"),
+                    )
+                ),
+            ),
+        ),
+        duration=RuleDuration(
+            kind=RuleDurationKind.WHILE_CONDITION_TRUE,
+            source_span=span,
+        ),
+    )
+    rule_ir = RuleIR(
+        rule_id="test:modifier-ignore:movement-rule",
+        source_id="test:modifier-ignore:movement-source",
+        normalized_text=text,
+        parser_version="test:modifier-ignore:v1",
+        clauses=(clause,),
+    )
+    return AbilityCatalogRecord(
+        record_id="test:modifier-ignore:movement-record",
+        definition=AbilityDefinition(
+            ability_id="test:modifier-ignore:movement-ability",
+            name="Test Modifier Ignore",
+            source_id=rule_ir.source_id,
+            when_descriptor="Passive.",
+            effect_descriptor=text,
+            restrictions_descriptor="This model only.",
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+                phase=BattlePhaseKind.MOVEMENT,
+            ),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": cast(JsonValue, rule_ir.to_payload())}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="core-intercessor-like-infantry",
+    )
+
+
+def _movement_modifier_ignore_registry() -> RuntimeModifierRegistry:
+    return RuntimeModifierRegistry.from_bindings(
+        movement_budget_modifier_bindings=(
+            MovementBudgetModifierBinding(
+                modifier_id="test:modifier-ignore:movement-penalty",
+                source_id="test:modifier-ignore:movement-penalty-source",
+                handler=_modifier_ignore_movement_penalty,
+            ),
+        ),
+        advance_roll_modifier_bindings=(
+            AdvanceRollModifierBinding(
+                modifier_id="test:modifier-ignore:advance-binding",
+                source_id="test:modifier-ignore:advance-binding-source",
+                handler=_modifier_ignore_advance_penalty,
+            ),
+        ),
+    )
+
+
+def _modifier_ignore_movement_penalty(context: MovementBudgetModifierContext) -> float:
+    source_unit = next(
+        unit
+        for army in context.state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == context.unit_instance_id
+    )
+    if context.model_instance_id != source_unit.own_model_ids()[0]:
+        return context.current_movement_inches
+    return context.current_movement_inches - 2.0
+
+
+def _modifier_ignore_advance_penalty(
+    context: AdvanceRollModifierContext,
+) -> tuple[RollModifier, ...]:
+    return (
+        *context.current_roll_modifiers,
+        RollModifier(
+            modifier_id="test:modifier-ignore:advance-penalty",
+            source_id="test:modifier-ignore:advance-penalty-source",
+            operand=-1,
+        ),
+    )
+
+
+def _install_movement_modifier_ignore_runtime(
+    lifecycle: GameLifecycle,
+    *,
+    ability_index: AbilityCatalogIndex,
+    registry: RuntimeModifierRegistry,
+) -> None:
+    handler = replace(
+        lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        ability_indexes_by_player_id={
+            "player-a": ability_index,
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        runtime_modifier_registry=registry,
+    )
+    lifecycle._movement_phase_handler = handler  # pyright: ignore[reportPrivateUsage]
+    flow = lifecycle._battle_round_flow  # pyright: ignore[reportPrivateUsage]
+    assert flow is not None
+    flow._phase_handlers[BattlePhase.MOVEMENT] = handler  # pyright: ignore[reportPrivateUsage]
+
+
+def _ignored_modifier_kinds(option: DecisionOption) -> tuple[str, ...]:
+    payload = option.payload
+    if not isinstance(payload, dict):
+        return ()
+    raw_context = payload.get("modifier_ignore_context")
+    if not isinstance(raw_context, dict):
+        return ()
+    ignored = raw_context.get("ignored_modifiers")
+    assert isinstance(ignored, list)
+    return tuple(cast(str, item["kind"]) for item in ignored if isinstance(item, dict))
 
 
 def _advance_to_movement_unit_selection(

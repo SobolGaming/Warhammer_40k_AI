@@ -237,18 +237,18 @@ The machine-readable report is `data/generated/ability_coverage/maulerfiend_cros
 | --- | --- | --- |
 | `counted-wargear-replacement` | `content_neutral_engine_mechanic` | The parser and unit factory preserve the counted replacement for all four exact current-source variants; that reuse does not certify their faction-local rules bundles. |
 | `deterministic-weapon-copy-identity` | `content_neutral_engine_mechanic` | Both equipped copies receive stable identities for all four exact current-source variants; identity support alone does not certify faction-local ability execution. |
-| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The contract is generic, but the checked-in end-to-end regression currently certifies only Emperor's Children datasheet 000004091. |
+| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The shared request, declaration, attack-pool, decision-record, and replay contract is exercised against all four exact current Maulerfiend datasheet IDs, including same-target declarations, split targets, and duplicate-copy rejection. |
 
 ### Exact faction variants
 
-| Faction / exact key | Source treatment | Generated component evidence | Faction-local source rules | Conclusion |
-| --- | --- | --- | --- | --- |
-| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | Not selected | Siege Crawler (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
-| Thousand Sons / `thousand-sons:000001029` | `rules_update` | Not selected | Snarling Protector (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| World Eaters / `world-eaters:000002639` | `rules_update` | Not selected | Savage Exaltation (`blocked_structured_semantics`)<br>The Scent of Blood (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+| Faction / exact key | Source treatment | Current MFM points | Generated component evidence | Faction-local source rules | Conclusion |
+| --- | --- | --- | --- | --- | --- |
+| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | all units: **130 pts** (1 model) | `Playable` for this exact ID | Siege Crawler (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Thousand Sons / `thousand-sons:000001029` | `rules_update` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Snarling Protector (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| World Eaters / `world-eaters:000002639` | `rules_update` | units 1-2: **140 pts** (1 model)<br>unit 3+: **150 pts** (1 model) | `Playable` for this exact ID | Savage Exaltation (`engine_consumed`)<br>The Scent of Blood (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
 
-**Death Guard:** The exhaustive current Death Guard Faction Pack review contains no Maulerfiend datasheet row; no synthetic support row is emitted.
+**Death Guard:** The exhaustive current Death Guard Faction Pack review and MFM faction inventory contain no Maulerfiend row; no synthetic support row is emitted.
 
 Unknown Abilities are descriptors that are present in the canonical catalog but are not yet parsed into a supported IR template or tied to a runtime consumer. Parsed-but-unconsumed IR remains separated by its semantic category and support stage instead of being collapsed into Unknown Abilities.
 
@@ -278,7 +278,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
 | `catalog-ir:can-fallback-and-charge` | Acrobatic |
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
-| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
+| `catalog-ir:charge-roll-modifier` | Instrument of Chaos<br>The Scent of Blood |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
 | `catalog-ir:command-end-sticky-objective-control` | Objective Defiled |
 | `catalog-ir:command-phase-ability-mode` | Beguiling Form<br>Daemon Primarch of Slaanesh<br>Daemonic Speed<br>Enthralling Hypnosis (Aura) |
@@ -319,8 +319,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fortification-cover` | No current generated rows |
 | `catalog-ir:fortification-desperate-escape` | No current generated rows |
 | `catalog-ir:fortification-target-permission` | No current generated rows |
+| `catalog-ir:friendly-engaged-anchor-charge-reroll` | Snarling Protector |
 | `catalog-ir:granted-ability:stealth` | No current generated rows |
-| `catalog-ir:hit-roll-modifier` | Glutton for Punishment<br>Piratical Hero<br>Psychic Guidance<br>Revel in Desecration |
+| `catalog-ir:hit-roll-modifier` | Glutton for Punishment<br>Piratical Hero<br>Psychic Guidance<br>Revel in Desecration<br>Savage Exaltation |
 | `catalog-ir:hit-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save<br>Shimmershield |
@@ -329,6 +330,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon<br>Psychic Guidance |
 | `catalog-ir:minimum-unmodified-hit-success` | Mandiblasters<br>Whispering Web |
 | `catalog-ir:model-materialization` | No current generated rows |
+| `catalog-ir:modifier-ignore-permission` | Siege Crawler |
 | `catalog-ir:movement-action-grant` | Flickerjump |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
@@ -359,7 +361,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:shooting-start-selected-target-effect` | Hallucinogen Grenades |
 | `catalog-ir:shooting-target-range-restriction` | Wreathed in Shadows (Aura, Psychic) |
 | `catalog-ir:start-battle-keyword-choice` | Fated Hero |
-| `catalog-ir:stratagem-cost-modifier` | Path of Command |
+| `catalog-ir:stratagem-cost-modifier` | Path of Command<br>Snarling Protector |
+| `catalog-ir:stratagem-phase-use-exception` | Snarling Protector |
 | `catalog-ir:strength-characteristic-modifier` | Daemon Prince of Khorne |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | Daemon Prince of Nurgle |
@@ -395,7 +398,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
-| `catalog-ir:wound-roll-modifier` | Glutton for Punishment<br>Wave Serpent Shield |
+| `catalog-ir:wound-roll-modifier` | Glutton for Punishment<br>Savage Exaltation<br>Wave Serpent Shield |
 | `catalog-ir:wound-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Excessive Assault<br>Fated Hero<br>Storm of Silence |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |

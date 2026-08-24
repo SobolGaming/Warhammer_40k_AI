@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-package-v1",
   "edition": 11,
-  "package_hash": "a82f901adbf41c40fe83df6d9687f02b2e7d54ce895208737c29bc5756bee54d",
+  "package_hash": "a310b4bb595385a277cdcc11752108a1dd33e69a49f29f92aaed845a8b643c3c",
   "registry_id": "warhammer-40000-11th-faction-pack-rule-ir",
   "shard_artifacts": {
     "aeldari": {
@@ -136,6 +136,19 @@
         "000004128:4"
       ]
     },
+    "chaos-space-marines": {
+      "datasheet_ids": [
+        "000000968"
+      ],
+      "path": "shards/chaos-space-marines.json",
+      "sha256": "b72dcc41332fa172f173a4f8cd05ab05947a6fb168054c144a073584a5c89485",
+      "source_package_ids": [
+        "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07"
+      ],
+      "source_row_ids": [
+        "000000968:3"
+      ]
+    },
     "emperors-children": {
       "datasheet_ids": [
         "000004077",
@@ -171,6 +184,33 @@
         "000004083:6",
         "000004090:3",
         "000004091:3"
+      ]
+    },
+    "thousand-sons": {
+      "datasheet_ids": [
+        "000001029"
+      ],
+      "path": "shards/thousand-sons.json",
+      "sha256": "c111851f71c0e52a45251b38efe3dec280e99a4256f1f6133e2fe54d0403c12a",
+      "source_package_ids": [
+        "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07"
+      ],
+      "source_row_ids": [
+        "000001029:2"
+      ]
+    },
+    "world-eaters": {
+      "datasheet_ids": [
+        "000002639"
+      ],
+      "path": "shards/world-eaters.json",
+      "sha256": "9c191219988c23db94ab6329127d7ff2d30b21a68c9796d4923dff84f094a5fc",
+      "source_package_ids": [
+        "gw-11e-world-eaters-maulerfiend-datasheet-2026-07"
+      ],
+      "source_row_ids": [
+        "000002639:3",
+        "000002639:4"
       ]
     }
   }

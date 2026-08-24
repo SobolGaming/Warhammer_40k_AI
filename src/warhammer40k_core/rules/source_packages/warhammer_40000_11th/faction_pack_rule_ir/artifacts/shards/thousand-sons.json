@@ -1,0 +1,471 @@
+{
+  "artifact_schema": "core-v2-faction-pack-rule-ir-shard-v1",
+  "datasheet_faction_ids": {
+    "000001029": "thousand-sons"
+  },
+  "datasheet_faction_ids_provenance": {
+    "source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
+    "source_snapshot_filename": "Datasheets.json",
+    "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
+  },
+  "edition": 11,
+  "package_hash": "809c6d7a113de5581686846dbb957273212494b7621ee6f5c4c9bb72efaa658f",
+  "shard_id": "thousand-sons",
+  "source_packages": {
+    "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07": {
+      "artifact_schema": "core-v2-thousand-sons-maulerfiend-rule-ir-v1",
+      "datasheet_id": "000001029",
+      "datasheet_name": "Maulerfiend",
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_thousand_sons-h1ysumgym3-kyfwf7cjpt.pdf",
+      "official_document_pages": [
+        9,
+        10,
+        11
+      ],
+      "official_document_sha256": "11a5ebb01ef17c79caaff54bcff80cbc7fa72040a5e15a1790e4a61754853e31",
+      "overlay_package_hash": "29fbb383c552fabc98fb36baad25816e19e2842b5b1d7d6ad6f5ebcbec616fd9",
+      "package_hash": "cd86855dd730ec1cdc90aa99fbefccc18ec1f80ced1aa97f5210e28f43fbf4ec",
+      "records": {
+        "000001029:2": {
+          "ability_name": "Snarling Protector",
+          "normalized_text_sha256": "d8d600e3ae5d0ff431d1720fdf18e348ef91bde1be12431ed25e7478c4d562d0",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:thousand-sons:maulerfiend:datasheet:000001029:2:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "stratagem_target"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "stratagem_targets_source_unit"
+                      },
+                      {
+                        "key": "selected_unit_allegiance",
+                        "value": "friendly"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 63,
+                      "start": 8,
+                      "text": "target this unit with the Heroic Intervention Stratagem"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "stratagem_phase_use_exception"
+                      },
+                      {
+                        "key": "bypass_same_stratagem_per_phase",
+                        "value": true
+                      },
+                      {
+                        "key": "does_not_block_other_units",
+                        "value": true
+                      },
+                      {
+                        "key": "frequency_scope",
+                        "value": "phase_per_unit"
+                      },
+                      {
+                        "key": "stratagem_id",
+                        "value": "heroic-intervention"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 235,
+                      "start": 166,
+                      "text": "does not prevent any uses of that Stratagem on other units this phase"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 236,
+                  "start": 0,
+                  "text": "You can target this unit with the Heroic Intervention Stratagem, regardless of any other uses of that Stratagem this phase. If you do: - That use is -1CP. - That use does not prevent any uses of that Stratagem on other units this phase."
+                },
+                "target": {
+                  "kind": "stratagem_use",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 145,
+                    "start": 137,
+                    "text": "That use"
+                  }
+                },
+                "template_id": "phase17c:stratagem-phase-use-exception",
+                "trigger": {
+                  "kind": "unit_selected",
+                  "parameters": [
+                    {
+                      "key": "selected_unit_allegiance",
+                      "value": "friendly"
+                    },
+                    {
+                      "key": "selection",
+                      "value": "stratagem_target"
+                    },
+                    {
+                      "key": "source_relationship",
+                      "value": "stratagem_targets_source_unit"
+                    },
+                    {
+                      "key": "stratagem_user",
+                      "value": "source_player"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_unit_selected_as_stratagem_target"
+                    },
+                    {
+                      "key": "usage_scope",
+                      "value": "source_model"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 63,
+                    "start": 8,
+                    "text": "target this unit with the Heroic Intervention Stratagem"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:thousand-sons:maulerfiend:datasheet:000001029:2:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "stratagem_target"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "stratagem_targets_source_unit"
+                      },
+                      {
+                        "key": "selected_unit_allegiance",
+                        "value": "friendly"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 63,
+                      "start": 8,
+                      "text": "target this unit with the Heroic Intervention Stratagem"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_command_points",
+                    "parameters": [
+                      {
+                        "key": "affected_player",
+                        "value": "source_player"
+                      },
+                      {
+                        "key": "application_scope",
+                        "value": "current_stratagem_use"
+                      },
+                      {
+                        "key": "delta",
+                        "value": -1
+                      },
+                      {
+                        "key": "minimum_cost",
+                        "value": 0
+                      },
+                      {
+                        "key": "operation",
+                        "value": "modify_stratagem_cost"
+                      },
+                      {
+                        "key": "optional",
+                        "value": false
+                      },
+                      {
+                        "key": "stacking",
+                        "value": "cumulative"
+                      },
+                      {
+                        "key": "stratagem_id",
+                        "value": "heroic-intervention"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 153,
+                      "start": 137,
+                      "text": "That use is -1CP"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 153,
+                  "start": 137,
+                  "text": "That use is -1CP"
+                },
+                "target": {
+                  "kind": "stratagem_use",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 145,
+                    "start": 137,
+                    "text": "That use"
+                  }
+                },
+                "template_id": "phase17c:stratagem-cost-modifier",
+                "trigger": {
+                  "kind": "unit_selected",
+                  "parameters": [
+                    {
+                      "key": "selected_unit_allegiance",
+                      "value": "friendly"
+                    },
+                    {
+                      "key": "selection",
+                      "value": "stratagem_target"
+                    },
+                    {
+                      "key": "source_relationship",
+                      "value": "stratagem_targets_source_unit"
+                    },
+                    {
+                      "key": "stratagem_user",
+                      "value": "source_player"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_unit_selected_as_stratagem_target"
+                    },
+                    {
+                      "key": "usage_scope",
+                      "value": "source_model"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 63,
+                    "start": 8,
+                    "text": "target this unit with the Heroic Intervention Stratagem"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:thousand-sons:maulerfiend:datasheet:000001029:2:clause:003",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "exclude_source_unit",
+                        "value": true
+                      },
+                      {
+                        "key": "gate_subject",
+                        "value": "friendly_anchor"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "friendly_engaged_keyword_unit"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 304,
+                      "start": 276,
+                      "text": "friendly engaged Psyker unit"
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "friendly_anchor"
+                      },
+                      {
+                        "key": "required_keyword",
+                        "value": "PSYKER"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 299,
+                      "start": 293,
+                      "text": "Psyker"
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 12
+                      },
+                      {
+                        "key": "first_subject",
+                        "value": "source_unit"
+                      },
+                      {
+                        "key": "negated",
+                        "value": false
+                      },
+                      {
+                        "key": "range_kind",
+                        "value": "numeric_range"
+                      },
+                      {
+                        "key": "second_subject",
+                        "value": "friendly_anchor"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 331,
+                      "start": 308,
+                      "text": "within 12\" of this unit"
+                    }
+                  },
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "required_enemy"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "enemy_engaged_with_selected_friendly_anchor"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 528,
+                      "start": 479,
+                      "text": "enemy unit engaged with that friendly Psyker unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "endpoint",
+                      "value": "phase"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 529,
+                    "start": 237,
+                    "text": "When this unit declares a charge, if a friendly engaged Psyker unit is within 12\" of this unit, you can use this part of this ability. If you do: - This unit can re-roll that Charge roll. - This unit must end that Charge move engaged with an enemy unit engaged with that friendly Psyker unit."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "charge_reroll_with_friendly_engaged_keyword_anchor"
+                      },
+                      {
+                        "key": "component_selection_policy",
+                        "value": "whole_roll"
+                      },
+                      {
+                        "key": "optional",
+                        "value": true
+                      },
+                      {
+                        "key": "required_charge_end_relationship",
+                        "value": "enemy_engaged_with_selected_anchor"
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "charge_roll"
+                      },
+                      {
+                        "key": "selection_policy",
+                        "value": "anchor_and_enemy_pair"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 529,
+                      "start": 237,
+                      "text": "When this unit declares a charge, if a friendly engaged Psyker unit is within 12\" of this unit, you can use this part of this ability. If you do: - This unit can re-roll that Charge roll. - This unit must end that Charge move engaged with an enemy unit engaged with that friendly Psyker unit."
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 529,
+                  "start": 237,
+                  "text": "When this unit declares a charge, if a friendly engaged Psyker unit is within 12\" of this unit, you can use this part of this ability. If you do: - This unit can re-roll that Charge roll. - This unit must end that Charge move engaged with an enemy unit engaged with that friendly Psyker unit."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 394,
+                    "start": 385,
+                    "text": "This unit"
+                  }
+                },
+                "template_id": "phase17c:friendly-engaged-anchor-charge-reroll",
+                "trigger": {
+                  "kind": "unit_selected",
+                  "parameters": [
+                    {
+                      "key": "selection",
+                      "value": "charging_unit"
+                    },
+                    {
+                      "key": "source_relationship",
+                      "value": "source_unit_declares_charge"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_charging_unit_selected_before_charge_roll"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 269,
+                    "start": 237,
+                    "text": "When this unit declares a charge"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "c3637f8cb5b85f17844ff5c648dfe0b3d08e3d7e2a3c4a58491f9149e7c4bbdb",
+            "normalized_text": "You can target this unit with the Heroic Intervention Stratagem, regardless of any other uses of that Stratagem this phase. If you do: - That use is -1CP. - That use does not prevent any uses of that Stratagem on other units this phase. When this unit declares a charge, if a friendly engaged Psyker unit is within 12\" of this unit, you can use this part of this ability. If you do: - This unit can re-roll that Charge roll. - This unit must end that Charge move engaged with an enemy unit engaged with that friendly Psyker unit.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:thousand-sons:maulerfiend:datasheet:000001029:2",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07:datasheet:000001029:2"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "review_row_id": "source:000001029",
+      "review_treatment": "rules_update",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    }
+  }
+}

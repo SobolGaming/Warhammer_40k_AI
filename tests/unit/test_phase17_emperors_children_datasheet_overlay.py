@@ -254,7 +254,11 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
+)
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
     SELECT_SHOOTING_TYPE_DECISION_TYPE,
@@ -273,6 +277,8 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
     HitRollModifierContext,
+    MovementBudgetModifierBinding,
+    MovementBudgetModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
     WoundRollModifierContext,
@@ -456,6 +462,45 @@ _RUNTIME_FIXTURE_DATASHEET_IDS = (
     "000004089",
     "000004090",
     "000004091",
+)
+
+_MAULERFIEND_VARIANT_DATASHEET_IDS = (
+    "000000968",
+    "000001029",
+    "000002639",
+    "000004091",
+)
+_MAULERFIEND_FACTION_ID_BY_DATASHEET_ID = {
+    "000000968": "CSM",
+    "000001029": "TS",
+    "000002639": "WE",
+    "000004091": "EC",
+}
+_MAULERFIEND_VARIANTS = (
+    pytest.param(
+        "000000968",
+        "000000968:magma-cutters",
+        2,
+        id="chaos-space-marines-000000968",
+    ),
+    pytest.param(
+        "000001029",
+        "000001029:magma-cutter",
+        2,
+        id="thousand-sons-000001029",
+    ),
+    pytest.param(
+        "000002639",
+        "000002639:magma-cutter",
+        3,
+        id="world-eaters-000002639",
+    ),
+    pytest.param(
+        "000004091",
+        "000004091:magma-cutters",
+        2,
+        id="emperors-children-000004091",
+    ),
 )
 
 
@@ -2702,6 +2747,25 @@ def test_lord_exultant_chaos_spawn_maulerfiend_catalog_is_exact() -> None:
         for effect in catalog.datasheet_by_id("000004091").damaged_effects
     ) == ((DamagedEffectKind.HIT_ROLL_MODIFIER, -1, 1, 4),)
 
+    maulerfiend_geometry = next(
+        record
+        for record in package.model_geometries
+        if record.model_profile_id == "000004091:maulerfiend"
+    )
+    maulerfiend_footprint_evidence = next(
+        evidence
+        for evidence in maulerfiend_geometry.evidence
+        if evidence.evidence_id == "000004091:maulerfiend:footprint"
+    )
+    assert maulerfiend_footprint_evidence.source_id == (
+        "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+        "base-size:page-74-emperors-children-maulerfiend"
+    )
+    assert (
+        "pdf:warhammer40000-event-companion:2026-06-12:base-size-guide"
+        in maulerfiend_geometry.source_ids
+    )
+
     lord = catalog.datasheet_by_id("000004078")
     assert tuple(
         (eligibility.role.value, target.bodyguard_datasheet_id)
@@ -2866,6 +2930,117 @@ def test_lord_exultant_chaos_spawn_maulerfiend_catalog_is_exact() -> None:
     }
 
 
+def test_csm_maulerfiend_siege_crawler_modifier_ignore_uses_actual_catalog_lifecycle() -> None:
+    session, maulerfiend, target = _battleline_lifecycle_session(
+        source_datasheet_id="000000968",
+        phase=BattlePhase.MOVEMENT,
+        with_icon=False,
+        game_id="csm-maulerfiend-siege-crawler-modifier-ignore",
+        catalog_package=_maulerfiend_variants_catalog_package(),
+        source_faction_id="CSM",
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    _move_unit(state, maulerfiend.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=30.0, y=30.0)
+    registry = _install_csm_maulerfiend_movement_penalty(session.lifecycle)
+
+    unit_request = _decision_request(session.advance_until_decision_or_terminal())
+    assert unit_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    unit_option = next(
+        option
+        for option in unit_request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("unit_instance_id") == maulerfiend.unit_instance_id
+    )
+    action_request = _decision_request(
+        session.submit_option(
+            request_id=unit_request.request_id,
+            option_id=unit_option.option_id,
+            result_id="csm-maulerfiend-siege-crawler-select-unit",
+        )
+    )
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    normal_options = tuple(
+        option
+        for option in action_request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("movement_phase_action") == MovementPhaseActionKind.NORMAL_MOVE.value
+    )
+    assert len(normal_options) == 2
+    ignore_option = next(option for option in normal_options if ":ignore:" in option.option_id)
+    assert isinstance(ignore_option.payload, dict)
+    context = cast(
+        dict[str, object],
+        ignore_option.payload["modifier_ignore_context"],
+    )
+    permissions = cast(list[dict[str, object]], context["permissions"])
+    available = cast(list[dict[str, object]], context["available_modifiers"])
+    ignored = cast(list[dict[str, object]], context["ignored_modifiers"])
+    assert [permission["source_id"] for permission in permissions] == [
+        "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07:datasheet:000000968:3"
+    ]
+    assert [permission["clause_id"] for permission in permissions] == [
+        "phase17k:chaos-space-marines:maulerfiend:datasheet:000000968:3:clause:001"
+    ]
+    assert [modifier["modifier_id"] for modifier in available] == [
+        "test:csm-maulerfiend:movement-penalty"
+    ]
+    assert ignored == available
+    assert (
+        DecisionRequest.from_payload(
+            json.loads(json.dumps(action_request.to_payload(), sort_keys=True))
+        )
+        == action_request
+    )
+
+    status = session.submit_option(
+        request_id=action_request.request_id,
+        option_id=ignore_option.option_id,
+        result_id="csm-maulerfiend-siege-crawler-ignore-movement-penalty",
+    )
+
+    assert status.status_kind not in {
+        LifecycleStatusKind.INVALID,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    current_maulerfiend = _unit_from_state(state, maulerfiend.unit_instance_id)
+    model = current_maulerfiend.own_models[0]
+    base_movement = next(
+        value.final
+        for value in model.characteristics
+        if value.characteristic is Characteristic.MOVEMENT
+    )
+    assert base_movement == 10
+    assert (
+        registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=current_maulerfiend.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                base_movement_inches=float(base_movement),
+                current_movement_inches=float(base_movement),
+            )
+        )
+        == 10.0
+    )
+    selection_events = tuple(
+        event
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "modifier_ignores_selected"
+    )
+    assert len(selection_events) == 1
+    assert session.lifecycle.decision_controller.records[-1].result.payload == (
+        ignore_option.payload
+    )
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+    assert "object at 0x" not in json.dumps(lifecycle_payload, sort_keys=True)
+
+
 def test_lord_exultant_and_maulerfiend_loadouts_materialize_exact_counts() -> None:
     package = _catalog_package()
     catalog = package.army_catalog
@@ -2952,11 +3127,20 @@ def test_lord_exultant_and_maulerfiend_loadouts_materialize_exact_counts() -> No
     )
 
 
-def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> None:
-    game_id = "maulerfiend-magma-cutter-copy-identity"
+@pytest.mark.parametrize(
+    ("datasheet_id", "magma_wargear_id", "attacks_per_copy"),
+    _MAULERFIEND_VARIANTS,
+)
+def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay(
+    datasheet_id: str,
+    magma_wargear_id: str,
+    attacks_per_copy: int,
+) -> None:
+    game_id = f"maulerfiend-magma-cutter-copy-identity:{datasheet_id}"
     session, maulerfiend, target = _maulerfiend_magma_cutter_shooting_session(
         game_id=game_id,
         extra_target=False,
+        datasheet_id=datasheet_id,
     )
     declaration_request = _advance_maulerfiend_to_shooting_declaration(
         session=session,
@@ -2966,13 +3150,16 @@ def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> N
         json.loads(json.dumps(declaration_request.to_payload(), sort_keys=True))
     )
     assert round_tripped_request == declaration_request
-    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(declaration_request)
+    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(
+        declaration_request,
+        magma_wargear_id=magma_wargear_id,
+    )
     assert len(magma_cutter_rows) == 2
     assert {cast(str, row["model_instance_id"]) for row in magma_cutter_rows} == {
         maulerfiend.own_models[0].model_instance_id
     }
     assert {cast(str, row["weapon_profile_id"]) for row in magma_cutter_rows} == {
-        "000004091:magma-cutters:standard"
+        f"{magma_wargear_id}:standard"
     }
     weapon_instance_ids = tuple(cast(str, row["weapon_instance_id"]) for row in magma_cutter_rows)
     assert len(set(weapon_instance_ids)) == 2
@@ -3061,7 +3248,10 @@ def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> N
     assert tuple(cast(str, pool["weapon_instance_id"]) for pool in attack_pools) == (
         weapon_instance_ids
     )
-    assert tuple(cast(int, pool["attacks"]) for pool in attack_pools) == (2, 2)
+    assert tuple(cast(int, pool["attacks"]) for pool in attack_pools) == (
+        attacks_per_copy,
+        attacks_per_copy,
+    )
 
     group_record = next(
         record
@@ -3077,12 +3267,15 @@ def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> N
         list[dict[str, JsonValue]],
         gathered_group["contributions"],
     )
-    assert gathered_group["total_attacks"] == 4
+    assert gathered_group["total_attacks"] == attacks_per_copy * 2
     assert (
         tuple(cast(str, contribution["weapon_instance_id"]) for contribution in contributions)
         == weapon_instance_ids
     )
-    assert tuple(cast(int, contribution["attacks"]) for contribution in contributions) == (2, 2)
+    assert tuple(cast(int, contribution["attacks"]) for contribution in contributions) == (
+        attacks_per_copy,
+        attacks_per_copy,
+    )
 
     _advance_maulerfiend_shooting_through_phase(
         session=session,
@@ -3096,7 +3289,7 @@ def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> N
         == f"attack-sequence:{declaration_result_id}"
         and cast(dict[str, JsonValue], record.payload)["step"] == AttackSequenceStep.HIT.value
     )
-    assert len(hit_events) == 4
+    assert len(hit_events) == attacks_per_copy * 2
 
     replay_payload = cast(
         ReplayArtifactPayload,
@@ -3129,10 +3322,19 @@ def test_maulerfiend_magma_cutter_copies_resolve_independently_and_replay() -> N
     assert replay_result.reproduced_exactly, replay_result.to_payload()
 
 
-def test_maulerfiend_magma_cutter_copies_can_split_legal_targets() -> None:
+@pytest.mark.parametrize(
+    ("datasheet_id", "magma_wargear_id", "attacks_per_copy"),
+    _MAULERFIEND_VARIANTS,
+)
+def test_maulerfiend_magma_cutter_copies_can_split_legal_targets(
+    datasheet_id: str,
+    magma_wargear_id: str,
+    attacks_per_copy: int,
+) -> None:
     session, maulerfiend, target = _maulerfiend_magma_cutter_shooting_session(
-        game_id="maulerfiend-magma-cutter-split-targets",
+        game_id=f"maulerfiend-magma-cutter-split-targets:{datasheet_id}",
         extra_target=True,
+        datasheet_id=datasheet_id,
     )
     state = session.lifecycle.state
     assert state is not None
@@ -3141,7 +3343,10 @@ def test_maulerfiend_magma_cutter_copies_can_split_legal_targets() -> None:
         session=session,
         source=maulerfiend,
     )
-    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(declaration_request)
+    proposal_request, magma_cutter_rows = _magma_cutter_available_weapon_rows(
+        declaration_request,
+        magma_wargear_id=magma_wargear_id,
+    )
     weapon_instance_ids = tuple(cast(str, row["weapon_instance_id"]) for row in magma_cutter_rows)
     assert len(magma_cutter_rows) == 2
     assert len(set(weapon_instance_ids)) == 2
@@ -3172,8 +3377,8 @@ def test_maulerfiend_magma_cutter_copies_can_split_legal_targets() -> None:
         (pool.weapon_instance_id, pool.target_unit_instance_id, pool.attacks)
         for pool in shooting_state.attack_pools
     ) == (
-        (weapon_instance_ids[0], target.unit_instance_id, 2),
-        (weapon_instance_ids[1], extra_target.unit_instance_id, 2),
+        (weapon_instance_ids[0], target.unit_instance_id, attacks_per_copy),
+        (weapon_instance_ids[1], extra_target.unit_instance_id, attacks_per_copy),
     )
     lifecycle_payload = cast(
         GameLifecyclePayload,
@@ -3188,8 +3393,8 @@ def test_maulerfiend_magma_cutter_copies_can_split_legal_targets() -> None:
         (pool.weapon_instance_id, pool.target_unit_instance_id, pool.attacks)
         for pool in restored_shooting_state.attack_pools
     ) == (
-        (weapon_instance_ids[0], target.unit_instance_id, 2),
-        (weapon_instance_ids[1], extra_target.unit_instance_id, 2),
+        (weapon_instance_ids[0], target.unit_instance_id, attacks_per_copy),
+        (weapon_instance_ids[1], extra_target.unit_instance_id, attacks_per_copy),
     )
 
 
@@ -5501,6 +5706,15 @@ def _catalog_package() -> CanonicalCatalogPackage:
     return _ability_support_catalog_package(datasheet_ids=_RUNTIME_FIXTURE_DATASHEET_IDS)
 
 
+@lru_cache(maxsize=1)
+def _maulerfiend_variants_catalog_package() -> CanonicalCatalogPackage:
+    return _ability_support_catalog_package(
+        datasheet_ids=tuple(
+            dict.fromkeys((*_RUNTIME_FIXTURE_DATASHEET_IDS, *_MAULERFIEND_VARIANT_DATASHEET_IDS))
+        )
+    )
+
+
 def _kakophonist_runtime_fixture() -> tuple[
     tuple[ArmyDefinition, ...],
     GameState,
@@ -6544,8 +6758,10 @@ def _battleline_lifecycle_session(
     extra_target: bool = False,
     attached_source: bool = False,
     source_wargear_option_id: str | None = None,
+    catalog_package: CanonicalCatalogPackage | None = None,
+    source_faction_id: str = "EC",
 ) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
-    package = _catalog_package()
+    package = _catalog_package() if catalog_package is None else catalog_package
     base_catalog = package.army_catalog
     target_datasheet_id = "000004080" if source_datasheet_id == "000004079" else "000004079"
     target_datasheet = base_catalog.datasheet_by_id(target_datasheet_id)
@@ -6585,32 +6801,58 @@ def _battleline_lifecycle_session(
         composition=target_composition,
         max_unit_models=len(target_composition),
     )
+    source_detachment_id = "battleline-lifecycle-test"
+    target_detachment_id = source_detachment_id
+    detachment_definitions: tuple[DetachmentDefinition, ...] = (
+        DetachmentDefinition(
+            detachment_id=source_detachment_id,
+            name="Battleline lifecycle test",
+            faction_id="EC",
+            detachment_point_cost=1,
+            unit_datasheet_ids=(
+                "000004079",
+                "000004080",
+                *(
+                    (source_datasheet_id,)
+                    if source_datasheet_id not in {"000004079", "000004080"}
+                    else ()
+                ),
+                *(("000004083",) if attached_source else ()),
+            ),
+            force_disposition_ids=("take-and-hold", "purge-the-foe"),
+            source_ids=("test:emperors-children:battleline-lifecycle",),
+        ),
+    )
+    if source_faction_id != "EC":
+        source_detachment_id = f"battleline-lifecycle-source-{source_faction_id.lower()}"
+        target_detachment_id = "battleline-lifecycle-target-ec"
+        detachment_definitions = (
+            DetachmentDefinition(
+                detachment_id=source_detachment_id,
+                name="Cross-faction source lifecycle test",
+                faction_id=source_faction_id,
+                detachment_point_cost=1,
+                unit_datasheet_ids=(source_datasheet_id,),
+                force_disposition_ids=("take-and-hold",),
+                source_ids=("test:maulerfiend:cross-faction-source-lifecycle",),
+            ),
+            DetachmentDefinition(
+                detachment_id=target_detachment_id,
+                name="Cross-faction target lifecycle test",
+                faction_id="EC",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(target_datasheet_id,),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:maulerfiend:cross-faction-target-lifecycle",),
+            ),
+        )
     catalog = replace(
         base_catalog,
         datasheets=tuple(
             target_datasheet if datasheet.datasheet_id == target_datasheet_id else datasheet
             for datasheet in base_catalog.datasheets
         ),
-        detachments=(
-            DetachmentDefinition(
-                detachment_id="battleline-lifecycle-test",
-                name="Battleline lifecycle test",
-                faction_id="EC",
-                detachment_point_cost=1,
-                unit_datasheet_ids=(
-                    "000004079",
-                    "000004080",
-                    *(
-                        (source_datasheet_id,)
-                        if source_datasheet_id not in {"000004079", "000004080"}
-                        else ()
-                    ),
-                    *(("000004083",) if attached_source else ()),
-                ),
-                force_disposition_ids=("take-and-hold", "purge-the-foe"),
-                source_ids=("test:emperors-children:battleline-lifecycle",),
-            ),
-        ),
+        detachments=detachment_definitions,
     )
     if single_source_model:
         source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
@@ -6748,8 +6990,8 @@ def _battleline_lifecycle_session(
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=DetachmentSelection(
-                faction_id="EC",
-                detachment_ids=("battleline-lifecycle-test",),
+                faction_id=source_faction_id,
+                detachment_ids=(source_detachment_id,),
             ),
             force_disposition_id="take-and-hold",
             unit_selections=(
@@ -6785,7 +7027,7 @@ def _battleline_lifecycle_session(
             ruleset_id=catalog.ruleset_id,
             detachment_selection=DetachmentSelection(
                 faction_id="EC",
-                detachment_ids=("battleline-lifecycle-test",),
+                detachment_ids=(target_detachment_id,),
             ),
             force_disposition_id="purge-the-foe",
             unit_selections=(
@@ -6870,14 +7112,17 @@ def _maulerfiend_magma_cutter_shooting_session(
     *,
     game_id: str,
     extra_target: bool,
+    datasheet_id: str,
 ) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
     session, maulerfiend, target = _battleline_lifecycle_session(
-        source_datasheet_id="000004091",
+        source_datasheet_id=datasheet_id,
         phase=BattlePhase.SHOOTING,
         with_icon=False,
         game_id=game_id,
         extra_target=extra_target,
-        source_wargear_option_id="000004091:magma-cutters:option-1",
+        source_wargear_option_id=f"{datasheet_id}:magma-cutters:option-1",
+        catalog_package=_maulerfiend_variants_catalog_package(),
+        source_faction_id=_MAULERFIEND_FACTION_ID_BY_DATASHEET_ID[datasheet_id],
     )
     state = session.lifecycle.state
     assert state is not None
@@ -6935,6 +7180,8 @@ def _advance_maulerfiend_to_shooting_declaration(
 
 def _magma_cutter_available_weapon_rows(
     request: DecisionRequest,
+    *,
+    magma_wargear_id: str,
 ) -> tuple[dict[str, JsonValue], tuple[dict[str, JsonValue], ...]]:
     assert request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
     request_payload = cast(dict[str, JsonValue], request.payload)
@@ -6943,9 +7190,7 @@ def _magma_cutter_available_weapon_rows(
         list[dict[str, JsonValue]],
         proposal_request["available_weapons"],
     )
-    rows = tuple(
-        weapon for weapon in available_weapons if weapon["wargear_id"] == "000004091:magma-cutters"
-    )
+    rows = tuple(weapon for weapon in available_weapons if weapon["wargear_id"] == magma_wargear_id)
     return proposal_request, rows
 
 
@@ -7676,6 +7921,35 @@ def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -
         ),
     )
     state.replace_battlefield_state(battlefield.with_unit_placement(moved))
+
+
+def _install_csm_maulerfiend_movement_penalty(
+    lifecycle: GameLifecycle,
+) -> RuntimeModifierRegistry:
+    registry = RuntimeModifierRegistry.from_bindings(
+        movement_budget_modifier_bindings=(
+            MovementBudgetModifierBinding(
+                modifier_id="test:csm-maulerfiend:movement-penalty",
+                source_id="test:csm-maulerfiend:movement-penalty-source",
+                handler=_csm_maulerfiend_movement_penalty,
+            ),
+        )
+    )
+    handler = replace(
+        lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        runtime_modifier_registry=registry,
+    )
+    lifecycle._movement_phase_handler = handler  # pyright: ignore[reportPrivateUsage]
+    flow = lifecycle._battle_round_flow  # pyright: ignore[reportPrivateUsage]
+    assert flow is not None
+    flow._phase_handlers[BattlePhase.MOVEMENT] = handler  # pyright: ignore[reportPrivateUsage]
+    return registry
+
+
+def _csm_maulerfiend_movement_penalty(context: MovementBudgetModifierContext) -> float:
+    if context.unit_instance_id != "army-a:source-battleline":
+        return context.current_movement_inches
+    return context.current_movement_inches - 2.0
 
 
 def _move_unit_with_authenticated_normal_move(

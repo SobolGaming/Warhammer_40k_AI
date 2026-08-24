@@ -6,7 +6,12 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityKind,
+    RangeProfile,
+    WeaponKeyword,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.critical_wounds import (
@@ -1184,6 +1189,101 @@ def test_ws14_generic_this_model_attack_modifiers_use_source_rules_unit_strength
     assert registry.wound_roll_modifier(wound_context) == 1
 
 
+def test_ws14_generic_this_model_melee_modifiers_use_target_rules_unit_strength() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(
+        catalog=catalog,
+        army_id="army-b",
+        unit_selection_id="defender-unit",
+        datasheet_id="core-character-support",
+    )
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    base_profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    melee_profile = replace(base_profile, range_profile=RangeProfile.melee())
+    ranged_profile = replace(base_profile, range_profile=RangeProfile.distance(24))
+    registry = RuntimeModifierRegistry.empty()
+    source_model_id = attacker.own_models[0].model_instance_id
+
+    for roll_type, strength_constraint in (
+        ("hit", "target_unit_below_starting_strength"),
+        ("wound", "target_unit_below_half_strength"),
+    ):
+        state.record_persisting_effect(
+            _generic_effect(
+                effect_id=f"ws14:this-model-target-strength-{roll_type}-bonus",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                target_kind="this_model",
+                effect_kind="modify_dice_roll",
+                parameters={"roll_type": roll_type, "delta": 1, "weapon_scope": "melee"},
+                conditions=(
+                    {
+                        "kind": "target_constraint",
+                        "parameters": [
+                            {"key": "gate_subject", "value": "attack_target"},
+                            {"key": "relationship", "value": "this_model_makes_attack"},
+                            {"key": "target_allegiance", "value": "enemy"},
+                            {"key": "target_constraint", "value": strength_constraint},
+                        ],
+                    },
+                ),
+                source_model_instance_id=source_model_id,
+            )
+        )
+
+    hit_context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=melee_profile,
+        source_phase=BattlePhase.FIGHT,
+    )
+    wound_context = WoundRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=melee_profile,
+        source_phase=BattlePhase.FIGHT,
+        strength=melee_profile.strength.final,
+        toughness=4,
+    )
+
+    assert registry.hit_roll_modifier(hit_context) == 0
+    assert registry.wound_roll_modifier(wound_context) == 0
+
+    defender = _unit_with_model_wounds(
+        defender,
+        wounds_remaining=defender.own_models[0].starting_wounds - 1,
+    )
+    _replace_unit(state, defender)
+    assert registry.hit_roll_modifier(hit_context) == 1
+    assert registry.wound_roll_modifier(wound_context) == 0
+
+    defender = _unit_with_model_wounds(
+        defender,
+        wounds_remaining=defender.own_models[0].starting_wounds // 2,
+    )
+    _replace_unit(state, defender)
+    assert registry.hit_roll_modifier(hit_context) == 1
+    assert registry.wound_roll_modifier(wound_context) == 0
+
+    defender = _unit_with_model_wounds(
+        defender,
+        wounds_remaining=_below_half_wounds(defender.own_models[0].starting_wounds),
+    )
+    _replace_unit(state, defender)
+    assert registry.hit_roll_modifier(hit_context) == 1
+    assert registry.wound_roll_modifier(wound_context) == 1
+    assert registry.hit_roll_modifier(replace(hit_context, weapon_profile=ranged_profile)) == 0
+    assert registry.wound_roll_modifier(replace(wound_context, weapon_profile=ranged_profile)) == 0
+
+
 def test_ws14_generic_source_strength_constraint_rejects_unknown_state() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
@@ -1228,8 +1328,14 @@ def test_ws14_generic_source_strength_constraint_rejects_unknown_state() -> None
         )
 
 
-def _unit(*, catalog: ArmyCatalog, army_id: str, unit_selection_id: str) -> UnitInstance:
-    datasheet = catalog.datasheet_by_id("core-character-leader")
+def _unit(
+    *,
+    catalog: ArmyCatalog,
+    army_id: str,
+    unit_selection_id: str,
+    datasheet_id: str = "core-character-leader",
+) -> UnitInstance:
+    datasheet = catalog.datasheet_by_id(datasheet_id)
     profile = datasheet.model_profiles[0]
     option = datasheet.wargear_options[0]
     return UnitFactory(catalog=catalog).instantiate_unit(

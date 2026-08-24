@@ -1997,6 +1997,12 @@ class GameLifecycle:
                 request=request,
                 result=result,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
+                ability_index=self._charge_phase_handler.ability_index_for_player(
+                    cast(str, request.actor_id)
+                ),
+                runtime_modifier_registry=(
+                    self._require_runtime_content_bundle().runtime_modifier_registry
+                ),
                 charge_target_restriction_hooks=(
                     self._require_runtime_content_bundle().charge_target_restriction_hook_registry
                 ),
@@ -2773,6 +2779,7 @@ class GameLifecycle:
                 self._command_phase_handler.stratagem_index,
                 self._movement_phase_handler.stratagem_index,
                 self._shooting_phase_handler.stratagem_index,
+                self._charge_phase_handler.stratagem_index,
                 self._fight_phase_handler.stratagem_index,
             ),
         )
@@ -2783,6 +2790,7 @@ class GameLifecycle:
         )
         self._command_phase_handler = CommandPhaseHandler(
             stratagem_index=runtime_stratagem_index,
+            stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             battle_shock_hooks=bundle.battle_shock_hook_registry,
             command_phase_start_hooks=bundle.command_phase_start_hook_registry,
             ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
@@ -2810,6 +2818,8 @@ class GameLifecycle:
         )
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
+            stratagem_index=runtime_stratagem_index,
+            stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             charge_declaration_hooks=bundle.charge_declaration_hook_registry,
             charge_target_restriction_hooks=bundle.charge_target_restriction_hook_registry,
             unit_move_completed_mortal_wound_hooks=(

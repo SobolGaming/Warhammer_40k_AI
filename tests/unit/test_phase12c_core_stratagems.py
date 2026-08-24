@@ -9,6 +9,9 @@ from tests.setup_completion_helpers import (
     enter_battle_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
 )
+from tools.generate_ability_support_matrix import (
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
@@ -118,6 +121,9 @@ from warhammer40k_core.engine.stratagem_catalog import (
     eleventh_edition_stratagem_catalog_records,
     eleventh_edition_stratagem_index,
 )
+from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
+    stratagem_phase_use_exception,
+)
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY,
     COMMAND_REROLL_DICE_CONTEXT_KEY,
@@ -164,6 +170,7 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTimingDescriptor,
     StratagemUseRecord,
     _handler_unavailable_reason,
+    _heroic_intervention_reachable_target_distances,
     create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
     invalid_heroic_intervention_charge_move_status,
@@ -178,6 +185,7 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_decline_option,
     stratagem_decline_payload,
     stratagem_target_kind_from_token,
+    stratagem_target_proposal_from_index,
     stratagem_target_proposal_request_payload,
     stratagem_use_options,
     stratagem_window_context_from_request,
@@ -1762,22 +1770,29 @@ def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> No
         poses=tuple(Pose.at(x=5.0 + index * 2.0, y=6.0) for index in range(5)),
     )
     _grant_cp(insufficient_state, player_id="player-a", amount=1)
-    rejected = _submit_source_stratagem_target(
-        insufficient_lifecycle,
-        stratagem_id="heroic-intervention",
+    insufficient_context = _context(
+        state=insufficient_state,
         player_id="player-a",
-        target_unit_id="army-alpha:intercessor-unit-1",
         trigger_kind=TimingTriggerKind.END_PHASE,
-        result_id="phase15e-heroic-insufficient-into-the-fray",
-        effect_selection={
-            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_INTO_THE_FRAY
-        },
+    )
+    rejected = request_stratagem_target_proposal(
+        state=insufficient_state,
+        decisions=insufficient_lifecycle.decision_controller,
+        proposal_request=StratagemTargetProposal.for_request(
+            context=insufficient_context,
+            catalog_record=_source_stratagem_record("heroic-intervention"),
+        ),
     )
 
-    assert rejected.status_kind is LifecycleStatusKind.INVALID
-    assert rejected.payload == {"invalid_reason": "insufficient_command_points"}
+    assert rejected.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert rejected.payload == {
+        "player_id": "player-a",
+        "stratagem_id": "heroic-intervention",
+        "unavailable_reason": "insufficient_command_points",
+    }
     assert insufficient_state.command_point_total("player-a") == 1
     assert insufficient_state.stratagem_use_records == []
+    assert insufficient_lifecycle.decision_controller.queue.pending_requests == ()
 
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -1820,6 +1835,73 @@ def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> No
     maximum_distance = context_payload["maximum_distance_inches"]
     assert type(maximum_distance) is int
     assert maximum_distance <= 6
+
+
+@pytest.mark.parametrize("enemy_state", ["reserves", "destroyed"])
+def test_phase15e_heroic_intervention_reachable_targets_skip_absent_enemy_geometry(
+    enemy_state: str,
+) -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    heroic_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=heroic_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    if enemy_state == "reserves":
+        _move_unit_to_reserves(
+            lifecycle,
+            player_id="player-b",
+            unit_instance_id=enemy_unit_id,
+        )
+    else:
+        for army_index, army in enumerate(state.army_definitions):
+            state.army_definitions[army_index] = replace(
+                army,
+                units=tuple(
+                    replace(
+                        unit,
+                        own_models=tuple(
+                            replace(model, wounds_remaining=0) for model in unit.own_models
+                        ),
+                    )
+                    if unit.unit_instance_id == enemy_unit_id
+                    else unit
+                    for unit in army.units
+                ),
+            )
+
+    assert (
+        _heroic_intervention_reachable_target_distances(
+            state=state,
+            player_id="player-a",
+            heroic_unit_id=heroic_unit_id,
+            mode=HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
+            maximum_distance_inches=12,
+        )
+        == {}
+    )
+
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.without_unit_placement(heroic_unit_id))
+    with pytest.raises(
+        GameLifecycleError,
+        match="Heroic Intervention source unit requires placed models",
+    ):
+        _heroic_intervention_reachable_target_distances(
+            state=state,
+            player_id="player-a",
+            heroic_unit_id=heroic_unit_id,
+            mode=HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
+            maximum_distance_inches=12,
+        )
 
 
 def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_first() -> None:
@@ -2665,6 +2747,250 @@ def test_july_destroyer_of_futures_uses_core_counteroffensive_paths_per_unit() -
     assert repeated.payload == {"invalid_reason": "source_ability_once_per_phase_per_unit"}
     assert len(_state(repeated_lifecycle).stratagem_use_records) == 2
     assert _state(repeated_lifecycle).command_point_total("player-b") == 2
+
+
+def test_unaffordable_parameterized_stratagem_without_reduced_target_stays_closed() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-a"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    context = _context(
+        state=state,
+        player_id="player-b",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    heroic = _source_stratagem_record("heroic-intervention")
+
+    assert (
+        stratagem_target_proposal_from_index(
+            state=state,
+            index=eleventh_edition_stratagem_index(),
+            context=context,
+            handler_id=heroic.definition.handler_id,
+        )
+        is None
+    )
+    unavailable = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=StratagemTargetProposal.for_request(
+            context=context,
+            catalog_record=heroic,
+        ),
+    )
+
+    assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert unavailable.payload == {
+        "player_id": "player-b",
+        "stratagem_id": "heroic-intervention",
+        "unavailable_reason": "insufficient_command_points",
+    }
+    assert lifecycle.decision_controller.queue.pending_requests == ()
+
+
+def test_snarling_protector_does_not_open_zero_cp_heroic_for_only_into_the_fray() -> None:
+    lifecycle, heroic = _snarling_protector_heroic_lifecycle(
+        _snarling_protector_catalog(),
+        enemy_made_charge_move=False,
+    )
+    state = _state(lifecycle)
+    bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
+    assert isinstance(bundle, RuntimeContentBundle)
+    context = _context(
+        state=state,
+        player_id="player-b",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+
+    assert (
+        stratagem_target_proposal_from_index(
+            state=state,
+            index=bundle.stratagem_indexes_by_player_id["player-b"],
+            context=context,
+            handler_id=heroic.definition.handler_id,
+            stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
+        )
+        is None
+    )
+    unavailable = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=StratagemTargetProposal.for_request(
+            context=context,
+            catalog_record=heroic,
+        ),
+        stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
+    )
+
+    assert unavailable.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert unavailable.payload == {
+        "player_id": "player-b",
+        "stratagem_id": "heroic-intervention",
+        "unavailable_reason": "insufficient_command_points",
+    }
+    assert lifecycle.decision_controller.queue.pending_requests == ()
+
+
+def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -> None:
+    catalog = _snarling_protector_catalog()
+    special_id = "army-beta:snarling-maulerfiend"
+    normal_id = "army-beta:normal-unit"
+
+    special_lifecycle, special_heroic = _snarling_protector_heroic_lifecycle(catalog)
+    special_state = _state(special_lifecycle)
+    special_state.record_stratagem_use(
+        _seeded_heroic_intervention_use(
+            record=special_heroic,
+            target_unit_id=normal_id,
+            use_index=1,
+        )
+    )
+    special_bundle = object.__getattribute__(special_lifecycle, "_runtime_content_bundle")
+    assert isinstance(special_bundle, RuntimeContentBundle)
+    special_context = _context(
+        state=special_state,
+        player_id="player-b",
+        trigger_kind=TimingTriggerKind.END_PHASE,
+    )
+    special_proposal_request = stratagem_target_proposal_from_index(
+        state=special_state,
+        index=special_bundle.stratagem_indexes_by_player_id["player-b"],
+        context=special_context,
+        handler_id="core:heroic-intervention",
+        stratagem_cost_modifier_registry=special_bundle.stratagem_cost_modifier_registry,
+    )
+    assert special_proposal_request is not None
+    special_waiting = request_stratagem_target_proposal(
+        state=special_state,
+        decisions=special_lifecycle.decision_controller,
+        proposal_request=special_proposal_request,
+        stratagem_cost_modifier_registry=special_bundle.stratagem_cost_modifier_registry,
+    )
+    special_request = _decision_request(special_waiting)
+    ordinary_proposal = _proposal_request_from_decision(special_request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-b",
+            target_unit_instance_id=normal_id,
+        )
+    )
+    ordinary_rejected = special_lifecycle.submit_decision(
+        _target_proposal_result(
+            request=special_request,
+            result_id="ordinary-heroic-unaffordable-at-zero-cp",
+            proposal=ordinary_proposal,
+        )
+    )
+
+    assert ordinary_rejected.status_kind is LifecycleStatusKind.INVALID
+    assert ordinary_rejected.payload == {"invalid_reason": "insufficient_command_points"}
+    assert special_lifecycle.decision_controller.queue.peek_next() == special_request
+    assert len(special_state.stratagem_use_records) == 1
+
+    special_proposal = _proposal_request_from_decision(special_request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-b",
+            target_unit_instance_id=special_id,
+        )
+    )
+    special_status = special_lifecycle.submit_decision(
+        _target_proposal_result(
+            request=special_request,
+            result_id="snarling-protector-heroic-after-normal-use",
+            proposal=special_proposal,
+        )
+    )
+
+    assert _decision_request(special_status).decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    special_use = _stratagem_use_by_result_id(
+        special_state,
+        "snarling-protector-heroic-after-normal-use",
+    )
+    exception = stratagem_phase_use_exception(special_heroic.definition)
+    assert exception is not None
+    assert exception.eligible_datasheet_ids == ("000001029",)
+    assert special_use.command_point_cost == 0
+    assert special_use.command_point_transaction_id is None
+    assert special_state.command_point_total("player-b") == 0
+    assert len(special_use.command_point_modifier_ids) == 1
+    assert special_use.command_point_modifier_source_ids == (exception.source_id,)
+    special_payload = _lifecycle_payload_copy(special_lifecycle)
+    restored_special = GameLifecycle.from_payload(special_payload)
+    assert restored_special.to_payload() == special_payload
+    assert (
+        _stratagem_use_by_result_id(
+            _state(restored_special),
+            "snarling-protector-heroic-after-normal-use",
+        )
+        == special_use
+    )
+
+    normal_lifecycle, normal_heroic = _snarling_protector_heroic_lifecycle(catalog)
+    normal_state = _state(normal_lifecycle)
+    normal_state.record_stratagem_use(
+        _seeded_heroic_intervention_use(
+            record=normal_heroic,
+            target_unit_id=special_id,
+            use_index=1,
+        )
+    )
+    _grant_cp(normal_state, player_id="player-b", amount=1)
+    normal_status = _submit_source_stratagem_target(
+        normal_lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-b",
+        target_unit_id=normal_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="normal-heroic-after-snarling-use",
+        catalog_record=normal_heroic,
+    )
+
+    assert _decision_request(normal_status).decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    normal_use = _stratagem_use_by_result_id(
+        normal_state,
+        "normal-heroic-after-snarling-use",
+    )
+    assert normal_use.command_point_cost == 1
+    assert normal_use.command_point_transaction_id is not None
+    assert normal_use.command_point_modifier_ids == ()
+    assert normal_state.command_point_total("player-b") == 0
+
+    repeated_lifecycle, repeated_heroic = _snarling_protector_heroic_lifecycle(catalog)
+    repeated_state = _state(repeated_lifecycle)
+    repeated_state.record_stratagem_use(
+        _seeded_heroic_intervention_use(
+            record=repeated_heroic,
+            target_unit_id=special_id,
+            use_index=1,
+        )
+    )
+    _grant_cp(repeated_state, player_id="player-b", amount=1)
+    repeated_status = _submit_source_stratagem_target(
+        repeated_lifecycle,
+        stratagem_id="heroic-intervention",
+        player_id="player-b",
+        target_unit_id=special_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        result_id="snarling-protector-heroic-repeat",
+        catalog_record=repeated_heroic,
+    )
+
+    assert repeated_status.status_kind is LifecycleStatusKind.INVALID
+    assert repeated_status.payload == {"invalid_reason": "source_ability_once_per_phase_per_unit"}
+    assert len(repeated_state.stratagem_use_records) == 1
+    assert repeated_state.command_point_total("player-b") == 1
 
 
 def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
@@ -6108,6 +6434,135 @@ def _july_thousand_sons_defiler_catalog() -> ArmyCatalog:
             else detachment
             for detachment in catalog.detachments
         ),
+    )
+
+
+def _snarling_protector_catalog() -> ArmyCatalog:
+    generated = _ability_support_catalog_package(datasheet_ids=("000001029",)).army_catalog
+    generated_maulerfiend = generated.datasheet_by_id("000001029")
+    snarling_protector = next(
+        ability
+        for ability in generated_maulerfiend.abilities
+        if ability.name == "Snarling Protector"
+    )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    return replace(
+        catalog,
+        catalog_id="phase12c-thousand-sons-snarling-protector-catalog",
+        source_package_id="data-package:phase12c:thousand-sons-snarling-protector:2026-08-23",
+        datasheets=(
+            *catalog.datasheets,
+            replace(
+                source,
+                datasheet_id="000001029",
+                name="Thousand Sons Maulerfiend",
+                abilities=(snarling_protector,),
+                source_ids=generated_maulerfiend.source_ids,
+            ),
+        ),
+        detachments=tuple(
+            replace(
+                detachment,
+                unit_datasheet_ids=(*detachment.unit_datasheet_ids, "000001029"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in catalog.detachments
+        ),
+    )
+
+
+def _snarling_protector_heroic_lifecycle(
+    catalog: ArmyCatalog,
+    *,
+    enemy_made_charge_move: bool = True,
+) -> tuple[GameLifecycle, StratagemCatalogRecord]:
+    config = _config(
+        beta_unit_selection_ids=("snarling-maulerfiend", "normal-unit"),
+        beta_datasheet_ids=("000001029", "core-intercessor-like-infantry"),
+        catalog=catalog,
+    )
+    lifecycle = _battle_lifecycle(config)
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-a"
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:snarling-maulerfiend",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:normal-unit",
+        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=28.0) for index in range(5)),
+    )
+    _clear_terrain(state)
+    if enemy_made_charge_move:
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id="phase12c-snarling-protector-enemy-charge-move",
+                source_rule_id="phase12c:snarling-protector:enemy-charge-move",
+                owner_player_id="player-a",
+                target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+                started_battle_round=state.battle_round,
+                started_phase=BattlePhase.CHARGE,
+                expiration=EffectExpiration.end_turn(
+                    battle_round=state.battle_round,
+                    player_id="player-a",
+                ),
+                effect_payload={"effect_kind": "charge_grants_fights_first"},
+            )
+        )
+    bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
+    assert isinstance(bundle, RuntimeContentBundle)
+    ability_index = bundle.ability_indexes_by_player_id["player-b"]
+    assert any(
+        record.datasheet_id == "000001029" and record.definition.name == "Snarling Protector"
+        for record in ability_index.all_records()
+    )
+    heroic = next(
+        record
+        for record in bundle.stratagem_indexes_by_player_id["player-b"].all_records()
+        if record.definition.stratagem_id == "heroic-intervention"
+    )
+    return lifecycle, heroic
+
+
+def _seeded_heroic_intervention_use(
+    *,
+    record: StratagemCatalogRecord,
+    target_unit_id: str,
+    use_index: int,
+) -> StratagemUseRecord:
+    binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_instance_id=target_unit_id,
+    )
+    return StratagemUseRecord(
+        use_id=f"stratagem-use:player-b:seeded-heroic:{use_index:03d}",
+        player_id="player-b",
+        stratagem_id=record.definition.stratagem_id,
+        source_id=record.definition.source_id,
+        battle_round=1,
+        phase=BattlePhase.CHARGE,
+        active_player_id="player-a",
+        timing_window_id=None,
+        request_id=f"seeded-heroic-request-{use_index:03d}",
+        result_id=f"seeded-heroic-result-{use_index:03d}",
+        selected_option_id="submit-parameterized-payload",
+        target_binding=binding,
+        targeted_unit_instance_ids=(target_unit_id,),
+        affected_unit_instance_ids=(target_unit_id,),
+        command_point_cost=0,
+        command_point_transaction_id=None,
+        handler_id=record.definition.handler_id,
     )
 
 

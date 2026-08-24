@@ -1,0 +1,407 @@
+{
+  "artifact_schema": "core-v2-faction-pack-rule-ir-shard-v1",
+  "datasheet_faction_ids": {
+    "000002639": "world-eaters"
+  },
+  "datasheet_faction_ids_provenance": {
+    "source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
+    "source_snapshot_filename": "Datasheets.json",
+    "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
+  },
+  "edition": 11,
+  "package_hash": "cb34e7c44ff9370e26bb1ff991f1b8f79dd23f7e48a9338c2a4dd2ba1adc9cc1",
+  "shard_id": "world-eaters",
+  "source_packages": {
+    "gw-11e-world-eaters-maulerfiend-datasheet-2026-07": {
+      "artifact_schema": "core-v2-world-eaters-maulerfiend-rule-ir-v1",
+      "datasheet_id": "000002639",
+      "datasheet_name": "Maulerfiend",
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_world_eaters-5g8k1b5jg0-3ttsio6riy.pdf",
+      "official_document_pages": [
+        7,
+        8
+      ],
+      "official_document_sha256": "42d9344798c0f359f2a3fb8338d7a0adf9ad0a12751450a929b64045eff8b239",
+      "overlay_package_hash": "29fbb383c552fabc98fb36baad25816e19e2842b5b1d7d6ad6f5ebcbec616fd9",
+      "package_hash": "ec2586fd7e601d9eb6cc42939b6c7f8cc36c325175addec49eb1544428424fe1",
+      "records": {
+        "000002639:3": {
+          "ability_name": "The Scent of Blood",
+          "normalized_text_sha256": "57893bf3a628e8cae32cdaba187b158b895e84293c023c03fcec8e74aa2fa8c8",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:world-eaters:maulerfiend:datasheet:000002639:3:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 9.0
+                      },
+                      {
+                        "key": "gate_subject",
+                        "value": "nearby_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "any_unit_within_distance_of_this_unit"
+                      },
+                      {
+                        "key": "target_allegiance",
+                        "value": "enemy"
+                      },
+                      {
+                        "key": "target_constraint",
+                        "value": "target_unit_below_starting_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 123,
+                      "start": 60,
+                      "text": "an enemy unit below Starting Strength is within 9\" of this unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "modifier_exclusive_group",
+                        "value": "scent-of-blood-charge-modifier"
+                      },
+                      {
+                        "key": "modifier_priority",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "charge"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 157,
+                      "start": 139,
+                      "text": "+1 to Charge rolls"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 158,
+                  "start": 57,
+                  "text": "If an enemy unit below Starting Strength is within 9\" of this unit, this unit has +1 to Charge rolls."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 123,
+                    "start": 114,
+                    "text": "this unit"
+                  }
+                },
+                "template_id": "phase17c:nearby-strength-charge-roll-modifier",
+                "trigger": null,
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:world-eaters:maulerfiend:datasheet:000002639:3:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 9.0
+                      },
+                      {
+                        "key": "gate_subject",
+                        "value": "nearby_unit"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "any_unit_within_distance_of_this_unit"
+                      },
+                      {
+                        "key": "target_allegiance",
+                        "value": "enemy"
+                      },
+                      {
+                        "key": "target_constraint",
+                        "value": "target_unit_below_half_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 227,
+                      "start": 168,
+                      "text": "an enemy unit Below Half-strength is within 9\" of this unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": 2
+                      },
+                      {
+                        "key": "modifier_exclusive_group",
+                        "value": "scent-of-blood-charge-modifier"
+                      },
+                      {
+                        "key": "modifier_priority",
+                        "value": 2
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "charge"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 261,
+                      "start": 243,
+                      "text": "+2 to Charge rolls"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 262,
+                  "start": 165,
+                  "text": "If an enemy unit Below Half-strength is within 9\" of this unit, this unit has +2 to Charge rolls."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 227,
+                    "start": 218,
+                    "text": "this unit"
+                  }
+                },
+                "template_id": "phase17c:nearby-strength-charge-roll-modifier",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "aed436f4f2cbe1a104d6c3a649668f1ad1b9c1d3da0d4e042e49c3941c797267",
+            "normalized_text": "In the Charge phase, when this unit declares a charge: - If an enemy unit below Starting Strength is within 9\" of this unit, this unit has +1 to Charge rolls. - Or: If an enemy unit Below Half-strength is within 9\" of this unit, this unit has +2 to Charge rolls.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:world-eaters:maulerfiend:datasheet:000002639:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-world-eaters-maulerfiend-datasheet-2026-07:datasheet:000002639:3"
+          }
+        },
+        "000002639:4": {
+          "ability_name": "Savage Exaltation",
+          "normalized_text_sha256": "e7d3e123885f659acd4ad1342c5aefcc4915ad052e7fca3a26ba511c8c20f190",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:world-eaters:maulerfiend:datasheet:000002639:4:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "attack_target"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "this_model_makes_attack"
+                      },
+                      {
+                        "key": "target_allegiance",
+                        "value": "enemy"
+                      },
+                      {
+                        "key": "target_constraint",
+                        "value": "target_unit_below_starting_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 104,
+                      "start": 58,
+                      "text": "enemy unit that is below its Starting Strength"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "hit"
+                      },
+                      {
+                        "key": "weapon_scope",
+                        "value": "melee"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 127,
+                      "start": 106,
+                      "text": "add 1 to the Hit roll"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 127,
+                  "start": 0,
+                  "text": "Each time this model makes a melee attack that targets an enemy unit that is below its Starting Strength, add 1 to the Hit roll"
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 20,
+                    "start": 10,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:dice-roll-modifier",
+                "trigger": {
+                  "kind": "dice_roll",
+                  "parameters": [
+                    {
+                      "key": "roll_type",
+                      "value": "hit"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 41,
+                    "start": 0,
+                    "text": "Each time this model makes a melee attack"
+                  }
+                },
+                "unsupported_reason": null
+              },
+              {
+                "clause_id": "phase17k:world-eaters:maulerfiend:datasheet:000002639:4:clause:002",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "attack_target"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "this_model_makes_attack"
+                      },
+                      {
+                        "key": "target_allegiance",
+                        "value": "enemy"
+                      },
+                      {
+                        "key": "target_constraint",
+                        "value": "target_unit_below_half_strength"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 197,
+                      "start": 159,
+                      "text": "enemy unit that is Below Half-strength"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "modify_dice_roll",
+                    "parameters": [
+                      {
+                        "key": "delta",
+                        "value": 1
+                      },
+                      {
+                        "key": "roll_type",
+                        "value": "wound"
+                      },
+                      {
+                        "key": "weapon_scope",
+                        "value": "melee"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 222,
+                      "start": 199,
+                      "text": "add 1 to the Wound roll"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 230,
+                  "start": 133,
+                  "text": "if that attack targets an enemy unit that is Below Half-strength, add 1 to the Wound roll as well"
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 20,
+                    "start": 10,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:dice-roll-modifier",
+                "trigger": {
+                  "kind": "dice_roll",
+                  "parameters": [
+                    {
+                      "key": "roll_type",
+                      "value": "wound"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 41,
+                    "start": 0,
+                    "text": "Each time this model makes a melee attack"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "719286c7ccda602807744b55c03b33cb47482a9acb7d89d0216f6ad90f3307d4",
+            "normalized_text": "Each time this model makes a melee attack that targets an enemy unit that is below its Starting Strength, add 1 to the Hit roll and, if that attack targets an enemy unit that is Below Half-strength, add 1 to the Wound roll as well.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:world-eaters:maulerfiend:datasheet:000002639:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-world-eaters-maulerfiend-datasheet-2026-07:datasheet:000002639:4"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "review_row_id": "source:000002639",
+      "review_treatment": "rules_update",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-world-eaters-maulerfiend-datasheet-2026-07",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    }
+  }
+}

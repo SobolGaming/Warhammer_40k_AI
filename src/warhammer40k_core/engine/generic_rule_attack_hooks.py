@@ -245,7 +245,7 @@ def generic_rule_modified_save_options(
     ):
         return context.save_options
     current = context.save_options
-    for effect in _matching_generic_unit_effects(
+    for effect in generic_rule_matching_unit_effects(
         state=context.state,
         unit_instance_id=context.target_unit_instance_id,
         effect_kind=RuleEffectKind.SET_CHARACTERISTIC,
@@ -264,7 +264,7 @@ def generic_rule_modified_save_options(
         current = generic_rule_save_options_with_invulnerable_save(
             current,
             target_number=_required_int_parameter(effect.parameters, key="value"),
-            source_id=_modifier_source_id(effect),
+            source_id=generic_rule_modifier_source_id(effect),
         )
     for effect in _matching_generic_attack_effects(
         state=context.state,
@@ -292,7 +292,7 @@ def generic_rule_modified_save_options(
         if not _roll_type_matches(effect.parameters, expected="save"):
             continue
         delta = _required_int_parameter(effect.parameters, key="delta")
-        source_id = _modifier_source_id(effect)
+        source_id = generic_rule_modifier_source_id(effect)
         current = tuple(
             generic_rule_save_option_with_roll_modifier(option, delta, source_id)
             for option in current
@@ -311,7 +311,7 @@ def generic_rule_modified_save_options(
         if _characteristic_parameter(effect.parameters) is not Characteristic.ARMOR_PENETRATION:
             continue
         delta = _required_int_parameter(effect.parameters, key="delta")
-        source_id = _modifier_source_id(effect)
+        source_id = generic_rule_modifier_source_id(effect)
         current = tuple(
             save_option_with_armor_penetration_modifier(
                 option,
@@ -470,7 +470,7 @@ def generic_rule_reroll_permission_contexts_for_unit(
         if expected_window != requested_timing_window:
             continue
         permission = RerollPermission(
-            source_id=_modifier_source_id(effect),
+            source_id=generic_rule_modifier_source_id(effect),
             timing_window=requested_timing_window,
             owning_player_id=requested_player_id,
             eligible_roll_type=requested_roll_type,
@@ -513,7 +513,7 @@ def generic_rule_unit_characteristic_modifiers(
             "Generic unit characteristic modifier queries require Characteristic."
         )
     modifiers: list[tuple[str, int]] = []
-    for effect in _matching_generic_unit_effects(
+    for effect in generic_rule_matching_unit_effects(
         state=state,
         unit_instance_id=unit_instance_id,
         effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
@@ -532,21 +532,11 @@ def generic_rule_unit_characteristic_modifiers(
 def generic_rule_modified_movement_inches(
     context: MovementBudgetModifierContext,
 ) -> float:
-    if type(context) is not MovementBudgetModifierContext:
-        raise GameLifecycleError("Generic movement hooks require MovementBudgetModifierContext.")
-    current = context.current_movement_inches
-    for _effect_id, delta in generic_rule_unit_characteristic_modifiers(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        characteristic=Characteristic.MOVEMENT,
-    ):
-        current = max(0.0, current + delta)
-    for effect in _matching_generic_unit_effects(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
-    ):
-        current = max(0.0, current + _required_numeric_parameter(effect.parameters, key="delta"))
+    from warhammer40k_core.engine.movement_budget_modifiers import (
+        generic_rule_movement_modifier_trace,
+    )
+
+    current, _applications = generic_rule_movement_modifier_trace(context)
     return current
 
 
@@ -560,7 +550,7 @@ def generic_rule_charge_roll_modifiers(
     )
 
     current = list(context.current_roll_modifiers)
-    for effect in _matching_generic_unit_effects(
+    for effect in generic_rule_matching_unit_effects(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
         effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
@@ -570,7 +560,7 @@ def generic_rule_charge_roll_modifiers(
         current.append(
             RollModifier(
                 modifier_id=effect.persisting_effect.effect_id,
-                source_id=_modifier_source_id(effect),
+                source_id=generic_rule_modifier_source_id(effect),
                 operand=_required_int_parameter(effect.parameters, key="delta"),
             )
         )
@@ -615,7 +605,7 @@ def _dice_roll_modifier_for_attack(
     return total
 
 
-def _matching_generic_unit_effects(
+def generic_rule_matching_unit_effects(
     *,
     state: object,
     unit_instance_id: str,
@@ -639,7 +629,9 @@ def _matching_generic_unit_effects(
             continue
         if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=effect_unit_id):
             continue
-        effect_slot = f"{_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
+        effect_slot = (
+            f"{generic_rule_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
+        )
         existing = matches_by_effect_slot.get(effect_slot)
         if existing is not None and (
             existing.rule_id,
@@ -781,7 +773,7 @@ def _matching_generic_attack_effects(
                 continue
             seen.add(key)
             matches.append(generic_effect)
-    return tuple(sorted(matches, key=lambda effect: _modifier_source_id(effect)))
+    return tuple(sorted(matches, key=lambda effect: generic_rule_modifier_source_id(effect)))
 
 
 def _generic_attack_effect_or_none(
@@ -1230,7 +1222,7 @@ def _profile_with_weapon_ability_grant(
     return rule_ir_weapon_ability_granted_profile(
         parameters=effect.parameters,
         profile=profile,
-        source_id=_modifier_source_id(effect),
+        source_id=generic_rule_modifier_source_id(effect),
     )
 
 
@@ -1242,7 +1234,7 @@ def _profile_with_characteristic_modifier(
     return rule_ir_modified_weapon_profile(
         parameters=effect.parameters,
         profile=profile,
-        source_id=_modifier_source_id(effect),
+        source_id=generic_rule_modifier_source_id(effect),
     )
 
 
@@ -1331,13 +1323,6 @@ def _targeting_rule_gate_applies(
     return _validate_identifier("required_targeting_rule_id", required_rule) in targeting_rule_ids
 
 
-def _required_numeric_parameter(parameters: dict[str, JsonValue], *, key: str) -> float:
-    value = parameters.get(key)
-    if type(value) not in {int, float}:
-        raise GameLifecycleError(f"Generic RuleIR parameter {key} must be numeric.")
-    return float(cast(int | float, value))
-
-
 def _required_identifier_payload(payload: dict[str, JsonValue], key: str) -> str:
     value = payload.get(key)
     if type(value) is not str:
@@ -1345,7 +1330,7 @@ def _required_identifier_payload(payload: dict[str, JsonValue], key: str) -> str
     return _validate_identifier(key, value)
 
 
-def _modifier_source_id(effect: _GenericAttackEffect) -> str:
+def generic_rule_modifier_source_id(effect: _GenericAttackEffect) -> str:
     return _validate_identifier(
         "generic modifier source_id",
         f"{effect.source_id}:{effect.clause_id}:{effect.effect_kind.value}",

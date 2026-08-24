@@ -678,12 +678,24 @@ def _heroic_intervention_reachable_target_distances(
     mode: str,
     maximum_distance_inches: int,
 ) -> dict[str, float]:
+    heroic_models = _geometry_models_for_unit(
+        state=state,
+        unit_instance_id=heroic_unit_id,
+    )
+    if not heroic_models:
+        raise GameLifecycleError("Heroic Intervention source unit requires placed models.")
     distances: dict[str, float] = {}
     for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=player_id):
-        distance = _closest_unit_distance_inches(
+        enemy_models = _geometry_models_for_unit(
             state=state,
-            first_unit_instance_id=heroic_unit_id,
-            second_unit_instance_id=enemy_unit_id,
+            unit_instance_id=enemy_unit_id,
+        )
+        if not enemy_models:
+            continue
+        distance = min(
+            heroic_model.range_to(enemy_model)
+            for heroic_model in heroic_models
+            for enemy_model in enemy_models
         )
         if distance > float(maximum_distance_inches):
             continue

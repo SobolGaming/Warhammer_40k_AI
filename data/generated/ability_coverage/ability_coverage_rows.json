@@ -1524,6 +1524,70 @@
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000968/core/000008339/none",
+    "datasheet_id": "000000968",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000000968:siege-crawler",
+    "ability_name": "Siege Crawler",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000968/datasheet/000000968:siege-crawler/none",
+    "datasheet_id": "000000968",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:modifier-ignore-permission"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008359",
+    "ability_name": "Dark Pacts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000000968/faction/000008359/none",
+    "datasheet_id": "000000968",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.dark_pacts"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
     "datasheet_id": "000000969",
     "datasheet_name": "Defiler",
@@ -1599,6 +1663,49 @@
       "faction.army_rule.dark_pacts"
     ],
     "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001029/core/000008339/none",
+    "datasheet_id": "000001029",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001029:snarling-protector",
+    "ability_name": "Snarling Protector",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none",
+    "datasheet_id": "000001029",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:friendly-engaged-anchor-charge-reroll",
+      "catalog-ir:stratagem-cost-modifier",
+      "catalog-ir:stratagem-phase-use-exception"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_unit",
+      "datasheet.rule_ir.grant_ability.unscoped",
+      "datasheet.rule_ir.modify_command_points.unscoped"
+    ],
+    "source_kind": "datasheet",
     "source_wargear_id": null,
     "support_stage": "engine_consumed"
   },
@@ -3075,6 +3182,89 @@
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/core/000008339/none",
+    "datasheet_id": "000002639",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002639:savage-exaltation",
+    "ability_name": "Savage Exaltation",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:savage-exaltation/none",
+    "datasheet_id": "000002639",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-modifier",
+      "catalog-ir:wound-roll-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.hit.this_model",
+      "datasheet.roll_modifier.wound.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002639:the-scent-of-blood",
+    "ability_name": "The Scent of Blood",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:the-scent-of-blood/none",
+    "datasheet_id": "000002639",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:charge-roll-modifier"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.charge.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008428",
+    "ability_name": "Blessings of Khorne",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/faction/000008428/none",
+    "datasheet_id": "000002639",
+    "datasheet_name": "Maulerfiend",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.blessings_of_khorne"
     ],
     "source_kind": "faction",
     "source_wargear_id": null,

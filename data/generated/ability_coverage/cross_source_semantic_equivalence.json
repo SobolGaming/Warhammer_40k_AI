@@ -7032,7 +7032,7 @@
     }
   ],
   "equivalent_group_count": 323,
-  "exact_text_only_member_count": 3186,
+  "exact_text_only_member_count": 3182,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -26620,12 +26620,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "a7b46404610b2cf04cc2863c6b6f2b50b2a7c26d617640ce68bca6a09199726c",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "076760afd22352e7ac8dc2eec12a0c2aa45861c28d846ce01f6f21f2557fb460",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "datasheet-ability:000000968:3",
@@ -26635,16 +26633,18 @@
       "rule_id": "000000968:3",
       "rule_name": "Siege Crawler",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:modifier-ignore-permission"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "af4e21026db7eba974743bd09941422bb876a31d8b2f492e8f0d28a92d566ba7",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000968:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000968:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -27157,31 +27157,33 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "e3f2b8b78c1e9bee8347e4bdbbbaaca26962e37fa72cd19e6d4f731a1bd504bf",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "b247ab9a54e8b72095a3caaccdc7241f5d631691bba560d5434326a6c404f6b9",
+      "execution_status": "engine_consumed",
       "faction_id": "thousand-sons",
       "faction_name": "Thousand Sons",
       "member_id": "datasheet-ability:000001029:2",
-      "normalized_text_hash": "be2835acce7faf8afdfbcbbc6b4a7458a8a99e4fc6972c687952958632fda7ec",
+      "normalized_text_hash": "d8d600e3ae5d0ff431d1720fdf18e348ef91bde1be12431ed25e7478c4d562d0",
       "owner_id": "000001029",
       "owner_name": "Maulerfiend",
       "rule_id": "000001029:2",
       "rule_name": "Snarling Protector",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:friendly-engaged-anchor-charge-reroll",
+        "catalog-ir:stratagem-cost-modifier",
+        "catalog-ir:stratagem-phase-use-exception"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "ecb053837c66a28d50626e646a7aa7e019c08309c0478fc1878652cde8ad6609",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001029:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001029:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -44708,40 +44710,38 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "b79cf6ed788e5e83374949a093c883f839d0a015f73f24a9d1e4c1cf83b0573a",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "061d4e5ef61dbf6ca9f6eb5a26dac8d0eb83eb822a5eb343ae34c954165793ab",
+      "execution_status": "engine_consumed",
       "faction_id": "world-eaters",
       "faction_name": "World Eaters",
       "member_id": "datasheet-ability:000002639:3",
-      "normalized_text_hash": "ff7dfa8c10d5a6af8f51ce6c4bde7970d71563ddc8410e42db5e3ec64ff885b7",
+      "normalized_text_hash": "57893bf3a628e8cae32cdaba187b158b895e84293c023c03fcec8e74aa2fa8c8",
       "owner_id": "000002639",
       "owner_name": "Maulerfiend",
       "rule_id": "000002639:3",
       "rule_name": "The Scent of Blood",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:charge-roll-modifier"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "1d576f0212b011279d5711b0535a8010051aea35dc72401b7679e1b38745c7b6",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002639:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002639:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "22aa5459b22026f5357ec87bd4ecde176b2a8c97e904893ddd879e49778ae578",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "303a25d8a5a4c03164198538f7ec0b44b7eee82a6f5e5cb5771219f4672086ff",
+      "execution_status": "engine_consumed",
       "faction_id": "world-eaters",
       "faction_name": "World Eaters",
       "member_id": "datasheet-ability:000002639:4",
@@ -44751,16 +44751,19 @@
       "rule_id": "000002639:4",
       "rule_name": "Savage Exaltation",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:hit-roll-modifier",
+        "catalog-ir:wound-roll-modifier"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "71f24df6ccae954176b7d2513ec74a94f836561f5e2916b789313fdc73168a25",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002639:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002639:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -48500,9 +48503,7 @@
       "rule_id": "000002795:5",
       "rule_name": "Sigismund's Heir",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [
-        "catalog-ir:charge-roll-modifier"
-      ],
+      "runtime_consumer_ids": [],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
       "semantic_hash": "ce6227e8b1386b343707240feae12439e13980b6ca596ce9140774a720bfe99b",
       "source_row_ids": [
@@ -122005,8 +122006,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "61e673d0d37721c4de32d632f3ba08baa37904c3427a6b088ede79e9fa6057d0",
+  "source_payload_checksum_sha256": "b6173c769788fdf3a3cba3218df9b11f7aa4a3a7b9da8a1bb79703fdc888f580",
   "source_text_unavailable_member_count": 111,
-  "structured_member_count": 797,
+  "structured_member_count": 801,
   "upstream_execution_checksum_sha256": "834125acc90177293fe986b60d1caa75c6fb47bef2aa6d9bf0571d0a54fd9347"
 }

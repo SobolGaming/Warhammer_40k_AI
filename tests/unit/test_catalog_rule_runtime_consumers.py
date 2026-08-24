@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import math
 from collections.abc import Mapping
 from dataclasses import replace
@@ -82,6 +83,9 @@ from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     CatalogBattleShockRerollRuntime,
     catalog_battle_shock_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_charge_roll_modifiers import (
+    clause_effect_is_supported_charge_roll_modifier,
+)
 from warhammer40k_core.engine.catalog_command_point_runtime import (
     CATALOG_IR_COMMAND_POINT_GAIN_EVENT,
     CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT,
@@ -106,6 +110,13 @@ from warhammer40k_core.engine.catalog_fight_end_triggered_movement_runtime impor
 from warhammer40k_core.engine.catalog_fight_end_triggered_movement_support import (
     CATALOG_IR_FIGHT_END_TRIGGERED_MOVEMENT_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_modifier_ignore import (
+    CATALOG_IR_MODIFIER_IGNORE_PERMISSION_CONSUMER_ID,
+    CatalogModifierIgnorePermission,
+    ModifierIgnoreKind,
+    catalog_modifier_ignore_permissions_for_unit,
+    clause_is_modifier_ignore_permission,
+)
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_runtime import (
     CatalogMovementEndReactiveNormalMoveRuntime,
 )
@@ -128,6 +139,7 @@ from warhammer40k_core.engine.catalog_reserve_arrival_restrictions import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
+    CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     CatalogAdvanceEligibilityRuntime,
@@ -139,6 +151,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CatalogRuleIrHookDefinition,
     CatalogUnitMoveCompletedMortalWoundsGroup,
     CatalogUnitMoveCompletedMortalWoundsTargetOption,
+    catalog_charge_roll_modifiers_for_unit,
     catalog_rule_clauses_from_record,
     catalog_rule_ir_consumer_ids_for_effect,
     catalog_rule_ir_consumers_for_rule,
@@ -243,6 +256,12 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.modifier_ignore import (
+    ModifierIgnoreSnapshot,
+    ignored_modifier_ids_for_context,
+    options_with_modifier_ignore_choices,
+    record_modifier_ignore_selection,
+)
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
     MovementEndSurgeDistanceKind,
@@ -278,6 +297,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
 )
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -349,6 +369,7 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -6682,7 +6703,14 @@ def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
         effect_roll_type: str,
         conditions: tuple[RuleCondition, ...] = (supported_condition,),
         delta: RuleParameterValue = 1,
+        weapon_scope: str | None = None,
     ) -> RuleClause:
+        effect_parameters: tuple[tuple[str, RuleParameterValue], ...] = (
+            ("delta", delta),
+            ("roll_type", effect_roll_type),
+        )
+        if weapon_scope is not None:
+            effect_parameters = (*effect_parameters, ("weapon_scope", weapon_scope))
         return RuleClause(
             clause_id=f"test:static-attack-modifier:{trigger_roll_type}:{effect_roll_type}",
             source_span=_span(),
@@ -6696,8 +6724,7 @@ def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
             effects=(
                 _effect(
                     RuleEffectKind.MODIFY_DICE_ROLL,
-                    ("delta", delta),
-                    ("roll_type", effect_roll_type),
+                    *effect_parameters,
                 ),
             ),
         )
@@ -6723,6 +6750,28 @@ def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
         assert clause_effect_is_supported_this_model_attack_roll_modifier(
             compiler_authored,
             compiler_authored.effects[0],
+        )
+
+    for target_constraint in (
+        "target_unit_below_starting_strength",
+        "target_unit_below_half_strength",
+    ):
+        condition = _condition(
+            RuleConditionKind.TARGET_CONSTRAINT,
+            ("gate_subject", "attack_target"),
+            ("relationship", "this_model_makes_attack"),
+            ("target_allegiance", "enemy"),
+            ("target_constraint", target_constraint),
+        )
+        clause = clause_for(
+            trigger_roll_type="hit",
+            effect_roll_type="hit",
+            conditions=(condition,),
+            weapon_scope="melee",
+        )
+        assert clause_effect_is_supported_this_model_attack_roll_modifier(
+            clause,
+            clause.effects[0],
         )
 
     supported = clause_for(trigger_roll_type="hit", effect_roll_type="hit")
@@ -6823,6 +6872,712 @@ def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
         assert not clause_effect_is_supported_this_model_attack_roll_modifier(
             clause,
             clause.effects[0],
+        )
+
+
+def test_catalog_modifier_ignore_permission_classifier_and_query_are_fail_closed() -> None:
+    source_army, _target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    clause = _modifier_ignore_permission_clause(
+        clause_id="test:modifier-ignore:valid",
+        modifier_kinds=(
+            ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC.value,
+            ModifierIgnoreKind.ADVANCE_ROLL.value,
+            ModifierIgnoreKind.CHARGE_ROLL.value,
+        ),
+    )
+    rule_ir = _rule_ir(source_id="test:modifier-ignore", clauses=(clause,))
+    record = _ability_record(
+        record_id="record:test:modifier-ignore",
+        rule_ir=rule_ir,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        datasheet_id=source_unit.datasheet_id,
+    )
+
+    assert clause_is_modifier_ignore_permission(clause)
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MODIFIER_IGNORE_PERMISSION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_MODIFIER_IGNORE_PERMISSION_CONSUMER_ID,
+    )
+    permissions = catalog_modifier_ignore_permissions_for_unit(
+        ability_index=AbilityCatalogIndex.from_records((record,)),
+        unit=source_unit,
+        current_model_instance_ids=source_unit.own_model_ids(),
+    )
+    assert tuple(permission.to_payload() for permission in permissions) == (
+        {
+            "permission_id": ("test:modifier-ignore:test:modifier-ignore:valid:modifier-ignore"),
+            "record_id": record.record_id,
+            "source_id": rule_ir.source_id,
+            "rule_ir_hash": rule_ir.ir_hash(),
+            "clause_id": clause.clause_id,
+            "modifier_kinds": [
+                ModifierIgnoreKind.ADVANCE_ROLL.value,
+                ModifierIgnoreKind.CHARGE_ROLL.value,
+                ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC.value,
+            ],
+        },
+    )
+
+    base_effect = clause.effects[0]
+    base_duration = clause.duration
+    assert base_duration is not None
+    unsupported_shapes = (
+        replace(
+            clause,
+            trigger=RuleTrigger(
+                kind=RuleTriggerKind.DICE_ROLL,
+                source_span=_span(),
+                parameters=_parameters(("roll_type", "advance")),
+            ),
+        ),
+        replace(
+            clause,
+            conditions=(
+                _condition(
+                    RuleConditionKind.TARGET_CONSTRAINT,
+                    ("target_constraint", "source_unit_is_visible"),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+        ),
+        replace(clause, duration=replace(base_duration, kind=RuleDurationKind.IMMEDIATE)),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    base_effect,
+                    parameters=_parameters(
+                        ("ability", "modifier_ignore_permission"),
+                        (
+                            "modifier_kinds",
+                            (ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC.value,),
+                        ),
+                        ("selection", "all"),
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    base_effect,
+                    parameters=_parameters(
+                        ("ability", "modifier_ignore_permission"),
+                        (
+                            "modifier_kinds",
+                            (
+                                ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC.value,
+                                ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC.value,
+                            ),
+                        ),
+                        ("selection", "any_or_all"),
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    base_effect,
+                    parameters=_parameters(
+                        ("ability", "modifier_ignore_permission"),
+                        ("modifier_kinds", ("hit_roll",)),
+                        ("selection", "any_or_all"),
+                    ),
+                ),
+            ),
+        ),
+    )
+    assert all(not clause_is_modifier_ignore_permission(item) for item in unsupported_shapes)
+
+    disabled_record = replace(record, disabled=True)
+    assert (
+        catalog_modifier_ignore_permissions_for_unit(
+            ability_index=AbilityCatalogIndex.from_records((disabled_record,)),
+            unit=source_unit,
+            current_model_instance_ids=source_unit.own_model_ids(),
+        )
+        == ()
+    )
+
+
+def test_modifier_ignore_options_effect_and_records_round_trip_deterministically() -> None:
+    source_army, _target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    unit_id = source_unit.unit_instance_id
+    model_id = source_unit.own_models[0].model_instance_id
+    permission = CatalogModifierIgnorePermission(
+        permission_id="test:modifier-ignore:permission",
+        record_id="test:modifier-ignore:record",
+        source_id="test:modifier-ignore:source",
+        rule_ir_hash="test:modifier-ignore:rule-ir-hash",
+        clause_id="test:modifier-ignore:clause",
+        modifier_kinds=(
+            ModifierIgnoreKind.CHARGE_ROLL,
+            ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
+            ModifierIgnoreKind.ADVANCE_ROLL,
+        ),
+    )
+    snapshots = (
+        ModifierIgnoreSnapshot(
+            kind=ModifierIgnoreKind.CHARGE_ROLL,
+            modifier_id="test:modifier-ignore:charge",
+            source_id="test:modifier-ignore:charge-source",
+        ),
+        ModifierIgnoreSnapshot(
+            kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
+            modifier_id="test:modifier-ignore:movement",
+            source_id="test:modifier-ignore:movement-source",
+            model_instance_id=model_id,
+        ),
+        ModifierIgnoreSnapshot(
+            kind=ModifierIgnoreKind.ADVANCE_ROLL,
+            modifier_id="test:modifier-ignore:advance",
+            source_id="test:modifier-ignore:advance-source",
+        ),
+    )
+    base_option = DecisionOption(
+        option_id="advance",
+        label="Advance",
+        payload={"unit_instance_id": unit_id},
+    )
+
+    options = options_with_modifier_ignore_choices(
+        option=base_option,
+        unit_instance_id=unit_id,
+        permissions=(permission,),
+        available_modifiers=tuple(reversed(snapshots)),
+    )
+    repeated = options_with_modifier_ignore_choices(
+        option=base_option,
+        unit_instance_id=unit_id,
+        permissions=(permission,),
+        available_modifiers=snapshots,
+    )
+    assert options == repeated
+    assert len(options) == 8
+    assert len({option.option_id for option in options}) == 8
+    assert options[0].option_id == base_option.option_id
+    assert all(option.option_id.startswith("advance:ignore:") for option in options[1:])
+
+    request = DecisionRequest(
+        request_id="test:modifier-ignore:request",
+        decision_type="select_movement_action",
+        actor_id=source_army.player_id,
+        payload={"unit_instance_id": unit_id},
+        options=options,
+    )
+    request_payload = json.loads(json.dumps(request.to_payload(), sort_keys=True))
+    restored_request = DecisionRequest.from_payload(request_payload)
+    assert restored_request == request
+    selected_option = options[-1]
+    assert isinstance(selected_option.payload, dict)
+    selected_context = cast(
+        dict[str, object],
+        selected_option.payload["modifier_ignore_context"],
+    )
+    assert len(cast(list[object], selected_context["ignored_modifiers"])) == 3
+    result = DecisionResult.for_request(
+        result_id="test:modifier-ignore:result",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+    decisions = DecisionController()
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    state.record_army_definition(source_army)
+    effect = record_modifier_ignore_selection(
+        state=state,
+        result=result,
+        unit_instance_id=unit_id,
+        phase=BattlePhaseKind.MOVEMENT,
+    )
+    assert effect is not None
+    assert ignored_modifier_ids_for_context(
+        state=state,
+        unit_instance_id=unit_id,
+        kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
+        model_instance_id=model_id,
+    ) == ("test:modifier-ignore:movement",)
+    assert ignored_modifier_ids_for_context(
+        state=state,
+        unit_instance_id=unit_id,
+        kind=ModifierIgnoreKind.ADVANCE_ROLL,
+    ) == ("test:modifier-ignore:advance",)
+    assert ignored_modifier_ids_for_context(
+        state=state,
+        unit_instance_id=unit_id,
+        kind=ModifierIgnoreKind.CHARGE_ROLL,
+    ) == ("test:modifier-ignore:charge",)
+
+    controller_payload = json.loads(json.dumps(decisions.to_payload(), sort_keys=True))
+    state_payload = json.loads(json.dumps(state.to_payload(), sort_keys=True))
+    assert DecisionController.from_payload(controller_payload).to_payload() == controller_payload
+    restored_state = GameState.from_payload(state_payload)
+    assert restored_state.to_payload() == state_payload
+    assert ignored_modifier_ids_for_context(
+        state=restored_state,
+        unit_instance_id=unit_id,
+        kind=ModifierIgnoreKind.CHARGE_ROLL,
+    ) == ("test:modifier-ignore:charge",)
+    assert "object at 0x" not in json.dumps(
+        {"decision": controller_payload, "state": state_payload}, sort_keys=True
+    )
+
+
+def test_modifier_ignore_context_rejects_duplicate_and_unpermitted_replay_shapes() -> None:
+    source_army, _target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    unit_id = source_unit.unit_instance_id
+    permission = CatalogModifierIgnorePermission(
+        permission_id="test:modifier-ignore:invalid-permission",
+        record_id="test:modifier-ignore:invalid-record",
+        source_id="test:modifier-ignore:invalid-source",
+        rule_ir_hash="test:modifier-ignore:invalid-hash",
+        clause_id="test:modifier-ignore:invalid-clause",
+        modifier_kinds=(ModifierIgnoreKind.ADVANCE_ROLL,),
+    )
+    advance_snapshot = ModifierIgnoreSnapshot(
+        kind=ModifierIgnoreKind.ADVANCE_ROLL,
+        modifier_id="test:modifier-ignore:invalid-advance",
+        source_id="test:modifier-ignore:invalid-advance-source",
+    )
+    base_option = DecisionOption(
+        option_id="advance",
+        label="Advance",
+        payload={"unit_instance_id": unit_id},
+    )
+    with pytest.raises(GameLifecycleError, match="snapshot identities must be unique"):
+        options_with_modifier_ignore_choices(
+            option=base_option,
+            unit_instance_id=unit_id,
+            permissions=(permission,),
+            available_modifiers=(advance_snapshot, advance_snapshot),
+        )
+
+    option = options_with_modifier_ignore_choices(
+        option=base_option,
+        unit_instance_id=unit_id,
+        permissions=(permission,),
+        available_modifiers=(advance_snapshot,),
+    )[1]
+    assert isinstance(option.payload, dict)
+    valid_payload = cast(dict[str, object], option.payload)
+    valid_context = cast(dict[str, object], valid_payload["modifier_ignore_context"])
+    request = DecisionRequest(
+        request_id="test:modifier-ignore:invalid-request",
+        decision_type="select_movement_action",
+        actor_id="player-a",
+        payload={},
+        options=(option,),
+    )
+    valid_result = DecisionResult.for_request(
+        result_id="test:modifier-ignore:invalid-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+
+    for expected_message, context in (
+        (
+            "permission IDs are duplicated",
+            {
+                **valid_context,
+                "permissions": [
+                    *cast(list[object], valid_context["permissions"]),
+                    *cast(list[object], valid_context["permissions"]),
+                ],
+            },
+        ),
+        (
+            "available modifier kind is not permitted",
+            {
+                **valid_context,
+                "available_modifiers": [
+                    ModifierIgnoreSnapshot(
+                        kind=ModifierIgnoreKind.CHARGE_ROLL,
+                        modifier_id="test:modifier-ignore:unpermitted-charge",
+                        source_id="test:modifier-ignore:unpermitted-charge-source",
+                    ).to_payload()
+                ],
+                "ignored_modifiers": [
+                    ModifierIgnoreSnapshot(
+                        kind=ModifierIgnoreKind.CHARGE_ROLL,
+                        modifier_id="test:modifier-ignore:unpermitted-charge",
+                        source_id="test:modifier-ignore:unpermitted-charge-source",
+                    ).to_payload()
+                ],
+            },
+        ),
+        (
+            "ignored modifiers are duplicated",
+            {
+                **valid_context,
+                "ignored_modifiers": [
+                    *cast(list[object], valid_context["ignored_modifiers"]),
+                    *cast(list[object], valid_context["ignored_modifiers"]),
+                ],
+            },
+        ),
+    ):
+        forged = replace(
+            valid_result,
+            payload=validate_json_value({**valid_payload, "modifier_ignore_context": context}),
+        )
+        state = _state_without_battlefield(
+            active_player_id="player-a",
+            phase=BattlePhase.MOVEMENT,
+        )
+        with pytest.raises(GameLifecycleError, match=expected_message):
+            record_modifier_ignore_selection(
+                state=state,
+                result=forged,
+                unit_instance_id=unit_id,
+                phase=BattlePhaseKind.MOVEMENT,
+            )
+        assert state.persisting_effects == []
+
+    valid_state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    valid_state.record_army_definition(source_army)
+    valid_effect = record_modifier_ignore_selection(
+        state=valid_state,
+        result=valid_result,
+        unit_instance_id=unit_id,
+        phase=BattlePhaseKind.MOVEMENT,
+    )
+    assert valid_effect is not None
+    assert isinstance(valid_effect.effect_payload, dict)
+    replay_effect_payload = cast(dict[str, object], valid_effect.effect_payload)
+    replay_context = cast(
+        dict[str, object],
+        replay_effect_payload["modifier_ignore_context"],
+    )
+    replay_permissions = cast(list[object], replay_context["permissions"])
+    malformed_replay_effect = replace(
+        valid_effect,
+        effect_id="test:modifier-ignore:malformed-replay-effect",
+        effect_payload=validate_json_value(
+            {
+                **replay_effect_payload,
+                "modifier_ignore_context": {
+                    **replay_context,
+                    "permissions": [*replay_permissions, *replay_permissions],
+                },
+            }
+        ),
+    )
+    replay_state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    replay_state.record_army_definition(source_army)
+    replay_state.record_persisting_effect(malformed_replay_effect)
+    with pytest.raises(GameLifecycleError, match="permission IDs are duplicated"):
+        ignored_modifier_ids_for_context(
+            state=replay_state,
+            unit_instance_id=unit_id,
+            kind=ModifierIgnoreKind.ADVANCE_ROLL,
+        )
+
+
+def test_catalog_charge_roll_modifier_classifier_is_fail_closed() -> None:
+    below_starting = _charge_strength_modifier_clause(
+        clause_id="test:charge-strength:below-starting",
+        target_constraint="target_unit_below_starting_strength",
+        delta=1,
+        modifier_priority=1,
+    )
+    below_half = _charge_strength_modifier_clause(
+        clause_id="test:charge-strength:below-half",
+        target_constraint="target_unit_below_half_strength",
+        delta=2,
+        modifier_priority=2,
+    )
+    unconditional = RuleClause(
+        clause_id="test:charge-strength:unconditional",
+        source_span=_span(),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.MODIFY_DICE_ROLL,
+                ("delta", 1),
+                ("roll_type", "charge"),
+            ),
+        ),
+    )
+
+    for clause in (unconditional, below_starting, below_half):
+        assert clause_effect_is_supported_charge_roll_modifier(
+            clause,
+            clause.effects[0],
+        )
+
+    rule_ir = _rule_ir(
+        source_id="test:charge-strength",
+        clauses=(below_half, below_starting),
+    )
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,)
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,)
+
+    base_condition = below_starting.conditions[0]
+    base_effect = below_starting.effects[0]
+    unsupported_shapes = (
+        # Target-keyword charge gates require declared-target semantics. Treating
+        # this shape as unconditional would over-apply rules such as Sigismund's Heir.
+        replace(
+            unconditional,
+            target=RuleTargetSpec(
+                kind=RuleTargetKind.THIS_UNIT,
+                source_span=_span(),
+                parameters=_parameters(("scope", "this_models_unit")),
+            ),
+            conditions=(
+                _condition(
+                    RuleConditionKind.KEYWORD_GATE,
+                    ("required_keyword", "CHARACTER"),
+                ),
+            ),
+        ),
+        replace(
+            below_starting,
+            conditions=(
+                replace(
+                    base_condition,
+                    parameters=_parameters(
+                        ("distance_inches", 0),
+                        ("gate_subject", "nearby_unit"),
+                        ("relationship", "any_unit_within_distance_of_this_unit"),
+                        ("target_allegiance", "enemy"),
+                        ("target_constraint", "target_unit_below_starting_strength"),
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            below_starting,
+            conditions=(
+                replace(
+                    base_condition,
+                    parameters=_parameters(
+                        ("distance_inches", 9.0),
+                        ("gate_subject", "nearby_unit"),
+                        ("relationship", "any_unit_within_distance_of_this_unit"),
+                        ("target_allegiance", "friendly"),
+                        ("target_constraint", "target_unit_below_starting_strength"),
+                    ),
+                ),
+            ),
+        ),
+        replace(below_starting, conditions=(base_condition, base_condition)),
+        replace(
+            below_starting,
+            effects=(
+                replace(
+                    base_effect,
+                    parameters=_parameters(
+                        ("delta", 1),
+                        ("modifier_priority", 1),
+                        ("roll_type", "charge"),
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            below_starting,
+            effects=(
+                replace(
+                    base_effect,
+                    parameters=_parameters(
+                        ("delta", 1),
+                        ("modifier_exclusive_group", "nearby-enemy-strength"),
+                        ("modifier_priority", 0),
+                        ("roll_type", "charge"),
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            below_starting,
+            target=RuleTargetSpec(
+                kind=RuleTargetKind.THIS_UNIT,
+                source_span=_span(),
+                parameters=_parameters(("scope", "models")),
+            ),
+        ),
+    )
+    for clause in unsupported_shapes:
+        assert not clause_effect_is_supported_charge_roll_modifier(
+            clause,
+            clause.effects[0],
+        )
+
+
+def test_catalog_charge_roll_modifiers_use_nearby_enemy_strength_priority() -> None:
+    source_army, target_army = _mustered_once_per_battle_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    source_x = 10.0
+    probe_target_x = 30.0
+    state = _state_without_battlefield(
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.CHARGE,
+    )
+    state.record_army_definition(source_army)
+    state.record_army_definition(target_army)
+    state.battlefield_state = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=source_x,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=probe_target_x,
+    )
+
+    def closest_distance_inches() -> float:
+        source_models = geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=source_unit.unit_instance_id,
+        )
+        target_models = geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=target_unit.unit_instance_id,
+        )
+        return min(
+            DistanceMeasurementContext.from_models(source, target).closest_distance_inches()
+            for source in source_models
+            for target in target_models
+        )
+
+    target_x = probe_target_x - (closest_distance_inches() - 9.0)
+    state.battlefield_state = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=source_x,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=target_x,
+    )
+    assert math.isclose(closest_distance_inches(), 9.0, abs_tol=1e-9)
+
+    below_starting = _charge_strength_modifier_clause(
+        clause_id="test:charge-strength-runtime:below-starting",
+        target_constraint="target_unit_below_starting_strength",
+        delta=1,
+        modifier_priority=1,
+    )
+    below_half = _charge_strength_modifier_clause(
+        clause_id="test:charge-strength-runtime:below-half",
+        target_constraint="target_unit_below_half_strength",
+        delta=2,
+        modifier_priority=2,
+    )
+    rule_ir = _rule_ir(
+        source_id="test:charge-strength-runtime",
+        clauses=(below_half, below_starting),
+    )
+    records = tuple(
+        _ability_record(
+            record_id=f"record:test:charge-strength-runtime:{index}",
+            rule_ir=rule_ir,
+            trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+            runtime_clause_id=clause.clause_id,
+            datasheet_id=source_unit.datasheet_id,
+        )
+        for index, clause in enumerate(rule_ir.clauses, start=1)
+    )
+    ability_index = AbilityCatalogIndex.from_records(records)
+
+    def modifiers() -> tuple[int, ...]:
+        return tuple(
+            modifier.operand
+            for modifier in catalog_charge_roll_modifiers_for_unit(
+                state=state,
+                ability_index=ability_index,
+                unit=source_unit,
+                current_model_instance_ids=source_unit.own_model_ids(),
+            )
+        )
+
+    assert modifiers() == ()
+
+    target_unit = _unit_with_dead_model(target_unit, index=4)
+    state.replace_army_definitions([source_army, _army_with_unit(target_army, target_unit)])
+    assert modifiers() == (1,)
+
+    target_unit = _unit_with_dead_model(target_unit, index=3)
+    state.replace_army_definitions([source_army, _army_with_unit(target_army, target_unit)])
+    assert modifiers() == (1,)
+
+    target_unit = _unit_with_dead_model(target_unit, index=2)
+    current_target_army = _army_with_unit(target_army, target_unit)
+    state.replace_army_definitions([source_army, current_target_army])
+    resolved = catalog_charge_roll_modifiers_for_unit(
+        state=state,
+        ability_index=ability_index,
+        unit=source_unit,
+        current_model_instance_ids=source_unit.own_model_ids(),
+    )
+    assert tuple(modifier.operand for modifier in resolved) == (2,)
+    assert tuple(modifier.priority for modifier in resolved) == (2,)
+
+    state.battlefield_state = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=source_x,
+        target_army=current_target_army,
+        target_unit=target_unit,
+        target_x=target_x + 0.001,
+    )
+    assert modifiers() == ()
+
+    state.battlefield_state = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=source_x,
+        target_army=current_target_army,
+        target_unit=target_unit,
+        target_x=target_x,
+    )
+    tied_rule_ir = _rule_ir(
+        source_id="test:charge-strength-runtime-tie",
+        clauses=(
+            below_half,
+            replace(
+                below_half,
+                clause_id="test:charge-strength-runtime:below-half-tie",
+            ),
+        ),
+    )
+    tied_index = AbilityCatalogIndex.from_records(
+        (
+            _ability_record(
+                record_id="record:test:charge-strength-runtime-tie",
+                rule_ir=tied_rule_ir,
+                trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+                datasheet_id=source_unit.datasheet_id,
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="ambiguous priority"):
+        catalog_charge_roll_modifiers_for_unit(
+            state=state,
+            ability_index=tied_index,
+            unit=source_unit,
+            current_model_instance_ids=source_unit.own_model_ids(),
         )
 
 
@@ -7535,6 +8290,63 @@ def _duration(endpoint: str) -> RuleDuration:
         kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
         source_span=_span(),
         parameters=_parameters(("endpoint", endpoint)),
+    )
+
+
+def _charge_strength_modifier_clause(
+    *,
+    clause_id: str,
+    target_constraint: str,
+    delta: int,
+    modifier_priority: int,
+) -> RuleClause:
+    return RuleClause(
+        clause_id=clause_id,
+        source_span=_span(),
+        conditions=(
+            _condition(
+                RuleConditionKind.TARGET_CONSTRAINT,
+                ("distance_inches", 9.0),
+                ("gate_subject", "nearby_unit"),
+                ("relationship", "any_unit_within_distance_of_this_unit"),
+                ("target_allegiance", "enemy"),
+                ("target_constraint", target_constraint),
+            ),
+        ),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.MODIFY_DICE_ROLL,
+                ("delta", delta),
+                ("modifier_exclusive_group", "nearby-enemy-strength"),
+                ("modifier_priority", modifier_priority),
+                ("roll_type", "charge"),
+            ),
+        ),
+    )
+
+
+def _modifier_ignore_permission_clause(
+    *,
+    clause_id: str,
+    modifier_kinds: tuple[str, ...],
+) -> RuleClause:
+    return RuleClause(
+        clause_id=clause_id,
+        source_span=_span(),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.GRANT_ABILITY,
+                ("ability", "modifier_ignore_permission"),
+                ("modifier_kinds", modifier_kinds),
+                ("selection", "any_or_all"),
+            ),
+        ),
+        duration=RuleDuration(
+            kind=RuleDurationKind.WHILE_CONDITION_TRUE,
+            source_span=_span(),
+        ),
     )
 
 

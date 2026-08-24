@@ -68,6 +68,7 @@ def _request_end_opponent_movement_reaction_if_available(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
     ruleset_descriptor: RulesetDescriptor | None = None,
     army_catalog: ArmyCatalog | None = None,
@@ -98,6 +99,7 @@ def _request_end_opponent_movement_reaction_if_available(
         decisions=decisions,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if fire_overwatch_status is not None:
         return fire_overwatch_status
@@ -106,6 +108,7 @@ def _request_end_opponent_movement_reaction_if_available(
         decisions=decisions,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
 
 
@@ -165,6 +168,7 @@ def _request_rapid_ingress_reaction_if_available(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     if reaction_queue is None or stratagem_index is None:
         return None
@@ -186,6 +190,7 @@ def _request_rapid_ingress_reaction_if_available(
             index=stratagem_index,
             context=context,
             handler_id=CORE_RAPID_INGRESS_HANDLER_ID,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         )
         if proposal is None:
             continue
@@ -239,6 +244,7 @@ def _request_fire_overwatch_reaction_if_available(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     if reaction_queue is None or stratagem_index is None:
         return None
@@ -279,6 +285,7 @@ def _request_fire_overwatch_reaction_if_available(
                 index=stratagem_index,
                 context=context,
                 handler_id=CORE_FIRE_OVERWATCH_HANDLER_ID,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             )
             if proposal is None:
                 continue

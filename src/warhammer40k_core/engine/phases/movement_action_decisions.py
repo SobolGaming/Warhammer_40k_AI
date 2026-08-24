@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.modifier_ignore import record_modifier_ignore_selection
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
@@ -59,6 +60,8 @@ def _request_movement_action(
     decisions: DecisionController,
     active_selection: MovementUnitSelection,
     ruleset_descriptor: RulesetDescriptor,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
@@ -76,6 +79,9 @@ def _request_movement_action(
             "unit_instance_id": active_selection.unit_instance_id,
         },
         options=_movement_action_options(
+            state=state,
+            ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             unit_placement=unit_placement,
             ruleset_descriptor=ruleset_descriptor,
@@ -166,6 +172,26 @@ def _apply_movement_action_decision(  # noqa: RET503
             and not disembarked_state.can_move_further
         ):
             raise GameLifecycleError("Disembarked unit cannot move further.")
+
+    modifier_ignore_effect = record_modifier_ignore_selection(
+        state=state,
+        result=result,
+        unit_instance_id=active_selection.unit_instance_id,
+        phase=BattlePhaseKind.MOVEMENT,
+    )
+    if modifier_ignore_effect is not None:
+        decisions.event_log.append(
+            "modifier_ignores_selected",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": active_selection.unit_instance_id,
+                "source_decision_request_id": result.request_id,
+                "source_decision_result_id": result.result_id,
+                "modifier_ignore_effect": modifier_ignore_effect.to_payload(),
+            },
+        )
 
     if action is MovementPhaseActionKind.REMAIN_STATIONARY:
         _complete_movement_activation(

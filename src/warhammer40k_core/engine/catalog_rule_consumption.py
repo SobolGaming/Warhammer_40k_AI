@@ -25,9 +25,12 @@ from warhammer40k_core.core.weapon_profiles import (
     weapon_keyword_from_token,
 )
 from warhammer40k_core.engine import catalog_attack_condition_classification as _attack_conditions
+from warhammer40k_core.engine import catalog_charge_roll_modifiers as _charge_modifiers
 from warhammer40k_core.engine import catalog_command_point_support as _command_points
+from warhammer40k_core.engine import catalog_conditional_charge_support as _conditional_charge
 from warhammer40k_core.engine import catalog_contextual_status_consumption as _contextual
 from warhammer40k_core.engine import catalog_datasheet_rule_support as _datasheet
+from warhammer40k_core.engine import catalog_modifier_ignore as _modifier_ignore
 from warhammer40k_core.engine import catalog_movement_transit as _t
 from warhammer40k_core.engine import catalog_once_per_battle_support as _frequency
 from warhammer40k_core.engine import catalog_post_shoot_status_descriptors as _status
@@ -1295,12 +1298,14 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
         _st.CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
         *_extensions.registered_consumer_ids(),
+        *_conditional_charge.registered_consumer_ids(),
         CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         *_ucbs.registered_hook_ids(),
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+        _modifier_ignore.CATALOG_IR_MODIFIER_IGNORE_PERMISSION_CONSUMER_ID,
         CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID,
         CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID,
         *_triggered_move.registered_hook_ids(),
@@ -1319,39 +1324,35 @@ def catalog_rule_ir_registered_hook_ids() -> tuple[str, ...]:
 
 def catalog_charge_roll_modifiers_for_unit(
     *,
+    state: GameState,
     ability_index: AbilityCatalogIndex,
     unit: UnitInstance,
     current_model_instance_ids: tuple[str, ...],
 ) -> tuple[RollModifier, ...]:
+    _charge_modifiers.validate_catalog_charge_roll_modifier_state(state)
     _validate_ability_index(ability_index)
     _validate_unit(unit)
     current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
-    modifiers: list[RollModifier] = []
+    sources: list[_charge_modifiers.CatalogChargeRollModifierSource] = []
     for record in _unit_scoped_generic_records(
         ability_index=ability_index,
         unit=unit,
         current_model_instance_ids=current_ids,
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     ):
-        rule_ir = _rule_ir_from_record(record)
-        for clause in rule_ir.clauses:
-            if not _clause_targets_this_unit(clause):
-                continue
-            for effect_index, effect in enumerate(clause.effects):
-                if not _effect_is_charge_roll_modifier(effect):
-                    continue
-                parameters = parameter_payload(effect.parameters)
-                delta = _int_parameter(parameters, key="delta")
-                modifiers.append(
-                    RollModifier(
-                        modifier_id=(
-                            f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}"
-                        ),
-                        source_id=record.definition.source_id,
-                        operand=delta,
-                    )
-                )
-    return tuple(sorted(modifiers, key=lambda modifier: modifier.modifier_id))
+        rule_ir = _scoped_rule_ir_from_record(record)
+        sources.append(
+            _charge_modifiers.CatalogChargeRollModifierSource(
+                rule_ir=rule_ir,
+                record_id=record.record_id,
+                source_id=record.definition.source_id,
+            )
+        )
+    return _charge_modifiers.catalog_charge_roll_modifiers_from_sources(
+        state=state,
+        sources=tuple(sources),
+        charging_unit_instance_id=unit.unit_instance_id,
+    )
 
 
 def catalog_advance_roll_reroll_permission_for_unit(
@@ -1550,7 +1551,7 @@ def catalog_weapon_keyword_grants_for_unit(
         unit=unit,
         current_model_instance_ids=current_ids,
     ):
-        rule_ir = _rule_ir_from_record(record)
+        rule_ir = _scoped_rule_ir_from_record(record)
         if not rule_ir.is_supported:
             continue
         for clause in rule_ir.clauses:
@@ -3654,7 +3655,7 @@ def record_catalog_feel_no_pain_sources_for_unit(
         )
         if not bearer_ids:
             continue
-        rule_ir = _rule_ir_from_record(record)
+        rule_ir = _scoped_rule_ir_from_record(record)
         for clause in rule_ir.clauses:
             if not _clause_targets_this_model(clause):
                 continue
@@ -3770,7 +3771,10 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
     consumer_ids.update(_extensions.consumer_ids_for_clause(clause))
+    consumer_ids.update(_conditional_charge.consumer_ids_for_clause(clause))
     consumer_ids.update(_datasheet.consumer_ids_for_clause(clause))
+    if _modifier_ignore.clause_is_modifier_ignore_permission(clause):
+        consumer_ids.add(_modifier_ignore.CATALOG_IR_MODIFIER_IGNORE_PERMISSION_CONSUMER_ID)
     if _keyword_choice.clause_is_start_battle_keyword_choice(clause):
         consumer_ids.add(CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID)
     if _frequency.clause_is_runtime_once_per_battle_activation(clause):
@@ -3837,7 +3841,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
                 consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
         return tuple(sorted(consumer_ids))
     for effect in clause.effects:
-        if _effect_is_charge_roll_modifier(effect):
+        if _charge_modifiers.clause_effect_is_supported_charge_roll_modifier(clause, effect):
             consumer_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
         reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
         if reroll_consumer_id is not None:
@@ -3883,7 +3887,7 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
             continue
         for effect in clause.effects:
-            if _effect_is_charge_roll_modifier(effect):
+            if _charge_modifiers.clause_effect_is_supported_charge_roll_modifier(clause, effect):
                 hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
             hook_ids.update(_catalog_ir_hook_ids_for_effect(effect))
     hook_ids.update(_st.selected_target_effect_consumer_ids_for_rule(rule_ir))
@@ -3893,7 +3897,10 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
 def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     hook_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
     hook_ids.update(_extensions.consumer_ids_for_clause(clause))
+    hook_ids.update(_conditional_charge.consumer_ids_for_clause(clause))
     hook_ids.update(_datasheet.consumer_ids_for_clause(clause))
+    if _modifier_ignore.clause_is_modifier_ignore_permission(clause):
+        hook_ids.add(_modifier_ignore.CATALOG_IR_MODIFIER_IGNORE_PERMISSION_CONSUMER_ID)
     if _frequency.clause_is_runtime_once_per_battle_activation(clause):
         hook_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     if _clause_is_supported_tracked_target_selection(clause):
@@ -4504,11 +4511,15 @@ def _rule_ir_from_record(record: AbilityCatalogRecord) -> RuleIR:
 
 
 def _clauses_from_record(record: AbilityCatalogRecord) -> tuple[RuleClause, ...]:
+    return _scoped_rule_ir_from_record(record).clauses
+
+
+def _scoped_rule_ir_from_record(record: AbilityCatalogRecord) -> RuleIR:
     if type(record) is not AbilityCatalogRecord:
         raise GameLifecycleError("Catalog rule consumer requires an AbilityCatalogRecord.")
     from warhammer40k_core.engine.rule_execution import scoped_rule_ir_from_execution_payload
 
-    return scoped_rule_ir_from_execution_payload(record.definition.replay_payload).clauses
+    return scoped_rule_ir_from_execution_payload(record.definition.replay_payload)
 
 
 def _record_source_matches_unit(
@@ -5096,16 +5107,6 @@ def _effect_is_supported_unit_move_completed_mortal_wounds(effect: RuleEffectSpe
         and parameters.get("target_scope") == "selected_enemy_unit"
     )
     return charge_shape or movement_shape
-
-
-def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
-    if effect.kind is not RuleEffectKind.MODIFY_DICE_ROLL:
-        return False
-    parameters = parameter_payload(effect.parameters)
-    roll_type = parameters.get("roll_type")
-    return roll_type in {"charge", "charge_roll"}
 
 
 def _effect_is_roll_reroll_permission(effect: RuleEffectSpec, *, roll_type: str) -> bool:
@@ -5939,7 +5940,14 @@ def catalog_rule_ir_consumer_ids_for_effect(
         raise GameLifecycleError("Catalog rule effect consumption requires RuleEffectSpec.")
     if effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION:
         return (CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,)
-    return _catalog_ir_hook_ids_for_effect(effect)
+    return tuple(
+        sorted(
+            {
+                *_catalog_ir_hook_ids_for_effect(effect),
+                *_conditional_charge.consumer_ids_for_effect(effect),
+            }
+        )
+    )
 
 
 def _catalog_ir_roll_modifier_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:

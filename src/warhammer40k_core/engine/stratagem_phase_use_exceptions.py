@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import placed_alive_models_for_component_unit
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -125,6 +126,29 @@ def stratagem_phase_use_exception(
     if not isinstance(payload, dict) or PHASE_USE_EXCEPTION_PAYLOAD_KEY not in payload:
         return None
     return StratagemPhaseUseException.from_payload(payload[PHASE_USE_EXCEPTION_PAYLOAD_KEY])
+
+
+def player_has_stratagem_phase_use_exception_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    definition: StratagemDefinition,
+) -> bool:
+    exception = stratagem_phase_use_exception(definition)
+    if exception is None:
+        return False
+    return any(
+        unit.datasheet_id in exception.eligible_datasheet_ids
+        and bool(
+            placed_alive_models_for_component_unit(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+            )
+        )
+        for army in state.army_definitions
+        if army.player_id == player_id
+        for unit in army.units
+    )
 
 
 def phase_use_exception_restriction_violation(

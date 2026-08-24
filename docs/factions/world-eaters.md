@@ -97,7 +97,7 @@ These are historical component-rollup categories rendered with human-facing labe
 | Component evidence | Datasheets |
 | --- | --- |
 | Component-complete | None |
-| Structured; interaction gaps | Defiler (`000004207`) |
+| Structured; interaction gaps | Defiler (`000004207`)<br>Maulerfiend (`000002639`) |
 | Partial | None |
 | Catalog-only | None |
 | Blocked | None |
@@ -176,6 +176,7 @@ This table reports component evidence generated from exact source text and struc
 | Datasheet | Component rollup | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Defiler (`000004207`) | **Structured; interaction gaps** | Full | Full | Full | Full | Full | Partial; implemented detachment rules 0/8 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords`; coverage artifact only | Faction army rule consumed; implemented detachment rules 0/8. Implemented detachment IDs: None. |
+| Maulerfiend (`000002639`) | **Structured; interaction gaps** | Full | Full | Full | Full | Full | Partial; implemented detachment rules 0/8 (None) | Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:hit-roll-modifier`, `catalog-ir:wound-roll-modifier`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords`; coverage artifact only | Faction army rule consumed; implemented detachment rules 0/8. Implemented detachment IDs: None. |
 
 ### Datasheet Ability Details
 
@@ -185,6 +186,10 @@ This table reports component evidence generated from exact source text and struc
 | Defiler (`000004207`) | Scuttling Walker (`000004207:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
 | Defiler (`000004207`) | Unleash Wrath (`000004207:unleash-wrath`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.out_of_phase_action.enemy_unit` | `catalog-ir:setup-reactive-shoot-charge` | None |
 | Defiler (`000004207`) | Blessings of Khorne (`000008428`) | `faction` | `engine_consumed` | `faction.army_rule.blessings_of_khorne` | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | None |
+| Maulerfiend (`000002639`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Maulerfiend (`000002639`) | Savage Exaltation (`000002639:savage-exaltation`) | `datasheet` | `engine_consumed` | `datasheet.roll_modifier.hit.this_model`, `datasheet.roll_modifier.wound.this_model` | `catalog-ir:hit-roll-modifier`, `catalog-ir:wound-roll-modifier` | None |
+| Maulerfiend (`000002639`) | The Scent of Blood (`000002639:the-scent-of-blood`) | `datasheet` | `engine_consumed` | `datasheet.roll_modifier.charge.this_unit` | `catalog-ir:charge-roll-modifier` | None |
+| Maulerfiend (`000002639`) | Blessings of Khorne (`000008428`) | `faction` | `engine_consumed` | `faction.army_rule.blessings_of_khorne` | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | None |
 
 ### Maulerfiend Cross-faction Support
 
@@ -198,18 +203,18 @@ The machine-readable report is `data/generated/ability_coverage/maulerfiend_cros
 | --- | --- | --- |
 | `counted-wargear-replacement` | `content_neutral_engine_mechanic` | The parser and unit factory preserve the counted replacement for all four exact current-source variants; that reuse does not certify their faction-local rules bundles. |
 | `deterministic-weapon-copy-identity` | `content_neutral_engine_mechanic` | Both equipped copies receive stable identities for all four exact current-source variants; identity support alone does not certify faction-local ability execution. |
-| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The contract is generic, but the checked-in end-to-end regression currently certifies only Emperor's Children datasheet 000004091. |
+| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The shared request, declaration, attack-pool, decision-record, and replay contract is exercised against all four exact current Maulerfiend datasheet IDs, including same-target declarations, split targets, and duplicate-copy rejection. |
 
 #### Exact faction variants
 
-| Faction / exact key | Source treatment | Generated component evidence | Faction-local source rules | Conclusion |
-| --- | --- | --- | --- | --- |
-| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | Not selected | Siege Crawler (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
-| Thousand Sons / `thousand-sons:000001029` | `rules_update` | Not selected | Snarling Protector (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| World Eaters / `world-eaters:000002639` | `rules_update` | Not selected | Savage Exaltation (`blocked_structured_semantics`)<br>The Scent of Blood (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+| Faction / exact key | Source treatment | Current MFM points | Generated component evidence | Faction-local source rules | Conclusion |
+| --- | --- | --- | --- | --- | --- |
+| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | all units: **130 pts** (1 model) | `Playable` for this exact ID | Siege Crawler (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Thousand Sons / `thousand-sons:000001029` | `rules_update` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Snarling Protector (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| World Eaters / `world-eaters:000002639` | `rules_update` | units 1-2: **140 pts** (1 model)<br>unit 3+: **150 pts** (1 model) | `Playable` for this exact ID | Savage Exaltation (`engine_consumed`)<br>The Scent of Blood (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
 
-**Death Guard:** The exhaustive current Death Guard Faction Pack review contains no Maulerfiend datasheet row; no synthetic support row is emitted.
+**Death Guard:** The exhaustive current Death Guard Faction Pack review and MFM faction inventory contain no Maulerfiend row; no synthetic support row is emitted.
 
 ## Cross-source Semantic Equivalence
 
@@ -217,7 +222,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 124 | 23 | 19 |
+| 124 | 25 | 19 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

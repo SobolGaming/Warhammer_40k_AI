@@ -201,6 +201,9 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_maulerfiend_datasheet_overlay_2026_07 as maulerfiend_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -243,7 +246,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     CHAOS_DAEMONS_LORD_OF_CHANGE_HEIGHT_OVERRIDES,
     CHAOS_DAEMONS_PLAGUEBEARERS_HEIGHT_OVERRIDES,
     CHAOS_DEFILER_HEIGHT_OVERRIDES,
-    EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_HEIGHT_OVERRIDES,
+    EMPERORS_CHILDREN_CHAOS_SPAWN_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
@@ -251,6 +254,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     EMPERORS_CHILDREN_LORD_EXULTANT_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES,
+    MAULERFIEND_HEIGHT_OVERRIDES,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
@@ -346,7 +350,11 @@ EMPERORS_CHILDREN_LUCIUS_DATASHEET_IDS = ("000004083",)
 EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS = ("000004084",)
 EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS = ("000004088",)
 EMPERORS_CHILDREN_FLAWLESS_BLADES_DATASHEET_IDS = ("000004089",)
-EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_DATASHEET_IDS = ("000004090", "000004091")
+EMPERORS_CHILDREN_CHAOS_SPAWN_DATASHEET_IDS = ("000004090",)
+EMPERORS_CHILDREN_MAULERFIEND_DATASHEET_IDS = (
+    maulerfiend_overlay.EMPERORS_CHILDREN_MAULERFIEND_DATASHEET_ID,
+)
+MAULERFIEND_DATASHEET_IDS = maulerfiend_overlay.CURRENT_MAULERFIEND_DATASHEET_IDS
 EMPERORS_CHILDREN_DEFILER_DATASHEET_IDS = ("000004208",)
 ABILITY_SUPPORT_DATASHEET_IDS = (
     *AELDARI_ASPECT_WARRIORS_DATASHEET_IDS,
@@ -374,7 +382,8 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS,
     *EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_DATASHEET_IDS,
-    *EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_DATASHEET_IDS,
+    *EMPERORS_CHILDREN_CHAOS_SPAWN_DATASHEET_IDS,
+    *MAULERFIEND_DATASHEET_IDS,
 )
 UNDIVIDED_DAEMON_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
@@ -1654,6 +1663,11 @@ def _ability_support_catalog_package(
         release_manifest=emperors_children_overlay.source_release_manifest(),
         overlay_packs=(emperors_children_overlay.overlay_pack(),),
     )
+    maulerfiend_overlaid_artifacts = apply_source_release_overlays(
+        source_artifacts=emperors_children_overlaid_artifacts,
+        release_manifest=maulerfiend_overlay.source_release_manifest(),
+        overlay_packs=(maulerfiend_overlay.overlay_pack(),),
+    )
     aeldari_overlay_pack = SourceOverlayPack.from_payload(
         cast(
             SourceOverlayPackPayload,
@@ -1693,7 +1707,7 @@ def _ability_support_catalog_package(
         )
     )
     overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=emperors_children_overlaid_artifacts,
+        source_artifacts=maulerfiend_overlaid_artifacts,
         release_manifest=aeldari_release_manifest,
         overlay_packs=(
             aeldari_overlay_pack,
@@ -1728,7 +1742,8 @@ def _ability_support_catalog_package(
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
             + CHAOS_DEFILER_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES
-            + EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_HEIGHT_OVERRIDES
+            + EMPERORS_CHILDREN_CHAOS_SPAWN_HEIGHT_OVERRIDES
+            + MAULERFIEND_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES
@@ -1772,7 +1787,11 @@ def _promote_runtime_backed_faction_abilities(
         if row.source_kind is not CatalogAbilitySourceKind.FACTION:
             return None
         if (
-            row.datasheet_id == csm_defiler_overlay.CHAOS_SPACE_MARINES_DEFILER_DATASHEET_ID
+            row.datasheet_id
+            in {
+                csm_defiler_overlay.CHAOS_SPACE_MARINES_DEFILER_DATASHEET_ID,
+                maulerfiend_overlay.CHAOS_SPACE_MARINES_MAULERFIEND_DATASHEET_ID,
+            }
             and row.ability_id == chaos_space_marines_army_rule.DARK_PACTS_SOURCE_ABILITY_ID
         ):
             return "faction.army_rule.dark_pacts", _chaos_space_marines_runtime_consumer_ids()
@@ -1782,7 +1801,11 @@ def _promote_runtime_backed_faction_abilities(
         ):
             return "faction.army_rule.nurgles_gift", _death_guard_runtime_consumer_ids()
         if (
-            row.datasheet_id == "000004207"
+            row.datasheet_id
+            in {
+                "000004207",
+                maulerfiend_overlay.WORLD_EATERS_MAULERFIEND_DATASHEET_ID,
+            }
             and row.ability_id == world_eaters_army_rule.BLESSINGS_OF_KHORNE_SOURCE_ABILITY_ID
         ):
             return "faction.army_rule.blessings_of_khorne", _world_eaters_runtime_consumer_ids()
@@ -1798,7 +1821,8 @@ def _promote_runtime_backed_faction_abilities(
                 *EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS,
                 *EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS,
                 *EMPERORS_CHILDREN_FLAWLESS_BLADES_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_DATASHEET_IDS,
+                *EMPERORS_CHILDREN_CHAOS_SPAWN_DATASHEET_IDS,
+                *EMPERORS_CHILDREN_MAULERFIEND_DATASHEET_IDS,
                 *EMPERORS_CHILDREN_DEFILER_DATASHEET_IDS,
             }
         ):

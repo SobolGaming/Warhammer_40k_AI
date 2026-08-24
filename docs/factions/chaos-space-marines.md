@@ -125,7 +125,7 @@ These are historical component-rollup categories rendered with human-facing labe
 | Component evidence | Datasheets |
 | --- | --- |
 | Component-complete | None |
-| Structured; interaction gaps | Defiler (`000000969`) |
+| Structured; interaction gaps | Defiler (`000000969`)<br>Maulerfiend (`000000968`) |
 | Partial | None |
 | Catalog-only | None |
 | Blocked | None |
@@ -237,6 +237,7 @@ This table reports component evidence generated from exact source text and struc
 | Datasheet | Component rollup | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Defiler (`000000969`) | **Structured; interaction gaps** | Full | Full | Full | Full | Full | Partial; implemented detachment rules 0/17 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier`; coverage artifact only | Faction army rule consumed; implemented detachment rules 0/17. Implemented detachment IDs: None. |
+| Maulerfiend (`000000968`) | **Structured; interaction gaps** | Full | Full | Full | Full | Full | Partial; implemented detachment rules 0/17 (None) | Runtime consumers: `catalog-ir:modifier-ignore-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier`; coverage artifact only | Faction army rule consumed; implemented detachment rules 0/17. Implemented detachment IDs: None. |
 
 ### Datasheet Ability Details
 
@@ -246,6 +247,9 @@ This table reports component evidence generated from exact source text and struc
 | Defiler (`000000969`) | Daemonforge (`000000969:daemonforge`) | `datasheet` | `engine_consumed` | `datasheet.dark_pact.wound_roll_reroll` | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll` | None |
 | Defiler (`000000969`) | Scuttling Walker (`000000969:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
 | Defiler (`000000969`) | Dark Pacts (`000008359`) | `faction` | `engine_consumed` | `faction.army_rule.dark_pacts` | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier` | None |
+| Maulerfiend (`000000968`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Maulerfiend (`000000968`) | Siege Crawler (`000000968:siege-crawler`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.grant_ability.this_model` | `catalog-ir:modifier-ignore-permission` | None |
+| Maulerfiend (`000000968`) | Dark Pacts (`000008359`) | `faction` | `engine_consumed` | `faction.army_rule.dark_pacts` | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier` | None |
 
 ### Maulerfiend Cross-faction Support
 
@@ -259,18 +263,18 @@ The machine-readable report is `data/generated/ability_coverage/maulerfiend_cros
 | --- | --- | --- |
 | `counted-wargear-replacement` | `content_neutral_engine_mechanic` | The parser and unit factory preserve the counted replacement for all four exact current-source variants; that reuse does not certify their faction-local rules bundles. |
 | `deterministic-weapon-copy-identity` | `content_neutral_engine_mechanic` | Both equipped copies receive stable identities for all four exact current-source variants; identity support alone does not certify faction-local ability execution. |
-| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The contract is generic, but the checked-in end-to-end regression currently certifies only Emperor's Children datasheet 000004091. |
+| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The shared request, declaration, attack-pool, decision-record, and replay contract is exercised against all four exact current Maulerfiend datasheet IDs, including same-target declarations, split targets, and duplicate-copy rejection. |
 
 #### Exact faction variants
 
-| Faction / exact key | Source treatment | Generated component evidence | Faction-local source rules | Conclusion |
-| --- | --- | --- | --- | --- |
-| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | Not selected | Siege Crawler (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
-| Thousand Sons / `thousand-sons:000001029` | `rules_update` | Not selected | Snarling Protector (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| World Eaters / `world-eaters:000002639` | `rules_update` | Not selected | Savage Exaltation (`blocked_structured_semantics`)<br>The Scent of Blood (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+| Faction / exact key | Source treatment | Current MFM points | Generated component evidence | Faction-local source rules | Conclusion |
+| --- | --- | --- | --- | --- | --- |
+| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | all units: **130 pts** (1 model) | `Playable` for this exact ID | Siege Crawler (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Thousand Sons / `thousand-sons:000001029` | `rules_update` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Snarling Protector (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| World Eaters / `world-eaters:000002639` | `rules_update` | units 1-2: **140 pts** (1 model)<br>unit 3+: **150 pts** (1 model) | `Playable` for this exact ID | Savage Exaltation (`engine_consumed`)<br>The Scent of Blood (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
 
-**Death Guard:** The exhaustive current Death Guard Faction Pack review contains no Maulerfiend datasheet row; no synthetic support row is emitted.
+**Death Guard:** The exhaustive current Death Guard Faction Pack review and MFM faction inventory contain no Maulerfiend row; no synthetic support row is emitted.
 
 ## Cross-source Semantic Equivalence
 
@@ -278,7 +282,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 303 | 29 | 45 |
+| 303 | 30 | 45 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

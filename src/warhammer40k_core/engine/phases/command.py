@@ -65,6 +65,7 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardStatus,
 )
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagems import (
     CORE_INSANE_BRAVERY_HANDLER_ID,
     CORE_NEW_ORDERS_HANDLER_ID,
@@ -96,6 +97,9 @@ def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
+        default_factory=StratagemCostModifierRegistry.empty
+    )
     battle_shock_hooks: BattleShockHookRegistry = field(
         default_factory=BattleShockHookRegistry.empty
     )
@@ -112,6 +116,10 @@ class CommandPhaseHandler:
     def __post_init__(self) -> None:
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
+        if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
+            raise GameLifecycleError(
+                "CommandPhaseHandler stratagem_cost_modifier_registry must be a registry."
+            )
         if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
             raise GameLifecycleError("CommandPhaseHandler battle_shock_hooks must be a registry.")
         if type(self.command_phase_start_hooks) is not CommandPhaseStartHookRegistry:
@@ -231,6 +239,7 @@ class CommandPhaseHandler:
                 state=state,
                 decisions=decisions,
                 stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
             )
             if stratagem_status is not None:
                 return stratagem_status
@@ -1105,6 +1114,7 @@ def _request_command_start_stratagem_if_available(
     state: GameState,
     decisions: DecisionController,
     stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     new_orders_context = StratagemEligibilityContext.from_state(
@@ -1155,6 +1165,7 @@ def _request_command_start_stratagem_if_available(
         index=stratagem_index,
         context=insane_bravery_context,
         handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if proposal is None:
         return None
@@ -1163,6 +1174,7 @@ def _request_command_start_stratagem_if_available(
         decisions=decisions,
         proposal_request=proposal,
         allow_decline=True,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
 
 
