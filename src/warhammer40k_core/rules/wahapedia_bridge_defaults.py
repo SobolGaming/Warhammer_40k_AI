@@ -281,6 +281,20 @@ AELDARI_KHARSETH_HEIGHT_OVERRIDES = (
     ),
 )
 
+AELDARI_SOLITAIRE_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000002538",
+        model_name="Solitaire - EPIC HERO",
+        height=2.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:aeldari:solitaire:height",
+        height_document_reference=(
+            "Aeldari Faction Pack Solitaire assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.59 (25mm base)"
+        ),
+    ),
+)
+
 AELDARI_RANGERS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000000592",
@@ -731,6 +745,19 @@ EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES = (
         ),
     ),
 )
+EMPERORS_CHILDREN_DAEMON_PRINCE_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004086",
+        model_name="Daemon Prince of Slaanesh",
+        height=4.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:daemon-prince-of-slaanesh:height",
+        height_document_reference=(
+            "Same no-wing Daemon Prince plastic model family as Chaos Daemons Faction Pack "
+            "pp.116-117; Warhammer Event Companion 2026-07-22 p.74 (60mm base)"
+        ),
+    ),
+)
 EMPERORS_CHILDREN_LORD_EXULTANT_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004078",
@@ -1027,6 +1054,7 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
     *AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
     *AELDARI_KHARSETH_HEIGHT_OVERRIDES,
+    *AELDARI_SOLITAIRE_HEIGHT_OVERRIDES,
     *AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BELAKOR_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
@@ -1040,6 +1068,7 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *MAULERFIEND_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_DAEMON_PRINCE_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_LORD_EXULTANT_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES,

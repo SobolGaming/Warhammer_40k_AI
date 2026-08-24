@@ -28,8 +28,8 @@ from warhammer40k_core.engine.generic_rule_effect_payloads import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
-    RuleExecutionStatus,
-    execute_rule_ir,
+    default_rule_execution_registry,
+    generic_rule_effect_payload,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -239,34 +239,15 @@ def _apply_generic_detachment_rule_effects(
             continue
         if already_installed:
             raise GameLifecycleError("Generic detachment effects are partially installed.")
-        result = execute_rule_ir(
-            rule_ir=binding_source.rule_ir,
-            context=RuleExecutionContext(
-                game_id=context.state.game_id,
-                player_id=army.player_id,
-                battle_round=max(1, context.state.battle_round),
-                phase=context.state.current_battle_phase,
-                active_player_id=context.state.active_player_id,
-                source_unit_instance_id=target_unit_ids[0],
-                target_unit_instance_ids=target_unit_ids,
-                target_player_id=army.player_id,
-                trigger_payload={
-                    "event": "detachment_rule_setup",
-                    "detachment_id": binding_source.record.detachment_id,
-                    "coverage_descriptor_id": binding_source.record.coverage_descriptor_id,
-                },
-                state=context.state,
-                event_log=context.decisions.event_log,
-                record_persisting_effects=False,
-            ),
+        effect_payloads = _materialized_detachment_effect_payloads(
+            context=context,
+            binding_source=binding_source,
+            army=army,
+            target_unit_ids=target_unit_ids,
         )
-        if result.status is not RuleExecutionStatus.APPLIED:
-            if result.reason is None:
-                raise GameLifecycleError("Generic detachment RuleIR failed without reason.")
-            raise GameLifecycleError(f"Generic detachment RuleIR failed: {result.reason}.")
-        if len(result.effect_payloads) != len(expected_ids):
+        if len(effect_payloads) != len(expected_ids):
             raise GameLifecycleError("Generic detachment RuleIR produced unexpected effects.")
-        for effect_payload in result.effect_payloads:
+        for effect_payload in effect_payloads:
             clause_id = _payload_string(effect_payload, "clause_id")
             effect_id = _detachment_effect_id(
                 record=binding_source.record,
@@ -304,6 +285,55 @@ def _apply_generic_detachment_rule_effects(
                 "persisting_effects": applied_payloads,
             },
         )
+
+
+def _materialized_detachment_effect_payloads(
+    *,
+    context: BattleFormationRequestContext,
+    binding_source: _GenericDetachmentRuleBindingSource,
+    army: ArmyDefinition,
+    target_unit_ids: tuple[str, ...],
+) -> tuple[dict[str, JsonValue], ...]:
+    """Materialize static detachment definitions without executing their later timing windows."""
+    if not binding_source.rule_ir.is_supported:
+        raise GameLifecycleError("Generic detachment RuleIR must be supported.")
+    rule_context = RuleExecutionContext(
+        game_id=context.state.game_id,
+        player_id=army.player_id,
+        battle_round=max(1, context.state.battle_round),
+        phase=context.state.current_battle_phase,
+        active_player_id=context.state.active_player_id,
+        source_unit_instance_id=target_unit_ids[0],
+        target_unit_instance_ids=target_unit_ids,
+        target_player_id=army.player_id,
+        trigger_payload={
+            "event": "detachment_rule_setup",
+            "detachment_id": binding_source.record.detachment_id,
+            "coverage_descriptor_id": binding_source.record.coverage_descriptor_id,
+        },
+        state=context.state,
+        record_persisting_effects=False,
+    )
+    registry = default_rule_execution_registry()
+    payloads: list[dict[str, JsonValue]] = []
+    for clause in binding_source.rule_ir.clauses:
+        if clause.unsupported_reason is not None or clause.diagnostics:
+            raise GameLifecycleError("Generic detachment RuleIR contains unsupported clauses.")
+        for effect_index, effect in enumerate(clause.effects):
+            if registry.binding_for_effect(clause=clause, effect=effect) is None:
+                raise GameLifecycleError(
+                    f"Generic detachment RuleIR has no handler for {effect.kind.value}."
+                )
+            payloads.append(
+                generic_rule_effect_payload(
+                    rule_ir=binding_source.rule_ir,
+                    clause=clause,
+                    effect=effect,
+                    context=rule_context,
+                    effect_index=effect_index,
+                )
+            )
+    return tuple(payloads)
 
 
 def _persisting_effect_for_detachment_payload(

@@ -7,6 +7,7 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import WeaponProfileError, weapon_keyword_from_token
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     allocated_attack_damage_modifier_descriptor_for_clause,
+    charged_melee_weapon_characteristic_aura_descriptor_for_clause,
     clause_uses_exact_datasheet_runtime_template,
     conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
@@ -21,6 +22,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     invulnerable_save_descriptor_for_clause,
     movement_action_grant_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
+    random_movement_attack_boost_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     charge_after_movement_actions_descriptor_for_clause,
@@ -112,6 +114,9 @@ CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
 CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:damage-roll-reroll"
 CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID = "catalog-ir:movement-action-grant"
+CATALOG_IR_CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_CONSUMER_ID = (
+    "catalog-ir:charged-melee-weapon-characteristic-aura"
+)
 CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:agile-manoeuvre-roll-reroll"
 CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID = "catalog-ir:faction-resource-refund-roll"
 CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID = "catalog-ir:conditional-leading-fixed-advance"
@@ -129,6 +134,7 @@ CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID = "catalog-ir:command-restoration"
 CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS = (
     CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
     CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID,
+    CATALOG_IR_CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
 )
@@ -223,8 +229,13 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.update(
             consumer_by_roll_type[roll_type] for roll_type in conditional_attack_rerolls.roll_types
         )
-    if movement_action_grant_descriptor_for_clause(clause) is not None:
+    if (
+        movement_action_grant_descriptor_for_clause(clause) is not None
+        or random_movement_attack_boost_descriptor_for_clause(clause) is not None
+    ):
         consumer_ids.add(CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID)
+    if charged_melee_weapon_characteristic_aura_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(CATALOG_IR_CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_CONSUMER_ID)
     conditional_leader_grant = conditional_leader_ability_grant_descriptor_for_clause(clause)
     if conditional_leader_grant is not None:
         consumer_ids.add(
@@ -341,6 +352,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
                 CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
                 CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
+                CATALOG_IR_CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_CONSUMER_ID,
                 CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID,
                 CATALOG_IR_FACTION_RESOURCE_REFUND_ROLL_CONSUMER_ID,
                 CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID,

@@ -73,7 +73,7 @@ def camouflaged_snipers_effect(
         source_rule_id=CAMOUFLAGED_SNIPERS_SOURCE_RULE_ID,
         owner_player_id=context.army.player_id,
         target_unit_instance_ids=(unit.unit_instance_id,),
-        started_battle_round=context.state.battle_round,
+        started_battle_round=context.persisting_effect_started_battle_round,
         started_phase=None,
         expiration=EffectExpiration.end_of_battle(),
         effect_payload=ranged_attacks_keep_hidden_payload(
@@ -114,7 +114,7 @@ def assassins_eye_effect(
         source_rule_id=ASSASSINS_EYE_SOURCE_RULE_ID,
         owner_player_id=context.army.player_id,
         target_unit_instance_ids=(unit.unit_instance_id,),
-        started_battle_round=context.state.battle_round,
+        started_battle_round=context.persisting_effect_started_battle_round,
         started_phase=None,
         expiration=EffectExpiration.end_of_battle(),
         effect_payload=character_target_ap_bonus_payload(

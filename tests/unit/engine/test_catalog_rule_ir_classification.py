@@ -45,6 +45,10 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID,
@@ -60,6 +64,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
+    CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
@@ -529,6 +534,9 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
         CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
         CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
+        CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
         "catalog-ir:movement-characteristic-query",
         "catalog-ir:toughness-characteristic-query",
         "catalog-ir:objective-control-characteristic-query",

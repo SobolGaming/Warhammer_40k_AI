@@ -9,10 +9,14 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari impor
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     descriptor_consumption as chaos_daemons_descriptor_consumption,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    army_rule as emperors_children_army_rule,
+)
 
 
 def faction_descriptor_consumption_records() -> tuple[CatalogDescriptorConsumptionRecord, ...]:
     return (
         *aeldari_descriptor_consumption.descriptor_consumption_records(),
         *chaos_daemons_descriptor_consumption.descriptor_consumption_records(),
+        *emperors_children_army_rule.descriptor_consumption_records(),
     )

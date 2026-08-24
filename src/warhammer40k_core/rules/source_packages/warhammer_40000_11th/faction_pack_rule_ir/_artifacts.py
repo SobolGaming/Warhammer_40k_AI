@@ -240,6 +240,29 @@ class _ReviewedOfficialSnapshotSingleDatasheetSourcePackageWire(
     package_hash: str
 
 
+class _ReviewedOfficialSnapshotSingleDatasheetWithoutOverlaySourcePackageWire(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    artifact_schema: str
+    source_package_id: str
+    source_snapshot_filename: str
+    source_snapshot_sha256: str
+    source_artifact_hash: str
+    official_document_filename: str
+    official_document_sha256: str
+    official_document_pages: list[int]
+    review_manifest_filename: str
+    review_manifest_sha256: str
+    review_row_id: str
+    review_treatment: str
+    datasheet_id: str
+    datasheet_name: str
+    records: dict[str, dict[str, object]]
+    package_hash: str
+
+
 @dataclass(frozen=True, slots=True)
 class RuleIrShardArtifactReference:
     path: str
@@ -315,6 +338,11 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
             package_hash="48799f43bc37a0550a7e98108f4e7db1751f3b6ab81d91c129608861a5807bf4",
             wire_type=_SnapshotSingleDatasheetSourcePackageWire,
         ),
+        "gw-11e-aeldari-solitaire-datasheet-2026-08": _SourcePackageDescriptor(
+            artifact_schema="core-v2-aeldari-solitaire-rule-ir-v1",
+            package_hash="aac8da08281361d1b4edd05910b4e72ff30f5add9f5793deab2804a2df25ae38",
+            wire_type=_ReviewedOfficialSnapshotSingleDatasheetWithoutOverlaySourcePackageWire,
+        ),
         "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14": (
             _SourcePackageDescriptor(
                 artifact_schema="core-v2-aeldari-shroud-runners-wraithblades-rule-ir-v1",
@@ -361,6 +389,13 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
             artifact_schema="core-v2-emperors-children-fulgrim-rule-ir-v1",
             package_hash="90b27e3a76f6a2c5b0b5cd3ad678ea284f202ac8f072ef35126d0762792a6d09",
             wire_type=_OfficialSnapshotSingleDatasheetSourcePackageWire,
+        ),
+        "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08": (
+            _SourcePackageDescriptor(
+                artifact_schema=("core-v2-emperors-children-daemon-prince-of-slaanesh-rule-ir-v1"),
+                package_hash=("86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84"),
+                wire_type=_ReviewedOfficialSnapshotMultiDatasheetSourcePackageWire,
+            )
         ),
         "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08": (
             _SourcePackageDescriptor(

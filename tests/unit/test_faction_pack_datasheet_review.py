@@ -58,6 +58,9 @@ from warhammer40k_core.engine.ability_coverage import (
     FEEL_NO_PAIN_DESCRIPTOR_RUNTIME_CONSUMER_IDS,
     AbilityCoverageSupportStage,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_support import (
+    CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_support import (
     CATALOG_IR_MOVEMENT_END_REACTIVE_NORMAL_MOVE_CONSUMER_ID,
 )
@@ -65,9 +68,11 @@ from warhammer40k_core.engine.catalog_prebattle_redeploy import (
     CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID,
+    CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID,
@@ -381,6 +386,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000002531", "Playable"),
         ("aeldari", "000002532", "Playable"),
         ("aeldari", "000002533", "Playable"),
+        ("aeldari", "000002538", "Playable"),
         ("aeldari", "000002759", "Playable"),
         ("aeldari", "000003909", "Playable"),
         ("aeldari", "000004193", "Playable"),
@@ -397,6 +403,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("emperors-children", "000004081", "Playable"),
         ("emperors-children", "000004083", "Playable"),
         ("emperors-children", "000004084", "Playable"),
+        ("emperors-children", "000004086", "Playable"),
         ("emperors-children", "000004088", "Playable"),
         ("emperors-children", "000004089", "Playable"),
         ("emperors-children", "000004090", "Playable"),
@@ -467,6 +474,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 "000004081",
                 "000004083",
                 "000004084",
+                "000004086",
                 "000004088",
                 "000004089",
                 "000004090",
@@ -537,7 +545,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         "000004091",
     }
     expected_component_statuses = {
-        "000004078": ("Full", "Full", "Full", "Full", "Playable", "Partial"),
+        "000004078": ("Full", "Full", "Full", "Full", "Full", "Partial"),
         "000004090": ("Full", "Full", "Full", "None", "Full", "Partial"),
         "000004091": ("Full", "Full", "Full", "Full", "Full", "Partial"),
     }
@@ -566,7 +574,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 (CORE_LEADER_ATTACHMENT_CONSUMER_ID,),
             ),
             "Euphoric Strikes": (
-                AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
+                AbilityCoverageSupportStage.ENGINE_CONSUMED,
                 (CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,),
             ),
             "LORD OF THE HOST": (
@@ -735,9 +743,9 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert len(rows_by_id) == 70
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
-        SEMANTIC_BUCKET_ALL_CONSUMED: 29,
+        SEMANTIC_BUCKET_ALL_CONSUMED: 30,
         SEMANTIC_BUCKET_HOST_NEEDED: 3,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 38,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 37,
     }
     assert {
         row.datasheet_id: row.pdf_page_reference
@@ -749,6 +757,32 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert rows_by_id["000000571"].semantic_bucket == SEMANTIC_BUCKET_UNSUPPORTED_IR
     assert rows_by_id["000002531"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert rows_by_id["000002532"].semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    solitaire = rows_by_id["000002538"]
+    assert solitaire.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
+    assert {
+        ability.ability_name: (ability.support_stage.value, ability.runtime_consumer_ids)
+        for ability in solitaire.abilities
+    } == {
+        "Blitz": (
+            "engine_consumed",
+            (
+                CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID,
+                CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
+            ),
+        ),
+        "Blur of Movement": (
+            "engine_consumed",
+            (CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,),
+        ),
+        "PATH OF DAMNATION": (
+            "engine_consumed",
+            ("army-mustering:warlord-restriction",),
+        ),
+        "Flip Belt": (
+            "engine_consumed",
+            (CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,),
+        ),
+    }
     night_spinner = rows_by_id["000000611"]
     assert night_spinner.semantic_bucket == SEMANTIC_BUCKET_ALL_CONSUMED
     assert {
@@ -981,8 +1015,8 @@ def test_aeldari_semantic_descriptions_exactly_partition_every_reviewed_ability(
     assert len(descriptions.rows) == 145
     assert descriptions_by_identity.keys() == expected_by_identity.keys()
     assert Counter(row.documentation_bucket for row in descriptions.rows) == {
-        DOCUMENTATION_BUCKET_SUPPORTED: 64,
-        DOCUMENTATION_BUCKET_STILL_NEEDED: 81,
+        DOCUMENTATION_BUCKET_SUPPORTED: 67,
+        DOCUMENTATION_BUCKET_STILL_NEEDED: 78,
     }
     prose_payload = cast(
         dict[str, Any],

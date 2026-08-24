@@ -107,6 +107,11 @@ class EnhancementEffectContext:
         if self.target_unit not in self.army.units:
             raise GameLifecycleError("EnhancementEffectContext target unit is not in the army.")
 
+    @property
+    def persisting_effect_started_battle_round(self) -> int:
+        """Return the canonical round anchor for effects installed during setup."""
+        return max(1, self.state.battle_round)
+
 
 @dataclass(frozen=True, slots=True)
 class EnhancementCharacteristicModifier:

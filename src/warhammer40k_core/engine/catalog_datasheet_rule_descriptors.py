@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.validation import canonical_keyword_token
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -33,6 +34,12 @@ CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID = (
 OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID = (
     "phase17l:optional-normal-move-characteristic-set-and-phase-end-risk"
 )
+OPTIONAL_PRE_NORMAL_MOVE_RANDOM_MODIFIERS_TEMPLATE_ID = (
+    "phase17p:optional-pre-normal-move-random-characteristic-modifiers"
+)
+CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_TEMPLATE_ID = (
+    "phase17p:charged-melee-weapon-characteristic-aura"
+)
 CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID = (
     "phase17m:conditional-leading-bodyguard-ability-grant"
 )
@@ -53,6 +60,8 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
         CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
         CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID,
         OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID,
+        OPTIONAL_PRE_NORMAL_MOVE_RANDOM_MODIFIERS_TEMPLATE_ID,
+        CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_TEMPLATE_ID,
         CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID,
         CONDITIONAL_NOT_LEADING_SELF_ABILITY_GRANT_TEMPLATE_ID,
         AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID,
@@ -128,6 +137,22 @@ class CatalogMovementActionGrantDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
+class CatalogRandomMovementAttackBoostDescriptor:
+    movement_action: str
+    movement_bonus_expression: DiceExpression
+    attacks_delta: int
+    weapon_names: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogChargedMeleeWeaponCharacteristicAuraDescriptor:
+    characteristic: Characteristic
+    delta: int
+    distance_inches: float
+    required_keyword: str
+
+
+@dataclass(frozen=True, slots=True)
 class CatalogConditionalLeaderAbilityGrantDescriptor:
     ability: str
     required_bodyguard_keyword: str
@@ -162,6 +187,8 @@ CatalogDatasheetRuntimeDescriptor = (
     | CatalogConditionalInvulnerableSaveDescriptor
     | CatalogConditionalAttackRerollDescriptor
     | CatalogMovementActionGrantDescriptor
+    | CatalogRandomMovementAttackBoostDescriptor
+    | CatalogChargedMeleeWeaponCharacteristicAuraDescriptor
     | CatalogConditionalLeaderAbilityGrantDescriptor
     | CatalogConditionalNotLeadingAbilityGrantDescriptor
     | CatalogConditionalLeadingRollRerollDescriptor
@@ -202,6 +229,10 @@ def exact_datasheet_runtime_descriptor_for_clause(
         return conditional_attack_reroll_descriptor_for_clause(clause)
     if clause.template_id == OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID:
         return movement_action_grant_descriptor_for_clause(clause)
+    if clause.template_id == OPTIONAL_PRE_NORMAL_MOVE_RANDOM_MODIFIERS_TEMPLATE_ID:
+        return random_movement_attack_boost_descriptor_for_clause(clause)
+    if clause.template_id == CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_TEMPLATE_ID:
+        return charged_melee_weapon_characteristic_aura_descriptor_for_clause(clause)
     if clause.template_id == CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID:
         return conditional_leader_ability_grant_descriptor_for_clause(clause)
     if clause.template_id == CONDITIONAL_NOT_LEADING_SELF_ABILITY_GRANT_TEMPLATE_ID:
@@ -476,6 +507,137 @@ def movement_action_grant_descriptor_for_clause(
         charge_forbidden=True,
         phase_end_roll_success_value=1,
         mortal_wounds_per_success=1,
+    )
+
+
+def random_movement_attack_boost_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogRandomMovementAttackBoostDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != OPTIONAL_PRE_NORMAL_MOVE_RANDOM_MODIFIERS_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.UNIT_SELECTED
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(clause.duration.parameters) != {"endpoint": "turn"}
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 2
+    ):
+        return None
+    if parameter_payload(clause.trigger.parameters) != {
+        "action": "normal_move",
+        "owner": "active_player",
+        "optional": True,
+        "phase": "movement",
+        "subject": "this_model",
+        "timing_window": "before_normal_move",
+    }:
+        return None
+    frequency = clause.conditions[0]
+    if frequency.kind is not RuleConditionKind.FREQUENCY_LIMIT or parameter_payload(
+        frequency.parameters
+    ) != {
+        "activation_kind": "optional_ability_use",
+        "max_uses": 1,
+        "scope": "battle",
+        "usage_subject": "this_model",
+    }:
+        return None
+    movement_effect, attacks_effect = clause.effects
+    movement_parameters = parameter_payload(movement_effect.parameters)
+    attacks_parameters = parameter_payload(attacks_effect.parameters)
+    weapon_names = attacks_parameters.get("weapon_names")
+    if (
+        movement_effect.kind is not RuleEffectKind.MODIFY_MOVE_DISTANCE
+        or movement_parameters
+        != {
+            "characteristic": "movement",
+            "operation": "add",
+            "roll_expression": "2D6",
+            "target_scope": "this_model",
+        }
+        or attacks_effect.kind is not RuleEffectKind.MODIFY_CHARACTERISTIC
+        or attacks_parameters.get("characteristic") != Characteristic.ATTACKS.value
+        or attacks_parameters.get("delta") != 3
+        or attacks_parameters.get("target_scope") != "this_model"
+        or set(attacks_parameters)
+        != {
+            "characteristic",
+            "delta",
+            "target_scope",
+            "weapon_names",
+        }
+        or type(weapon_names) is not tuple
+        or not weapon_names
+        or not all(type(name) is str and name for name in weapon_names)
+    ):
+        return None
+    return CatalogRandomMovementAttackBoostDescriptor(
+        movement_action="normal_move",
+        movement_bonus_expression=DiceExpression(quantity=2, sides=6),
+        attacks_delta=3,
+        weapon_names=weapon_names,
+    )
+
+
+def charged_melee_weapon_characteristic_aura_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogChargedMeleeWeaponCharacteristicAuraDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != CHARGED_MELEE_WEAPON_CHARACTERISTIC_AURA_TEMPLATE_ID
+        or clause.trigger is not None
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.AURA_UNITS
+        or parameter_payload(clause.target.parameters)
+        != {"allegiance": "friendly", "include_source_unit": True}
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.WHILE_CONDITION_TRUE
+        or clause.duration.parameters
+        or tuple(condition.kind for condition in clause.conditions)
+        != (
+            RuleConditionKind.AURA,
+            RuleConditionKind.DISTANCE_PREDICATE,
+            RuleConditionKind.KEYWORD_GATE,
+        )
+        or len(clause.effects) != 1
+    ):
+        return None
+    aura_condition, distance_condition, keyword_condition = clause.conditions
+    effect = clause.effects[0]
+    distance_parameters = parameter_payload(distance_condition.parameters)
+    keyword_parameters = parameter_payload(keyword_condition.parameters)
+    effect_parameters = parameter_payload(effect.parameters)
+    if (
+        aura_condition.parameters
+        or distance_parameters
+        != {
+            "distance_inches": 6,
+            "object_kind": "unit",
+            "object_reference": "this_model",
+            "predicate": "within",
+        }
+        or keyword_parameters != {"required_keyword": "SLAANESH"}
+        or effect.kind is not RuleEffectKind.MODIFY_CHARACTERISTIC
+        or effect_parameters
+        != {
+            "characteristic": Characteristic.ARMOR_PENETRATION.value,
+            "delta": -1,
+            "requires_charge_move_this_turn": True,
+            "target_scope": "aura_units",
+            "weapon_scope": "melee",
+        }
+    ):
+        return None
+    return CatalogChargedMeleeWeaponCharacteristicAuraDescriptor(
+        characteristic=Characteristic.ARMOR_PENETRATION,
+        delta=-1,
+        distance_inches=6.0,
+        required_keyword="SLAANESH",
     )
 
 

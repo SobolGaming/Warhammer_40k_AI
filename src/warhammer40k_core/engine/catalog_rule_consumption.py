@@ -24,6 +24,9 @@ from warhammer40k_core.core.weapon_profiles import (
     canonical_weapon_keyword_tokens,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.engine import (
+    catalog_advance_eligibility_classification as _advance_eligibility,
+)
 from warhammer40k_core.engine import catalog_attack_condition_classification as _attack_conditions
 from warhammer40k_core.engine import catalog_charge_roll_modifiers as _charge_modifiers
 from warhammer40k_core.engine import catalog_command_point_support as _command_points
@@ -157,6 +160,7 @@ CatalogMovementTransitPermission = _t.CatalogMovementTransitPermission
 _is_movement_transit = _t.clause_is_supported_movement_transit_permission
 _movement_mode_token = _t.movement_mode_token
 _movement_transit_permissions_from_clause = _t.movement_transit_permissions_from_clause
+_clause_grants_advance_eligibility = _advance_eligibility.clause_grants_advance_eligibility
 
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
@@ -213,11 +217,13 @@ CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID = "catalog-ir:setup-reactive-
 CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID = (
     _keyword_choice.CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID
 )
-CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
+CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = (
+    _advance_eligibility.CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID
+)
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
 CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
-    "catalog-ir:can-advance-and-shoot-and-charge"
+    _advance_eligibility.CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
 CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID = (
@@ -333,14 +339,6 @@ _CATALOG_IR_FALL_BACK_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = Mappin
         "can_fall_back_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
         "can_fallback_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
         "can_fall_back_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
-    }
-)
-_CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
-    {
-        "can_advance_and_charge": CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
-        "can_advance_and_shoot_and_charge": (
-            CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
-        ),
     }
 )
 
@@ -1277,6 +1275,7 @@ def catalog_weapon_profile_modifier_bindings(
 def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
     hook_ids = {
         *_datasheet.registered_consumer_ids(),
+        *_command_points.registered_consumer_ids(),
         *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
@@ -1287,6 +1286,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
         CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
         CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+        CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         *_contextual.registered_hook_ids(),
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -3770,6 +3770,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _keyword_choice.clause_has_invalid_exact_start_battle_keyword_choice_shape(clause):
         return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
+    consumer_ids.update(_advance_eligibility.consumer_ids_for_clause(clause))
     consumer_ids.update(_extensions.consumer_ids_for_clause(clause))
     consumer_ids.update(_conditional_charge.consumer_ids_for_clause(clause))
     consumer_ids.update(_datasheet.consumer_ids_for_clause(clause))
@@ -3851,9 +3852,6 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
             consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
         if _effect_is_turn_end_reserve_permission(effect):
             consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
-        advance_consumer_id = _advance_eligibility_consumer_id_for_effect(effect)
-        if advance_consumer_id is not None:
-            consumer_ids.add(advance_consumer_id)
         fall_back_consumer_id = _fall_back_eligibility_consumer_id_for_effect(effect)
         if fall_back_consumer_id is not None:
             consumer_ids.add(fall_back_consumer_id)
@@ -3869,6 +3867,11 @@ def catalog_rule_ir_clause_wide_consumer_ids(clause: RuleClause) -> tuple[str, .
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         *_datasheet.CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS,
     }
+    if _frequency.clause_is_runtime_once_per_battle_with_default_execution_consumers(
+        clause,
+        consumer_ids_for_effect=catalog_rule_ir_consumer_ids_for_effect,
+    ):
+        compound_consumer_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     return tuple(
         sorted(compound_consumer_ids.intersection(catalog_rule_ir_consumers_for_clause(clause)))
     )
@@ -4465,11 +4468,24 @@ def _matching_advance_eligibility_records(
         current_model_instance_ids=current_model_ids,
         trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
     ):
-        if any(
-            _clause_grants_advance_eligibility(clause, ability=requested_ability)
+        matching_clauses = tuple(
+            clause
             for clause in _clauses_from_record(record)
+            if _clause_grants_advance_eligibility(clause, ability=requested_ability)
+        )
+        if not matching_clauses:
+            continue
+        if not any(
+            clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT
+            for clause in matching_clauses
         ):
-            matching_records.append(record)
+            _validate_model_scoped_advance_eligibility_source(
+                state=context.state,
+                record=record,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+            )
+        matching_records.append(record)
     return tuple(sorted(matching_records, key=lambda record: record.record_id))
 
 
@@ -4614,6 +4630,32 @@ def _validate_this_model_source_id(
             raise GameLifecycleError("Catalog this-model source must be alive.")
         return source_model_id
     raise GameLifecycleError("Catalog this-model source is not owned by the unit.")
+
+
+def _validate_model_scoped_advance_eligibility_source(
+    *,
+    state: GameState,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> None:
+    source_model_id = _validate_this_model_source_id(
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    _advance_eligibility.validate_model_scoped_source_evidence(
+        source_model_instance_id=source_model_id,
+        source_is_wargear=record.source_kind is AbilitySourceKind.WARGEAR,
+        wargear_bearer_model_instance_ids=_record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_model_instance_ids,
+        ),
+        rules_unit=rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+        ),
+    )
 
 
 def _this_model_restore_missing_wounds(
@@ -5221,15 +5263,6 @@ def _effect_is_minimum_unmodified_hit_success(effect: RuleEffectSpec) -> bool:
     )
 
 
-def _clause_grants_advance_eligibility(clause: RuleClause, *, ability: str) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog advance eligibility requires RuleClause.")
-    requested_ability = _validate_identifier("ability", ability)
-    return _clause_targets_this_unit(clause) and any(
-        _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
-    )
-
-
 def _clause_grants_fall_back_eligibility(clause: RuleClause, *, ability: str) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog Fall Back eligibility requires RuleClause.")
@@ -5237,18 +5270,6 @@ def _clause_grants_fall_back_eligibility(clause: RuleClause, *, ability: str) ->
     return _clause_targets_this_unit(clause) and any(
         _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
     )
-
-
-def _advance_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
-    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
-        return None
-    parameters = parameter_payload(effect.parameters)
-    ability = parameters.get("ability")
-    if type(ability) is not str:
-        return None
-    return _CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS.get(_catalog_ir_lookup_token(ability))
 
 
 def _fall_back_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:

@@ -50,6 +50,7 @@ _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
 _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "app_core_rules_hidden_2026_08_09": "official_app_capture",
     "chaos_daemons_roster_2026_07": "official_roster_source",
+    "court_of_slaughter_anvanth_2026_08": "official_roster_source",
     "event_companion_2026_06_artifacts": "official_event_source",
     "event_companion_layouts_2026_06": "official_event_source",
     "faction_pack_rule_ir": "datasheet_rule_ir_registry",
@@ -491,7 +492,11 @@ def test_source_specific_rule_ir_builders_share_complete_package_delegate() -> N
         if not delegates_shard_id or not delegates_check:
             violations.append(path.relative_to(ROOT).as_posix())
 
-    assert len(source_specific_builders) == 16
+    assert len(source_specific_builders) == 18
+    assert {
+        "generate_aeldari_solitaire_rule_ir.py",
+        "generate_emperors_children_daemon_prince_rule_ir.py",
+    }.issubset({path.name for path in source_specific_builders})
     assert violations == []
 
 

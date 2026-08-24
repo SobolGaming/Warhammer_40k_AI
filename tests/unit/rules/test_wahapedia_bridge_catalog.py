@@ -42,6 +42,7 @@ from tests.support.wahapedia_source_fixtures import (
     wahapedia_source_artifacts,
 )
 
+from warhammer40k_core.core.army_catalog import datasheet_has_catalog_faction_ownership
 from warhammer40k_core.core.attachment_eligibility import AttachmentRole
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
@@ -76,6 +77,10 @@ from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
+from warhammer40k_core.engine.ability_coverage import (
+    AbilityCoverageSupportStage,
+    ability_coverage_rows_from_catalog,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_command_point_support import (
     CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
@@ -88,6 +93,12 @@ from warhammer40k_core.engine.dice_result_override_descriptors import (
     ASPECT_SHRINE_TOKEN_RESOURCE_KIND,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.datasheet_faction_access import (
+    default_datasheet_faction_access_registry,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import (
+    mustering as aeldari_mustering,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.orks import (
     army_rule as orks_army_rule,
 )
@@ -184,6 +195,104 @@ def test_default_geometry_keeps_unverified_chaos_daemons_heights_review_blocked(
     }
 
     assert actual == expected
+
+
+def test_aeldari_disparate_paths_keeps_battle_focus_primary_and_descriptor_source() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=wahapedia_source_artifacts(),
+        bridge_package_id=bridge_package_id(),
+        datasheet_ids=("000000601", "000002538"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000000601",
+                model_name="Warp Spider Exarch",
+                height=1.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:aeldari:warp-spider-exarch:test-height",
+                height_document_reference="Aeldari bridge regression fixture",
+            ),
+            ModelHeightOverride(
+                datasheet_id="000000601",
+                model_name="Warp Spiders",
+                height=1.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:aeldari:warp-spiders:test-height",
+                height_document_reference="Aeldari bridge regression fixture",
+            ),
+            ModelHeightOverride(
+                datasheet_id="000002538",
+                model_name="Solitaire - EPIC HERO",
+                height=2.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:aeldari:solitaire:test-height",
+                height_document_reference="Aeldari bridge regression fixture",
+            ),
+        ),
+    )
+    disparate_paths_row = next(
+        row
+        for row in artifact_by_table(bridge_artifacts, "Datasheets_abilities").rows
+        if row.runtime_fields_payload()["datasheet_id"] == "000002538"
+        and row.runtime_fields_payload()["ability_id"] == "000009896"
+    )
+    assert any(
+        source_id.endswith(":Abilities:000009896:AE")
+        for source_id in source_ids_from_row(disparate_paths_row)
+    )
+    package = build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+
+    faction = package.army_catalog.factions[0]
+    assert faction.faction_id == "AE"
+    assert faction.name == "Aeldari"
+    assert faction.faction_keywords == ("ASURYANI",)
+    assert faction.army_rule_ids == ("000009894",)
+    solitaire = package.army_catalog.datasheet_by_id("000002538")
+    assert solitaire.keywords.faction_keywords == ("HARLEQUINS",)
+    abilities = {ability.name: ability for ability in solitaire.abilities}
+    assert abilities["Battle Focus"].ability_id == "000009894"
+    assert abilities["Disparate Paths"].ability_id == "000009896"
+    assert abilities["Disparate Paths"].source_kind is CatalogAbilitySourceKind.FACTION
+    assert datasheet_has_catalog_faction_ownership(datasheet=solitaire, faction=faction)
+    assert default_datasheet_faction_access_registry().allows(
+        datasheet=solitaire,
+        faction=faction,
+    )
+    assert abilities["PATH OF DAMNATION"].rule_ir_payload == {"mustering_warlord": "forbidden"}
+    solitaire_unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-aeldari",
+        selection=UnitMusterSelection(
+            unit_selection_id="solitaire",
+            datasheet_id=solitaire.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000002538:solitaire-epic-hero",
+                    model_count=1,
+                ),
+            ),
+        ),
+        datasheet=solitaire,
+    )
+    assert solitaire_unit.own_models[0].wargear_ids == (
+        "000002538:solitaire-weapons",
+        "000002538:flip-belt",
+    )
+    disparate_paths_coverage = next(
+        row
+        for row in ability_coverage_rows_from_catalog(package.army_catalog)
+        if row.datasheet_id == solitaire.datasheet_id
+        and row.ability_id == aeldari_mustering.DISPARATE_PATHS_CATALOG_ABILITY_ID
+    )
+    assert disparate_paths_coverage.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert disparate_paths_coverage.runtime_consumer_ids == (
+        aeldari_mustering.DISPARATE_PATHS_MUSTERING_CONSUMER_ID,
+    )
 
 
 def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog() -> None:

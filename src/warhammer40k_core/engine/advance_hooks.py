@@ -4,10 +4,15 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.dice import DiceExpression, DiceExpressionPayload
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rule_frequency import (
+    OptionalAbilityFrequencyUsage,
+    OptionalAbilityFrequencyUsagePayload,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -19,6 +24,7 @@ class AdvanceMoveGrantPayload(TypedDict):
     label: str
     granted_ranged_weapon_keywords: list[str]
     movement_bonus_inches: int
+    movement_bonus_dice_expression: NotRequired[DiceExpressionPayload | None]
     fixed_advance_inches: NotRequired[int | None]
     ignores_vertical_distance: NotRequired[bool]
     automatic: NotRequired[bool]
@@ -26,6 +32,7 @@ class AdvanceMoveGrantPayload(TypedDict):
     decision_effect_payload: JsonValue
     unit_effect_payload: JsonValue
     unit_effect_expiration: str | None
+    rule_frequency_usage: NotRequired[OptionalAbilityFrequencyUsagePayload | None]
 
 
 SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE = "select_movement_action_grant"
@@ -49,6 +56,7 @@ class AdvanceMoveContext:
     movement_phase_action: str
     movement_request_id: str
     movement_result_id: str
+    event_log: EventLog | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -82,6 +90,8 @@ class AdvanceMoveContext:
             "movement_result_id",
             _validate_identifier("movement_result_id", self.movement_result_id),
         )
+        if self.event_log is not None and type(self.event_log) is not EventLog:
+            raise GameLifecycleError("AdvanceMoveContext event_log must be an EventLog.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,6 +101,7 @@ class AdvanceMoveGrant:
     label: str
     granted_ranged_weapon_keywords: tuple[str, ...]
     movement_bonus_inches: int = 0
+    movement_bonus_dice_expression: DiceExpression | None = None
     fixed_advance_inches: int | None = None
     ignores_vertical_distance: bool = False
     automatic: bool = False
@@ -98,6 +109,7 @@ class AdvanceMoveGrant:
     decision_effect_payload: JsonValue = None
     unit_effect_payload: JsonValue = None
     unit_effect_expiration: str | None = None
+    rule_frequency_usage: OptionalAbilityFrequencyUsage | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -116,6 +128,15 @@ class AdvanceMoveGrant:
             "movement_bonus_inches",
             _validate_non_negative_int("movement_bonus_inches", self.movement_bonus_inches),
         )
+        if self.movement_bonus_dice_expression is not None:
+            if type(self.movement_bonus_dice_expression) is not DiceExpression:
+                raise GameLifecycleError(
+                    "Advance grant movement_bonus_dice_expression must be DiceExpression."
+                )
+            if self.movement_bonus_inches != 0:
+                raise GameLifecycleError(
+                    "Advance grant cannot combine fixed and random movement bonuses."
+                )
         if self.fixed_advance_inches is not None:
             object.__setattr__(
                 self,
@@ -148,6 +169,15 @@ class AdvanceMoveGrant:
             raise GameLifecycleError("Advance grant expiration requires a unit effect payload.")
         if self.unit_effect_payload is not None and self.unit_effect_expiration is None:
             raise GameLifecycleError("Advance grant unit effect requires an expiration.")
+        if self.movement_bonus_dice_expression is not None and self.unit_effect_payload is None:
+            raise GameLifecycleError("Random movement bonus requires a unit effect payload.")
+        if (
+            self.rule_frequency_usage is not None
+            and type(self.rule_frequency_usage) is not OptionalAbilityFrequencyUsage
+        ):
+            raise GameLifecycleError(
+                "Advance grant rule_frequency_usage must be typed frequency metadata."
+            )
 
     def to_payload(self) -> AdvanceMoveGrantPayload:
         return {
@@ -156,6 +186,11 @@ class AdvanceMoveGrant:
             "label": self.label,
             "granted_ranged_weapon_keywords": list(self.granted_ranged_weapon_keywords),
             "movement_bonus_inches": self.movement_bonus_inches,
+            "movement_bonus_dice_expression": (
+                None
+                if self.movement_bonus_dice_expression is None
+                else self.movement_bonus_dice_expression.to_payload()
+            ),
             "fixed_advance_inches": self.fixed_advance_inches,
             "ignores_vertical_distance": self.ignores_vertical_distance,
             "automatic": self.automatic,
@@ -163,16 +198,28 @@ class AdvanceMoveGrant:
             "decision_effect_payload": self.decision_effect_payload,
             "unit_effect_payload": self.unit_effect_payload,
             "unit_effect_expiration": self.unit_effect_expiration,
+            "rule_frequency_usage": (
+                None
+                if self.rule_frequency_usage is None
+                else self.rule_frequency_usage.to_payload()
+            ),
         }
 
     @classmethod
     def from_payload(cls, payload: AdvanceMoveGrantPayload) -> Self:
+        movement_bonus_dice_expression = payload.get("movement_bonus_dice_expression")
+        rule_frequency_usage = payload.get("rule_frequency_usage")
         return cls(
             hook_id=payload["hook_id"],
             source_id=payload["source_id"],
             label=payload["label"],
             granted_ranged_weapon_keywords=tuple(payload["granted_ranged_weapon_keywords"]),
             movement_bonus_inches=payload["movement_bonus_inches"],
+            movement_bonus_dice_expression=(
+                None
+                if movement_bonus_dice_expression is None
+                else DiceExpression.from_payload(movement_bonus_dice_expression)
+            ),
             fixed_advance_inches=payload.get("fixed_advance_inches"),
             ignores_vertical_distance=payload.get("ignores_vertical_distance", False),
             automatic=payload.get("automatic", False),
@@ -180,6 +227,11 @@ class AdvanceMoveGrant:
             decision_effect_payload=payload["decision_effect_payload"],
             unit_effect_payload=payload["unit_effect_payload"],
             unit_effect_expiration=payload["unit_effect_expiration"],
+            rule_frequency_usage=(
+                None
+                if rule_frequency_usage is None
+                else OptionalAbilityFrequencyUsage.from_payload(rule_frequency_usage)
+            ),
         )
 
 

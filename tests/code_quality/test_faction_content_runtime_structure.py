@@ -36,6 +36,11 @@ FORBIDDEN_RUNTIME_IMPORT_TOKENS = (
     "rule_parser",
     "wahapedia",
 )
+CONTENT_NEUTRAL_MUSTERING_CONSUMERS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "list_validation.py",
+    ROOT / "src" / "warhammer40k_core" / "engine" / "faction_content" / "runtime_evidence.py",
+)
+EDITION_FACTION_CONTENT_IMPORT_PREFIX = "warhammer40k_core.engine.faction_content.warhammer_40000_"
 
 
 def test_faction_content_runtime_files_stay_below_line_limit() -> None:
@@ -55,6 +60,25 @@ def test_faction_content_runtime_does_not_import_raw_source_or_parser_tooling() 
         for token in FORBIDDEN_RUNTIME_IMPORT_TOKENS:
             if token in text:
                 offenders.append((path.relative_to(ROOT).as_posix(), token))
+
+    assert offenders == []
+
+
+def test_generic_mustering_consumers_do_not_import_edition_faction_content() -> None:
+    offenders: list[tuple[str, str]] = []
+    for path in CONTENT_NEUTRAL_MUSTERING_CONSUMERS:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        imported_modules: list[str] = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imported_modules.extend(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module is not None:
+                imported_modules.append(node.module)
+        offenders.extend(
+            (path.relative_to(ROOT).as_posix(), module)
+            for module in imported_modules
+            if module.startswith(EDITION_FACTION_CONTENT_IMPORT_PREFIX)
+        )
 
     assert offenders == []
 

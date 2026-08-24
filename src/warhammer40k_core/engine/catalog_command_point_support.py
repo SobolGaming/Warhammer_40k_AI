@@ -18,6 +18,13 @@ CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID = "catalog-ir:command-point-gain"
 CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID = "catalog-ir:stratagem-cost-modifier"
 
 
+def registered_consumer_ids() -> tuple[str, ...]:
+    return (
+        CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+
+
 def command_point_consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     _validate_clause(clause)
     consumer_ids: list[str] = []

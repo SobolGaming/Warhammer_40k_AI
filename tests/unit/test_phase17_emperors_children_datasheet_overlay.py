@@ -209,6 +209,7 @@ from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.fight_phase_start_hooks import (
+    SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
 )
@@ -3669,6 +3670,70 @@ def test_euphoric_strikes_activates_once_and_modifies_only_lord_melee_weapons() 
         is None
     )
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_euphoric_strikes_uses_fight_start_lifecycle_and_replays() -> None:
+    session, lord, _target = _battleline_lifecycle_session(
+        source_datasheet_id="000004078",
+        phase=BattlePhase.FIGHT,
+        with_icon=False,
+        game_id="lord-exultant-euphoric-strikes-lifecycle",
+    )
+    request = _decision_request(session.advance_until_decision_or_terminal())
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
+    assert request_payload["ability_name"] == "Euphoric Strikes"
+    assert request_payload["source_unit_instance_id"] == lord.unit_instance_id
+    assert request_payload["source_model_instance_id"] == (lord.own_models[0].model_instance_id)
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    use_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["activate"] is True
+    )
+
+    submitted = session.submit_option(
+        request_id=request.request_id,
+        option_id=use_option.option_id,
+        result_id="lord-exultant-euphoric-strikes-lifecycle:use",
+    )
+
+    assert submitted.status_kind not in {
+        LifecycleStatusKind.INVALID,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    activation = next(
+        event
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == CATALOG_ONCE_PER_BATTLE_ABILITY_ACTIVATED_EVENT
+    )
+    activation_payload = cast(dict[str, JsonValue], activation.payload)
+    execution = cast(dict[str, JsonValue], activation_payload["rule_execution"])
+    assert execution["status"] == "applied"
+    assert len(cast(list[JsonValue], execution["effect_payloads"])) == 2
+    created_effects = cast(list[dict[str, JsonValue]], execution["created_persisting_effects"])
+    assert len(created_effects) == 2
+    assert all(
+        effect["target_unit_instance_ids"] == [lord.unit_instance_id] for effect in created_effects
+    )
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id="lord-exultant-euphoric-strikes-lifecycle",
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
 
 
 def test_maulerfiend_glutton_for_punishment_uses_live_source_strength_gates() -> None:

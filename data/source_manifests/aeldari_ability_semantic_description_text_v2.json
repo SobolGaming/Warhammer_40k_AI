@@ -473,13 +473,13 @@
     },
     {
       "ability_id": "000002538:blitz",
-      "description": "A once-per-battle pre-move 2D6-inch Move and +3 Attacks modifier through turn end are still needed.",
-      "evidence_sha256": "edcdc17264dcc48edf80184e7922c6cfabe7940258a4816f20931a8f943039b8"
+      "description": "The once-per-battle pre-move 2D6-inch Move and +3 Solitaire weapons Attacks modifiers through turn end are consumed by the movement-action and frequency runtime paths.",
+      "evidence_sha256": "2059e63f9e7b9434e8b31975f271dd5e3a40088d89e62379c87b2a3ecab83233"
     },
     {
       "ability_id": "000002538:blur-of-movement",
-      "description": "Charge-after-Advance eligibility is parsed; the movement/charge query host is still needed.",
-      "evidence_sha256": "3eee351c8fcde9dad07c3f56e68326bb608b06d7873e68314e40c70b7183bbe6"
+      "description": "Charge-after-Advance eligibility is consumed by the advance-eligibility runtime.",
+      "evidence_sha256": "1e6b26e5c02ca7609e4dc770b06b8d720ec834bf2ca149c40b7024411e48022d"
     },
     {
       "ability_id": "000002538:path-of-damnation",
@@ -488,8 +488,8 @@
     },
     {
       "ability_id": "000002538:flip-belt",
-      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
-      "evidence_sha256": "2794c8658d0e6d0c4f64e9eec86c5f739ccd1d4a34dff632be82b72a69eafafc"
+      "description": "Vertical-distance-free bearer movement for Normal, Advance, Fall Back and Charge moves is consumed by the movement-transit permission runtime.",
+      "evidence_sha256": "cec11b3a9799aae1ed8b4d8576f327b2d637839ee06be79765bfb391693d5b94"
     },
     {
       "ability_id": "000002539:acrobatic-grace",

@@ -149,3 +149,15 @@ FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID = {
     "TS": "000008424",
     "WE": "000008428",
 }
+FACTION_KEYWORDS_BY_ARMY_RULE_ABILITY_ID = {
+    "000009894": ("Asuryani",),
+}
+# The source snapshot uses a comma between these two distinct loadout items. Keep
+# the correction keyed to the stable datasheet identity and exact source preimage
+# so a future source change fails closed instead of silently changing equipment.
+LOADOUT_SEPARATOR_NORMALIZATION_BY_DATASHEET_ID = {
+    "000002538": (
+        "This model is equipped with: Solitaire weapons, flip belt.",
+        "This model is equipped with: Solitaire weapons; flip belt.",
+    ),
+}

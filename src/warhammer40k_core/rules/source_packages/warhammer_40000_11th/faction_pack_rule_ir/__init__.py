@@ -28,7 +28,7 @@ from ._artifacts import (
 _ARTIFACT_ROOT: Final = "artifacts"
 _MANIFEST_PATH: Final = f"{_ARTIFACT_ROOT}/package.json"
 
-EXPECTED_PACKAGE_HASH: Final = "a310b4bb595385a277cdcc11752108a1dd33e69a49f29f92aaed845a8b643c3c"
+EXPECTED_PACKAGE_HASH: Final = "96da4b016a58c2160b6ab4c6448acd4d345be15deb1facb99ecc54e60b6fab02"
 
 
 def _artifact_bytes(relative_path: str) -> bytes:

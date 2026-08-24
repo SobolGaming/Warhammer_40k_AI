@@ -6689,6 +6689,88 @@ def test_catalog_advance_and_fall_back_runtime_exposes_all_source_backed_permiss
         )
 
 
+def test_catalog_this_model_advance_eligibility_rejects_multi_model_bearer_widening() -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    source_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    wargear_id = "test:catalog-advance-eligibility:bearer-wargear"
+    source_unit = replace(
+        source_unit,
+        own_models=(
+            replace(
+                source_unit.own_models[0],
+                wargear_ids=tuple(sorted((*source_unit.own_models[0].wargear_ids, wargear_id))),
+            ),
+            *source_unit.own_models[1:],
+        ),
+    )
+    source_army = replace(
+        source_army,
+        units=tuple(
+            source_unit if unit.unit_instance_id == source_unit.unit_instance_id else unit
+            for unit in source_army.units
+        ),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=create_deterministic_battlefield_scenario(
+            battlefield_id="catalog-this-model-advance-eligibility-attached",
+            armies=(source_army, target_army),
+        ).battlefield_state,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    clause = RuleClause(
+        clause_id="test:catalog-this-model-advance-eligibility:clause",
+        source_span=_span(),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.GRANT_ABILITY,
+                ("ability", "can_advance_and_charge"),
+                ("target_scope", "this_model"),
+            ),
+        ),
+        duration=RuleDuration(
+            kind=RuleDurationKind.PERMANENT,
+            source_span=_span(),
+        ),
+    )
+    record = _ability_record(
+        record_id="record:catalog-this-model-advance-eligibility",
+        rule_ir=_rule_ir(
+            source_id="test:catalog-this-model-advance-eligibility",
+            clauses=(clause,),
+        ),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        datasheet_id=source_unit.datasheet_id,
+        source_kind=AbilitySourceKind.WARGEAR,
+        wargear_id=wargear_id,
+    )
+    runtime = CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    context = AdvanceEligibilityContext(
+        state=state,
+        player_id=source_army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=source_unit.unit_instance_id,
+        movement_request_id="request:catalog-this-model-advance-eligibility",
+        movement_result_id="result:catalog-this-model-advance-eligibility",
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="this-model advance eligibility requires a singleton alive rules unit",
+    ):
+        runtime.advance_and_charge_handler(context)
+
+
 def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
     supported_condition = _condition(
         RuleConditionKind.TARGET_CONSTRAINT,

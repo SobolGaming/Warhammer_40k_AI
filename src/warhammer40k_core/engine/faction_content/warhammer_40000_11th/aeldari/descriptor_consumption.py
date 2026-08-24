@@ -4,9 +4,12 @@ from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine.catalog_descriptor_consumption import (
     CatalogDescriptorConsumptionRecord,
 )
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import (
+    army_rule,
+    mustering,
+)
 
-BATTLE_FOCUS_CATALOG_ABILITY_ID = "000009894"
+BATTLE_FOCUS_CATALOG_ABILITY_ID = mustering.BATTLE_FOCUS_CATALOG_ABILITY_ID
 
 
 def descriptor_consumption_records() -> tuple[CatalogDescriptorConsumptionRecord, ...]:
@@ -23,5 +26,11 @@ def descriptor_consumption_records() -> tuple[CatalogDescriptorConsumptionRecord
                 army_rule.SUDDEN_STRIKE_HOOK_ID,
                 army_rule.SWIFT_AS_THE_WIND_HOOK_ID,
             ),
+        ),
+        CatalogDescriptorConsumptionRecord(
+            ability_id=mustering.DISPARATE_PATHS_CATALOG_ABILITY_ID,
+            source_kind=CatalogAbilitySourceKind.FACTION,
+            semantic_categories=("faction.army_rule.disparate_paths",),
+            runtime_consumer_ids=(mustering.DISPARATE_PATHS_MUSTERING_CONSUMER_ID,),
         ),
     )

@@ -526,13 +526,12 @@ def apply_destruction_reaction_decision(
     record = decisions.record_for_result(result)
     request = record.request
     decision = DestructionReactionDecision.from_result(request=request, result=result)
+    selected_reaction_kind = decision.selected_reaction_kind
     selected_source = _selected_destruction_reaction_source_from_request(
         request=request,
         selected_source_id=decision.selected_source_id,
     )
-    if selected_source is not None and selected_source.reaction_kind is not (
-        decision.selected_reaction_kind
-    ):
+    if selected_source is not None and selected_source.reaction_kind is not selected_reaction_kind:
         raise GameLifecycleError("Selected destruction reaction kind drift.")
     context = validate_destruction_reaction_context_matches_sequence(
         attack_sequence=attack_sequence,
@@ -552,6 +551,8 @@ def apply_destruction_reaction_decision(
             source_id=selected_source.source_id,
             source_rule_id=selected_source.source_rule_id,
             source_phase=attack_sequence.source_phase,
+            activation_result_id=result.result_id,
+            completion_context=cast(JsonValue, context),
         )
     decisions.event_log.append(
         "destruction_reaction_resolved",
@@ -559,9 +560,7 @@ def apply_destruction_reaction_decision(
             "decision": decision.to_payload(),
             "selected_source": None if selected_source is None else selected_source.to_payload(),
             "selected_reaction_kind": (
-                None
-                if decision.selected_reaction_kind is None
-                else decision.selected_reaction_kind.value
+                None if selected_reaction_kind is None else selected_reaction_kind.value
             ),
             "action_host": _destruction_reaction_action_host(selected_source),
             "execution_status": (

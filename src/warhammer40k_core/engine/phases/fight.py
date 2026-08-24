@@ -202,7 +202,9 @@ from warhammer40k_core.engine.phases.fight_attack_sequence_selection import (
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
     apply_rule_destruction_reaction_and_schedule_fight_on_death,
+    fight_on_death_completion_requires_rule_finalization,
     remove_rule_fight_on_death_models_for_completed_activation,
+    schedule_attack_sequence_fight_on_death_after_completed_activation,
 )
 from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
@@ -939,7 +941,9 @@ def _complete_active_fight_activation(
             }
         ),
     )
-    if fight_on_death_completion is not None:
+    if fight_on_death_completion is not None and (
+        fight_on_death_completion_requires_rule_finalization(fight_on_death_completion)
+    ):
         finalization_status = finalize_rule_destruction_after_fight_activation(
             state=state,
             decisions=decisions,
@@ -948,6 +952,13 @@ def _complete_active_fight_activation(
         )
         if finalization_status is not None:
             return finalization_status
+    if schedule_attack_sequence_fight_on_death_after_completed_activation(
+        state=state,
+        decisions=decisions,
+        completed_activation=activation,
+        completed_fight_on_death_context=fight_on_death_completion,
+    ):
+        return None
     counteroffensive_status = _request_counteroffensive_if_available(
         handler=handler,
         state=state,

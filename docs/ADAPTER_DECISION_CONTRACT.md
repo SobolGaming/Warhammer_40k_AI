@@ -759,6 +759,16 @@ replay-safe. Adapters must not alter the movement budget, mark the unit unable
 to Charge, roll the phase-end dice, choose damaged models, or apply wounds
 locally.
 
+Aeldari Solitaire's Blitz also uses `select_movement_action_grant` before its
+Normal Move. Its grant payload carries the source-backed
+`movement_bonus_dice_expression` and typed `rule_frequency_usage` metadata.
+After the engine accepts the option, it consumes the once-per-battle use, rolls
+2D6 through the random-characteristic service, and records the resolved roll
+and Move bonus in an end-of-turn effect. That effect applies only to the source
+model and adds 3 Attacks only to its named Solitaire weapons. Declining does not
+consume the use. Adapters must not roll the bonus, track the frequency limit,
+increase Move or Attacks, or broaden either modifier to another model or weapon.
+
 Aeldari Spiritseer's Spirit Mark uses the finite decision type
 `select_catalog_movement_target_pair` when the source model starts or ends a
 move. Each use option identifies one engine-enumerated friendly non-TITANIC

@@ -172,6 +172,7 @@ This generated section reports pregame army-list rules enforced by `army_musteri
 
 | Rule | Rule ID | Source ID | Faction / allowed base factions | Enforcement surface | Support stage | Enforcement ID | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Disparate Paths | `army-mustering:aeldari-disparate-paths` | `000009896` | faction `aeldari`; allowed base `aeldari` | `catalog_generation/list_validation/army_mustering` | `full` | `datasheet-faction-access:aeldari-disparate-paths` | tests/unit/rules/test_wahapedia_bridge_catalog.py::test_aeldari_disparate_paths_keeps_battle_focus_primary_and_descriptor_source; tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army; tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_rejects_unlinked_or_unrelated_datasheet; tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition | Allows a source-linked HARLEQUINS datasheet carrying Disparate Paths in an ASURYANI Battle Focus army while leaving unrelated or unlinked datasheets illegal; datasheet-specific Warlord restrictions remain authoritative. |
 | Leader and Support attachment declarations | `army-mustering:attachment-declaration` | `core:attachment-eligibility` | allowed base `any` | `catalog_generation/army_mustering` | `full` | `army_mustering:_resolve_attached_unit_formations` | tests/unit/test_phase9c_mustering.py::test_attachment_declarations_form_runtime_attached_unit_from_structured_catalog; tests/unit/rules/test_wahapedia_bridge_catalog.py::test_phase17k_support_ability_marks_attachment_eligibility_role_as_support | Consumes every structured attachment target through the shared army-mustering path, preserves target-specific source IDs on the attached-unit formation, and rejects catalog targets that are not present in the same catalog. |
 | Cult of the Dark Gods | `army-mustering:cult-of-the-dark-gods` | `phase17g:chaos-space-marines:cult-of-the-dark-gods` | faction `chaos-space-marines`; allowed base `chaos-space-marines` | `army_mustering/list_validation/army_factory` | `full` | `army_mustering:_append_cult_of_dark_gods_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_cult_of_dark_gods_allows_cult_units_and_replaces_faction_keywords; tests/unit/test_phase9c_mustering.py::test_phase17g_cult_of_dark_gods_points_cap_scales_by_battle_size | Allows selected cult datasheets in Heretic Astartes armies, enforces battle-size points caps, and replaces faction keywords during army creation. |
 | Daemonic Pact | `army-mustering:daemonic-pact` | `phase17g:chaos-daemons:daemonic-pact` | faction `chaos-daemons`; allowed base `chaos-knights`, `chaos-space-marines` | `army_mustering/list_validation` | `full` | `army_mustering:_append_daemonic_pact_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_allows_legiones_daemonica_allies; tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_points_cap_scales_by_battle_size | Allows LEGIONES DAEMONICA allies for Chaos Knights or Heretic Astartes armies, enforces battle-size points caps, god Battleline ratios, base-model keywords, and allied Warlord/Enhancement restrictions. |
@@ -181,6 +182,7 @@ This generated section reports pregame army-list rules enforced by `army_musteri
 | Shadow Legion Thralls of the First Prince | `army-mustering:shadow-legion-thralls-of-the-first-prince` | `phase17g:chaos-daemons:shadow-legion:thralls-of-the-first-prince` | faction `chaos-daemons`; allowed base `chaos-daemons` | `army_mustering/list_validation/army_factory` | `full` | `army_mustering:_append_shadow_legion_violations` | tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_mustering_grants_keywords_and_deep_strike; tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_roster_reports_thralls_and_forbidden_units | Enforces Shadow Legion detachment restrictions, Heretic Astartes Thralls allow-list and points caps, forbidden Daemon Prince/Epic Hero selections, and grants Shadow Legion, Undivided, and Deep Strike keywords. |
 | Space Marine Chapters | `army-mustering:space-marine-chapters` | `phase17g:space-marines:space-marine-chapters` | faction `space-marines`; allowed base `space-marines` | `army_mustering/list_validation` | `full` | `army_mustering:_append_space_marine_chapter_violations` | tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_black_templars_and_space_wolves; tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_deathwatch_restrictions | Enforces one-Chapter roster restrictions plus Black Templars, Space Wolves, and Deathwatch forbidden-unit gates for Adeptus Astartes armies. |
 | Supreme Commander | `army-mustering:supreme-commander` | `core:supreme-commander` | allowed base `any` | `army_mustering/list_validation` | `full` | `army_mustering:_append_supreme_commander_warlord_violations` | tests/unit/test_phase9c_mustering.py::test_mustering_requires_supreme_commander_to_be_warlord; tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander | Consumes structured Supreme Commander mustering descriptors and requires an eligible Supreme Commander unit to be selected as Warlord when present. |
+| Datasheet Warlord restrictions | `army-mustering:warlord-restriction` | `core:datasheet-mustering:warlord-restriction` | allowed base `any` | `army_mustering` | `full` | `army_mustering:_append_warlord_violations` | tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition; tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander | Consumes structured datasheet mustering descriptors and rejects a selected Warlord when the source ability marks that datasheet as forbidden. |
 
 ## Factions
 
@@ -273,18 +275,19 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:battle-shock-failed-heal` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:battle-shock-forced-test` | Pall of Despair (Aura, Psychic) |
 | `catalog-ir:battle-shock-reroll` | No current generated rows |
-| `catalog-ir:can-advance-and-charge` | Acrobatic |
+| `catalog-ir:can-advance-and-charge` | Acrobatic<br>Blur of Movement |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
 | `catalog-ir:can-fallback-and-charge` | Acrobatic |
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos<br>The Scent of Blood |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
+| `catalog-ir:charged-melee-weapon-characteristic-aura` | Excessive Vigour (Aura) |
 | `catalog-ir:command-end-sticky-objective-control` | Objective Defiled |
 | `catalog-ir:command-phase-ability-mode` | Beguiling Form<br>Daemon Primarch of Slaanesh<br>Daemonic Speed<br>Enthralling Hypnosis (Aura) |
 | `catalog-ir:command-point-gain` | Diviner of Futures<br>Icon of Excess |
 | `catalog-ir:command-restoration` | Tears of Isha (Psychic) |
-| `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord<br>Spiritseer |
+| `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord<br>Lord of Excess<br>Spiritseer |
 | `catalog-ir:conditional-leading-ability:fights-first` | ASPECT TRAINING |
 | `catalog-ir:conditional-leading-ability:infiltrators` | ASPECT TRAINING<br>LORD OF THE HOST |
 | `catalog-ir:conditional-leading-ability:scouts` | ASPECT TRAINING<br>LORD OF THE HOST |
@@ -309,7 +312,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fight-activation-movement-distance` | No current generated rows |
 | `catalog-ir:fight-end-failed-activation-model-destruction` | Daemonic Patrons |
 | `catalog-ir:fight-end-triggered-movement` | Raid and Run |
-| `catalog-ir:fight-on-death-source` | Malevolent Souls |
+| `catalog-ir:fight-on-death-source` | Ecstatic Death<br>Malevolent Souls |
 | `catalog-ir:fight-selected-critical-wound-threshold` | Daemonic Patrons |
 | `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
 | `catalog-ir:first-death-return` | Unquenchable Resolve |
@@ -331,17 +334,17 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:minimum-unmodified-hit-success` | Mandiblasters<br>Whispering Web |
 | `catalog-ir:model-materialization` | No current generated rows |
 | `catalog-ir:modifier-ignore-permission` | Siege Crawler |
-| `catalog-ir:movement-action-grant` | Flickerjump |
+| `catalog-ir:movement-action-grant` | Blitz<br>Flickerjump |
 | `catalog-ir:movement-characteristic-modifier` | Daemon Prince of Slaanesh |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
 | `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast<br>Scuttling Horrors |
 | `catalog-ir:movement-end-selected-target-effect` | Doom (Psychic) |
 | `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |
-| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Scuttling Walker<br>Serpentine |
+| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Flip Belt<br>Scuttling Walker<br>Serpentine |
 | `catalog-ir:named-weapon-ability-choice` | Master of Magicks (Psychic) |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
-| `catalog-ir:once-per-battle-ability` | Euphoric Strikes<br>Malefic Destruction<br>Unholy Vigour |
+| `catalog-ir:once-per-battle-ability` | Blitz<br>Euphoric Strikes<br>Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
 | `catalog-ir:poisoned-command-mortal-wounds` | Daemonic Poisons |
 | `catalog-ir:post-fight-hit-target-effect` | Daemonic Poisons |

@@ -30,6 +30,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.rules import wahapedia_base_size_bridge as _base_size_bridge
 from warhammer40k_core.rules import wahapedia_bridge_columns as _bridge_columns
+from warhammer40k_core.rules import wahapedia_bridge_patterns as _patterns
 from warhammer40k_core.rules import wahapedia_materialization_bridge as _materialization_bridge
 from warhammer40k_core.rules import wahapedia_model_profile_mapping as _model_profiles
 from warhammer40k_core.rules.attachment_wargear_requirements import (
@@ -73,7 +74,6 @@ from warhammer40k_core.rules.wahapedia_bridge_patterns import (
     DAMAGED_OC_RE,
     DAMAGED_RANGE_RE,
     DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE,
-    FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID,
     OPTION_RE,
     REPLACEMENT_WITH_CHOICES_RE,
     REPLACEMENT_WITH_REQUIRED_CHOICES_RE,
@@ -291,13 +291,16 @@ def _bridge_datasheet(
         else (faction_row, faction_ability_row, faction_ability_source)
     )
     faction_source_ids = _source_ids(*faction_source_rows)
+    catalog_faction_keywords = _patterns.FACTION_KEYWORDS_BY_ARMY_RULE_ABILITY_ID.get(
+        _required_field(faction_ability_source, "id"), faction_keywords
+    )
     _append_or_merge_faction_row(
         bridged_rows=bridged_rows,
         row={
             "id": faction_id,
             "name": _raw_or_field(faction_row, "name"),
             "content_scope": "matched_play",
-            "faction_keywords": _joined(faction_keywords),
+            "faction_keywords": _joined(catalog_faction_keywords),
             "army_rule_id": _required_field(faction_ability_source, "id"),
             "army_rule_name": _raw_or_field(faction_ability_source, "name"),
             "source_ids": _joined(faction_source_ids),
@@ -619,21 +622,23 @@ def _faction_catalog_ability_rows(
         )
         if _required_field(row, "type") == "Faction"
     )
+    primary_ability_id = _patterns.FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID.get(faction_id)
     if len(rows) == 1:
-        ability_source = _ability_source_row(context=context, ability_row=rows[0])
-        return rows[0], ability_source
-    if not rows:
-        ability_id = FACTION_ARMY_RULE_ABILITY_IDS_BY_FACTION_ID.get(faction_id)
-        if ability_id is None:
-            raise WahapediaBridgeError("Datasheet has no faction ability fallback.")
+        return rows[0], _ability_source_row(context=context, ability_row=rows[0])
+    if not rows and primary_ability_id is not None:
         return None, _ability_source_row_by_id_and_faction(
-            context=context,
-            ability_id=ability_id,
-            faction_id=faction_id,
+            context=context, ability_id=primary_ability_id, faction_id=faction_id
         )
-    if len(rows) != 1:
-        raise WahapediaBridgeError("Datasheet must link exactly one faction ability.")
-    raise WahapediaBridgeError("Datasheet faction ability lookup failed.")
+    if len(rows) > 1 and primary_ability_id is not None:
+        primary_rows = tuple(
+            row for row in rows if _required_field(row, "ability_id") == primary_ability_id
+        )
+        if len(primary_rows) != 1:
+            raise WahapediaBridgeError("Datasheet primary faction ability linkage is invalid.")
+        return primary_rows[0], _ability_source_row(context=context, ability_row=primary_rows[0])
+    if not rows:
+        raise WahapediaBridgeError("Datasheet has no faction ability fallback.")
+    raise WahapediaBridgeError("Datasheet must link exactly one faction ability.")
 
 
 def _ability_source_row(

@@ -51,6 +51,9 @@ from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.catalog_runtime_hooks import (
     CATALOG_IR_SHOOTING_PHASE_START_HOOK_ID,
 )
+from warhammer40k_core.engine.faction_content.datasheet_faction_access import (
+    default_datasheet_faction_access_registry,
+)
 from warhammer40k_core.engine.generic_target_restriction_effects import (
     GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_HOOK_ID,
 )
@@ -148,6 +151,7 @@ _ENGINE_GLOBAL_RUNTIME_CONSUMER_IDS: Final = frozenset(
         SPACE_MARINE_CHAPTERS_SOURCE_ID,
         SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
         WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,
+        *default_datasheet_faction_access_registry().runtime_consumer_ids,
     }
 )
 

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_frequency import optional_ability_frequency_condition
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleEffectSpec,
     RuleTargetKind,
     RuleTriggerKind,
     parameter_payload,
@@ -21,9 +24,57 @@ def clause_has_unconsumed_once_per_battle_activation(clause: RuleClause) -> bool
 
 
 def clause_is_runtime_once_per_battle_activation(clause: RuleClause) -> bool:
-    return clause_is_fight_start_once_per_battle_activation(
-        clause
-    ) or clause_is_any_phase_start_once_per_battle_activation(clause)
+    return (
+        clause_is_fight_start_once_per_battle_activation(clause)
+        or clause_is_any_phase_start_once_per_battle_activation(clause)
+        or clause_is_pre_normal_move_once_per_battle_activation(clause)
+    )
+
+
+def clause_is_runtime_once_per_battle_with_default_execution_consumers(
+    clause: RuleClause,
+    *,
+    consumer_ids_for_effect: Callable[[RuleEffectSpec], tuple[str, ...]],
+) -> bool:
+    if not clause_is_runtime_once_per_battle_activation(clause):
+        return False
+    from warhammer40k_core.engine.rule_execution import default_rule_execution_registry
+
+    registry = default_rule_execution_registry()
+    return all(
+        consumer_ids_for_effect(effect)
+        and registry.binding_for_effect(clause=clause, effect=effect) is not None
+        for effect in clause.effects
+    )
+
+
+def clause_is_pre_normal_move_once_per_battle_activation(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog once-per-battle classification requires RuleClause.")
+    condition = optional_ability_frequency_condition(clause)
+    if (
+        not clause.is_supported
+        or not clause.effects
+        or condition is None
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.UNIT_SELECTED
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+    ):
+        return False
+    trigger = parameter_payload(clause.trigger.parameters)
+    return (
+        trigger
+        == {
+            "action": "normal_move",
+            "owner": "active_player",
+            "optional": True,
+            "phase": "movement",
+            "subject": "this_model",
+            "timing_window": "before_normal_move",
+        }
+        and parameter_payload(condition.parameters).get("usage_subject") == "this_model"
+    )
 
 
 def clause_is_any_phase_start_once_per_battle_activation(clause: RuleClause) -> bool:

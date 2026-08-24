@@ -216,7 +216,7 @@ def _persisting_enhancement_effect(
         source_rule_id=source_rule_id,
         owner_player_id=context.army.player_id,
         target_unit_instance_ids=(context.target_unit.unit_instance_id,),
-        started_battle_round=context.state.battle_round,
+        started_battle_round=context.persisting_effect_started_battle_round,
         started_phase=None,
         expiration=EffectExpiration.end_of_battle(),
         effect_payload={

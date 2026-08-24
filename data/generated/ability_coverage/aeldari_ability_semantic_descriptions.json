@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "665ee3d943f8217a6fd246a022fd7226de858720bfd2845a6c5a6473050f0602",
-  "description_text_sha256": "d59b60413f1f1f3ff2a20f3c67f9c0b1edb517a94649bcffb1b529ce9fa8e072",
+  "coverage_sha256": "c1cc85945a239f2ac648620a01a8c5a03817aada251605824e295d0427218c32",
+  "description_text_sha256": "5c01df8837c316ce75d116cdc53ede06e550591e844d73bfa2f906119b0c577b",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -2900,22 +2900,34 @@
     {
       "ability_id": "000002538:blitz",
       "ability_name": "Blitz",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000002538",
       "datasheet_name": "Solitaire",
-      "description": "A once-per-battle pre-move 2D6-inch Move and +3 Attacks modifier through turn end are still needed.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "edcdc17264dcc48edf80184e7922c6cfabe7940258a4816f20931a8f943039b8",
+      "description": "The once-per-battle pre-move 2D6-inch Move and +3 Solitaire weapons Attacks modifiers through turn end are consumed by the movement-action and frequency runtime paths.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "2059e63f9e7b9434e8b31975f271dd5e3a40088d89e62379c87b2a3ecab83233",
       "normalized_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
       "raw_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-action-grant",
+        "catalog-ir:once-per-battle-ability"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
-          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:6:description:clause:002:effect:0",
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant",
+            "catalog-ir:once-per-battle-ability"
+          ],
+          "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:6:clause:001:effect:0",
+          "semantic_kind": "modify_move_distance"
+        },
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant",
+            "catalog-ir:once-per-battle-ability"
+          ],
+          "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:6:clause:001:effect:1",
           "semantic_kind": "modify_characteristic"
         }
       ],
@@ -2924,7 +2936,7 @@
       ],
       "source_kind": "datasheet",
       "source_row_id": "000002538:6",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000002538:blur-of-movement",
@@ -2932,17 +2944,21 @@
       "catalog_support": "generic_rule_ir",
       "datasheet_id": "000002538",
       "datasheet_name": "Solitaire",
-      "description": "Charge-after-Advance eligibility is parsed; the movement/charge query host is still needed.",
+      "description": "Charge-after-Advance eligibility is consumed by the advance-eligibility runtime.",
       "diagnostic_reasons": [],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "3eee351c8fcde9dad07c3f56e68326bb608b06d7873e68314e40c70b7183bbe6",
+      "documentation_bucket": "supported",
+      "evidence_sha256": "1e6b26e5c02ca7609e4dc770b06b8d720ec834bf2ca149c40b7024411e48022d",
       "normalized_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
       "raw_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:can-advance-and-charge"
+      ],
       "semantic_consumers": [
         {
-          "runtime_consumer_ids": [],
-          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:7:description:clause:001:effect:0",
+          "runtime_consumer_ids": [
+            "catalog-ir:can-advance-and-charge"
+          ],
+          "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:7:clause:001:effect:0",
           "semantic_kind": "grant_ability"
         }
       ],
@@ -2951,7 +2967,7 @@
       ],
       "source_kind": "datasheet",
       "source_row_id": "000002538:7",
-      "support_stage": "generic_ir_executable"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000002538:path-of-damnation",
@@ -2987,25 +3003,33 @@
     {
       "ability_id": "000002538:flip-belt",
       "ability_name": "Flip Belt",
-      "catalog_support": "unsupported",
+      "catalog_support": "generic_rule_ir",
       "datasheet_id": "000002538",
       "datasheet_name": "Solitaire",
-      "description": "Vertical-distance-free bearer movement with PathWitness validation is still needed.",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "documentation_bucket": "still_needed",
-      "evidence_sha256": "2794c8658d0e6d0c4f64e9eec86c5f739ccd1d4a34dff632be82b72a69eafafc",
+      "description": "Vertical-distance-free bearer movement for Normal, Advance, Fall Back and Charge moves is consumed by the movement-transit permission runtime.",
+      "diagnostic_reasons": [],
+      "documentation_bucket": "supported",
+      "evidence_sha256": "cec11b3a9799aae1ed8b4d8576f327b2d637839ee06be79765bfb391693d5b94",
       "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
       "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
-      "runtime_consumer_ids": [],
-      "semantic_consumers": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:movement-transit-permission"
+      ],
+      "semantic_consumers": [
+        {
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-transit-permission"
+          ],
+          "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:9:clause:001:effect:0",
+          "semantic_kind": "movement_transit_permission"
+        }
+      ],
       "source_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:9"
       ],
       "source_kind": "wargear",
       "source_row_id": "000002538:9",
-      "support_stage": "ir_compiled_unsupported"
+      "support_stage": "engine_consumed"
     },
     {
       "ability_id": "000002539:acrobatic-grace",

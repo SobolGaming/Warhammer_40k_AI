@@ -19,6 +19,7 @@ from warhammer40k_core.engine.catalog_descriptor_consumption import (
     catalog_descriptor_consumption_for,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
     catalog_rule_ir_clause_wide_consumer_ids,
     catalog_rule_ir_consumer_ids_for_effect,
     catalog_rule_ir_consumers_for_clause,
@@ -939,8 +940,6 @@ def _effect_runtime_consumer_ids(
     """Partition trigger- and condition-aware clause consumers by represented effect."""
     if not clause.effects:
         return ()
-    if len(clause.effects) == 1:
-        return (tuple(sorted(runtime_consumer_ids)),)
     consumers = frozenset(runtime_consumer_ids)
     clause_wide_consumers = consumers.intersection(
         {
@@ -948,6 +947,14 @@ def _effect_runtime_consumer_ids(
             *_CONTEXTUAL_CLAUSE_WIDE_CONSUMER_IDS,
         }
     )
+    if len(clause.effects) == 1:
+        single_effect_consumers = consumers
+        if (
+            CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID in consumers
+            and CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID not in clause_wide_consumers
+        ):
+            single_effect_consumers = consumers - {CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID}
+        return (tuple(sorted(single_effect_consumers)),)
     return tuple(
         tuple(
             sorted(
@@ -1200,6 +1207,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
     "faction.army_rule.templar_vows": "Black Templars Army Rule",
     "faction.army_rule.dark_pacts": "Chaos Space Marines Army Rule",
     "faction.army_rule.corsairs_and_travelling_players": "Drukhari Army Rule",
+    "faction.army_rule.disparate_paths": "Aeldari Army Rule",
     "faction.army_rule.power_from_pain": "Drukhari Army Rule",
     "faction.army_rule.thrill_seekers": "Emperor's Children Army Rule",
     "faction.army_rule.nurgles_gift": "Death Guard Army Rule",

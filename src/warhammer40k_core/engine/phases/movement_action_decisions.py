@@ -8,6 +8,10 @@ from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
 from warhammer40k_core.engine.modifier_ignore import record_modifier_ignore_selection
+from warhammer40k_core.core.dice import RandomCharacteristicTiming
+from warhammer40k_core.engine.rule_frequency import (
+    consume_optional_ability_frequency_usage,
+)
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
@@ -386,6 +390,7 @@ def _request_advance_move_grant_decision_if_available(
             movement_phase_action=pending_action.movement_phase_action.value,
             movement_request_id=pending_action.request_id,
             movement_result_id=pending_action.result_id,
+            event_log=decisions.event_log,
         )
     )
     if not grants:
@@ -616,6 +621,7 @@ def _apply_advance_move_grant_decision(
     for selected_grant in selected_grants:
         _assert_advance_move_grant_still_available(
             state=state,
+            decisions=decisions,
             pending_action=pending_action,
             selected_grant=selected_grant,
             registry=advance_move_hooks,
@@ -677,6 +683,7 @@ def _apply_advance_move_grant_decision(
 def _assert_advance_move_grant_still_available(
     *,
     state: GameState,
+    decisions: DecisionController,
     pending_action: PendingMovementActionSelection,
     selected_grant: AdvanceMoveGrant,
     registry: AdvanceMoveHookRegistry,
@@ -690,6 +697,7 @@ def _assert_advance_move_grant_still_available(
             movement_phase_action=pending_action.movement_phase_action.value,
             movement_request_id=pending_action.request_id,
             movement_result_id=pending_action.result_id,
+            event_log=decisions.event_log,
         )
     )
     for current_grant in current_grants:
@@ -711,6 +719,15 @@ def _record_movement_action_grant_effects(
     source_request_id = _validate_identifier("source_request_id", source_request_id)
     source_result_id = _validate_identifier("source_result_id", source_result_id)
     effects: list[PersistingEffect] = []
+    if grant.rule_frequency_usage is not None:
+        consume_optional_ability_frequency_usage(
+            usage=grant.rule_frequency_usage,
+            event_log=decisions.event_log,
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.MOVEMENT,
+            active_player_id=state.active_player_id,
+            timing_window_id="before_normal_move",
+        )
     if grant.decision_effect_payload is not None:
         resource_spend_result = apply_faction_resource_spend_effect(
             state=state,
@@ -739,13 +756,22 @@ def _record_movement_action_grant_effects(
         )
         effects.append(spend_effect)
     if grant.unit_effect_payload is not None:
+        unit_effect_payload = _resolved_movement_action_grant_unit_effect_payload(
+            state=state,
+            decisions=decisions,
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            source_request_id=source_request_id,
+            source_result_id=source_result_id,
+            grant=grant,
+        )
         unit_effect = PersistingEffect(
             effect_id=f"{grant.hook_id}:{source_request_id}:{source_result_id}:unit",
             source_rule_id=grant.source_id,
             owner_player_id=player_id,
             target_unit_instance_ids=_movement_action_grant_unit_effect_target_ids(
                 unit_instance_id=unit_instance_id,
-                effect_payload=grant.unit_effect_payload,
+                effect_payload=unit_effect_payload,
             ),
             started_battle_round=state.battle_round,
             started_phase=BattlePhaseKind.MOVEMENT,
@@ -754,11 +780,49 @@ def _record_movement_action_grant_effects(
                 player_id=player_id,
                 expiration=grant.unit_effect_expiration,
             ),
-            effect_payload=grant.unit_effect_payload,
+            effect_payload=unit_effect_payload,
         )
         state.record_persisting_effect(unit_effect)
         effects.append(unit_effect)
     return tuple(effects)
+
+
+def _resolved_movement_action_grant_unit_effect_payload(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    player_id: str,
+    unit_instance_id: str,
+    source_request_id: str,
+    source_result_id: str,
+    grant: AdvanceMoveGrant,
+) -> JsonValue:
+    payload = grant.unit_effect_payload
+    expression = grant.movement_bonus_dice_expression
+    if expression is None:
+        return payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Random movement bonus requires an object unit effect payload.")
+    scope_id = (
+        f"{unit_instance_id}:{grant.hook_id}:{source_request_id}:{source_result_id}:movement-bonus"
+    )
+    roll = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_random_characteristic(
+        characteristic=Characteristic.MOVEMENT,
+        timing=RandomCharacteristicTiming.UNIT_WHEN_SELECTED_TO_MOVE,
+        scope_id=scope_id,
+        expression=expression,
+        reason=f"{grant.label} movement bonus",
+        actor_id=player_id,
+    )
+    if "movement_bonus_inches" in payload or "movement_bonus_roll" in payload:
+        raise GameLifecycleError("Random movement bonus payload is already resolved.")
+    return validate_json_value(
+        {
+            **payload,
+            "movement_bonus_inches": roll.value,
+            "movement_bonus_roll": roll.to_payload(),
+        }
+    )
 
 
 def _movement_action_grant_unit_effect_target_ids(
