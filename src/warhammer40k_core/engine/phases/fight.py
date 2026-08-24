@@ -3429,6 +3429,7 @@ def _request_counteroffensive_if_available(
             index=handler.stratagem_index,
             context=context,
             handler_id=CORE_COUNTEROFFENSIVE_HANDLER_ID,
+            stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
         )
         if proposal is None:
             continue
@@ -3578,6 +3579,7 @@ def _request_epic_challenge_if_available(
         index=handler.stratagem_index,
         context=context,
         handler_id=CORE_EPIC_CHALLENGE_HANDLER_ID,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
     )
     if proposal is None:
         return None
@@ -3586,6 +3588,7 @@ def _request_epic_challenge_if_available(
         decisions=decisions,
         proposal_request=proposal,
         allow_decline=True,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
     )
 
 

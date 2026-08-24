@@ -32,6 +32,7 @@ if TYPE_CHECKING or __package__:
         generate_aeldari_yriel_vypers_starfangs_rule_ir as aeldari_yriel_vypers_starfangs,
     )
     from tools import generate_chaos_daemons_datasheet_rule_ir as chaos_daemons
+    from tools import generate_chaos_maulerfiend_variants_rule_ir as chaos_maulerfiends
     from tools import generate_emperors_children_fulgrim_rule_ir as emperors_children_fulgrim
     from tools import (
         generate_emperors_children_infractors_tormentors_rule_ir as emperors_children_battleline,
@@ -62,6 +63,7 @@ else:
     import generate_aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_rule_ir as aeldari_four
     import generate_aeldari_yriel_vypers_starfangs_rule_ir as aeldari_yriel_vypers_starfangs
     import generate_chaos_daemons_datasheet_rule_ir as chaos_daemons
+    import generate_chaos_maulerfiend_variants_rule_ir as chaos_maulerfiends
     import generate_emperors_children_fulgrim_rule_ir as emperors_children_fulgrim
     import generate_emperors_children_infractors_tormentors_rule_ir as emperors_children_battleline
     import generate_emperors_children_lucius_rule_ir as emperors_children_lucius
@@ -105,7 +107,10 @@ SHARD_ARTIFACT_DIRECTORY = (
 PACKAGE_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY.parent / "package.json"
 AELDARI_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY / "aeldari.json"
 CHAOS_DAEMONS_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY / "chaos-daemons.json"
+CHAOS_SPACE_MARINES_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY / "chaos-space-marines.json"
 EMPERORS_CHILDREN_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY / "emperors-children.json"
+THOUSAND_SONS_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY / "thousand-sons.json"
+WORLD_EATERS_OUTPUT_PATH = SHARD_ARTIFACT_DIRECTORY / "world-eaters.json"
 
 AELDARI_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     aeldari_aspect_warriors.generated_artifact_payload,
@@ -129,22 +134,39 @@ EMPERORS_CHILDREN_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
 CHAOS_DAEMONS_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     chaos_daemons.generated_artifact_payload,
 )
+CHAOS_SPACE_MARINES_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
+    chaos_maulerfiends.generated_chaos_space_marines_artifact_payload,
+)
+THOUSAND_SONS_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
+    chaos_maulerfiends.generated_thousand_sons_artifact_payload,
+)
+WORLD_EATERS_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
+    chaos_maulerfiends.generated_world_eaters_artifact_payload,
+)
 
 _OUTPUT_PATH_BY_SHARD_ID = {
     "aeldari": AELDARI_OUTPUT_PATH,
     "chaos-daemons": CHAOS_DAEMONS_OUTPUT_PATH,
+    "chaos-space-marines": CHAOS_SPACE_MARINES_OUTPUT_PATH,
     "emperors-children": EMPERORS_CHILDREN_OUTPUT_PATH,
+    "thousand-sons": THOUSAND_SONS_OUTPUT_PATH,
+    "world-eaters": WORLD_EATERS_OUTPUT_PATH,
 }
 _SOURCE_PACKAGE_FACTORIES_BY_SHARD_ID = {
     "aeldari": AELDARI_SOURCE_PACKAGE_FACTORIES,
     "chaos-daemons": CHAOS_DAEMONS_SOURCE_PACKAGE_FACTORIES,
+    "chaos-space-marines": CHAOS_SPACE_MARINES_SOURCE_PACKAGE_FACTORIES,
     "emperors-children": EMPERORS_CHILDREN_SOURCE_PACKAGE_FACTORIES,
+    "thousand-sons": THOUSAND_SONS_SOURCE_PACKAGE_FACTORIES,
+    "world-eaters": WORLD_EATERS_SOURCE_PACKAGE_FACTORIES,
 }
 _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "AE": "aeldari",
     "CD": "chaos-daemons",
+    "CSM": "chaos-space-marines",
     "EC": "emperors-children",
     "TS": "thousand-sons",
+    "WE": "world-eaters",
 }
 
 PACKAGE_ARTIFACT_SCHEMA = "core-v2-faction-pack-rule-ir-package-v1"

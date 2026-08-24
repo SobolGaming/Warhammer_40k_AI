@@ -9,11 +9,29 @@ from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixtu
 from tests.support.selected_target_charge_fixtures import (
     selected_target_charge_persisting_effect,
 )
+from tools.generate_ability_support_matrix import (
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
+from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
+)
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
@@ -21,6 +39,23 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     ModelPlacement,
     UnitPlacement,
+)
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_conditional_charge_runtime import (
+    catalog_conditional_charge_declaration_hook_bindings,
+    stratagem_records_with_source_backed_phase_use_exceptions,
+)
+from warhammer40k_core.engine.catalog_conditional_charge_support import (
+    CATALOG_IR_FRIENDLY_ENGAGED_ANCHOR_CHARGE_CONSUMER_ID,
+    CATALOG_IR_STRATAGEM_PHASE_USE_EXCEPTION_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_conditional_charge_support import (
+    consumer_ids_for_clause as conditional_charge_consumer_ids_for_clause,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_ir_consumers_for_clause,
 )
 from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     selected_target_charge_constraint_for_unit,
@@ -47,9 +82,12 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -91,6 +129,9 @@ from warhammer40k_core.engine.phases.charge import (
     legal_charge_target_unit_instance_ids,
     resolve_charge_move,
 )
+from warhammer40k_core.engine.phases.charge_reactions import (
+    request_end_opponent_charge_heroic_intervention_if_available,
+)
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
@@ -101,10 +142,34 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     reposition_destruction_policy,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+from warhammer40k_core.engine.runtime_modifiers import (
+    ChargeRollModifierBinding,
+    ChargeRollModifierContext,
+    RuntimeModifierRegistry,
+)
+from warhammer40k_core.engine.stratagem_catalog import (
+    eleventh_edition_core_stratagem_catalog_records,
+)
+from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
+    stratagem_phase_use_exception,
+)
+from warhammer40k_core.engine.stratagems import (
+    HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
+    HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND,
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+    StratagemTargetProposal,
+    StratagemTargetProposalPayload,
+    StratagemUseRecord,
+    stratagem_decline_payload,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_coherency import MovementRollbackRecord, UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
@@ -121,10 +186,592 @@ from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleCondition,
+    RuleConditionKind,
+    RuleDuration,
+    RuleDurationKind,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleTargetKind,
+    RuleTargetSpec,
+    RuleTrigger,
+    RuleTriggerKind,
+    parameters_from_pairs,
+)
 
 _ATTACHED_CHARGE_TARGET_ID = "attached-unit:army-beta:marked-bodyguard"
 _END_PHASE_CHARGE_GRANT_ID = "phase15a:test-charge-grant:end-phase"
 _END_TURN_CHARGE_GRANT_ID = "phase15a:test-charge-grant:end-turn"
+
+
+def test_source_backed_conditional_charge_rule_ir_classifies_and_overlays_heroic() -> None:
+    record, clauses = _conditional_charge_ability_record()
+
+    assert conditional_charge_consumer_ids_for_clause(clauses[0]) == (
+        CATALOG_IR_STRATAGEM_PHASE_USE_EXCEPTION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_consumers_for_clause(clauses[0]) == (
+        CATALOG_IR_STRATAGEM_PHASE_USE_EXCEPTION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_consumers_for_clause(clauses[1]) == (
+        CATALOG_IR_STRATAGEM_COST_MODIFIER_CONSUMER_ID,
+    )
+    assert conditional_charge_consumer_ids_for_clause(clauses[2]) == (
+        CATALOG_IR_FRIENDLY_ENGAGED_ANCHOR_CHARGE_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_consumers_for_clause(clauses[2]) == (
+        CATALOG_IR_FRIENDLY_ENGAGED_ANCHOR_CHARGE_CONSUMER_ID,
+    )
+
+    base_records = eleventh_edition_core_stratagem_catalog_records()
+    base_heroic = next(
+        item for item in base_records if item.definition.stratagem_id == "heroic-intervention"
+    )
+    overlaid = stratagem_records_with_source_backed_phase_use_exceptions(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records((record,)),
+        },
+        stratagem_records=(),
+    )
+    assert tuple(item.definition.stratagem_id for item in overlaid) == ("heroic-intervention",)
+    heroic = next(
+        item for item in overlaid if item.definition.stratagem_id == "heroic-intervention"
+    )
+    exception = stratagem_phase_use_exception(heroic.definition)
+
+    assert exception is not None
+    assert exception.source_ability_id == record.definition.ability_id
+    assert exception.source_id == record.definition.source_id
+    assert exception.eligible_datasheet_ids == ("core-intercessor-like-infantry",)
+    assert exception.frequency_scope == "phase_per_unit"
+    assert exception.bypass_same_stratagem_per_phase is True
+    assert exception.does_not_block_other_units is True
+    assert isinstance(base_heroic.definition.effect_payload, dict)
+    assert isinstance(heroic.definition.effect_payload, dict)
+    assert (
+        heroic.definition.effect_payload["modes"] == base_heroic.definition.effect_payload["modes"]
+    )
+
+
+def test_source_backed_conditional_charge_selects_pair_and_round_trips_required_target() -> None:
+    lifecycle, units = _conditional_charge_lifecycle(
+        game_id="phase15a-source-backed-conditional-charge"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["charger"].unit_instance_id,
+            result_id="phase15a-source-backed-conditional-charge-select",
+        )
+    )
+    pair_options = _conditional_charge_pair_options(grant_request)
+
+    assert grant_request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE
+    assert tuple(sorted(pair_options)) == (
+        units["enemy-1"].unit_instance_id,
+        units["enemy-2"].unit_instance_id,
+    )
+    assert {
+        cast(str, replay_payload["anchor_unit_instance_id"])
+        for replay_payload in pair_options.values()
+    } == {
+        units["psyker-anchor-1"].unit_instance_id,
+        units["psyker-anchor-2"].unit_instance_id,
+    }
+    selected_enemy_id = units["enemy-1"].unit_instance_id
+    selected_option_id = cast(str, pair_options[selected_enemy_id]["hook_id"])
+    reroll_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=grant_request,
+            option_id=selected_option_id,
+            result_id="phase15a-source-backed-conditional-charge-grant",
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    effect = _state(lifecycle).persisting_effects_for_unit(units["charger"].unit_instance_id)[0]
+    assert isinstance(effect.effect_payload, dict)
+    permission_payload = cast(dict[str, object], effect.effect_payload["permission"])
+    assert permission_payload["component_selection_policy"] == (
+        RerollComponentSelectionPolicy.WHOLE_ROLL.value
+    )
+    source_payload = cast(dict[str, object], effect.effect_payload["source_payload"])
+    assert source_payload[CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY] == [selected_enemy_id]
+
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(lifecycle_payload)
+    assert restored.to_payload() == lifecycle_payload
+    restored_reroll_request = _decision_request(restored.advance_until_decision_or_terminal())
+    proposal_request = _decision_request(
+        _submit_option(
+            restored,
+            request=restored_reroll_request,
+            option_id="decline",
+            result_id="phase15a-source-backed-conditional-charge-decline-reroll",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    proposal_context = cast(dict[str, object], proposal.context)
+    assert proposal_context[CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY] == [
+        selected_enemy_id
+    ]
+
+    invalid = _submit_charge_move_proposal(
+        restored,
+        request=proposal_request,
+        result_id="phase15a-source-backed-conditional-charge-wrong-target",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=proposal.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(),
+            witness=None,
+        ),
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_validation_violation(invalid)["violation_code"] == (
+        "charge_required_target_not_selected"
+    )
+    assert "<" not in json.dumps(lifecycle_payload, sort_keys=True)
+
+
+def test_generated_thousand_sons_maulerfiend_charge_reroll_loads_through_bundle() -> None:
+    lifecycle, units = _generated_snarling_protector_charge_lifecycle(
+        game_id="phase15a-generated-thousand-sons-maulerfiend-charge-reroll"
+    )
+    maulerfiend = units["maulerfiend"]
+    assert maulerfiend.datasheet_id == "000001029"
+    assert len(maulerfiend.own_models) == 1
+
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=maulerfiend.unit_instance_id,
+            result_id="phase15a-generated-thousand-sons-maulerfiend-selected",
+        )
+    )
+    pair_options = _conditional_charge_pair_options(grant_request)
+    enemy_id = units["enemy"].unit_instance_id
+    source_payload = pair_options[enemy_id]
+
+    assert grant_request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE
+    assert source_payload["ability_id"] == "000001029:snarling-protector"
+    assert source_payload["source_rule_id"] == (
+        "data-package:core-v2:wahapedia-" + "1" + "0" + "e-bridge:phase17k-generated:"
+        "Datasheets_abilities:000001029:2"
+    )
+    assert source_payload["clause_id"] == (
+        "phase17k:thousand-sons:maulerfiend:datasheet:000001029:2:clause:003"
+    )
+    assert source_payload["source_component_unit_instance_id"] == maulerfiend.unit_instance_id
+    assert source_payload["anchor_unit_instance_id"] == units["psyker-anchor"].unit_instance_id
+    assert source_payload[CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY] == [enemy_id]
+
+    reroll_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=grant_request,
+            option_id=cast(str, source_payload["hook_id"]),
+            result_id="phase15a-generated-thousand-sons-maulerfiend-grant-selected",
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+
+
+def test_end_charge_heroic_ordinary_opportunity_is_independent_of_snarling_state() -> None:
+    without_source, without_source_units = _end_charge_heroic_session(
+        game_id="phase15a-ordinary-heroic-without-snarling",
+        maulerfiend_selection_ids=(),
+        ordinary_selection_ids=("ordinary",),
+        command_points=1,
+    )
+    with_source, with_source_units = _end_charge_heroic_session(
+        game_id="phase15a-ordinary-heroic-with-snarling",
+        maulerfiend_selection_ids=("maulerfiend",),
+        ordinary_selection_ids=("ordinary",),
+        command_points=1,
+    )
+    cases: list[tuple[str, LocalGameSession, dict[str, UnitInstance]]] = [
+        ("absent", without_source, without_source_units),
+        ("eligible", with_source.fork(), with_source_units),
+        ("engaged", with_source.fork(), with_source_units),
+        ("out_of_range", with_source.fork(), with_source_units),
+        ("unplaced", with_source.fork(), with_source_units),
+        ("destroyed", with_source.fork(), with_source_units),
+    ]
+    opportunity_signatures: list[tuple[str, str, str | None]] = []
+
+    for source_state, session, units in cases:
+        state = _state(session.lifecycle)
+        source = units.get("maulerfiend")
+        if source is not None:
+            _set_snarling_source_state_for_heroic_test(
+                state=state,
+                unit=source,
+                source_state=source_state,
+            )
+        request = _decision_request(session.advance_until_decision_or_terminal())
+        proposal = _heroic_proposal_from_request(request)
+        opportunity_signatures.append(
+            (
+                request.decision_type,
+                proposal.stratagem_id,
+                proposal.context.timing_window_id,
+            )
+        )
+
+        assert request.actor_id == "player-a"
+        assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+        if source is not None and source_state not in {"eligible"}:
+            invalid_result_id = f"phase15a-{source_state}-snarling-target-invalid"
+            invalid = _submit_end_charge_heroic_target(
+                session,
+                request=request,
+                target_unit_instance_id=source.unit_instance_id,
+                result_id=invalid_result_id,
+            )
+            assert invalid.status_kind is LifecycleStatusKind.INVALID
+            assert session.lifecycle.pending_decision_request() == request
+            assert all(use.result_id != invalid_result_id for use in state.stratagem_use_records)
+
+        ordinary_result_id = f"phase15a-{source_state}-ordinary-heroic-selected"
+        movement_status = _submit_end_charge_heroic_target(
+            session,
+            request=request,
+            target_unit_instance_id=units["ordinary"].unit_instance_id,
+            result_id=ordinary_result_id,
+        )
+        ordinary_use = _stratagem_use_for_result_id(
+            state,
+            result_id=ordinary_result_id,
+        )
+
+        assert _decision_request(movement_status).decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+        assert ordinary_use.command_point_cost == 1
+        assert ordinary_use.command_point_modifier_ids == ()
+        assert state.command_point_total("player-a") == 0
+
+    assert len(set(opportunity_signatures)) == 1
+
+
+@pytest.mark.parametrize("enemy_context", ["unplaced", "out_of_range"])
+@pytest.mark.parametrize("command_points", [1, 2])
+def test_end_charge_heroic_reaction_requires_concrete_legal_affordable_target(
+    enemy_context: str,
+    command_points: int,
+) -> None:
+    lifecycle, units = _generated_snarling_protector_charge_lifecycle(
+        game_id=(f"phase15a-snarling-protector-no-legal-target-{enemy_context}-{command_points}-cp")
+    )
+    state = _state(lifecycle)
+    state.active_player_id = "player-b"
+    state.gain_command_points(
+        player_id="player-a",
+        amount=command_points,
+        source_id=(f"phase15a:snarling-protector:{enemy_context}:{command_points}-cp"),
+        source_kind=CommandPointSourceKind.OTHER,
+    )
+    assert state.battlefield_state is not None
+    if enemy_context == "unplaced":
+        state.battlefield_state = state.battlefield_state.without_unit_placement(
+            units["enemy"].unit_instance_id
+        )
+    else:
+        state.replace_battlefield_state(
+            state.battlefield_state.with_unit_placement(
+                _unit_placement_at(
+                    units["enemy"],
+                    army_id="army-beta",
+                    player_id="player-b",
+                    poses=_compact_test_unit_poses(
+                        origin=Pose.at(70.0, 70.0),
+                        model_count=len(units["enemy"].own_models),
+                    ),
+                )
+            )
+        )
+    bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
+    assert isinstance(bundle, RuntimeContentBundle)
+
+    status = request_end_opponent_charge_heroic_intervention_if_available(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_queue=lifecycle.reaction_queue,
+        stratagem_index=bundle.stratagem_indexes_by_player_id["player-a"],
+        stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
+    )
+
+    assert status is None
+    assert lifecycle.reaction_queue.frames == ()
+    assert lifecycle.decision_controller.queue.pending_requests == ()
+
+
+def test_generated_snarling_protector_heroic_uses_charge_adapter_and_replay_path() -> None:
+    session, units = _end_charge_heroic_session(
+        game_id="phase15a-generated-snarling-protector-heroic",
+        maulerfiend_selection_ids=("maulerfiend",),
+        ordinary_selection_ids=("ordinary",),
+        command_points=1,
+    )
+    lifecycle = session.lifecycle
+    state = _state(lifecycle)
+    maulerfiend = units["maulerfiend"]
+    ordinary = units["ordinary"]
+    assert maulerfiend.datasheet_id == "000001029"
+    assert state.command_point_total("player-a") == 1
+    bundle = object.__getattribute__(lifecycle, "_runtime_content_bundle")
+    assert isinstance(bundle, RuntimeContentBundle)
+    heroic = next(
+        record
+        for record in bundle.stratagem_indexes_by_player_id["player-a"].all_records()
+        if record.definition.stratagem_id == "heroic-intervention"
+    )
+    exception = stratagem_phase_use_exception(heroic.definition)
+    assert exception is not None
+    assert exception.eligible_datasheet_ids == ("000001029",)
+    request = _decision_request(session.advance_until_decision_or_terminal())
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    proposal = StratagemTargetProposal.from_payload(
+        cast(StratagemTargetProposalPayload, request_payload["proposal_request"])
+    )
+    reaction_window = cast(dict[str, JsonValue], request_payload["reaction_window"])
+    parent = cast(dict[str, JsonValue], request_payload["parent"])
+
+    assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert request_payload["declinable"] is True
+    assert proposal.stratagem_id == "heroic-intervention"
+    assert proposal.context.timing_window_id == (
+        "heroic-intervention-end-charge-round-01-active-player-b-player-player-a"
+    )
+    timing_window = cast(dict[str, JsonValue], reaction_window["timing_window"])
+    assert timing_window["window_id"] == proposal.context.timing_window_id
+    assert parent["step"] == "charge_phase_end_reactions"
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(checkpoint)
+    assert restored.lifecycle.to_payload() == session.lifecycle.to_payload()
+    assert restored.lifecycle.pending_decision_request() == request
+    assert "<" not in json.dumps(checkpoint, sort_keys=True)
+
+    decline_session = restored.fork()
+    decline_request = decline_session.lifecycle.pending_decision_request()
+    assert decline_request is not None
+    assert decline_request == request
+    declined = decline_session.submit_parameterized_payload(
+        request_id=decline_request.request_id,
+        payload=stratagem_decline_payload(),
+        result_id="phase15a-generated-snarling-protector-heroic-declined",
+    )
+    declined_state = _state(decline_session.lifecycle)
+    assert declined.status_kind is not LifecycleStatusKind.INVALID
+    assert declined_state.current_battle_phase is BattlePhase.FIGHT
+    assert decline_session.lifecycle.reaction_queue.frames == ()
+    assert len(_event_payloads(decline_session.lifecycle, "stratagem_window_declined")) == 1
+    assert all(
+        pending.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+        for pending in decline_session.lifecycle.decision_controller.queue.pending_requests
+    )
+
+    targets = {
+        "ordinary": ordinary.unit_instance_id,
+        "snarling": maulerfiend.unit_instance_id,
+    }
+    expected_costs = {"ordinary": 1, "snarling": 0}
+    for order in (("ordinary", "snarling"), ("snarling", "ordinary")):
+        branch = restored.fork()
+        first_kind, second_kind = order
+        first_result_id = f"phase15a-generated-heroic-{first_kind}-first"
+        first_movement = _submit_end_charge_heroic_target(
+            branch,
+            request=_require_pending_request(branch),
+            target_unit_instance_id=targets[first_kind],
+            result_id=first_result_id,
+        )
+        first_movement_request = _decision_request(first_movement)
+        first_use = _stratagem_use_for_result_id(
+            _state(branch.lifecycle),
+            result_id=first_result_id,
+        )
+        assert first_use.request_id == request.request_id
+        assert first_use.command_point_cost == expected_costs[first_kind]
+        assert first_use.command_point_modifier_source_ids == (
+            () if first_kind == "ordinary" else (exception.source_id,)
+        )
+        if first_kind == "ordinary":
+            branch = LocalGameSession.from_persistence_payload(branch.to_persistence_payload())
+            assert (
+                _stratagem_use_for_result_id(
+                    _state(branch.lifecycle),
+                    result_id=first_result_id,
+                )
+                == first_use
+            )
+            assert _require_pending_request(branch) == first_movement_request
+            first_movement_request = _require_pending_request(branch)
+        second_window_status = _submit_heroic_intervention_no_move(
+            branch,
+            movement_request=first_movement_request,
+            result_id=f"phase15a-generated-heroic-{first_kind}-first-no-move",
+        )
+        second_request = _decision_request(second_window_status)
+        second_proposal = _heroic_proposal_from_request(second_request)
+        assert second_proposal.context.timing_window_id == proposal.context.timing_window_id
+
+        second_result_id = f"phase15a-generated-heroic-{second_kind}-second"
+        second_movement = _submit_end_charge_heroic_target(
+            branch,
+            request=second_request,
+            target_unit_instance_id=targets[second_kind],
+            result_id=second_result_id,
+        )
+        second_use = _stratagem_use_for_result_id(
+            _state(branch.lifecycle),
+            result_id=second_result_id,
+        )
+        assert second_use.command_point_cost == expected_costs[second_kind]
+        assert second_use.command_point_modifier_source_ids == (
+            () if second_kind == "ordinary" else (exception.source_id,)
+        )
+        completed = _submit_heroic_intervention_no_move(
+            branch,
+            movement_request=_decision_request(second_movement),
+            result_id=f"phase15a-generated-heroic-{second_kind}-second-no-move",
+        )
+        branch_state = _state(branch.lifecycle)
+        assert completed.status_kind is not LifecycleStatusKind.INVALID
+        assert branch_state.current_battle_phase is BattlePhase.FIGHT
+        assert branch_state.command_point_total("player-a") == 0
+        assert branch.lifecycle.reaction_queue.frames == ()
+        replay = ReplayRunner.from_payload(
+            branch.replay_artifact(
+                artifact_id=f"replay:phase15a:heroic:{first_kind}-then-{second_kind}"
+            )
+        ).run()
+        assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+def test_end_charge_heroic_two_snarling_units_each_use_exception_once() -> None:
+    session, units = _end_charge_heroic_session(
+        game_id="phase15a-two-snarling-protectors",
+        maulerfiend_selection_ids=("maulerfiend-1", "maulerfiend-2"),
+        ordinary_selection_ids=(),
+        command_points=0,
+    )
+    state = _state(session.lifecycle)
+    first_request = _decision_request(session.advance_until_decision_or_terminal())
+    first_result_id = "phase15a-two-snarling-first-selected"
+    first_movement = _submit_end_charge_heroic_target(
+        session,
+        request=first_request,
+        target_unit_instance_id=units["maulerfiend-1"].unit_instance_id,
+        result_id=first_result_id,
+    )
+    second_window_status = _submit_heroic_intervention_no_move(
+        session,
+        movement_request=_decision_request(first_movement),
+        result_id="phase15a-two-snarling-first-no-move",
+    )
+    second_request = _decision_request(second_window_status)
+    records_before_repeat = len(session.lifecycle.decision_controller.records)
+
+    repeated = _submit_end_charge_heroic_target(
+        session,
+        request=second_request,
+        target_unit_instance_id=units["maulerfiend-1"].unit_instance_id,
+        result_id="phase15a-two-snarling-first-repeated",
+    )
+
+    assert repeated.status_kind is LifecycleStatusKind.INVALID
+    assert repeated.payload == {"invalid_reason": "source_ability_once_per_phase_per_unit"}
+    assert session.lifecycle.pending_decision_request() == second_request
+    assert len(session.lifecycle.decision_controller.records) == records_before_repeat
+    assert len(state.stratagem_use_records) == 1
+
+    second_result_id = "phase15a-two-snarling-second-selected"
+    second_movement = _submit_end_charge_heroic_target(
+        session,
+        request=second_request,
+        target_unit_instance_id=units["maulerfiend-2"].unit_instance_id,
+        result_id=second_result_id,
+    )
+    completed = _submit_heroic_intervention_no_move(
+        session,
+        movement_request=_decision_request(second_movement),
+        result_id="phase15a-two-snarling-second-no-move",
+    )
+    uses = tuple(
+        _stratagem_use_for_result_id(state, result_id=result_id)
+        for result_id in (first_result_id, second_result_id)
+    )
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert state.current_battle_phase is BattlePhase.FIGHT
+    assert tuple(use.command_point_cost for use in uses) == (0, 0)
+    assert tuple(use.target_binding.target_unit_instance_id for use in uses) == (
+        units["maulerfiend-1"].unit_instance_id,
+        units["maulerfiend-2"].unit_instance_id,
+    )
+    assert state.command_point_total("player-a") == 0
+    assert session.lifecycle.reaction_queue.frames == ()
+
+
+def test_source_backed_conditional_charge_rejects_stale_selected_anchor() -> None:
+    lifecycle, units = _conditional_charge_lifecycle(
+        game_id="phase15a-source-backed-conditional-charge-stale"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["charger"].unit_instance_id,
+            result_id="phase15a-source-backed-conditional-charge-stale-select",
+        )
+    )
+    pair_options = _conditional_charge_pair_options(grant_request)
+    selected = pair_options[units["enemy-1"].unit_instance_id]
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    anchor = units["psyker-anchor-1"]
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            anchor,
+            army_id="army-alpha",
+            player_id="player-a",
+            poses=_compact_test_unit_poses(
+                origin=Pose.at(50.0, 50.0),
+                model_count=len(anchor.own_models),
+            ),
+        )
+    )
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=cast(str, selected["hook_id"]),
+        result_id="phase15a-source-backed-conditional-charge-stale-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert "not available" in cast(str, cast(dict[str, object], invalid.payload)["detail"])
+    assert lifecycle.decision_controller.queue.pending_requests == (grant_request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+    assert state.persisting_effects_for_unit(units["charger"].unit_instance_id) == ()
 
 
 def test_charge_declaration_grant_selection_records_end_phase_unit_effect() -> None:
@@ -691,6 +1338,132 @@ def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() 
     assert units["enemy"].unit_instance_id in roll_result.reachable_target_distances_inches
     assert 2 <= roll_result.value <= 12
     assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+
+
+@pytest.mark.parametrize(
+    ("ignored_modifier_id", "expected_modifier_ids"),
+    [
+        (
+            "test:modifier-ignore:charge-penalty",
+            ("test:modifier-ignore:charge-bonus",),
+        ),
+        (
+            "test:modifier-ignore:charge-bonus",
+            ("test:modifier-ignore:charge-penalty",),
+        ),
+    ],
+)
+def test_charging_unit_modifier_ignore_subsets_use_finite_lifecycle_and_round_trip(
+    ignored_modifier_id: str,
+    expected_modifier_ids: tuple[str, ...],
+) -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        game_id=f"phase15a-modifier-ignore-{ignored_modifier_id.rsplit(':', maxsplit=1)[1]}",
+    )
+    source_unit = units["intercessor-1"]
+    ability_index = AbilityCatalogIndex.from_records(
+        (_charge_modifier_ignore_ability_record(datasheet_id=source_unit.datasheet_id),)
+    )
+    _install_charge_modifier_ignore_runtime(
+        lifecycle,
+        ability_index=ability_index,
+        registry=_charge_modifier_ignore_registry(),
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    unit_options = tuple(
+        option
+        for option in selection_request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("submission_kind") == SELECT_CHARGING_UNIT_DECISION_TYPE
+    )
+    assert len(unit_options) == 4
+    selected_option = next(
+        option
+        for option in unit_options
+        if _ignored_charge_modifier_ids(option) == (ignored_modifier_id,)
+    )
+    restored_request = DecisionRequest.from_payload(
+        json.loads(json.dumps(selection_request.to_payload(), sort_keys=True))
+    )
+    assert restored_request == selection_request
+
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=selected_option.option_id,
+        result_id=(
+            f"phase15a-modifier-ignore-select-{ignored_modifier_id.rsplit(':', maxsplit=1)[1]}"
+        ),
+    )
+    roll_result = _roll_result_from_event(lifecycle, "charge_roll_resolved")
+    assert (
+        tuple(modifier.modifier_id for modifier in roll_result.request.roll_modifiers)
+        == expected_modifier_ids
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.decision_controller.records[-1].result.payload == selected_option.payload
+    modifier_events = _event_payloads(lifecycle, "modifier_ignores_selected")
+    assert len(modifier_events) == 1
+    effect_payload = cast(dict[str, object], modifier_events[0]["modifier_ignore_effect"])
+    assert effect_payload["source_rule_id"] == "core:modifier-ignore-selection"
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+    assert "object at 0x" not in json.dumps(lifecycle_payload, sort_keys=True)
+
+
+def test_charging_unit_modifier_ignore_option_drift_rejects_before_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        game_id="phase15a-modifier-ignore-stale",
+    )
+    source_unit = units["intercessor-1"]
+    ability_index = AbilityCatalogIndex.from_records(
+        (_charge_modifier_ignore_ability_record(datasheet_id=source_unit.datasheet_id),)
+    )
+    _install_charge_modifier_ignore_runtime(
+        lifecycle,
+        ability_index=ability_index,
+        registry=_charge_modifier_ignore_registry(),
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    stale_option = next(
+        option
+        for option in selection_request.options
+        if _ignored_charge_modifier_ids(option) == ("test:modifier-ignore:charge-penalty",)
+    )
+    _install_charge_modifier_ignore_runtime(
+        lifecycle,
+        ability_index=ability_index,
+        registry=RuntimeModifierRegistry.empty(),
+    )
+
+    status = _submit_option(
+        lifecycle,
+        request=selection_request,
+        option_id=stale_option.option_id,
+        result_id="phase15a-modifier-ignore-stale-select",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    assert status.payload["invalid_reason"] == "charging_unit_option_drift"
+    assert status.payload["field"] == "modifier_ignore_context"
+    assert lifecycle.decision_controller.queue.pending_requests == (selection_request,)
+    assert lifecycle.decision_controller.records == ()
+    assert _event_payloads(lifecycle, "modifier_ignores_selected") == ()
+    assert _event_payloads(lifecycle, "charge_roll_resolved") == ()
 
 
 def test_successful_charge_roll_creates_phase15b_movement_boundary() -> None:
@@ -2545,6 +3318,8 @@ def _charge_lifecycle(
     alpha_unit_ids: tuple[str, ...],
     enemy_model_poses: tuple[Pose, ...],
     game_id: str,
+    catalog: ArmyCatalog | None = None,
+    alpha_datasheet_ids_by_selection_id: dict[str, str] | None = None,
     alpha_origins: dict[str, Pose] | None = None,
     enemy_unit_ids: tuple[str, ...] = ("enemy",),
     enemy_origins: dict[str, Pose] | None = None,
@@ -2556,6 +3331,8 @@ def _charge_lifecycle(
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
         enemy_attached_unit_ids=enemy_attached_unit_ids,
+        catalog=catalog,
+        alpha_datasheet_ids_by_selection_id=alpha_datasheet_ids_by_selection_id,
     )
     armies = _mustered_armies(config)
     mission_setup = config.mission_setup
@@ -2681,6 +3458,536 @@ def _charge_lifecycle_with_declaration_grants(
     return lifecycle, units
 
 
+def _conditional_charge_lifecycle(
+    *,
+    game_id: str,
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = replace(
+        base_catalog,
+        datasheets=tuple(
+            replace(
+                datasheet,
+                keywords=replace(
+                    datasheet.keywords,
+                    keywords=(*datasheet.keywords.keywords, "PSYKER"),
+                ),
+            )
+            if datasheet.datasheet_id == "core-intercessor-like-infantry"
+            else datasheet
+            for datasheet in base_catalog.datasheets
+        ),
+    )
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("charger", "psyker-anchor-1", "psyker-anchor-2"),
+        alpha_origins={
+            "charger": Pose.at(6.0, 20.0),
+            "psyker-anchor-1": Pose.at(18.0, 20.0),
+            "psyker-anchor-2": Pose.at(18.0, 28.0),
+        },
+        enemy_unit_ids=("enemy-1", "enemy-2"),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(18.0, 21.05),
+            model_count=5,
+        ),
+        enemy_origins={
+            "enemy-1": Pose.at(18.0, 21.05),
+            "enemy-2": Pose.at(18.0, 29.05),
+        },
+        game_id=game_id,
+        catalog=catalog,
+    )
+    state = _state(lifecycle)
+    record, _clauses = _conditional_charge_ability_record()
+    ability_indexes = {
+        "player-a": AbilityCatalogIndex.from_records((record,)),
+        "player-b": AbilityCatalogIndex.from_records(()),
+    }
+    registry = ChargeDeclarationHookRegistry.from_bindings(
+        catalog_conditional_charge_declaration_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes,
+            armies=tuple(state.army_definitions),
+        )
+    )
+    _install_charge_declaration_registry(lifecycle, registry)
+    return lifecycle, units
+
+
+def _generated_snarling_protector_charge_lifecycle(
+    *,
+    game_id: str,
+    maulerfiend_selection_ids: tuple[str, ...] = ("maulerfiend",),
+    ordinary_selection_ids: tuple[str, ...] = ("psyker-anchor",),
+    alpha_origins: dict[str, Pose] | None = None,
+    enemy_origin: Pose | None = None,
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    generated = _ability_support_catalog_package(datasheet_ids=("000001029",)).army_catalog
+    generated_maulerfiend = generated.datasheet_by_id("000001029")
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_anchor = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    anchor_datasheet_id = "phase15a-thousand-sons-psyker-anchor"
+    thousand_sons_anchor = replace(
+        base_anchor,
+        datasheet_id=anchor_datasheet_id,
+        name="Phase 15A Thousand Sons Psyker Anchor",
+        keywords=replace(
+            base_anchor.keywords,
+            keywords=(*base_anchor.keywords.keywords, "PSYKER"),
+            faction_keywords=("THOUSAND SONS",),
+        ),
+        source_ids=("phase15a:thousand-sons:psyker-anchor",),
+    )
+    base_detachment = next(
+        detachment
+        for detachment in base_catalog.detachments
+        if detachment.detachment_id == "core-combined-arms"
+    )
+    thousand_sons_detachment = replace(
+        base_detachment,
+        detachment_id="phase15a-thousand-sons-detachment",
+        name="Phase 15A Thousand Sons Detachment",
+        faction_id="TS",
+        unit_datasheet_ids=("000001029", anchor_datasheet_id),
+        source_ids=("phase15a:thousand-sons:detachment",),
+    )
+    catalog = replace(
+        base_catalog,
+        catalog_id="phase15a-generated-thousand-sons-maulerfiend-catalog",
+        source_package_id=("data-package:phase15a:generated-thousand-sons-maulerfiend:2026-08-23"),
+        factions=(*base_catalog.factions, *generated.factions),
+        army_rules=(*base_catalog.army_rules, *generated.army_rules),
+        datasheets=(
+            *base_catalog.datasheets,
+            generated_maulerfiend,
+            thousand_sons_anchor,
+        ),
+        wargear=(*base_catalog.wargear, *generated.wargear),
+        detachments=(*base_catalog.detachments, thousand_sons_detachment),
+    )
+    resolved_alpha_origins = (
+        {
+            "maulerfiend": Pose.at(6.0, 20.0),
+            "psyker-anchor": Pose.at(18.0, 20.0),
+        }
+        if alpha_origins is None
+        else alpha_origins
+    )
+    resolved_enemy_origin = Pose.at(18.0, 21.05) if enemy_origin is None else enemy_origin
+    return _charge_lifecycle(
+        alpha_unit_ids=(*maulerfiend_selection_ids, *ordinary_selection_ids),
+        alpha_datasheet_ids_by_selection_id={
+            **dict.fromkeys(maulerfiend_selection_ids, "000001029"),
+            **dict.fromkeys(ordinary_selection_ids, anchor_datasheet_id),
+        },
+        alpha_origins=resolved_alpha_origins,
+        enemy_unit_ids=("enemy",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=resolved_enemy_origin,
+            model_count=5,
+        ),
+        game_id=game_id,
+        catalog=catalog,
+    )
+
+
+def _end_charge_heroic_session(
+    *,
+    game_id: str,
+    maulerfiend_selection_ids: tuple[str, ...],
+    ordinary_selection_ids: tuple[str, ...],
+    command_points: int,
+) -> tuple[LocalGameSession, dict[str, UnitInstance]]:
+    maulerfiend_origins = (Pose.at(24.0, 30.0), Pose.at(42.0, 30.0))
+    if len(maulerfiend_selection_ids) > len(maulerfiend_origins):
+        raise AssertionError("Heroic Intervention fixture supports at most two Maulerfiends.")
+    alpha_origins = {
+        **{
+            selection_id: maulerfiend_origins[index]
+            for index, selection_id in enumerate(maulerfiend_selection_ids)
+        },
+        **{
+            selection_id: Pose.at(30.0, 24.0 - (index * 8.0))
+            for index, selection_id in enumerate(ordinary_selection_ids)
+        },
+    }
+    lifecycle, units = _generated_snarling_protector_charge_lifecycle(
+        game_id=game_id,
+        maulerfiend_selection_ids=maulerfiend_selection_ids,
+        ordinary_selection_ids=ordinary_selection_ids,
+        alpha_origins=alpha_origins,
+        enemy_origin=Pose.at(30.0, 30.0),
+    )
+    state = _state(lifecycle)
+    state.active_player_id = "player-b"
+    state.replace_charge_phase_state(
+        ChargePhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-b",
+        ).with_phase_complete()
+    )
+    enemy = units["enemy"]
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id=f"{game_id}:enemy-charge-move",
+            source_rule_id=f"{game_id}:enemy-charge-move-source",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(enemy.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhase.CHARGE,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id="player-b",
+            ),
+            effect_payload={"effect_kind": "charge_grants_fights_first"},
+        )
+    )
+    if command_points:
+        state.gain_command_points(
+            player_id="player-a",
+            amount=command_points,
+            source_id=f"{game_id}:command-points",
+            source_kind=CommandPointSourceKind.OTHER,
+        )
+    return LocalGameSession(lifecycle=lifecycle), units
+
+
+def _set_snarling_source_state_for_heroic_test(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    source_state: str,
+) -> None:
+    if source_state == "eligible":
+        return
+    if source_state == "destroyed":
+        _destroy_unit_models_for_test(state, unit_instance_id=unit.unit_instance_id)
+        return
+    if state.battlefield_state is None:
+        raise AssertionError("Heroic Intervention source fixture requires battlefield state.")
+    if source_state == "unplaced":
+        state.replace_battlefield_state(
+            state.battlefield_state.without_unit_placement(unit.unit_instance_id)
+        )
+        return
+    origins = {
+        "engaged": Pose.at(30.0, 27.0),
+        "out_of_range": Pose.at(5.0, 5.0),
+    }
+    origin = origins.get(source_state)
+    if origin is None:
+        raise AssertionError(f"Unsupported Snarling Protector fixture state: {source_state}")
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(
+            _unit_placement_at(
+                unit,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=_compact_test_unit_poses(
+                    origin=origin,
+                    model_count=len(unit.own_models),
+                ),
+            )
+        )
+    )
+
+
+def _heroic_proposal_from_request(request: DecisionRequest) -> StratagemTargetProposal:
+    payload = request.payload
+    assert isinstance(payload, dict)
+    return StratagemTargetProposal.from_payload(
+        cast(StratagemTargetProposalPayload, payload["proposal_request"])
+    )
+
+
+def _submit_end_charge_heroic_target(
+    session: LocalGameSession,
+    *,
+    request: DecisionRequest,
+    target_unit_instance_id: str,
+    result_id: str,
+) -> LifecycleStatus:
+    selected = _heroic_proposal_from_request(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id=request.actor_id,
+            target_unit_instance_id=target_unit_instance_id,
+        ),
+        effect_selection={
+            HEROIC_INTERVENTION_MODE_CONTEXT_KEY: HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND
+        },
+    )
+    return session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=validate_json_value({"proposal": selected.to_payload()}),
+        result_id=result_id,
+    )
+
+
+def _submit_heroic_intervention_no_move(
+    session: LocalGameSession,
+    *,
+    movement_request: DecisionRequest,
+    result_id: str,
+) -> LifecycleStatus:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        movement_request.payload
+    )
+    return session.submit_parameterized_payload(
+        request_id=movement_request.request_id,
+        payload=validate_json_value(
+            ChargeMoveProposal(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                unit_instance_id=proposal_request.unit_instance_id,
+                movement_phase_action="charge_move",
+                movement_mode=MovementMode.CHARGE,
+                charge_target_unit_instance_ids=(),
+                witness=None,
+            ).to_payload()
+        ),
+        result_id=result_id,
+    )
+
+
+def _stratagem_use_for_result_id(
+    state: GameState,
+    *,
+    result_id: str,
+) -> StratagemUseRecord:
+    matches = tuple(use for use in state.stratagem_use_records if use.result_id == result_id)
+    if len(matches) != 1:
+        raise AssertionError("Expected exactly one Stratagem use for result ID.")
+    return matches[0]
+
+
+def _require_pending_request(session: LocalGameSession) -> DecisionRequest:
+    request = session.lifecycle.pending_decision_request()
+    if request is None:
+        raise AssertionError("Heroic Intervention session requires a pending request.")
+    return request
+
+
+def _conditional_charge_pair_options(
+    request: DecisionRequest,
+) -> dict[str, dict[str, object]]:
+    pairs: dict[str, dict[str, object]] = {}
+    for option in request.options:
+        if option.option_id == DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID:
+            continue
+        payload = cast(dict[str, object], option.payload)
+        grants = cast(list[dict[str, object]], payload["selected_charge_declaration_grants"])
+        assert len(grants) == 1
+        replay_payload = cast(dict[str, object], grants[0]["replay_payload"])
+        enemy_id = cast(str, replay_payload["required_enemy_unit_instance_id"])
+        assert enemy_id not in pairs
+        pairs[enemy_id] = replay_payload
+    return pairs
+
+
+def _conditional_charge_ability_record() -> tuple[
+    AbilityCatalogRecord, tuple[RuleClause, RuleClause, RuleClause]
+]:
+    span = _conditional_charge_rule_span()
+    phase_use_clause = RuleClause(
+        clause_id="test:conditional-charge:phase-use-exception",
+        source_span=span,
+        trigger=RuleTrigger(
+            kind=RuleTriggerKind.UNIT_SELECTED,
+            source_span=span,
+            parameters=parameters_from_pairs(
+                (
+                    ("selection", "stratagem_target"),
+                    ("timing_window", "after_unit_selected_as_stratagem_target"),
+                    ("source_relationship", "stratagem_targets_source_unit"),
+                    ("selected_unit_allegiance", "friendly"),
+                    ("stratagem_user", "source_player"),
+                    ("usage_scope", "source_model"),
+                )
+            ),
+        ),
+        conditions=(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "stratagem_target"),
+                        ("relationship", "stratagem_targets_source_unit"),
+                        ("selected_unit_allegiance", "friendly"),
+                    )
+                ),
+            ),
+        ),
+        target=RuleTargetSpec(kind=RuleTargetKind.STRATAGEM_USE, source_span=span),
+        effects=(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("ability", "stratagem_phase_use_exception"),
+                        ("stratagem_id", "heroic-intervention"),
+                        ("frequency_scope", "phase_per_unit"),
+                        ("bypass_same_stratagem_per_phase", True),
+                        ("does_not_block_other_units", True),
+                    )
+                ),
+            ),
+        ),
+    )
+    cost_clause = RuleClause(
+        clause_id="test:conditional-charge:heroic-cost",
+        source_span=span,
+        trigger=phase_use_clause.trigger,
+        conditions=phase_use_clause.conditions,
+        target=phase_use_clause.target,
+        effects=(
+            RuleEffectSpec(
+                kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("operation", "modify_stratagem_cost"),
+                        ("affected_player", "source_player"),
+                        ("delta", -1),
+                        ("application_scope", "current_stratagem_use"),
+                        ("minimum_cost", 0),
+                        ("optional", False),
+                        ("stacking", "cumulative"),
+                        ("stratagem_id", "heroic-intervention"),
+                    )
+                ),
+            ),
+        ),
+    )
+    charge_clause = RuleClause(
+        clause_id="test:conditional-charge:reroll",
+        source_span=span,
+        trigger=RuleTrigger(
+            kind=RuleTriggerKind.UNIT_SELECTED,
+            source_span=span,
+            parameters=parameters_from_pairs(
+                (
+                    ("selection", "charging_unit"),
+                    ("timing_window", "after_charging_unit_selected_before_charge_roll"),
+                    ("source_relationship", "source_unit_declares_charge"),
+                )
+            ),
+        ),
+        conditions=(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "friendly_anchor"),
+                        ("relationship", "friendly_engaged_keyword_unit"),
+                        ("exclude_source_unit", True),
+                    )
+                ),
+            ),
+            RuleCondition(
+                kind=RuleConditionKind.KEYWORD_GATE,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "friendly_anchor"),
+                        ("required_keyword", "PSYKER"),
+                    )
+                ),
+            ),
+            RuleCondition(
+                kind=RuleConditionKind.DISTANCE_PREDICATE,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("first_subject", "source_unit"),
+                        ("second_subject", "friendly_anchor"),
+                        ("range_kind", "numeric_range"),
+                        ("distance_inches", 12),
+                        ("negated", False),
+                    )
+                ),
+            ),
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "required_enemy"),
+                        (
+                            "relationship",
+                            "enemy_engaged_with_selected_friendly_anchor",
+                        ),
+                    )
+                ),
+            ),
+        ),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=span),
+        effects=(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        (
+                            "ability",
+                            "charge_reroll_with_friendly_engaged_keyword_anchor",
+                        ),
+                        ("roll_type", "charge_roll"),
+                        ("component_selection_policy", "whole_roll"),
+                        ("selection_policy", "anchor_and_enemy_pair"),
+                        (
+                            "required_charge_end_relationship",
+                            "enemy_engaged_with_selected_anchor",
+                        ),
+                        ("optional", True),
+                    )
+                ),
+            ),
+        ),
+        duration=RuleDuration(
+            kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
+            source_span=span,
+            parameters=parameters_from_pairs((("endpoint", "phase"),)),
+        ),
+    )
+    clauses = (phase_use_clause, cost_clause, charge_clause)
+    rule_ir = RuleIR(
+        rule_id="test:conditional-charge:rule",
+        source_id="test:conditional-charge:source",
+        normalized_text=span.text,
+        parser_version="test:conditional-charge:v1",
+        clauses=tuple(sorted(clauses, key=lambda clause: clause.clause_id)),
+    )
+    return (
+        AbilityCatalogRecord(
+            record_id="test:conditional-charge:record",
+            definition=AbilityDefinition(
+                ability_id="test:conditional-charge:ability",
+                name="Source-backed Conditional Charge",
+                source_id=rule_ir.source_id,
+                when_descriptor="When this unit declares a charge.",
+                effect_descriptor="Use shared Stratagem and Charge services.",
+                restrictions_descriptor="Requires an engaged friendly Psyker within 12 inches.",
+                timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+                handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+                replay_payload=validate_json_value(
+                    {"rule_ir": cast(JsonValue, rule_ir.to_payload())}
+                ),
+            ),
+            source_kind=AbilitySourceKind.DATASHEET,
+            datasheet_id="core-intercessor-like-infantry",
+        ),
+        clauses,
+    )
+
+
+def _conditional_charge_rule_span() -> TextSpan:
+    text = "Source-backed conditional Charge semantic test."
+    return TextSpan(text=text, start=0, end=len(text))
+
+
 def _end_phase_charge_declaration_grant(
     context: ChargeDeclarationContext,
 ) -> ChargeDeclarationGrant:
@@ -2731,6 +4038,134 @@ def _install_charge_declaration_registry(
     flow._phase_handlers[BattlePhase.CHARGE] = handler  # pyright: ignore[reportPrivateUsage]
 
 
+def _charge_modifier_ignore_ability_record(*, datasheet_id: str) -> AbilityCatalogRecord:
+    text = "This model can ignore any or all modifiers to Move, Advance and Charge."
+    span = TextSpan(text=text, start=0, end=len(text))
+    clause = RuleClause(
+        clause_id="test:modifier-ignore:charge-clause",
+        source_span=span,
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=span),
+        effects=(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("ability", "modifier_ignore_permission"),
+                        (
+                            "modifier_kinds",
+                            (
+                                "movement_characteristic",
+                                "advance_roll",
+                                "charge_roll",
+                            ),
+                        ),
+                        ("selection", "any_or_all"),
+                    )
+                ),
+            ),
+        ),
+        duration=RuleDuration(
+            kind=RuleDurationKind.WHILE_CONDITION_TRUE,
+            source_span=span,
+        ),
+    )
+    rule_ir = RuleIR(
+        rule_id="test:modifier-ignore:charge-rule",
+        source_id="test:modifier-ignore:charge-source",
+        normalized_text=text,
+        parser_version="test:modifier-ignore:v1",
+        clauses=(clause,),
+    )
+    return AbilityCatalogRecord(
+        record_id="test:modifier-ignore:charge-record",
+        definition=AbilityDefinition(
+            ability_id="test:modifier-ignore:charge-ability",
+            name="Test Modifier Ignore",
+            source_id=rule_ir.source_id,
+            when_descriptor="Passive.",
+            effect_descriptor=text,
+            restrictions_descriptor="This model only.",
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+                phase=BattlePhaseKind.CHARGE,
+            ),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": cast(JsonValue, rule_ir.to_payload())}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=datasheet_id,
+    )
+
+
+def _charge_modifier_ignore_registry() -> RuntimeModifierRegistry:
+    return RuntimeModifierRegistry.from_bindings(
+        charge_roll_modifier_bindings=(
+            ChargeRollModifierBinding(
+                modifier_id="test:modifier-ignore:charge-binding",
+                source_id="test:modifier-ignore:charge-binding-source",
+                handler=_modifier_ignore_charge_modifiers,
+            ),
+        )
+    )
+
+
+def _modifier_ignore_charge_modifiers(
+    context: ChargeRollModifierContext,
+) -> tuple[RollModifier, ...]:
+    return (
+        *context.current_roll_modifiers,
+        RollModifier(
+            modifier_id="test:modifier-ignore:charge-penalty",
+            source_id="test:modifier-ignore:charge-penalty-source",
+            operand=-1,
+        ),
+        RollModifier(
+            modifier_id="test:modifier-ignore:charge-bonus",
+            source_id="test:modifier-ignore:charge-bonus-source",
+            operand=1,
+        ),
+    )
+
+
+def _install_charge_modifier_ignore_runtime(
+    lifecycle: GameLifecycle,
+    *,
+    ability_index: AbilityCatalogIndex,
+    registry: RuntimeModifierRegistry,
+) -> None:
+    handler = replace(
+        lifecycle._charge_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        ability_indexes_by_player_id={
+            "player-a": ability_index,
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        runtime_modifier_registry=registry,
+    )
+    lifecycle._charge_phase_handler = handler  # pyright: ignore[reportPrivateUsage]
+    flow = lifecycle._battle_round_flow  # pyright: ignore[reportPrivateUsage]
+    assert flow is not None
+    flow._phase_handlers[BattlePhase.CHARGE] = handler  # pyright: ignore[reportPrivateUsage]
+    bundle = lifecycle._runtime_content_bundle  # pyright: ignore[reportPrivateUsage]
+    assert bundle is not None
+    lifecycle._runtime_content_bundle = replace(  # pyright: ignore[reportPrivateUsage]
+        bundle,
+        runtime_modifier_registry=registry,
+    )
+
+
+def _ignored_charge_modifier_ids(option: DecisionOption) -> tuple[str, ...]:
+    payload = option.payload
+    if not isinstance(payload, dict):
+        return ()
+    raw_context = payload.get("modifier_ignore_context")
+    if not isinstance(raw_context, dict):
+        return ()
+    ignored = raw_context.get("ignored_modifiers")
+    assert isinstance(ignored, list)
+    return tuple(cast(str, item["modifier_id"]) for item in ignored if isinstance(item, dict))
+
+
 def _charge_roll_request(*, player_id: str, unit_instance_id: str) -> ChargeRollRequest:
     return ChargeRollRequest(
         request_id=f"charge-roll-{player_id}-{unit_instance_id}",
@@ -2762,24 +4197,27 @@ def _config(
     alpha_unit_ids: tuple[str, ...],
     enemy_unit_ids: tuple[str, ...],
     enemy_attached_unit_ids: tuple[str, str] | None = None,
+    catalog: ArmyCatalog | None = None,
+    alpha_datasheet_ids_by_selection_id: dict[str, str] | None = None,
 ) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase15a-test"
         ),
-        army_catalog=catalog,
+        army_catalog=resolved_catalog,
         army_muster_requests=(
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=alpha_unit_ids,
+                datasheet_ids_by_selection_id=alpha_datasheet_ids_by_selection_id,
             ),
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=enemy_unit_ids,
@@ -2856,7 +4294,12 @@ def _army_muster_request(
     unit_selection_ids: tuple[str, ...],
     character_unit_selection_ids: tuple[str, ...] = (),
     attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    datasheet_ids_by_selection_id: dict[str, str] | None = None,
 ) -> ArmyMusterRequest:
+    thousand_sons_roster = datasheet_ids_by_selection_id is not None and any(
+        datasheet_id in {"000001029", "phase15a-thousand-sons-psyker-anchor"}
+        for datasheet_id in datasheet_ids_by_selection_id.values()
+    )
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -2864,14 +4307,24 @@ def _army_muster_request(
         source_package_id=catalog.source_package_id,
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
-            faction_id="core-marine-force",
-            detachment_ids=("core-combined-arms",),
+            faction_id="TS" if thousand_sons_roster else "core-marine-force",
+            detachment_ids=(
+                "phase15a-thousand-sons-detachment"
+                if thousand_sons_roster
+                else "core-combined-arms",
+            ),
         ),
         force_disposition_id="purge-the-foe",
         unit_selections=tuple(
             _unit_selection(
                 unit_id,
+                catalog=catalog,
                 is_character=unit_id in character_unit_selection_ids,
+                datasheet_id=(
+                    None
+                    if datasheet_ids_by_selection_id is None
+                    else datasheet_ids_by_selection_id.get(unit_id)
+                ),
             )
             for unit_id in unit_selection_ids
         ),
@@ -2882,19 +4335,42 @@ def _army_muster_request(
 def _unit_selection(
     unit_selection_id: str,
     *,
+    catalog: ArmyCatalog,
     is_character: bool = False,
+    datasheet_id: str | None = None,
 ) -> UnitMusterSelection:
-    datasheet_id = "core-character-leader" if is_character else "core-intercessor-like-infantry"
-    model_profile_id = "core-character-leader" if is_character else "core-intercessor-like"
-    return UnitMusterSelection(
-        unit_selection_id=unit_selection_id,
-        datasheet_id=datasheet_id,
-        model_profile_selections=(
+    if datasheet_id is not None and is_character:
+        raise AssertionError("A character fixture cannot also override its datasheet ID.")
+    resolved_datasheet_id = (
+        datasheet_id
+        if datasheet_id is not None
+        else "core-character-leader"
+        if is_character
+        else "core-intercessor-like-infantry"
+    )
+    model_profile_selections: tuple[ModelProfileSelection, ...]
+    if datasheet_id is None:
+        model_profile_selections = (
             ModelProfileSelection(
-                model_profile_id=model_profile_id,
+                model_profile_id=(
+                    "core-character-leader" if is_character else "core-intercessor-like"
+                ),
                 model_count=1 if is_character else 5,
             ),
-        ),
+        )
+    else:
+        datasheet = catalog.datasheet_by_id(resolved_datasheet_id)
+        model_profile_selections = tuple(
+            ModelProfileSelection(
+                model_profile_id=composition.model_profile_id,
+                model_count=composition.min_models,
+            )
+            for composition in datasheet.composition
+        )
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=resolved_datasheet_id,
+        model_profile_selections=model_profile_selections,
     )
 
 

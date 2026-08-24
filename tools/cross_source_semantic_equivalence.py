@@ -29,7 +29,9 @@ from warhammer40k_core.engine.semantic_equivalence import (
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_overlay import SourceOverlayOperationKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_maulerfiend_datasheet_overlay_2026_07,
     datasheet_keyword_lexicon_2026_06_14,
     faction_detachments_2026_27,
     faction_execution_2026_27,
@@ -43,6 +45,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
     Phase17FExecutionRecord,
     Phase17FExecutionStatus,
 )
+from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaJsonArtifact,
@@ -467,7 +470,7 @@ def _datasheet_ability_members(
             )
         datasheet_row, faction_id, faction_name = datasheet_record
         datasheet_fields = datasheet_row.runtime_fields_payload()
-        source_text = _single_source_text(row)
+        source_text = _current_datasheet_ability_source_text(row)
         rule_ir, normalized_text = _compile_source_text(
             member_id=f"datasheet-ability:{row.source_row_id}",
             source_text=source_text,
@@ -734,6 +737,41 @@ def _single_source_text(row: NormalizedSourceRow) -> _SourceRuleText:
         source_row_ids=(row.stable_source_id(),),
         source_text_ids=(field.source_text_id,),
         raw_text=field.sanitized_text,
+    )
+
+
+def _current_datasheet_ability_source_text(row: NormalizedSourceRow) -> _SourceRuleText:
+    source_text = _single_source_text(row)
+    current_text_by_source_row_id = {
+        "000001029:2": (
+            chaos_maulerfiend_datasheet_overlay_2026_07.THOUSAND_SONS_SNARLING_PROTECTOR_DESCRIPTION
+        ),
+        "000002639:3": (
+            chaos_maulerfiend_datasheet_overlay_2026_07.WORLD_EATERS_SCENT_OF_BLOOD_DESCRIPTION
+        ),
+    }
+    current_text = current_text_by_source_row_id.get(row.source_row_id)
+    if current_text is None:
+        return source_text
+    operations = tuple(
+        operation
+        for operation in chaos_maulerfiend_datasheet_overlay_2026_07.overlay_pack().operations
+        if operation.source_table == row.source_table
+        and operation.source_row_id == row.source_row_id
+    )
+    if (
+        len(operations) != 1
+        or operations[0].operation_kind is not SourceOverlayOperationKind.UPDATE_ROW
+        or operations[0].expected_preimage_hash != source_row_hash(row)
+        or dict(operations[0].fields) != {"description": current_text}
+    ):
+        raise CrossSourceSemanticGeneratorError(
+            "Maulerfiend semantic-audit overlay provenance drifted."
+        )
+    return _SourceRuleText(
+        source_row_ids=source_text.source_row_ids,
+        source_text_ids=source_text.source_text_ids,
+        raw_text=current_text,
     )
 
 

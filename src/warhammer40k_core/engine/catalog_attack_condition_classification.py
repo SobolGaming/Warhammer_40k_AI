@@ -42,7 +42,13 @@ def clause_effect_is_supported_this_model_attack_roll_modifier(
     roll_type = effect_parameters.get("roll_type")
     if type(roll_type) is not str or roll_type not in _SUPPORTED_ATTACK_ROLL_TYPES:
         return False
-    if set(effect_parameters) != {"delta", "roll_type"}:
+    expected_effect_keys = {"delta", "roll_type"}
+    weapon_scope = effect_parameters.get("weapon_scope")
+    if weapon_scope is not None:
+        if weapon_scope not in {"all", "melee", "ranged"}:
+            return False
+        expected_effect_keys.add("weapon_scope")
+    if set(effect_parameters) != expected_effect_keys:
         return False
     if type(effect_parameters.get("delta")) is not int:
         return False
@@ -73,6 +79,21 @@ def condition_is_supported_this_model_attack_strength_gate(
         "target_allegiance": "enemy",
         "target_constraint": "target_not_below_half_strength",
     }:
+        return True
+    if parameters in (
+        {
+            "gate_subject": "attack_target",
+            "relationship": "this_model_makes_attack",
+            "target_allegiance": "enemy",
+            "target_constraint": "target_unit_below_starting_strength",
+        },
+        {
+            "gate_subject": "attack_target",
+            "relationship": "this_model_makes_attack",
+            "target_allegiance": "enemy",
+            "target_constraint": "target_unit_below_half_strength",
+        },
+    ):
         return True
     return parameters in (
         {

@@ -587,6 +587,7 @@ def _apply_setup_reactive_charge(
     target_unit_id = _payload_string(payload, key="target_unit_instance_id")
     source_unit = _unit_by_id(state=state, unit_instance_id=source_unit_id)
     roll_modifiers = catalog_charge_roll_modifiers_for_unit(
+        state=state,
         ability_index=ability_index,
         unit=source_unit,
         current_model_instance_ids=_current_model_instance_ids_for_unit(

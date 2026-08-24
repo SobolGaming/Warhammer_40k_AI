@@ -140,4 +140,5 @@ def _name_key(value: str) -> str:
     ascii_value = "".join(
         character for character in normalized if not unicodedata.combining(character)
     )
-    return " ".join(ascii_value.casefold().replace("\N{RIGHT SINGLE QUOTATION MARK}", "'").split())
+    apostrophe_normalized = ascii_value.replace("\N{RIGHT SINGLE QUOTATION MARK}", "'")
+    return " ".join(apostrophe_normalized.casefold().replace("'", "").split())

@@ -12,6 +12,12 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierBinding,
     AllocatedAttackDamageModifierContext,
 )
+from warhammer40k_core.engine.movement_budget_modifiers import (
+    MovementBudgetModifierApplication as MovementBudgetModifierApplication,
+)
+from warhammer40k_core.engine.movement_budget_modifiers import (
+    MovementBudgetModifierContext as MovementBudgetModifierContext,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
     PostRollWeaponProfileModifierBinding,
@@ -334,41 +340,6 @@ class SaveOptionModifierContext:
                 "allocated_model_instance_id",
                 self.allocated_model_instance_id,
             ),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class MovementBudgetModifierContext:
-    state: GameState
-    unit_instance_id: str
-    model_instance_id: str
-    base_movement_inches: float
-    current_movement_inches: float
-
-    def __post_init__(self) -> None:
-        from warhammer40k_core.engine.game_state import GameState
-
-        if type(self.state) is not GameState:
-            raise GameLifecycleError("Movement budget modifier state must be GameState.")
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier("unit_instance_id", self.unit_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "model_instance_id",
-            _validate_identifier("model_instance_id", self.model_instance_id),
-        )
-        object.__setattr__(
-            self,
-            "base_movement_inches",
-            _validate_non_negative_float("base_movement_inches", self.base_movement_inches),
-        )
-        object.__setattr__(
-            self,
-            "current_movement_inches",
-            _validate_non_negative_float("current_movement_inches", self.current_movement_inches),
         )
 
 
@@ -1165,20 +1136,20 @@ class RuntimeModifierRegistry:
         return generic_rule_modified_save_options(replace(context, save_options=current))
 
     def modified_movement_inches(self, context: MovementBudgetModifierContext) -> float:
-        if type(context) is not MovementBudgetModifierContext:
-            raise GameLifecycleError("Movement budget modifiers require a context.")
-        from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_modified_movement_inches,
+        current, _applications = self.movement_budget_modifier_trace(context)
+        return current
+
+    def movement_budget_modifier_trace(
+        self,
+        context: MovementBudgetModifierContext,
+    ) -> tuple[float, tuple[MovementBudgetModifierApplication, ...]]:
+        from warhammer40k_core.engine.movement_budget_modifiers import (
+            movement_budget_modifier_trace,
         )
 
-        current = context.current_movement_inches
-        for binding in self.movement_budget_modifier_bindings:
-            current = _validate_non_negative_float(
-                f"{binding.modifier_id} returned movement",
-                binding.handler(replace(context, current_movement_inches=current)),
-            )
-        return generic_rule_modified_movement_inches(
-            replace(context, current_movement_inches=current)
+        return movement_budget_modifier_trace(
+            context=context,
+            bindings=self.movement_budget_modifier_bindings,
         )
 
     def modified_objective_control(self, context: ObjectiveControlModifierContext) -> int:
@@ -1217,7 +1188,17 @@ class RuntimeModifierRegistry:
                 f"{binding.modifier_id} returned advance roll modifiers",
                 binding.handler(replace(context, current_roll_modifiers=current)),
             )
-        return current
+        from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
+        from warhammer40k_core.engine.modifier_ignore import ignored_modifier_ids_for_context
+
+        ignored_ids = frozenset(
+            ignored_modifier_ids_for_context(
+                state=context.state,
+                unit_instance_id=context.unit_instance_id,
+                kind=ModifierIgnoreKind.ADVANCE_ROLL,
+            )
+        )
+        return tuple(modifier for modifier in current if modifier.modifier_id not in ignored_ids)
 
     def charge_roll_modifiers(
         self,
@@ -1235,7 +1216,20 @@ class RuntimeModifierRegistry:
                 f"{binding.modifier_id} returned charge roll modifiers",
                 binding.handler(replace(context, current_roll_modifiers=current)),
             )
-        return generic_rule_charge_roll_modifiers(replace(context, current_roll_modifiers=current))
+        current = generic_rule_charge_roll_modifiers(
+            replace(context, current_roll_modifiers=current)
+        )
+        from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
+        from warhammer40k_core.engine.modifier_ignore import ignored_modifier_ids_for_context
+
+        ignored_ids = frozenset(
+            ignored_modifier_ids_for_context(
+                state=context.state,
+                unit_instance_id=context.unit_instance_id,
+                kind=ModifierIgnoreKind.CHARGE_ROLL,
+            )
+        )
+        return tuple(modifier for modifier in current if modifier.modifier_id not in ignored_ids)
 
     def modified_weapon_profile(
         self,
@@ -1433,15 +1427,6 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported runtime modifier BattlePhase: {token}.") from exc
-
-
-def _validate_non_negative_float(field_name: str, value: object) -> float:
-    if type(value) not in {int, float}:
-        raise GameLifecycleError(f"{field_name} must be numeric.")
-    numeric = float(cast(int | float, value))
-    if numeric < 0.0:
-        raise GameLifecycleError(f"{field_name} must not be negative.")
-    return numeric
 
 
 def _validate_non_negative_int(field_name: str, value: object) -> int:

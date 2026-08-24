@@ -328,6 +328,50 @@ def test_cross_source_semantic_audit_uses_exact_non_materialization_static_rule_
     )
 
 
+@pytest.mark.parametrize(
+    ("owner_id", "rule_name", "runtime_consumer_ids"),
+    [
+        (
+            "000001029",
+            "Snarling Protector",
+            (
+                "catalog-ir:friendly-engaged-anchor-charge-reroll",
+                "catalog-ir:stratagem-cost-modifier",
+                "catalog-ir:stratagem-phase-use-exception",
+            ),
+        ),
+        (
+            "000002639",
+            "The Scent of Blood",
+            ("catalog-ir:charge-roll-modifier",),
+        ),
+        (
+            "000002639",
+            "Savage Exaltation",
+            (
+                "catalog-ir:hit-roll-modifier",
+                "catalog-ir:wound-roll-modifier",
+            ),
+        ),
+    ],
+)
+def test_cross_source_semantic_audit_uses_exact_other_maulerfiend_static_rule_ir(
+    owner_id: str,
+    rule_name: str,
+    runtime_consumer_ids: tuple[str, ...],
+) -> None:
+    member = _semantic_audit().member(
+        content_kind=SemanticContentKind.DATASHEET_ABILITY,
+        owner_id=owner_id,
+        rule_name=rule_name,
+    )
+
+    assert member.equivalence_basis is SemanticEquivalenceBasis.STRUCTURED_RULE_IR
+    assert member.execution_status is SemanticExecutionStatus.ENGINE_CONSUMED
+    assert member.support_transfer is SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
+    assert member.runtime_consumer_ids == runtime_consumer_ids
+
+
 def test_maulerfiend_cross_faction_report_separates_generic_and_local_support() -> None:
     payload = _maulerfiend_support_payload()
     rows_by_key = {row["key"]: row for row in payload["rows"]}
@@ -345,8 +389,8 @@ def test_maulerfiend_cross_faction_report_separates_generic_and_local_support() 
             "faction_name": "Death Guard",
             "status": "not_present_in_current_source_review",
             "evidence": (
-                "The exhaustive current Death Guard Faction Pack review contains no "
-                "Maulerfiend datasheet row; no synthetic support row is emitted."
+                "The exhaustive current Death Guard Faction Pack review and MFM faction "
+                "inventory contain no Maulerfiend row; no synthetic support row is emitted."
             ),
         }
     ]
@@ -357,18 +401,76 @@ def test_maulerfiend_cross_faction_report_separates_generic_and_local_support() 
         "shooting-weapon-copy-contract",
     }
     assert all(set(row["reusable_generic_mechanic_ids"]) == mechanic_ids for row in payload["rows"])
-    assert rows_by_key["emperors-children:000004091"]["component_support"] is not None
-    assert all(
-        row["component_support"] is None
-        for key, row in rows_by_key.items()
-        if key != "emperors-children:000004091"
-    )
+    for row in rows_by_key.values():
+        component_support = row["component_support"]
+        assert component_support is not None
+        assert component_support["overall"] == "Playable"
+        assert component_support["datasheet_ability_status"] == "Full"
+        assert component_support["faction_interaction_status"] == "Partial"
+
     assert {
-        key: tuple(rule["rule_name"] for rule in row["faction_local_rules"])
+        key: {
+            rule["rule_name"]: (
+                rule["execution_status"],
+                tuple(rule["runtime_consumer_ids"]),
+            )
+            for rule in row["faction_local_rules"]
+        }
         for key, row in rows_by_key.items()
     } == {
-        "chaos-space-marines:000000968": ("Siege Crawler",),
-        "emperors-children:000004091": ("Glutton for Punishment",),
-        "thousand-sons:000001029": ("Snarling Protector",),
-        "world-eaters:000002639": ("Savage Exaltation", "The Scent of Blood"),
+        "chaos-space-marines:000000968": {
+            "Siege Crawler": (
+                "engine_consumed",
+                ("catalog-ir:modifier-ignore-permission",),
+            ),
+        },
+        "emperors-children:000004091": {
+            "Glutton for Punishment": (
+                "engine_consumed",
+                (
+                    "catalog-ir:hit-roll-modifier",
+                    "catalog-ir:wound-roll-modifier",
+                ),
+            ),
+        },
+        "thousand-sons:000001029": {
+            "Snarling Protector": (
+                "engine_consumed",
+                (
+                    "catalog-ir:friendly-engaged-anchor-charge-reroll",
+                    "catalog-ir:stratagem-cost-modifier",
+                    "catalog-ir:stratagem-phase-use-exception",
+                ),
+            ),
+        },
+        "world-eaters:000002639": {
+            "Savage Exaltation": (
+                "engine_consumed",
+                (
+                    "catalog-ir:hit-roll-modifier",
+                    "catalog-ir:wound-roll-modifier",
+                ),
+            ),
+            "The Scent of Blood": (
+                "engine_consumed",
+                ("catalog-ir:charge-roll-modifier",),
+            ),
+        },
+    }
+    assert {
+        key: tuple(
+            (
+                bracket["unit_number_min"],
+                bracket["unit_number_max"],
+                bracket["model_count"],
+                bracket["points"],
+            )
+            for bracket in row["current_points"]["brackets"]
+        )
+        for key, row in rows_by_key.items()
+    } == {
+        "chaos-space-marines:000000968": ((1, None, 1, 130),),
+        "emperors-children:000004091": ((1, 2, 1, 120), (3, None, 1, 130)),
+        "thousand-sons:000001029": ((1, 2, 1, 120), (3, None, 1, 130)),
+        "world-eaters:000002639": ((1, 2, 1, 140), (3, None, 1, 150)),
     }

@@ -466,6 +466,14 @@
         "datasheet_id": "000000969",
         "datasheet_name": "Defiler",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008359",
+        "ability_name": "Dark Pacts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000968/faction/000008359/none",
+        "datasheet_id": "000000968",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -473,14 +481,16 @@
     ],
     "category_id": "faction.army_rule.dark_pacts",
     "category_name": "Chaos Space Marines Army Rule",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "runtime-content-warhammer-40000-11th/chaos-space-marines/faction/warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts/none",
-      "chaos-daemons-bridge-catalog/000000969/faction/000008359/none"
+      "chaos-daemons-bridge-catalog/000000969/faction/000008359/none",
+      "chaos-daemons-bridge-catalog/000000968/faction/000008359/none"
     ],
     "datasheet_names": [
       "Chaos Space Marines",
-      "Defiler"
+      "Defiler",
+      "Maulerfiend"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed",
@@ -492,7 +502,7 @@
       "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier"
     ],
     "source_kind_counts": {
-      "faction": 2
+      "faction": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -644,6 +654,30 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000968/core/000008339/none",
+        "datasheet_id": "000000968",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001029/core/000008339/none",
+        "datasheet_id": "000001029",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/core/000008339/none",
+        "datasheet_id": "000002639",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/core/000008339/none",
         "datasheet_id": "000004091",
         "datasheet_name": "Maulerfiend",
@@ -703,7 +737,7 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 18,
+    "coverage_row_count": 21,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
@@ -716,6 +750,9 @@
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004077/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001120/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000000968/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000001029/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000002639/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004091/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
@@ -745,7 +782,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 18
+      "core": 21
     },
     "support_stages": [
       "engine_consumed"
@@ -1428,6 +1465,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000002639:the-scent-of-blood",
+        "ability_name": "The Scent of Blood",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:the-scent-of-blood/none",
+        "datasheet_id": "000002639",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "The Scent of Blood"
+    ],
+    "category_id": "datasheet.roll_modifier.charge.this_unit",
+    "category_name": "Datasheet Roll Modifier Charge This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:the-scent-of-blood/none"
+    ],
+    "datasheet_names": [
+      "Maulerfiend"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:charge-roll-modifier"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001114:bane-of-cowards",
         "ability_name": "Bane of Cowards",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
@@ -1546,6 +1616,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000002639:savage-exaltation",
+        "ability_name": "Savage Exaltation",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:savage-exaltation/none",
+        "datasheet_id": "000002639",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004091:glutton-for-punishment",
         "ability_name": "Glutton for Punishment",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
@@ -1557,14 +1635,16 @@
     "ability_names": [
       "Beguiling Form",
       "Glutton for Punishment",
-      "Revel in Desecration"
+      "Revel in Desecration",
+      "Savage Exaltation"
     ],
     "category_id": "datasheet.roll_modifier.hit.this_model",
     "category_name": "Datasheet Roll Modifier Hit This Model",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:beguiling-form/none",
+      "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:savage-exaltation/none",
       "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none"
     ],
     "datasheet_names": [
@@ -1578,7 +1658,7 @@
       "catalog-ir:wound-roll-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -1687,6 +1767,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000002639:savage-exaltation",
+        "ability_name": "Savage Exaltation",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:savage-exaltation/none",
+        "datasheet_id": "000002639",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004091:glutton-for-punishment",
         "ability_name": "Glutton for Punishment",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
@@ -1705,12 +1793,14 @@
     ],
     "ability_names": [
       "Glutton for Punishment",
+      "Savage Exaltation",
       "Wave Serpent Shield"
     ],
     "category_id": "datasheet.roll_modifier.wound.this_model",
     "category_name": "Datasheet Roll Modifier Wound This Model",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002639/datasheet/000002639:savage-exaltation/none",
       "chaos-daemons-bridge-catalog/000004091/datasheet/000004091:glutton-for-punishment/none",
       "chaos-daemons-bridge-catalog/000000599/datasheet/000000599:wave-serpent-shield/none"
     ],
@@ -1723,7 +1813,7 @@
       "catalog-ir:wound-roll-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -1959,6 +2049,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000000968:siege-crawler",
+        "ability_name": "Siege Crawler",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000968/datasheet/000000968:siege-crawler/none",
+        "datasheet_id": "000000968",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000588:spiritseer",
         "ability_name": "Spiritseer",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
@@ -1983,11 +2081,12 @@
       "Duellist's Hubris",
       "LORD OF THE HOST",
       "Malevolent Souls",
+      "Siege Crawler",
       "Spiritseer"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 8,
+    "coverage_row_count": 9,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
@@ -1995,6 +2094,7 @@
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
       "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:lord-of-the-host/none",
       "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
+      "chaos-daemons-bridge-catalog/000000968/datasheet/000000968:siege-crawler/none",
       "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
@@ -2004,6 +2104,7 @@
       "Fulgrim",
       "Lord Exultant",
       "Lucius the Eternal",
+      "Maulerfiend",
       "Spiritseer",
       "Wraithblades"
     ],
@@ -2015,10 +2116,11 @@
       "catalog-ir:conditional-leading-ability:scouts",
       "catalog-ir:conditional-leading-ability:stealth",
       "catalog-ir:conditional-not-leading-ability:fights-first",
-      "catalog-ir:fight-on-death-source"
+      "catalog-ir:fight-on-death-source",
+      "catalog-ir:modifier-ignore-permission"
     ],
     "source_kind_counts": {
-      "datasheet": 8
+      "datasheet": 9
     },
     "support_stages": [
       "engine_consumed"
@@ -2035,6 +2137,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000001029:snarling-protector",
+        "ability_name": "Snarling Protector",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none",
+        "datasheet_id": "000001029",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000601:flickerjump",
         "ability_name": "Flickerjump",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none",
@@ -2045,26 +2155,67 @@
     ],
     "ability_names": [
       "Acrobatic",
-      "Flickerjump"
+      "Flickerjump",
+      "Snarling Protector"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_unit",
     "category_name": "Datasheet Rule Ir Grant Ability This Unit",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000594/datasheet/000000594:acrobatic/none",
+      "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none",
       "chaos-daemons-bridge-catalog/000000601/datasheet/000000601:flickerjump/none"
     ],
     "datasheet_names": [
       "Howling Banshees",
+      "Maulerfiend",
       "Warp Spiders"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:can-advance-and-charge",
       "catalog-ir:can-fallback-and-charge",
-      "catalog-ir:movement-action-grant"
+      "catalog-ir:friendly-engaged-anchor-charge-reroll",
+      "catalog-ir:movement-action-grant",
+      "catalog-ir:stratagem-cost-modifier",
+      "catalog-ir:stratagem-phase-use-exception"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001029:snarling-protector",
+        "ability_name": "Snarling Protector",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none",
+        "datasheet_id": "000001029",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Snarling Protector"
+    ],
+    "category_id": "datasheet.rule_ir.grant_ability.unscoped",
+    "category_name": "Datasheet Rule Ir Grant Ability Unscoped",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none"
+    ],
+    "datasheet_names": [
+      "Maulerfiend"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:friendly-engaged-anchor-charge-reroll",
+      "catalog-ir:stratagem-cost-modifier",
+      "catalog-ir:stratagem-phase-use-exception"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -2623,31 +2774,44 @@
         "datasheet_id": "000000568",
         "datasheet_name": "Eldrad Ulthran",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000001029:snarling-protector",
+        "ability_name": "Snarling Protector",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none",
+        "datasheet_id": "000001029",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
       "Diviner of Futures",
-      "Path of Command"
+      "Path of Command",
+      "Snarling Protector"
     ],
     "category_id": "datasheet.rule_ir.modify_command_points.unscoped",
     "category_name": "Datasheet Rule Ir Modify Command Points Unscoped",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:path-of-command/none",
       "chaos-daemons-bridge-catalog/000002759/datasheet/000002759:path-of-command/none",
-      "chaos-daemons-bridge-catalog/000000568/datasheet/000000568:diviner-of-futures/none"
+      "chaos-daemons-bridge-catalog/000000568/datasheet/000000568:diviner-of-futures/none",
+      "chaos-daemons-bridge-catalog/000001029/datasheet/000001029:snarling-protector/none"
     ],
     "datasheet_names": [
       "Autarch",
       "Autarch Wayleaper",
-      "Eldrad Ulthran"
+      "Eldrad Ulthran",
+      "Maulerfiend"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:command-point-gain",
-      "catalog-ir:stratagem-cost-modifier"
+      "catalog-ir:friendly-engaged-anchor-charge-reroll",
+      "catalog-ir:stratagem-cost-modifier",
+      "catalog-ir:stratagem-phase-use-exception"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -5505,6 +5669,14 @@
         "source_kind": "faction"
       },
       {
+        "ability_id": "000008428",
+        "ability_name": "Blessings of Khorne",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002639/faction/000008428/none",
+        "datasheet_id": "000002639",
+        "datasheet_name": "Maulerfiend",
+        "source_kind": "faction"
+      },
+      {
         "ability_id": "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne",
         "ability_name": "Blessings of Khorne",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/world-eaters/faction/warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne/none",
@@ -5518,13 +5690,15 @@
     ],
     "category_id": "faction.army_rule.blessings_of_khorne",
     "category_name": "World Eaters Army Rule",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
+      "chaos-daemons-bridge-catalog/000002639/faction/000008428/none",
       "runtime-content-warhammer-40000-11th/world-eaters/faction/warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne/none"
     ],
     "datasheet_names": [
       "Defiler",
+      "Maulerfiend",
       "World Eaters"
     ],
     "runtime_consumer_ids": [
@@ -5535,7 +5709,7 @@
       "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords"
     ],
     "source_kind_counts": {
-      "faction": 2
+      "faction": 3
     },
     "support_stages": [
       "engine_consumed"

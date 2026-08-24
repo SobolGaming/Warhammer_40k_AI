@@ -42,8 +42,10 @@ _FORBIDDEN_ENGINE_IMPORTS = {
 _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "AE": "aeldari",
     "CD": "chaos-daemons",
+    "CSM": "chaos-space-marines",
     "EC": "emperors-children",
     "TS": "thousand-sons",
+    "WE": "world-eaters",
 }
 _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "app_core_rules_hidden_2026_08_09": "official_app_capture",
@@ -123,7 +125,10 @@ def test_datasheet_rule_ir_uses_one_stable_physical_sharded_package() -> None:
     assert shard_artifacts == (
         "aeldari.json",
         "chaos-daemons.json",
+        "chaos-space-marines.json",
         "emperors-children.json",
+        "thousand-sons.json",
+        "world-eaters.json",
     )
 
 
@@ -144,7 +149,10 @@ def test_datasheet_rule_ir_shards_record_source_backed_faction_identity() -> Non
     assert tuple(sorted(manifest["shard_artifacts"])) == (
         "aeldari",
         "chaos-daemons",
+        "chaos-space-marines",
         "emperors-children",
+        "thousand-sons",
+        "world-eaters",
     )
     for shard_id, reference in manifest["shard_artifacts"].items():
         assert reference["path"] == f"shards/{shard_id}.json"
@@ -489,7 +497,14 @@ def test_source_specific_rule_ir_builders_share_complete_package_delegate() -> N
 
 @pytest.mark.parametrize(
     "shard_id",
-    ["aeldari", "chaos-daemons", "emperors-children"],
+    [
+        "aeldari",
+        "chaos-daemons",
+        "chaos-space-marines",
+        "emperors-children",
+        "thousand-sons",
+        "world-eaters",
+    ],
 )
 def test_source_specific_checks_preserve_real_loader_compatibility(shard_id: str) -> None:
     generate_registered_rule_ir_shard(shard_id=shard_id, check=True)
@@ -501,7 +516,8 @@ def test_source_specific_checks_preserve_real_loader_compatibility(shard_id: str
                 "from warhammer40k_core.rules.source_packages.warhammer_40000_11th "
                 "import faction_pack_rule_ir as registry; "
                 "assert registry.supported_shard_ids() == "
-                "('aeldari', 'chaos-daemons', 'emperors-children')"
+                "('aeldari', 'chaos-daemons', 'chaos-space-marines', "
+                "'emperors-children', 'thousand-sons', 'world-eaters')"
             ),
         ),
         cwd=ROOT,
@@ -593,7 +609,14 @@ def _redirect_rule_ir_generator_outputs(
     shard_directory = tmp_path / "artifacts" / "shards"
     output_paths = {
         shard_id: shard_directory / f"{shard_id}.json"
-        for shard_id in ("aeldari", "chaos-daemons", "emperors-children")
+        for shard_id in (
+            "aeldari",
+            "chaos-daemons",
+            "chaos-space-marines",
+            "emperors-children",
+            "thousand-sons",
+            "world-eaters",
+        )
     }
     monkeypatch.setattr(
         faction_rule_ir_generator,

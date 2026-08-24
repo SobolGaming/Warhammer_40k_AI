@@ -14,16 +14,22 @@ from tests.support.catalog_package_fixtures import (
 )
 from tests.support.catalog_rule_ir_fixtures import model_bearing_wargear
 from tests.support.catalog_runtime_fixtures import (
+    battle_state_with_armies,
     battle_state_with_army,
     bloodcrushers_battlefield_state,
     current_model_ids,
     player_ability_index,
+    set_current_model_wounds,
+    single_model_unit_placement,
 )
+from tools.generate_ability_support_matrix import _ability_support_catalog_package
 
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
 )
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import collect_battle_shock_test_requests
+from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacedArmy
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
     catalog_charge_roll_modifiers_for_unit,
@@ -31,15 +37,26 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_hook_ids_for_rule,
     record_catalog_feel_no_pain_sources_for_unit,
 )
+from warhammer40k_core.engine.catalog_static_attack_modifier_runtime import (
+    record_catalog_static_rule_effects,
+)
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
 from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.phase import (
+    BattlePhase,
     GameLifecycleError,
 )
+from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierContext,
+    RuntimeModifierRegistry,
+    WoundRollModifierContext,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.rules.rule_ir import (
     RuleIR,
     RuleIRPayload,
@@ -55,6 +72,7 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
     army = bloodcrushers_army(package=package, unit=unit)
     player_index = player_ability_index(package=package, army=army)
     battlefield = bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = battle_state_with_army(army=army, battlefield=battlefield)
     destroyed_bearer_battlefield = battlefield.with_removed_models(
         (
             model_bearing_wargear(
@@ -63,9 +81,14 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
             ).model_instance_id,
         )
     )
+    destroyed_bearer_state = battle_state_with_army(
+        army=army,
+        battlefield=destroyed_bearer_battlefield,
+    )
     records_by_name = {record.definition.name: record for record in player_index.all_records()}
 
     modifiers = catalog_charge_roll_modifiers_for_unit(
+        state=state,
         ability_index=player_index,
         unit=unit,
         current_model_instance_ids=current_model_ids(
@@ -74,6 +97,7 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         ),
     )
     destroyed_bearer_modifiers = catalog_charge_roll_modifiers_for_unit(
+        state=destroyed_bearer_state,
         ability_index=player_index,
         unit=unit,
         current_model_instance_ids=current_model_ids(
@@ -130,18 +154,21 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
     assert result.to_payload()["request"]["roll_modifiers"][0]["operand"] == 1
     with pytest.raises(GameLifecycleError, match="current model evidence must be a tuple"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=player_index,
             unit=unit,
             current_model_instance_ids=cast(tuple[str, ...], ["not-a-tuple"]),
         )
     with pytest.raises(GameLifecycleError, match="current model evidence must not be empty"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=player_index,
             unit=unit,
             current_model_instance_ids=(),
         )
     with pytest.raises(GameLifecycleError, match="current model evidence must not duplicate"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=player_index,
             unit=unit,
             current_model_instance_ids=(
@@ -151,12 +178,14 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         )
     with pytest.raises(GameLifecycleError, match="current model evidence contains unknown"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=player_index,
             unit=unit,
             current_model_instance_ids=("army-khorne:bloodcrushers-1:model:missing",),
         )
     with pytest.raises(GameLifecycleError, match="requires an AbilityCatalogIndex"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=cast(AbilityCatalogIndex, object()),
             unit=unit,
             current_model_instance_ids=current_model_ids(
@@ -166,6 +195,7 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         )
     with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=player_index,
             unit=cast(UnitInstance, object()),
             current_model_instance_ids=current_model_ids(
@@ -175,6 +205,7 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         )
     with pytest.raises(GameLifecycleError, match="current model evidence must contain IDs"):
         catalog_charge_roll_modifiers_for_unit(
+            state=state,
             ability_index=player_index,
             unit=unit,
             current_model_instance_ids=("",),
@@ -322,3 +353,167 @@ def test_phase17k_collar_of_khorne_catalog_ir_records_bearer_psychic_fnp_source(
         )
         == ()
     )
+
+
+def test_world_eaters_maulerfiend_exact_rule_ir_resolves_scent_and_savage_exaltation() -> None:
+    package = _ability_support_catalog_package(datasheet_ids=("000002639", "000004091"))
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+
+    def army_for_datasheet(
+        *,
+        datasheet_id: str,
+        army_id: str,
+        player_id: str,
+        faction_id: str,
+        force_disposition_id: str,
+    ) -> ArmyDefinition:
+        datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
+        model_profile = datasheet.model_profiles[0]
+        unit = factory.instantiate_unit(
+            army_id=army_id,
+            datasheet=datasheet,
+            selection=UnitMusterSelection(
+                unit_selection_id=f"{datasheet_id}-1",
+                datasheet_id=datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id=model_profile.model_profile_id,
+                        model_count=1,
+                    ),
+                ),
+            ),
+        )
+        return ArmyDefinition(
+            army_id=army_id,
+            player_id=player_id,
+            catalog_id=package.army_catalog.catalog_id,
+            source_package_id=package.army_catalog.source_package_id,
+            ruleset_id=package.army_catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id=faction_id,
+                detachment_ids=(f"test-{faction_id.casefold()}",),
+            ),
+            force_disposition_id=force_disposition_id,
+            units=(unit,),
+        )
+
+    world_eaters = army_for_datasheet(
+        datasheet_id="000002639",
+        army_id="world-eaters-army",
+        player_id="world-eaters-player",
+        faction_id="WE",
+        force_disposition_id="take-and-hold",
+    )
+    opponent = army_for_datasheet(
+        datasheet_id="000004091",
+        army_id="opponent-army",
+        player_id="opponent-player",
+        faction_id="EC",
+        force_disposition_id="purge-the-foe",
+    )
+    maulerfiend = world_eaters.units[0]
+    target = opponent.units[0]
+    battlefield = BattlefieldRuntimeState(
+        battlefield_id="world-eaters-maulerfiend-runtime",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            PlacedArmy(
+                army_id=world_eaters.army_id,
+                player_id=world_eaters.player_id,
+                unit_placements=(single_model_unit_placement(world_eaters, maulerfiend, x=10.0),),
+            ),
+            PlacedArmy(
+                army_id=opponent.army_id,
+                player_id=opponent.player_id,
+                unit_placements=(single_model_unit_placement(opponent, target, x=23.0),),
+            ),
+        ),
+    )
+    state = battle_state_with_armies(
+        armies=(world_eaters, opponent),
+        battlefield=battlefield,
+        active_player_id=world_eaters.player_id,
+        phase=BattlePhase.CHARGE,
+    )
+    world_eaters_index = player_ability_index(package=package, army=world_eaters)
+
+    def scent_modifiers() -> tuple[tuple[int, int], ...]:
+        return tuple(
+            (modifier.operand, modifier.priority)
+            for modifier in catalog_charge_roll_modifiers_for_unit(
+                state=state,
+                ability_index=world_eaters_index,
+                unit=maulerfiend,
+                current_model_instance_ids=maulerfiend.own_model_ids(),
+            )
+        )
+
+    assert scent_modifiers() == ()
+    target_model = target.own_models[0]
+    set_current_model_wounds(
+        state,
+        model_instance_id=target_model.model_instance_id,
+        wounds_remaining=target_model.starting_wounds - 1,
+    )
+    assert scent_modifiers() == ((1, 1),)
+    set_current_model_wounds(
+        state,
+        model_instance_id=target_model.model_instance_id,
+        wounds_remaining=(target_model.starting_wounds - 1) // 2,
+    )
+    assert scent_modifiers() == ((2, 2),)
+
+    record_catalog_static_rule_effects(
+        state=state,
+        ability_indexes_by_player_id={
+            world_eaters.player_id: world_eaters_index,
+            opponent.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(world_eaters, opponent),
+    )
+    fists_profile = next(
+        wargear.weapon_profiles[0]
+        for wargear in package.army_catalog.wargear
+        if wargear.wargear_id == "000002639:maulerfiend-fists"
+    )
+    magma_profile = next(
+        wargear.weapon_profiles[0]
+        for wargear in package.army_catalog.wargear
+        if wargear.wargear_id == "000002639:magma-cutter"
+    )
+    modifier_registry = RuntimeModifierRegistry.empty()
+
+    def attack_modifiers(*, melee: bool) -> tuple[int, int]:
+        weapon_profile = fists_profile if melee else magma_profile
+        phase = BattlePhase.FIGHT if melee else BattlePhase.SHOOTING
+        return (
+            modifier_registry.hit_roll_modifier(
+                HitRollModifierContext(
+                    state=state,
+                    attacking_unit_instance_id=maulerfiend.unit_instance_id,
+                    attacker_model_instance_id=maulerfiend.own_models[0].model_instance_id,
+                    target_unit_instance_id=target.unit_instance_id,
+                    weapon_profile=weapon_profile,
+                    source_phase=phase,
+                )
+            ),
+            modifier_registry.wound_roll_modifier(
+                WoundRollModifierContext(
+                    state=state,
+                    source_phase=phase,
+                    attacking_unit_instance_id=maulerfiend.unit_instance_id,
+                    attacker_model_instance_id=maulerfiend.own_models[0].model_instance_id,
+                    target_unit_instance_id=target.unit_instance_id,
+                    weapon_profile=weapon_profile,
+                    strength=weapon_profile.strength.final,
+                    toughness=10,
+                )
+            ),
+        )
+
+    assert attack_modifiers(melee=True) == (1, 1)
+    assert attack_modifiers(melee=False) == (0, 0)

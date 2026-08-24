@@ -387,6 +387,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000004194", "Playable"),
         ("aeldari", "000004195", "Playable"),
         ("aeldari", "000004196", "Playable"),
+        ("chaos-space-marines", "000000968", "Playable"),
         ("chaos-space-marines", "000000969", "Playable"),
         ("death-guard", "000004209", "Playable"),
         ("emperors-children", "000004077", "Playable"),
@@ -401,7 +402,9 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("emperors-children", "000004090", "Playable"),
         ("emperors-children", "000004091", "Playable"),
         ("emperors-children", "000004208", "Playable"),
+        ("thousand-sons", "000001029", "Playable"),
         ("thousand-sons", "000001030", "Playable"),
+        ("world-eaters", "000002639", "Playable"),
         ("world-eaters", "000004207", "Playable"),
     }
     thousand_sons_defiler = next(

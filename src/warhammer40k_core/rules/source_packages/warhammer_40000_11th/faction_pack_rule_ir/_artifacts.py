@@ -350,6 +350,13 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
             package_hash="b0a9d9c6e9d8bd96d578bb17751362b2a3cd9aff531940c59b35498668b72754",
             wire_type=_DualSnapshotMultiDatasheetSourcePackageWire,
         ),
+        "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07": (
+            _SourcePackageDescriptor(
+                artifact_schema="core-v2-chaos-space-marines-maulerfiend-rule-ir-v1",
+                package_hash=("7821c492bb354a2856e30a61499a38d741f8000019533652390301671fc30801"),
+                wire_type=_ReviewedOfficialSnapshotSingleDatasheetSourcePackageWire,
+            )
+        ),
         "gw-11e-emperors-children-fulgrim-datasheet-2026-07": _SourcePackageDescriptor(
             artifact_schema="core-v2-emperors-children-fulgrim-rule-ir-v1",
             package_hash="90b27e3a76f6a2c5b0b5cd3ad678ea284f202ac8f072ef35126d0762792a6d09",
@@ -374,6 +381,16 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
         "gw-11e-emperors-children-lucius-datasheet-2026-07": _SourcePackageDescriptor(
             artifact_schema="core-v2-emperors-children-lucius-rule-ir-v1",
             package_hash="7c770c35c173b33b320af89cc878ca4398567976741160f7ff4873272118877f",
+            wire_type=_ReviewedOfficialSnapshotSingleDatasheetSourcePackageWire,
+        ),
+        "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07": _SourcePackageDescriptor(
+            artifact_schema="core-v2-thousand-sons-maulerfiend-rule-ir-v1",
+            package_hash="cd86855dd730ec1cdc90aa99fbefccc18ec1f80ced1aa97f5210e28f43fbf4ec",
+            wire_type=_ReviewedOfficialSnapshotSingleDatasheetSourcePackageWire,
+        ),
+        "gw-11e-world-eaters-maulerfiend-datasheet-2026-07": _SourcePackageDescriptor(
+            artifact_schema="core-v2-world-eaters-maulerfiend-rule-ir-v1",
+            package_hash="ec2586fd7e601d9eb6cc42939b6c7f8cc36c325175addec49eb1544428424fe1",
             wire_type=_ReviewedOfficialSnapshotSingleDatasheetSourcePackageWire,
         ),
     }

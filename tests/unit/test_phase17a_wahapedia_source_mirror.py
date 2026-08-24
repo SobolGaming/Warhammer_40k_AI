@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import zipfile
 from dataclasses import replace
 from datetime import date
@@ -10,13 +11,15 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from tests.support.wahapedia_source_fixtures import (
-    artifact_by_table,
-    wahapedia_source_artifacts,
-)
+from tests.support.wahapedia_source_fixtures import wahapedia_source_artifacts
 from tools.faction_pack_datasheet_review import (
     DatasheetSourceTreatment,
     faction_pack_datasheet_review,
+)
+from tools.generate_ability_support_matrix import (
+    ABILITY_SUPPORT_DATASHEET_IDS,
+    MAULERFIEND_DATASHEET_IDS,
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_datasheet_keyword_lexicon import (
     build_keyword_sequence_parts,
@@ -29,8 +32,11 @@ from tools.wahapedia_fetch import (
     fetch_wahapedia_sources,
 )
 
-from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
-from warhammer40k_core.engine.list_validation import UnitMusterSelection
+from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.datasheet import DamagedEffectKind
+from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.army_points import calculate_mfm_army_points
+from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.unit_factory import UnitFactory
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -53,13 +59,20 @@ from warhammer40k_core.rules.source_catalog import (
     SourcePackageManifest,
     SourcePackageManifestPayload,
 )
+from warhammer40k_core.rules.source_overlay import (
+    SourceOverlayError,
+    apply_source_release_overlays,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_maulerfiend_datasheet_overlay_2026_07 as maulerfiend_overlay,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
-    ModelHeightOverride,
     build_wahapedia_canonical_bridge_artifacts,
 )
+from warhammer40k_core.rules.wahapedia_bridge_defaults import MAULERFIEND_HEIGHT_OVERRIDES
 from warhammer40k_core.rules.wahapedia_schema import (
     EditionSourceConfig,
     EditionSourceConfigPayload,
@@ -613,9 +626,107 @@ def test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_varia
             DatasheetSourceTreatment.UNCHANGED_PREDECESSOR,
         ),
     }
+    variant_catalog_expectations = {
+        "000000968": {
+            "faction_keyword": "HERETIC ASTARTES",
+            "movement": 10,
+            "keywords": ("CHAOS", "DAEMON", "MAULERFIEND", "VEHICLE", "WALKER"),
+            "abilities": ("Dark Pacts", "Deadly Demise", "Siege Crawler"),
+            "magma_name": "Magma cutters",
+            "magma_skill": 3,
+            "magma_keywords": ("Melta",),
+            "magma_abilities": ("melta:2",),
+            "fists_attacks": 6,
+            "height_source_id": "geometry-review:chaos-space-marines:maulerfiend:height",
+            "footprint_source_id": (
+                "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+                "base-size:page-69-chaos-space-marines-maulerfiend"
+            ),
+        },
+        "000001029": {
+            "faction_keyword": "THOUSAND SONS",
+            "movement": 10,
+            "keywords": (
+                "CHAOS",
+                "DAEMON",
+                "MAULERFIEND",
+                "TZEENTCH",
+                "VEHICLE",
+                "WALKER",
+            ),
+            "abilities": ("Deadly Demise", "Snarling Protector"),
+            "magma_name": "Magma cutter",
+            "magma_skill": 3,
+            "magma_keywords": ("Melta",),
+            "magma_abilities": ("melta:2",),
+            "fists_attacks": 6,
+            "height_source_id": "geometry-review:thousand-sons:maulerfiend:height",
+            "footprint_source_id": (
+                "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+                "base-size:page-90-thousand-sons-maulerfiend"
+            ),
+        },
+        "000002639": {
+            "faction_keyword": "WORLD EATERS",
+            "movement": 12,
+            "keywords": (
+                "CHAOS",
+                "DAEMON",
+                "KHORNE",
+                "MAULERFIEND",
+                "VEHICLE",
+                "WALKER",
+            ),
+            "abilities": (
+                "Blessings of Khorne",
+                "Deadly Demise",
+                "Savage Exaltation",
+                "The Scent of Blood",
+            ),
+            "magma_name": "Magma cutter",
+            "magma_skill": 4,
+            "magma_keywords": ("Melta", "Rapid Fire"),
+            "magma_abilities": ("melta:2", "rapid-fire:1"),
+            "fists_attacks": 8,
+            "height_source_id": "geometry-review:world-eaters:maulerfiend:height",
+            "footprint_source_id": (
+                "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+                "base-size:page-93-world-eaters-maulerfiend"
+            ),
+        },
+        "000004091": {
+            "faction_keyword": "EMPEROR'S CHILDREN",
+            "movement": 10,
+            "keywords": (
+                "CHAOS",
+                "DAEMON",
+                "MAULERFIEND",
+                "SLAANESH",
+                "VEHICLE",
+                "WALKER",
+            ),
+            "abilities": ("Deadly Demise", "Glutton for Punishment", "Thrill Seekers"),
+            "magma_name": "Magma cutters",
+            "magma_skill": 3,
+            "magma_keywords": ("Melta",),
+            "magma_abilities": ("melta:2",),
+            "fists_attacks": 6,
+            "height_source_id": "geometry-review:emperors-children:maulerfiend:height",
+            "footprint_source_id": (
+                "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+                "base-size:page-74-emperors-children-maulerfiend"
+            ),
+        },
+    }
     datasheet_ids = tuple(datasheet_id for _, datasheet_id in variant_details)
-    source_artifacts = wahapedia_source_artifacts()
-    source_datasheets = artifact_by_table(source_artifacts, "Datasheets")
+    source_artifacts = apply_source_release_overlays(
+        source_artifacts=wahapedia_source_artifacts(),
+        release_manifest=maulerfiend_overlay.source_release_manifest(),
+        overlay_packs=(maulerfiend_overlay.overlay_pack(),),
+    )
+    source_datasheets = next(
+        artifact for artifact in source_artifacts if artifact.source_table == "Datasheets"
+    )
     source_identity_by_id: dict[str, tuple[str, str]] = {}
     for row in source_datasheets.rows:
         if row.source_row_id in datasheet_ids:
@@ -652,21 +763,7 @@ def test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_varia
             version="phase17a-test",
         ),
         datasheet_ids=datasheet_ids,
-        height_overrides=tuple(
-            ModelHeightOverride(
-                datasheet_id=datasheet_id,
-                model_name="Maulerfiend",
-                height=90.0,
-                height_units=GeometrySourceUnits.MILLIMETERS,
-                height_source_id=(
-                    f"geometry-review:maulerfiend-cross-faction:{datasheet_id}:height"
-                ),
-                height_document_reference=(
-                    "Maulerfiend cross-faction source-bridge regression fixture"
-                ),
-            )
-            for datasheet_id in datasheet_ids
-        ),
+        height_overrides=MAULERFIEND_HEIGHT_OVERRIDES,
     )
     package = build_canonical_catalog_package(
         package_id=DataPackageId(
@@ -689,6 +786,182 @@ def test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_varia
     for (faction_id, datasheet_id), (_, magma_wargear_id, _) in variant_details.items():
         datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
         model_profile = datasheet.model_profiles[0]
+        expected = variant_catalog_expectations[datasheet_id]
+        magma_profile = next(
+            wargear.weapon_profiles[0]
+            for wargear in package.army_catalog.wargear
+            if wargear.wargear_id == magma_wargear_id
+        )
+        lasher_profile = next(
+            wargear.weapon_profiles[0]
+            for wargear in package.army_catalog.wargear
+            if wargear.wargear_id == f"{datasheet_id}:lasher-tendrils"
+        )
+        fists_profile = next(
+            wargear.weapon_profiles[0]
+            for wargear in package.army_catalog.wargear
+            if wargear.wargear_id == f"{datasheet_id}:maulerfiend-fists"
+        )
+        geometry = next(
+            record
+            for record in package.model_geometries
+            if record.model_profile_id == model_profile.model_profile_id
+        )
+        assert (datasheet.composition[0].min_models, datasheet.composition[0].max_models) == (
+            1,
+            1,
+        )
+        assert {
+            value.characteristic.value: (value.value_kind.value, value.final)
+            for value in model_profile.characteristics
+        } == {
+            "ballistic_skill": ("source_dash", 0),
+            "invulnerable_save": ("numeric", 5),
+            "leadership": ("numeric", 6),
+            "movement": ("numeric", expected["movement"]),
+            "objective_control": ("numeric", 3),
+            "save": ("numeric", 3),
+            "toughness": ("numeric", 10),
+            "weapon_skill": ("source_dash", 0),
+            "wounds": ("numeric", 12),
+        }
+        assert tuple(sorted(datasheet.keywords.keywords)) == expected["keywords"]
+        assert datasheet.keywords.faction_keywords == (expected["faction_keyword"],)
+        assert (
+            tuple(sorted(ability.name for ability in datasheet.abilities)) == expected["abilities"]
+        )
+        assert tuple(
+            (effect.effect_kind, effect.modifier, effect.wounds_min, effect.wounds_max)
+            for effect in datasheet.damaged_effects
+        ) == ((DamagedEffectKind.HIT_ROLL_MODIFIER, -1, 1, 4),)
+        assert model_profile.characteristic(Characteristic.MOVEMENT).final == expected["movement"]
+        assert model_profile.base_size.to_payload() == {
+            "kind": "oval",
+            "diameter_mm": None,
+            "length_mm": 120.0,
+            "width_mm": 92.0,
+        }
+        assert math.isclose(geometry.height.height_inches, 90.0 / 25.4, abs_tol=1e-12)
+        assert expected["height_source_id"] in {
+            evidence.source_id for evidence in geometry.evidence
+        }
+        assert (
+            next(
+                evidence
+                for evidence in geometry.evidence
+                if evidence.evidence_id == f"{model_profile.model_profile_id}:footprint"
+            ).source_id
+            == expected["footprint_source_id"]
+        )
+        magma_damage_dice = magma_profile.damage_profile.dice_expression
+        assert (
+            magma_profile.name,
+            magma_profile.range_profile.kind.value,
+            magma_profile.range_profile.distance_inches,
+            magma_profile.attack_profile.fixed_attacks,
+            magma_profile.skill.final,
+            magma_profile.strength.final,
+            magma_profile.armor_penetration.final,
+            magma_profile.damage_profile.fixed_damage,
+            (
+                None
+                if magma_damage_dice is None
+                else (
+                    magma_damage_dice.quantity,
+                    magma_damage_dice.sides,
+                    magma_damage_dice.modifier,
+                )
+            ),
+            tuple(keyword.value for keyword in magma_profile.keywords),
+            tuple(ability.ability_id for ability in magma_profile.abilities),
+        ) == (
+            expected["magma_name"],
+            "distance",
+            6,
+            2,
+            expected["magma_skill"],
+            9,
+            -4,
+            None,
+            (1, 6, 0),
+            expected["magma_keywords"],
+            expected["magma_abilities"],
+        )
+        fists_damage_dice = fists_profile.damage_profile.dice_expression
+        assert (
+            fists_profile.name,
+            fists_profile.range_profile.kind.value,
+            fists_profile.range_profile.distance_inches,
+            fists_profile.attack_profile.fixed_attacks,
+            fists_profile.skill.final,
+            fists_profile.strength.final,
+            fists_profile.armor_penetration.final,
+            fists_profile.damage_profile.fixed_damage,
+            (
+                None
+                if fists_damage_dice is None
+                else (
+                    fists_damage_dice.quantity,
+                    fists_damage_dice.sides,
+                    fists_damage_dice.modifier,
+                )
+            ),
+            tuple(keyword.value for keyword in fists_profile.keywords),
+            tuple(ability.ability_id for ability in fists_profile.abilities),
+        ) == (
+            "Maulerfiend fists",
+            "melee",
+            None,
+            expected["fists_attacks"],
+            3,
+            14,
+            -2,
+            None,
+            (1, 6, 1),
+            (),
+            (),
+        )
+        assert (
+            lasher_profile.name,
+            lasher_profile.range_profile.kind.value,
+            lasher_profile.range_profile.distance_inches,
+            lasher_profile.attack_profile.fixed_attacks,
+            lasher_profile.skill.final,
+            lasher_profile.strength.final,
+            lasher_profile.armor_penetration.final,
+            lasher_profile.damage_profile.fixed_damage,
+            tuple(keyword.value for keyword in lasher_profile.keywords),
+            tuple(ability.ability_id for ability in lasher_profile.abilities),
+        ) == (
+            "Lasher tendrils",
+            "melee",
+            None,
+            6,
+            3,
+            7,
+            -1,
+            1,
+            ("Extra Attacks",),
+            (),
+        )
+        default_unit = factory.instantiate_unit(
+            army_id=f"{faction_id}-army",
+            datasheet=datasheet,
+            selection=UnitMusterSelection(
+                unit_selection_id=f"{faction_id}-maulerfiend-default",
+                datasheet_id=datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id=model_profile.model_profile_id,
+                        model_count=datasheet.composition[0].min_models,
+                    ),
+                ),
+            ),
+        )
+        assert default_unit.own_models[0].wargear_ids == (
+            f"{datasheet_id}:lasher-tendrils",
+            f"{datasheet_id}:maulerfiend-fists",
+        )
         selection = UnitMusterSelection(
             unit_selection_id=f"{faction_id}-maulerfiend-magma-cutters",
             datasheet_id=datasheet_id,
@@ -732,6 +1005,179 @@ def test_phase17a_maulerfiend_counted_replacement_is_generic_across_source_varia
                 )
             )
         assert reconstructed_identity_rows[0] == reconstructed_identity_rows[1]
+
+
+def test_phase17a_current_maulerfiend_rules_updates_are_fail_closed_and_source_bound() -> None:
+    pack = maulerfiend_overlay.overlay_pack()
+    manifest = maulerfiend_overlay.source_release_manifest()
+    assert manifest.overlay_package_ids == (pack.package_id,)
+    assert maulerfiend_overlay.source_package_identity_payload() == {
+        "source_package_id": pack.package_id.stable_identity(),
+        "source_payload_checksum_sha256": pack.package_hash(),
+        "source_date": "2026-07-22",
+        "source_edition": "warhammer-40000-11th",
+    }
+    assert tuple(
+        (operation.source_row_id, operation.source_reference) for operation in pack.operations
+    ) == (
+        (
+            "000001029:2",
+            "gw-11e-thousand-sons-faction-pack-2026-07:datasheet:000001029:rules-update:page-10",
+        ),
+        (
+            "000002639:3",
+            "gw-11e-world-eaters-faction-pack-2026-07:datasheet:000002639:rules-update:page-8",
+        ),
+    )
+
+    overlaid = apply_source_release_overlays(
+        source_artifacts=wahapedia_source_artifacts(),
+        release_manifest=manifest,
+        overlay_packs=(pack,),
+    )
+    abilities = next(
+        artifact for artifact in overlaid if artifact.source_table == "Datasheets_abilities"
+    )
+    descriptions = {
+        row.source_row_id: row.runtime_fields_payload()["description"]
+        for row in abilities.rows
+        if row.source_row_id in {"000001029:2", "000002639:3"}
+    }
+    assert descriptions == {
+        "000001029:2": maulerfiend_overlay.THOUSAND_SONS_SNARLING_PROTECTOR_DESCRIPTION,
+        "000002639:3": maulerfiend_overlay.WORLD_EATERS_SCENT_OF_BLOOD_DESCRIPTION,
+    }
+
+    stale_pack = replace(
+        pack,
+        operations=(
+            replace(
+                pack.operations[0],
+                expected_preimage_hash=hashlib.sha256(b"stale").hexdigest(),
+            ),
+            pack.operations[1],
+        ),
+    )
+    with pytest.raises(SourceOverlayError, match="target_drift"):
+        apply_source_release_overlays(
+            source_artifacts=wahapedia_source_artifacts(),
+            release_manifest=manifest,
+            overlay_packs=(stale_pack,),
+        )
+
+
+def test_phase17a_all_current_maulerfiends_are_selected_and_mfm_priced() -> None:
+    assert MAULERFIEND_DATASHEET_IDS == (
+        "000000968",
+        "000001029",
+        "000002639",
+        "000004091",
+    )
+    assert set(MAULERFIEND_DATASHEET_IDS) <= set(ABILITY_SUPPORT_DATASHEET_IDS)
+
+    package = _ability_support_catalog_package(datasheet_ids=MAULERFIEND_DATASHEET_IDS)
+    assert tuple(datasheet.datasheet_id for datasheet in package.army_catalog.datasheets) == (
+        "000000968",
+        "000001029",
+        "000002639",
+        "000004091",
+    )
+    assert not any(
+        "DEATH GUARD" in datasheet.keywords.faction_keywords
+        for datasheet in package.army_catalog.datasheets
+    )
+
+    current_rule_text = {
+        (datasheet.datasheet_id, ability.name): ability.effect_description
+        for datasheet in package.army_catalog.datasheets
+        for ability in datasheet.abilities
+        if (datasheet.datasheet_id, ability.name)
+        in {
+            ("000001029", "Snarling Protector"),
+            ("000002639", "The Scent of Blood"),
+        }
+    }
+    assert current_rule_text == {
+        (
+            "000001029",
+            "Snarling Protector",
+        ): maulerfiend_overlay.THOUSAND_SONS_SNARLING_PROTECTOR_DESCRIPTION,
+        (
+            "000002639",
+            "The Scent of Blood",
+        ): maulerfiend_overlay.WORLD_EATERS_SCENT_OF_BLOOD_DESCRIPTION,
+    }
+
+    variant_points = {
+        "000000968": ("CSM", (130, 130, 130)),
+        "000001029": ("TS", (120, 120, 130)),
+        "000002639": ("WE", (140, 140, 150)),
+        "000004091": ("EC", (120, 120, 130)),
+    }
+    for datasheet_id, (faction_id, expected_points) in variant_points.items():
+        datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
+        model_profile_id = datasheet.model_profiles[0].model_profile_id
+        unit_selections = tuple(
+            UnitMusterSelection(
+                unit_selection_id=f"{faction_id.lower()}-maulerfiend-{unit_number}",
+                datasheet_id=datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id=model_profile_id,
+                        model_count=1,
+                    ),
+                ),
+            )
+            for unit_number in range(1, 4)
+        )
+        calculation = calculate_mfm_army_points(
+            catalog=package.army_catalog,
+            request=ArmyMusterRequest(
+                army_id=f"{faction_id.lower()}-maulerfiend-army",
+                player_id="maulerfiend-points-player",
+                catalog_id=package.army_catalog.catalog_id,
+                source_package_id=package.army_catalog.source_package_id,
+                ruleset_id=package.army_catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id=faction_id,
+                    detachment_ids=("maulerfiend-points-proof",),
+                ),
+                force_disposition_id="maulerfiend-points-proof",
+                unit_selections=unit_selections,
+            ),
+        )
+        assert tuple(
+            (
+                line.datasheet_id,
+                line.mfm_unit_record_id,
+                line.mfm_unit_id,
+                line.unit_number,
+                line.model_count,
+                line.base_points,
+                line.wargear_points,
+                line.total_points,
+            )
+            for line in calculation.unit_lines
+        ) == tuple(
+            (
+                datasheet_id,
+                "units-maulerfiend",
+                "maulerfiend",
+                unit_number,
+                1,
+                points,
+                0,
+                points,
+            )
+            for unit_number, points in enumerate(expected_points, start=1)
+        )
+        assert tuple(
+            (point.unit_selection_id, point.points)
+            for point in calculation.roster_unit_point_values()
+        ) == tuple(
+            (selection.unit_selection_id, points)
+            for selection, points in zip(unit_selections, expected_points, strict=True)
+        )
 
 
 def test_phase17a_datasheet_model_blank_name_is_optional_source_text() -> None:

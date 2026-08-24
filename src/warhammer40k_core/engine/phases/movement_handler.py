@@ -193,6 +193,11 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 active_selection=active_selection,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
 
         scenario = _battlefield_scenario(state)
@@ -267,6 +272,7 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
                 ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=self.army_catalog,
@@ -312,26 +318,61 @@ class MovementPhaseHandler:
         action = movement_phase_action_kind_from_token(
             _payload_string(payload, key="movement_phase_action")
         )
-        if action is not MovementPhaseActionKind.NORMAL_MOVE:
-            return None
         movement_state = state.movement_phase_state
         if movement_state is None or movement_state.active_selection is None:
             raise GameLifecycleError("Movement action requires active movement selection.")
         unit_instance_id = movement_state.active_selection.unit_instance_id
-        if not _unit_already_made_normal_move_this_phase(
+        normal_move_already_made = _unit_already_made_normal_move_this_phase(
             state=state,
             player_id=_active_player_id(state),
             unit_instance_id=unit_instance_id,
-        ):
-            return None
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Unit has already made a Normal move this phase.",
-            payload={
-                "invalid_reason": "normal_move_already_used_this_phase",
-                "unit_instance_id": unit_instance_id,
-            },
         )
+        if action is MovementPhaseActionKind.NORMAL_MOVE and normal_move_already_made:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Unit has already made a Normal move this phase.",
+                payload={
+                    "invalid_reason": "normal_move_already_used_this_phase",
+                    "unit_instance_id": unit_instance_id,
+                },
+            )
+        scenario = _battlefield_scenario(state)
+        unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+        current_options = _movement_action_options(
+            state=state,
+            ability_index=_ability_index_for_player(
+                self.ability_indexes_by_player_id,
+                player_id=_active_player_id(state),
+            ),
+            runtime_modifier_registry=self.runtime_modifier_registry,
+            scenario=scenario,
+            unit_placement=unit_placement,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            normal_move_already_made=normal_move_already_made,
+            battle_round=state.battle_round,
+            hover_mode_states=tuple(state.hover_mode_states),
+            battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            objective_markers=_objective_markers_for_state(state),
+            disembarked_unit_state=state.disembarked_unit_state_for_unit(
+                player_id=_active_player_id(state),
+                battle_round=state.battle_round,
+                unit_instance_id=unit_instance_id,
+            ),
+        )
+        current_option = next(
+            (option for option in current_options if option.option_id == result.selected_option_id),
+            None,
+        )
+        if current_option is None or current_option.payload != result.payload:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Movement action modifier context is stale.",
+                payload={
+                    "invalid_reason": "movement_action_option_drift",
+                    "unit_instance_id": unit_instance_id,
+                },
+            )
+        return None
 
     def invalid_proposal_submission_status(
         self,
@@ -650,6 +691,7 @@ def _begin_reinforcements_step(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
     ruleset_descriptor: RulesetDescriptor | None = None,
     army_catalog: ArmyCatalog | None = None,
@@ -675,6 +717,7 @@ def _begin_reinforcements_step(
             decisions=decisions,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             ability_indexes_by_player_id=ability_indexes_by_player_id,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
@@ -722,6 +765,7 @@ def _complete_reinforcements_step(
     decisions: DecisionController,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None,
     ruleset_descriptor: RulesetDescriptor | None = None,
     army_catalog: ArmyCatalog | None = None,
@@ -760,6 +804,7 @@ def _complete_reinforcements_step(
         decisions=decisions,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,

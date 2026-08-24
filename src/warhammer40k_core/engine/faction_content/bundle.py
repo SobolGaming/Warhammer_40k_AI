@@ -7,6 +7,9 @@ from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine import (
+    catalog_conditional_charge_runtime as _conditional_charge,
+)
+from warhammer40k_core.engine import (
     catalog_turn_end_reserves,
     generic_detachment_rule_effects,
     generic_rule_lifecycle_hooks,
@@ -1392,6 +1395,12 @@ class RuntimeContentBundle:
             catalog=catalog,
             records=ability_records,
         )
+        stratagem_records = (
+            _conditional_charge.stratagem_records_with_source_backed_phase_use_exceptions(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                stratagem_records=stratagem_records,
+            )
+        )
         catalog_cp = CatalogCommandPointRuntime(ability_indexes_by_player_id, validated_armies)
         catalog_rules = CatalogDatasheetRuleRuntime(ability_indexes_by_player_id, validated_armies)
         catalog_selected_fight_risk = CatalogSelectedToFightRiskRuntime(
@@ -1654,9 +1663,12 @@ class RuntimeContentBundle:
             )
         )
         charge_declaration_hook_registry = ChargeDeclarationHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.charge_declaration_hook_bindings,
+            (
+                *_conditional_charge.catalog_conditional_charge_declaration_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(vc, lambda c: c.charge_declaration_hook_bindings),
             )
         )
         shooting_target_restriction_hook_registry = (

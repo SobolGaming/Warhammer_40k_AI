@@ -296,18 +296,18 @@ The machine-readable report is `data/generated/ability_coverage/maulerfiend_cros
 | --- | --- | --- |
 | `counted-wargear-replacement` | `content_neutral_engine_mechanic` | The parser and unit factory preserve the counted replacement for all four exact current-source variants; that reuse does not certify their faction-local rules bundles. |
 | `deterministic-weapon-copy-identity` | `content_neutral_engine_mechanic` | Both equipped copies receive stable identities for all four exact current-source variants; identity support alone does not certify faction-local ability execution. |
-| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The contract is generic, but the checked-in end-to-end regression currently certifies only Emperor's Children datasheet 000004091. |
+| `shooting-weapon-copy-contract` | `content_neutral_adapter_and_replay_mechanic` | The shared request, declaration, attack-pool, decision-record, and replay contract is exercised against all four exact current Maulerfiend datasheet IDs, including same-target declarations, split targets, and duplicate-copy rejection. |
 
 #### Exact faction variants
 
-| Faction / exact key | Source treatment | Generated component evidence | Faction-local source rules | Conclusion |
-| --- | --- | --- | --- | --- |
-| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | Not selected | Siege Crawler (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
-| Thousand Sons / `thousand-sons:000001029` | `rules_update` | Not selected | Snarling Protector (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
-| World Eaters / `world-eaters:000002639` | `rules_update` | Not selected | Savage Exaltation (`blocked_structured_semantics`)<br>The Scent of Blood (`blocked_structured_semantics`) | Source-reviewed exact faction variant is not selected into the generated catalog support evidence. Generic mechanics alone do not establish its catalog, geometry, source rules, or faction integration. |
+| Faction / exact key | Source treatment | Current MFM points | Generated component evidence | Faction-local source rules | Conclusion |
+| --- | --- | --- | --- | --- | --- |
+| Chaos Space Marines / `chaos-space-marines:000000968` | `unchanged_predecessor` | all units: **130 pts** (1 model) | `Playable` for this exact ID | Siege Crawler (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Emperor's Children / `emperors-children:000004091` | `unchanged_predecessor` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Glutton for Punishment (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| Thousand Sons / `thousand-sons:000001029` | `rules_update` | units 1-2: **120 pts** (1 model)<br>unit 3+: **130 pts** (1 model) | `Playable` for this exact ID | Snarling Protector (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
+| World Eaters / `world-eaters:000002639` | `rules_update` | units 1-2: **140 pts** (1 model)<br>unit 3+: **150 pts** (1 model) | `Playable` for this exact ID | Savage Exaltation (`engine_consumed`)<br>The Scent of Blood (`engine_consumed`) | Exact faction datasheet has Playable generated component evidence; that evidence does not transfer to another datasheet ID. |
 
-**Death Guard:** The exhaustive current Death Guard Faction Pack review contains no Maulerfiend datasheet row; no synthetic support row is emitted.
+**Death Guard:** The exhaustive current Death Guard Faction Pack review and MFM faction inventory contain no Maulerfiend row; no synthetic support row is emitted.
 
 ## Cross-source Semantic Equivalence
 

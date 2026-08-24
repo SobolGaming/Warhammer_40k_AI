@@ -33,9 +33,6 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     conditional_charge_after_movement_action_allowed,
 )
-from warhammer40k_core.engine.catalog_rule_consumption import (
-    catalog_charge_roll_modifiers_for_unit,
-)
 from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     selected_target_charge_constraint_for_unit,
 )
@@ -43,7 +40,6 @@ from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
     ChargeDistanceState,
     ChargeDistanceStatePayload,
-    ChargeEligibilityContext,
     ChargeRollRequest,
     ChargeRollRequestPayload,
     ChargeRollResult,
@@ -70,9 +66,6 @@ from warhammer40k_core.engine.charge_required_targets import (
 )
 from warhammer40k_core.engine.charge_roll_permissions import (
     charge_reroll_permission_for_unit as _charge_reroll_permission_for_unit,
-)
-from warhammer40k_core.engine.charge_roll_permissions import (
-    current_model_instance_ids_for_charge_unit as _current_model_instance_ids_for_charge_unit,
 )
 from warhammer40k_core.engine.charge_roll_reroll_requests import (
     build_charge_roll_reroll_request,
@@ -114,14 +107,12 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.phases import charge_modifier_ignore as _modifier_ignore
 from warhammer40k_core.engine.phases.charge_move_completed_hooks import (
     resolve_charge_move_completed_hooks,
     validate_charge_move_completed_hook_provider,
 )
-from warhammer40k_core.engine.runtime_modifiers import (
-    ChargeRollModifierContext,
-    RuntimeModifierRegistry,
-)
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionContext,
     ChargeTargetRestrictionHookRegistry,
@@ -143,17 +134,19 @@ from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
+COMPLETE_CHARGE_PHASE_OPTION_ID = _modifier_ignore.COMPLETE_CHARGE_PHASE_OPTION_ID
+SELECT_CHARGING_UNIT_DECISION_TYPE = _modifier_ignore.SELECT_CHARGING_UNIT_DECISION_TYPE
+
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
+    from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+    from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 
 
-SELECT_CHARGING_UNIT_DECISION_TYPE = "select_charging_unit"
-COMPLETE_CHARGE_PHASE_OPTION_ID = "complete_charge_phase"
 CHARGE_MOVE_ACTION = "charge_move"
 FIGHTS_FIRST_CHARGE_EFFECT_KIND = "charge_grants_fights_first"
 CHARGE_AFTER_FALL_BACK_EFFECT_KIND = "charge_after_fall_back_allowed"
-_COMPLETE_CHARGE_PHASE_STATUS = "charge_phase_complete"
 _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = "charge_move_proposal_required"
 _CHARGE_MOVE_INVALID_STATUS = "charge_move_invalid"
 _CHARGE_MOVE_DECLINED_STATUS = "charge_move_declined"
@@ -162,6 +155,18 @@ _CHARGE_MOVE_COMPLETED_STATUS = "charge_move_completed"
 
 def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
     return MappingProxyType({})
+
+
+def _default_stratagem_index() -> StratagemCatalogIndex:
+    from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+
+    return eleventh_edition_stratagem_index()
+
+
+def _empty_stratagem_cost_modifier_registry() -> StratagemCostModifierRegistry:
+    from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+
+    return StratagemCostModifierRegistry.empty()
 
 
 def _empty_declared_charge_targets() -> dict[str, tuple[str, ...]]:
@@ -843,6 +848,10 @@ class ChargePhaseState:
 @dataclass(frozen=True, slots=True)
 class ChargePhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
+    stratagem_index: StratagemCatalogIndex = field(default_factory=_default_stratagem_index)
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
+        default_factory=_empty_stratagem_cost_modifier_registry
+    )
     charge_declaration_hooks: ChargeDeclarationHookRegistry = field(
         default_factory=ChargeDeclarationHookRegistry.empty
     )
@@ -866,12 +875,21 @@ class ChargePhaseHandler:
     )
 
     def __post_init__(self) -> None:
+        from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
+        from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+
         if (
             self.ruleset_descriptor is not None
             and type(self.ruleset_descriptor) is not RulesetDescriptor
         ):
             raise GameLifecycleError(
                 "ChargePhaseHandler ruleset_descriptor must be a RulesetDescriptor."
+            )
+        if type(self.stratagem_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("ChargePhaseHandler stratagem_index must be an index.")
+        if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
+            raise GameLifecycleError(
+                "ChargePhaseHandler stratagem_cost_modifier_registry must be a registry."
             )
         if type(self.charge_declaration_hooks) is not ChargeDeclarationHookRegistry:
             raise GameLifecycleError(
@@ -896,6 +914,12 @@ class ChargePhaseHandler:
     def phase(self) -> BattlePhase:
         return BattlePhase.CHARGE
 
+    def ability_index_for_player(self, player_id: str) -> AbilityCatalogIndex:
+        return _ability_index_for_player(
+            self.ability_indexes_by_player_id,
+            player_id=player_id,
+        )
+
     def begin_phase(
         self,
         *,
@@ -903,7 +927,6 @@ class ChargePhaseHandler:
         decisions: DecisionController,
         reaction_queue: ReactionQueue | None = None,
     ) -> LifecycleStatus:
-        del reaction_queue
         _validate_charge_phase_state(state)
         charge_state = _ensure_charge_phase_state(state=state)
         pending_distance_state = charge_state.move_pending_distance_state()
@@ -925,19 +948,11 @@ class ChargePhaseHandler:
         if move_completed_status is not None:
             return move_completed_status
         if charge_state.phase_complete:
-            decisions.event_log.append(
-                "charge_phase_completed",
-                _charge_phase_status_payload(
-                    state=state,
-                    phase_body_status=_COMPLETE_CHARGE_PHASE_STATUS,
-                ),
-            )
-            return LifecycleStatus.advanced(
-                stage=GameLifecycleStage.BATTLE,
-                payload=_charge_phase_status_payload(
-                    state=state,
-                    phase_body_status=_COMPLETE_CHARGE_PHASE_STATUS,
-                ),
+            return _complete_charge_phase_or_request_heroic_intervention(
+                handler=self,
+                state=state,
+                decisions=decisions,
+                reaction_queue=reaction_queue,
             )
 
         legal_unit_ids = _legal_charging_unit_ids(
@@ -948,19 +963,11 @@ class ChargePhaseHandler:
         )
         if not legal_unit_ids:
             state.replace_charge_phase_state(charge_state.with_phase_complete())
-            decisions.event_log.append(
-                "charge_phase_completed",
-                _charge_phase_status_payload(
-                    state=state,
-                    phase_body_status=_COMPLETE_CHARGE_PHASE_STATUS,
-                ),
-            )
-            return LifecycleStatus.advanced(
-                stage=GameLifecycleStage.BATTLE,
-                payload=_charge_phase_status_payload(
-                    state=state,
-                    phase_body_status=_COMPLETE_CHARGE_PHASE_STATUS,
-                ),
+            return _complete_charge_phase_or_request_heroic_intervention(
+                handler=self,
+                state=state,
+                decisions=decisions,
+                reaction_queue=reaction_queue,
             )
 
         request = DecisionRequest(
@@ -975,11 +982,19 @@ class ChargePhaseHandler:
                     "active_player_id": _active_player_id(state),
                 }
             ),
-            options=_charging_unit_options(
+            options=_modifier_ignore.charging_unit_options_with_modifier_ignore_choices(
                 state=state,
                 unit_ids=legal_unit_ids,
                 include_complete=True,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                active_player_id=_active_player_id(state),
+                unit_lookup=_unit_by_id,
+                target_candidate_provider=_charge_target_candidates,
                 charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             ),
         )
@@ -1074,12 +1089,45 @@ class ChargePhaseHandler:
         raise GameLifecycleError("Charge phase received unsupported decision type.")
 
 
+def _complete_charge_phase_or_request_heroic_intervention(
+    *,
+    handler: ChargePhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+) -> LifecycleStatus:
+    from warhammer40k_core.engine.phases.charge_reactions import (
+        request_end_opponent_charge_heroic_intervention_if_available,
+    )
+
+    reaction_status = request_end_opponent_charge_heroic_intervention_if_available(
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        stratagem_index=handler.stratagem_index,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
+    )
+    if reaction_status is not None:
+        return reaction_status
+    payload = _charge_phase_status_payload(
+        state=state,
+        phase_body_status=_modifier_ignore.COMPLETE_CHARGE_PHASE_STATUS,
+    )
+    decisions.event_log.append("charge_phase_completed", payload)
+    return LifecycleStatus.advanced(
+        stage=GameLifecycleStage.BATTLE,
+        payload=payload,
+    )
+
+
 def invalid_charging_unit_selection_status(
     *,
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus | None:
     invalid_status = _invalid_charging_unit_finite_decision_status(
@@ -1119,15 +1167,6 @@ def invalid_charging_unit_selection_status(
             )
         return None
     selected_unit_id = _payload_string(payload, key="unit_instance_id")
-    if selected_unit_id != result.selected_option_id:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Charging unit selection payload does not match the selected option.",
-            payload={
-                "invalid_reason": "invalid_charging_unit_result",
-                "field": "unit_instance_id",
-            },
-        )
     if selected_unit_id not in current_legal_ids:
         return LifecycleStatus.invalid(
             stage=state.stage,
@@ -1137,7 +1176,23 @@ def invalid_charging_unit_selection_status(
                 "field": "unit_instance_id",
             },
         )
-    return None
+    current_options = _modifier_ignore.charging_unit_options_with_modifier_ignore_choices(
+        state=state,
+        unit_ids=current_legal_ids,
+        include_complete=True,
+        ruleset_descriptor=ruleset_descriptor,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        active_player_id=_active_player_id(state),
+        unit_lookup=_unit_by_id,
+        target_candidate_provider=_charge_target_candidates,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
+    )
+    return _modifier_ignore.invalid_charge_modifier_ignore_context_status(
+        state=state,
+        result=result,
+        current_options=current_options,
+    )
 
 
 def invalid_charge_move_proposal_status(
@@ -1394,7 +1449,7 @@ def _apply_charging_unit_selection_decision(
             "charge_phase_completion_declared",
             _charge_phase_status_payload(
                 state=state,
-                phase_body_status=_COMPLETE_CHARGE_PHASE_STATUS,
+                phase_body_status=_modifier_ignore.COMPLETE_CHARGE_PHASE_STATUS,
                 skipped_unit_ids=skipped_unit_ids,
             ),
         )
@@ -1410,6 +1465,12 @@ def _apply_charging_unit_selection_decision(
     )
     if unit_instance_id not in legal_unit_ids:
         raise GameLifecycleError("Charging unit selection is not currently legal.")
+    _modifier_ignore.record_charge_modifier_ignore_selection(
+        state=state,
+        decisions=decisions,
+        result=result,
+        unit_instance_id=unit_instance_id,
+    )
     selection = ChargingUnitSelection(
         player_id=active_player_id,
         battle_round=state.battle_round,
@@ -1802,20 +1863,11 @@ def _resolve_charge_roll(
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     unit = _unit_for_selection(state=state, selection=selection)
-    roll_modifiers = catalog_charge_roll_modifiers_for_unit(
+    roll_modifiers = _modifier_ignore.charge_roll_modifiers_for_unit(
+        state=state,
         ability_index=ability_index,
         unit=unit,
-        current_model_instance_ids=_current_model_instance_ids_for_charge_unit(
-            state=state,
-            unit=unit,
-        ),
-    )
-    roll_modifiers = runtime_modifier_registry.charge_roll_modifiers(
-        ChargeRollModifierContext(
-            state=state,
-            unit_instance_id=unit.unit_instance_id,
-            current_roll_modifiers=roll_modifiers,
-        )
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     roll_request = ChargeRollRequest(
         request_id=f"charge-roll:{selection.result_id}",
@@ -3017,67 +3069,6 @@ def _charge_move_transition_batch(
             )
         )
     return BattlefieldTransitionBatch(displacements=tuple(displacement_records))
-
-
-def _charging_unit_options(
-    *,
-    state: GameState,
-    unit_ids: tuple[str, ...],
-    include_complete: bool,
-    ruleset_descriptor: RulesetDescriptor,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
-) -> tuple[DecisionOption, ...]:
-    options: list[DecisionOption] = []
-    for unit_id in unit_ids:
-        unit = _unit_by_id(state=state, unit_instance_id=unit_id)
-        target_candidates = _charge_target_candidates(
-            state=state,
-            unit_instance_id=unit_id,
-            ruleset_descriptor=ruleset_descriptor,
-            charge_target_restriction_hooks=charge_target_restriction_hooks,
-        )
-        eligibility_context = ChargeEligibilityContext(
-            player_id=_active_player_id(state),
-            battle_round=state.battle_round,
-            unit_instance_id=unit_id,
-            target_candidates=target_candidates,
-        )
-        options.append(
-            DecisionOption(
-                option_id=unit_id,
-                label=unit.name,
-                payload=validate_json_value(
-                    {
-                        "submission_kind": SELECT_CHARGING_UNIT_DECISION_TYPE,
-                        "game_id": state.game_id,
-                        "battle_round": state.battle_round,
-                        "phase": BattlePhase.CHARGE.value,
-                        "active_player_id": _active_player_id(state),
-                        "unit_instance_id": unit_id,
-                        "eligibility_context": eligibility_context.to_payload(),
-                    }
-                ),
-            )
-        )
-    if include_complete:
-        options.append(
-            DecisionOption(
-                option_id=COMPLETE_CHARGE_PHASE_OPTION_ID,
-                label="Complete Charge Phase",
-                payload=validate_json_value(
-                    {
-                        "submission_kind": COMPLETE_CHARGE_PHASE_OPTION_ID,
-                        "game_id": state.game_id,
-                        "battle_round": state.battle_round,
-                        "phase": BattlePhase.CHARGE.value,
-                        "active_player_id": state.active_player_id,
-                        "phase_body_status": _COMPLETE_CHARGE_PHASE_STATUS,
-                        "skipped_unit_ids": list(unit_ids),
-                    }
-                ),
-            )
-        )
-    return tuple(options)
 
 
 def _ensure_charge_phase_state(*, state: GameState) -> ChargePhaseState:

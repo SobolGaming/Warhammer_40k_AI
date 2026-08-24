@@ -7,6 +7,13 @@ if TYPE_CHECKING:
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.generic_rule_strength_constraints import (
+    TARGET_CONSTRAINT_NOT_BELOW_HALF_STRENGTH,
+    TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
+    TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH,
+    TARGET_CONSTRAINT_TARGET_UNIT_BELOW_HALF_STRENGTH,
+    TARGET_CONSTRAINT_TARGET_UNIT_BELOW_STARTING_STRENGTH,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
@@ -19,9 +26,6 @@ from warhammer40k_core.rules.rule_ir import RuleConditionKind, RuleTargetKind
 
 TARGET_ALLEGIANCE_ENEMY = "enemy"
 TARGET_ALLEGIANCE_FRIENDLY = "friendly"
-TARGET_CONSTRAINT_NOT_BELOW_HALF_STRENGTH = "target_not_below_half_strength"
-TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH = "source_unit_below_starting_strength"
-TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH = "source_unit_below_half_strength"
 
 
 def generic_rule_parameters_from_effect_payload(
@@ -271,6 +275,27 @@ def generic_rule_target_constraints_apply(
                 return False
             continue
         if constraint in {
+            TARGET_CONSTRAINT_TARGET_UNIT_BELOW_STARTING_STRENGTH,
+            TARGET_CONSTRAINT_TARGET_UNIT_BELOW_HALF_STRENGTH,
+        }:
+            if target_unit_instance_id is None:
+                return False
+            target_strength = _target_unit_strength_context(
+                state=state,
+                target_unit_instance_id=target_unit_instance_id,
+            )
+            if (
+                constraint == TARGET_CONSTRAINT_TARGET_UNIT_BELOW_STARTING_STRENGTH
+                and not target_strength.is_below_starting_strength
+            ):
+                return False
+            if (
+                constraint == TARGET_CONSTRAINT_TARGET_UNIT_BELOW_HALF_STRENGTH
+                and not target_strength.is_below_half_strength
+            ):
+                return False
+            continue
+        if constraint in {
             TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_STARTING_STRENGTH,
             TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
         }:
@@ -404,17 +429,28 @@ def _target_is_not_below_half_strength(
     state: object,
     target_unit_instance_id: str,
 ) -> bool:
+    return not _target_unit_strength_context(
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
+    ).is_below_half_strength
+
+
+def _target_unit_strength_context(
+    *,
+    state: object,
+    target_unit_instance_id: str,
+) -> BelowHalfStrengthContext:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
     if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR half-strength gate requires GameState.")
+        raise GameLifecycleError("Generic RuleIR target-strength gate requires GameState.")
     target_unit_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     target_rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=target_unit_id,
     )
-    context = BelowHalfStrengthContext.from_rules_unit(
+    return BelowHalfStrengthContext.from_rules_unit(
         rules_unit=target_rules_unit,
         starting_strength=state.starting_strength_record_for_unit(
             target_rules_unit.unit_instance_id
@@ -423,7 +459,6 @@ def _target_is_not_below_half_strength(
             model.model_instance_id for model in target_rules_unit.alive_models()
         ),
     )
-    return not context.is_below_half_strength
 
 
 def _source_unit_strength_context(

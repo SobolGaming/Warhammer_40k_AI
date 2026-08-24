@@ -841,7 +841,7 @@ EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES = (
         ),
     ),
 )
-EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_HEIGHT_OVERRIDES = (
+EMPERORS_CHILDREN_CHAOS_SPAWN_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004090",
         model_name="Chaos Spawn",
@@ -853,6 +853,47 @@ EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_HEIGHT_OVERRIDES = (
             "community estimate that the official model is approximately one-and-a-half "
             "Chaos Space Marines tall; representative 2.25-inch height; "
             "Warhammer Event Companion 2026-07-22 p.74 (50mm base)"
+        ),
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+)
+MAULERFIEND_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000968",
+        model_name="Maulerfiend",
+        height=90.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-review:chaos-space-marines:maulerfiend:height",
+        height_document_reference=(
+            "https://www.reddit.com/r/ThousandSons/comments/164il3g/maulerfiend_size/ "
+            "assembled-miniature measurement (90mm to upper spines); "
+            "Warhammer Event Companion 2026-07-22 p.69 (120x92mm oval base)"
+        ),
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+    ModelHeightOverride(
+        datasheet_id="000001029",
+        model_name="Maulerfiend",
+        height=90.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-review:thousand-sons:maulerfiend:height",
+        height_document_reference=(
+            "https://www.reddit.com/r/ThousandSons/comments/164il3g/maulerfiend_size/ "
+            "assembled-miniature measurement (90mm to upper spines); "
+            "Warhammer Event Companion 2026-07-22 p.90 (120x92mm oval base)"
+        ),
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+    ModelHeightOverride(
+        datasheet_id="000002639",
+        model_name="Maulerfiend",
+        height=90.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-review:world-eaters:maulerfiend:height",
+        height_document_reference=(
+            "https://www.reddit.com/r/ThousandSons/comments/164il3g/maulerfiend_size/ "
+            "assembled-miniature measurement (90mm to upper spines); "
+            "Warhammer Event Companion 2026-07-22 p.93 (120x92mm oval base)"
         ),
         evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
     ),
@@ -995,7 +1036,8 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DAEMONS_PLAGUEBEARERS_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES,
-    *EMPERORS_CHILDREN_CHAOS_SPAWN_MAULERFIEND_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_CHAOS_SPAWN_HEIGHT_OVERRIDES,
+    *MAULERFIEND_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES,

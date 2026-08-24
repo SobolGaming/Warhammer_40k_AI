@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 from tests.code_quality.source_index import (
+    ast_for,
     combined_source_for,
     function_source_for,
     source_for,
@@ -15,6 +17,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_stratagem
 )
 
 ROOT = Path(__file__).resolve().parents[2]
+ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
 README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
@@ -40,6 +43,7 @@ STRATAGEMS_SPLIT_PATHS = tuple(sorted(STRATAGEMS_PATH.parent.glob("stratagems*.p
 SHOOTING_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting.py"
 SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
+PHASE_USE_EXCEPTION_MODULE = "warhammer40k_core.engine.stratagem_phase_use_exceptions"
 
 
 def _attack_sequence_source() -> str:
@@ -48,6 +52,44 @@ def _attack_sequence_source() -> str:
 
 def _stratagems_source() -> str:
     return combined_source_for(STRATAGEMS_SPLIT_PATHS)
+
+
+def _phase_exception_imports(tree: ast.Module) -> tuple[set[str], set[str]]:
+    direct_symbols: set[str] = set()
+    module_aliases: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module == PHASE_USE_EXCEPTION_MODULE:
+            direct_symbols.update(alias.asname or alias.name for alias in node.names)
+        elif isinstance(node, ast.Import):
+            module_aliases.update(
+                alias.asname or alias.name.rsplit(".", maxsplit=1)[-1]
+                for alias in node.names
+                if alias.name == PHASE_USE_EXCEPTION_MODULE
+            )
+    return direct_symbols, module_aliases
+
+
+def _called_symbol_name(call: ast.Call) -> str | None:
+    if isinstance(call.func, ast.Name):
+        return call.func.id
+    if isinstance(call.func, ast.Attribute):
+        return call.func.attr
+    return None
+
+
+def _call_uses_phase_exception_import(
+    call: ast.Call,
+    *,
+    direct_symbols: set[str],
+    module_aliases: set[str],
+) -> bool:
+    if isinstance(call.func, ast.Name):
+        return call.func.id in direct_symbols
+    return (
+        isinstance(call.func, ast.Attribute)
+        and isinstance(call.func.value, ast.Name)
+        and call.func.value.id in module_aliases
+    )
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -68,6 +110,39 @@ def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
 
     assert {row.stratagem_id for row in rows} == expected_stratagem_ids
     assert [row.stratagem_id for row in rows if row.handler_id.startswith("unsupported:")] == []
+
+
+def test_phase14i_core_stratagem_timing_hosts_do_not_roster_gate_on_phase_exceptions() -> None:
+    offenders: list[str] = []
+    audited_host_count = 0
+    for path in sorted(ENGINE_ROOT.rglob("*.py"), key=lambda item: item.as_posix()):
+        tree = ast_for(path)
+        direct_exception_symbols, exception_module_aliases = _phase_exception_imports(tree)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            calls = tuple(child for child in ast.walk(node) if isinstance(child, ast.Call))
+            if not any(
+                _called_symbol_name(call) == "stratagem_target_proposal_from_index"
+                for call in calls
+            ):
+                continue
+            audited_host_count += 1
+            for call in calls:
+                called_symbol = _called_symbol_name(call)
+                if (
+                    called_symbol is not None and "phase_use_exception" in called_symbol
+                ) or _call_uses_phase_exception_import(
+                    call,
+                    direct_symbols=direct_exception_symbols,
+                    module_aliases=exception_module_aliases,
+                ):
+                    offenders.append(
+                        f"{path.relative_to(ROOT).as_posix()}:{node.name}:{call.lineno}"
+                    )
+
+    assert audited_host_count > 0
+    assert offenders == []
 
 
 def test_phase14i_core_ability_source_rows_have_no_unsupported_handlers() -> None:

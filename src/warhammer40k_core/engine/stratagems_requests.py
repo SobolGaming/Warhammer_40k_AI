@@ -520,6 +520,7 @@ def request_stratagem_target_proposal(
     decisions: DecisionController,
     proposal_request: StratagemTargetProposal,
     allow_decline: bool = False,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem proposal requires a DecisionController.")
@@ -529,11 +530,12 @@ def request_stratagem_target_proposal(
         raise GameLifecycleError("Stratagem proposal decline allowance must be a bool.")
     if proposal_request.target_binding is not None:
         raise GameLifecycleError("Stratagem proposal request cannot include a target binding.")
-    violation = _stratagem_unavailable_reason(
+    violation = _parameterized_stratagem_unavailable_reason(
         state=state,
         record=proposal_request.catalog_record,
         context=proposal_request.context,
-        target_binding=None,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        require_legal_affordable_target=False,
     )
     if violation is not None:
         return LifecycleStatus.unsupported(
@@ -628,9 +630,15 @@ def stratagem_target_proposal_from_index(
     index: StratagemCatalogIndex,
     context: StratagemEligibilityContext,
     handler_id: str,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+    require_legal_affordable_target: bool = False,
 ) -> StratagemTargetProposal | None:
     if type(index) is not StratagemCatalogIndex:
         raise GameLifecycleError("Stratagem target proposal requires a StratagemCatalogIndex.")
+    if type(require_legal_affordable_target) is not bool:
+        raise GameLifecycleError(
+            "Stratagem target proposal strict target preflight must be a bool."
+        )
     if type(context) is not StratagemEligibilityContext:
         raise GameLifecycleError("Stratagem target proposal requires an eligibility context.")
     requested_handler_id = _validate_identifier("handler_id", handler_id)
@@ -641,10 +649,185 @@ def stratagem_target_proposal_from_index(
             continue
         if definition.target_spec.enumerable:
             continue
-        if _record_is_available_for_context(state=state, record=record, context=context):
+        if (
+            _parameterized_stratagem_unavailable_reason(
+                state=state,
+                record=record,
+                context=context,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+                require_legal_affordable_target=require_legal_affordable_target,
+            )
+            is None
+        ):
             matches.append(record)
     if not matches:
         return None
     if len(matches) > 1:
         raise GameLifecycleError("Stratagem target proposal index matched multiple records.")
     return StratagemTargetProposal.for_request(context=context, catalog_record=matches[0])
+
+
+def _parameterized_stratagem_unavailable_reason(
+    *,
+    state: GameState,
+    record: StratagemCatalogRecord,
+    context: StratagemEligibilityContext,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
+    require_legal_affordable_target: bool,
+) -> str | None:
+    """Return why no legal, affordable target proposal can be submitted.
+
+    Parameterized requests cannot always test affordability against an unbound
+    target: source-backed cost modifiers may depend on the physical unit selected,
+    and selectable modes can have different costs and target geometry.  Target
+    enumeration here remains engine-internal; adapters still submit the target
+    through the parameterized decision contract.
+    """
+    global_violation = _stratagem_unavailable_reason(
+        state=state,
+        record=record,
+        context=context,
+        target_binding=None,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        ignore_command_point_affordability=True,
+    )
+    if global_violation is not None:
+        return global_violation
+
+    definition = record.definition
+    unbound_minimum_is_affordable = False
+    if not require_legal_affordable_target:
+        unbound_effect_selections: tuple[JsonValue, ...] = (None,)
+        if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
+            unbound_effect_selections = tuple(
+                {HEROIC_INTERVENTION_MODE_CONTEXT_KEY: mode}
+                for mode in _heroic_intervention_mode_costs(definition)
+            )
+        unbound_command_point_costs = tuple(
+            _selected_command_point_cost(
+                state=state,
+                definition=definition,
+                context=context,
+                target_binding=None,
+                effect_selection=effect_selection,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            )
+            for effect_selection in unbound_effect_selections
+        )
+        minimum_unbound_command_point_cost = min(unbound_command_point_costs)
+        maximum_unbound_command_point_cost = max(unbound_command_point_costs)
+        unbound_minimum_is_affordable = (
+            state.command_point_total(context.player_id) >= minimum_unbound_command_point_cost
+        )
+        if state.command_point_total(context.player_id) >= maximum_unbound_command_point_cost:
+            return None
+
+    candidate_bindings = _enumerated_target_bindings(
+        state=state,
+        player_id=context.player_id,
+        definition=definition,
+        context=context,
+    )
+    if not candidate_bindings:
+        if unbound_minimum_is_affordable:
+            return None
+        return "no_eligible_target_binding"
+
+    found_restriction_eligible_candidate = False
+    for target_binding in candidate_bindings:
+        if (
+            _restriction_violation(
+                state=state,
+                player_id=context.player_id,
+                definition=definition,
+                context=context,
+                target_binding=target_binding,
+            )
+            is not None
+        ):
+            continue
+        for effect_selection in _parameterized_affordability_effect_selections(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+        ):
+            if (
+                _effect_selection_error(
+                    definition=definition,
+                    context=context,
+                    effect_selection=effect_selection,
+                )
+                is not None
+            ):
+                continue
+            if not _parameterized_effect_selection_has_legal_target_context(
+                state=state,
+                definition=definition,
+                context=context,
+                target_binding=target_binding,
+                effect_selection=effect_selection,
+            ):
+                continue
+            found_restriction_eligible_candidate = True
+            command_point_cost = _selected_command_point_cost(
+                state=state,
+                definition=definition,
+                context=context,
+                target_binding=target_binding,
+                effect_selection=effect_selection,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            )
+            if state.command_point_total(context.player_id) >= command_point_cost:
+                return None
+
+    if found_restriction_eligible_candidate:
+        return "insufficient_command_points"
+    if unbound_minimum_is_affordable:
+        return None
+    return "no_eligible_target_binding"
+
+
+def _parameterized_affordability_effect_selections(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+) -> tuple[JsonValue, ...]:
+    if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        return tuple(
+            {HEROIC_INTERVENTION_MODE_CONTEXT_KEY: mode}
+            for mode in _heroic_intervention_mode_costs(definition)
+        )
+    return _effect_selections_for_binding(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=target_binding,
+    )
+
+
+def _parameterized_effect_selection_has_legal_target_context(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    effect_selection: JsonValue,
+) -> bool:
+    if definition.handler_id != CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        return True
+    mode = _heroic_intervention_mode(
+        definition=definition,
+        effect_selection=effect_selection,
+    )
+    return bool(
+        _heroic_intervention_reachable_target_distances(
+            state=state,
+            player_id=context.player_id,
+            heroic_unit_id=_require_target_unit_id(target_binding),
+            mode=mode,
+            maximum_distance_inches=int(HEROIC_INTERVENTION_TARGET_RANGE_INCHES),
+        )
+    )

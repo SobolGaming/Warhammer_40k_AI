@@ -21,8 +21,9 @@ from warhammer40k_core.engine.semantic_equivalence import (
     CrossSourceSemanticAudit,
     SemanticContentKind,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import mfm_2026_07
 
-SCHEMA_VERSION = "maulerfiend-cross-faction-support-v1"
+SCHEMA_VERSION = "maulerfiend-cross-faction-support-v2"
 FAMILY_ID = "warhammer_40000_11th:datasheet-family:maulerfiend"
 
 _EXPECTED_VARIANT_RULE_NAMES = {
@@ -32,6 +33,12 @@ _EXPECTED_VARIANT_RULE_NAMES = {
     ("world-eaters", "000002639"): ("Savage Exaltation", "The Scent of Blood"),
 }
 _DEATH_GUARD_FACTION_ID = "death-guard"
+_EXPECTED_CURRENT_POINTS = {
+    ("chaos-space-marines", "000000968"): ((1, None, 1, 130),),
+    ("emperors-children", "000004091"): ((1, 2, 1, 120), (3, None, 1, 130)),
+    ("thousand-sons", "000001029"): ((1, 2, 1, 120), (3, None, 1, 130)),
+    ("world-eaters", "000002639"): ((1, 2, 1, 140), (3, None, 1, 150)),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,8 +89,9 @@ _GENERIC_MECHANICS = (
             "test_maulerfiend_magma_cutter_copies_can_split_legal_targets",
         ),
         certification_limit=(
-            "The contract is generic, but the checked-in end-to-end regression currently "
-            "certifies only Emperor's Children datasheet 000004091."
+            "The shared request, declaration, attack-pool, decision-record, and replay "
+            "contract is exercised against all four exact current Maulerfiend datasheet IDs, "
+            "including same-target declarations, split targets, and duplicate-copy rejection."
         ),
     ),
 )
@@ -147,6 +155,23 @@ class ComponentSupportPayload(TypedDict):
     tests_evidence: str
 
 
+class CurrentPointsBracketPayload(TypedDict):
+    unit_number_min: int
+    unit_number_max: int | None
+    model_count: int
+    points: int
+    source_ids: list[str]
+
+
+class CurrentPointsPayload(TypedDict):
+    source_package_id: str
+    source_payload_checksum_sha256: str
+    faction_id: str
+    datasheet_id: str
+    mfm_unit_id: str
+    brackets: list[CurrentPointsBracketPayload]
+
+
 class MaulerfiendVariantPayload(TypedDict):
     key: str
     faction_id: str
@@ -158,6 +183,7 @@ class MaulerfiendVariantPayload(TypedDict):
     identity_scope: str
     reusable_generic_mechanic_ids: list[str]
     component_support: ComponentSupportPayload | None
+    current_points: CurrentPointsPayload
     faction_local_rules: list[FactionLocalRulePayload]
     support_conclusion: str
 
@@ -206,6 +232,20 @@ def maulerfiend_cross_faction_support(
             reviewed_variants[key] = (review, review_row)
     if set(reviewed_variants) != set(_EXPECTED_VARIANT_RULE_NAMES):
         raise ValueError("Maulerfiend current-source faction variants drifted.")
+
+    expected_mfm_faction_ids = {
+        faction_id for faction_id, _datasheet_id in _EXPECTED_VARIANT_RULE_NAMES
+    }
+    current_mfm_faction_ids = {
+        faction_id
+        for faction_id in mfm_2026_07.supported_faction_ids()
+        if any(
+            unit.source_section_id == "units" and unit.name.casefold() == "maulerfiend"
+            for unit in mfm_2026_07.faction_record(faction_id).units
+        )
+    }
+    if current_mfm_faction_ids != expected_mfm_faction_ids:
+        raise ValueError("Maulerfiend current MFM faction inventory drifted.")
 
     death_guard_review = review_by_faction_id.get(_DEATH_GUARD_FACTION_ID)
     if death_guard_review is None:
@@ -288,6 +328,11 @@ def maulerfiend_cross_faction_support(
                 ),
                 "reusable_generic_mechanic_ids": list(mechanic_ids),
                 "component_support": component_support,
+                "current_points": _current_points_payload(
+                    faction_id=review.faction_id,
+                    datasheet_id=datasheet_id,
+                    datasheet_name=review_row.datasheet_name,
+                ),
                 "faction_local_rules": [
                     {
                         "rule_name": member.rule_name,
@@ -327,8 +372,8 @@ def maulerfiend_cross_faction_support(
                 "faction_name": death_guard_review.faction_name,
                 "status": "not_present_in_current_source_review",
                 "evidence": (
-                    "The exhaustive current Death Guard Faction Pack review contains no "
-                    "Maulerfiend datasheet row; no synthetic support row is emitted."
+                    "The exhaustive current Death Guard Faction Pack review and MFM faction "
+                    "inventory contain no Maulerfiend row; no synthetic support row is emitted."
                 ),
             }
         ],
@@ -373,10 +418,10 @@ def maulerfiend_cross_faction_support_markdown(
             f"{subsection_heading_prefix} Exact faction variants",
             "",
             (
-                "| Faction / exact key | Source treatment | Generated component evidence | "
-                "Faction-local source rules | Conclusion |"
+                "| Faction / exact key | Source treatment | Current MFM points | "
+                "Generated component evidence | Faction-local source rules | Conclusion |"
             ),
-            "| --- | --- | --- | --- | --- |",
+            "| --- | --- | --- | --- | --- | --- |",
         )
     )
     for row in payload["rows"]:
@@ -390,9 +435,13 @@ def maulerfiend_cross_faction_support_markdown(
             f"{rule['rule_name']} (`{rule['execution_status']}`)"
             for rule in row["faction_local_rules"]
         )
+        points_label = "<br>".join(
+            _current_points_bracket_label(bracket) for bracket in row["current_points"]["brackets"]
+        )
         lines.append(
             f"| {row['faction_name']} / `{row['key']}` | `{row['source_treatment']}` | "
-            f"{component_label} | {rules_label} | {row['support_conclusion']} |"
+            f"{points_label} | {component_label} | {rules_label} | "
+            f"{row['support_conclusion']} |"
         )
     for absent in payload["absent_factions"]:
         lines.extend(("", f"**{absent['faction_name']}:** {absent['evidence']}"))
@@ -405,3 +454,73 @@ def includes_maulerfiend_faction(
     return any(row["faction_id"] == faction_id for row in payload["rows"]) or any(
         row["faction_id"] == faction_id for row in payload["absent_factions"]
     )
+
+
+def _current_points_payload(
+    *,
+    faction_id: str,
+    datasheet_id: str,
+    datasheet_name: str,
+) -> CurrentPointsPayload:
+    expected = _EXPECTED_CURRENT_POINTS.get((faction_id, datasheet_id))
+    if expected is None:
+        raise ValueError("Maulerfiend current-points exact identity is unreviewed.")
+    faction = mfm_2026_07.faction_record(faction_id)
+    matches = tuple(
+        unit
+        for unit in faction.units
+        if unit.name.casefold() == datasheet_name.casefold() and unit.source_section_id == "units"
+    )
+    if len(matches) != 1:
+        raise ValueError("Maulerfiend current MFM faction/name identity drifted.")
+    unit = matches[0]
+    brackets: list[CurrentPointsBracketPayload] = []
+    actual: list[tuple[int, int | None, int, int]] = []
+    for bracket in unit.cost_brackets:
+        if len(bracket.rows) != 1:
+            raise ValueError("Maulerfiend current MFM bracket must have one model-count row.")
+        row = bracket.rows[0]
+        if row.model_count is None:
+            raise ValueError("Maulerfiend current MFM row must carry a model count.")
+        actual.append(
+            (
+                bracket.unit_number_min,
+                bracket.unit_number_max,
+                row.model_count,
+                row.points,
+            )
+        )
+        brackets.append(
+            {
+                "unit_number_min": bracket.unit_number_min,
+                "unit_number_max": bracket.unit_number_max,
+                "model_count": row.model_count,
+                "points": row.points,
+                "source_ids": [bracket.source_id, row.source_id],
+            }
+        )
+    if tuple(actual) != expected:
+        raise ValueError("Maulerfiend current MFM points drifted from reviewed values.")
+    return {
+        "source_package_id": mfm_2026_07.SOURCE_PACKAGE_ID,
+        "source_payload_checksum_sha256": (mfm_2026_07.SOURCE_PAYLOAD_CHECKSUM_SHA256),
+        "faction_id": faction_id,
+        "datasheet_id": datasheet_id,
+        "mfm_unit_id": unit.unit_id,
+        "brackets": brackets,
+    }
+
+
+def _current_points_bracket_label(bracket: CurrentPointsBracketPayload) -> str:
+    maximum = bracket["unit_number_max"]
+    if maximum is None:
+        unit_range = (
+            "all units"
+            if bracket["unit_number_min"] == 1
+            else f"unit {bracket['unit_number_min']}+"
+        )
+    elif maximum == bracket["unit_number_min"]:
+        unit_range = f"unit {maximum}"
+    else:
+        unit_range = f"units {bracket['unit_number_min']}-{maximum}"
+    return f"{unit_range}: **{bracket['points']} pts** ({bracket['model_count']} model)"

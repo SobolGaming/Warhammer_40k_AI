@@ -7,6 +7,14 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.catalog_modifier_ignore import (
+    ModifierIgnoreKind,
+    catalog_modifier_ignore_permissions_for_unit,
+)
+from warhammer40k_core.engine.modifier_ignore import (
+    ModifierIgnoreSnapshot,
+    options_with_modifier_ignore_choices,
+)
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
@@ -87,6 +95,9 @@ def _mission_action_state_is_active_for_unit(
 
 def _movement_action_options(
     *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
@@ -230,7 +241,98 @@ def _movement_action_options(
                         )
                     )
             continue
-    return tuple(options)
+    return _movement_options_with_modifier_ignore_choices(
+        state=state,
+        ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        unit_placement=unit_placement,
+        options=tuple(options),
+    )
+
+
+def _movement_options_with_modifier_ignore_choices(
+    *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    unit_placement: UnitPlacement,
+    options: tuple[DecisionOption, ...],
+) -> tuple[DecisionOption, ...]:
+    unit = _unit_instance_by_id(
+        state=state,
+        unit_instance_id=unit_placement.unit_instance_id,
+    )
+    current_model_ids = tuple(
+        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
+    )
+    permissions = catalog_modifier_ignore_permissions_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+    )
+    if not permissions:
+        return options
+    models_by_id = {model.model_instance_id: model for model in unit.own_models}
+    movement_snapshots: list[ModifierIgnoreSnapshot] = []
+    for model_id in current_model_ids:
+        model = models_by_id.get(model_id)
+        if model is None:
+            raise GameLifecycleError("Movement modifier snapshot model is not owned by unit.")
+        base_movement = float(_model_movement_inches(model))
+        _modified, applications = runtime_modifier_registry.movement_budget_modifier_trace(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model_id,
+                base_movement_inches=base_movement,
+                current_movement_inches=base_movement,
+            )
+        )
+        movement_snapshots.extend(
+            ModifierIgnoreSnapshot(
+                kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
+                modifier_id=application.modifier_id,
+                source_id=application.source_id,
+                model_instance_id=model_id,
+            )
+            for application in applications
+        )
+    advance_modifiers = runtime_modifier_registry.advance_roll_modifiers(
+        AdvanceRollModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            current_roll_modifiers=(),
+        )
+    )
+    advance_snapshots = tuple(
+        ModifierIgnoreSnapshot.for_roll_modifier(
+            kind=ModifierIgnoreKind.ADVANCE_ROLL,
+            modifier=modifier,
+        )
+        for modifier in advance_modifiers
+    )
+    expanded: list[DecisionOption] = []
+    for option in options:
+        if not isinstance(option.payload, dict):
+            raise GameLifecycleError("Movement action option payload must be an object.")
+        action = movement_phase_action_kind_from_token(
+            _payload_string(option.payload, key="movement_phase_action")
+        )
+        if action is MovementPhaseActionKind.REMAIN_STATIONARY:
+            expanded.append(option)
+            continue
+        snapshots: tuple[ModifierIgnoreSnapshot, ...] = tuple(movement_snapshots)
+        if action is MovementPhaseActionKind.ADVANCE:
+            snapshots = (*snapshots, *advance_snapshots)
+        expanded.extend(
+            options_with_modifier_ignore_choices(
+                option=option,
+                unit_instance_id=unit.unit_instance_id,
+                permissions=permissions,
+                available_modifiers=snapshots,
+            )
+        )
+    return tuple(expanded)
 
 
 def _advance_roll_request_for_action(

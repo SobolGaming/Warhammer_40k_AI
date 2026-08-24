@@ -1,0 +1,110 @@
+{
+  "artifact_schema": "core-v2-faction-pack-rule-ir-shard-v1",
+  "datasheet_faction_ids": {
+    "000000968": "chaos-space-marines"
+  },
+  "datasheet_faction_ids_provenance": {
+    "source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
+    "source_snapshot_filename": "Datasheets.json",
+    "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
+  },
+  "edition": 11,
+  "package_hash": "a8f15143582e1665218c63bcbf5609caa546372f47ca06c0d05d4f253ed52e7c",
+  "shard_id": "chaos-space-marines",
+  "source_packages": {
+    "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07": {
+      "artifact_schema": "core-v2-chaos-space-marines-maulerfiend-rule-ir-v1",
+      "datasheet_id": "000000968",
+      "datasheet_name": "Maulerfiend",
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_chaos_space_marines-att4ehoaum-8mmiunajyf.pdf",
+      "official_document_pages": [],
+      "official_document_sha256": "407dd6f175a7c27e0cb20bc95f68675ab0f9250883f08660cd2f16ef6d9f4998",
+      "overlay_package_hash": "29fbb383c552fabc98fb36baad25816e19e2842b5b1d7d6ad6f5ebcbec616fd9",
+      "package_hash": "7821c492bb354a2856e30a61499a38d741f8000019533652390301671fc30801",
+      "records": {
+        "000000968:3": {
+          "ability_name": "Siege Crawler",
+          "normalized_text_sha256": "1df0c4e1113123b7e634de4a22551fa0b2e69d3c37fd9bf9e846ae200ac39b25",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:chaos-space-marines:maulerfiend:datasheet:000000968:3:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 116,
+                    "start": 0,
+                    "text": "You can ignore any or all modifiers to this model's Move characteristic and to Advance and Charge rolls made for it."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "modifier_ignore_permission"
+                      },
+                      {
+                        "key": "modifier_kinds",
+                        "value": [
+                          "movement_characteristic",
+                          "advance_roll",
+                          "charge_roll"
+                        ]
+                      },
+                      {
+                        "key": "selection",
+                        "value": "any_or_all"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 35,
+                      "start": 8,
+                      "text": "ignore any or all modifiers"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 116,
+                  "start": 0,
+                  "text": "You can ignore any or all modifiers to this model's Move characteristic and to Advance and Charge rolls made for it."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 49,
+                    "start": 39,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:modifier-ignore-permission",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "216c8b517a9934133bce5b4c3db86da8b400f9ca2ed3c6c1334bd3cf7ce7ef18",
+            "normalized_text": "You can ignore any or all modifiers to this model's Move characteristic and to Advance and Charge rolls made for it.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:chaos-space-marines:maulerfiend:datasheet:000000968:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07:datasheet:000000968:3"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "review_row_id": "source:000000968",
+      "review_treatment": "unchanged_predecessor",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    }
+  }
+}

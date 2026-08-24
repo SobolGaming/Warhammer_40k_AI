@@ -690,6 +690,27 @@ Adapter helper APIs should take `request_id` explicitly even when a local wrappe
 
 Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. Remain Stationary resolves as a finite action. Normal Move, Advance, and Fall Back always emit a follow-up `submit_movement_proposal` request carrying the same mode context; adapters must submit the actual `PathWitness` and model poses through that parameterized request.
 
+When source-backed runtime content lets the selected unit ignore any or all
+applicable Move-characteristic or Advance-roll modifiers, the existing
+`select_movement_action` finite space enumerates every legal physical-modifier
+subset. The keep-all choice retains the normal action option ID. A choice that
+ignores one or more modifiers appends a deterministic `:ignore:<hash>` suffix
+to that action option ID. Its payload adds `modifier_ignore_context`, containing
+the selected `unit_instance_id`, source/record/RuleIR/clause provenance under
+`permissions`, the complete `available_modifiers` snapshot, and the selected
+`ignored_modifiers` subset. Each modifier snapshot carries `kind`, stable
+`modifier_id`, optional `source_id`, and a `model_instance_id` only for a
+Move-characteristic modifier. Normal Move and Fall Back enumerate applicable
+Move-characteristic modifiers; Advance enumerates both Move-characteristic and
+Advance-roll modifiers. Remain Stationary is not expanded. Adapters must submit
+one exact engine-enumerated option ID and payload, and must not classify a
+modifier as beneficial or detrimental or edit the subset locally. The accepted
+selection is recorded as a phase-scoped engine effect and
+`modifier_ignores_selected` event before movement or the Advance roll resolves.
+Duplicate, malformed, invented, no-longer-applicable, or stale modifier
+contexts reject before queue pop and before a `DecisionRecord` or selection
+effect is created.
+
 Terrain classification is authoritative during movement-proposal validation.
 All models can move horizontally and vertically through Light terrain.
 `INFANTRY`/`BEASTS`/`SWARM` models can move horizontally and vertically through
@@ -1338,7 +1359,7 @@ Phase 12B introduces the initial parameterized Stratagem target-binding decision
 
 Phase-integrated optional Stratagem windows may also be declined through the same lifecycle path. Finite `use_stratagem` windows include the engine-emitted option ID `decline_stratagem_window` with payload `{"submission_kind": "decline_stratagem_window"}`. Parameterized `submit_stratagem_target_proposal` windows are declinable only when the engine marks the request payload with `declinable: true`; adapters decline by submitting the fixed `submit_parameterized_payload` option with the same decline payload instead of a typed `proposal`. A decline records a `DecisionRecord`, emits `stratagem_window_declined`, spends no CP, creates no `StratagemUseRecord`, applies no effect, and suppresses re-opening the same game/player/round/phase/trigger/timing-window. Phase hooks that expose multiple optional Stratagem opportunities under the same phase and trigger must assign distinct `timing_window_id` values so declining one window cannot suppress a separate later window. Reaction-window declines resolve the reaction frame and then emit `reaction_parent_resumed`.
 
-Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Accepted parameterized submissions apply the Stratagem use atomically through `GameLifecycle.submit_decision(...)`: the engine re-checks timing, CP, restrictions, target validity, spends CP, records `StratagemUseRecord`, emits `stratagem_used`, and applies any Phase-12B-supported handler/effect payload. The only post-selection affordability exception is the source-backed cost-increase case documented in the Phase 17G Stratagem-cost modifier contract below. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
+Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule: stale, drifted, malformed, schema-invalid, or wrong-context payloads are rejected before the queue is popped or a `DecisionRecord` is created. They must not spend CP or mutate state. Before emitting a parameterized Stratagem request, the engine evaluates its current legal target bindings and target-dependent runtime cost modifiers and requires at least one restriction-eligible, affordable candidate. This enumeration is engine-internal and does not convert the request into a finite adapter choice: adapters must still submit the target binding, and an unaffordable target remains invalid even when another target made the request available. Accepted parameterized submissions apply the Stratagem use atomically through `GameLifecycle.submit_decision(...)`: the engine re-checks timing, CP, restrictions, target validity, spends CP, records `StratagemUseRecord`, emits `stratagem_used`, and applies any Phase-12B-supported handler/effect payload. The only post-selection affordability exception is the source-backed cost-increase case documented in the Phase 17G Stratagem-cost modifier contract below. Rule-invalid but well-formed proposals may be recorded as rejected attempts only when the specific proposal contract explicitly allows that behavior and emits a fresh pending request for retry.
 
 Phase 12C source-backed Core Stratagems are adapter-visible through these handler bindings:
 
@@ -1418,17 +1439,26 @@ Phase 15E adds these Stratagem-coupled Charge/Fight decisions:
 - Counteroffensive and Epic Challenge are `submit_stratagem_target_proposal` requests emitted from Fight-step timing hooks. Counteroffensive target proposals are reaction-window requests for the opponent after an enemy unit has resolved attacks. Epic Challenge target proposals are declinable requests for the player whose CHARACTER unit has just been selected to fight.
 - Crushing Impact is a Charge-phase `submit_stratagem_target_proposal` after a friendly MONSTER/VEHICLE ends a Charge Move. Its nested enemy/model selections are carried in `effect_selection`, not in adapter-owned state.
 
-Source-backed per-unit exceptions to Counteroffensive's same-Stratagem-per-phase
-restriction retain this proposal shape and the `core:counteroffensive` handler.
+Core Heroic Intervention timing is hosted at the end of every opponent Charge
+phase whenever the reacting player has at least one concrete legal and affordable
+target. The timing window is not gated by possession of a source-backed exception
+unit. Source-overlaid Stratagem records retain the ordinary parameterized proposal
+shape and `core:heroic-intervention` handler; target-specific validation applies
+the normal once-per-phase restriction and cost to ordinary targets or the
+source-backed phase-use exception and cost modifier to a qualifying target.
+
+Source-backed per-unit exceptions to Heroic Intervention's or
+Counteroffensive's same-Stratagem-per-phase restriction retain the corresponding
+Core proposal shape and handler.
 When such a source is active, the embedded catalog record's
 `definition.effect_payload.stratagem_phase_use_exception` contains the stable
 source ability ID, runtime descriptor ID, exact eligible datasheet IDs,
 `frequency_scope: "phase_per_unit"`, and the two non-blocking phase-use flags.
 The engine may therefore keep the parameterized opportunity available after an
-earlier Counteroffensive use when the actor owns a qualifying unit. Adapters
+earlier use when a concrete qualifying target remains legal and affordable. Adapters
 must treat this payload as engine-owned availability context: they must not
 infer qualifying units from display names or rule text, suppress the opportunity
-because another unit used Counteroffensive, or synthesize an additional use.
+because another unit used the same Stratagem, or synthesize an additional use.
 Target-specific validation rejects a second use by the same qualifying unit
 with `source_ability_once_per_phase_per_unit`. Accepted qualifying uses still
 follow the ordinary proposal, CP transaction, `StratagemUseRecord`,
@@ -1758,12 +1788,22 @@ Phase 15A implements Charge phase eligibility, declaration, optional source-back
 
 Phase 15A exposes this active-player decision:
 
-- `select_charging_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_charge_phase`. Unit option payloads include `submission_kind: "select_charging_unit"`, game, round, phase, active player, selected unit ID, target candidates, and the current eligibility context. The completion option uses `submission_kind: "complete_charge_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player charging units.
+- `select_charging_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id`, a deterministic `<unit_instance_id>:ignore:<hash>` variant when the unit may ignore one or more currently applicable Charge-roll modifiers, or `complete_charge_phase`. Unit option payloads include `submission_kind: "select_charging_unit"`, game, round, phase, active player, selected unit ID, target candidates, and the current eligibility context. Modifier-ignore variants add the same source-bound `modifier_ignore_context` used by Movement actions, with `kind: "charge_roll"` snapshots and one option for every legal subset; the unsuffixed unit option keeps all modifiers. The completion option uses `submission_kind: "complete_charge_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player charging units.
 - `select_charge_declaration_grant`: finite active-player choice emitted after `select_charging_unit` and before the Charge roll when runtime content exposes legal declaration grants. Option IDs are deterministic source hook IDs, plus `decline_charge_declaration_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate defensive restrictions locally. Drukhari `Power from Pain: Lithe Agility` uses this surface to spend one Pain token and record Charge-phase empowerment before the Charge roll. Black Templars `Abhor the Witch, Destroy the Witch` uses this surface to accept a source-backed Charge-roll reroll and a mandatory PSYKER target snapshot whose obligation remains active independently of post-roll reachability.
 
 Charge eligibility target candidates are engine-enumerated from battlefield state and the active ruleset's `charge_policy`. Phase 15A rejects chargers that Advanced, Fell Back, are within Engagement Range, are off the battlefield, already declared a Charge this phase, or have no enemy unit within the descriptor-sourced declaration range, currently 12", unless a future source-backed rule explicitly marks that unit as allowed to declare a charge. An active selected-target Charge constraint is evaluated independently of that candidate list: every current surviving successor of every historical marked rules-unit identity must itself be placed and must be a legal target. If a mark is destroyed, off the battlefield, otherwise unavailable, or has any current surviving successor that is unplaced or not legal, the charging unit cannot declare a Charge while that effect remains active; another legal enemy does not satisfy the obligation.
 
 Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and either emits a `select_charge_declaration_grant` request or rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-authored target declaration payload. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class. Source-backed non-Command rerolls, such as Drukhari Lithe Agility after an accepted Power from Pain declaration grant, Black Templars Abhor the Witch after an accepted PSYKER charge grant, or Chaos Terminators' Lethal Obsession, may still emit `select_dice_reroll`; the request payload carries the source permission and the engine ignores only the Command Re-roll forbidden marker for that source-backed reroll. Every source-backed Charge reroll request also carries `charge_context.legal_target_unit_instance_ids` and `charge_context.charge_move_required_target_unit_instance_ids`; selected-target requests additionally carry `charge_context.selected_target_charge_constraint`. The constraint records `reroll_allowed`, every `required_target_unit_instance_id`, all contributing `source_effect_ids`, historical marked identity IDs, unavailable and destroyed identity IDs, and deterministic current/surviving/placed lineage. Repeated compatible marks coalesce into one whole-roll reroll permission. When either snapshot expresses a mandatory target, lifecycle revalidates the constraint, required-target snapshot, and legal-target snapshot before queue pop, so a reactive move, destruction, split, expiry, or other target drift returns typed invalid status without consuming the pending request.
+
+An accepted charging-unit modifier-ignore option first records the same
+phase-scoped selection effect and `modifier_ignores_selected` event used by
+Movement, then resolves the Charge roll without exactly the selected physical
+modifier IDs. Different legal Charge-roll modifiers remain independently
+selectable even when they originate from the same rule or have equal operands.
+The request, option, `DecisionRecord`, effect, event, Charge-roll request, and
+replay payload preserve those identities. Duplicate, malformed, invented, or
+stale contexts reject before queue pop, before the charging-unit record, and
+before any Charge roll.
 
 The `charge_roll_resolved` payload includes:
 

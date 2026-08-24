@@ -576,22 +576,35 @@ def test_phase17b_faction_pack_rule_ir_registry_indexes_exact_source_identities(
     assert faction_pack_rule_ir.supported_shard_ids() == (
         "aeldari",
         "chaos-daemons",
+        "chaos-space-marines",
         "emperors-children",
+        "thousand-sons",
+        "world-eaters",
     )
     assert faction_pack_rule_ir.supported_faction_ids() == (
         "aeldari",
         "chaos-daemons",
+        "chaos-space-marines",
         "emperors-children",
         "thousand-sons",
+        "world-eaters",
     )
-    assert len(faction_pack_rule_ir.supported_datasheet_source_row_ids()) == 82
+    assert len(faction_pack_rule_ir.supported_datasheet_source_row_ids()) == 86
     assert source_row_id in faction_pack_rule_ir.supported_datasheet_source_row_ids(
         "emperors-children"
     )
     assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000004091") == (
         source_package_id,
     )
-    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000000968") == ()
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000000968") == (
+        "gw-11e-chaos-space-marines-maulerfiend-datasheet-2026-07",
+    )
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000001029") == (
+        "gw-11e-thousand-sons-maulerfiend-datasheet-2026-07",
+    )
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000002639") == (
+        "gw-11e-world-eaters-maulerfiend-datasheet-2026-07",
+    )
     assert faction_pack_rule_ir.source_faction_id_by_datasheet_id("000004127") == ("thousand-sons")
     assert "000004127" in faction_pack_rule_ir.supported_datasheet_ids("thousand-sons")
     assert "000004127" not in faction_pack_rule_ir.supported_datasheet_ids("chaos-daemons")
