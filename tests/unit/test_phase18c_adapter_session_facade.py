@@ -38,6 +38,7 @@ from warhammer40k_core.engine.deployment import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -98,6 +99,28 @@ def test_local_game_session_satisfies_shared_adapter_session_protocol() -> None:
     assert validate_json_value(json.loads(json.dumps(catalog_view, sort_keys=True))) == catalog_view
     assert validate_json_value(json.loads(json.dumps(game_view, sort_keys=True))) == game_view
     assert validate_json_value(json.loads(json.dumps(event_delta, sort_keys=True))) == event_delta
+
+
+def test_pre_battlefield_lifecycle_restore_and_session_fork_round_trip() -> None:
+    session = LocalGameSession()
+    status = session.start(_config(game_id="phase18c-pre-battlefield-fork"))
+    state = session.lifecycle.state
+    assert state is not None
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    assert state.battlefield_state is None
+
+    lifecycle_payload = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle_payload, sort_keys=True)),
+        )
+    )
+    forked = session.fork()
+
+    assert restored.to_payload() == lifecycle_payload
+    assert forked.lifecycle.to_payload() == lifecycle_payload
+    assert forked.lifecycle.decision_controller.queue.pending_requests == ()
 
 
 def test_cli_ui_network_and_headless_finite_producers_submit_through_session() -> None:

@@ -223,6 +223,7 @@ from warhammer40k_core.engine.weapon_abilities import (
 )
 from warhammer40k_core.engine.weapon_declaration import (
     SHOOTING_DECLARATION_PROPOSAL_KIND,
+    SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     AvailableWeaponPayload,
     RangedAttackPool,
     RangedAttackPoolPayload,
@@ -326,6 +327,7 @@ __all__ = (
     "SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE",
     "SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE",
     "SHOOTING_DECLARATION_PROPOSAL_KIND",
+    "SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE",
     "SNAP_SHOOTING_RULE_ID",
     "Self",
     "ShootingDeclarationProposal",

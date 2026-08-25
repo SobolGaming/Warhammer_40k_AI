@@ -32,6 +32,7 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
 )
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelPlacement,
@@ -127,6 +128,7 @@ from warhammer40k_core.engine.phases.fight import (
 )
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.stratagems import (
@@ -143,6 +145,7 @@ from warhammer40k_core.engine.unit_abilities import (
     fights_first_source_id_for_unit,
     unit_has_fights_first,
 )
+from warhammer40k_core.engine.unit_coherency import unit_placement_coherency_result
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -694,6 +697,127 @@ def test_phase15d_lifecycle_accepts_melee_declaration_for_engaged_character() ->
     assert accepted_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
 
 
+def test_phase15d_lifecycle_excludes_fight_on_death_only_melee_target_and_rejects_forgery() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("fight-on-death-target", "living-target"),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "fight-on-death-target": Pose.at(12.0, 20.0),
+            "living-target": Pose.at(10.0, 22.0),
+        },
+        game_id="phase15d-fight-on-death-targetability",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    state = _state(lifecycle)
+    attacker = units["attacker"]
+    retained_target = units["fight-on-death-target"]
+    living_target = units["living-target"]
+    retained_model = retained_target.own_models[0]
+    _retain_model_for_fight_on_death(
+        state=state,
+        unit=retained_target,
+        model_instance_id=retained_model.model_instance_id,
+        effect_id="phase15d:fight-on-death:melee-targetability",
+    )
+
+    activation_request = _advance_to_fight_order_request(lifecycle)
+    melee_status = _submit_option(
+        lifecycle,
+        request=activation_request,
+        option_id=fight_activation_option_id(
+            unit_instance_id=attacker.unit_instance_id,
+            fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[0],
+        ),
+        result_id="phase15d-fight-on-death-targetability-activation",
+    )
+    melee_request = _decision_request(melee_status)
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    available_weapon = cast(dict[str, object], proposal_request.available_weapons[0])
+
+    assert proposal_request.target_unit_instance_ids == (living_target.unit_instance_id,)
+    assert cast(list[str], available_weapon["engaged_target_unit_instance_ids"]) == [
+        living_target.unit_instance_id
+    ]
+    assert retained_target.unit_instance_id not in proposal_request.target_unit_instance_ids
+
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored_checkpoint = GameLifecycle.from_payload(checkpoint)
+    assert (
+        restored_checkpoint.decision_controller.queue.peek_next().request_id
+        == melee_request.request_id
+    )
+    for inventory_key in (
+        "target_unit_instance_ids",
+        "engaged_target_unit_instance_ids",
+    ):
+        target_authority_drift = cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(checkpoint, sort_keys=True)),
+        )
+        drifted_request = target_authority_drift["decisions"]["queue"]["pending_requests"][0]
+        drifted_payload = cast(dict[str, object], drifted_request["payload"])
+        drifted_proposal = cast(dict[str, object], drifted_payload["proposal_request"])
+        if inventory_key == "target_unit_instance_ids":
+            drifted_inventory = cast(list[object], drifted_proposal[inventory_key])
+        else:
+            drifted_weapons = cast(list[dict[str, object]], drifted_proposal["available_weapons"])
+            drifted_inventory = cast(list[object], drifted_weapons[0][inventory_key])
+        drifted_inventory.append(retained_target.unit_instance_id)
+        with pytest.raises(
+            GameLifecycleError,
+            match="Melee target selection requires at least one placed living target model",
+        ):
+            GameLifecycle.from_payload(target_authority_drift)
+
+    forged_proposal = MeleeDeclarationProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        player_id=proposal_request.actor_id,
+        battle_round=proposal_request.battle_round,
+        unit_instance_id=proposal_request.unit_instance_id,
+        source_decision_request_id=proposal_request.source_decision_request_id,
+        source_decision_result_id=proposal_request.source_decision_result_id,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=cast(
+                    str,
+                    available_weapon["model_instance_id"],
+                ),
+                wargear_id=cast(str, available_weapon["wargear_id"]),
+                weapon_profile_id=cast(str, available_weapon["weapon_profile_id"]),
+                target_allocations=(MeleeTargetAllocation(retained_target.unit_instance_id),),
+            ),
+        ),
+    )
+    invalid_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=melee_request.request_id,
+            result_id="phase15d-fight-on-death-targetability-forged",
+            payload=cast(JsonValue, forged_proposal.to_payload()),
+        ).to_result(melee_request)
+    )
+    invalid_payload = cast(dict[str, object], invalid_status.payload)
+    validation = cast(dict[str, object], invalid_payload["proposal_validation"])
+    violations = cast(list[dict[str, object]], validation["violations"])
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert violations[0]["violation_code"] == "melee_target_not_engaged_with_model"
+    assert lifecycle.decision_controller.queue.pending_requests == (melee_request,)
+    assert _event_payloads(lifecycle, "melee_declaration_accepted") == ()
+    assert _event_payloads(lifecycle, "unit_selected_as_target_stratagem_window_opened") == ()
+    assert _event_payloads(lifecycle, "attack_sequence_step") == ()
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    assert fight_state.attack_sequence is None
+    assert state.one_shot_weapon_use_records == []
+
+
 def test_phase15d_fight_activation_prevalidation_rejects_drifted_results() -> None:
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("attacker",),
@@ -986,6 +1110,109 @@ def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submiss
     assert stale_violations[0]["violation_code"] == "stale_proposal_request"
     assert lifecycle.decision_controller.records == ()
     assert lifecycle.decision_controller.queue.pending_requests == (request,)
+
+
+def test_phase15d_restore_accepts_pile_in_completed_before_fight_on_death_retention() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15d-restore-historical-pile-in-before-fight-on-death",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    proposal = FightMovementProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.PILE_IN,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action=PILE_IN_ACTION,
+        movement_mode=MovementMode.PILE_IN,
+        pile_in_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+        witness=_fight_movement_witness_for_unit(
+            lifecycle=lifecycle,
+            unit=units["attacker"],
+            dx=0.25,
+            endpoint_only=False,
+        ),
+    )
+    status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=proposal,
+        result_id="phase15d-historical-pile-in",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+
+    state = _state(lifecycle)
+    model = units["attacker"].own_models[0]
+    effect_id = "phase15d:fight-on-death:after-pile-in"
+    placement = _retain_model_for_fight_on_death(
+        state=state,
+        unit=units["attacker"],
+        model_instance_id=model.model_instance_id,
+        effect_id=effect_id,
+    )
+    lifecycle.decision_controller.event_log.append(
+        "fight_on_death_model_awaiting_attack",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhaseKind.FIGHT.value,
+            "model_instance_id": model.model_instance_id,
+            "unit_instance_id": units["attacker"].unit_instance_id,
+            "source_id": "phase15d:test:fight-on-death",
+            "source_rule_id": "phase15c:test:fight-on-death",
+            "effect_id": effect_id,
+            "model_placement": placement.to_payload(),
+        },
+    )
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    restored = GameLifecycle.from_payload(checkpoint)
+
+    assert restored.to_payload() == checkpoint
+    event_types = tuple(
+        event.event_type for event in restored.decision_controller.event_log.records
+    )
+    assert event_types.index("fight_movement_completed") < event_types.index(
+        "fight_on_death_model_awaiting_attack"
+    )
+
+    authority_order_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_events = authority_order_drift["decisions"]["event_log"]
+    completed_event = next(
+        event for event in drifted_events if event["event_type"] == "fight_movement_completed"
+    )
+    awaiting_event = next(
+        event
+        for event in drifted_events
+        if event["event_type"] == "fight_on_death_model_awaiting_attack"
+    )
+    completed_event["event_type"], awaiting_event["event_type"] = (
+        awaiting_event["event_type"],
+        completed_event["event_type"],
+    )
+    completed_event["payload"], awaiting_event["payload"] = (
+        awaiting_event["payload"],
+        completed_event["payload"],
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Fight movement witness includes a retained destroyed model",
+    ):
+        GameLifecycle.from_payload(authority_order_drift)
 
 
 def test_phase15d_endpoint_only_pile_in_records_rejected_attempt_and_retries() -> None:
@@ -1609,6 +1836,49 @@ def test_phase15d_overrun_activation_requests_overrun_pile_in_proposal() -> None
     assert context["movement_mode"] == ProposalKind.PILE_IN.value
     assert event_payload["proposal_kind"] == ProposalKind.PILE_IN.value
     assert activation_payload["fight_type"] == FightTypeKind.OVERRUN.value
+
+
+def test_fight_on_death_only_overrun_activation_skips_pile_in_proposal() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("charger",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "charger": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(30.0, 20.0),
+        },
+        game_id="phase15c-fight-on-death-overrun-no-pile-in",
+        charge_fights_first_unit_keys=("charger",),
+    )
+    state = _state(lifecycle)
+    charger = units["charger"]
+    for index, model in enumerate(charger.own_models):
+        _retain_model_for_fight_on_death(
+            state=state,
+            unit=charger,
+            model_instance_id=model.model_instance_id,
+            effect_id=f"phase15c:fight-on-death:overrun:{index:02d}",
+        )
+
+    request = _advance_to_fight_order_request(lifecycle)
+    overrun_option_id = fight_activation_option_id(
+        unit_instance_id=charger.unit_instance_id,
+        fight_type=FightTypeKind.OVERRUN,
+    )
+    assert overrun_option_id in _request_option_ids(request)
+    lifecycle.submit_decision(
+        FiniteOptionSubmission(
+            request_id=request.request_id,
+            selected_option_id=overrun_option_id,
+            result_id="phase15c-fight-on-death-overrun-activation",
+        ).to_result(request)
+    )
+
+    assert not any(
+        event.event_type == "overrun_pile_in_requested"
+        for event in lifecycle.decision_controller.event_log.records
+    )
+    skipped = _last_event_payload(lifecycle, "overrun_pile_in_not_available")
+    assert skipped["reason"] == "no_living_movable_models"
 
 
 def test_phase15d_attached_overrun_keeps_canonical_identity_through_movement() -> None:
@@ -2350,6 +2620,65 @@ def test_fight_interrupt_source_is_not_offered_again_after_decline() -> None:
     assert len(_event_payloads(lifecycle, "fight_interrupt_activation_selected")) == 0
 
 
+def test_fight_on_death_only_source_engages_living_enemy_without_reciprocal_eligibility() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("living",),
+        enemy_unit_ids=("retained",),
+        origins={
+            "living": Pose.at(10.0, 20.0),
+            "retained": Pose.at(12.0, 20.0),
+        },
+        game_id="phase15c-fight-on-death-asymmetric-engagement",
+    )
+    state = _state(lifecycle)
+    living = units["living"]
+    retained = units["retained"]
+    for index, model in enumerate(retained.own_models):
+        _retain_model_for_fight_on_death(
+            state=state,
+            unit=retained,
+            model_instance_id=model.model_instance_id,
+            effect_id=f"phase15c:fight-on-death:asymmetric-engagement:{index:02d}",
+        )
+
+    assert unit_is_currently_engaged(
+        state=state,
+        unit_instance_id=retained.unit_instance_id,
+    )
+    assert not unit_is_currently_engaged(
+        state=state,
+        unit_instance_id=living.unit_instance_id,
+    )
+
+    request = _advance_to_fight_order_request(lifecycle)
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    retained_reasons = fight_eligibility_reasons_for_unit(
+        state=state,
+        fight_state=fight_state,
+        unit_instance_id=retained.unit_instance_id,
+        policy=policy,
+    )
+    living_reasons = fight_eligibility_reasons_for_unit(
+        state=state,
+        fight_state=fight_state,
+        unit_instance_id=living.unit_instance_id,
+        policy=policy,
+    )
+
+    assert retained_reasons == (
+        FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,
+        FightEligibilityKind.CURRENTLY_ENGAGED,
+    )
+    assert living_reasons == ()
+    assert fight_state.fight_order_state.engaged_at_fight_step_start_unit_ids == (
+        retained.unit_instance_id,
+    )
+    assert request.actor_id == _player_id_for_unit(retained)
+    assert _request_unit_ids(request) == [retained.unit_instance_id]
+
+
 @pytest.mark.parametrize("living_model_count", [0, 3])
 def test_fight_on_death_models_and_survivors_share_one_normal_activation(
     living_model_count: int,
@@ -2451,8 +2780,11 @@ def test_fight_on_death_models_and_survivors_share_one_normal_activation(
     )
     status = _drain_fight_movement_requests(lifecycle, status)
     next_request = _decision_request(status)
-    assert next_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
-    assert next_request.actor_id == "player-a"
+    if living_model_count == 0:
+        assert next_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    else:
+        assert next_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+        assert next_request.actor_id == "player-a"
 
     state = _state(lifecycle)
     assert fight_on_death_model_ids_awaiting_attack(state=state) == ()
@@ -2468,12 +2800,596 @@ def test_fight_on_death_models_and_survivors_share_one_normal_activation(
     assert cleanup_payload["model_instance_ids"] == sorted(destroyed_model_ids)
     assert cleanup_payload["reason"] == "unit_fight_completed"
     fight_state = state.fight_phase_state
-    assert fight_state is not None
-    assert [
-        selection.unit_instance_id
-        for selection in fight_state.fight_order_state.activation_selections
-        if selection.unit_instance_id == retained.unit_instance_id
-    ] == [retained.unit_instance_id]
+    if living_model_count == 0:
+        assert state.current_battle_phase is BattlePhase.MOVEMENT
+        assert fight_state is None
+    else:
+        assert fight_state is not None
+        assert [
+            selection.unit_instance_id
+            for selection in fight_state.fight_order_state.activation_selections
+            if selection.unit_instance_id == retained.unit_instance_id
+        ] == [retained.unit_instance_id]
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_fight_on_death_destroyed_model_stays_fixed_while_survivors_consolidate_and_replay(
+    attached: bool,
+) -> None:
+    alpha_unit_ids = ("bodyguard", "leader") if attached else ("retained",)
+    origins = (
+        {
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(17.5, 20.0),
+            "enemy": Pose.at(20.4, 20.0),
+        }
+        if attached
+        else {
+            "retained": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(18.5, 20.0),
+        }
+    )
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=alpha_unit_ids,
+        enemy_unit_ids=("enemy",),
+        origins=origins,
+        game_id=f"phase15c-fight-on-death-living-consolidate-{attached}",
+        alpha_unit_specs=(
+            {"leader": ("core-character-leader", "core-character-leader", 1)} if attached else None
+        ),
+        alpha_attachment_declarations=(
+            (
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader",
+                    bodyguard_unit_selection_id="bodyguard",
+                ),
+            )
+            if attached
+            else ()
+        ),
+    )
+    state = _state(lifecycle)
+    physical_unit = units["bodyguard" if attached else "retained"]
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=physical_unit.unit_instance_id,
+    )
+    destroyed_model = rules_unit.components[0].unit.own_models[0]
+    destroyed_placement = _retain_model_for_fight_on_death(
+        state=state,
+        unit=rules_unit.components[0].unit,
+        model_instance_id=destroyed_model.model_instance_id,
+        effect_id=f"phase15c:fight-on-death:consolidate:{attached}",
+    )
+    _record_fights_first_effect(
+        state=state,
+        unit=rules_unit.components[0].unit,
+        effect_kind=CHARGE_FIGHTS_FIRST_EFFECT_KIND,
+    )
+    _record_fights_first_effect(
+        state=state,
+        unit=units["enemy"],
+        effect_kind=CHARGE_FIGHTS_FIRST_EFFECT_KIND,
+    )
+    enemy_retained_poses: dict[str, Pose] = {}
+    for index, model in enumerate(units["enemy"].own_models[:-1]):
+        retained_enemy = _retain_model_for_fight_on_death(
+            state=state,
+            unit=units["enemy"],
+            model_instance_id=model.model_instance_id,
+            effect_id=f"phase15c:fight-on-death:measurement-target:{attached}:{index:02d}",
+        )
+        enemy_retained_poses[model.model_instance_id] = retained_enemy.pose
+    _start_consolidate_step(lifecycle)
+
+    status = lifecycle.advance_until_decision_or_terminal()
+    request = _decision_request(status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    current_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    living_model_ids = tuple(
+        sorted(model.model_instance_id for model in current_rules_unit.alive_models())
+    )
+    measurement_battlefield = state.battlefield_state
+    assert measurement_battlefield is not None
+    source_living_poses = tuple(
+        measurement_battlefield.model_placement_by_id(model_id).pose
+        for model_id in living_model_ids
+    )
+    far_living_enemy_pose = measurement_battlefield.model_placement_by_id(
+        units["enemy"].own_models[-1].model_instance_id
+    ).pose
+    assert (
+        min(
+            pose.position.distance_2d_to(far_living_enemy_pose.position)
+            for pose in source_living_poses
+        )
+        > 6.0
+    )
+    assert (
+        min(
+            source_pose.position.distance_2d_to(retained_pose.position)
+            for source_pose in source_living_poses
+            for retained_pose in enemy_retained_poses.values()
+        )
+        <= 3.0
+    )
+    assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    assert proposal_request.proposal_kind is ProposalKind.CONSOLIDATE
+    assert proposal_request.unit_instance_id == rules_unit.unit_instance_id
+    assert proposal_request.context is not None
+    assert proposal_request.context["legal_consolidation_modes"] == [
+        ConsolidationModeKind.ONGOING.value
+    ]
+    assert destroyed_model.model_instance_id not in living_model_ids
+
+    witness = _fight_movement_witness_for_model_ids(
+        lifecycle=lifecycle,
+        model_instance_ids=living_model_ids,
+        dx=1.0,
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=rules_unit.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ONGOING,
+        consolidate_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+        witness=witness,
+    )
+    initial_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(initial_payload)
+    assert restored.to_payload() == initial_payload
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+
+    overlap_witness = _fight_movement_witness_ending_model_at_pose(
+        lifecycle=lifecycle,
+        model_instance_ids=living_model_ids,
+        moved_model_instance_id=living_model_ids[0],
+        final_pose=destroyed_placement.pose,
+    )
+    overlap_status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=replace(proposal, witness=overlap_witness),
+        result_id=f"phase15c-fight-on-death-fixed-base-overlap-{attached}",
+    )
+    overlap_payload = cast(dict[str, object], overlap_status.payload)
+    overlap_validation = cast(dict[str, object], overlap_payload["proposal_validation"])
+    overlap_violations = cast(list[dict[str, object]], overlap_validation["violations"])
+    assert overlap_status.status_kind is LifecycleStatusKind.INVALID
+    assert overlap_violations[0]["violation_code"] == "end_on_model_overlap"
+    pending_requests = lifecycle.decision_controller.queue.pending_requests
+    assert len(pending_requests) == 1
+    retry_request = pending_requests[0]
+    retry_proposal_request = MovementProposalRequest.from_decision_request_payload(
+        retry_request.payload
+    )
+    assert retry_request.request_id != request.request_id
+    assert retry_proposal_request.proposal_kind is proposal_request.proposal_kind
+    assert retry_proposal_request.unit_instance_id == proposal_request.unit_instance_id
+    assert battlefield.model_placement_by_id(destroyed_model.model_instance_id).pose == (
+        destroyed_placement.pose
+    )
+    replay_initial_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    submitted = _submit_fight_movement_proposal(
+        lifecycle,
+        request=retry_request,
+        proposal=replace(
+            proposal,
+            proposal_request_id=retry_proposal_request.request_id,
+        ),
+        result_id=f"phase15c-fight-on-death-consolidate-{attached}",
+    )
+    assert submitted.status_kind is not LifecycleStatusKind.INVALID
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    assert battlefield.model_placement_or_none(destroyed_model.model_instance_id) is None
+    for model_id in living_model_ids:
+        assert battlefield.model_placement_by_id(model_id).pose == witness.final_pose_for_model(
+            model_id
+        )
+    completed = _last_event_payload(lifecycle, "fight_movement_completed")
+    transition = cast(dict[str, object], completed["transition_batch"])
+    displacement_ids = {
+        cast(dict[str, object], displacement)["model_instance_id"]
+        for displacement in cast(list[object], transition["displacements"])
+    }
+    assert displacement_ids == set(living_model_ids)
+    assert destroyed_model.model_instance_id not in displacement_ids
+    for model_id in enemy_retained_poses:
+        assert battlefield.model_placement_or_none(model_id) is None
+    assert fight_on_death_model_ids_awaiting_attack(state=state) == ()
+    event_types = tuple(
+        event.event_type for event in lifecycle.decision_controller.event_log.records
+    )
+    assert event_types.index("fight_movement_completed") < event_types.index(
+        "fight_on_death_models_removed"
+    )
+    cleanup = _last_event_payload(lifecycle, "fight_on_death_models_removed")
+    assert cleanup["model_instance_ids"] == sorted(
+        (destroyed_model.model_instance_id, *enemy_retained_poses)
+    )
+    assert cleanup["reason"] == "phase_end"
+
+    final_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    movement_record = next(
+        record
+        for record in final_payload["decisions"]["records"]
+        if cast(dict[str, object], record["result"])["result_id"]
+        == f"phase15c-fight-on-death-consolidate-{attached}"
+    )
+    movement_result = cast(dict[str, object], movement_record["result"])
+    movement_payload = cast(dict[str, object], movement_result["payload"])
+    movement_witness = cast(dict[str, object], movement_payload["witness"])
+    movement_paths = cast(list[dict[str, object]], movement_witness["model_paths"])
+    assert {cast(str, path["model_id"]) for path in movement_paths} == set(living_model_ids)
+
+    restored_final = GameLifecycle.from_payload(final_payload)
+    restored_battlefield = _state(restored_final).battlefield_state
+    assert restored_battlefield is not None
+    assert restored_battlefield.model_placement_or_none(destroyed_model.model_instance_id) is None
+    artifact = ReplayArtifact.capture(
+        artifact_id=f"phase15c-fight-on-death-consolidate-replay-{attached}",
+        initial_lifecycle_payload=replay_initial_payload,
+        final_lifecycle=lifecycle,
+    )
+    replay_result = ReplayRunner(artifact).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_fight_on_death_survivor_move_checkpoint_uses_living_only_global_coherency() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("retained",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "retained": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(18.5, 20.0),
+        },
+        game_id="phase15c-fight-on-death-living-only-restore-coherency",
+    )
+    state = _state(lifecycle)
+    retained = units["retained"]
+    destroyed_model = retained.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    unit_placement = battlefield.unit_placement_by_id(retained.unit_instance_id)
+    separated_pose = Pose.at(8.6, 20.0)
+    state.replace_battlefield_state(
+        battlefield.with_unit_placement(
+            unit_placement.with_model_placements(
+                tuple(
+                    replace(placement, pose=separated_pose)
+                    if placement.model_instance_id == destroyed_model.model_instance_id
+                    else placement
+                    for placement in unit_placement.model_placements
+                )
+            )
+        )
+    )
+    destroyed_placement = _retain_model_for_fight_on_death(
+        state=state,
+        unit=retained,
+        model_instance_id=destroyed_model.model_instance_id,
+        effect_id="phase15c:fight-on-death:living-only-restore-coherency",
+    )
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=retained.unit_instance_id,
+    )
+    request = _advance_to_fight_movement_request_for_unit(
+        lifecycle,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    living_model_ids = tuple(sorted(model.model_instance_id for model in rules_unit.alive_models()))
+    witness = _fight_movement_witness_for_model_ids(
+        lifecycle=lifecycle,
+        model_instance_ids=living_model_ids,
+        dx=1.0,
+    )
+
+    status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=FightMovementProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=ProposalKind.PILE_IN,
+            unit_instance_id=rules_unit.unit_instance_id,
+            movement_phase_action=PILE_IN_ACTION,
+            movement_mode=MovementMode.PILE_IN,
+            pile_in_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+            witness=witness,
+        ),
+        result_id="phase15c-fight-on-death-living-only-coherent-pile-in",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.decision_controller.queue.pending_requests
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    assert battlefield.model_placement_by_id(destroyed_model.model_instance_id).pose == (
+        destroyed_placement.pose
+    )
+    physical_scenario = battlefield_scenario_for_state(state=state)
+    physical_result = unit_placement_coherency_result(
+        scenario=physical_scenario,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        unit_placement=battlefield.unit_placement_by_id(retained.unit_instance_id),
+    )
+    living_result = unit_placement_coherency_result(
+        scenario=replace(physical_scenario, present_destroyed_model_ids=()),
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        unit_placement=battlefield.unit_placement_by_id(retained.unit_instance_id),
+    )
+    assert not physical_result.is_coherent
+    assert living_result.is_coherent
+
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(checkpoint)
+    assert restored.to_payload() == checkpoint
+    assert restored.decision_controller.queue.pending_requests
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_fight_on_death_no_move_restore_rejects_retained_endpoint_inventory(
+    attached: bool,
+) -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=(("bodyguard", "leader") if attached else ("retained",)),
+        enemy_unit_ids=("enemy",),
+        origins=(
+            {
+                "bodyguard": Pose.at(10.0, 20.0),
+                "leader": Pose.at(17.0, 20.0),
+                "enemy": Pose.at(19.0, 20.0),
+            }
+            if attached
+            else {
+                "retained": Pose.at(10.0, 20.0),
+                "enemy": Pose.at(18.5, 20.0),
+            }
+        ),
+        game_id=f"phase15c-fight-on-death-no-move-restore-{attached}",
+        alpha_unit_specs=(
+            {"leader": ("core-character-leader", "core-character-leader", 1)} if attached else None
+        ),
+        alpha_attachment_declarations=(
+            (
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader",
+                    bodyguard_unit_selection_id="bodyguard",
+                ),
+            )
+            if attached
+            else ()
+        ),
+    )
+    state = _state(lifecycle)
+    physical_unit = units["bodyguard" if attached else "retained"]
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=physical_unit.unit_instance_id,
+    )
+    destroyed_model = physical_unit.own_models[0]
+    destroyed_placement = _retain_model_for_fight_on_death(
+        state=state,
+        unit=physical_unit,
+        model_instance_id=destroyed_model.model_instance_id,
+        effect_id=f"phase15c:fight-on-death:no-move-restore:{attached}",
+    )
+    request = _advance_to_fight_movement_request_for_unit(
+        lifecycle,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    result_id = f"phase15c-fight-on-death-no-move:{attached}"
+    status = _submit_fight_movement_no_move(
+        lifecycle,
+        request=request,
+        result_id=result_id,
+    )
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert destroyed_model.model_instance_id in fight_on_death_model_ids_awaiting_attack(
+        state=state
+    )
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+
+    endpoint_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    completed_event = next(
+        event
+        for event in endpoint_drift["decisions"]["event_log"]
+        if event["event_type"] == "fight_movement_completed"
+        and cast(dict[str, object], event["payload"]).get("result_id") == result_id
+    )
+    completed_payload = cast(dict[str, object], completed_event["payload"])
+    retained_payload = cast(dict[str, object], destroyed_placement.to_payload())
+    if attached:
+        resolution = cast(dict[str, object], completed_payload["resolution"])
+        for placement_key in (
+            "before_rules_unit_placement",
+            "attempted_rules_unit_placement",
+        ):
+            grouped_placement = cast(dict[str, object], resolution[placement_key])
+            components = cast(
+                list[dict[str, object]],
+                grouped_placement["component_unit_placements"],
+            )
+            component = next(
+                row
+                for row in components
+                if row["unit_instance_id"] == physical_unit.unit_instance_id
+            )
+            cast(list[object], component["model_placements"]).append(retained_payload)
+    else:
+        endpoint = cast(dict[str, object], completed_payload["movement_endpoint_placement"])
+        cast(list[object], endpoint["model_placements"]).append(retained_payload)
+
+    with pytest.raises(GameLifecycleError, match="retained destroyed model"):
+        GameLifecycle.from_payload(endpoint_drift)
+
+
+def test_fight_on_death_restore_rejects_retained_model_in_invalid_attempt_witness() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("retained",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "retained": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(18.5, 20.0),
+        },
+        game_id="phase15c-fight-on-death-invalid-attempt-restore",
+    )
+    state = _state(lifecycle)
+    retained = units["retained"]
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=retained.unit_instance_id,
+    )
+    destroyed_model = retained.own_models[0]
+    _retain_model_for_fight_on_death(
+        state=state,
+        unit=retained,
+        model_instance_id=destroyed_model.model_instance_id,
+        effect_id="phase15c:fight-on-death:invalid-attempt-restore",
+    )
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=retained.unit_instance_id,
+    )
+    request = _advance_to_fight_movement_request_for_unit(
+        lifecycle,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    living_model_ids = tuple(sorted(model.model_instance_id for model in rules_unit.alive_models()))
+    rule_invalid_witness = _fight_movement_witness_for_model_ids(
+        lifecycle=lifecycle,
+        model_instance_ids=living_model_ids,
+        dx=3.5,
+    )
+    result_id = "phase15c-fight-on-death-invalid-attempt"
+    status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=FightMovementProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=ProposalKind.PILE_IN,
+            unit_instance_id=rules_unit.unit_instance_id,
+            movement_phase_action=PILE_IN_ACTION,
+            movement_mode=MovementMode.PILE_IN,
+            pile_in_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+            witness=rule_invalid_witness,
+        ),
+        result_id=result_id,
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+
+    witness_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    movement_record = next(
+        record
+        for record in witness_drift["decisions"]["records"]
+        if cast(dict[str, object], record["result"])["result_id"] == result_id
+    )
+    movement_result = cast(dict[str, object], movement_record["result"])
+    movement_payload = cast(dict[str, object], movement_result["payload"])
+    movement_witness = cast(dict[str, object], movement_payload["witness"])
+    movement_paths = cast(list[dict[str, object]], movement_witness["model_paths"])
+    forged_path = cast(
+        dict[str, object],
+        json.loads(json.dumps(movement_paths[0], sort_keys=True)),
+    )
+    forged_path["model_id"] = destroyed_model.model_instance_id
+    movement_paths.append(forged_path)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Fight movement witness includes a retained destroyed model",
+    ):
+        GameLifecycle.from_payload(witness_drift)
+
+
+def test_fight_on_death_only_unit_receives_no_consolidation_proposal() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("retained",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "retained": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(18.5, 20.0),
+        },
+        game_id="phase15c-fight-on-death-no-consolidate",
+    )
+    state = _state(lifecycle)
+    retained = units["retained"]
+    retained_poses: dict[str, Pose] = {}
+    for index, model in enumerate(retained.own_models):
+        placement = _retain_model_for_fight_on_death(
+            state=state,
+            unit=retained,
+            model_instance_id=model.model_instance_id,
+            effect_id=f"phase15c:fight-on-death:no-consolidate:{index:02d}",
+        )
+        retained_poses[model.model_instance_id] = placement.pose
+    _record_fights_first_effect(
+        state=state,
+        unit=retained,
+        effect_kind=CHARGE_FIGHTS_FIRST_EFFECT_KIND,
+    )
+    _start_consolidate_step(lifecycle)
+
+    status = lifecycle.advance_until_decision_or_terminal()
+    request = _decision_request(status)
+
+    assert not any(
+        event.event_type == "fight_movement_requested"
+        for event in lifecycle.decision_controller.event_log.records
+    )
+    assert request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert fight_on_death_model_ids_awaiting_attack(state=state) == ()
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    assert all(battlefield.model_placement_or_none(model_id) is None for model_id in retained_poses)
+    cleanup = _last_event_payload(lifecycle, "fight_on_death_models_removed")
+    assert cleanup["model_instance_ids"] == sorted(retained_poses)
+    assert cleanup["reason"] == "phase_end"
 
 
 def test_fight_phase_state_wraps_fight_order_state_payloads_round_trip() -> None:
@@ -3236,6 +4152,87 @@ def _fight_movement_witness_for_unit(
     return PathWitness.for_paths(tuple(model_paths))
 
 
+def _fight_movement_witness_for_model_ids(
+    *,
+    lifecycle: GameLifecycle,
+    model_instance_ids: tuple[str, ...],
+    dx: float,
+) -> PathWitness:
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for model_id in model_instance_ids:
+        start = battlefield_state.model_placement_by_id(model_id).pose
+        midpoint = Pose.at(
+            start.position.x + (dx / 2.0),
+            start.position.y,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        end = Pose.at(
+            start.position.x + dx,
+            start.position.y,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((model_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _fight_movement_witness_ending_model_at_pose(
+    *,
+    lifecycle: GameLifecycle,
+    model_instance_ids: tuple[str, ...],
+    moved_model_instance_id: str,
+    final_pose: Pose,
+) -> PathWitness:
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for model_id in model_instance_ids:
+        start = battlefield_state.model_placement_by_id(model_id).pose
+        end = final_pose if model_id == moved_model_instance_id else start
+        midpoint = Pose.at(
+            start.position.x + ((end.position.x - start.position.x) / 2.0),
+            start.position.y + ((end.position.y - start.position.y) / 2.0),
+            start.position.z + ((end.position.z - start.position.z) / 2.0),
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((model_id, (start, midpoint, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _retain_model_for_fight_on_death(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    model_instance_id: str,
+    effect_id: str,
+) -> ModelPlacement:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.model_placement_by_id(model_instance_id)
+    model = next(model for model in unit.own_models if model.model_instance_id == model_instance_id)
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=unit.unit_instance_id,
+        model_instance_id=model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=placement,
+        effect_id=effect_id,
+        source_rule_id="phase15c:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    return placement
+
+
 def _start_consolidate_step(lifecycle: GameLifecycle) -> None:
     state = _state(lifecycle)
     policy = state.runtime_ruleset_descriptor().fight_policy
@@ -3312,6 +4309,27 @@ def _advance_to_fight_order_request(lifecycle: GameLifecycle) -> DecisionRequest
             lifecycle.advance_until_decision_or_terminal(),
         )
     )
+
+
+def _advance_to_fight_movement_request_for_unit(
+    lifecycle: GameLifecycle,
+    *,
+    unit_instance_id: str,
+) -> DecisionRequest:
+    status = lifecycle.advance_until_decision_or_terminal()
+    for index in range(32):
+        request = _decision_request(status)
+        if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
+            raise AssertionError("Expected a Fight movement proposal for the requested unit.")
+        proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+        if proposal_request.unit_instance_id == unit_instance_id:
+            return request
+        status = _submit_fight_movement_no_move(
+            lifecycle,
+            request=request,
+            result_id=f"{unit_instance_id}:preceding-no-move:{index:02d}",
+        )
+    raise AssertionError("Requested Fight movement unit was not reached.")
 
 
 def _drain_full_fight_phase(

@@ -1207,6 +1207,22 @@ def test_selected_to_fight_risk_fight_on_death_cleans_at_phase_end_then_splits()
     )
     checkpoint = GameLifecycle.from_payload(checkpoint).to_payload()
     assert GameLifecycle.from_payload(checkpoint).to_payload() == checkpoint
+    placement_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    battlefield_payload = placement_drift["state"]["battlefield_state"]
+    assert battlefield_payload is not None
+    retained_placement = next(
+        placement
+        for army in battlefield_payload["placed_armies"]
+        for unit_placement in army["unit_placements"]
+        for placement in unit_placement["model_placements"]
+        if placement["model_instance_id"] == model_id
+    )
+    retained_placement["pose"]["position"]["x"] += 1.0
+    with pytest.raises(GameLifecycleError, match="retained model placement drift"):
+        GameLifecycle.from_payload(placement_drift)
     liability_drift = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(checkpoint, sort_keys=True)),

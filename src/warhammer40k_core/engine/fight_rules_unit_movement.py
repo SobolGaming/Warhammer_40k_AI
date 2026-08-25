@@ -19,6 +19,28 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.fight_movement_source import (
+    fight_movement_source_component_placement as _movement_source_component_placement,
+)
+from warhammer40k_core.engine.fight_movement_source import (
+    fight_movement_source_geometry_models as _movement_source_geometry_models_for_rules_unit,
+)
+from warhammer40k_core.engine.fight_movement_source import (
+    fight_movement_source_model_placements as _movement_source_model_placements,
+)
+from warhammer40k_core.engine.fight_movement_source import (
+    fight_movement_source_rules_unit_placement as _movement_source_rules_unit_placement,
+)
+from warhammer40k_core.engine.fight_movement_source import (
+    fight_movement_source_scenario as _movement_scenario_for_rules_unit,
+)
+from warhammer40k_core.engine.fight_movement_source import (
+    merge_fight_movement_source_placement as _merge_movement_source_placement,
+)
+from warhammer40k_core.engine.fight_movement_source import (
+    require_fight_movement_source_matches_current,
+    retained_fight_movement_source_path_violations,
+)
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ENEMY_DISTANCE_INCHES,
     PILE_IN_TARGET_DISTANCE_INCHES,
@@ -27,7 +49,6 @@ from warhammer40k_core.engine.fight_resolution import (
     FightMovementResolution,
     fight_movement_maximum_distance_inches,
     fight_movement_resolution_violation,
-    legal_consolidation_modes,
     resolve_fight_movement,
 )
 from warhammer40k_core.engine.fight_rules_unit_movement_types import (
@@ -107,13 +128,19 @@ def legal_rules_unit_pile_in_target_unit_ids(
     )
     if engaged:
         return engaged
-    source_models = _geometry_models_for_rules_unit(scenario=scenario, rules_unit=rules_unit)
+    source_models = _movement_source_geometry_models_for_rules_unit(
+        scenario=scenario,
+        rules_unit=rules_unit,
+    )
     return tuple(
         target.unit_instance_id
         for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
         if _closest_distance(
             source_models,
-            _geometry_models_for_rules_unit(scenario=scenario, rules_unit=target),
+            _measurement_target_geometry_models_for_rules_unit(
+                scenario=scenario,
+                rules_unit=target,
+            ),
         )
         <= PILE_IN_TARGET_DISTANCE_INCHES
     )
@@ -128,14 +155,6 @@ def legal_rules_unit_consolidation_modes(
     state: GameState,
 ) -> tuple[ConsolidationModeKind, ...]:
     rules_unit = _canonical_rules_unit(state=state, unit_instance_id=unit_instance_id)
-    if not rules_unit.is_attached_rules_unit:
-        return legal_consolidation_modes(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            unit_instance_id=unit_instance_id,
-            objective_markers=objective_markers,
-            state=state,
-        )
     if _engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -143,17 +162,23 @@ def legal_rules_unit_consolidation_modes(
         state=state,
     ):
         return (ConsolidationModeKind.ONGOING,)
-    source_models = _geometry_models_for_rules_unit(scenario=scenario, rules_unit=rules_unit)
+    source_models = _movement_source_geometry_models_for_rules_unit(
+        scenario=scenario,
+        rules_unit=rules_unit,
+    )
     if any(
         _closest_distance(
             source_models,
-            _geometry_models_for_rules_unit(scenario=scenario, rules_unit=target),
+            _measurement_target_geometry_models_for_rules_unit(
+                scenario=scenario,
+                rules_unit=target,
+            ),
         )
         <= CONSOLIDATE_ENEMY_DISTANCE_INCHES
         for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
     ):
         return (ConsolidationModeKind.ENGAGING,)
-    source_placements = _present_model_placements(
+    source_placements = _movement_source_model_placements(
         scenario=scenario,
         rules_unit=rules_unit,
     )
@@ -247,15 +272,10 @@ def fight_rules_unit_movement_witness_matches_current_status(
         state=state,
         unit_instance_id=proposal.unit_instance_id,
     )
-    if rules_unit.is_attached_rules_unit:
-        placements = _present_model_placements(
-            scenario=scenario,
-            rules_unit=rules_unit,
-        )
-    else:
-        placements = scenario.battlefield_state.unit_placement_by_id(
-            proposal.unit_instance_id
-        ).model_placements
+    placements = _movement_source_model_placements(
+        scenario=scenario,
+        rules_unit=rules_unit,
+    )
     expected_model_ids = tuple(sorted(placement.model_instance_id for placement in placements))
     if tuple(sorted(witness.model_ids())) != expected_model_ids:
         return _invalid(
@@ -290,29 +310,56 @@ def resolve_rules_unit_fight_movement(
         unit_instance_id=proposal.unit_instance_id,
     )
     if not rules_unit.is_attached_rules_unit:
-        physical_proposal = _proposal_with_physical_target_ids(
+        standalone_before = _movement_source_component_placement(
             scenario=scenario,
+            rules_unit=rules_unit,
+        )
+        movement_scenario = _movement_scenario_for_rules_unit(
+            scenario=scenario,
+            rules_unit=rules_unit,
+            component_unit_placements=(standalone_before,),
+        )
+        physical_proposal = _proposal_with_physical_target_ids(
+            scenario=movement_scenario,
             state=state,
             proposal=proposal,
         )
         resolution = resolve_fight_movement(
-            scenario=scenario,
+            scenario=movement_scenario,
             ruleset_descriptor=ruleset_descriptor,
             proposal=physical_proposal,
             maximum_distance_inches=maximum_distance_inches,
             state=state,
         )
+        fixed_source_violations = retained_fight_movement_source_path_violations(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            rules_unit=rules_unit,
+            witness=proposal.witness,
+            movement_mode=proposal.movement_mode,
+            displacement_kind=_displacement_kind(proposal.proposal_kind),
+            maximum_distance_inches=maximum_distance_inches,
+        )
         return replace(
             resolution,
+            path_validation_results=(
+                *resolution.path_validation_results,
+                *fixed_source_violations,
+            ),
             endpoint_witness=_canonical_standalone_endpoint_witness(
                 endpoint_witness=resolution.endpoint_witness,
                 proposal=proposal,
                 state=state,
             ),
         )
-    before = _present_rules_unit_placement(
+    grouped_before = _movement_source_rules_unit_placement(
         scenario=scenario,
         rules_unit=rules_unit,
+    )
+    movement_scenario = _movement_scenario_for_rules_unit(
+        scenario=scenario,
+        rules_unit=rules_unit,
+        component_unit_placements=grouped_before.component_unit_placements,
     )
     if proposal.is_no_move_choice:
         return RulesUnitFightMovementResolution(
@@ -321,16 +368,16 @@ def resolve_rules_unit_fight_movement(
             movement_phase_action=proposal.movement_phase_action,
             movement_mode=proposal.movement_mode,
             maximum_distance_inches=maximum_distance_inches,
-            before_rules_unit_placement=before,
-            attempted_rules_unit_placement=before,
+            before_rules_unit_placement=grouped_before,
+            attempted_rules_unit_placement=grouped_before,
             witness=None,
             endpoint_witness=_endpoint_witness(
-                before_scenario=scenario,
-                after_scenario=scenario,
+                before_scenario=movement_scenario,
+                after_scenario=movement_scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 rules_unit=rules_unit,
-                before=before,
-                after=before,
+                before=grouped_before,
+                after=grouped_before,
                 target_unit_instance_ids=(),
                 objective_id=None,
                 state=state,
@@ -343,10 +390,10 @@ def resolve_rules_unit_fight_movement(
     witness = proposal.witness
     if witness is None:
         raise GameLifecycleError("Rules-unit Fight movement requires a PathWitness.")
-    _require_witness_matches_placement(witness=witness, placement=before)
-    attempted = _attempted_rules_unit_placement(before=before, witness=witness)
+    _require_witness_matches_placement(witness=witness, placement=grouped_before)
+    attempted = _attempted_rules_unit_placement(before=grouped_before, witness=witness)
     attempted_scenario = _scenario_with_rules_unit_placement(
-        scenario=scenario,
+        scenario=movement_scenario,
         placement=attempted,
     )
     path_results: list[PathValidationResult] = []
@@ -359,7 +406,7 @@ def resolve_rules_unit_fight_movement(
     attempted_by_component = {
         placement.unit_instance_id: placement for placement in attempted.component_unit_placements
     }
-    for before_component in before.component_unit_placements:
+    for before_component in grouped_before.component_unit_placements:
         component_scenario = _scenario_with_component_placement(
             scenario=attempted_scenario,
             placement=before_component,
@@ -398,6 +445,17 @@ def resolve_rules_unit_fight_movement(
             raise GameLifecycleError("Rules-unit Fight movement component resolution drift.")
         path_results.extend(component_resolution.path_validation_results)
         terrain_results.extend(component_resolution.terrain_path_legality_results)
+    path_results.extend(
+        retained_fight_movement_source_path_violations(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            rules_unit=rules_unit,
+            witness=witness,
+            movement_mode=proposal.movement_mode,
+            displacement_kind=_displacement_kind(proposal.proposal_kind),
+            maximum_distance_inches=maximum_distance_inches,
+        )
+    )
     coherency_result = rules_unit_coherency_result(
         scenario=attempted_scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -409,7 +467,7 @@ def resolve_rules_unit_fight_movement(
         else RulesUnitMovementRollbackRecord(
             unit_instance_id=rules_unit.unit_instance_id,
             displacement_kind=_displacement_kind(proposal.proposal_kind),
-            before_rules_unit_placement=before,
+            before_rules_unit_placement=grouped_before,
             attempted_rules_unit_placement=attempted,
             coherency_result=coherency_result,
         )
@@ -420,15 +478,15 @@ def resolve_rules_unit_fight_movement(
         movement_phase_action=proposal.movement_phase_action,
         movement_mode=proposal.movement_mode,
         maximum_distance_inches=maximum_distance_inches,
-        before_rules_unit_placement=before,
+        before_rules_unit_placement=grouped_before,
         attempted_rules_unit_placement=attempted,
         witness=witness,
         endpoint_witness=_endpoint_witness(
-            before_scenario=scenario,
+            before_scenario=movement_scenario,
             after_scenario=attempted_scenario,
             ruleset_descriptor=ruleset_descriptor,
             rules_unit=rules_unit,
-            before=before,
+            before=grouped_before,
             after=attempted,
             target_unit_instance_ids=proposal.target_unit_instance_ids,
             objective_id=proposal.objective_id,
@@ -451,8 +509,21 @@ def fight_rules_unit_movement_resolution_violation(
     state: GameState,
 ) -> ProposalValidationResult | None:
     if isinstance(resolution, FightMovementResolution):
-        physical_proposal = _proposal_with_physical_target_ids(
+        rules_unit = _canonical_rules_unit(
+            state=state,
+            unit_instance_id=proposal.unit_instance_id,
+        )
+        before = _movement_source_component_placement(
             scenario=scenario,
+            rules_unit=rules_unit,
+        )
+        movement_scenario = _movement_scenario_for_rules_unit(
+            scenario=scenario,
+            rules_unit=rules_unit,
+            component_unit_placements=(before,),
+        )
+        physical_proposal = _proposal_with_physical_target_ids(
+            scenario=movement_scenario,
             state=state,
             proposal=proposal,
         )
@@ -460,7 +531,7 @@ def fight_rules_unit_movement_resolution_violation(
             proposal_request=proposal_request,
             proposal=physical_proposal,
             resolution=resolution,
-            scenario=scenario,
+            scenario=movement_scenario,
             ruleset_descriptor=ruleset_descriptor,
             state=state,
         )
@@ -495,20 +566,25 @@ def fight_rules_unit_movement_resolution_violation(
         )
     if proposal.is_no_move_choice:
         return None
-    before = resolution.before_rules_unit_placement
+    grouped_before = resolution.before_rules_unit_placement
     after = resolution.attempted_rules_unit_placement
-    after_scenario = _scenario_with_rules_unit_placement(
+    movement_scenario = _movement_scenario_for_rules_unit(
         scenario=scenario,
+        rules_unit=rules_unit,
+        component_unit_placements=grouped_before.component_unit_placements,
+    )
+    after_scenario = _scenario_with_rules_unit_placement(
+        scenario=movement_scenario,
         placement=after,
     )
     return _endpoint_validation(
-        before_scenario=scenario,
+        before_scenario=movement_scenario,
         after_scenario=after_scenario,
         ruleset_descriptor=ruleset_descriptor,
         request=proposal_request,
         proposal=proposal,
         rules_unit=rules_unit,
-        before=before,
+        before=grouped_before,
         after=after,
         state=state,
     )
@@ -530,18 +606,46 @@ def apply_fight_rules_unit_movement_resolution(
     battlefield_state: BattlefieldRuntimeState,
     resolution: FightRulesUnitMovementResolution,
 ) -> BattlefieldRuntimeState:
-    if isinstance(resolution, FightMovementResolution):
-        return battlefield_state.with_unit_placement(resolution.attempted_placement)
     if not resolution.is_valid:
         raise GameLifecycleError("Invalid rules-unit Fight movement cannot mutate state.")
+    if isinstance(resolution, FightMovementResolution):
+        current = battlefield_state.unit_placement_by_id(resolution.unit_instance_id)
+        expected = resolution.attempted_placement
+        if resolution.witness is not None:
+            expected = expected.with_model_placements(
+                tuple(
+                    placement.with_pose(
+                        resolution.witness.poses_for_model(placement.model_instance_id)[0]
+                    )
+                    for placement in expected.model_placements
+                )
+            )
+        require_fight_movement_source_matches_current(
+            current=current,
+            expected=expected,
+        )
+        return battlefield_state.with_unit_placement(
+            _merge_movement_source_placement(
+                current=current,
+                attempted=resolution.attempted_placement,
+            )
+        )
     for before in resolution.before_rules_unit_placement.component_unit_placements:
-        if battlefield_state.unit_placement_by_id(before.unit_instance_id) != before:
-            raise GameLifecycleError("Rules-unit Fight movement application context drift.")
+        require_fight_movement_source_matches_current(
+            current=battlefield_state.unit_placement_by_id(before.unit_instance_id),
+            expected=before,
+        )
     if resolution.before_rules_unit_placement == resolution.attempted_rules_unit_placement:
         return battlefield_state
     updated = battlefield_state
     for attempted in resolution.attempted_rules_unit_placement.component_unit_placements:
-        updated = updated.with_unit_placement(attempted)
+        current = updated.unit_placement_by_id(attempted.unit_instance_id)
+        updated = updated.with_unit_placement(
+            _merge_movement_source_placement(
+                current=current,
+                attempted=attempted,
+            )
+        )
     return updated
 
 
@@ -638,13 +742,19 @@ def _consolidation_rule_validation(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
         )
-    source_models = _geometry_models_for_rules_unit(scenario=scenario, rules_unit=rules_unit)
+    source_models = _movement_source_geometry_models_for_rules_unit(
+        scenario=scenario,
+        rules_unit=rules_unit,
+    )
     enemies_within_three = tuple(
         target.unit_instance_id
         for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
         if _closest_distance(
             source_models,
-            _geometry_models_for_rules_unit(scenario=scenario, rules_unit=target),
+            _measurement_target_geometry_models_for_rules_unit(
+                scenario=scenario,
+                rules_unit=target,
+            ),
         )
         <= CONSOLIDATE_ENEMY_DISTANCE_INCHES
     )
@@ -665,7 +775,7 @@ def _consolidation_rule_validation(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
         )
-    source_placements = _present_model_placements(
+    source_placements = _movement_source_model_placements(
         scenario=scenario,
         rules_unit=rules_unit,
     )
@@ -864,11 +974,11 @@ def _continuing_engagement_violation(
 ) -> str | None:
     after_by_id = {model.model_id: model for model in after_models}
     for target in _enemy_rules_units(state=state, rules_unit=rules_unit):
-        target_before = _geometry_models_for_rules_unit(
+        target_before = _measurement_target_geometry_models_for_rules_unit(
             scenario=before_scenario,
             rules_unit=target,
         )
-        target_after = _geometry_models_for_rules_unit(
+        target_after = _measurement_target_geometry_models_for_rules_unit(
             scenario=after_scenario,
             rules_unit=target,
         )
@@ -937,7 +1047,7 @@ def _engaged_enemy_rules_unit_ids(
     rules_unit: RulesUnitView,
     state: GameState,
 ) -> tuple[str, ...]:
-    source_models = _geometry_models_for_rules_unit(
+    source_models = _movement_source_geometry_models_for_rules_unit(
         scenario=scenario,
         rules_unit=rules_unit,
     )
@@ -951,7 +1061,7 @@ def _engaged_enemy_rules_unit_ids(
                 vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
             )
             for source in source_models
-            for enemy in _geometry_models_for_rules_unit(
+            for enemy in _measurement_target_geometry_models_for_rules_unit(
                 scenario=scenario,
                 rules_unit=target,
             )
@@ -1008,7 +1118,7 @@ def _geometry_models_for_target_ids(
     return tuple(
         model
         for target_id in target_unit_instance_ids
-        for model in _geometry_models_for_rules_unit(
+        for model in _measurement_target_geometry_models_for_rules_unit(
             scenario=scenario,
             rules_unit=_canonical_rules_unit(state=state, unit_instance_id=target_id),
         )
@@ -1025,20 +1135,20 @@ def _enemy_geometry_models(
         model
         for rules_unit in fight_present_rules_unit_views(state=state)
         if rules_unit.owner_player_id != player_id
-        for model in _geometry_models_for_rules_unit(
+        for model in _measurement_target_geometry_models_for_rules_unit(
             scenario=scenario,
             rules_unit=rules_unit,
         )
     )
 
 
-def _geometry_models_for_rules_unit(
+def _measurement_target_geometry_models_for_rules_unit(
     *,
     scenario: BattlefieldScenario,
     rules_unit: RulesUnitView,
 ) -> tuple[GeometryModel, ...]:
     models: list[GeometryModel] = []
-    for placement in _present_model_placements(
+    for placement in _measurement_target_model_placements(
         scenario=scenario,
         rules_unit=rules_unit,
     ):
@@ -1066,7 +1176,7 @@ def _geometry_models_for_placement(
     )
 
 
-def _present_model_placements(
+def _measurement_target_model_placements(
     *,
     scenario: BattlefieldScenario,
     rules_unit: RulesUnitView,
@@ -1090,38 +1200,6 @@ def _present_model_placements(
     if not placements:
         raise GameLifecycleError("Fight rules unit requires present models.")
     return tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
-
-
-def _present_rules_unit_placement(
-    *,
-    scenario: BattlefieldScenario,
-    rules_unit: RulesUnitView,
-) -> FightRulesUnitPlacement:
-    present_model_ids = {
-        placement.model_instance_id
-        for placement in _present_model_placements(
-            scenario=scenario,
-            rules_unit=rules_unit,
-        )
-    }
-    components: list[UnitPlacement] = []
-    for component in rules_unit.components:
-        placement = scenario.battlefield_state.unit_placement_or_none(
-            component.unit.unit_instance_id
-        )
-        if placement is None:
-            continue
-        selected = tuple(
-            model_placement
-            for model_placement in placement.model_placements
-            if model_placement.model_instance_id in present_model_ids
-        )
-        if selected:
-            components.append(placement.with_model_placements(selected))
-    return FightRulesUnitPlacement(
-        rules_unit_instance_id=rules_unit.unit_instance_id,
-        component_unit_placements=tuple(components),
-    )
 
 
 def _attempted_rules_unit_placement(

@@ -17,7 +17,6 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
@@ -114,6 +113,9 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, Life
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    placed_alive_geometry_models_for_unit_placements,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -1144,19 +1146,19 @@ def _unit_placements_within(
     second: UnitPlacement,
     distance_inches: float,
 ) -> bool:
-    for first_placement in first.model_placements:
-        first_model = geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(first_placement),
-            placement=first_placement,
-        )
-        for second_placement in second.model_placements:
-            second_model = geometry_model_for_placement(
-                model=scenario.model_instance_for_placement(second_placement),
-                placement=second_placement,
-            )
-            if first_model.range_to(second_model) <= distance_inches:
-                return True
-    return False
+    first_models = placed_alive_geometry_models_for_unit_placements(
+        scenario=scenario,
+        unit_placements=(first,),
+    )
+    second_models = placed_alive_geometry_models_for_unit_placements(
+        scenario=scenario,
+        unit_placements=(second,),
+    )
+    return any(
+        first_model.range_to(second_model) <= distance_inches
+        for first_model in first_models
+        for second_model in second_models
+    )
 
 
 def _unit_level_of_control(

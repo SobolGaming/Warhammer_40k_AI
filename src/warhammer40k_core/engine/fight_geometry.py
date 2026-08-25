@@ -36,6 +36,60 @@ def geometry_models_for_fight_unit(
     )
 
 
+def geometry_models_for_fight_attack_target_unit(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+    state: GameState | None = None,
+) -> tuple[GeometryModel, ...]:
+    """Return only living models from a placed melee attack target unit."""
+    models = geometry_models_for_fight_unit(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+        state=state,
+    )
+    unit = scenario.unit_instance_for_placement(
+        scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    )
+    living_model_ids = {model.model_instance_id for model in unit.own_models if model.is_alive}
+    return tuple(model for model in models if model.model_id in living_model_ids)
+
+
+def attack_targetable_engaged_enemy_unit_ids(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    state: GameState | None = None,
+) -> tuple[str, ...]:
+    source_models = geometry_models_for_fight_unit_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        state=state,
+    )
+    engaged: list[str] = []
+    for enemy_unit_id in enemy_unit_ids_for_fight_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    ):
+        enemy_models = geometry_models_for_fight_attack_target_unit(
+            scenario=scenario,
+            unit_instance_id=enemy_unit_id,
+            state=state,
+        )
+        if any(
+            source_model.is_within_engagement_range(
+                enemy_model,
+                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
+                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+            )
+            for source_model in source_models
+            for enemy_model in enemy_models
+        ):
+            engaged.append(enemy_unit_id)
+    return tuple(sorted(engaged))
+
+
 def geometry_model_for_fight_unit_model(
     *,
     scenario: BattlefieldScenario,

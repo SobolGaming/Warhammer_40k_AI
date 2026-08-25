@@ -5891,7 +5891,7 @@ def test_phase14h_mustered_attached_unit_selects_to_shoot_as_one_rules_unit() ->
         assert completed_payload["skipped_unit_ids"] == []
 
 
-def test_phase14h_attached_target_range_skips_destroyed_unplaced_components() -> None:
+def test_phase14h_attached_target_ignores_fight_on_death_only_component_for_attacks() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_specs=_attached_enemy_unit_specs(),
@@ -5900,6 +5900,10 @@ def test_phase14h_attached_target_range_skips_destroyed_unplaced_components() ->
     state = _state(lifecycle)
     formation = _attached_formation_for_player(state=state, player_id="player-b")
     bodyguard = units["bodyguard-unit"]
+    awaiting_model = bodyguard.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    awaiting_placement = battlefield.model_placement_by_id(awaiting_model.model_instance_id)
     removed_bodyguard_ids = tuple(model.model_instance_id for model in bodyguard.own_models)
     _replace_unit_instance_in_state(
         state=state,
@@ -5908,23 +5912,50 @@ def test_phase14h_attached_target_range_skips_destroyed_unplaced_components() ->
             own_models=tuple(replace(model, wounds_remaining=0) for model in bodyguard.own_models),
         ),
     )
-    battlefield = state.battlefield_state
-    assert battlefield is not None
     state.replace_battlefield_state(battlefield.with_removed_models(removed_bodyguard_ids))
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=awaiting_placement,
+        effect_id="phase14h-attached-target-awaiting",
+        source_rule_id="phase14h-attached-target-rule",
+        source_phase=BattlePhase.SHOOTING,
+    )
     updated_battlefield = state.battlefield_state
     assert updated_battlefield is not None
 
     unit_target_within_max_range = _shooting_phase_private("_unit_target_within_max_range")
+    scenario = battlefield_scenario_for_state(state=state)
+    candidate = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=units["intercessor-1"],
+        weapon_profile=_first_weapon_profile(lifecycle, units["intercessor-1"]),
+        target_unit_ids=(formation.attached_unit_instance_id,),
+    )[0]
+    allocation_context = allocation_context_for_unit(
+        state=state,
+        target_unit_instance_id=formation.attached_unit_instance_id,
+    )
+    living_character_model_ids = tuple(
+        sorted(
+            model.model_instance_id
+            for unit_key in ("leader-unit", "support-unit")
+            for model in units[unit_key].own_models
+        )
+    )
 
     assert unit_target_within_max_range(
-        scenario=BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=updated_battlefield,
-        ),
+        scenario=scenario,
         unit=units["intercessor-1"],
         target_unit_id=formation.attached_unit_instance_id,
         range_inches=240,
     )
+    assert candidate.is_legal
+    assert candidate.target_in_range_model_ids
+    assert set(candidate.target_in_range_model_ids) <= set(living_character_model_ids)
+    assert set(candidate.target_visible_model_ids) <= set(living_character_model_ids)
+    assert awaiting_model.model_instance_id not in allocation_context.alive_model_ids
+    assert allocation_context.legal_model_ids() == living_character_model_ids
 
 
 def test_phase14i_sustained_hits_slash_keyword_gate_controls_generated_hits() -> None:
@@ -6241,6 +6272,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=defender.unit_instance_id,
+        placed_alive_models_only=True,
     )
     assert not unit_has_line_of_sight_to_target(
         state=state,
@@ -6248,6 +6280,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=defender.unit_instance_id,
+        placed_alive_models_only=True,
         terrain_features=(_blocking_ruin(),),
     )
 
@@ -6264,6 +6297,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
             ruleset_descriptor=_ruleset(),
             observing_unit=observer,
             target_unit_id=defender.unit_instance_id,
+            placed_alive_models_only=True,
         )
     with pytest.raises(GameLifecycleError, match="requires a BattlefieldScenario"):
         unit_has_line_of_sight_to_target(
@@ -6272,6 +6306,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
             ruleset_descriptor=_ruleset(),
             observing_unit=observer,
             target_unit_id=defender.unit_instance_id,
+            placed_alive_models_only=True,
         )
     with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
         unit_has_line_of_sight_to_target(
@@ -6280,6 +6315,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
             ruleset_descriptor=cast(RulesetDescriptor, object()),
             observing_unit=observer,
             target_unit_id=defender.unit_instance_id,
+            placed_alive_models_only=True,
         )
     with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
         unit_has_line_of_sight_to_target(
@@ -6288,6 +6324,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
             ruleset_descriptor=_ruleset(),
             observing_unit=cast(UnitInstance, object()),
             target_unit_id=defender.unit_instance_id,
+            placed_alive_models_only=True,
         )
     with pytest.raises(GameLifecycleError, match="terrain_features must contain"):
         unit_has_line_of_sight_to_target(
@@ -6296,6 +6333,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
             ruleset_descriptor=_ruleset(),
             observing_unit=observer,
             target_unit_id=defender.unit_instance_id,
+            placed_alive_models_only=True,
             terrain_features=cast(tuple[TerrainFeatureDefinition, ...], ("bad-terrain",)),
         )
 
@@ -11417,11 +11455,29 @@ def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywor
     )
 
 
-def test_phase13e_fight_on_death_only_unit_accepts_ranged_declaration_without_allocation() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+def test_phase13e_fight_on_death_only_unit_is_not_a_ranged_target_or_spent_attack() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            (
+                "fight-on-death-target",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+            (
+                "living-target",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+        ),
+        enemy_pose=Pose.at(28.0, 35.0),
+    )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
-    defender = units["enemy"]
+    defender = units["fight-on-death-target"]
+    living_target = units["living-target"]
     battlefield = state.battlefield_state
     assert battlefield is not None
     awaiting_model = defender.own_models[0]
@@ -11459,6 +11515,21 @@ def test_phase13e_fight_on_death_only_unit_accepts_ranged_declaration_without_al
             target_unit_instance_id=defender.unit_instance_id,
         )
 
+    candidate = shooting_target_candidates_for_unit(
+        scenario=battlefield_scenario_for_state(state=state),
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        target_unit_ids=(defender.unit_instance_id,),
+    )[0]
+
+    assert not candidate.is_legal
+    assert (
+        candidate.violation_code is ShootingTargetViolationCode.TARGET_HAS_NO_PLACED_LIVING_MODELS
+    )
+    assert candidate.target_in_range_model_ids == ()
+    assert candidate.target_visible_model_ids == ()
+
     lifecycle = replace(lifecycle, state=GameState.from_payload(state.to_payload()))
     state = _state(lifecycle)
     assert (
@@ -11475,39 +11546,88 @@ def test_phase13e_fight_on_death_only_unit_accepts_ranged_declaration_without_al
         unit_instance_id=attacker.unit_instance_id,
         selection_result_id="phase13e-fod-ranged-select",
     )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
+    assert defender.unit_instance_id not in {
+        candidate_payload["target_unit_instance_id"] for candidate_payload in target_candidates
+    }
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored_checkpoint = GameLifecycle.from_payload(checkpoint)
+    assert (
+        restored_checkpoint.decision_controller.queue.peek_next().request_id
+        == declaration_request.request_id
+    )
+    target_authority_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_request = target_authority_drift["decisions"]["queue"]["pending_requests"][0]
+    drifted_request_payload = cast(dict[str, object], drifted_request["payload"])
+    drifted_proposal_request = cast(
+        dict[str, object],
+        drifted_request_payload["proposal_request"],
+    )
+    drifted_candidates = cast(
+        list[dict[str, object]],
+        drifted_proposal_request["target_candidates"],
+    )
+    injected_candidate = cast(
+        dict[str, object],
+        json.loads(json.dumps(drifted_candidates[0], sort_keys=True)),
+    )
+    injected_candidate["target_unit_instance_id"] = defender.unit_instance_id
+    drifted_candidates.append(injected_candidate)
+    with pytest.raises(
+        GameLifecycleError,
+        match="target_has_no_placed_living_models",
+    ):
+        GameLifecycle.from_payload(target_authority_drift)
+
     proposal = _proposal_from_request(
         request=declaration_request,
-        target_unit_id=defender.unit_instance_id,
+        target_unit_id=living_target.unit_instance_id,
+    )
+    forged_proposal = replace(
+        proposal,
+        declarations=tuple(
+            replace(
+                declaration,
+                target_unit_instance_id=defender.unit_instance_id,
+            )
+            for declaration in proposal.declarations
+        ),
     )
 
     status = _submit_payload(
         lifecycle,
         request=declaration_request,
-        payload=proposal.to_payload(),
+        payload=forged_proposal.to_payload(),
         result_id="phase13e-fod-ranged-declaration",
     )
 
-    assert status.status_kind in {
-        LifecycleStatusKind.ADVANCED,
-        LifecycleStatusKind.WAITING_FOR_DECISION,
-    }
-    accepted = _last_event_payload(lifecycle, "shooting_declaration_accepted")
-    assert (
-        cast(list[dict[str, object]], accepted["attack_pools"])[0]["target_unit_instance_id"]
-        == defender.unit_instance_id
+    _assert_invalid_proposal_status(
+        status,
+        expected_code="target_has_no_placed_living_models",
+        expected_field="declarations",
     )
-    assert _event_payloads(lifecycle, "attack_pool_not_allocated") == (
-        {
-            "sequence_id": "attack-sequence:phase13e-fod-ranged-declaration",
-            "pool_index": 0,
-            "target_unit_instance_id": defender.unit_instance_id,
-            "reason": "target_present_without_living_models",
-        },
-    )
-    assert _event_payloads(lifecycle, "attack_sequence_completed")
+    assert _event_payloads(lifecycle, "shooting_declaration_accepted") == ()
+    assert _event_payloads(lifecycle, "unit_selected_as_target_stratagem_window_opened") == ()
+    assert _event_payloads(lifecycle, "attack_sequence_step") == ()
+    assert _event_payloads(lifecycle, "attack_pool_not_allocated") == ()
+    state = _state(lifecycle)
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    assert shooting_state.shot_unit_ids == ()
+    assert shooting_state.attack_sequence is None
+    assert state.ranged_attack_history_records == []
+    assert state.one_shot_weapon_use_records == []
 
 
-def test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit() -> None:
+def test_phase13e_fight_target_enumeration_excludes_fight_on_death_only_unit() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_pose=Pose.at(11.0, 35.0),
@@ -11541,12 +11661,15 @@ def test_phase13e_fight_target_enumeration_includes_fight_on_death_only_unit() -
     )
     scenario = battlefield_scenario_for_state(state=state)
 
-    assert melee_target_unit_ids(
-        scenario=scenario,
-        ruleset_descriptor=_ruleset(),
-        unit_instance_id=attacker.unit_instance_id,
-        state=state,
-    ) == (defender.unit_instance_id,)
+    assert (
+        melee_target_unit_ids(
+            scenario=scenario,
+            ruleset_descriptor=_ruleset(),
+            unit_instance_id=attacker.unit_instance_id,
+            state=state,
+        )
+        == ()
+    )
 
 
 def test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_allocation() -> None:
@@ -11591,12 +11714,13 @@ def test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_alloca
     )
 
     assert candidate.is_legal
-    assert awaiting_model.model_instance_id in candidate.target_in_range_model_ids
-    assert awaiting_model.model_instance_id in candidate.target_visible_model_ids
+    living_model_ids = tuple(model.model_instance_id for model in replacement.own_models[1:])
+    assert awaiting_model.model_instance_id not in candidate.target_in_range_model_ids
+    assert awaiting_model.model_instance_id not in candidate.target_visible_model_ids
+    assert candidate.target_in_range_model_ids == living_model_ids
+    assert candidate.target_visible_model_ids == living_model_ids
     assert awaiting_model.model_instance_id not in allocation_context.alive_model_ids
-    assert allocation_context.alive_model_ids == tuple(
-        model.model_instance_id for model in replacement.own_models[1:]
-    )
+    assert allocation_context.alive_model_ids == living_model_ids
     assert BattlefieldScenario.from_payload(scenario.to_payload()) == scenario
 
     replayed_state = GameState.from_payload(state.to_payload())
@@ -11623,6 +11747,49 @@ def test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_alloca
 
     assert replayed_candidate.to_payload() == candidate.to_payload()
     assert replayed_allocation_context.to_payload() == allocation_context.to_payload()
+
+    lifecycle = replace(lifecycle, state=replayed_state)
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13e-mixed-target-select",
+    )
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored_checkpoint = GameLifecycle.from_payload(checkpoint)
+    assert (
+        restored_checkpoint.decision_controller.queue.peek_next().request_id
+        == declaration_request.request_id
+    )
+    target_authority_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    pending_request = target_authority_drift["decisions"]["queue"]["pending_requests"][0]
+    pending_payload = cast(dict[str, object], pending_request["payload"])
+    pending_proposal = cast(dict[str, object], pending_payload["proposal_request"])
+    pending_candidates = cast(list[dict[str, object]], pending_proposal["target_candidates"])
+    drifted_candidate = next(
+        candidate_payload
+        for candidate_payload in pending_candidates
+        if candidate_payload["target_unit_instance_id"] == defender.unit_instance_id
+        and candidate_payload["is_legal"] is True
+    )
+    cast(list[object], drifted_candidate["target_visible_model_ids"]).append(
+        awaiting_model.model_instance_id
+    )
+    cast(list[object], drifted_candidate["target_in_range_model_ids"]).append(
+        awaiting_model.model_instance_id
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Ranged target inventory includes a retained destroyed model",
+    ):
+        GameLifecycle.from_payload(target_authority_drift)
 
 
 def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:

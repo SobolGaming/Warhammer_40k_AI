@@ -16,6 +16,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine.battlefield_presence import (
+    scenario_rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
@@ -40,6 +43,9 @@ from warhammer40k_core.engine.shooting_selection_range import (
 )
 from warhammer40k_core.engine.shooting_selection_range import (
     geometry_models_for_unit_placements as _geometry_models_for_unit_placements,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    placed_alive_geometry_models_for_unit_placements as _geometry_models_for_target_placements,
 )
 from warhammer40k_core.engine.shooting_selection_range import (
     target_in_range_model_ids as _target_in_range_model_ids,
@@ -99,6 +105,7 @@ class ShootingTargetViolationCode(StrEnum):
     MELEE_WEAPON = "melee_weapon"
     NOT_ENEMY_UNIT = "not_enemy_unit"
     TARGET_NOT_PLACED = "target_not_placed"
+    TARGET_HAS_NO_PLACED_LIVING_MODELS = "target_has_no_placed_living_models"
     OUT_OF_RANGE = "out_of_range"
     OUTSIDE_DETECTION_RANGE = "outside_detection_range"
     NOT_VISIBLE = "not_visible"
@@ -498,13 +505,17 @@ def unit_has_line_of_sight_to_target(
     observer_model_instance_id: str | None = None,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     terrain_areas: tuple[PlacedTerrainArea, ...] = (),
+    placed_alive_models_only: bool,
 ) -> bool:
+    """Query LOS under the caller's explicit living-model policy for both sides."""
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Line of sight target query requires a BattlefieldScenario.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Line of sight target query requires a RulesetDescriptor.")
     if type(observing_unit) is not UnitInstance:
         raise GameLifecycleError("Line of sight target query requires a UnitInstance.")
+    if type(placed_alive_models_only) is not bool:
+        raise GameLifecycleError("Line of sight placed_alive_models_only must be a bool.")
     _validate_identifier("target_unit_id", target_unit_id)
     observer_model_id = _validate_optional_identifier(
         "observer_model_instance_id",
@@ -527,14 +538,26 @@ def unit_has_line_of_sight_to_target(
     )
     if observing_placement is None or target_placements is None:
         raise GameLifecycleError("Line of sight target query requires placed units.")
+    if placed_alive_models_only and not scenario_rules_unit_has_placed_alive_model(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    ):
+        return False
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
     )
-    target_models = _geometry_models_for_unit_placements(
-        scenario=scenario,
-        unit_placements=target_placements,
+    target_models = (
+        _geometry_models_for_target_placements(
+            scenario=scenario,
+            unit_placements=target_placements,
+        )
+        if placed_alive_models_only
+        else _geometry_models_for_unit_placements(
+            scenario=scenario,
+            unit_placements=target_placements,
+        )
     )
     hidden_model_ids = set(
         terrain_hidden_model_ids(
@@ -569,6 +592,13 @@ def unit_has_line_of_sight_to_target(
         scenario=scenario,
         unit_placement=observing_placement,
     )
+    if placed_alive_models_only:
+        alive_observer_model_ids = {
+            model.model_instance_id for model in observing_unit.own_models if model.is_alive
+        }
+        observer_models = tuple(
+            model for model in observer_models if model.model_id in alive_observer_model_ids
+        )
     if observer_model_id is not None:
         observer_models = tuple(
             model for model in observer_models if model.model_id == observer_model_id
@@ -704,6 +734,18 @@ def _target_candidate(
             message="Ranged target selection requires placed attacker and target units.",
             visibility_cache_key=visibility_cache_key,
         )
+    if not scenario_rules_unit_has_placed_alive_model(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    ):
+        return _invalid_candidate(
+            attacker_unit=attacker_unit,
+            weapon_profile=weapon_profile,
+            target_unit_id=target_unit_id,
+            violation_code=ShootingTargetViolationCode.TARGET_HAS_NO_PLACED_LIVING_MODELS,
+            message="Ranged target selection requires at least one placed living target model.",
+            visibility_cache_key=visibility_cache_key,
+        )
     hunter_rule_ids: tuple[str, ...] = ()
     if WeaponKeyword.HUNTER in weapon_profile.keywords:
         hunter_rule_ids = (HUNTER_RULE_ID,)
@@ -722,7 +764,14 @@ def _target_candidate(
         attacker_placement=attacker_placement,
         attacker_model_instance_id=attacker_model_instance_id,
     )
-    target_models = _geometry_models_for_unit_placements(
+    attacker_models = tuple(
+        model
+        for model in attacker_models
+        if scenario.model_instance_for_placement(
+            scenario.battlefield_state.model_placement_by_id(model.model_id)
+        ).is_alive
+    )
+    target_models = _geometry_models_for_target_placements(
         scenario=scenario,
         unit_placements=target_placements,
     )

@@ -141,6 +141,8 @@ def _unit_target_within_max_range(
         attacking_unit_instance_id=unit.unit_instance_id,
         target_unit_instance_id=target_unit_id,
         max_range_inches=range_inches,
+        placed_alive_attacker_models_only=True,
+        placed_alive_target_models_only=True,
     )
 
 
@@ -344,6 +346,7 @@ def _target_visible_to_friendly_unit(
             ruleset_descriptor=ruleset_descriptor,
             observing_unit=friendly_unit,
             target_unit_id=target_unit_instance_id,
+            placed_alive_models_only=True,
             terrain_features=terrain_features,
             terrain_areas=_terrain_areas_for_state(state),
         ):

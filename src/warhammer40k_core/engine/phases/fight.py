@@ -44,7 +44,6 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    fight_present_rules_unit_views,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
@@ -211,6 +210,7 @@ from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
     remove_rule_fight_on_death_contexts_for_completed_activation,
 )
 from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
     rules_unit_identity_ids,
     rules_unit_view_by_id,
 )
@@ -779,6 +779,26 @@ def _advance_active_fight_activation(
             activation_result_id=activation.result_id,
         )
     ):
+        if not melee_rules_unit.alive_models():
+            state.replace_fight_phase_state(
+                fight_state.with_overrun_pile_in_completed(
+                    activation_result_id=activation.result_id,
+                )
+            )
+            decisions.event_log.append(
+                "overrun_pile_in_not_available",
+                validate_json_value(
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "phase": BattlePhase.FIGHT.value,
+                        "phase_body_status": "overrun_pile_in_not_available",
+                        "activation_selection": activation.to_payload(),
+                        "reason": "no_living_movable_models",
+                    }
+                ),
+            )
+            return None
         return _request_overrun_pile_in(
             state=state,
             decisions=decisions,
@@ -1953,7 +1973,7 @@ def _eligible_fight_movement_unit_ids(
     scenario = _battlefield_scenario(state)
     rules_units = tuple(
         rules_unit
-        for rules_unit in fight_present_rules_unit_views(state=state)
+        for rules_unit in placed_alive_rules_unit_views(state=state)
         if rules_unit.owner_player_id == player_id
     )
     charged_unit_ids = set(fight_state.fight_order_state.fights_first_registry.charged_unit_ids())

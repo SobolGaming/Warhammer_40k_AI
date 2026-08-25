@@ -39,3 +39,26 @@ def geometry_models_for_rules_unit(
                 continue
             geometry_models.append(geometry_model_for_placement(model=model, placement=placement))
     return tuple(geometry_models)
+
+
+def placed_alive_geometry_models_for_rules_unit(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[GeometryModel, ...]:
+    """Return geometry for the placed living models in a rules unit."""
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Placed alive rules-unit geometry requires battlefield state.")
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    alive_model_ids = {model.model_instance_id for model in rules_unit.alive_models()}
+    if not alive_model_ids.intersection(battlefield.placed_model_ids()):
+        return ()
+    return tuple(
+        model
+        for model in geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
+        if model.model_id in alive_model_ids
+    )

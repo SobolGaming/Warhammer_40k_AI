@@ -68,9 +68,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
     PlacementError,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.catalog_model_scope import scoped_roll_model_ids_for_effect
 from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
@@ -109,6 +107,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
@@ -133,7 +134,6 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
 )
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -2119,9 +2119,9 @@ def _unit_move_completed_mortal_wounds_target_candidates(
         state=state,
         unit_instance_id=source_rules_unit_id,
     )
-    source_models = _placed_alive_geometry_models_for_rules_unit(
+    source_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
-        rules_unit_instance_id=source_rules_unit.unit_instance_id,
+        unit_instance_id=source_rules_unit.unit_instance_id,
     )
     if not source_models:
         return ()
@@ -2130,9 +2130,9 @@ def _unit_move_completed_mortal_wounds_target_candidates(
         state=state,
         player_id=source_rules_unit.owner_player_id,
     ):
-        target_models = _placed_alive_geometry_models_for_rules_unit(
+        target_models = placed_alive_geometry_models_for_rules_unit(
             state=state,
-            rules_unit_instance_id=target_rules_unit.unit_instance_id,
+            unit_instance_id=target_rules_unit.unit_instance_id,
         )
         if not target_models:
             continue
@@ -2199,9 +2199,9 @@ def _visible_enemy_rules_unit_ids_for_source(
     if state.battlefield_state is None:
         raise GameLifecycleError("Visible enemy rules-unit query requires battlefield state.")
     source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
-    source_models = _placed_alive_geometry_models_for_rules_unit(
+    source_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
-        rules_unit_instance_id=source_rules_unit.unit_instance_id,
+        unit_instance_id=source_rules_unit.unit_instance_id,
     )
     if not source_models:
         return ()
@@ -2211,9 +2211,9 @@ def _visible_enemy_rules_unit_ids_for_source(
         state=state,
         player_id=source_rules_unit.owner_player_id,
     ):
-        target_models = _placed_alive_geometry_models_for_rules_unit(
+        target_models = placed_alive_geometry_models_for_rules_unit(
             state=state,
-            rules_unit_instance_id=target_rules_unit.unit_instance_id,
+            unit_instance_id=target_rules_unit.unit_instance_id,
         )
         if not target_models or not any(
             source_model.range_to(target_model) <= range_inches
@@ -2230,6 +2230,7 @@ def _visible_enemy_rules_unit_ids_for_source(
                 ruleset_descriptor=ruleset_descriptor,
                 observing_unit=component.unit,
                 target_unit_id=target_rules_unit.unit_instance_id,
+                placed_alive_models_only=True,
                 terrain_features=state.battlefield_state.terrain_features,
                 terrain_areas=(
                     () if state.mission_setup is None else state.mission_setup.terrain_areas
@@ -2472,45 +2473,6 @@ def _placed_alive_model_instance_ids_for_rules_unit(
             if model.model_instance_id in placed_model_ids
         )
     )
-
-
-def _placed_alive_geometry_models_for_rules_unit(
-    *,
-    state: GameState,
-    rules_unit_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    _validate_game_state(state)
-    rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
-    if state.battlefield_state is None:
-        return ()
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    model_by_id = {
-        model.model_instance_id: model
-        for model in rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=rules_unit_id,
-        ).alive_models()
-    }
-    models: list[GeometryModel] = []
-    for model_id in _placed_alive_model_instance_ids_for_rules_unit(
-        state=state,
-        rules_unit_instance_id=rules_unit_id,
-    ):
-        placement = state.battlefield_state.model_placement_by_id(model_id)
-        model = model_by_id.get(model_id)
-        if model is None:
-            raise GameLifecycleError(
-                "Catalog move-completed mortal wounds model placement drifted."
-            )
-        if scenario.model_instance_for_placement(placement).model_instance_id != model_id:
-            raise GameLifecycleError(
-                "Catalog move-completed mortal wounds placement references wrong model."
-            )
-        models.append(geometry_model_for_placement(model=model, placement=placement))
-    return tuple(models)
 
 
 def _rules_unit_views_for_other_players(

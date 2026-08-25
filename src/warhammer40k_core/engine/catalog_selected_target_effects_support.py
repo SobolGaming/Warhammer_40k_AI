@@ -14,6 +14,7 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_presence import rules_unit_has_placed_alive_model
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
@@ -63,7 +64,9 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     current_rules_unit_views_for_identity,
@@ -308,7 +311,7 @@ def selection_distance_conditions_apply(
     )
     if not distance_conditions:
         return True
-    target_models = geometry_models_for_rules_unit(
+    target_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=target_rules_unit.unit_instance_id,
     )
@@ -331,7 +334,7 @@ def selection_distance_conditions_apply(
             condition_source_model_id = None
         else:
             raise GameLifecycleError("Catalog selected-target distance object kind is unsupported.")
-        source_models = geometry_models_for_rules_unit(
+        source_models = placed_alive_geometry_models_for_rules_unit(
             state=state,
             unit_instance_id=source_rules_unit.unit_instance_id,
         )
@@ -403,6 +406,7 @@ def selection_visibility_conditions_apply(
                 observer_model_instance_id=observer_model_id,
                 terrain_features=state.battlefield_state.terrain_features,
                 terrain_areas=shooting_terrain_areas_for_state(state),
+                placed_alive_models_only=True,
             )
             for observing_unit in observing_components
         ):
@@ -458,23 +462,6 @@ def canonical_rules_unit_ids(
             if rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit)
         )
     return frozenset(canonical_ids)
-
-
-def rules_unit_has_placed_alive_model(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-    model_instance_id: str | None = None,
-) -> bool:
-    if state.battlefield_state is None:
-        return False
-    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
-    return any(
-        model.is_alive
-        and model.model_instance_id in placed_model_ids
-        and (model_instance_id is None or model.model_instance_id == model_instance_id)
-        for model in rules_unit.own_models
-    )
 
 
 def effect_target_unit_ids(

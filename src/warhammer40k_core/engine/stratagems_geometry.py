@@ -556,6 +556,7 @@ def _visible_enemy_target_is_visible_and_in_range(
         ruleset_descriptor=_stratagem_ruleset_descriptor(),
         observing_unit=source_unit,
         target_unit_id=target_unit_instance_id,
+        placed_alive_models_only=False,
         terrain_features=_stratagem_terrain_features(state),
         terrain_areas=shooting_terrain_areas_for_state(state),
     )

@@ -12,7 +12,9 @@ from warhammer40k_core.engine.generic_rule_strength_constraints import (
     TARGET_CONSTRAINT_TARGET_UNIT_BELOW_STARTING_STRENGTH,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
     rules_unit_view_by_id,
@@ -278,7 +280,7 @@ def _clause_conditions_apply(
         state=state,
         unit_instance_id=charging_unit_instance_id,
     )
-    source_models = geometry_models_for_rules_unit(
+    source_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=charging_rules_unit.unit_instance_id,
     )
@@ -287,7 +289,7 @@ def _clause_conditions_apply(
     for candidate in placed_alive_rules_unit_views(state=state):
         if candidate.owner_player_id == charging_rules_unit.owner_player_id:
             continue
-        target_models = geometry_models_for_rules_unit(
+        target_models = placed_alive_geometry_models_for_rules_unit(
             state=state,
             unit_instance_id=candidate.unit_instance_id,
         )
@@ -299,6 +301,7 @@ def _clause_conditions_apply(
             state=state,
             constraints=(target_constraint,),
             attacking_unit_instance_id=charging_rules_unit.unit_instance_id,
+            attacker_model_instance_id=None,
             target_unit_instance_id=candidate.unit_instance_id,
             attack_strength=None,
             target_toughness=None,

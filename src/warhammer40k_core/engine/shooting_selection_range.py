@@ -23,7 +23,10 @@ def target_within_shooting_selection_range(
     target_unit_instance_id: str,
     max_range_inches: object,
     attacker_model_instance_id: str | None = None,
+    placed_alive_attacker_models_only: bool,
+    placed_alive_target_models_only: bool,
 ) -> bool:
+    """Measure placements under the caller's explicit living-model policy for each side."""
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Shooting selection range query requires BattlefieldScenario.")
     attacking_unit_id = _validate_identifier(
@@ -35,6 +38,14 @@ def target_within_shooting_selection_range(
         "attacker_model_instance_id",
         attacker_model_instance_id,
     )
+    if type(placed_alive_attacker_models_only) is not bool:
+        raise GameLifecycleError(
+            "Shooting selection range placed_alive_attacker_models_only must be a bool."
+        )
+    if type(placed_alive_target_models_only) is not bool:
+        raise GameLifecycleError(
+            "Shooting selection range placed_alive_target_models_only must be a bool."
+        )
     if not isinstance(max_range_inches, int | float) or type(max_range_inches) is bool:
         raise GameLifecycleError("Shooting selection range query requires numeric max range.")
     resolved_max_range = float(max_range_inches)
@@ -51,6 +62,8 @@ def target_within_shooting_selection_range(
             scenario=scenario,
             first_unit_id=attacking_unit_id,
             second_rules_unit=target_rules_unit,
+            placed_alive_attacker_models_only=placed_alive_attacker_models_only,
+            placed_alive_target_models_only=placed_alive_target_models_only,
         )
         return target_distance <= resolved_max_range + _RANGE_EPSILON
     attacker_placement = unit_placement_or_none(scenario, attacking_unit_id)
@@ -67,9 +80,24 @@ def target_within_shooting_selection_range(
         attacker_placement=attacker_placement,
         attacker_model_instance_id=attacker_model_id,
     )
-    target_models = geometry_models_for_unit_placements(
-        scenario=scenario,
-        unit_placements=target_placements,
+    if placed_alive_attacker_models_only:
+        attacker_models = tuple(
+            model
+            for model in attacker_models
+            if scenario.model_instance_for_placement(
+                scenario.battlefield_state.model_placement_by_id(model.model_id)
+            ).is_alive
+        )
+    target_models = (
+        placed_alive_geometry_models_for_unit_placements(
+            scenario=scenario,
+            unit_placements=target_placements,
+        )
+        if placed_alive_target_models_only
+        else geometry_models_for_unit_placements(
+            scenario=scenario,
+            unit_placements=target_placements,
+        )
     )
     return bool(
         target_in_range_model_ids(
@@ -117,6 +145,20 @@ def geometry_models_for_unit_placements(
             scenario=scenario,
             unit_placement=unit_placement,
         )
+    )
+
+
+def placed_alive_geometry_models_for_unit_placements(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placements: tuple[UnitPlacement, ...],
+) -> tuple[Model, ...]:
+    """Return geometry for only the living models in the supplied placements."""
+    return tuple(
+        geometry_model_for_placement(model=model, placement=model_placement)
+        for unit_placement in unit_placements
+        for model_placement in unit_placement.model_placements
+        if (model := scenario.model_instance_for_placement(model_placement)).is_alive
     )
 
 
@@ -171,6 +213,8 @@ def _closest_distance_between_unit_and_rules_unit(
     scenario: BattlefieldScenario,
     first_unit_id: str,
     second_rules_unit: RulesUnitView,
+    placed_alive_attacker_models_only: bool,
+    placed_alive_target_models_only: bool,
 ) -> float:
     first_placement = scenario.battlefield_state.unit_placement_by_id(first_unit_id)
     second_placements = unit_placements_for_rules_unit_or_none(
@@ -183,9 +227,24 @@ def _closest_distance_between_unit_and_rules_unit(
         scenario=scenario,
         unit_placement=first_placement,
     )
-    second_models = geometry_models_for_unit_placements(
-        scenario=scenario,
-        unit_placements=second_placements,
+    if placed_alive_attacker_models_only:
+        first_models = tuple(
+            model
+            for model in first_models
+            if scenario.model_instance_for_placement(
+                scenario.battlefield_state.model_placement_by_id(model.model_id)
+            ).is_alive
+        )
+    second_models = (
+        placed_alive_geometry_models_for_unit_placements(
+            scenario=scenario,
+            unit_placements=second_placements,
+        )
+        if placed_alive_target_models_only
+        else geometry_models_for_unit_placements(
+            scenario=scenario,
+            unit_placements=second_placements,
+        )
     )
     distances = tuple(
         DistanceMeasurementContext.from_models(first_model, second_model).closest_distance_inches()

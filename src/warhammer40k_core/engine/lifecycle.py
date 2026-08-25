@@ -3535,7 +3535,7 @@ def _validate_payload_consistency(
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)
-    _fahi.validate_restore(state, event_records, decision_records)
+    _fahi.validate_restore(state, event_records, decision_records, pending_decision_requests)
     validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
@@ -3586,7 +3586,7 @@ def _validate_battlefield_state_consistency(
             scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
         if config is not None and _state_requires_deployed_battlefield_state(state):
             assert_battlefield_units_in_coherency(
-                scenario=scenario,
+                scenario=_fahi.battlefield_scenario_for_living_model_coherency(scenario=scenario),
                 ruleset_descriptor=config.ruleset_descriptor,
             )
     except PlacementError as exc:

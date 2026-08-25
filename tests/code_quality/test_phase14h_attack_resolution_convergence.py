@@ -61,6 +61,7 @@ PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
 DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     "with_removed_models": {
         "src/warhammer40k_core/engine/damage_allocation.py": 1,
+        "src/warhammer40k_core/engine/fight_activation_history_integrity.py": 1,
         "src/warhammer40k_core/engine/fight_on_death.py": 1,
         "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": 1,
         "src/warhammer40k_core/engine/reserves.py": 1,
@@ -72,6 +73,7 @@ DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     },
     "without_unit_placement": {
         "src/warhammer40k_core/engine/aircraft.py": 1,
+        "src/warhammer40k_core/engine/fight_movement_source.py": 1,
         "src/warhammer40k_core/engine/prebattle.py": 1,
         "src/warhammer40k_core/engine/rules_unit_placement.py": 1,
         "src/warhammer40k_core/engine/transport_embark_groups.py": 1,
@@ -281,7 +283,7 @@ def test_primary_battlefield_departure_callers_and_provenance_are_fail_closed() 
         )
 
 
-def test_battlefield_removal_owners_converge_or_are_explicitly_prebattle() -> None:
+def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative() -> None:
     calls_by_method: dict[str, dict[str, int]] = {
         method_name: {} for method_name in DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
     }
@@ -299,6 +301,21 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_prebattle() -> No
                 calls_by_method[method_name][relative_path] = count
 
     assert calls_by_method == DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
+
+    # Fight movement and restore validation construct temporary scenario views.
+    # They never replace authoritative GameState battlefield state.
+    fight_movement_source = source_for(SRC_ROOT / "engine" / "fight_movement_source.py")
+    fight_restore_integrity_source = source_for(
+        SRC_ROOT / "engine" / "fight_activation_history_integrity.py"
+    )
+    assert "Build the resolver view with only living source models" in fight_movement_source
+    assert "battlefield = battlefield.without_unit_placement(component_id)" in (
+        fight_movement_source
+    )
+    assert "battlefield_scenario_for_living_model_coherency" in (fight_restore_integrity_source)
+    assert "scenario.battlefield_state.with_removed_models(" in (fight_restore_integrity_source)
+    assert "replace_battlefield_state" not in fight_movement_source
+    assert "replace_battlefield_state" not in fight_restore_integrity_source
 
     aircraft_source = source_for(SRC_ROOT / "engine" / "aircraft.py")
     aircraft_owner_source = source_for(

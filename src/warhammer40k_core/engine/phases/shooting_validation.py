@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
@@ -308,6 +311,15 @@ def _enemy_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ..
                 unit_instance_id=placement.unit_instance_id,
             )
             if rules_unit_id in seen:
+                continue
+            rules_unit = rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=rules_unit_id,
+            )
+            if not rules_unit_has_placed_alive_model(
+                state=state,
+                rules_unit=rules_unit,
+            ):
                 continue
             seen.add(rules_unit_id)
             unit_ids.append(rules_unit_id)

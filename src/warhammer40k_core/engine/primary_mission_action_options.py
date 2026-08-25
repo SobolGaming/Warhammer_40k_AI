@@ -376,6 +376,7 @@ def _surveil_targets(
                     ruleset_descriptor=ruleset_descriptor,
                     observing_unit=component.unit,
                     target_unit_id=target.unit_instance_id,
+                    placed_alive_models_only=True,
                     terrain_features=battlefield.terrain_features,
                     terrain_areas=terrain_areas,
                 )
@@ -407,6 +408,8 @@ def _rules_unit_within_18(
             attacking_unit_instance_id=component.unit.unit_instance_id,
             target_unit_instance_id=target_unit_id,
             max_range_inches=18,
+            placed_alive_attacker_models_only=True,
+            placed_alive_target_models_only=True,
         )
         for component in observer.components
     )

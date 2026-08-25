@@ -28,6 +28,51 @@ def battlefield_scenario_for_state(*, state: GameState) -> BattlefieldScenario:
     )
 
 
+def rules_unit_has_placed_alive_model(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    model_instance_id: str | None = None,
+) -> bool:
+    """Return whether the rules unit has a matching living model placement."""
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        return False
+    return _rules_unit_has_placed_alive_model(
+        placed_model_ids=frozenset(battlefield.placed_model_ids()),
+        rules_unit=rules_unit,
+        model_instance_id=model_instance_id,
+    )
+
+
+def scenario_rules_unit_has_placed_alive_model(
+    *,
+    scenario: BattlefieldScenario,
+    rules_unit: RulesUnitView,
+    model_instance_id: str | None = None,
+) -> bool:
+    """Return whether a scenario rules unit has a matching living model placement."""
+    return _rules_unit_has_placed_alive_model(
+        placed_model_ids=frozenset(scenario.battlefield_state.placed_model_ids()),
+        rules_unit=rules_unit,
+        model_instance_id=model_instance_id,
+    )
+
+
+def _rules_unit_has_placed_alive_model(
+    *,
+    placed_model_ids: frozenset[str],
+    rules_unit: RulesUnitView,
+    model_instance_id: str | None,
+) -> bool:
+    return any(
+        model.is_alive
+        and model.model_instance_id in placed_model_ids
+        and (model_instance_id is None or model.model_instance_id == model_instance_id)
+        for model in rules_unit.own_models
+    )
+
+
 def fight_present_rules_unit_views(*, state: GameState) -> tuple[RulesUnitView, ...]:
     """Enumerate rules units with living or Fight On Death-present models."""
     present_by_id = {

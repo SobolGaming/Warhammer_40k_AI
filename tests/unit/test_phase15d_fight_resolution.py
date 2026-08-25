@@ -39,6 +39,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -47,6 +48,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
 )
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ACTION,
     MELEE_TARGETING_RULE_ID,
@@ -2628,6 +2630,356 @@ def test_phase15d_attached_pile_in_moves_every_component_atomically() -> None:
             updated.model_placement_by_id(model_id).pose.position.x
             == scenario.battlefield_state.model_placement_by_id(model_id).pose.position.x + 0.25
         )
+
+
+def test_phase15d_retained_destroyed_source_base_stays_a_fixed_endpoint_blocker() -> None:
+    (
+        _catalog,
+        ruleset,
+        scenario,
+        state,
+        rules_unit,
+        bodyguard,
+        leader,
+        target,
+    ) = _attached_melee_fixture()
+    battlefield = scenario.battlefield_state
+    bodyguard_placement = battlefield.unit_placement_by_id(bodyguard.unit_instance_id)
+    leader_placement = battlefield.unit_placement_by_id(leader.unit_instance_id)
+    target_placement = battlefield.unit_placement_by_id(target.unit_instance_id)
+    battlefield = battlefield.with_unit_placement(
+        bodyguard_placement.with_model_placements(
+            tuple(
+                placement.with_pose(Pose.at(10.0, 10.0))
+                for placement in bodyguard_placement.model_placements
+            )
+        )
+    )
+    battlefield = battlefield.with_unit_placement(
+        leader_placement.with_model_placements(
+            tuple(
+                placement.with_pose(Pose.at(8.0, 10.0))
+                for placement in leader_placement.model_placements
+            )
+        )
+    )
+    battlefield = battlefield.with_unit_placement(
+        target_placement.with_model_placements(
+            tuple(
+                placement.with_pose(Pose.at(13.0, 10.0))
+                for placement in target_placement.model_placements
+            )
+        )
+    )
+    state.replace_battlefield_state(battlefield)
+    destroyed_model = bodyguard.own_models[0]
+    destroyed_placement = battlefield.model_placement_by_id(destroyed_model.model_instance_id)
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=bodyguard.unit_instance_id,
+        model_instance_id=destroyed_model.model_instance_id,
+        damage=destroyed_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=destroyed_placement,
+        effect_id="phase15d:fight-on-death:fixed-source-blocker",
+        source_rule_id="phase15d:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    current_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    retained_battlefield = state.battlefield_state
+    assert retained_battlefield is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=retained_battlefield,
+        present_destroyed_model_ids=(destroyed_model.model_instance_id,),
+    )
+    living_model = current_rules_unit.alive_models()[0]
+    living_start = scenario.battlefield_state.model_placement_by_id(
+        living_model.model_instance_id
+    ).pose
+    witness = PathWitness.for_paths(
+        (
+            (
+                living_model.model_instance_id,
+                (
+                    living_start,
+                    Pose.at(9.0, 10.0),
+                    destroyed_placement.pose,
+                ),
+            ),
+        )
+    )
+    request = _rules_unit_fight_movement_request(
+        proposal_kind=ProposalKind.PILE_IN,
+        rules_unit=current_rules_unit,
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.PILE_IN,
+        unit_instance_id=current_rules_unit.unit_instance_id,
+        movement_phase_action=PILE_IN_ACTION,
+        movement_mode=MovementMode.PILE_IN,
+        pile_in_target_unit_instance_ids=(target.unit_instance_id,),
+        witness=witness,
+    )
+
+    witness_with_destroyed_model = PathWitness.for_paths(
+        (
+            *tuple(
+                (
+                    model_id,
+                    witness.poses_for_model(model_id),
+                )
+                for model_id in witness.model_ids()
+            ),
+            (
+                destroyed_model.model_instance_id,
+                (
+                    destroyed_placement.pose,
+                    Pose.at(
+                        destroyed_placement.pose.position.x + 0.25,
+                        destroyed_placement.pose.position.y,
+                    ),
+                ),
+            ),
+        )
+    )
+    destroyed_model_witness_violation = fight_rules_unit_movement_witness_matches_current_status(
+        state=state,
+        scenario=scenario,
+        proposal_request=request,
+        proposal=replace(proposal, witness=witness_with_destroyed_model),
+    )
+    assert destroyed_model_witness_violation is not None
+    assert (
+        destroyed_model_witness_violation.violations[0].violation_code
+        == "fight_movement_witness_model_drift"
+    )
+
+    assert (
+        fight_rules_unit_movement_witness_matches_current_status(
+            state=state,
+            scenario=scenario,
+            proposal_request=request,
+            proposal=proposal,
+        )
+        is None
+    )
+    resolution = resolve_rules_unit_fight_movement(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        maximum_distance_inches=3.0,
+        state=state,
+    )
+    assert isinstance(resolution, RulesUnitFightMovementResolution)
+    assert not resolution.is_valid
+    violation = fight_rules_unit_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        state=state,
+    )
+    assert violation is not None
+    assert violation.violations[0].violation_code == "end_on_model_overlap"
+    with pytest.raises(GameLifecycleError, match="cannot mutate"):
+        apply_fight_rules_unit_movement_resolution(
+            battlefield_state=scenario.battlefield_state,
+            resolution=resolution,
+        )
+    assert (
+        scenario.battlefield_state.model_placement_by_id(destroyed_model.model_instance_id).pose
+        == destroyed_placement.pose
+    )
+
+
+def test_phase15d_retained_destroyed_target_still_supports_fight_movement_measurement() -> None:
+    _catalog, ruleset, scenario, attacker, target, _target_b = _melee_fixture(
+        target_a_pose=Pose.at(14.5, 10.0),
+        target_b_pose=Pose.at(30.0, 30.0),
+    )
+    state = _attack_sequence_state(
+        game_id="phase15d-retained-target-movement-measurement",
+        ruleset=ruleset,
+        scenario=scenario,
+    )
+    target_model = target.own_models[0]
+    target_placement = scenario.battlefield_state.model_placement_by_id(
+        target_model.model_instance_id
+    )
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=target.unit_instance_id,
+        model_instance_id=target_model.model_instance_id,
+        damage=target_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=target_placement,
+        effect_id="phase15d:fight-on-death:measurement-target",
+        source_rule_id="phase15d:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    retained_battlefield = state.battlefield_state
+    assert retained_battlefield is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=retained_battlefield,
+        present_destroyed_model_ids=(target_model.model_instance_id,),
+    )
+
+    assert legal_rules_unit_pile_in_target_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        state=state,
+    ) == (target.unit_instance_id,)
+    assert legal_rules_unit_consolidation_modes(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        objective_markers=(),
+        state=state,
+    ) == (ConsolidationModeKind.ENGAGING,)
+
+
+def test_phase15d_grouped_completed_event_accepts_living_component_subset() -> None:
+    (
+        _catalog,
+        ruleset,
+        scenario,
+        state,
+        rules_unit,
+        bodyguard,
+        leader,
+        target,
+    ) = _attached_melee_fixture()
+    battlefield = scenario.battlefield_state
+    component_poses = (
+        (bodyguard, Pose.at(5.0, 10.0)),
+        (leader, Pose.at(10.0, 10.0)),
+        (target, Pose.at(12.0, 10.0)),
+    )
+    for unit, pose in component_poses:
+        placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+        battlefield = battlefield.with_unit_placement(
+            placement.with_model_placements(
+                tuple(
+                    model_placement.with_pose(pose)
+                    for model_placement in placement.model_placements
+                )
+            )
+        )
+    state.replace_battlefield_state(battlefield)
+
+    destroyed_model = bodyguard.own_models[0]
+    destroyed_placement = battlefield.model_placement_by_id(destroyed_model.model_instance_id)
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=bodyguard.unit_instance_id,
+        model_instance_id=destroyed_model.model_instance_id,
+        damage=destroyed_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=destroyed_placement,
+        effect_id="phase15d:fight-on-death:completed-event-component-subset",
+        source_rule_id="phase15d:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    retained_battlefield = state.battlefield_state
+    assert retained_battlefield is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=retained_battlefield,
+        present_destroyed_model_ids=(destroyed_model.model_instance_id,),
+    )
+    current_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
+    living_model = leader.own_models[0]
+    living_start = scenario.battlefield_state.model_placement_by_id(
+        living_model.model_instance_id
+    ).pose
+    witness = PathWitness.for_paths(
+        (
+            (
+                living_model.model_instance_id,
+                (
+                    living_start,
+                    Pose.at(10.125, 10.0),
+                    Pose.at(10.25, 10.0),
+                ),
+            ),
+        )
+    )
+    request = _rules_unit_fight_movement_request(
+        proposal_kind=ProposalKind.PILE_IN,
+        rules_unit=current_rules_unit,
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.PILE_IN,
+        unit_instance_id=current_rules_unit.unit_instance_id,
+        movement_phase_action=PILE_IN_ACTION,
+        movement_mode=MovementMode.PILE_IN,
+        pile_in_target_unit_instance_ids=(target.unit_instance_id,),
+        witness=witness,
+    )
+    resolution = resolve_rules_unit_fight_movement(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        maximum_distance_inches=3.0,
+        state=state,
+    )
+    assert isinstance(resolution, RulesUnitFightMovementResolution)
+    assert resolution.is_valid
+    assert (
+        fight_rules_unit_movement_resolution_violation(
+            proposal_request=request,
+            proposal=proposal,
+            resolution=resolution,
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+            state=state,
+        )
+        is None
+    )
+    assert resolution.before_rules_unit_placement.component_unit_instance_ids == (
+        leader.unit_instance_id,
+    )
+    assert current_rules_unit.component_unit_instance_ids == tuple(
+        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+    )
+    event_payload: dict[str, object] = {
+        "unit_instance_id": resolution.unit_instance_id,
+        "proposal_kind": proposal.proposal_kind.value,
+        "resolution": resolution.to_payload(),
+        "transition_batch": resolution.transition_batch().to_payload(),
+    }
+
+    assert (
+        fight_rules_unit_movement_endpoint_from_completed_event(
+            payload=cast(dict[str, JsonValue], event_payload),
+            component_unit_instance_ids=current_rules_unit.component_unit_instance_ids,
+        )
+        == resolution.attempted_rules_unit_placement
+    )
 
 
 def test_phase15d_grouped_fight_placement_and_rollback_records_fail_fast() -> None:

@@ -1574,6 +1574,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
+        placed_alive_models_only=True,
     )
 
     all_inside_light = _scenario_with_unit_pose(
@@ -1600,6 +1601,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
+        placed_alive_models_only=True,
     )
 
     exact_light_area_id = "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
@@ -1685,6 +1687,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
+        placed_alive_models_only=True,
     )
 
 
@@ -1864,6 +1867,7 @@ def test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_k
         ruleset_descriptor=_ruleset(),
         observing_unit=attacker,
         target_unit_id=attached.attached_unit_instance_id,
+        placed_alive_models_only=True,
     )
 
 

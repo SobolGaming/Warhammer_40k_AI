@@ -35,6 +35,9 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
 )
 from warhammer40k_core.engine.fight_geometry import (
+    attack_targetable_engaged_enemy_unit_ids as _attack_targetable_engaged_enemy_unit_ids,
+)
+from warhammer40k_core.engine.fight_geometry import (
     closest_fight_unit_distance_inches as _closest_unit_distance_inches,
 )
 from warhammer40k_core.engine.fight_geometry import (
@@ -54,6 +57,9 @@ from warhammer40k_core.engine.fight_geometry import (
 )
 from warhammer40k_core.engine.fight_geometry import (
     geometry_model_for_fight_unit_model as _geometry_model_for_unit_model,
+)
+from warhammer40k_core.engine.fight_geometry import (
+    geometry_models_for_fight_attack_target_unit as _geometry_models_for_attack_target_unit,
 )
 from warhammer40k_core.engine.fight_geometry import (
     geometry_models_for_fight_unit as _geometry_models_for_unit,
@@ -1313,7 +1319,7 @@ def melee_target_unit_ids(
     state: GameState | None = None,
 ) -> tuple[str, ...]:
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    return _engaged_enemy_unit_ids(
+    return _attack_targetable_engaged_enemy_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
@@ -2377,7 +2383,7 @@ def _engaged_enemy_unit_ids_for_model(
         scenario=scenario,
         unit_placement=unit_placement,
     ):
-        enemy_models = _geometry_models_for_unit(
+        enemy_models = _geometry_models_for_attack_target_unit(
             scenario=scenario,
             unit_instance_id=enemy_unit_id,
             state=state,
@@ -2440,7 +2446,7 @@ def _extended_melee_target_unit_ids_for_model(
         unit_placement=unit_placement,
         model_instance_id=model_instance_id,
     )
-    engaged_unit_ids = _engaged_enemy_unit_ids(
+    engaged_unit_ids = _attack_targetable_engaged_enemy_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
@@ -2448,7 +2454,7 @@ def _extended_melee_target_unit_ids_for_model(
     )
     extended: list[str] = []
     for enemy_unit_id in engaged_unit_ids:
-        enemy_models = _geometry_models_for_unit(
+        enemy_models = _geometry_models_for_attack_target_unit(
             scenario=scenario,
             unit_instance_id=enemy_unit_id,
             state=state,
@@ -2477,7 +2483,7 @@ def _engaged_model_ids_for_model_and_target_unit_or_empty(
         unit_placement=unit_placement,
         model_instance_id=model_instance_id,
     )
-    target_models = _geometry_models_for_unit(
+    target_models = _geometry_models_for_attack_target_unit(
         scenario=scenario,
         unit_instance_id=target_unit_instance_id,
         state=state,
@@ -2528,7 +2534,7 @@ def target_model_ids_for_melee_attack(
     )
     target_model_ids = tuple(
         target_model.model_id
-        for target_model in _geometry_models_for_unit(
+        for target_model in _geometry_models_for_attack_target_unit(
             scenario=scenario,
             unit_instance_id=target_unit_instance_id,
             state=state,
@@ -2568,7 +2574,7 @@ def melee_targeting_permission_sources_for_model_target(
         unit_placement=unit_placement,
         model_instance_id=attacker_model_instance_id,
     )
-    target_models = _geometry_models_for_unit(
+    target_models = _geometry_models_for_attack_target_unit(
         scenario=scenario,
         unit_instance_id=target_unit_instance_id,
         state=state,

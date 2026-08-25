@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CORE = ROOT / "src" / "warhammer40k_core" / "core"
+ENGINE = ROOT / "src" / "warhammer40k_core" / "engine"
 MOVEMENT_LEGALITY = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_legality.py"
 MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
 MOVEMENT_PHASE_FILES = (
@@ -35,6 +36,10 @@ PRIMARY_MISSION_STATE_RUNTIME = (
 FIGHT_RULES_UNIT_MOVEMENT_TYPES = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "fight_rules_unit_movement_types.py"
 )
+FIGHT_GEOMETRY = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_geometry.py"
+FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
+SHOOTING_TARGETS = ROOT / "src" / "warhammer40k_core" / "engine" / "shooting_targets.py"
+STRATAGEMS_GEOMETRY = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems_geometry.py"
 UNIT_MODULES = (
     CORE / "unit.py",
     CORE / "attached_unit.py",
@@ -274,6 +279,106 @@ def test_completed_fight_move_consumers_use_canonical_identity_and_group_endpoin
         "current_rules_unit_views_for_canonical_identity",
         "current_rules_unit_views_for_identity",
     }.issubset(resolver_call_names)
+
+
+def test_attack_target_geometry_is_living_only_without_weakening_stratagem_presence() -> None:
+    shooting_candidate = _function_node(path=SHOOTING_TARGETS, function_name="_target_candidate")
+    shooting_calls = {
+        node.func.id
+        for node in ast.walk(shooting_candidate)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "_geometry_models_for_target_placements" in shooting_calls
+
+    melee_targets = _function_node(path=FIGHT_RESOLUTION, function_name="melee_target_unit_ids")
+    melee_calls = {
+        node.func.id
+        for node in ast.walk(melee_targets)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "_attack_targetable_engaged_enemy_unit_ids" in melee_calls
+
+    fight_target_geometry = _function_node(
+        path=FIGHT_GEOMETRY,
+        function_name="geometry_models_for_fight_attack_target_unit",
+    )
+    assert any(
+        isinstance(node, ast.Attribute) and node.attr == "is_alive"
+        for node in ast.walk(fight_target_geometry)
+    )
+
+    stratagem_geometry = _function_node(
+        path=STRATAGEMS_GEOMETRY,
+        function_name="_geometry_models_for_unit",
+    )
+    stratagem_calls = {
+        node.func.id
+        for node in ast.walk(stratagem_geometry)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "model_is_present_on_battlefield" in stratagem_calls
+    assert "placed_alive_geometry_models_for_rules_unit" not in stratagem_calls
+
+
+def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> None:
+    physical_los_calls: list[tuple[Path, int]] = []
+    range_call_count = 0
+    los_call_count = 0
+
+    for path in sorted(ENGINE.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name):
+                continue
+            keywords = {keyword.arg: keyword.value for keyword in node.keywords}
+            if node.func.id == "target_within_shooting_selection_range":
+                range_call_count += 1
+                for keyword_name in (
+                    "placed_alive_attacker_models_only",
+                    "placed_alive_target_models_only",
+                ):
+                    value = keywords.get(keyword_name)
+                    assert isinstance(value, ast.Constant), (
+                        f"{path.relative_to(ROOT)}:{node.lineno} must pass {keyword_name}=True"
+                    )
+                    assert value.value is True, (
+                        f"{path.relative_to(ROOT)}:{node.lineno} must pass {keyword_name}=True"
+                    )
+            if node.func.id == "unit_has_line_of_sight_to_target":
+                los_call_count += 1
+                value = keywords.get("placed_alive_models_only")
+                assert isinstance(value, ast.Constant), (
+                    f"{path.relative_to(ROOT)}:{node.lineno} must explicitly pass "
+                    "placed_alive_models_only"
+                )
+                assert type(value.value) is bool, (
+                    f"{path.relative_to(ROOT)}:{node.lineno} must explicitly pass "
+                    "placed_alive_models_only"
+                )
+                if value.value is False:
+                    physical_los_calls.append((path, node.lineno))
+
+    assert range_call_count > 0
+    assert los_call_count > 0
+    assert len(physical_los_calls) == 1
+    assert physical_los_calls[0][0] == STRATAGEMS_GEOMETRY
+
+    stratagem_visibility = _function_node(
+        path=STRATAGEMS_GEOMETRY,
+        function_name="_visible_enemy_target_is_visible_and_in_range",
+    )
+    stratagem_los_calls = tuple(
+        node
+        for node in ast.walk(stratagem_visibility)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "unit_has_line_of_sight_to_target"
+    )
+    assert len(stratagem_los_calls) == 1
+    stratagem_keywords = {keyword.arg: keyword.value for keyword in stratagem_los_calls[0].keywords}
+    explicit_physical = stratagem_keywords.get("placed_alive_models_only")
+    assert isinstance(explicit_physical, ast.Constant)
+    assert explicit_physical.value is False
 
 
 def _function_node(*, path: Path, function_name: str) -> ast.FunctionDef:

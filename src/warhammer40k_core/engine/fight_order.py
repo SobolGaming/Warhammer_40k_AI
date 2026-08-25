@@ -35,9 +35,13 @@ from warhammer40k_core.engine.fights_first import (
     FightsFirstSource as FightsFirstSource,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import (
+    geometry_models_for_rules_unit,
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
+    placed_alive_rules_unit_views,
     rules_unit_identity_history_contains,
     rules_unit_view_by_id,
 )
@@ -1327,7 +1331,7 @@ def eligible_fight_contexts_for_player(
     )
     enemy_rules_units = tuple(
         rules_unit
-        for rules_unit in placed_rules_units
+        for rules_unit in placed_alive_rules_unit_views(state=state)
         if rules_unit.owner_player_id != requested_player_id
     )
     contexts: list[FightEligibilityContext] = []
@@ -1382,7 +1386,7 @@ def unit_is_currently_engaged(*, state: GameState, unit_instance_id: str) -> boo
         state=state,
         unit_instance_id=requested_unit_id,
     )
-    placed_rules_units = fight_present_rules_unit_views(state=state)
+    placed_rules_units = placed_alive_rules_unit_views(state=state)
     return _unit_is_engaged(
         state=state,
         rules_unit=rules_unit,
@@ -1426,6 +1430,7 @@ def engaged_unit_ids_at_fight_start(
 ) -> tuple[str, ...]:
     del policy
     placed_rules_units = fight_present_rules_unit_views(state=state)
+    placed_alive_rules_units = placed_alive_rules_unit_views(state=state)
     engaged: set[str] = set()
     for rules_unit in placed_rules_units:
         if _unit_is_engaged(
@@ -1433,7 +1438,7 @@ def engaged_unit_ids_at_fight_start(
             rules_unit=rules_unit,
             enemy_rules_units=tuple(
                 candidate
-                for candidate in placed_rules_units
+                for candidate in placed_alive_rules_units
                 if candidate.owner_player_id != rules_unit.owner_player_id
             ),
         ):
@@ -1609,7 +1614,7 @@ def fight_eligibility_reasons_for_unit(
         state=state,
         unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
     )
-    placed_rules_units = fight_present_rules_unit_views(state=state)
+    placed_rules_units = placed_alive_rules_unit_views(state=state)
     return _fight_eligibility_reasons_for_rules_unit(
         state=state,
         fight_state=fight_state,
@@ -1672,7 +1677,7 @@ def _unit_is_engaged(
     if not unit_models:
         return False
     for enemy_rules_unit in enemy_rules_units:
-        enemy_models = geometry_models_for_rules_unit(
+        enemy_models = placed_alive_geometry_models_for_rules_unit(
             state=state,
             unit_instance_id=enemy_rules_unit.unit_instance_id,
         )
@@ -1700,7 +1705,7 @@ def _closest_enemy_distance_inches(
     distances: list[float] = []
     for enemy_rules_unit in enemy_rules_units:
         for first_model in unit_models:
-            for second_model in geometry_models_for_rules_unit(
+            for second_model in placed_alive_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=enemy_rules_unit.unit_instance_id,
             ):
