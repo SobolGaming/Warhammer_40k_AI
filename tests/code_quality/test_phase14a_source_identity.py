@@ -91,6 +91,15 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
+    / "core_command_phase_2026_08"
+    / "artifacts"
+    / "package.json",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
     / "july_rules_updates_2026_07"
     / "artifacts"
     / "package.json",

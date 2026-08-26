@@ -83,6 +83,9 @@ from warhammer40k_core.engine.turn_start_engagement import (
     record_turn_start_engagement_snapshot,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_command_phase_2026_08,
+)
 
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE = "replace_tactical_secondary_mission"
@@ -162,31 +165,15 @@ class CommandPhaseHandler:
 
         command_state = _ensure_command_step_state(state, active_player_id=active_player_id)
         if not command_state.command_points_granted:
-            _resolve_command_step_start(
+            command_start_status = _resolve_command_phase_start_boundary(
                 state=state,
                 decisions=decisions,
                 command_phase_start_hooks=self.command_phase_start_hooks,
-            )
-            command_state = _command_step_state(state)
-        if not command_state.scoring_hooks_resolved:
-            command_start_effect_status = self.command_phase_start_hooks.resolve_effects(
-                CommandPhaseStartEffectContext(
-                    state=state,
-                    decisions=decisions,
-                    active_player_id=active_player_id,
-                    runtime_modifier_registry=self.runtime_modifier_registry,
-                )
-            )
-            if command_start_effect_status is not None:
-                return command_start_effect_status
-        if not command_state.scoring_hooks_resolved:
-            command_start_status = _request_command_phase_start_faction_rule_if_available(
-                state=state,
-                decisions=decisions,
-                command_phase_start_hooks=self.command_phase_start_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
             if command_start_status is not None:
                 return command_start_status
+            command_state = _command_step_state(state)
         if not command_state.scoring_hooks_resolved:
             _resolve_command_phase_scoring_hooks(state=state, decisions=decisions)
             command_state = _command_step_state(state)
@@ -808,9 +795,13 @@ def _command_phase_start_faction_rule_drift_reason(
         return "command_step_active_player_drift"
     if command_state.battle_round != state.battle_round:
         return "command_step_battle_round_drift"
-    if not command_state.command_points_granted:
-        return "command_points_not_granted"
-    if command_state.scoring_hooks_resolved:
+    if not command_state.command_phase_start_synchronous_hooks_resolved:
+        return "command_phase_start_synchronous_hooks_not_resolved"
+    if (
+        command_state.command_phase_start_boundary_resolved
+        or command_state.command_points_granted
+        or command_state.scoring_hooks_resolved
+    ):
         return "command_phase_start_window_closed"
     target_unit_id = payload.get("target_unit_instance_id")
     target_owner_id = payload.get("target_owner_player_id")
@@ -883,21 +874,74 @@ def _command_step_state(state: GameState) -> CommandStepState:
     return state.command_step_state
 
 
-def _resolve_command_step_start(
+def _resolve_command_phase_start_boundary(
     *,
     state: GameState,
     decisions: DecisionController,
     command_phase_start_hooks: CommandPhaseStartHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
+    command_state = _command_step_state(state)
+    if command_state.command_points_granted:
+        raise GameLifecycleError("Command-start boundary cannot run after Core CP is granted.")
+    if not command_state.command_phase_start_synchronous_hooks_resolved:
+        cleared_battle_shocked_unit_ids = state.clear_battle_shock_for_player(active_player_id)
+        command_phase_start_hooks.resolve(
+            CommandPhaseStartContext(
+                state=state,
+                decisions=decisions,
+                active_player_id=active_player_id,
+            )
+        )
+        state.replace_command_step_state(
+            _command_step_state(state).with_command_phase_start_synchronous_hooks_resolved(
+                cleared_battle_shocked_unit_ids=cleared_battle_shocked_unit_ids,
+            )
+        )
+        command_state = _command_step_state(state)
+    if not command_state.command_phase_start_boundary_resolved:
+        command_start_effect_status = command_phase_start_hooks.resolve_effects(
+            CommandPhaseStartEffectContext(
+                state=state,
+                decisions=decisions,
+                active_player_id=active_player_id,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+        )
+        if command_start_effect_status is not None:
+            return command_start_effect_status
+        command_start_status = _request_command_phase_start_faction_rule_if_available(
+            state=state,
+            decisions=decisions,
+            command_phase_start_hooks=command_phase_start_hooks,
+        )
+        if command_start_status is not None:
+            return command_start_status
+        state.replace_command_step_state(
+            _command_step_state(state).with_command_phase_start_boundary_resolved()
+        )
+    _resolve_gain_core_command_points_step(state=state, decisions=decisions)
+    return None
+
+
+def _resolve_gain_core_command_points_step(
+    *,
+    state: GameState,
+    decisions: DecisionController,
 ) -> None:
     active_player_id = _active_player_id(state)
-    cleared_battle_shocked_unit_ids = state.clear_battle_shock_for_player(active_player_id)
+    command_state = _command_step_state(state)
+    if not command_state.command_phase_start_boundary_resolved:
+        raise GameLifecycleError("Core CP gain requires the resolved Command-start boundary.")
     gain_payloads: list[JsonValue] = []
     for player_id in state.player_ids:
         gain = state.gain_command_points(
             player_id=player_id,
             amount=1,
             source_id=(
-                f"command-phase-start:round-{state.battle_round:02d}:active-{active_player_id}"
+                f"{core_command_phase_2026_08.GAIN_CORE_CP_SOURCE_ID}:"
+                f"round-{state.battle_round:02d}:active-{active_player_id}"
             ),
             source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
         )
@@ -906,13 +950,6 @@ def _resolve_command_step_start(
         gain_payload = validate_json_value(gain.to_payload())
         gain_payloads.append(gain_payload)
         decisions.event_log.append("command_points_gained", gain_payload)
-    command_phase_start_hooks.resolve(
-        CommandPhaseStartContext(
-            state=state,
-            decisions=decisions,
-            active_player_id=active_player_id,
-        )
-    )
     state.replace_command_step_state(_command_step_state(state).with_command_points_granted())
     decisions.event_log.append(
         "command_step_started",
@@ -922,7 +959,9 @@ def _resolve_command_step_start(
             "active_player_id": active_player_id,
             "phase": BattlePhase.COMMAND.value,
             "command_point_gains": gain_payloads,
-            "cleared_battle_shocked_unit_ids": list(cleared_battle_shocked_unit_ids),
+            "cleared_battle_shocked_unit_ids": list(
+                command_state.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
         },
     )
 

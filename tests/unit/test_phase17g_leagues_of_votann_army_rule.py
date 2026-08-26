@@ -179,8 +179,10 @@ def test_command_phase_handler_with_bundle_hook_transitions_to_fortify_takeover(
     )
 
     completed = handler.begin_phase(state=state, decisions=decisions)
+    resumed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert resumed.status_kind is LifecycleStatusKind.ADVANCED
     assert army_rule.yield_points_available(state, player_id="player-a") == 8
     assert (
         army_rule.prioritised_efficiency_mode_for_player(state, player_id="player-a")
@@ -195,12 +197,17 @@ def test_command_phase_handler_with_bundle_hook_transitions_to_fortify_takeover(
     assert payload["mode_before"] == "hostile_acquisition"
     assert payload["mode_after"] == "fortify_takeover"
     event_types = tuple(record.event_type for record in decisions.event_log.records)
-    assert event_types.index("command_points_gained") < event_types.index(
-        "leagues_of_votann_prioritised_efficiency_resolved"
-    )
+    assert event_types.count("leagues_of_votann_prioritised_efficiency_resolved") == 1
+    assert event_types.count("command_points_gained") == 2
+    assert event_types.count("command_step_started") == 1
     assert event_types.index("leagues_of_votann_prioritised_efficiency_resolved") < (
-        event_types.index("command_step_started")
+        event_types.index("command_points_gained")
     )
+    assert max(
+        index
+        for index, event_type in enumerate(event_types)
+        if event_type == "command_points_gained"
+    ) < event_types.index("command_step_started")
 
 
 def test_non_votann_detachment_with_votann_keyword_unit_does_not_gain_yield_points() -> None:

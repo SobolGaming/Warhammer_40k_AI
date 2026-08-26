@@ -8,6 +8,8 @@ from typing import TypedDict, cast
 import pytest
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -29,6 +31,7 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.battle_shock import BattleShockedUnitState
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartContext,
@@ -61,6 +64,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.runtime_modifiers import WoundRollModifierContext
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.source_backed_rerolls import (
@@ -125,11 +129,34 @@ def _malformed_command_phase_start_result_handler(
 
 def test_lifecycle_requests_oath_target_and_records_effects() -> None:
     lifecycle = _battle_ready_lifecycle()
+    session = LocalGameSession(lifecycle=lifecycle)
+    state = _require_state(lifecycle)
+    active_army = state.army_definition_for_player("player-a")
+    assert active_army is not None
+    active_unit = active_army.unit_by_id(SPACE_MARINES_UNIT_ID)
+    state.replace_battle_shock_state(
+        (
+            [SPACE_MARINES_UNIT_ID],
+            [
+                BattleShockedUnitState(
+                    player_id="player-a",
+                    unit_instance_id=SPACE_MARINES_UNIT_ID,
+                    model_instance_ids=tuple(
+                        model.model_instance_id for model in active_unit.own_models
+                    ),
+                    source_result_id="phase17g-space-marines-prior-battle-shock",
+                    battle_round_started=state.battle_round,
+                    expires_at_player_command_phase_start="player-a",
+                    expires_at_battle_round=state.battle_round + 1,
+                )
+            ],
+        )
+    )
     contribution = army_rule.runtime_contribution()
     assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
     assert not contribution.contribution_id.endswith(":scaffold")
 
-    status = lifecycle.advance_until_decision_or_terminal()
+    status = session.advance_until_decision_or_terminal()
 
     request = status.decision_request
     assert request is not None
@@ -139,16 +166,43 @@ def test_lifecycle_requests_oath_target_and_records_effects() -> None:
         f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
         f"space_marines:oath_of_moment:{ENEMY_OTHER_ID}",
     }
-
-    lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase17g-space-marines-oath-target",
-            request=request,
-            selected_option_id=f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
+    assert state.command_point_total("player-a") == 0
+    assert state.command_point_total("player-b") == 0
+    assert state.command_step_state is not None
+    assert state.command_step_state.command_phase_start_synchronous_hooks_resolved
+    assert not state.command_step_state.command_phase_start_boundary_resolved
+    assert state.command_step_state.command_phase_start_cleared_battle_shocked_unit_ids == (
+        SPACE_MARINES_UNIT_ID,
+    )
+    assert not state.command_step_state.command_points_granted
+    assert SPACE_MARINES_UNIT_ID not in state.battle_shocked_unit_ids
+    event_types = tuple(
+        record.event_type for record in lifecycle.decision_controller.event_log.records
+    )
+    assert "command_phase_start_faction_rule_requested" in event_types
+    assert "command_points_gained" not in event_types
+    for viewer_player_id in state.player_ids:
+        pending = session.view(viewer_player_id=viewer_player_id)["pending_decision"]
+        assert pending is not None
+        assert pending["decision_type"] == request.decision_type
+    cursors = {
+        viewer_player_id: EventStreamCursor(
+            session.events_since(
+                EventStreamCursor(),
+                viewer_player_id=viewer_player_id,
+            )["next_cursor"]
         )
+        for viewer_player_id in state.player_ids
+    }
+
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
+        result_id="phase17g-space-marines-oath-target",
     )
 
-    state = _require_state(lifecycle)
+    assert state.command_point_total("player-a") == 1
+    assert state.command_point_total("player-b") == 1
     assert (
         army_rule.oath_of_moment_target_unit_id_for_player(
             state,
@@ -177,8 +231,47 @@ def test_lifecycle_requests_oath_target_and_records_effects() -> None:
         )
         is None
     )
+    event_types = tuple(
+        record.event_type for record in lifecycle.decision_controller.event_log.records
+    )
+    assert event_types.index("command_phase_start_faction_rule_requested") < event_types.index(
+        "space_marines_oath_of_moment_target_selected"
+    )
+    assert event_types.index("space_marines_oath_of_moment_target_selected") < event_types.index(
+        "command_points_gained"
+    )
+    assert event_types.count("command_points_gained") == 2
+    assert max(
+        index
+        for index, event_type in enumerate(event_types)
+        if event_type == "command_points_gained"
+    ) < event_types.index("command_step_started")
+    command_step_records = tuple(
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "command_step_started"
+    )
+    assert len(command_step_records) == 1
+    command_step_payload = command_step_records[0].payload
+    assert isinstance(command_step_payload, dict)
+    assert command_step_payload["cleared_battle_shocked_unit_ids"] == [SPACE_MARINES_UNIT_ID]
+    for viewer_player_id, cursor in cursors.items():
+        visible_event_types = {
+            event["event_type"]
+            for event in session.events_since(
+                cursor,
+                viewer_player_id=viewer_player_id,
+            )["events"]
+        }
+        assert "space_marines_oath_of_moment_target_selected" in visible_event_types
+        assert "command_points_gained" in visible_event_types
+        assert "command_step_started" in visible_event_types
     restored = cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
     assert restored == state.to_payload()
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:phase17g:space-marines:oath-command-start")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
 
 
 def test_command_phase_start_hook_registry_routes_requests_and_results() -> None:
@@ -608,6 +701,12 @@ def test_oath_target_drift_rejects_before_queue_pop() -> None:
     assert isinstance(rejected.payload, dict)
     assert rejected.payload["invalid_reason"] == "target_unit_missing"
     assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+    assert state.command_point_total("player-a") == 0
+    assert state.command_point_total("player-b") == 0
+    assert not any(
+        record.event_type == "command_points_gained"
+        for record in lifecycle.decision_controller.event_log.records
+    )
 
 
 def test_oath_request_and_result_defensive_paths() -> None:

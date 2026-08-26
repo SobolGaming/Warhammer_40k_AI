@@ -41,6 +41,9 @@ class CommandStepStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
     current_step: str
+    command_phase_start_synchronous_hooks_resolved: bool
+    command_phase_start_boundary_resolved: bool
+    command_phase_start_cleared_battle_shocked_unit_ids: list[str]
     command_points_granted: bool
     scoring_hooks_resolved: bool
     tactical_secondary_resolved: bool
@@ -107,6 +110,9 @@ class CommandStepState:
     battle_round: int
     active_player_id: str
     current_step: CommandPhaseStep = CommandPhaseStep.COMMAND
+    command_phase_start_synchronous_hooks_resolved: bool = False
+    command_phase_start_boundary_resolved: bool = False
+    command_phase_start_cleared_battle_shocked_unit_ids: tuple[str, ...] = ()
     command_points_granted: bool = False
     scoring_hooks_resolved: bool = False
     tactical_secondary_resolved: bool = False
@@ -127,6 +133,30 @@ class CommandStepState:
             _validate_identifier("CommandStepState active_player_id", self.active_player_id),
         )
         object.__setattr__(self, "current_step", command_phase_step_from_token(self.current_step))
+        object.__setattr__(
+            self,
+            "command_phase_start_synchronous_hooks_resolved",
+            _validate_bool(
+                "CommandStepState command_phase_start_synchronous_hooks_resolved",
+                self.command_phase_start_synchronous_hooks_resolved,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "command_phase_start_boundary_resolved",
+            _validate_bool(
+                "CommandStepState command_phase_start_boundary_resolved",
+                self.command_phase_start_boundary_resolved,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "command_phase_start_cleared_battle_shocked_unit_ids",
+            _validate_identifier_tuple(
+                "CommandStepState command_phase_start_cleared_battle_shocked_unit_ids",
+                self.command_phase_start_cleared_battle_shocked_unit_ids,
+            ),
+        )
         object.__setattr__(
             self,
             "command_points_granted",
@@ -182,6 +212,26 @@ class CommandStepState:
                 "CommandStepState cannot enter Battle-shock before Command step CP gain."
             )
         if (
+            self.command_phase_start_boundary_resolved
+            and not self.command_phase_start_synchronous_hooks_resolved
+        ):
+            raise GameLifecycleError(
+                "CommandStepState cannot resolve the Command-start boundary before synchronous "
+                "hooks resolve."
+            )
+        if (
+            self.command_phase_start_cleared_battle_shocked_unit_ids
+            and not self.command_phase_start_synchronous_hooks_resolved
+        ):
+            raise GameLifecycleError(
+                "CommandStepState cannot retain Command-start Battle-shock clears before "
+                "synchronous hooks resolve."
+            )
+        if self.command_points_granted and not self.command_phase_start_boundary_resolved:
+            raise GameLifecycleError(
+                "CommandStepState cannot grant Core CP before the Command-start boundary resolves."
+            )
+        if (
             self.battle_shock_step_resolved
             and self.current_step is not CommandPhaseStep.BATTLE_SHOCK
         ):
@@ -193,11 +243,72 @@ class CommandStepState:
     def start(cls, *, battle_round: int, active_player_id: str) -> Self:
         return cls(battle_round=battle_round, active_player_id=active_player_id)
 
-    def with_command_points_granted(self) -> Self:
+    def with_command_phase_start_synchronous_hooks_resolved(
+        self,
+        *,
+        cleared_battle_shocked_unit_ids: tuple[str, ...],
+    ) -> Self:
+        if self.command_phase_start_synchronous_hooks_resolved:
+            raise GameLifecycleError("Synchronous Command-start hooks were already resolved.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=True,
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(cleared_battle_shocked_unit_ids),
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_command_phase_start_boundary_resolved(self) -> Self:
+        if not self.command_phase_start_synchronous_hooks_resolved:
+            raise GameLifecycleError(
+                "Command-start boundary cannot resolve before synchronous hooks resolve."
+            )
+        if self.command_phase_start_boundary_resolved:
+            raise GameLifecycleError("Command-start boundary was already resolved.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=True,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_command_points_granted(self) -> Self:
+        if not self.command_phase_start_boundary_resolved:
+            raise GameLifecycleError(
+                "Core CP cannot be granted before the Command-start boundary resolves."
+            )
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=True,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
@@ -212,6 +323,13 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=True,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
@@ -226,6 +344,13 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=True,
@@ -240,6 +365,13 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=self.current_step,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
@@ -272,6 +404,13 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
@@ -289,6 +428,13 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
@@ -306,6 +452,13 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_phase_start_cleared_battle_shocked_unit_ids=(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
@@ -320,6 +473,13 @@ class CommandStepState:
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
             "current_step": self.current_step.value,
+            "command_phase_start_synchronous_hooks_resolved": (
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            "command_phase_start_boundary_resolved": (self.command_phase_start_boundary_resolved),
+            "command_phase_start_cleared_battle_shocked_unit_ids": list(
+                self.command_phase_start_cleared_battle_shocked_unit_ids
+            ),
             "command_points_granted": self.command_points_granted,
             "scoring_hooks_resolved": self.scoring_hooks_resolved,
             "tactical_secondary_resolved": self.tactical_secondary_resolved,
@@ -339,6 +499,13 @@ class CommandStepState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             current_step=command_phase_step_from_token(payload["current_step"]),
+            command_phase_start_synchronous_hooks_resolved=payload[
+                "command_phase_start_synchronous_hooks_resolved"
+            ],
+            command_phase_start_boundary_resolved=payload["command_phase_start_boundary_resolved"],
+            command_phase_start_cleared_battle_shocked_unit_ids=tuple(
+                payload["command_phase_start_cleared_battle_shocked_unit_ids"]
+            ),
             command_points_granted=payload["command_points_granted"],
             scoring_hooks_resolved=payload["scoring_hooks_resolved"],
             tactical_secondary_resolved=payload["tactical_secondary_resolved"],

@@ -24,6 +24,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     app_core_rules_hidden_2026_08_09,
     chapter_approved_2026_27,
     core_abilities,
+    core_command_phase_2026_08,
     core_rules,
     core_stratagems,
     core_stratagems_2026_08,
@@ -1344,6 +1345,231 @@ def test_p15d_core_stratagem_app_source_rejects_unknown_evidence_id_as_typed_err
         )
 
 
+def test_p08a_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None:
+    raw = _core_command_phase_source_artifact_path().read_bytes()
+    artifact_payload = _core_command_phase_source_payload()
+    source_document = cast(dict[str, object], artifact_payload["source_document"])
+    source_package = core_command_phase_2026_08.source_package()
+    rules = core_command_phase_2026_08.source_rule_records()
+    rules_by_id = {rule.rule_id: rule for rule in rules}
+
+    assert hashlib.sha256(raw).hexdigest() == (core_command_phase_2026_08.EXPECTED_ARTIFACT_SHA256)
+    assert core_command_phase_2026_08.PACKAGE_HASH == (
+        "b29a141391d20acc559e9a19dc08fba5c126d29f451726ea81262e4f8591d4e4"
+    )
+    assert [(rule.section_id, rule.display_order, rule.section_heading) for rule in rules] == [
+        ("08.01", 1, "START OF COMMAND PHASE"),
+        ("08.02", 2, "GAIN CORE CP"),
+    ]
+    assert core_command_phase_2026_08.RULE_SOURCE_IDS == {
+        "start-of-command-phase": ("gw-11e-core-rules:command-phase:start-of-command-phase"),
+        "gain-core-cp": "gw-11e-core-rules:command-phase:gain-core-cp",
+    }
+    assert rules_by_id["start-of-command-phase"].source_id == (
+        core_command_phase_2026_08.START_OF_COMMAND_PHASE_SOURCE_ID
+    )
+    assert rules_by_id["gain-core-cp"].source_id == (
+        core_command_phase_2026_08.GAIN_CORE_CP_SOURCE_ID
+    )
+    assert rules_by_id["start-of-command-phase"].official_pdf_source_text == (
+        "Rules that are triggered at the start of the Command phase are resolved now."
+    )
+    assert rules_by_id["gain-core-cp"].official_pdf_source_text == (
+        "Both players gain 1 Command Point (CP)."
+    )
+    assert all(
+        hashlib.sha256(rule.source_text.encode()).hexdigest()
+        == rule.transcription_sha256
+        == core_command_phase_2026_08.TRANSCRIPTION_SHA256_BY_RULE_ID[rule.rule_id]
+        for rule in rules
+    )
+    assert all(
+        hashlib.sha256(rule.official_pdf_source_text.encode()).hexdigest()
+        == rule.official_pdf_transcription_sha256
+        == core_command_phase_2026_08.OFFICIAL_PDF_TRANSCRIPTION_SHA256_BY_RULE_ID[rule.rule_id]
+        for rule in rules
+    )
+    assert (
+        hashlib.sha256(Path(core_rules.LOCAL_CORE_RULES_PDF).read_bytes()).hexdigest()
+        == (source_document["official_pdf_sha256"])
+    )
+    assert source_document["official_pdf_sha256"] == (
+        core_command_phase_2026_08.EXPECTED_OFFICIAL_PDF_SHA256
+    )
+    assert source_document["official_pdf_source_id"] == (
+        "gw-11e-core-rules:manifest:local-core-rules-pdf"
+    )
+    assert source_document["authoritative_category_url"] == (
+        "https://www.40k.app/rules/08-command-phase"
+    )
+    assert source_document["authoritative_category_observed_at"] == ("2026-08-25T00:00:00-04:00")
+    assert source_document["authoritative_category_scope"] == ("category_08_review_audit_record")
+    assert source_document["category_body_capture_status"] == (
+        "review_audit_without_retained_page_body"
+    )
+    assert source_document["search_index_context_observed_at"] == ("2026-08-26T14:49:10-04:00")
+    assert source_document["search_index_context_scope"] == (
+        "secondary_context_only_not_rule_evidence"
+    )
+    assert all(
+        record.source_url != "https://www.40k.app/rules"
+        and record.observed_at != "2026-08-26T14:49:10-04:00"
+        for record in core_command_phase_2026_08.source_evidence_records()
+    )
+    assert source_document["exact_text_source_scope"] == (
+        "retained_official_pdf_sections_08.01_and_08.02"
+    )
+
+    review_context, source_observation_by_row_id = _core_rules_review_audit_context()
+    assert review_context["observed_at"] == "2026-08-25T00:00:00-04:00"
+    for rule in rules:
+        evidence = source_package.source_evidence_catalog.records_for_source_id(rule.source_id)
+        project_review = next(
+            record
+            for record in evidence
+            if record.evidence_kind == "project_reviewed_app_transcription"
+        )
+        mirror = next(record for record in evidence if record.evidence_kind == "third_party_mirror")
+        assert project_review.source_url is project_review.observed_at is None
+        assert project_review.verification_status == "unverified"
+        assert mirror.source_url == "https://www.40k.app/rules/08-command-phase"
+        assert mirror.observed_at == "2026-08-25T00:00:00-04:00"
+        assert mirror.source_title == "40k.app Core Rules - Command Phase"
+        assert mirror.review_audit_row_id == "category:08"
+        assert (
+            mirror.review_audit_source_observation_sha256
+            == (source_observation_by_row_id["category:08"])
+        )
+        assert mirror.observation_sha256 == rule.source_observation_sha256
+        assert all(
+            record.transcription_sha256 == rule.transcription_sha256
+            and record.load_support_status == "loaded"
+            and record.semantic_execution_status == "executable_engine_runtime"
+            and record.runtime_consumer_ids == rule.runtime_consumer_ids
+            and RuleEvidenceRecord.from_payload(record.to_payload()) == record
+            for record in evidence
+        )
+        assert (
+            source_package.source_catalog.source_text_by_id(rule.source_id).raw_text
+            == rule.section_heading
+        )
+        assert (
+            source_package.source_catalog.source_text_by_id(
+                f"{rule.source_id}:official-pdf-body"
+            ).raw_text
+            == rule.official_pdf_source_text
+        )
+
+    catalog_payload = source_package.source_catalog.to_payload()
+    assert SourceCatalog.from_payload(catalog_payload).to_payload() == catalog_payload
+
+
+@pytest.mark.parametrize(
+    ("target", "field_name", "replacement"),
+    [
+        ("rule", "display_order", 2),
+        ("rule", "official_pdf_source_text", "stale PDF text"),
+        ("document", "category_body_capture_status", "captured"),
+        ("mirror", "source_url", "https://www.40k.app/rules"),
+        ("rule", "semantic_execution_status", "partial_engine_runtime"),
+    ],
+)
+def test_p08a_command_phase_source_rejects_identity_provenance_and_status_drift(
+    target: str,
+    field_name: str,
+    replacement: object,
+) -> None:
+    payload = _core_command_phase_source_payload()
+    rules = cast(list[dict[str, object]], payload["rules"])
+    evidence = cast(list[dict[str, object]], payload["evidence_records"])
+    if target == "rule":
+        rules[0][field_name] = replacement
+    elif target == "document":
+        source_document = cast(dict[str, object], payload["source_document"])
+        source_document[field_name] = replacement
+    else:
+        mirror = next(
+            record
+            for record in evidence
+            if record["evidence_id"]
+            == "40k-app-command-phase-audit-2026-08-25:start-of-command-phase"
+        )
+        mirror[field_name] = replacement
+
+    with pytest.raises(core_command_phase_2026_08.CoreCommandPhaseSourceArtifactError):
+        core_command_phase_2026_08.core_command_phase_source_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "reordered_rules",
+        "missing_rule",
+        "extra_rule",
+        "reordered_evidence",
+        "missing_evidence",
+        "extra_evidence",
+    ],
+)
+def test_p08a_command_phase_source_rejects_inventory_drift(mutation: str) -> None:
+    payload = _core_command_phase_source_payload()
+    rules = cast(list[dict[str, object]], payload["rules"])
+    evidence = cast(list[dict[str, object]], payload["evidence_records"])
+    if mutation == "reordered_rules":
+        rules.reverse()
+    elif mutation == "missing_rule":
+        rules.pop()
+    elif mutation == "extra_rule":
+        rules.append(dict(rules[0]))
+    elif mutation == "reordered_evidence":
+        evidence.reverse()
+    elif mutation == "missing_evidence":
+        evidence.pop()
+    else:
+        extra_evidence = dict(evidence[0])
+        extra_evidence["evidence_id"] = "core-v2-p08a-source-review:extra"
+        evidence.append(extra_evidence)
+
+    with pytest.raises(core_command_phase_2026_08.CoreCommandPhaseSourceArtifactError):
+        core_command_phase_2026_08.core_command_phase_source_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+@pytest.mark.parametrize(
+    "malformation",
+    ["malformed_json", "unknown_field"],
+)
+def test_p08a_command_phase_source_rejects_malformed_or_unknown_fields(
+    malformation: str,
+) -> None:
+    if malformation == "malformed_json":
+        raw = b"{"
+    else:
+        payload = _core_command_phase_source_payload()
+        payload["unexpected_field"] = True
+        raw = json.dumps(payload, sort_keys=True).encode()
+
+    with pytest.raises(
+        core_command_phase_2026_08.CoreCommandPhaseSourceArtifactError,
+        match="artifact is invalid",
+    ):
+        core_command_phase_2026_08.core_command_phase_source_artifact_from_json_bytes(raw)
+
+
+def test_p08a_command_phase_source_rejects_raw_byte_drift() -> None:
+    raw = _core_command_phase_source_artifact_path().read_bytes()
+    core_command_phase_2026_08.validate_core_command_phase_source_artifact_bytes(raw)
+
+    with pytest.raises(
+        core_command_phase_2026_08.CoreCommandPhaseSourceArtifactError,
+        match="artifact bytes drifted",
+    ):
+        core_command_phase_2026_08.validate_core_command_phase_source_artifact_bytes(raw + b"\n")
+
+
 def test_project_reviewed_app_transcription_is_truthful_and_insufficient_alone() -> None:
     package = core_stratagems_2026_08.source_package()
     source_id = core_stratagems_2026_08.RULE_SOURCE_IDS["crushing-impact"]
@@ -1423,6 +1649,20 @@ def _core_stratagem_app_source_payload() -> dict[str, object]:
     return cast(
         dict[str, object],
         json.loads(_core_stratagem_app_source_artifact_path().read_text()),
+    )
+
+
+def _core_command_phase_source_artifact_path() -> Path:
+    return Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_command_phase_2026_08/artifacts/package.json"
+    )
+
+
+def _core_command_phase_source_payload() -> dict[str, object]:
+    return cast(
+        dict[str, object],
+        json.loads(_core_command_phase_source_artifact_path().read_text()),
     )
 
 

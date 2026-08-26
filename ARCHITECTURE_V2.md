@@ -1502,7 +1502,13 @@ Objects:
 Invariants:
 
 - Command phase has Command step then Battle-shock step;
-- at the start of each player's Command phase, before other Command rules, both players gain 1CP;
+- the lifecycle's generic `START_PHASE` dispatch is the outer Command-phase boundary;
+- after that outer boundary, every synchronous Command-start hook, Command-start effect, and finite
+  Command-start choice resolves through one resumable engine-owned boundary before Core CP is gained;
+- a pending Command-start choice pauses that boundary with both players' Core CP unchanged; each
+  accepted submission resumes the lifecycle automatically until the next start choice or boundary
+  completion, and only after completion does the engine grant both players 1CP and emit
+  `command_step_started`;
 - outside the normal Command-phase CP gain, each player can gain only 1CP per battle round, regardless of source, unless a rule explicitly overrides this;
 - below-half-strength units on the battlefield create Battle-shock test requests during the Battle-shock step;
 - a Battle-shock test rolls 2D6 and passes if the total is greater than or equal to the best Leadership in that unit;
@@ -1519,7 +1525,12 @@ Invariants:
 
 Required tests:
 
-- both players gain 1CP at the start of each Command phase;
+- generic `START_PHASE` dispatch precedes every Command-start hook, effect, and finite choice;
+- synchronous Command-start hooks and effects resolve before both players gain 1CP, and
+  `command_step_started` follows both Core CP gains;
+- a pending Command-start choice leaves both players' Core CP unchanged, each accepted lifecycle
+  submission auto-advances to the next request or completion without repeating prior hooks, and final
+  completion performs the one-time Core CP gain;
 - non-Command CP gain cap of 1CP per battle round is enforced;
 - below-half-strength unit emits Battle-shock test request;
 - below-Starting-Strength forced test suppresses duplicate Below Half-strength test unless overridden;

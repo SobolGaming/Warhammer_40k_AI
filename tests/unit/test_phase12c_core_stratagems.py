@@ -6495,7 +6495,11 @@ def _set_command_step_ready_for_battle_shock(state: GameState) -> None:
         active_player_id="player-a",
     )
     state.command_step_state = (
-        command_state.with_command_points_granted()
+        command_state.with_command_phase_start_synchronous_hooks_resolved(
+            cleared_battle_shocked_unit_ids=(),
+        )
+        .with_command_phase_start_boundary_resolved()
+        .with_command_points_granted()
         .with_scoring_hooks_resolved()
         .with_tactical_secondary_resolved()
     )
@@ -6507,7 +6511,12 @@ def _set_command_step_ready_for_tactical_secondary(state: GameState) -> None:
         active_player_id="player-a",
     )
     state.command_step_state = (
-        command_state.with_command_points_granted().with_scoring_hooks_resolved()
+        command_state.with_command_phase_start_synchronous_hooks_resolved(
+            cleared_battle_shocked_unit_ids=(),
+        )
+        .with_command_phase_start_boundary_resolved()
+        .with_command_points_granted()
+        .with_scoring_hooks_resolved()
     )
 
 

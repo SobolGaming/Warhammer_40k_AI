@@ -1554,7 +1554,12 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
     command_state = CommandStepState.start(
         battle_round=1,
         active_player_id="player-a",
-    ).with_command_points_granted()
+    ).with_command_phase_start_synchronous_hooks_resolved(
+        cleared_battle_shocked_unit_ids=("unit-cleared-before-command-start",),
+    )
+    assert not command_state.command_phase_start_boundary_resolved
+    command_state = command_state.with_command_phase_start_boundary_resolved()
+    command_state = command_state.with_command_points_granted()
     assert CommandStepState.from_payload(command_state.to_payload()) == command_state
 
     ledger, applied = CommandPointLedger.initial(player_id="player-a").gain(
@@ -1574,6 +1579,43 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
             battle_round=1,
             active_player_id="player-a",
             current_step=CommandPhaseStep.BATTLE_SHOCK,
+        )
+    with pytest.raises(GameLifecycleError, match="Core CP cannot be granted"):
+        CommandStepState.start(
+            battle_round=1,
+            active_player_id="player-a",
+        ).with_command_points_granted()
+    with pytest.raises(GameLifecycleError, match="before synchronous hooks resolve"):
+        CommandStepState.start(
+            battle_round=1,
+            active_player_id="player-a",
+        ).with_command_phase_start_boundary_resolved()
+    synchronous_only_state = CommandStepState.start(
+        battle_round=1,
+        active_player_id="player-a",
+    ).with_command_phase_start_synchronous_hooks_resolved(
+        cleared_battle_shocked_unit_ids=(),
+    )
+    with pytest.raises(GameLifecycleError, match="before the Command-start boundary resolves"):
+        synchronous_only_state.with_command_points_granted()
+    with pytest.raises(GameLifecycleError, match="already resolved"):
+        synchronous_only_state.with_command_phase_start_boundary_resolved().with_command_phase_start_boundary_resolved()
+    with pytest.raises(GameLifecycleError, match="already resolved"):
+        CommandStepState.start(
+            battle_round=1,
+            active_player_id="player-a",
+        ).with_command_phase_start_synchronous_hooks_resolved(
+            cleared_battle_shocked_unit_ids=(),
+        ).with_command_phase_start_synchronous_hooks_resolved(
+            cleared_battle_shocked_unit_ids=(),
+        )
+    with pytest.raises(GameLifecycleError, match="before the Command-start boundary resolves"):
+        CommandStepState(
+            battle_round=1,
+            active_player_id="player-a",
+            command_phase_start_synchronous_hooks_resolved=True,
+            command_phase_start_boundary_resolved=False,
+            command_points_granted=True,
         )
     with pytest.raises(GameLifecycleError, match="Battle-shock step requires Command step CP gain"):
         CommandStepState.start(

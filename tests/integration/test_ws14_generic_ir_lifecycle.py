@@ -27,6 +27,9 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
 )
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -256,7 +259,27 @@ def test_ws14_more_dakka_stratagem_activation_binds_target_through_lifecycle_bun
         request=request,
         selected_option_id=selected_option.option_id,
     )
-    lifecycle.submit_decision(result)
+    submit_status = lifecycle.submit_decision(result)
+
+    assert submit_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    command_start_request = lifecycle.pending_decision_request()
+    assert command_start_request is not None
+    assert (
+        command_start_request.decision_type
+        == SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE
+    )
+    decline_waaagh_option = next(
+        option
+        for option in command_start_request.options
+        if _json_object(option.payload).get("selected_waaagh_option") == "decline"
+    )
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="ws14-more-dakka-decline-waaagh-result",
+            request=command_start_request,
+            selected_option_id=decline_waaagh_option.option_id,
+        )
+    )
 
     assert state.command_point_total("player-a") == 1
     use_record = state.stratagem_use_records[-1]
