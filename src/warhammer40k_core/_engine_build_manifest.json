@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8901c7b9eaca3756536160291aeef3d485b7f0acb18622788460603bfec94838",
-  "fingerprint": "8901c7b9eaca3756536160291aeef3d485b7f0acb18622788460603bfec94838",
-  "resource_count": 2418,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d51abbec6648cba7265713fb1dd2167069fcc229673e57fc800a957ebf59ced",
+  "fingerprint": "9d51abbec6648cba7265713fb1dd2167069fcc229673e57fc800a957ebf59ced",
+  "resource_count": 2421,
   "resources": [
     {
       "byte_length": 113,
@@ -11165,9 +11165,9 @@
       "sha256": "3a0825f1d4a711315e27b460ccae058593bff39253573d1472b07e1291aa1170"
     },
     {
-      "byte_length": 27246,
+      "byte_length": 28037,
       "path": "warhammer40k_core/rules/source_evidence.py",
-      "sha256": "b208b5088681b58ec876b07d428c0f759bb5b97857d8a74c3321eb829139c56a"
+      "sha256": "1573d702c901937770624c90ccffb9a95e56e2e9a6838dc2cf544938adfcb6c4"
     },
     {
       "byte_length": 45065,
@@ -11265,9 +11265,24 @@
       "sha256": "9814f120edfddbab3f31186f2a48f022b8975733538f2559b0213e5accf28e72"
     },
     {
-      "byte_length": 15478,
+      "byte_length": 16699,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems.py",
-      "sha256": "664d7079e0e37d0ad53ec4e5405b1f35ebec67ad3a2c8d7f9d630769441a9930"
+      "sha256": "d154cd5972c737f88739abd8d639e72104dc51a098f2aab4abd13d12ce025962"
+    },
+    {
+      "byte_length": 6951,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems_2026_08/__init__.py",
+      "sha256": "54a0ba92c2a026d2bb1892eb327979fe7abb89688d4a30181a7f1b0be7d88090"
+    },
+    {
+      "byte_length": 29299,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems_2026_08/_artifacts.py",
+      "sha256": "019f5a0f23e65135f568624f8c542a3924b1667b8a9109da1153f578bc9e83fd"
+    },
+    {
+      "byte_length": 24105,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_stratagems_2026_08/artifacts/package.json",
+      "sha256": "c20bb95c9c657fe1b568c44454e566de4e3a52311ba838612fab2eb898b2d4c8"
     },
     {
       "byte_length": 6867,

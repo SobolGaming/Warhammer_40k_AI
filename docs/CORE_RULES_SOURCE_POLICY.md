@@ -37,6 +37,11 @@ Workshop.
    hash-pinned source artifacts are the data boundary consumed by loaders.
 6. Owner transcriptions and mirror observations remain separate evidence
    records even when their text matches.
+   An exact transcription created during a repository source review uses
+   `project_reviewed_app_transcription`, never
+   `owner_supplied_app_transcription`. It remains unverified on its own and
+   must be paired with an authoritative mirror observation before partial or
+   executable semantics can be certified.
 7. A row absent from, or conflicting with, the authoritative App mirror is not
    certified merely because an older repository transcription exists.
 8. Load support and semantic execution status remain separate and truthful.

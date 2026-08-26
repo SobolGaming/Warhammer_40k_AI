@@ -1,0 +1,398 @@
+{
+  "artifact_schema": "core-v2-core-stratagem-app-source-v1",
+  "evidence_contexts": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "context_id": "core-v2-p15d-project-source-review",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 40k.app Core Stratagems"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "context_id": "40k-app-core-stratagems-observed-2026-08-26",
+      "evidence_kind": "third_party_mirror",
+      "observed_at": "2026-08-26T11:15:23-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules - Stratagems"
+    }
+  ],
+  "evidence_records": [
+    {
+      "evidence_context_id": "core-v2-p15d-project-source-review",
+      "evidence_id": "core-v2-p15d-source-review:crushing-impact",
+      "load_support_status": "loaded",
+      "observation_sha256": "5a5ff9e9acbad1c8fdd6f68d80ccf49ed9a196c65372ed9fc7006fee1e208aef",
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-stratagems:core:crushing-impact",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_geometry:_crushing_impact_context_error",
+        "warhammer40k_core.engine.stratagems_effect_handlers:_apply_crushing_impact_handler"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": null,
+      "transcription_sha256": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
+      "verification_status": "unverified"
+    },
+    {
+      "evidence_context_id": "40k-app-core-stratagems-observed-2026-08-26",
+      "evidence_id": "40k-app-core-stratagems-2026-08-26:crushing-impact",
+      "load_support_status": "loaded",
+      "observation_sha256": "329f378b3cb1f78f28f7f32047e01e2b78295d155c30df9fde775bf0cab3afa4",
+      "review_audit_row_id": "finding:official-pdf-mirror-order-15-05-15-06",
+      "review_audit_source_observation_sha256": "743ece521c82481891e362e74ca916da5b24910e2dbf75ee27c9aed133e9480d",
+      "rule_source_id": "gw-11e-core-stratagems:core:crushing-impact",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_geometry:_crushing_impact_context_error",
+        "warhammer40k_core.engine.stratagems_effect_handlers:_apply_crushing_impact_handler"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": "https://www.40k.app/rules/15-stratagems",
+      "transcription_sha256": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "evidence_context_id": "core-v2-p15d-project-source-review",
+      "evidence_id": "core-v2-p15d-source-review:explosives",
+      "load_support_status": "loaded",
+      "observation_sha256": "60d6e150e38fbf865dd50493f7abe8da1cc650e813b4ff2f029ef1446f6db99e",
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-stratagems:core:explosives",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_geometry:_explosives_context_error",
+        "warhammer40k_core.engine.stratagems_effect_handlers:_apply_explosives_handler"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": null,
+      "transcription_sha256": "c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f",
+      "verification_status": "unverified"
+    },
+    {
+      "evidence_context_id": "40k-app-core-stratagems-observed-2026-08-26",
+      "evidence_id": "40k-app-core-stratagems-2026-08-26:explosives",
+      "load_support_status": "loaded",
+      "observation_sha256": "45c1a404c497f2d3d1cb0feb00ce09371fd3520bce8af43214930bc474dd9c41",
+      "review_audit_row_id": "finding:official-pdf-mirror-order-15-05-15-06",
+      "review_audit_source_observation_sha256": "743ece521c82481891e362e74ca916da5b24910e2dbf75ee27c9aed133e9480d",
+      "rule_source_id": "gw-11e-core-stratagems:core:explosives",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_geometry:_explosives_context_error",
+        "warhammer40k_core.engine.stratagems_effect_handlers:_apply_explosives_handler"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": "https://www.40k.app/rules/15-stratagems",
+      "transcription_sha256": "c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "evidence_context_id": "core-v2-p15d-project-source-review",
+      "evidence_id": "core-v2-p15d-source-review:rapid-ingress",
+      "load_support_status": "loaded",
+      "observation_sha256": "da831b250982d46cd9fc5b70e340c7a017d37c328296243ebc8d569f95d46cdd",
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-stratagems:core:rapid-ingress",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_targeting:_rapid_ingress_unit_ids",
+        "warhammer40k_core.engine.stratagems_core_handlers:_apply_rapid_ingress_handler",
+        "warhammer40k_core.engine.stratagems_ingress:_apply_rapid_ingress_placement"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": null,
+      "transcription_sha256": "2e9028ed2bf0c1fa19d7774ceb7bb81d415097e38b47c78ab67d7cff303955f6",
+      "verification_status": "unverified"
+    },
+    {
+      "evidence_context_id": "40k-app-core-stratagems-observed-2026-08-26",
+      "evidence_id": "40k-app-core-stratagems-2026-08-26:rapid-ingress",
+      "load_support_status": "loaded",
+      "observation_sha256": "42c4328d54aa18d826225dedd0b1e0043f4d8e3fe0f2e09d1ab12db7913314a6",
+      "review_audit_row_id": "category:15",
+      "review_audit_source_observation_sha256": "90d660a2388e7f6799e71fe8c2305d019409614b70ee9fcb962609851ab15f59",
+      "rule_source_id": "gw-11e-core-stratagems:core:rapid-ingress",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_targeting:_rapid_ingress_unit_ids",
+        "warhammer40k_core.engine.stratagems_core_handlers:_apply_rapid_ingress_handler",
+        "warhammer40k_core.engine.stratagems_ingress:_apply_rapid_ingress_placement"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": "https://www.40k.app/rules/15-stratagems",
+      "transcription_sha256": "2e9028ed2bf0c1fa19d7774ceb7bb81d415097e38b47c78ab67d7cff303955f6",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "evidence_context_id": "core-v2-p15d-project-source-review",
+      "evidence_id": "core-v2-p15d-source-review:fire-overwatch",
+      "load_support_status": "loaded",
+      "observation_sha256": "e4a2236eec11a8977cafa3e56fe019dd6e800daa713ab3460d26ed21927221c7",
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-stratagems:core:fire-overwatch",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_eligibility:_handler_unavailable_reason",
+        "warhammer40k_core.engine.stratagems_targeting:_fire_overwatch_target_binding_error",
+        "warhammer40k_core.engine.stratagems_fire_overwatch:_apply_fire_overwatch_handler"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": null,
+      "transcription_sha256": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
+      "verification_status": "unverified"
+    },
+    {
+      "evidence_context_id": "40k-app-core-stratagems-observed-2026-08-26",
+      "evidence_id": "40k-app-core-stratagems-2026-08-26:fire-overwatch",
+      "load_support_status": "loaded",
+      "observation_sha256": "6cfdfa59d51b3bc1302101ac70a142bc3926ac2f532fb035254f4cc08eb6f9a1",
+      "review_audit_row_id": "category:15",
+      "review_audit_source_observation_sha256": "90d660a2388e7f6799e71fe8c2305d019409614b70ee9fcb962609851ab15f59",
+      "rule_source_id": "gw-11e-core-stratagems:core:fire-overwatch",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_eligibility:_handler_unavailable_reason",
+        "warhammer40k_core.engine.stratagems_targeting:_fire_overwatch_target_binding_error",
+        "warhammer40k_core.engine.stratagems_fire_overwatch:_apply_fire_overwatch_handler"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": "https://www.40k.app/rules/15-stratagems",
+      "transcription_sha256": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "evidence_context_id": "core-v2-p15d-project-source-review",
+      "evidence_id": "core-v2-p15d-source-review:snap-shooting",
+      "load_support_status": "loaded",
+      "observation_sha256": "514a29a9270acb65aba29c23a4fa9a22ca4c81c465106fc1e019b1f1cf47ba6c",
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-stratagems:rule:snap-shooting",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
+        "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": null,
+      "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
+      "verification_status": "unverified"
+    },
+    {
+      "evidence_context_id": "40k-app-core-stratagems-observed-2026-08-26",
+      "evidence_id": "40k-app-core-stratagems-2026-08-26:snap-shooting",
+      "load_support_status": "loaded",
+      "observation_sha256": "b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26",
+      "review_audit_row_id": "category:15",
+      "review_audit_source_observation_sha256": "90d660a2388e7f6799e71fe8c2305d019409614b70ee9fcb962609851ab15f59",
+      "rule_source_id": "gw-11e-core-stratagems:rule:snap-shooting",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
+        "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_url": "https://www.40k.app/rules/15-stratagems",
+      "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "numbering_anomalies": [
+    {
+      "anomaly_id": "gw-11e-core-stratagems:anomaly:fight-example-crushing-impact-cross-reference",
+      "observed_at": "2026-08-26T11:15:23-04:00",
+      "observed_reference_text": "using the Crushing Impact stratagem (15.06).",
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "referenced_title": "Crushing Impact",
+      "related_review_finding_id": "finding:official-pdf-mirror-order-15-05-15-06",
+      "related_review_finding_source_observation_sha256": "743ece521c82481891e362e74ca916da5b24910e2dbf75ee27c9aed133e9480d",
+      "resolution_basis": "stable_title_and_complete_operative_text",
+      "resolved_section_id": "15.05",
+      "resolved_source_id": "gw-11e-core-stratagems:core:crushing-impact",
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:12",
+      "review_audit_source_observation_sha256": "e993a6133af95dc2f1361b32dc95b7d9b7502eb4aabc226f9e5e6dff34b92a63",
+      "section_id": "12.01",
+      "source_observation_sha256": "561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46",
+      "source_text": "Because both RED**** units made charge moves this turn, they are both Fights First units this phase and are both eligible to make pile-in moves, even though the MONSTER is unengaged as it destroyed its charge target in the Charge phase using the Crushing Impact stratagem (15.06).",
+      "source_url": "https://www.40k.app/rules/12-fight-phase",
+      "stale_section_id": "15.06",
+      "transcription_sha256": "b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff"
+    }
+  ],
+  "package_hash": "c6bfeb538aa1a5b933c561c3c554691792259400234dc9ec303d36ff400c5a09",
+  "rules": [
+    {
+      "command_point_cost": 1,
+      "effect_text": "Resolve the following sequence:\n1. Select one enemy unit engaged with your unit.\n2. Select one model in your unit engaged with that enemy unit.\n3. Roll a number of D6 equal to the T characteristic of that model: for each 1, your unit suffers 1 mortal wound; for each 5+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds per unit)",
+      "evidence_ids": [
+        "core-v2-p15d-source-review:crushing-impact",
+        "40k-app-core-stratagems-2026-08-26:crushing-impact"
+      ],
+      "kind": "stratagem",
+      "load_support_status": "loaded",
+      "phase_text": "Charge Phase",
+      "restrictions_text": null,
+      "rule_id": "crushing-impact",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_geometry:_crushing_impact_context_error",
+        "warhammer40k_core.engine.stratagems_effect_handlers:_apply_crushing_impact_handler"
+      ],
+      "runtime_rule_id": "core:crushing-impact",
+      "section_id": "15.05",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-stratagems:core:crushing-impact",
+      "source_observation_sha256": "329f378b3cb1f78f28f7f32047e01e2b78295d155c30df9fde775bf0cab3afa4",
+      "source_text": "15.05 Crushing Impact\nCrushing Impact\nCharge Phase\nTARGET\nThat MONSTER/VEHICLE unit\nWHEN\nYour Charge phase, just after a friendly MONSTER/VEHICLE unit ends a charge move.\nEFFECT\nResolve the following sequence:\n1. Select one enemy unit engaged with your unit.\n2. Select one model in your unit engaged with that enemy unit.\n3. Roll a number of D6 equal to the T characteristic of that model: for each 1, your unit suffers 1 mortal wound; for each 5+, that enemy unit suffers 1 mortal wound (to a maximum of 6 mortal wounds per unit)\n1 CP",
+      "target_text": "That MONSTER/VEHICLE unit",
+      "title": "Crushing Impact",
+      "transcription_sha256": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
+      "when_text": "Your Charge phase, just after a friendly MONSTER/VEHICLE unit ends a charge move."
+    },
+    {
+      "command_point_cost": 1,
+      "effect_text": "Resolve the following sequence: 1. Select one EXPLOSIVES/GRENADES model in your unit. 2. Select one unengaged enemy unit within 8\" of and visible to that model. 3. Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound (06.02).",
+      "evidence_ids": [
+        "core-v2-p15d-source-review:explosives",
+        "40k-app-core-stratagems-2026-08-26:explosives"
+      ],
+      "kind": "stratagem",
+      "load_support_status": "loaded",
+      "phase_text": "Shooting Phase",
+      "restrictions_text": null,
+      "rule_id": "explosives",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_geometry:_explosives_context_error",
+        "warhammer40k_core.engine.stratagems_effect_handlers:_apply_explosives_handler"
+      ],
+      "runtime_rule_id": "core:explosives",
+      "section_id": "15.06",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-stratagems:core:explosives",
+      "source_observation_sha256": "45c1a404c497f2d3d1cb0feb00ce09371fd3520bce8af43214930bc474dd9c41",
+      "source_text": "15.06 Explosives\nExplosives\nShooting Phase\nTARGET\nOne friendly unengaged EXPLOSIVES/GRENADES unit that is eligible to shoot and did not make an advance move this turn.\nWHEN\nYour Shooting phase.\nEFFECT\nResolve the following sequence: 1. Select one EXPLOSIVES/GRENADES model in your unit. 2. Select one unengaged enemy unit within 8\" of and visible to that model. 3. Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound (06.02).\n1 CP",
+      "target_text": "One friendly unengaged EXPLOSIVES/GRENADES unit that is eligible to shoot and did not make an advance move this turn.",
+      "title": "Explosives",
+      "transcription_sha256": "c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f",
+      "when_text": "Your Shooting phase."
+    },
+    {
+      "command_point_cost": 1,
+      "effect_text": "Your unit makes an Ingress Move (20.04).",
+      "evidence_ids": [
+        "core-v2-p15d-source-review:rapid-ingress",
+        "40k-app-core-stratagems-2026-08-26:rapid-ingress"
+      ],
+      "kind": "stratagem",
+      "load_support_status": "loaded",
+      "phase_text": "Movement Phase",
+      "restrictions_text": "You cannot use this stratagem during the first battle round.",
+      "rule_id": "rapid-ingress",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_targeting:_rapid_ingress_unit_ids",
+        "warhammer40k_core.engine.stratagems_core_handlers:_apply_rapid_ingress_handler",
+        "warhammer40k_core.engine.stratagems_ingress:_apply_rapid_ingress_placement"
+      ],
+      "runtime_rule_id": "core:rapid-ingress",
+      "section_id": "15.07",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-stratagems:core:rapid-ingress",
+      "source_observation_sha256": "42c4328d54aa18d826225dedd0b1e0043f4d8e3fe0f2e09d1ab12db7913314a6",
+      "source_text": "15.07 Rapid Ingress\nRapid Ingress\nMovement Phase\nTARGET\nOne friendly unit that is in strategic reserves (excluding AIRCRAFT).\nWHEN\nEnd of your opponent\u2019s Movement phase.\nEFFECT\nYour unit makes an Ingress Move (20.04).\nRESTRICTION\nYou cannot use this stratagem during the first battle round.\n1 CP",
+      "target_text": "One friendly unit that is in strategic reserves (excluding AIRCRAFT).",
+      "title": "Rapid Ingress",
+      "transcription_sha256": "2e9028ed2bf0c1fa19d7774ceb7bb81d415097e38b47c78ab67d7cff303955f6",
+      "when_text": "End of your opponent\u2019s Movement phase."
+    },
+    {
+      "command_point_cost": 1,
+      "effect_text": "Your unit shoots using Snap Shooting (15.09).",
+      "evidence_ids": [
+        "core-v2-p15d-source-review:fire-overwatch",
+        "40k-app-core-stratagems-2026-08-26:fire-overwatch"
+      ],
+      "kind": "stratagem",
+      "load_support_status": "loaded",
+      "phase_text": "Movement Phase",
+      "restrictions_text": null,
+      "rule_id": "fire-overwatch",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagems_eligibility:_handler_unavailable_reason",
+        "warhammer40k_core.engine.stratagems_targeting:_fire_overwatch_target_binding_error",
+        "warhammer40k_core.engine.stratagems_fire_overwatch:_apply_fire_overwatch_handler"
+      ],
+      "runtime_rule_id": "core:fire-overwatch",
+      "section_id": "15.08",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-stratagems:core:fire-overwatch",
+      "source_observation_sha256": "6cfdfa59d51b3bc1302101ac70a142bc3926ac2f532fb035254f4cc08eb6f9a1",
+      "source_text": "15.08 Fire Overwatch\nFire Overwatch\nMovement Phase\nTARGET\nOne friendly unengaged unit (excluding TITANIC units).\nWHEN\nEnd of your opponent\u2019s Movement phase.\nEFFECT\nYour unit shoots using Snap Shooting (15.09).\n1 CP",
+      "target_text": "One friendly unengaged unit (excluding TITANIC units).",
+      "title": "Fire Overwatch",
+      "transcription_sha256": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
+      "when_text": "End of your opponent\u2019s Movement phase."
+    },
+    {
+      "command_point_cost": null,
+      "effect_text": "Your unit shoots as described in Making Attacks (04). While shooting: You can only target one visible enemy unit within 24\" of your unit (and only if it is an eligible target). Each attack only hits on an unmodified hit roll of 6 (irrespective of the attacking weapon\u2019s BS characteristic or any modifiers). You cannot re\u2011roll hit rolls.",
+      "evidence_ids": [
+        "core-v2-p15d-source-review:snap-shooting",
+        "40k-app-core-stratagems-2026-08-26:snap-shooting"
+      ],
+      "kind": "shooting_type",
+      "load_support_status": "loaded",
+      "phase_text": null,
+      "restrictions_text": "After shooting: Until the end of the phase, your unit is not eligible to start an action.",
+      "rule_id": "snap-shooting",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_targeting:_snap_shooting_type_allowed_for_unit_target",
+        "warhammer40k_core.engine.phases.shooting_declaration_validation:_attack_pools_or_validation",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ],
+      "runtime_rule_id": "core:snap-shooting",
+      "section_id": "15.09",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-stratagems:rule:snap-shooting",
+      "source_observation_sha256": "b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26",
+      "source_text": "15.09 Snap Shooting\nWHEN ELIGIBLE\nAs stated in the rule allowing this shooting type.\nEFFECT\nYour unit shoots as described in Making Attacks (04).\nWHILE SHOOTING\nYou can only target one visible enemy unit within 24\" of your unit (and only if it is an eligible target).\nEach attack only hits on an unmodified hit roll of 6 (irrespective of the attacking weapon\u2019s BS characteristic or any modifiers).\nYou cannot re\u2011roll hit rolls.\nAFTER SHOOTING\nUntil the end of the phase, your unit is not eligible to start an action.",
+      "target_text": "You can only target one visible enemy unit within 24\" of your unit (and only if it is an eligible target).",
+      "title": "Snap Shooting",
+      "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
+      "when_text": "As stated in the rule allowing this shooting type."
+    }
+  ],
+  "source_document": {
+    "document_id": "warhammer-40000-app-core-stratagems-observed-2026-08-26",
+    "official_pdf_document_id": "eng_01-06_warhammer40k_new40k_core_rules",
+    "official_pdf_sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "official_pdf_source_package_id": "gw-11e-core-rules",
+    "provider_name": "40k.app",
+    "provider_non_affiliation_recorded": true,
+    "source_platform": "Web",
+    "source_title": "Warhammer 40,000 App Core Rules - Stratagems",
+    "source_url": "https://www.40k.app/rules/15-stratagems",
+    "supersession_scope": "maintained_app_wording_and_provider_locators_15.05_through_15.09"
+  },
+  "source_package_id": "gw-11e-core-stratagems",
+  "source_version": "40k-app-observed-2026-08-26"
+}
