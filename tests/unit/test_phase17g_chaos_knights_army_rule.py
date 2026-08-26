@@ -625,8 +625,7 @@ def test_dismay_forces_below_starting_enemy_battle_shock_test() -> None:
 
 
 def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
-    state = battle_state()
-    state.game_id = "phase17g-chaos-knights-delirium"
+    state = battle_state(game_id="phase17g-chaos-knights-delirium")
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
         state,

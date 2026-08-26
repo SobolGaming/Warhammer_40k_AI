@@ -147,7 +147,14 @@ def clause_is_supported_movement_transit_permission(clause: RuleClause) -> bool:
         return False
     permissions = {supported_effect.permission for supported_effect in supported}
     if target_kind is RuleTargetKind.THIS_MODEL:
-        return permissions == {"move_over_as_if_not_there"} and len(supported) == 1
+        return (
+            frozenset(permissions)
+            in {
+                frozenset({"move_over_as_if_not_there"}),
+                frozenset({"ignore_vertical_distance"}),
+            }
+            and len(supported) == 1
+        )
     if target_kind is RuleTargetKind.THIS_UNIT:
         return permissions == {"move_through_models", "move_through_terrain_features"} or (
             permissions == {"ignore_vertical_distance"} and len(supported) == 1

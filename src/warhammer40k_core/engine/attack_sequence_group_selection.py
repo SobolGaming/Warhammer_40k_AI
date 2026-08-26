@@ -8,6 +8,12 @@ from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     emit_deferred_mortal_wounds_applied as _emit_deferred_mortal_wounds_applied,
 )
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.attack_sequence_grouped_allocation import (
+    grouped_wounded_contexts_for_pool as _grouped_wounded_contexts_for_pool,
+)
+from warhammer40k_core.engine.attack_sequence_mortal_wound_logical_death import (
+    resolve_attack_sequence_mortal_wound_feel_no_pain,
+)
 from warhammer40k_core.engine.attack_sequence_post_roll import (
     defer_grouped_devastating_wounds as _defer_grouped_devastating_wounds,
     split_or_resume_post_roll_attack_pools,
@@ -526,13 +532,12 @@ def apply_destruction_reaction_decision(
     record = decisions.record_for_result(result)
     request = record.request
     decision = DestructionReactionDecision.from_result(request=request, result=result)
+    selected_reaction_kind = decision.selected_reaction_kind
     selected_source = _selected_destruction_reaction_source_from_request(
         request=request,
         selected_source_id=decision.selected_source_id,
     )
-    if selected_source is not None and selected_source.reaction_kind is not (
-        decision.selected_reaction_kind
-    ):
+    if selected_source is not None and selected_source.reaction_kind is not selected_reaction_kind:
         raise GameLifecycleError("Selected destruction reaction kind drift.")
     context = validate_destruction_reaction_context_matches_sequence(
         attack_sequence=attack_sequence,
@@ -552,6 +557,8 @@ def apply_destruction_reaction_decision(
             source_id=selected_source.source_id,
             source_rule_id=selected_source.source_rule_id,
             source_phase=attack_sequence.source_phase,
+            activation_result_id=result.result_id,
+            completion_context=cast(JsonValue, context),
         )
     decisions.event_log.append(
         "destruction_reaction_resolved",
@@ -559,9 +566,7 @@ def apply_destruction_reaction_decision(
             "decision": decision.to_payload(),
             "selected_source": None if selected_source is None else selected_source.to_payload(),
             "selected_reaction_kind": (
-                None
-                if decision.selected_reaction_kind is None
-                else decision.selected_reaction_kind.value
+                None if selected_reaction_kind is None else selected_reaction_kind.value
             ),
             "action_host": _destruction_reaction_action_host(selected_source),
             "execution_status": (
@@ -655,7 +660,7 @@ def _continue_grouped_damage_after_interruption(
         else dice_manager
     )
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
-    return _resolve_grouped_damage_from(
+    resolved_sequence, resolved_allocated_ids, resolved_status = _resolve_grouped_damage_from(
         state=state,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
@@ -666,6 +671,18 @@ def _continue_grouped_damage_after_interruption(
         hooks=hooks,
         runtime_modifier_registry=runtime_modifiers,
     )
+    if resolved_status is None and resolved_sequence is not None and resolved_sequence.is_complete:
+        return resolve_attack_sequence_until_blocked(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            attack_sequence=resolved_sequence,
+            already_allocated_model_ids=resolved_allocated_ids,
+            hooks=hooks,
+            dice_manager=manager,
+            runtime_modifier_registry=runtime_modifiers,
+        )
+    return resolved_sequence, resolved_allocated_ids, resolved_status
 
 
 def _apply_deferred_mortal_wounds(
@@ -766,20 +783,14 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
         if dice_manager is None
         else dice_manager
     )
-    request_payload = _payload_object(request.payload)
-    lost_wound_context = _payload_object(request_payload["lost_wound_context"])
-    request_source_context = _payload_object(lost_wound_context["source_context"])
-    is_deadly_demise_request = (
-        request_source_context.get("source_kind") == DEADLY_DEMISE_SOURCE_KIND
-    )
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_attack_sequence_mortal_wound_feel_no_pain(
         state=state,
         decisions=decisions,
+        attack_sequence=attack_sequence,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),
         dice_manager=manager,
-        remove_destroyed_models=not is_deadly_demise_request,
     )
     source_context = _payload_object(routed.progress.source_context)
     if source_context.get("source_kind") == DEADLY_DEMISE_SOURCE_KIND:
@@ -1439,61 +1450,3 @@ def _resolve_grouped_current_pool(
         stratagem_index=stratagem_index,
         runtime_modifier_registry=runtime_modifier_registry,
     )
-
-
-def _grouped_wounded_contexts_for_pool(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    manager: DiceRollManager,
-    attack_sequence: AttackSequence,
-    hooks: AttackSequenceHooks,
-    stratagem_index: StratagemCatalogIndex | None,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> tuple[
-    tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
-    LifecycleStatus | None,
-]:
-    pool = attack_sequence.current_pool()
-    wounded_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
-    for attack_index in range(pool.attacks):
-        current = AttackSequence(
-            sequence_id=attack_sequence.sequence_id,
-            source_phase=attack_sequence.source_phase,
-            attacker_player_id=attack_sequence.attacker_player_id,
-            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-            attack_pools=attack_sequence.attack_pools,
-            used_pool_indices=attack_sequence.used_pool_indices,
-            selected_target_unit_instance_id=attack_sequence.selected_target_unit_instance_id,
-            current_gathered_group=attack_sequence.current_gathered_group,
-            pool_index=attack_sequence.pool_index,
-            attack_index=attack_index,
-            deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
-        )
-        while True:
-            attack_context, status = _roll_hit_and_wound(
-                state=state,
-                decisions=decisions,
-                manager=manager,
-                attack_sequence=current,
-                hooks=hooks,
-                stratagem_index=stratagem_index,
-                runtime_modifier_registry=runtime_modifier_registry,
-            )
-            if status is not None:
-                return (), status
-            if attack_context is None:
-                break
-            if attack_context["wound_roll"]["successful"]:
-                wounded_contexts.append((current, attack_context))
-            hit_roll = HitRoll.from_payload(attack_context["hit_roll"])
-            if current.generated_hit_index + 1 >= hit_roll.generated_hits:
-                break
-            next_sequence = current.advanced_after_generated_hit(hit_roll)
-            if (
-                next_sequence.pool_index != current.pool_index
-                or next_sequence.attack_index != current.attack_index
-            ):
-                break
-            current = next_sequence
-    return tuple(wounded_contexts), None

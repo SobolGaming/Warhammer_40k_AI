@@ -1069,3 +1069,61 @@ def _emit_grouped_save_die_event(
             payload=payload,
         ),
     )
+
+
+def grouped_wounded_contexts_for_pool(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    hooks: AttackSequenceHooks,
+    stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> tuple[
+    tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    LifecycleStatus | None,
+]:
+    pool = attack_sequence.current_pool()
+    wounded_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
+    for attack_index in range(pool.attacks):
+        current = AttackSequence(
+            sequence_id=attack_sequence.sequence_id,
+            source_phase=attack_sequence.source_phase,
+            attacker_player_id=attack_sequence.attacker_player_id,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attack_pools=attack_sequence.attack_pools,
+            used_pool_indices=attack_sequence.used_pool_indices,
+            selected_target_unit_instance_id=attack_sequence.selected_target_unit_instance_id,
+            current_gathered_group=attack_sequence.current_gathered_group,
+            pool_index=attack_sequence.pool_index,
+            attack_index=attack_index,
+            deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
+        )
+        while True:
+            attack_context, status = _roll_hit_and_wound(
+                state=state,
+                decisions=decisions,
+                manager=manager,
+                attack_sequence=current,
+                hooks=hooks,
+                stratagem_index=stratagem_index,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+            if status is not None:
+                return (), status
+            if attack_context is None:
+                break
+            if attack_context["wound_roll"]["successful"]:
+                wounded_contexts.append((current, attack_context))
+            hit_roll = HitRoll.from_payload(attack_context["hit_roll"])
+            if current.generated_hit_index + 1 >= hit_roll.generated_hits:
+                break
+            next_sequence = current.advanced_after_generated_hit(hit_roll)
+            if (
+                next_sequence.pool_index != current.pool_index
+                or next_sequence.attack_index != current.attack_index
+            ):
+                break
+            current = next_sequence
+    return tuple(wounded_contexts), None

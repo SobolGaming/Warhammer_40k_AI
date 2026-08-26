@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.generic_rule_strength_constraints import (
     TARGET_CONSTRAINT_NOT_BELOW_HALF_STRENGTH,
     TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
@@ -16,12 +17,16 @@ from warhammer40k_core.engine.generic_rule_strength_constraints import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import (
+    geometry_models_for_rules_unit,
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
+from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.rule_ir import RuleConditionKind, RuleTargetKind
 
 TARGET_ALLEGIANCE_ENEMY = "enemy"
@@ -232,6 +237,7 @@ def generic_rule_target_constraints_apply(
     state: object,
     constraints: tuple[str, ...],
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
     target_unit_instance_id: str | None,
     attack_strength: int | None,
     target_toughness: int | None,
@@ -243,6 +249,7 @@ def generic_rule_target_constraints_apply(
             if not _target_is_closest_enemy_within_distance(
                 state=state,
                 attacking_unit_instance_id=attacking_unit_instance_id,
+                attacker_model_instance_id=attacker_model_instance_id,
                 target_unit_instance_id=target_unit_instance_id,
                 distance_inches=18.0,
             ):
@@ -260,6 +267,7 @@ def generic_rule_target_constraints_apply(
             if not _target_is_enemy_within_distance(
                 state=state,
                 attacking_unit_instance_id=attacking_unit_instance_id,
+                attacker_model_instance_id=attacker_model_instance_id,
                 target_unit_instance_id=target_unit_instance_id,
                 distance_inches=12.0,
             ):
@@ -349,7 +357,7 @@ def generic_rule_target_proximity_keyword_gate_applies(
             _unit_has_keyword(state=state, unit_instance_id=candidate_unit_id, keyword=keyword)
             for keyword in required_keywords
         ) and (
-            _closest_unit_distance_inches(
+            _closest_placed_alive_unit_distance_inches(
                 state=state,
                 first_unit_instance_id=candidate_unit_id,
                 second_unit_instance_id=target_unit_instance_id,
@@ -378,6 +386,7 @@ def _target_is_closest_enemy_within_distance(
     *,
     state: object,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
     target_unit_instance_id: str,
     distance_inches: float,
 ) -> bool:
@@ -385,18 +394,20 @@ def _target_is_closest_enemy_within_distance(
     target_owner = _unit_owner(state=state, unit_instance_id=target_unit_instance_id)
     if attacker_owner == target_owner:
         return False
-    target_distance = _closest_unit_distance_inches(
+    target_distance = _closest_attack_target_distance_inches(
         state=state,
-        first_unit_instance_id=attacking_unit_instance_id,
-        second_unit_instance_id=target_unit_instance_id,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
     )
     if target_distance > distance_inches:
         return False
     for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=attacker_owner):
-        candidate_distance = _closest_unit_distance_inches(
+        candidate_distance = _closest_attack_target_distance_inches(
             state=state,
-            first_unit_instance_id=attacking_unit_instance_id,
-            second_unit_instance_id=enemy_unit_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=enemy_unit_id,
         )
         if candidate_distance < target_distance:
             return False
@@ -407,6 +418,7 @@ def _target_is_enemy_within_distance(
     *,
     state: object,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
     target_unit_instance_id: str,
     distance_inches: float,
 ) -> bool:
@@ -415,10 +427,11 @@ def _target_is_enemy_within_distance(
     if attacker_owner == target_owner:
         return False
     return (
-        _closest_unit_distance_inches(
+        _closest_attack_target_distance_inches(
             state=state,
-            first_unit_instance_id=attacking_unit_instance_id,
-            second_unit_instance_id=target_unit_instance_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
         )
         <= distance_inches
     )
@@ -552,7 +565,7 @@ def _unit_owner(*, state: object, unit_instance_id: str) -> str:
     ).owner_player_id
 
 
-def _closest_unit_distance_inches(
+def _closest_placed_alive_unit_distance_inches(
     *,
     state: object,
     first_unit_instance_id: str,
@@ -562,11 +575,11 @@ def _closest_unit_distance_inches(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    first_models = geometry_models_for_rules_unit(
+    first_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=first_unit_instance_id,
     )
-    second_models = geometry_models_for_rules_unit(
+    second_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=second_unit_instance_id,
     )
@@ -577,6 +590,99 @@ def _closest_unit_distance_inches(
         for first_model in first_models
         for second_model in second_models
     )
+
+
+def _closest_attack_target_distance_inches(
+    *,
+    state: object,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
+    target_unit_instance_id: str,
+) -> float:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
+    attacker_models = _attack_source_geometry_models(
+        state=state,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
+    )
+    target_models = placed_alive_geometry_models_for_rules_unit(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    if not attacker_models or not target_models:
+        raise GameLifecycleError("Generic RuleIR target constraint requires placed models.")
+    return min(
+        DistanceMeasurementContext.from_models(
+            attacker_model, target_model
+        ).closest_distance_inches()
+        for attacker_model in attacker_models
+        for target_model in target_models
+    )
+
+
+def _attack_source_geometry_models(
+    *,
+    state: object,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
+) -> tuple[Model, ...]:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
+    attacking_unit_id = _validate_identifier(
+        "attacking_unit_instance_id",
+        attacking_unit_instance_id,
+    )
+    living_models = placed_alive_geometry_models_for_rules_unit(
+        state=state,
+        unit_instance_id=attacking_unit_id,
+    )
+    if attacker_model_instance_id is None:
+        return living_models
+    attacker_model_id = _validate_identifier(
+        "attacker_model_instance_id",
+        attacker_model_instance_id,
+    )
+    attacking_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=attacking_unit_id,
+    )
+    attacker_model = next(
+        (
+            model
+            for model in attacking_rules_unit.own_models
+            if model.model_instance_id == attacker_model_id
+        ),
+        None,
+    )
+    if attacker_model is None:
+        raise GameLifecycleError(
+            "Generic RuleIR attacker model does not belong to the attacking rules unit."
+        )
+    if attacker_model.is_alive:
+        return living_models
+    if not model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=attacker_model_id,
+    ):
+        return ()
+    retained_attacker_models = tuple(
+        model
+        for model in geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=attacking_unit_id,
+        )
+        if model.model_id == attacker_model_id
+    )
+    if not retained_attacker_models:
+        raise GameLifecycleError(
+            "Generic RuleIR retained attacker model requires physical geometry."
+        )
+    return (*living_models, *retained_attacker_models)
 
 
 def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:

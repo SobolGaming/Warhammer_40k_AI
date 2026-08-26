@@ -12,7 +12,10 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     CatalogMovementTargetPairDescriptor,
     movement_target_pair_descriptor_for_clause,
@@ -27,7 +30,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     effect_with_selected_target,
-    rules_unit_has_placed_alive_model,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -56,7 +58,9 @@ from warhammer40k_core.engine.rule_target_resolution import (
     canonical_keyword,
     unit_has_required_keywords,
 )
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
@@ -444,7 +448,7 @@ class CatalogMovementTargetPairRuntime:
             raise GameLifecycleError("Catalog movement target-pair lookup requires GameState.")
         source_models = tuple(
             model
-            for model in geometry_models_for_rules_unit(
+            for model in placed_alive_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=source.source_rules_unit.unit_instance_id,
             )
@@ -473,7 +477,7 @@ class CatalogMovementTargetPairRuntime:
                 for keyword in source.descriptor.excluded_keywords
             ):
                 continue
-            target_models = geometry_models_for_rules_unit(
+            target_models = placed_alive_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=view.unit_instance_id,
             )
@@ -512,6 +516,7 @@ class CatalogMovementTargetPairRuntime:
                 ruleset_descriptor=state.runtime_ruleset_descriptor(),
                 observing_unit=observing_unit,
                 observer_model_instance_id=source.source_model_instance_id,
+                placed_alive_models_only=True,
                 target_unit_id=view.unit_instance_id,
                 terrain_features=state.battlefield_state.terrain_features,
                 terrain_areas=shooting_terrain_areas_for_state(state),

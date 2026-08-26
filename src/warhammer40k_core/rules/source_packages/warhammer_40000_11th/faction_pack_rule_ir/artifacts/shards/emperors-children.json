@@ -6,6 +6,7 @@
     "000004079": "emperors-children",
     "000004080": "emperors-children",
     "000004083": "emperors-children",
+    "000004086": "emperors-children",
     "000004090": "emperors-children",
     "000004091": "emperors-children"
   },
@@ -15,9 +16,401 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "fce2b73ac5becf507d89a25e565024bd1f5f00611bcf36028f9724e47cdd2412",
+  "package_hash": "bb067e9171cbe530cab9d6fef25d88c0bf32d4befde295a0b251e64b83ad4cd4",
   "shard_id": "emperors-children",
   "source_packages": {
+    "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08": {
+      "artifact_schema": "core-v2-emperors-children-daemon-prince-of-slaanesh-rule-ir-v1",
+      "datasheets": [
+        {
+          "datasheet_id": "000004086",
+          "datasheet_name": "Daemon Prince of Slaanesh",
+          "pdf_page_reference": null,
+          "review_row_id": "source:000004086",
+          "review_treatment": "unchanged_predecessor"
+        }
+      ],
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+      "official_document_pages": [],
+      "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+      "overlay_package_hash": "c8a36f8301ace9121e92418f48d47818c8bc9b64ede895a0b84556bfba5824bb",
+      "package_hash": "86cf74bc36db389c92c05dba0752832eed98272a0a0fa2d16923c1e2b5f16d84",
+      "records": {
+        "000004086:3": {
+          "ability_name": "Lord of Excess",
+          "datasheet_id": "000004086",
+          "datasheet_name": "Daemon Prince of Slaanesh",
+          "normalized_text_sha256": "9e718c2486acc18b48038a0b06413c9893a4127bd99514806c78c0eb186f01f2",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:daemon-prince:datasheet:000004086:3:clause:001",
+                "conditions": [
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "allegiance",
+                        "value": "friendly"
+                      },
+                      {
+                        "key": "distance_inches",
+                        "value": 3
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      },
+                      {
+                        "key": "required_keyword_sequence",
+                        "value": [
+                          "SLAANESH",
+                          "INFANTRY"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 77,
+                      "start": 20,
+                      "text": "within 3\" of one or more friendly Slaanesh Infantry units"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 26,
+                    "start": 0,
+                    "text": "While this model is within"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "lone_operative"
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 120,
+                      "start": 98,
+                      "text": "Lone Operative ability"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 121,
+                  "start": 0,
+                  "text": "While this model is within 3\" of one or more friendly Slaanesh Infantry units, this model has the Lone Operative ability."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 16,
+                    "start": 6,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:conditional-ability-grant",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "e23cab9616632cfb6ab8453c08c73ce1dd98098f9d4075942b53c01879c22886",
+            "normalized_text": "While this model is within 3\" of one or more friendly Slaanesh Infantry units, this model has the Lone Operative ability.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:daemon-prince:datasheet:000004086:3",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08:datasheet:000004086:3"
+          }
+        },
+        "000004086:4": {
+          "ability_name": "Excessive Vigour (Aura)",
+          "datasheet_id": "000004086",
+          "datasheet_name": "Daemon Prince of Slaanesh",
+          "normalized_text_sha256": "564f7f1afb6326b673c3f72de5756362440274fad4c4c461442e9ace42ce8bfa",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:daemon-prince:datasheet:000004086:4:clause:001",
+                "conditions": [
+                  {
+                    "kind": "aura",
+                    "parameters": [],
+                    "source_span": {
+                      "end": 40,
+                      "start": 0,
+                      "text": "While a friendly Slaanesh unit is within"
+                    }
+                  },
+                  {
+                    "kind": "distance_predicate",
+                    "parameters": [
+                      {
+                        "key": "distance_inches",
+                        "value": 6
+                      },
+                      {
+                        "key": "object_kind",
+                        "value": "unit"
+                      },
+                      {
+                        "key": "object_reference",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "predicate",
+                        "value": "within"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 57,
+                      "start": 34,
+                      "text": "within 6\" of this model"
+                    }
+                  },
+                  {
+                    "kind": "keyword_gate",
+                    "parameters": [
+                      {
+                        "key": "required_keyword",
+                        "value": "SLAANESH"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 30,
+                      "start": 17,
+                      "text": "Slaanesh unit"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "while_condition_true",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 40,
+                    "start": 0,
+                    "text": "While a friendly Slaanesh unit is within"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "armor_penetration"
+                      },
+                      {
+                        "key": "delta",
+                        "value": -1
+                      },
+                      {
+                        "key": "requires_charge_move_this_turn",
+                        "value": true
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "aura_units"
+                      },
+                      {
+                        "key": "weapon_scope",
+                        "value": "melee"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 201,
+                      "start": 102,
+                      "text": "improve the Armour Penetration characteristic of melee weapons equipped by models in that unit by 1"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 202,
+                  "start": 0,
+                  "text": "While a friendly Slaanesh unit is within 6\" of this model, if that unit made a Charge move this turn, improve the Armour Penetration characteristic of melee weapons equipped by models in that unit by 1."
+                },
+                "target": {
+                  "kind": "aura_units",
+                  "parameters": [
+                    {
+                      "key": "allegiance",
+                      "value": "friendly"
+                    },
+                    {
+                      "key": "include_source_unit",
+                      "value": true
+                    }
+                  ],
+                  "source_span": {
+                    "end": 30,
+                    "start": 6,
+                    "text": "a friendly Slaanesh unit"
+                  }
+                },
+                "template_id": "phase17p:charged-melee-weapon-characteristic-aura",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "e632fc9e349a4bb96fade5b977af6f0eb4abc27fcf5c00d1886c408c8e003b65",
+            "normalized_text": "While a friendly Slaanesh unit is within 6\" of this model, if that unit made a Charge move this turn, improve the Armour Penetration characteristic of melee weapons equipped by models in that unit by 1.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:daemon-prince:datasheet:000004086:4",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08:datasheet:000004086:4"
+          }
+        },
+        "000004086:5": {
+          "ability_name": "Ecstatic Death",
+          "datasheet_id": "000004086",
+          "datasheet_name": "Daemon Prince of Slaanesh",
+          "normalized_text_sha256": "6093398da2860af58c4d65a875a41127ce78307b4a894976f81a9fea79c05e06",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:emperors-children:daemon-prince:datasheet:000004086:5:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "attack_kind",
+                        "value": "melee"
+                      },
+                      {
+                        "key": "gate_subject",
+                        "value": "destroyed_model"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "destroyed_by_attack"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 44,
+                      "start": 17,
+                      "text": "destroyed by a melee attack"
+                    }
+                  },
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "gate_subject",
+                        "value": "destroyed_model"
+                      },
+                      {
+                        "key": "relationship",
+                        "value": "has_not_fought_this_phase"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 77,
+                      "start": 49,
+                      "text": "it has not fought this phase"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "fight_on_death"
+                      },
+                      {
+                        "key": "optional",
+                        "value": true
+                      },
+                      {
+                        "key": "trigger_roll_threshold",
+                        "value": 2
+                      },
+                      {
+                        "key": "trigger_roll_type",
+                        "value": "emperors_children_ecstatic_death"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 206,
+                      "start": 129,
+                      "text": "This model can fight after the attacking unit has finished making its attacks"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 238,
+                  "start": 0,
+                  "text": "If this model is destroyed by a melee attack, if it has not fought this phase, roll one D6: on a 2+, do not remove it from play. This model can fight after the attacking unit has finished making its attacks, and is then removed from play."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 13,
+                    "start": 3,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17c:conditional-model-fight-on-death",
+                "trigger": {
+                  "kind": "model_destroyed",
+                  "parameters": [
+                    {
+                      "key": "destroyed_target",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "after_attacking_unit_finished_attacks"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 44,
+                    "start": 3,
+                    "text": "this model is destroyed by a melee attack"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "02ffebfccb554e19e90a3e10985ead8532df8e65cd3cdaa1973d57ea8f024edd",
+            "normalized_text": "If this model is destroyed by a melee attack, if it has not fought this phase, roll one D6: on a 2+, do not remove it from play. This model can fight after the attacking unit has finished making its attacks, and is then removed from play.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:emperors-children:daemon-prince:datasheet:000004086:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08:datasheet:000004086:5"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    },
     "gw-11e-emperors-children-fulgrim-datasheet-2026-07": {
       "artifact_schema": "core-v2-emperors-children-fulgrim-rule-ir-v1",
       "datasheet_id": "000004077",

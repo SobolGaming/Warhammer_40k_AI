@@ -8,7 +8,7 @@ import pytest
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -33,6 +33,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -53,6 +54,9 @@ from warhammer40k_core.engine.healing import (
     invalid_healing_model_decision_status,
     resolve_healing_until_blocked,
 )
+from warhammer40k_core.engine.healing_geometry import (
+    healing_phase_start_enemy_engagement_model_ids,
+)
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
     apply_healing_revival_placement_decision,
@@ -70,6 +74,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -1188,6 +1193,47 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
     assert decisions.records == ()
 
 
+def test_healing_phase_start_engagement_includes_retained_fight_on_death_enemy() -> None:
+    state = _battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhaseKind.FIGHT)
+    unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:intercessor-unit-3"
+    unit = _unit_by_id(state, unit_id)
+    enemy = _unit_by_id(state, enemy_unit_id)
+    _place_unit_model_poses(
+        state,
+        unit_id=unit_id,
+        poses=(
+            Pose.at(x=10.0, y=10.0),
+            *tuple(Pose.at(x=30.0 + index, y=30.0) for index in range(1, len(unit.own_models))),
+        ),
+    )
+    _place_unit_model_poses(
+        state,
+        unit_id=enemy_unit_id,
+        poses=(
+            Pose.at(x=12.4, y=10.0),
+            *tuple(Pose.at(x=50.0 + index, y=40.0) for index in range(1, len(enemy.own_models))),
+        ),
+    )
+    retained_enemy_placement = _remove_model(
+        state,
+        model_instance_id=enemy.own_models[0].model_instance_id,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_enemy_placement,
+        effect_id="phase14h-phase-start-retained-enemy",
+        source_rule_id="phase14h-phase-start-retained-enemy-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    assert healing_phase_start_enemy_engagement_model_ids(
+        state=state,
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
+    ) == (retained_enemy_placement.model_instance_id,)
+
+
 def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> None:
     state = _battle_state()
     decisions = DecisionController()
@@ -1243,6 +1289,80 @@ def test_revival_engagement_validator_ignores_destroyed_enemy_placements() -> No
     assert model_by_id(state=state, model_instance_id=removed_placement.model_instance_id).is_alive
     assert state.battlefield_state is not None
     assert enemy.own_models[0].model_instance_id in state.battlefield_state.placed_model_ids()
+
+
+def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> None:
+    state = _battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhaseKind.FIGHT)
+    decisions = DecisionController()
+    unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:intercessor-unit-3"
+    unit = _unit_by_id(state, unit_id)
+    enemy = _unit_by_id(state, enemy_unit_id)
+    target_poses = tuple(
+        Pose.at(x=10.0 + index * 1.8, y=10.0) for index in range(len(unit.own_models))
+    )
+    enemy_poses = (
+        Pose.at(x=8.3, y=10.0),
+        *tuple(Pose.at(x=40.0 + index, y=40.0) for index in range(1, len(enemy.own_models))),
+    )
+    _place_unit_model_poses(state, unit_id=unit_id, poses=target_poses)
+    _place_unit_model_poses(state, unit_id=enemy_unit_id, poses=enemy_poses)
+    revival_placement = _remove_model(
+        state,
+        model_instance_id=unit.own_models[0].model_instance_id,
+    )
+    retained_enemy_placement = _remove_model(
+        state,
+        model_instance_id=enemy.own_models[0].model_instance_id,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_enemy_placement,
+        effect_id="phase14h-revival-retained-enemy",
+        source_rule_id="phase14h-revival-retained-enemy-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    phase_start_engagement_ids = healing_phase_start_enemy_engagement_model_ids(
+        state=state,
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
+    )
+    assert phase_start_engagement_ids == ()
+    effect = HealingEffect(
+        effect_id="phase14h-revive-retained-enemy-engagement",
+        target_unit_instance_id=unit_id,
+        amount=1,
+        opposing_player_id="player-b",
+        phase_start_model_ids=_placed_model_ids(state, unit_id),
+        phase_start_enemy_engagement_model_ids=phase_start_engagement_ids,
+    )
+
+    blocked, request = resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_ruleset(),
+        effect=effect,
+    )
+    assert request is not None
+    with pytest.raises(GameLifecycleError, match="engages a new enemy model"):
+        apply_healing_revival_placement_decision(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=_ruleset(),
+            effect=blocked,
+            result=_healing_revival_result(
+                request=request,
+                placement=revival_placement,
+                result_id="phase14h-revive-retained-enemy-engagement-result",
+            ),
+        )
+
+    assert decisions.queue.pending_requests == (request,)
+    assert decisions.records == ()
+    assert not model_by_id(
+        state=state,
+        model_instance_id=revival_placement.model_instance_id,
+    ).is_alive
 
 
 def test_healing_domain_records_fail_fast_on_invalid_payload_shapes() -> None:

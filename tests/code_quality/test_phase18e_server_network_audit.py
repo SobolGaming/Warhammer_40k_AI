@@ -46,6 +46,7 @@ REDACTION_CONSUMER_MODULES = (
     SRC / "adapters" / "server_sync.py",
     SRC / "adapters" / "server_types.py",
 )
+REDACTION_MODULE = SRC / "adapters" / "redaction.py"
 LOCAL_REDACTION_HELPER_NAMES = frozenset(
     {
         "_redacted_decision_type",
@@ -176,3 +177,61 @@ def test_adapter_hidden_decision_redaction_is_centralized() -> None:
         if not imports_shared_redaction:
             violations.append(f"{path}: does not import adapters.redaction")
     assert not violations
+
+
+def test_internal_model_destruction_authority_redaction_covers_public_surfaces() -> None:
+    tree = ast.parse(REDACTION_MODULE.read_text(encoding="utf-8"), filename=str(REDACTION_MODULE))
+    key_assignment = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name)
+            and target.id == "_INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS"
+            for target in node.targets
+        )
+    )
+    assert isinstance(key_assignment.value, ast.Call)
+    assert key_assignment.value.args
+    key_values = key_assignment.value.args[0]
+    assert isinstance(key_values, ast.Set)
+    observed_keys = {
+        element.value
+        for element in key_values.elts
+        if isinstance(element, ast.Constant) and type(element.value) is str
+    }
+    assert {
+        "logical_death_cause_binding",
+        "logical_death_event",
+        "logical_death_events",
+        "model_destruction_cause_authorities",
+        "model_destruction_cause_id",
+        "parent_model_destruction_cause_id",
+    } <= observed_keys
+
+    hidden_event_owner = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_event_record_hidden_from_context"
+    )
+    assert any(
+        isinstance(node, ast.Name) and node.id == "MORTAL_WOUND_APPLICATION_STARTED_EVENT"
+        for node in ast.walk(hidden_event_owner)
+    )
+
+    for function_name in (
+        "public_decision_request_payload",
+        "redacted_lifecycle_status",
+        "public_event_record_payload",
+    ):
+        function = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == function_name
+        )
+        assert any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_without_internal_model_destruction_authority"
+            for node in ast.walk(function)
+        )

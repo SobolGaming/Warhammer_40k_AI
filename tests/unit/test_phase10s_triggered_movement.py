@@ -8,19 +8,24 @@ import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelDisplacementKind,
+    ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.damage_allocation import apply_damage_to_model
+from warhammer40k_core.engine.damage_allocation_targets import DamageKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -52,6 +57,7 @@ from warhammer40k_core.engine.triggered_movement import (
     DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
     TriggeredMovementDescriptor,
+    TriggeredMovementEligibleUnit,
     TriggeredMovementHandler,
     TriggeredMovementKind,
     TriggeredMovementRequest,
@@ -61,6 +67,7 @@ from warhammer40k_core.engine.triggered_movement import (
     apply_triggered_movement_to_battlefield,
     resolve_triggered_movement,
     triggered_movement_kind_from_token,
+    triggered_movement_unit_selection_request,
     triggered_movement_violation_code_from_token,
 )
 from warhammer40k_core.engine.unit_coherency import (
@@ -141,6 +148,211 @@ def test_blood_surge_like_movement_is_triggered_decision_with_model_choices() ->
     assert len(displacements) == len(unit_placement.model_placements)
     assert {cast(str, record["displacement_kind"]) for record in displacements} == {"surge_move"}
     assert {cast(str, record["source_rule_id"]) for record in displacements} == {"blood_surge"}
+
+
+def test_fight_end_triggered_movement_moves_only_living_models_and_retains_fod_base() -> None:
+    state = _battle_ready_state()
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit_placement = _unit_placement(state)
+    retained_placement = unit_placement.model_placements[0]
+    _retain_models_for_fight_on_death(
+        state=state,
+        placements=(retained_placement,),
+    )
+    retained_pose = retained_placement.pose
+    current_placement = _unit_placement(state)
+    living_placements = tuple(
+        placement
+        for placement in current_placement.model_placements
+        if placement.model_instance_id != retained_placement.model_instance_id
+    )
+    witness = _shift_model_placements_witness(living_placements, dx=0.25)
+    descriptor = _fight_end_triggered_descriptor(max_distance_inches=1.0)
+    handler = TriggeredMovementHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=current_placement.unit_instance_id,
+        descriptor=descriptor,
+        candidate_witnesses=(witness,),
+    )
+    selected_payload = _option_payload(request, "triggered_move_001")
+    model_movements = cast(list[dict[str, JsonValue]], selected_payload["model_movements"])
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase10s-fight-end-retained-result",
+        request=request,
+        selected_option_id="triggered_move_001",
+    )
+    decisions.submit_result(result)
+
+    status = handler.apply_decision(state=state, result=result, decisions=decisions)
+
+    assert status is None
+    assert {cast(str, movement["model_instance_id"]) for movement in model_movements} == {
+        placement.model_instance_id for placement in living_placements
+    }
+    assert retained_placement.model_instance_id not in witness.model_ids()
+    moved_placement = _unit_placement(state)
+    assert _model_placement_by_id(moved_placement, retained_placement.model_instance_id).pose == (
+        retained_pose
+    )
+    for before in living_placements:
+        after = _model_placement_by_id(moved_placement, before.model_instance_id)
+        assert after.pose.position.x == before.pose.position.x + 0.25
+    resolved_payload = _last_event_payload(decisions, "triggered_movement_resolved")
+    transition_batch = cast(dict[str, JsonValue], resolved_payload["transition_batch"])
+    displacements = cast(list[dict[str, JsonValue]], transition_batch["displacements"])
+    assert {cast(str, displacement["model_instance_id"]) for displacement in displacements} == {
+        placement.model_instance_id for placement in living_placements
+    }
+    scenario = battlefield_scenario_for_state(state=state)
+    assert scenario.present_destroyed_model_ids == (retained_placement.model_instance_id,)
+    assert scenario.model_is_present_at_placement(
+        _model_placement_by_id(moved_placement, retained_placement.model_instance_id)
+    )
+
+
+def test_fight_end_triggered_movement_omits_fod_only_source_unit() -> None:
+    state = _battle_ready_state()
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit_placement = _unit_placement(state)
+    _retain_models_for_fight_on_death(
+        state=state,
+        placements=unit_placement.model_placements,
+    )
+    current_placement = _unit_placement(state)
+    descriptor = _fight_end_triggered_descriptor(max_distance_inches=1.0)
+    eligible = TriggeredMovementEligibleUnit(
+        unit_instance_id=current_placement.unit_instance_id,
+        hook_id="phase10s-fight-end-hook",
+        source_id="phase10s-fight-end-source",
+    )
+
+    selection_request = triggered_movement_unit_selection_request(
+        state=state,
+        player_id=current_placement.player_id,
+        descriptor=descriptor,
+        eligible_units=(eligible,),
+    )
+
+    assert tuple(option.option_id for option in selection_request.options) == (
+        DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+    )
+    selection_payload = cast(dict[str, JsonValue], selection_request.payload)
+    assert selection_payload["eligible_units"] == []
+    with pytest.raises(
+        GameLifecycleError,
+        match="at least one placed living source model",
+    ):
+        TriggeredMovementHandler(ruleset_descriptor=_ruleset()).request_from_state(
+            state=state,
+            unit_instance_id=current_placement.unit_instance_id,
+            descriptor=descriptor,
+            candidate_witnesses=(_shift_witness(current_placement, dx=0.25),),
+        )
+
+
+@pytest.mark.parametrize(
+    ("movement_kind", "expected_violation"),
+    [
+        ("crossing", "friendly_model_transit_forbidden"),
+        ("aircraft_crossing", "friendly_model_transit_forbidden"),
+        ("endpoint_overlap", "end_on_model_overlap"),
+    ],
+)
+def test_retained_fod_base_blocks_triggered_movement_crossing_and_overlap(
+    movement_kind: str,
+    expected_violation: str,
+) -> None:
+    state = _battle_ready_state()
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit_placement = _unit_placement(state)
+    retained, mover, *other_living = unit_placement.model_placements
+    source_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == unit_placement.unit_instance_id
+    )
+    retained_radius = _first_model_radius_x(source_unit)
+    if movement_kind == "aircraft_crossing":
+        state.army_definitions = [
+            replace(
+                army,
+                units=tuple(
+                    replace(unit, keywords=(*unit.keywords, "Aircraft"))
+                    if unit.unit_instance_id == source_unit.unit_instance_id
+                    else unit
+                    for unit in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ]
+    retained_pose = Pose.at(13.0, 10.0)
+    start_x = (
+        10.0
+        if movement_kind in {"crossing", "aircraft_crossing"}
+        else retained_pose.position.x - ((2.0 * retained_radius) + 0.2)
+    )
+    mover_pose = Pose.at(start_x, retained_pose.position.y)
+    other_poses = (Pose.at(20.0, 20.0), Pose.at(21.5, 20.0), Pose.at(20.0, 21.5))
+    assert state.battlefield_state is not None
+    positioned = unit_placement.with_model_placements(
+        (
+            retained.with_pose(retained_pose),
+            mover.with_pose(mover_pose),
+            *(
+                placement.with_pose(pose)
+                for placement, pose in zip(other_living, other_poses, strict=True)
+            ),
+        )
+    )
+    state.replace_battlefield_state(state.battlefield_state.with_unit_placement(positioned))
+    retained = _model_placement_by_id(positioned, retained.model_instance_id)
+    _retain_models_for_fight_on_death(state=state, placements=(retained,))
+    current_placement = _unit_placement(state)
+    mover = _model_placement_by_id(current_placement, mover.model_instance_id)
+    end_pose = (
+        Pose.at(16.0, mover.pose.position.y)
+        if movement_kind in {"crossing", "aircraft_crossing"}
+        else Pose.at(mover.pose.position.x + 0.3, mover.pose.position.y)
+    )
+    witness = _witness_for_living_source_endpoint(
+        unit_placement=current_placement,
+        retained_model_ids=(retained.model_instance_id,),
+        moving_model_id=mover.model_instance_id,
+        end_pose=end_pose,
+    )
+
+    resolution = resolve_triggered_movement(
+        scenario=battlefield_scenario_for_state(state=state),
+        ruleset_descriptor=_ruleset(),
+        unit_placement=current_placement,
+        descriptor=_fight_end_triggered_descriptor(max_distance_inches=6.0),
+        path_witness=witness,
+        battle_round=state.battle_round,
+    )
+
+    source_model_ids = tuple(
+        sorted(
+            placement.model_instance_id
+            for placement in current_placement.model_placements
+            if placement.model_instance_id != retained.model_instance_id
+        )
+    )
+    mover_result = resolution.path_validation_results[
+        source_model_ids.index(mover.model_instance_id)
+    ]
+    violation = mover_result.violations[0]
+    assert not resolution.is_valid
+    assert violation.violation_code == expected_violation
+    assert violation.blocker_id == retained.model_instance_id
+    assert (
+        _model_placement_by_id(resolution.attempted_placement, retained.model_instance_id).pose
+        == retained.pose
+    )
 
 
 def test_optional_triggered_movement_can_be_declined_without_mutation() -> None:
@@ -866,6 +1078,37 @@ def test_surge_movement_cannot_occur_while_within_engagement_range() -> None:
     )
 
 
+def test_surge_movement_cannot_leave_retained_only_enemy_engagement() -> None:
+    state = _battle_ready_state()
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    _move_first_enemy_model_into_engagement(state)
+    assert state.battlefield_state is not None
+    enemy_placement = state.battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-2")
+    _retain_models_for_fight_on_death(
+        state=state,
+        placements=enemy_placement.model_placements,
+    )
+    unit_placement = _unit_placement(state)
+
+    resolution = resolve_triggered_movement(
+        scenario=_scenario_from_state(state),
+        ruleset_descriptor=_ruleset(),
+        unit_placement=unit_placement,
+        descriptor=_movement_surge_descriptor(max_distance_inches=3.0),
+        path_witness=_shift_witness(unit_placement, dx=3.0),
+        battle_round=state.battle_round,
+    )
+
+    assert not resolution.is_valid
+    assert resolution.restriction_violations[0].violation_code is (
+        TriggeredMovementViolationCode.ENGAGEMENT_RANGE_SURGE_FORBIDDEN
+    )
+    scenario = _scenario_from_state(state)
+    assert scenario.present_destroyed_model_ids == tuple(
+        sorted(placement.model_instance_id for placement in enemy_placement.model_placements)
+    )
+
+
 def test_one_surge_move_per_phase_is_enforced() -> None:
     state = _battle_ready_state()
     unit_placement = _unit_placement(state)
@@ -1309,7 +1552,10 @@ def test_triggered_movement_validators_fail_fast_for_bad_domain_objects() -> Non
 
     first_model_path = full_witness.poses_for_model(first_model.model_instance_id)
     partial_witness = PathWitness.for_paths(((first_model.model_instance_id, first_model_path),))
-    with pytest.raises(GameLifecycleError, match="witness must match selected unit models"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="witness must match selected unit living models",
+    ):
         resolve_triggered_movement(
             scenario=_scenario_from_state(state),
             ruleset_descriptor=_ruleset(),
@@ -1744,6 +1990,23 @@ def _reactive_step_descriptor(
     )
 
 
+def _fight_end_triggered_descriptor(
+    *,
+    max_distance_inches: float,
+) -> TriggeredMovementDescriptor:
+    return TriggeredMovementDescriptor(
+        movement_kind=TriggeredMovementKind.TRIGGERED,
+        source_rule_id="phase10s-fight-end-triggered",
+        trigger_timing=ReactionWindow(
+            phase=BattlePhase.FIGHT,
+            window_kind=ReactionWindowKind.RULE_TRIGGER,
+            source_step="fight_end",
+            source_event_id="phase10s-fight-end-source-event",
+        ),
+        max_distance_inches=max_distance_inches,
+    )
+
+
 def _normal_move_state_from_descriptor(
     *,
     player_id: str,
@@ -1993,16 +2256,98 @@ def _hover_state_for_aircraft(aircraft: UnitInstance) -> HoverModeState:
 
 
 def _scenario_from_state(state: GameState) -> BattlefieldScenario:
-    assert state.battlefield_state is not None
-    return BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
+    return battlefield_scenario_for_state(state=state)
 
 
 def _unit_placement(state: GameState) -> UnitPlacement:
     assert state.battlefield_state is not None
     return state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+
+
+def _model_placement_by_id(
+    unit_placement: UnitPlacement,
+    model_instance_id: str,
+) -> ModelPlacement:
+    return next(
+        placement
+        for placement in unit_placement.model_placements
+        if placement.model_instance_id == model_instance_id
+    )
+
+
+def _retain_models_for_fight_on_death(
+    *,
+    state: GameState,
+    placements: tuple[ModelPlacement, ...],
+) -> None:
+    models_by_id = {
+        model.model_instance_id: model
+        for army in state.army_definitions
+        for unit in army.units
+        for model in unit.own_models
+    }
+    for placement in placements:
+        model = models_by_id[placement.model_instance_id]
+        damage = apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=placement.unit_instance_id,
+            model_instance_id=placement.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+        assert damage.destroyed
+        restore_model_awaiting_fight_on_death(
+            state=state,
+            placement=placement,
+            effect_id=f"phase10s-fight-on-death:{placement.model_instance_id}",
+            source_rule_id="phase10s-test-fight-on-death",
+            source_phase=BattlePhaseKind.FIGHT,
+        )
+
+
+def _shift_model_placements_witness(
+    placements: tuple[ModelPlacement, ...],
+    *,
+    dx: float,
+) -> PathWitness:
+    return PathWitness.for_straight_line_endpoints(
+        tuple(
+            (
+                placement.model_instance_id,
+                placement.pose,
+                Pose.at(
+                    placement.pose.position.x + dx,
+                    placement.pose.position.y,
+                    placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+            for placement in placements
+        )
+    )
+
+
+def _witness_for_living_source_endpoint(
+    *,
+    unit_placement: UnitPlacement,
+    retained_model_ids: tuple[str, ...],
+    moving_model_id: str,
+    end_pose: Pose,
+) -> PathWitness:
+    retained_ids = set(retained_model_ids)
+    return PathWitness.for_paths(
+        tuple(
+            (
+                placement.model_instance_id,
+                (
+                    placement.pose,
+                    end_pose if placement.model_instance_id == moving_model_id else placement.pose,
+                ),
+            )
+            for placement in unit_placement.model_placements
+            if placement.model_instance_id not in retained_ids
+        )
+    )
 
 
 def _shift_witness(unit_placement: UnitPlacement, *, dx: float) -> PathWitness:

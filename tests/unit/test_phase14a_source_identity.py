@@ -78,11 +78,12 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> No
     assert {rule.rule_id: rule.behavior_descriptor for rule in event_rules} == {
         "generating-command-points": "non_core_cp_gain_maximum_one_per_battle_round",
     }
-    assert len(app_core_rules) == 15
+    assert len(app_core_rules) == 16
     assert {rule.rule_id for rule in app_core_rules} == set(
         july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS
     )
     assert {rule.behavior_descriptor for rule in app_core_rules} >= {
+        "fight_on_death_models_wait_for_their_units_single_attack_selection",
         "embarked_return_requires_remaining_transport_capacity",
         "post_roll_profile_changes_split_attack_pools",
         "forced_desperate_escape_tests_all_models_and_battle_shock",

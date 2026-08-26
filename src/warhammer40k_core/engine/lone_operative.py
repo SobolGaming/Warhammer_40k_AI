@@ -50,4 +50,6 @@ def lone_operative_target_allowed(
         attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=target_rules_unit.unit_instance_id,
         max_range_inches=profile.range_inches,
+        placed_alive_attacker_models_only=True,
+        placed_alive_target_models_only=True,
     )

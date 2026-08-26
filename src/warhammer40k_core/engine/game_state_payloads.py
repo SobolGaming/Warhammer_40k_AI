@@ -27,6 +27,9 @@ from warhammer40k_core.engine.faction_resources import FactionResourceLedgerPayl
 from warhammer40k_core.engine.faction_rule_states import FactionRuleStatePayload
 from warhammer40k_core.engine.fight_order import FightPhaseStatePayload
 from warhammer40k_core.engine.mission_setup import MissionSetupPayload
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    ModelDestructionCauseAuthorityPayload,
+)
 from warhammer40k_core.engine.normal_move_history import NormalMoveStatePayload
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecordPayload
 from warhammer40k_core.engine.phases.charge import ChargePhaseStatePayload
@@ -187,6 +190,7 @@ class GameStatePayload(TypedDict):
     destruction_reaction_sources_by_model_id: dict[str, list[DestructionReactionSourcePayload]]
     one_shot_weapon_use_records: list[OneShotWeaponUseRecordPayload]
     ranged_attack_history_records: list[RangedAttackHistoryRecordPayload]
+    model_destruction_cause_authorities: list[ModelDestructionCauseAuthorityPayload]
     reserve_states: list[ReserveStatePayload]
     cult_ambush_markers: list[CultAmbushMarkerPayload]
     hover_mode_states: list[HoverModeStatePayload]

@@ -186,6 +186,20 @@ def test_destruction_evidence_metadata_is_rng_history_neutral() -> None:
                     "pose": {"x": 1.0, "y": 2.0, "z": 0.0, "facing_degrees": 0.0},
                 }
             ],
+            "logical_death_cause_binding": {
+                "binding_kind": "fixed_producer",
+                "cause_kind": "mortal_wound",
+                "fixed_producer_id": "mortal-application",
+                "producer_rows": [],
+            },
+            "logical_death_events": [
+                {
+                    "event_id": "event-000001",
+                    "event_type": "model_logical_death_recorded",
+                    "payload": {"cause_id": "derived-cause"},
+                }
+            ],
+            "model_destruction_cause_id": "derived-cause",
         },
     )
     base_result = DecisionResult.for_request(
@@ -202,6 +216,10 @@ def test_destruction_evidence_metadata_is_rng_history_neutral() -> None:
     enriched_manager = DiceRollManager("seed")
     base_manager.record_decision(request=base_request, result=base_result)
     enriched_manager.record_decision(request=enriched_request, result=enriched_result)
+    enriched_manager.event_log.append(
+        "model_logical_death_recorded",
+        {"cause_id": "derived-cause"},
+    )
     spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=100_000),
         reason="Roll after replay evidence metadata",

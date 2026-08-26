@@ -18,6 +18,10 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.model_destruction_cause_producers import (
+    PARENT_MODEL_DESTRUCTION_CAUSE_ID_FIELD,
+    rule_effect_model_destruction_cause_id,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
     MortalWoundDestructionEvidencePayload,
@@ -152,9 +156,16 @@ def build_rule_deadly_demise_secondary_root_context(
                 "source_step": "deadly_demise_collateral",
                 "source_rule_id": source.source_rule_id,
                 "source_effect_ids": [],
-                "source_result_id": (
-                    f"{_payload_string(parent_root_context, 'source_result_id')}:"
-                    f"deadly-demise:{source.source_id}:{model_id}"
+                "source_result_id": rule_deadly_demise_secondary_source_result_id(
+                    parent_root_context=parent_root_context,
+                    source=source,
+                    model_instance_id=model_id,
+                ),
+                PARENT_MODEL_DESTRUCTION_CAUSE_ID_FIELD: (
+                    rule_effect_model_destruction_cause_id(
+                        state=state,
+                        root_context=parent_root_context,
+                    )
                 ),
                 "rules_unit_instance_id": rules_unit_id,
                 "target_unit_instance_id": physical_unit_id,
@@ -189,6 +200,21 @@ def build_rule_deadly_demise_secondary_root_context(
                 ],
             }
         ),
+    )
+
+
+def rule_deadly_demise_secondary_source_result_id(
+    *,
+    parent_root_context: dict[str, JsonValue],
+    source: DestructionReactionSource,
+    model_instance_id: str,
+) -> str:
+    if type(source) is not DestructionReactionSource:
+        raise GameLifecycleError("Rule Deadly Demise producer requires a typed source.")
+    model_id = _validate_identifier("model_instance_id", model_instance_id)
+    return (
+        f"{_payload_string(parent_root_context, 'source_result_id')}:"
+        f"deadly-demise:{source.source_id}:{model_id}"
     )
 
 

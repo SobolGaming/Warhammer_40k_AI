@@ -2,17 +2,25 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict
 
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    PlacementError,
     UnitPlacement,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+    scenario_rules_units_are_physically_engaged,
+)
+from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_identity,
+    rules_unit_identities_share_lineage,
+    rules_unit_view_from_armies,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -64,16 +72,17 @@ def record_turn_start_engagement_snapshot(
         scenario=scenario,
         friendly_placements=friendly_placements,
         enemy_placements=enemy_placements,
-        horizontal_inches=state.runtime_ruleset_descriptor().engagement_policy.horizontal_inches,
-        vertical_inches=state.runtime_ruleset_descriptor().engagement_policy.vertical_inches,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )
+    friendly_rules_unit_ids = _canonical_physically_present_rules_unit_ids_for_placements(
+        scenario=scenario,
+        placements=friendly_placements,
     )
     effect = PersistingEffect(
         effect_id=effect_id,
         source_rule_id=TURN_START_ENGAGEMENT_SNAPSHOT_SOURCE_RULE_ID,
         owner_player_id=active_player_id,
-        target_unit_instance_ids=tuple(
-            placement.unit_instance_id for placement in friendly_placements
-        ),
+        target_unit_instance_ids=friendly_rules_unit_ids,
         started_battle_round=state.battle_round,
         started_phase=BattlePhase.COMMAND,
         expiration=EffectExpiration.end_turn(
@@ -120,7 +129,7 @@ def turn_start_enemy_unit_ids_for_friendly_unit(
     pairs = payload.get("engaged_pairs")
     if not isinstance(pairs, list):
         raise GameLifecycleError("Turn-start engagement snapshot pairs must be a list.")
-    target_ids: list[str] = []
+    historical_target_ids: set[str] = set()
     for pair in pairs:
         if not isinstance(pair, dict):
             raise GameLifecycleError("Turn-start engagement snapshot pair must be an object.")
@@ -132,9 +141,24 @@ def turn_start_enemy_unit_ids_for_friendly_unit(
             "enemy_unit_instance_id",
             pair.get("enemy_unit_instance_id"),
         )
-        if friendly_id == friendly_unit_id:
-            target_ids.append(enemy_id)
-    return tuple(sorted(set(target_ids)))
+        if rules_unit_identities_share_lineage(
+            state=state,
+            first_unit_instance_id=friendly_id,
+            second_unit_instance_id=friendly_unit_id,
+        ):
+            historical_target_ids.add(enemy_id)
+    return tuple(
+        sorted(
+            {
+                current_view.unit_instance_id
+                for historical_target_id in historical_target_ids
+                for current_view in current_rules_unit_views_for_identity(
+                    state=state,
+                    unit_instance_id=historical_target_id,
+                )
+            }
+        )
+    )
 
 
 def _turn_start_engagement_snapshot_effect(
@@ -185,10 +209,7 @@ def _snapshot_effect_id(*, game_id: str, battle_round: int, player_id: str) -> s
 def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     if state.battlefield_state is None:
         raise GameLifecycleError("Turn-start engagement snapshot requires battlefield_state.")
-    return BattlefieldScenario(
-        battlefield_state=state.battlefield_state,
-        armies=tuple(state.army_definitions),
-    )
+    return battlefield_scenario_for_state(state=state)
 
 
 def _placed_unit_placements_for_player(
@@ -222,30 +243,31 @@ def _engaged_unit_pairs(
     scenario: BattlefieldScenario,
     friendly_placements: tuple[UnitPlacement, ...],
     enemy_placements: tuple[UnitPlacement, ...],
-    horizontal_inches: float,
-    vertical_inches: float,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> tuple[TurnStartEngagementPairPayload, ...]:
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Turn-start engagement snapshot requires RulesetDescriptor.")
     pairs: list[TurnStartEngagementPairPayload] = []
-    for friendly_placement in friendly_placements:
-        friendly_models = _geometry_models_for_unit_placement(
-            scenario=scenario,
-            unit_placement=friendly_placement,
-        )
-        for enemy_placement in enemy_placements:
-            enemy_models = _geometry_models_for_unit_placement(
+    friendly_unit_ids = _canonical_physically_present_rules_unit_ids_for_placements(
+        scenario=scenario,
+        placements=friendly_placements,
+    )
+    enemy_unit_ids = _canonical_physically_present_rules_unit_ids_for_placements(
+        scenario=scenario,
+        placements=enemy_placements,
+    )
+    for friendly_unit_id in friendly_unit_ids:
+        for enemy_unit_id in enemy_unit_ids:
+            if scenario_rules_units_are_physically_engaged(
                 scenario=scenario,
-                unit_placement=enemy_placement,
-            )
-            if _model_groups_are_engaged(
-                first_models=friendly_models,
-                second_models=enemy_models,
-                horizontal_inches=horizontal_inches,
-                vertical_inches=vertical_inches,
+                ruleset_descriptor=ruleset_descriptor,
+                first_unit_instance_id=friendly_unit_id,
+                second_unit_instance_id=enemy_unit_id,
             ):
                 pairs.append(
                     {
-                        "friendly_unit_instance_id": friendly_placement.unit_instance_id,
-                        "enemy_unit_instance_id": enemy_placement.unit_instance_id,
+                        "friendly_unit_instance_id": friendly_unit_id,
+                        "enemy_unit_instance_id": enemy_unit_id,
                     }
                 )
     return tuple(
@@ -259,36 +281,28 @@ def _engaged_unit_pairs(
     )
 
 
-def _geometry_models_for_unit_placement(
+def _canonical_physically_present_rules_unit_ids_for_placements(
     *,
     scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-) -> tuple[GeometryModel, ...]:
-    models: list[GeometryModel] = []
-    for placement in unit_placement.model_placements:
-        try:
-            model = scenario.model_instance_for_placement(placement)
-        except PlacementError as exc:
-            raise GameLifecycleError("Turn-start engagement model placement is invalid.") from exc
-        models.append(geometry_model_for_placement(model=model, placement=placement))
-    return tuple(models)
-
-
-def _model_groups_are_engaged(
-    *,
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-    horizontal_inches: float,
-    vertical_inches: float,
-) -> bool:
-    return any(
-        first_model.is_within_engagement_range(
-            second_model,
-            horizontal_inches=horizontal_inches,
-            vertical_inches=vertical_inches,
+    placements: tuple[UnitPlacement, ...],
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            {
+                rules_unit.unit_instance_id
+                for placement in placements
+                for rules_unit in (
+                    rules_unit_view_from_armies(
+                        armies=scenario.armies,
+                        unit_instance_id=placement.unit_instance_id,
+                    ),
+                )
+                if physical_geometry_models_for_rules_unit(
+                    scenario=scenario,
+                    unit_instance_id=rules_unit.unit_instance_id,
+                )
+            }
         )
-        for first_model in first_models
-        for second_model in second_models
     )
 
 

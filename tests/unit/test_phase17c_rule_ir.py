@@ -84,6 +84,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     _feel_no_pain_source_from_effect,  # pyright: ignore[reportPrivateUsage]
     _movement_transit_permissions_from_clause,  # pyright: ignore[reportPrivateUsage]
+    catalog_rule_ir_clause_wide_consumer_ids,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
@@ -414,6 +415,41 @@ def test_phase17c_once_per_battle_optional_activation_compiles_to_generic_ir() -
     assert CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID in (
         catalog_rule_ir_hook_ids_for_rule(rule_ir)
     )
+    clause_rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id=rule_ir.source_id,
+        ability_name="Finest Hour",
+        rule_ir=rule_ir,
+    )
+    rollup = ability_support_rollup_for_rule_ir(
+        source_ability_id=rule_ir.source_id,
+        ability_name="Finest Hour",
+        rule_ir=rule_ir,
+    )
+    assert clause_rows[0].effect_runtime_consumer_ids == (
+        (CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,),
+        (CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,),
+    )
+    assert clause_rows[0].support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert rollup.overall_ability_support is AbilityOverallSupport.FULL
+
+    unconsumed_clause = replace(
+        clause,
+        effects=(
+            RuleEffectSpec(
+                kind=RuleEffectKind.DESTROY_MODEL,
+                source_span=clause.effects[0].source_span,
+            ),
+        ),
+    )
+    unconsumed_rule_ir = replace(rule_ir, clauses=(unconsumed_clause,))
+    unconsumed_rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id=unconsumed_rule_ir.source_id,
+        ability_name="Unconsumed Finest Hour",
+        rule_ir=unconsumed_rule_ir,
+    )
+    assert catalog_rule_ir_clause_wide_consumer_ids(unconsumed_clause) == ()
+    assert unconsumed_rows[0].effect_runtime_consumer_ids == ((),)
+    assert unconsumed_rows[0].support_stage is (AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE)
 
 
 def test_phase17c_once_per_battle_without_runtime_timing_is_not_execution_supported() -> None:

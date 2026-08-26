@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -9,6 +10,9 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookBinding,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.catalog_descriptor_consumption import (
+    CatalogDescriptorConsumptionRecord,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
@@ -47,6 +51,22 @@ EMPERORS_CHILDREN_FACTION_KEYWORD = "EMPEROR'S CHILDREN"
 THRILL_SEEKERS_RULE_UPDATE_SOURCE = (
     "warhammer_40000_11th:emperors_children:faction_pack:rules_updates:none"
 )
+
+
+def descriptor_consumption_records() -> tuple[CatalogDescriptorConsumptionRecord, ...]:
+    return (
+        CatalogDescriptorConsumptionRecord(
+            ability_id=THRILL_SEEKERS_SOURCE_ABILITY_ID,
+            source_kind=CatalogAbilitySourceKind.FACTION,
+            semantic_categories=("faction.army_rule.thrill_seekers",),
+            runtime_consumer_ids=(
+                ADVANCE_ELIGIBILITY_HOOK_ID,
+                CHARGE_TARGET_RESTRICTION_HOOK_ID,
+                FALL_BACK_ELIGIBILITY_HOOK_ID,
+                SHOOTING_TARGET_RESTRICTION_HOOK_ID,
+            ),
+        ),
+    )
 
 
 def runtime_contribution() -> RuntimeContentContribution:

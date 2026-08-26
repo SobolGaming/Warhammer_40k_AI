@@ -66,6 +66,8 @@ def validate_destruction_source_identity(
         "destroying_player_id",
         destroying_player_id,
     )
+    if requested_destroying_player_id not in state.player_ids:
+        raise GameLifecycleError("Destruction source player is not in the game.")
     if source_rules_unit_instance_id is None:
         if source_model_instance_id is not None:
             raise GameLifecycleError("Destruction source model requires a source rules unit.")

@@ -15550,6 +15550,7 @@
         ],
         "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
       },
+      "model_destruction_cause_authorities": [],
       "movement_phase_state": null,
       "normal_move_states": [],
       "objective_control_record_authorities": [],

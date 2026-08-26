@@ -12,8 +12,12 @@ if TYPE_CHECKING:
         DamageApplicationPayload,
         FeelNoPainResolutionPayload,
     )
+    from warhammer40k_core.engine.event_log import EventRecordPayload
     from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
         MortalWoundDestructionEvidencePayload,
+    )
+    from warhammer40k_core.engine.mortal_wound_logical_death import (
+        MortalWoundLogicalDeathCauseBindingPayload,
     )
 
 MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
@@ -37,6 +41,8 @@ class MortalWoundFeelNoPainContextPayload(TypedDict):
     priority_model_ids: list[str]
     destruction_evidence: MortalWoundDestructionEvidencePayload | None
     destroyed_model_placements: list[ModelPlacementPayload]
+    logical_death_events: list[EventRecordPayload]
+    logical_death_cause_binding: MortalWoundLogicalDeathCauseBindingPayload
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -49,6 +55,29 @@ def parse_mortal_wound_feel_no_pain_context(
         raise GameLifecycleError("Mortal wound Feel No Pain context must be an object.")
     if payload.get("context_kind") != MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND:
         raise GameLifecycleError("Mortal wound Feel No Pain context kind is invalid.")
+    expected_fields = {
+        "context_kind",
+        "application_id",
+        "source_rule_id",
+        "source_context",
+        "target_unit_instance_id",
+        "defender_player_id",
+        "model_instance_id",
+        "mortal_wounds",
+        "remaining_mortal_wounds",
+        "spill_over",
+        "applications",
+        "feel_no_pain_resolutions",
+        "ignored_mortal_wounds",
+        "remaining_mortal_wounds_lost",
+        "priority_model_ids",
+        "destruction_evidence",
+        "destroyed_model_placements",
+        "logical_death_events",
+        "logical_death_cause_binding",
+    }
+    if set(payload) != expected_fields:
+        raise GameLifecycleError("Mortal wound Feel No Pain context fields are invalid.")
     applications = _list(payload, "applications")
     resolutions = _list(payload, "feel_no_pain_resolutions")
     destroyed_model_placements = _list(payload, "destroyed_model_placements")
@@ -56,11 +85,27 @@ def parse_mortal_wound_feel_no_pain_context(
         raise GameLifecycleError(
             "Mortal wound context destroyed_model_placements must contain objects."
         )
+    logical_death_events = _list(payload, "logical_death_events")
+    if any(
+        not isinstance(item, dict)
+        or set(item) != {"event_id", "event_type", "payload"}
+        or type(item.get("event_id")) is not str
+        or type(item.get("event_type")) is not str
+        for item in logical_death_events
+    ):
+        raise GameLifecycleError(
+            "Mortal wound context logical_death_events must contain exact event records."
+        )
     priority_model_ids = tuple(_string_list(payload, "priority_model_ids"))
     raw_destruction_evidence = payload.get("destruction_evidence")
     if raw_destruction_evidence is not None and not isinstance(raw_destruction_evidence, dict):
         raise GameLifecycleError(
             "Mortal wound context destruction_evidence must be an object or null."
+        )
+    logical_death_cause_binding = payload.get("logical_death_cause_binding")
+    if not isinstance(logical_death_cause_binding, dict):
+        raise GameLifecycleError(
+            "Mortal wound context logical_death_cause_binding must be an object."
         )
     return {
         "context_kind": MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
@@ -85,6 +130,11 @@ def parse_mortal_wound_feel_no_pain_context(
         "destroyed_model_placements": cast(
             'list["ModelPlacementPayload"]',
             destroyed_model_placements,
+        ),
+        "logical_death_events": cast('list["EventRecordPayload"]', logical_death_events),
+        "logical_death_cause_binding": cast(
+            "MortalWoundLogicalDeathCauseBindingPayload",
+            logical_death_cause_binding,
         ),
     }
 

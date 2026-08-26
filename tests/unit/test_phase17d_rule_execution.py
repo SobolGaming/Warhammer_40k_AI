@@ -3967,9 +3967,8 @@ def _setup_reactive_single_model_state(
     assert state.battlefield_state is not None
     source_unit = _unit_by_id(state, "army-beta:intercessor-unit-2")
     if not keep_all_source_models:
-        state.battlefield_state = state.battlefield_state.with_removed_models(
-            tuple(model.model_instance_id for model in source_unit.own_models[1:])
-        )
+        for model in source_unit.own_models[1:]:
+            _destroy_model(state, model_instance_id=model.model_instance_id)
     records = catalog_ability_records_from_catalog(catalog)
     player_b_index = build_player_ability_index(
         records,

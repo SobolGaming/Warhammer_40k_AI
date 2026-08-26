@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 ONE_NORMAL_MOVE_PER_PHASE_SOURCE_RULE_ID = (
     "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase"
@@ -115,6 +118,24 @@ def normal_move_source_kind_from_token(value: object) -> NormalMoveSourceKind:
         return NormalMoveSourceKind(value)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported NormalMoveSourceKind token: {value}.") from exc
+
+
+def validate_normal_move_state_consistency(*, state: GameState) -> None:
+    if not state.normal_move_states:
+        return
+    if state.stage is not GameLifecycleStage.BATTLE:
+        raise GameLifecycleError("normal_move_states require battle stage.")
+    unit_owner_by_id = {
+        unit.unit_instance_id: army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+    }
+    for normal_move_state in state.normal_move_states:
+        owner = unit_owner_by_id.get(normal_move_state.unit_instance_id)
+        if owner is None:
+            raise GameLifecycleError("normal_move_states unit is unknown.")
+        if owner != normal_move_state.player_id:
+            raise GameLifecycleError("normal_move_states player_id does not match unit owner.")
 
 
 def _battle_phase_from_token(value: object) -> BattlePhase:

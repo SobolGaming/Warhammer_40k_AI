@@ -342,15 +342,19 @@ _DATASHEET_REVIEW_ROWS = (
         group=_SLAANESH_DAEMONS_GROUP,
         datasheet="Daemon Prince of Slaanesh",
         datasheet_id="000004086",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths."
+            "Deadly Demise D3, Lord of Excess conditional Lone Operative, Excessive Vigour "
+            "(Aura) charged-unit melee Armour Penetration aura, Ecstatic Death fight-on-death, "
+            "and the Thrill Seekers army-rule handler are engine-consumed."
         ),
-        semantics_needed=(
-            "Lord of Excess conditional Lone Operative, Excessive Vigour (Aura) charged-unit "
-            "melee Armour Penetration aura, and Ecstatic Death fight-on-death sequencing."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Daemon Prince of Slaanesh blocker; catalog, model geometry, wargear, "
+            "datasheet-ability, and Thrill Seekers component evidence is complete. The "
+            "historical rollup token is `Playable`, but selected-game capabilities remain "
+            "separate while detachment coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_SLAANESH_DAEMONS_GROUP,
@@ -879,6 +883,7 @@ def emperors_children_datasheet_support_markdown(
             "000004081",
             "000004083",
             "000004084",
+            "000004086",
             "000004088",
             "000004089",
             "000004090",

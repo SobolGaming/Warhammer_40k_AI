@@ -1,6 +1,20 @@
 [
   {
     "allowed_base_faction_ids": [
+      "aeldari"
+    ],
+    "display_name": "Disparate Paths",
+    "enforcement_id": "datasheet-faction-access:aeldari-disparate-paths",
+    "enforcement_surface": "catalog_generation/list_validation/army_mustering",
+    "faction_id": "aeldari",
+    "notes": "Allows a source-linked HARLEQUINS datasheet carrying Disparate Paths in an ASURYANI Battle Focus army while leaving unrelated or unlinked datasheets illegal; datasheet-specific Warlord restrictions remain authoritative.",
+    "rule_id": "army-mustering:aeldari-disparate-paths",
+    "source_id": "000009896",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/rules/test_wahapedia_bridge_catalog.py::test_aeldari_disparate_paths_keeps_battle_focus_primary_and_descriptor_source; tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army; tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_rejects_unlinked_or_unrelated_datasheet; tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition"
+  },
+  {
+    "allowed_base_faction_ids": [
       "any"
     ],
     "display_name": "Leader and Support attachment declarations",
@@ -125,5 +139,19 @@
     "source_id": "core:supreme-commander",
     "support_stage": "full",
     "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_mustering_requires_supreme_commander_to_be_warlord; tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "any"
+    ],
+    "display_name": "Datasheet Warlord restrictions",
+    "enforcement_id": "army_mustering:_append_warlord_violations",
+    "enforcement_surface": "army_mustering",
+    "faction_id": null,
+    "notes": "Consumes structured datasheet mustering descriptors and rejects a selected Warlord when the source ability marks that datasheet as forbidden.",
+    "rule_id": "army-mustering:warlord-restriction",
+    "source_id": "core:datasheet-mustering:warlord-restriction",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition; tests/unit/test_phase9c_mustering.py::test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander"
   }
 ]

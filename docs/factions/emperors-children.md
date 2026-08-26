@@ -276,7 +276,7 @@ This table covers the Slaanesh Daemon datasheets retained by the Emperor's Child
 
 | Datasheet | Source basis | IR coverage | Supported semantics | IR semantics still needed | Bridge / catalog blockers |
 | --- | --- | --- | --- | --- | --- |
-| Daemon Prince of Slaanesh (`000004086`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D3 and the Thrill Seekers army-rule handler are implemented paths. | Lord of Excess conditional Lone Operative, Excessive Vigour (Aura) charged-unit melee Armour Penetration aura, and Ecstatic Death fight-on-death sequencing. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
+| Daemon Prince of Slaanesh (`000004086`) | Pinned predecessor row; not reprinted or updated in the PDF. | All consumed | Deadly Demise D3, Lord of Excess conditional Lone Operative, Excessive Vigour (Aura) charged-unit melee Armour Penetration aura, Ecstatic Death fight-on-death, and the Thrill Seekers army-rule handler are engine-consumed. | None in the exact source ability rows. | No known Daemon Prince of Slaanesh blocker; catalog, model geometry, wargear, datasheet-ability, and Thrill Seekers component evidence is complete. The historical rollup token is `Playable`, but selected-game capabilities remain separate while detachment coverage is partial. |
 | Daemon Prince of Slaanesh with Wings (`000004087`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deadly Demise D3, Deep Strike, Stimulated by Pain incoming Damage reduction, and the Thrill Seekers army-rule handler are implemented paths. | Daemonic Destruction charge-end mortal wounds capped at six. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Daemonettes (`000004095`) | Pinned predecessor row; not reprinted or updated in the PDF. | Bridge/catalog blocked | Deep Strike, Fights First, Daemonic Icon Leadership, Instrument of Chaos Charge modifier, and Pact of Excess mustering restrictions are implemented paths. | Horrifying Beauty Fight-start Battle-shock tests with the Below Half-strength modifier. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
 | Fiends (`000004096`) | Pinned predecessor row; not reprinted or updated in the PDF. | All known ability semantics consumed; catalog blocked | Deep Strike, Soporific Musk Fall Back Desperate Escape tests and modifiers, and Pact of Excess mustering restrictions are implemented paths. Soporific Musk is engine-consumed through source-equivalent content-neutral RuleIR. | None in the exact source ability rows. | No generated DatasheetSupportRow; active catalog, model, wargear, geometry, and playability evidence is not yet proven. |
@@ -315,7 +315,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 119 | 49 | 18 |
+| 119 | 52 | 18 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

@@ -10,10 +10,10 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
 )
-from warhammer40k_core.engine.catalog_geometry import alive_geometry_models_for_placement
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
@@ -21,6 +21,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_rules_units_are_physically_engaged,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -38,8 +42,6 @@ if TYPE_CHECKING:
 
 CATALOG_FORCED_DESPERATE_ESCAPE_SOURCE_KIND = "catalog_rule_ir"
 
-_ENGAGEMENT_RANGE_HORIZONTAL_INCHES = 1.0
-_ENGAGEMENT_RANGE_VERTICAL_INCHES = 5.0
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
@@ -85,7 +87,6 @@ def catalog_forced_desperate_escape_sources_for_unit(
                     continue
                 if not _target_within_source_engagement(
                     state=state,
-                    armies=armies,
                     source_unit=source_unit,
                     target_unit_instance_id=requested_unit_id,
                 ):
@@ -200,34 +201,32 @@ def _canonical_keyword_set(values: tuple[RuleParameterValue, ...]) -> frozenset[
 def _target_within_source_engagement(
     *,
     state: GameState,
-    armies: tuple[ArmyDefinition, ...],
     source_unit: UnitInstance,
     target_unit_instance_id: str,
 ) -> bool:
     if state.battlefield_state is None:
         return False
-    scenario = BattlefieldScenario(
-        armies=armies,
-        battlefield_state=state.battlefield_state,
+    source_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source_unit.unit_instance_id,
     )
-    source_placement = state.battlefield_state.unit_placement_by_id(source_unit.unit_instance_id)
-    target_placement = state.battlefield_state.unit_placement_by_id(target_unit_instance_id)
-    source_models = alive_geometry_models_for_placement(
-        scenario=scenario,
-        unit_placement=source_placement,
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
     )
-    target_models = alive_geometry_models_for_placement(
-        scenario=scenario,
-        unit_placement=target_placement,
-    )
-    return any(
-        source_model.is_within_engagement_range(
-            target_model,
-            horizontal_inches=_ENGAGEMENT_RANGE_HORIZONTAL_INCHES,
-            vertical_inches=_ENGAGEMENT_RANGE_VERTICAL_INCHES,
-        )
-        for source_model in source_models
-        for target_model in target_models
+    if not rules_unit_has_placed_alive_model(
+        state=state,
+        rules_unit=source_rules_unit,
+    ) or not rules_unit_has_placed_alive_model(
+        state=state,
+        rules_unit=target_rules_unit,
+    ):
+        return False
+    return scenario_rules_units_are_physically_engaged(
+        scenario=battlefield_scenario_for_state(state=state),
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        first_unit_instance_id=source_rules_unit.unit_instance_id,
+        second_unit_instance_id=target_rules_unit.unit_instance_id,
     )
 
 

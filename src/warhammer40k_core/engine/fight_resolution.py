@@ -35,6 +35,9 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
 )
 from warhammer40k_core.engine.fight_geometry import (
+    attack_targetable_engaged_enemy_unit_ids as _attack_targetable_engaged_enemy_unit_ids,
+)
+from warhammer40k_core.engine.fight_geometry import (
     closest_fight_unit_distance_inches as _closest_unit_distance_inches,
 )
 from warhammer40k_core.engine.fight_geometry import (
@@ -56,6 +59,9 @@ from warhammer40k_core.engine.fight_geometry import (
     geometry_model_for_fight_unit_model as _geometry_model_for_unit_model,
 )
 from warhammer40k_core.engine.fight_geometry import (
+    geometry_models_for_fight_attack_target_unit as _geometry_models_for_attack_target_unit,
+)
+from warhammer40k_core.engine.fight_geometry import (
     geometry_models_for_fight_unit as _geometry_models_for_unit,
 )
 from warhammer40k_core.engine.fight_geometry import (
@@ -70,10 +76,10 @@ from warhammer40k_core.engine.fight_geometry import (
 from warhammer40k_core.engine.fight_geometry import (
     unit_id_for_fight_model as _unit_id_for_model,
 )
-from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_restricted_model_ids_for_activation,
-    model_is_present_on_battlefield,
+from warhammer40k_core.engine.fight_movement_target_authority import (
+    selectable_enemy_unit_ids_in_canonical_inventory,
 )
+from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -83,6 +89,11 @@ from warhammer40k_core.engine.movement_proposals import (
     proposal_kind_from_token,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+    scenario_physical_enemy_rules_unit_ids,
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_identity_ids,
@@ -1219,20 +1230,24 @@ def legal_pile_in_target_unit_ids(
     state: GameState | None = None,
 ) -> tuple[str, ...]:
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    engaged = _engaged_enemy_unit_ids(
+    selectable_enemy_ids = _enemy_unit_ids_for_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    )
+    physically_engaged_ids = scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
-        state=state,
+        unit_instance_id=unit_instance_id,
     )
-    if engaged:
-        return engaged
+    if physically_engaged_ids:
+        return selectable_enemy_unit_ids_in_canonical_inventory(
+            scenario=scenario,
+            selectable_enemy_ids=selectable_enemy_ids,
+            canonical_inventory=physically_engaged_ids,
+        )
     return tuple(
         enemy_id
-        for enemy_id in _enemy_unit_ids_for_placement(
-            scenario=scenario,
-            unit_placement=unit_placement,
-        )
+        for enemy_id in selectable_enemy_ids
         if _closest_unit_distance_inches(
             scenario=scenario,
             first_unit_instance_id=unit_instance_id,
@@ -1252,13 +1267,25 @@ def legal_consolidation_modes(
     state: GameState | None = None,
 ) -> tuple[ConsolidationModeKind, ...]:
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    if _engaged_enemy_unit_ids(
+    selectable_enemy_ids = _enemy_unit_ids_for_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    )
+    physically_engaged_ids = scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
-        state=state,
-    ):
-        return (ConsolidationModeKind.ONGOING,)
+        unit_instance_id=unit_instance_id,
+    )
+    if physically_engaged_ids:
+        return (
+            (ConsolidationModeKind.ONGOING,)
+            if selectable_enemy_unit_ids_in_canonical_inventory(
+                scenario=scenario,
+                selectable_enemy_ids=selectable_enemy_ids,
+                canonical_inventory=physically_engaged_ids,
+            )
+            else ()
+        )
     if _enemy_unit_ids_within_distance(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -1316,7 +1343,7 @@ def melee_target_unit_ids(
     state: GameState | None = None,
 ) -> tuple[str, ...]:
     unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    return _engaged_enemy_unit_ids(
+    return _attack_targetable_engaged_enemy_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
@@ -1333,7 +1360,7 @@ def available_melee_weapons_payloads(
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> tuple[JsonValue, ...]:
-    payloads = tuple(
+    return tuple(
         validate_json_value(
             {
                 "model_instance_id": weapon["model_instance_id"],
@@ -1361,21 +1388,6 @@ def available_melee_weapons_payloads(
             state=state,
             source_decision_result_id=source_decision_result_id,
         )
-    )
-    restricted_model_ids = (
-        None
-        if state is None or source_decision_result_id is None
-        else fight_on_death_restricted_model_ids_for_activation(
-            state=state,
-            activation_result_id=source_decision_result_id,
-        )
-    )
-    if restricted_model_ids is None:
-        return payloads
-    return tuple(
-        payload
-        for payload in payloads
-        if isinstance(payload, dict) and payload.get("engaged_target_unit_instance_ids")
     )
 
 
@@ -1770,7 +1782,7 @@ def _pile_in_rule_validation(
             message="Pile In movement requires one or more target units.",
             field="pile_in_target_unit_instance_ids",
         )
-    if set(selected) != set(legal_targets) and _unit_is_engaged(
+    if set(selected) != set(legal_targets) and scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_instance_id=proposal.unit_instance_id,
@@ -1813,13 +1825,29 @@ def _consolidate_rule_validation(
             field="consolidation_mode",
         )
     unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    engaged = _engaged_enemy_unit_ids(
+    physically_engaged_ids = scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
-        state=state,
+        unit_instance_id=proposal.unit_instance_id,
     )
-    if engaged:
+    selectable_enemy_ids = _enemy_unit_ids_for_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    )
+    engaged = selectable_enemy_unit_ids_in_canonical_inventory(
+        scenario=scenario,
+        selectable_enemy_ids=selectable_enemy_ids,
+        canonical_inventory=physically_engaged_ids,
+    )
+    if physically_engaged_ids:
+        if not engaged:
+            return ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="consolidation_no_selectable_engaged_target",
+                message="Destroyed-only physical Engagement grants no Consolidation target.",
+                field="consolidation_mode",
+            )
         if proposal.consolidation_mode is not ConsolidationModeKind.ONGOING:
             return _invalid_consolidation_mode(proposal_request, "ongoing")
         if set(proposal.consolidate_target_unit_instance_ids) != set(engaged):
@@ -1948,19 +1976,19 @@ def _consolidate_endpoint_validation(
     state: GameState | None,
 ) -> ProposalValidationResult | None:
     before = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    base_contact_violation = _base_contact_movement_violation(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        before=before,
+        after=after,
+        state=state,
+    )
+    if base_contact_violation is not None:
+        return _endpoint_invalid(proposal_request, base_contact_violation, "witness")
     if proposal.consolidation_mode in {
         ConsolidationModeKind.ONGOING,
         ConsolidationModeKind.ENGAGING,
     }:
-        base_contact_violation = _base_contact_movement_violation(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            before=before,
-            after=after,
-            state=state,
-        )
-        if base_contact_violation is not None:
-            return _endpoint_invalid(proposal_request, base_contact_violation, "witness")
         closer_violation = _moved_models_closer_to_targets_violation(
             scenario=scenario,
             before=before,
@@ -1999,11 +2027,10 @@ def _consolidate_endpoint_validation(
             scenario=scenario,
             placement=after,
         )
-        if _engaged_enemy_unit_ids(
+        if scenario_physically_engaged_enemy_rules_unit_ids(
             scenario=attempted_scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=after,
-            state=state,
+            unit_instance_id=proposal.unit_instance_id,
         ):
             return _endpoint_invalid(
                 proposal_request,
@@ -2257,14 +2284,13 @@ def _continuing_engagement_violation(
     for before_model in _geometry_models_for_unit_placement(
         scenario=scenario, unit_placement=before, state=state
     ):
-        for enemy_unit_id in _enemy_unit_ids_for_placement(
+        for enemy_unit_id in scenario_physical_enemy_rules_unit_ids(
             scenario=scenario,
-            unit_placement=before,
+            unit_instance_id=before.unit_instance_id,
         ):
-            enemy_models = _geometry_models_for_unit(
+            enemy_models = physical_geometry_models_for_rules_unit(
                 scenario=scenario,
                 unit_instance_id=enemy_unit_id,
-                state=state,
             )
             if not _model_engaged_with_any(
                 model=before_model,
@@ -2278,10 +2304,9 @@ def _continuing_engagement_violation(
                 model_instance_id=before_model.model_id,
                 pose=_model_pose(after, before_model.model_id),
             )
-            after_enemy_models = _geometry_models_for_unit(
+            after_enemy_models = physical_geometry_models_for_rules_unit(
                 scenario=after_scenario,
                 unit_instance_id=enemy_unit_id,
-                state=state,
             )
             if not _model_engaged_with_any(
                 model=after_model,
@@ -2322,22 +2347,6 @@ def _unit_is_engaged_with_any(
         )
         for model in source_models
         for target in target_models
-    )
-
-
-def _unit_is_engaged(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    unit_instance_id: str,
-) -> bool:
-    placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    return bool(
-        _engaged_enemy_unit_ids(
-            scenario=scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            unit_placement=placement,
-        )
     )
 
 
@@ -2395,7 +2404,7 @@ def _engaged_enemy_unit_ids_for_model(
         scenario=scenario,
         unit_placement=unit_placement,
     ):
-        enemy_models = _geometry_models_for_unit(
+        enemy_models = _geometry_models_for_attack_target_unit(
             scenario=scenario,
             unit_instance_id=enemy_unit_id,
             state=state,
@@ -2458,7 +2467,7 @@ def _extended_melee_target_unit_ids_for_model(
         unit_placement=unit_placement,
         model_instance_id=model_instance_id,
     )
-    engaged_unit_ids = _engaged_enemy_unit_ids(
+    engaged_unit_ids = _attack_targetable_engaged_enemy_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
@@ -2466,7 +2475,7 @@ def _extended_melee_target_unit_ids_for_model(
     )
     extended: list[str] = []
     for enemy_unit_id in engaged_unit_ids:
-        enemy_models = _geometry_models_for_unit(
+        enemy_models = _geometry_models_for_attack_target_unit(
             scenario=scenario,
             unit_instance_id=enemy_unit_id,
             state=state,
@@ -2495,7 +2504,7 @@ def _engaged_model_ids_for_model_and_target_unit_or_empty(
         unit_placement=unit_placement,
         model_instance_id=model_instance_id,
     )
-    target_models = _geometry_models_for_unit(
+    target_models = _geometry_models_for_attack_target_unit(
         scenario=scenario,
         unit_instance_id=target_unit_instance_id,
         state=state,
@@ -2546,7 +2555,7 @@ def target_model_ids_for_melee_attack(
     )
     target_model_ids = tuple(
         target_model.model_id
-        for target_model in _geometry_models_for_unit(
+        for target_model in _geometry_models_for_attack_target_unit(
             scenario=scenario,
             unit_instance_id=target_unit_instance_id,
             state=state,
@@ -2586,7 +2595,7 @@ def melee_targeting_permission_sources_for_model_target(
         unit_placement=unit_placement,
         model_instance_id=attacker_model_instance_id,
     )
-    target_models = _geometry_models_for_unit(
+    target_models = _geometry_models_for_attack_target_unit(
         scenario=scenario,
         unit_instance_id=target_unit_instance_id,
         state=state,
@@ -2786,18 +2795,9 @@ def _available_melee_weapons_for_unit(
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> tuple[_AvailableMeleeWeapon, ...]:
-    restricted_model_ids = (
-        None
-        if state is None or source_decision_result_id is None
-        else fight_on_death_restricted_model_ids_for_activation(
-            state=state,
-            activation_result_id=source_decision_result_id,
-        )
-    )
+    del source_decision_result_id
     weapons: list[_AvailableMeleeWeapon] = []
     for model in unit.own_models:
-        if restricted_model_ids is not None and model.model_instance_id not in restricted_model_ids:
-            continue
         if state is None and not model.is_alive:
             continue
         if state is not None and not model_is_present_on_battlefield(

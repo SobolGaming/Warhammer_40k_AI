@@ -655,6 +655,7 @@ def _rules_unit_has_visible_target(
             ruleset_descriptor=ruleset_descriptor,
             observing_unit=component.unit,
             target_unit_id=target_rules_unit.unit_instance_id,
+            placed_alive_models_only=True,
             terrain_features=terrain_features,
             terrain_areas=shooting_terrain_areas_for_state(state),
         ):

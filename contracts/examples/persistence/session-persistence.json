@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "339e54229e4a5fe90df851ef5903072b23952d85600f30946a63d2f7690ab7f7",
+  "content_hash": "5031f56b359203f8588436b757b33592a01fe175c5e14683aecfb27f5c1422bc",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,7 +92,7 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:69332c9d693adfdaa0b0e6eb8a3e6b39bbd42a2565e6c9f3389e9a73f57d14a4",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b8444147aede4ba18a4da9b78dd7ef269e3b3714d9893a38640dd2a36fe3af9",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "11.0.0",
@@ -106,7 +106,7 @@
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "88129e68d637760e77741f48780623126814fad5404f256879539ceba2413911",
+        "content_hash": "b556dc97296d977a6b3f2be3fb277fdbade0e833a1aeec1a06acde8266fe0acc",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
         "initial_replay_lifecycle": {
@@ -4688,6 +4688,7 @@
               "terrain_features": [],
               "terrain_layout_id": "phase18l-contract-custom-terrain"
             },
+            "model_destruction_cause_authorities": [],
             "movement_phase_state": null,
             "normal_move_states": [],
             "objective_control_record_authorities": [],
@@ -9378,6 +9379,7 @@
               "terrain_features": [],
               "terrain_layout_id": "phase18l-contract-custom-terrain"
             },
+            "model_destruction_cause_authorities": [],
             "movement_phase_state": null,
             "normal_move_states": [],
             "objective_control_record_authorities": [],
@@ -9489,7 +9491,7 @@
             ]
           }
         },
-        "lifecycle_hash": "7f6a943fdbebc7b25b06f2598a353a6129c7788c0464800bfab1e6d1bb6c45ae",
+        "lifecycle_hash": "148b3b68647b4ae35181c44dc89b96866a77723309dfca0c7e9ea9e18475c8c9",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -14073,6 +14075,7 @@
                 "terrain_features": [],
                 "terrain_layout_id": "phase18l-contract-custom-terrain"
               },
+              "model_destruction_cause_authorities": [],
               "movement_phase_state": null,
               "normal_move_states": [],
               "objective_control_record_authorities": [],
@@ -14305,7 +14308,7 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:69332c9d693adfdaa0b0e6eb8a3e6b39bbd42a2565e6c9f3389e9a73f57d14a4",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b8444147aede4ba18a4da9b78dd7ef269e3b3714d9893a38640dd2a36fe3af9",
               "engine_version": "0.1.0",
               "event_cursor": "388W53mqNJ9kUCV-Fj9fODjzD11j4q3iMJSAvsKPs-8cRXX5bVPD1YUATMEGNWi2",
               "game_id": "phase18l-contract-persistence",
@@ -14352,7 +14355,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "1ed46acc382d0eefb0b74e59cfde4c7c50e2469139ba84454a6161e851c259a1",
+      "history_head": "aa69807159862b85772b9d4f7d4508fc7f572e8e592cc6e2a85da734eefcfc48",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -14424,8 +14427,8 @@
       "revision_history": [
         {
           "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
-          "authoritative_state_hash": "07d8cdd70c07333c8179c655d19d0afbfc93e7ef3e6753d6bd58a81b665ac70e",
-          "checkpoint_hash": "c812d091778ab6f9bf720416c263f36b10bdca3345bfb7e1339d2c69f1510603",
+          "authoritative_state_hash": "96eeb07f103e8bcd5dc07a7bcae86a6f6ea6cd2a34dc3284906a5965b7b8a60f",
+          "checkpoint_hash": "bf4b1f479a4bf6ac1002bd7809d8b60ee87fd32516b34dec61901cea7ab1d749",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -14441,7 +14444,7 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "0c36c036d97a28a0a03637db4d6849e1cb7872f6e748052c6b71bfbf4a7a8671",
+          "revision_commitment": "b8426fa6354289f5d7f31e442ea7285694b25aa96ff6986f7468c4915fdc2a41",
           "rng_draw_count": 0,
           "rng_history_count": 1,
           "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
@@ -14454,8 +14457,8 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "7f6a943fdbebc7b25b06f2598a353a6129c7788c0464800bfab1e6d1bb6c45ae",
-          "checkpoint_hash": "1c80333f23471d132f852f109ad276ae960bf0d89771eed0f27e73b63f1b0d22",
+          "authoritative_state_hash": "148b3b68647b4ae35181c44dc89b96866a77723309dfca0c7e9ea9e18475c8c9",
+          "checkpoint_hash": "29758c2888698f4cbe6f808d1fb2eb398057c5aa4176e19539e3e0fcaae407ab",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -14474,7 +14477,7 @@
             },
             "token": "YZJA38OJu5UyOZl4J5q7ELsstxFF_7eq5djAo-dtBx66u9ie5C6doHWxiFyJT5O1"
           },
-          "journal_entry_hash": "43980c1fc0fccca8b9222f4de350635574446278e2eebafd309f5a14d623506c",
+          "journal_entry_hash": "0e4ecfd53b23c894faa61cc32b54847ff2246735e123c07b11ef2bee8c145716",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -14491,9 +14494,9 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "0c36c036d97a28a0a03637db4d6849e1cb7872f6e748052c6b71bfbf4a7a8671",
-          "response_hash": "68efada0d0f39aa56d83d34c4a3d2e91d935561d5682c928ed92a36805efcabe",
-          "revision_commitment": "1ed46acc382d0eefb0b74e59cfde4c7c50e2469139ba84454a6161e851c259a1",
+          "previous_revision_commitment": "b8426fa6354289f5d7f31e442ea7285694b25aa96ff6986f7468c4915fdc2a41",
+          "response_hash": "88f90c4263470745d3ddb896e14d3d8b4f721f1e926be1e663fb37f7816c0b9a",
+          "revision_commitment": "aa69807159862b85772b9d4f7d4508fc7f572e8e592cc6e2a85da734eefcfc48",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",
@@ -14521,7 +14524,7 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "5c60512652779bafe9c1075475df9b892b6c95caf3eb20d8736ed89fec121287",
+            "content_hash": "e1b95366a7f9c7c73c3c7d67d54b042403e06a6641869d415f24e8e9a7ba10e2",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5cdef2eabf7518e2abf3976239e13cbd51731553a1c5c4fd64dee7a18b529d54",
             "initial_replay_lifecycle": null,
@@ -16825,6 +16828,7 @@
                   "terrain_features": [],
                   "terrain_layout_id": "phase18l-contract-custom-terrain"
                 },
+                "model_destruction_cause_authorities": [],
                 "movement_phase_state": null,
                 "normal_move_states": [],
                 "objective_control_record_authorities": [],
@@ -16907,7 +16911,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "07d8cdd70c07333c8179c655d19d0afbfc93e7ef3e6753d6bd58a81b665ac70e",
+            "lifecycle_hash": "96eeb07f103e8bcd5dc07a7bcae86a6f6ea6cd2a34dc3284906a5965b7b8a60f",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -19212,6 +19216,7 @@
                     "terrain_features": [],
                     "terrain_layout_id": "phase18l-contract-custom-terrain"
                   },
+                  "model_destruction_cause_authorities": [],
                   "movement_phase_state": null,
                   "normal_move_states": [],
                   "objective_control_record_authorities": [],
@@ -19361,7 +19366,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "88129e68d637760e77741f48780623126814fad5404f256879539ceba2413911",
+            "content_hash": "b556dc97296d977a6b3f2be3fb277fdbade0e833a1aeec1a06acde8266fe0acc",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
             "initial_replay_lifecycle": {
@@ -23943,6 +23948,7 @@
                   "terrain_features": [],
                   "terrain_layout_id": "phase18l-contract-custom-terrain"
                 },
+                "model_destruction_cause_authorities": [],
                 "movement_phase_state": null,
                 "normal_move_states": [],
                 "objective_control_record_authorities": [],
@@ -28633,6 +28639,7 @@
                   "terrain_features": [],
                   "terrain_layout_id": "phase18l-contract-custom-terrain"
                 },
+                "model_destruction_cause_authorities": [],
                 "movement_phase_state": null,
                 "normal_move_states": [],
                 "objective_control_record_authorities": [],
@@ -28744,7 +28751,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "7f6a943fdbebc7b25b06f2598a353a6129c7788c0464800bfab1e6d1bb6c45ae",
+            "lifecycle_hash": "148b3b68647b4ae35181c44dc89b96866a77723309dfca0c7e9ea9e18475c8c9",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -33328,6 +33335,7 @@
                     "terrain_features": [],
                     "terrain_layout_id": "phase18l-contract-custom-terrain"
                   },
+                  "model_destruction_cause_authorities": [],
                   "movement_phase_state": null,
                   "normal_move_states": [],
                   "objective_control_record_authorities": [],

@@ -7,11 +7,13 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
-    BattlefieldTransitionBatchPayload,
     ModelPlacement,
     ModelPlacementPayload,
     UnitPlacement,
     UnitPlacementPayload,
+)
+from warhammer40k_core.engine.battlefield_transition_history import (
+    authoritative_battlefield_transition_batch_or_none,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
@@ -46,6 +48,11 @@ from warhammer40k_core.engine.scoring import (
     PrimaryUnitDestructionState,
     PrimaryUnitDestructionStatePayload,
 )
+from warhammer40k_core.engine.transports import (
+    DestroyedTransportDisembark,
+    DestroyedTransportDisembarkPayload,
+    DisembarkModeKind,
+)
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     model_restoration_events_for_event_log_interval,
 )
@@ -54,20 +61,6 @@ from warhammer40k_core.geometry.pose import Pose
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
-_TRANSITION_EVENT_TYPES = frozenset(
-    {
-        "battlefield_models_placed",
-        "catalog_models_materialized",
-        "catalog_setup_reactive_charge_move_completed",
-        "charge_move_completed",
-        "fight_movement_completed",
-        "heroic_intervention_charge_move_completed",
-        "movement_activation_completed",
-        "reinforcement_unit_arrived",
-        "triggered_movement_resolved",
-        "unit_disembarked",
-    }
-)
 _DESPERATE_ESCAPE_DEPARTURE_SOURCE_PREFIX = "core-rules:desperate-escape:"
 _EMERGENCY_DISEMBARK_DEPARTURE_SOURCE_PREFIX = "core-rules:emergency-disembark:"
 
@@ -264,7 +257,7 @@ def _physical_authority_by_model(
 ) -> dict[str, _PhysicalAuthority]:
     authority = {} if initial is None else dict(initial)
     for event in event_records:
-        transition = _transition_from_event(event)
+        transition = authoritative_battlefield_transition_batch_or_none(event=event)
         if transition is not None:
             _apply_transition(
                 authority=authority,
@@ -275,6 +268,11 @@ def _physical_authority_by_model(
                         departure_by_id=departure_by_id,
                     )
                 ),
+            )
+        if event.event_type == "unit_disembarked":
+            _apply_destroyed_transport_disembark_omitted_model_destruction(
+                authority=authority,
+                event=event,
             )
         if event.event_type == "attack_sequence_step":
             _apply_damage_step(authority=authority, event=event)
@@ -303,6 +301,45 @@ def _physical_authority_by_model(
                 starting_wounds_by_model_id=starting_wounds_by_model_id,
             )
     return authority
+
+
+def _apply_destroyed_transport_disembark_omitted_model_destruction(
+    *,
+    authority: dict[str, _PhysicalAuthority],
+    event: EventRecord,
+) -> None:
+    if not isinstance(event.payload, dict):
+        raise GameLifecycleError("Destroyed Transport disembark authority payload is invalid.")
+    raw_disembark = event.payload.get("destroyed_transport_disembark")
+    if raw_disembark is None:
+        return
+    if not isinstance(raw_disembark, dict):
+        raise GameLifecycleError("Destroyed Transport disembark authority is invalid.")
+    try:
+        disembark = DestroyedTransportDisembark.from_payload(
+            cast(DestroyedTransportDisembarkPayload, raw_disembark)
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise GameLifecycleError("Destroyed Transport disembark authority is invalid.") from exc
+    if not disembark.destroyed_model_instance_ids:
+        return
+    if disembark.disembark_mode is not DisembarkModeKind.EMERGENCY_DISEMBARK:
+        raise GameLifecycleError("Destroyed Transport omitted-model authority mode drift.")
+    placed_model_ids = {
+        placement.model_instance_id
+        for placement in disembark.placement.selection.attempted_placement.model_placements
+    }
+    if placed_model_ids.intersection(disembark.destroyed_model_instance_ids):
+        raise GameLifecycleError("Destroyed Transport omitted-model authority overlaps placement.")
+    for model_id in disembark.destroyed_model_instance_ids:
+        prior = authority.get(model_id)
+        if prior is not None and prior.presence == "battlefield":
+            raise GameLifecycleError("Destroyed Transport omitted-model history is discontinuous.")
+        authority[model_id] = _PhysicalAuthority(
+            presence="destroyed",
+            pose=None,
+            wounds_remaining=0,
+        )
 
 
 def _physical_authority_before_checkpoint(
@@ -419,21 +456,6 @@ def _checkpoint_authority(
     if not required_model_ids <= checkpoint_model_ids:
         raise GameLifecycleError("Primary mission checkpoint model authority inventory regressed.")
     return authority
-
-
-def _transition_from_event(event: EventRecord) -> BattlefieldTransitionBatch | None:
-    if event.event_type not in _TRANSITION_EVENT_TYPES:
-        return None
-    if not isinstance(event.payload, dict):
-        raise GameLifecycleError("Primary mission physical event payload is invalid.")
-    raw_transition = event.payload.get("transition_batch")
-    if raw_transition is None:
-        return None
-    if not isinstance(raw_transition, dict):
-        raise GameLifecycleError("Primary mission physical transition payload is invalid.")
-    return BattlefieldTransitionBatch.from_payload(
-        cast(BattlefieldTransitionBatchPayload, raw_transition)
-    )
 
 
 def _apply_transition(

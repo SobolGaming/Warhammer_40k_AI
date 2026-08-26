@@ -1,0 +1,402 @@
+{
+  "artifact_schema": "core-v2-player-army-list-v1",
+  "army_list_id": "court-of-slaughter",
+  "name": "Court of Slaughter",
+  "faction_id": "emperors-children",
+  "detachment_selection": {
+    "faction_id": "emperors-children",
+    "detachment_ids": [
+      "court-of-the-phoenician",
+      "spectacle-of-slaughter"
+    ],
+    "enhancement_ids": [
+      "000010654002",
+      "000010654005",
+      "000010900002",
+      "000010900003"
+    ],
+    "stratagem_ids": []
+  },
+  "force_disposition_id": "purge-the-foe",
+  "battle_size": "strike_force",
+  "declared_total_points": 2000,
+  "units": [
+    {
+      "selection": {
+        "unit_selection_id": "lucius",
+        "datasheet_id": "000004083",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004083:lucius-the-eternal-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 120
+    },
+    {
+      "selection": {
+        "unit_selection_id": "flawless-blades-lucius",
+        "datasheet_id": "000004089",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004089:flawless-blades",
+            "model_count": 6
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 210
+    },
+    {
+      "selection": {
+        "unit_selection_id": "lord-exultant",
+        "datasheet_id": "000004078",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004078:lord-exultant",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004078:plasma-pistol-rapture-lash:option-1",
+            "model_profile_id": "000004078:lord-exultant",
+            "wargear_ids": [
+              "000004078:rapture-lash"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 105
+    },
+    {
+      "selection": {
+        "unit_selection_id": "infractors",
+        "datasheet_id": "000004080",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004080:infractors",
+            "model_count": 4
+          },
+          {
+            "model_profile_id": "000004080:obsessionist",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004080:obsessionist-plasma-pistol:option-1",
+            "model_profile_id": "000004080:obsessionist",
+            "wargear_ids": [
+              "000004080:plasma-pistol"
+            ]
+          },
+          {
+            "option_id": "000004080:obsessionist-rapture-lash:option-2",
+            "model_profile_id": "000004080:obsessionist",
+            "wargear_ids": [
+              "000004080:rapture-lash"
+            ]
+          },
+          {
+            "option_id": "000004080:icon-of-excess:option-3",
+            "model_profile_id": "000004080:infractors",
+            "wargear_ids": [
+              "000004080:icon-of-excess"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 85
+    },
+    {
+      "selection": {
+        "unit_selection_id": "lord-kakophonist-1",
+        "datasheet_id": "000004084",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004084:lord-kakophonist",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004084:screamer-pistol-close-combat-weapon:option-1",
+            "model_profile_id": "000004084:lord-kakophonist",
+            "wargear_ids": [
+              "000004084:close-combat-weapon",
+              "000004084:screamer-pistol"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 70
+    },
+    {
+      "selection": {
+        "unit_selection_id": "noise-marines-1",
+        "datasheet_id": "000004088",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004088:disharmonist",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000004088:noise-marines",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004088:sonic-blaster-blastmaster:option-2",
+            "model_profile_id": "000004088:noise-marines",
+            "wargear_ids": [
+              "000004088:blastmaster"
+            ],
+            "selection_count": 2
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 145
+    },
+    {
+      "selection": {
+        "unit_selection_id": "lord-kakophonist-2",
+        "datasheet_id": "000004084",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004084:lord-kakophonist",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004084:screamer-pistol-close-combat-weapon:option-1",
+            "model_profile_id": "000004084:lord-kakophonist",
+            "wargear_ids": [
+              "000004084:close-combat-weapon",
+              "000004084:screamer-pistol"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 70
+    },
+    {
+      "selection": {
+        "unit_selection_id": "noise-marines-2",
+        "datasheet_id": "000004088",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004088:disharmonist",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000004088:noise-marines",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004088:sonic-blaster-blastmaster:option-2",
+            "model_profile_id": "000004088:noise-marines",
+            "wargear_ids": [
+              "000004088:blastmaster"
+            ],
+            "selection_count": 2
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 145
+    },
+    {
+      "selection": {
+        "unit_selection_id": "daemon-prince-of-slaanesh",
+        "datasheet_id": "000004086",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004086:daemon-prince-of-slaanesh",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 190
+    },
+    {
+      "selection": {
+        "unit_selection_id": "fulgrim",
+        "datasheet_id": "000004077",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004077:fulgrim-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 340
+    },
+    {
+      "selection": {
+        "unit_selection_id": "tormentors",
+        "datasheet_id": "000004079",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004079:obsessionist",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000004079:tormentors",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000004079:obsessionist-plasma-pistol:option-1",
+            "model_profile_id": "000004079:obsessionist",
+            "wargear_ids": [
+              "000004079:plasma-pistol"
+            ]
+          },
+          {
+            "option_id": "000004079:boltgun-meltagun:option-3",
+            "model_profile_id": "000004079:tormentors",
+            "wargear_ids": [
+              "000004079:meltagun"
+            ]
+          },
+          {
+            "option_id": "000004079:boltgun-plasma-gun:option-4",
+            "model_profile_id": "000004079:tormentors",
+            "wargear_ids": [
+              "000004079:plasma-gun"
+            ]
+          },
+          {
+            "option_id": "000004079:icon-of-excess:option-5",
+            "model_profile_id": "000004079:tormentors",
+            "wargear_ids": [
+              "000004079:icon-of-excess"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 80
+    },
+    {
+      "selection": {
+        "unit_selection_id": "flawless-blades-2",
+        "datasheet_id": "000004089",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004089:flawless-blades",
+            "model_count": 6
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 210
+    },
+    {
+      "selection": {
+        "unit_selection_id": "flawless-blades-3",
+        "datasheet_id": "000004089",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004089:flawless-blades",
+            "model_count": 3
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 110
+    },
+    {
+      "selection": {
+        "unit_selection_id": "maulerfiend",
+        "datasheet_id": "000004091",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004091:maulerfiend",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 120
+    }
+  ],
+  "attachment_declarations": [
+    {
+      "source_unit_selection_id": "lucius",
+      "bodyguard_unit_selection_id": "flawless-blades-lucius"
+    },
+    {
+      "source_unit_selection_id": "lord-exultant",
+      "bodyguard_unit_selection_id": "infractors"
+    },
+    {
+      "source_unit_selection_id": "lord-kakophonist-1",
+      "bodyguard_unit_selection_id": "noise-marines-1"
+    },
+    {
+      "source_unit_selection_id": "lord-kakophonist-2",
+      "bodyguard_unit_selection_id": "noise-marines-2"
+    }
+  ],
+  "enhancement_assignments": [
+    {
+      "enhancement_id": "000010900003",
+      "target_unit_selection_id": "flawless-blades-lucius",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons"
+    },
+    {
+      "enhancement_id": "000010654002",
+      "target_unit_selection_id": "lord-exultant",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:tears-of-the-phoenix"
+    },
+    {
+      "enhancement_id": "000010654005",
+      "target_unit_selection_id": "daemon-prince-of-slaanesh",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:court-of-the-phoenician:enhancement:spiritsliver"
+    },
+    {
+      "enhancement_id": "000010900003",
+      "target_unit_selection_id": "flawless-blades-2",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:eager-patrons"
+    },
+    {
+      "enhancement_id": "000010900002",
+      "target_unit_selection_id": "flawless-blades-3",
+      "source_id": "gw-11e-mfm-2026-07:faction:emperors-children:detachment:spectacle-of-slaughter:enhancement:beguiling-grotesquerie"
+    }
+  ],
+  "warlord_selection": {
+    "unit_selection_id": "fulgrim",
+    "source_id": "player-army-list:court-of-slaughter:warlord"
+  },
+  "dedicated_transport_manifests": [],
+  "provenance": {
+    "source_format": "warhammer-40000-app-text",
+    "app_version": "v2.4.0 (139)",
+    "data_version": "v925",
+    "points_source_package_id": "gw-11e-mfm-2026-07"
+  }
+}

@@ -16,6 +16,12 @@
         "source_text": "Some attacks may be modified as a result of the values of hit/wound rolls made for those attacks. When this happens, split those attacks into attack pools based on their new identical attack profiles. The active player can decide which attack pool to resolve first for steps 5.3 and 5.4. Once those steps have been completed for that attack pool, the active player can decide the next pool to resolve and repeat until all new attack pools are resolved."
       },
       {
+        "behavior_descriptor": "fight_on_death_models_wait_for_their_units_single_attack_selection",
+        "rule_id": "05.04.05-fight-on-death",
+        "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.04.05-fight-on-death",
+        "source_text": "Some rules enable models to attack after they have been destroyed. When a model under such an effect is destroyed, do not remove it from play. Those models will stay on the battlefield until their unit is selected to attack and has attacked, or until the end of the phase (whichever comes first). Any rules triggered by those models being destroyed are resolved, and then those destroyed models are removed. If a rule instructs a destroyed model to fight immediately after the attacking unit, instead that model is not removed from the battlefield until that model's unit has fought, or until the end of the phase (whichever comes first). This allows the models in the unit to fight all at once, and Stratagems that target that unit will also affect that destroyed model."
+      },
+      {
         "behavior_descriptor": "desperate_escape_test_means_hazard_rolls",
         "rule_id": "09.07.01-desperate-escape-definition",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-desperate-escape-definition",

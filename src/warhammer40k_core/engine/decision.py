@@ -44,6 +44,9 @@ from warhammer40k_core.engine.event_log import (
     canonical_json,
     validate_json_value,
 )
+from warhammer40k_core.engine.mortal_wound_application_authority import (
+    MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+)
 
 __all__ = [
     "DICE_REROLL_DECISION_TYPE",
@@ -65,10 +68,19 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
         "timing_window_opened",
         "timing_window_resolved",
         "mortal_wound_model_destructions_finalized",
+        "model_logical_death_recorded",
+        MORTAL_WOUND_APPLICATION_STARTED_EVENT,
     }
 )
 _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS = frozenset(
-    ("destroyed_model_placements", "destruction_evidence", "weapon_instance_id")
+    (
+        "destroyed_model_placements",
+        "destruction_evidence",
+        "logical_death_cause_binding",
+        "logical_death_events",
+        "model_destruction_cause_id",
+        "weapon_instance_id",
+    )
 )
 
 _EVENT_ID_PREFIX = "event-"

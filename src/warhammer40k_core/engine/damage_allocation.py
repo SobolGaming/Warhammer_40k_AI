@@ -12,7 +12,7 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import mortal_wound_application_authority as _mwaa
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, PlacementError
 from warhammer40k_core.engine.damage_allocation_targets import (
     DamageKind as DamageKind,
@@ -23,11 +23,54 @@ from warhammer40k_core.engine.damage_allocation_targets import (
 from warhammer40k_core.engine.damage_allocation_targets import (
     damage_kind_from_token as damage_kind_from_token,
 )
+from warhammer40k_core.engine.damage_allocation_validation import (
+    decision_payload_object as _payload_object,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    decision_payload_string as _payload_string,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    decision_payload_string_tuple as _payload_string_tuple,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_d6_target as _validate_d6_target,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_exact_type_tuple,
+    validate_unique_sorted_exact_type_tuple,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_identifier as _validate_identifier,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_identifier_tuple as _validate_identifier_tuple,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_model_identifier_subset as _validate_subset,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_non_negative_int as _validate_non_negative_int,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_optional_identifier as _validate_optional_identifier,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_optional_save as _validate_optional_save,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_ordered_identifier_tuple as _validate_ordered_identifier_tuple,
+)
+from warhammer40k_core.engine.damage_allocation_validation import (
+    validate_positive_int as _validate_positive_int,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    ModelDestructionCauseKind,
+)
 from warhammer40k_core.engine.mortal_wound_context import (
     MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
     MortalWoundFeelNoPainContextPayload,
@@ -43,6 +86,12 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     record_finalized_mortal_wound_progress_destructions,
     validate_mortal_wound_destroyed_model_placements,
     validate_mortal_wound_destruction_evidence_mode,
+)
+from warhammer40k_core.engine.mortal_wound_logical_death import (
+    MortalWoundLogicalDeathCauseBinding,
+    MortalWoundLogicalDeathRecorder,
+    fixed_mortal_wound_logical_death_recorder,
+    validate_mortal_wound_logical_death_progress,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
@@ -1045,9 +1094,17 @@ class MortalWoundApplication:
         )
         if type(self.spill_over) is not bool:
             raise GameLifecycleError("MortalWoundApplication spill_over must be a bool.")
-        applications = _validate_damage_applications(self.applications)
+        applications = validate_exact_type_tuple(
+            self.applications,
+            item_type=DamageApplication,
+            collection_label="Damage applications",
+        )
         object.__setattr__(self, "applications", applications)
-        resolutions = _validate_feel_no_pain_resolutions(self.feel_no_pain_resolutions)
+        resolutions = validate_exact_type_tuple(
+            self.feel_no_pain_resolutions,
+            item_type=FeelNoPainResolution,
+            collection_label="Feel No Pain resolutions",
+        )
         object.__setattr__(self, "feel_no_pain_resolutions", resolutions)
         object.__setattr__(
             self,
@@ -1116,6 +1173,8 @@ class MortalWoundApplicationProgress:
     remaining_mortal_wounds: int
     spill_over: bool
     destruction_evidence: MortalWoundDestructionEvidence | None
+    logical_death_events: tuple[EventRecord, ...]
+    logical_death_cause_binding: MortalWoundLogicalDeathCauseBinding | None = None
     applications: tuple[DamageApplication, ...] = ()
     feel_no_pain_resolutions: tuple[FeelNoPainResolution, ...] = ()
     ignored_mortal_wounds: int = 0
@@ -1183,11 +1242,23 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError(
                 "MortalWoundApplicationProgress destruction_evidence is invalid."
             )
-        object.__setattr__(self, "applications", _validate_damage_applications(self.applications))
+        object.__setattr__(
+            self,
+            "applications",
+            validate_exact_type_tuple(
+                self.applications,
+                item_type=DamageApplication,
+                collection_label="Damage applications",
+            ),
+        )
         object.__setattr__(
             self,
             "feel_no_pain_resolutions",
-            _validate_feel_no_pain_resolutions(self.feel_no_pain_resolutions),
+            validate_exact_type_tuple(
+                self.feel_no_pain_resolutions,
+                item_type=FeelNoPainResolution,
+                collection_label="Feel No Pain resolutions",
+            ),
         )
         object.__setattr__(
             self,
@@ -1226,6 +1297,27 @@ class MortalWoundApplicationProgress:
                 has_destruction_evidence=self.destruction_evidence is not None,
             ),
         )
+        if (
+            self.logical_death_cause_binding is not None
+            and type(self.logical_death_cause_binding) is not MortalWoundLogicalDeathCauseBinding
+        ):
+            raise GameLifecycleError(
+                "MortalWoundApplicationProgress logical-death binding is invalid."
+            )
+        object.__setattr__(
+            self,
+            "logical_death_events",
+            validate_mortal_wound_logical_death_progress(
+                binding=self.logical_death_cause_binding,
+                logical_death_events=self.logical_death_events,
+                destroyed_damage_application_payloads=tuple(
+                    cast(JsonValue, application.to_payload())
+                    for application in self.applications
+                    if application.destroyed
+                ),
+                placement_retained=self.destruction_evidence is None,
+            ),
+        )
         accounted = (
             sum(application.wounds_lost for application in self.applications)
             + self.ignored_mortal_wounds
@@ -1248,8 +1340,18 @@ class MortalWoundApplicationProgress:
         spill_over: bool,
         destruction_evidence: MortalWoundDestructionEvidence | None,
         priority_model_ids: tuple[str, ...] = (),
+        logical_death_cause_binding: MortalWoundLogicalDeathCauseBinding | None = None,
     ) -> Self:
         wounds = _validate_positive_int("mortal_wounds", mortal_wounds)
+        binding = logical_death_cause_binding
+        if destruction_evidence is not None:
+            expected_binding = MortalWoundLogicalDeathCauseBinding.fixed(
+                cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+                producer_id=application_id,
+            )
+            if binding is not None and binding != expected_binding:
+                raise GameLifecycleError("Mortal wound destruction cause binding drift.")
+            binding = expected_binding
         return cls(
             application_id=application_id,
             source_rule_id=source_rule_id,
@@ -1260,6 +1362,8 @@ class MortalWoundApplicationProgress:
             remaining_mortal_wounds=wounds,
             spill_over=spill_over,
             destruction_evidence=destruction_evidence,
+            logical_death_events=(),
+            logical_death_cause_binding=binding,
             priority_model_ids=priority_model_ids,
         )
 
@@ -1277,6 +1381,12 @@ class MortalWoundApplicationProgress:
             spill_over=context["spill_over"],
             destruction_evidence=evidence_from_json(
                 cast(JsonValue, context["destruction_evidence"])
+            ),
+            logical_death_events=tuple(
+                EventRecord.from_payload(event) for event in context["logical_death_events"]
+            ),
+            logical_death_cause_binding=MortalWoundLogicalDeathCauseBinding.from_payload(
+                context["logical_death_cause_binding"]
             ),
             applications=tuple(
                 DamageApplication.from_payload(application)
@@ -1300,6 +1410,9 @@ class MortalWoundApplicationProgress:
         *,
         model_instance_id: str,
     ) -> MortalWoundFeelNoPainContextPayload:
+        binding = self.logical_death_cause_binding
+        if binding is None:
+            raise GameLifecycleError("Mortal wound Feel No Pain context lacks cause binding.")
         return {
             "context_kind": MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
             "application_id": self.application_id,
@@ -1325,6 +1438,8 @@ class MortalWoundApplicationProgress:
             "destroyed_model_placements": [
                 placement.to_payload() for placement in self.destroyed_model_placements
             ],
+            "logical_death_events": [event.to_payload() for event in self.logical_death_events],
+            "logical_death_cause_binding": binding.to_payload(),
         }
 
     def with_remaining_lost(self) -> Self:
@@ -1342,9 +1457,11 @@ class MortalWoundApplicationProgress:
         self,
         *,
         state: GameState,
+        decisions: DecisionController,
         model_instance_id: str,
         resolution: FeelNoPainResolution,
         remove_destroyed_model: bool = True,
+        logical_death_recorder: MortalWoundLogicalDeathRecorder | None = None,
     ) -> Self:
         if self.remaining_mortal_wounds < 1:
             raise GameLifecycleError("Mortal wound progress has no wound to resolve.")
@@ -1354,18 +1471,37 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError("Mortal wound Feel No Pain resolves one wound at a time.")
         if type(remove_destroyed_model) is not bool:
             raise GameLifecycleError("remove_destroyed_model must be a bool.")
+        if type(decisions) is not DecisionController:
+            raise GameLifecycleError("Mortal wound progress requires DecisionController.")
+        binding = self.logical_death_cause_binding
+        if remove_destroyed_model:
+            expected_binding = MortalWoundLogicalDeathCauseBinding.fixed(
+                cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+                producer_id=self.application_id,
+            )
+            if binding is not None and binding != expected_binding:
+                raise GameLifecycleError("Mortal wound destruction cause binding drift.")
+            binding = expected_binding
+            recorder = fixed_mortal_wound_logical_death_recorder(
+                state=state,
+                event_log=decisions.event_log,
+                binding=binding,
+            )
+        else:
+            if binding is None or logical_death_recorder is None:
+                raise GameLifecycleError(
+                    "Retained mortal wound destruction requires logical-death authority."
+                )
+            recorder = logical_death_recorder
         applications = list(self.applications)
         ignored = self.ignored_mortal_wounds
         remaining_lost = self.remaining_mortal_wounds_lost
         destroyed_model_placements = list(self.destroyed_model_placements)
+        logical_death_events = list(self.logical_death_events)
         if resolution.remaining_wounds > 0:
-            pre_removal_placement = (
-                pre_removal_model_placement_for_mortal_wound_destruction(
-                    state=state,
-                    model_instance_id=model_instance_id,
-                )
-                if remove_destroyed_model
-                else None
+            pre_removal_placement = pre_removal_model_placement_for_mortal_wound_destruction(
+                state=state,
+                model_instance_id=model_instance_id,
             )
             application = apply_damage_to_model(
                 state=state,
@@ -1376,12 +1512,16 @@ class MortalWoundApplicationProgress:
                 remove_destroyed_model=remove_destroyed_model,
             )
             applications.append(application)
-            if application.destroyed and remove_destroyed_model:
-                if pre_removal_placement is None:
-                    raise GameLifecycleError(
-                        "Mortal wound destruction is missing pre-removal placement evidence."
-                    )
-                destroyed_model_placements.append(pre_removal_placement)
+            if application.destroyed:
+                logical_death_event = recorder(
+                    damage_application=application,
+                    destroyed_model_placement=pre_removal_placement,
+                    placement_retained=not remove_destroyed_model,
+                )
+                binding = binding.with_logical_death_event(logical_death_event)
+                logical_death_events.append(logical_death_event)
+                if remove_destroyed_model:
+                    destroyed_model_placements.append(pre_removal_placement)
             if application.destroyed and not self.spill_over:
                 remaining_lost += self.remaining_mortal_wounds - 1
         else:
@@ -1398,6 +1538,8 @@ class MortalWoundApplicationProgress:
             ignored_mortal_wounds=ignored,
             remaining_mortal_wounds_lost=remaining_lost,
             destroyed_model_placements=tuple(destroyed_model_placements),
+            logical_death_events=tuple(logical_death_events),
+            logical_death_cause_binding=binding,
         )
 
     def to_application(self) -> MortalWoundApplication:
@@ -2238,6 +2380,7 @@ def continue_mortal_wound_application(
     progress: MortalWoundApplicationProgress,
     dice_manager: DiceRollManager | None = None,
     remove_destroyed_models: bool = True,
+    logical_death_recorder: MortalWoundLogicalDeathRecorder | None = None,
 ) -> MortalWoundRoutingResult:
     if type(remove_destroyed_models) is not bool:
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
@@ -2245,6 +2388,11 @@ def continue_mortal_wound_application(
         progress=progress,
         remove_destroyed_models=remove_destroyed_models,
     )
+    if not remove_destroyed_models and (
+        progress.logical_death_cause_binding is None or logical_death_recorder is None
+    ):
+        raise GameLifecycleError("Retained mortal wound routing requires logical-death authority.")
+    _mwaa.ensure_started(state, decisions.event_log, progress)
     current = progress
     while current.remaining_mortal_wounds > 0:
         rules_unit = current_placed_alive_rules_unit_view_for_identity(
@@ -2327,9 +2475,11 @@ def continue_mortal_wound_application(
             resolution = FeelNoPainResolution.declined(requested_wounds=1)
         current = current.after_wound_resolution(
             state=state,
+            decisions=decisions,
             model_instance_id=model_id,
             resolution=resolution,
             remove_destroyed_model=remove_destroyed_models,
+            logical_death_recorder=logical_death_recorder,
         )
     record_finalized_mortal_wound_progress_destructions(
         state=state,
@@ -2349,6 +2499,7 @@ def resolve_mortal_wound_feel_no_pain_decision(
     next_request_id: str,
     dice_manager: DiceRollManager | None = None,
     remove_destroyed_models: bool = True,
+    logical_death_recorder: MortalWoundLogicalDeathRecorder | None = None,
 ) -> MortalWoundRoutingResult:
     if type(remove_destroyed_models) is not bool:
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
@@ -2376,9 +2527,11 @@ def resolve_mortal_wound_feel_no_pain_decision(
         )
     updated = progress.after_wound_resolution(
         state=state,
+        decisions=decisions,
         model_instance_id=model_id,
         resolution=resolution,
         remove_destroyed_model=remove_destroyed_models,
+        logical_death_recorder=logical_death_recorder,
     )
     return continue_mortal_wound_application(
         state=state,
@@ -2387,6 +2540,7 @@ def resolve_mortal_wound_feel_no_pain_decision(
         progress=updated,
         dice_manager=dice_manager,
         remove_destroyed_models=remove_destroyed_models,
+        logical_death_recorder=logical_death_recorder,
     )
 
 
@@ -2842,30 +2996,6 @@ def _canonical_keyword(keyword: str) -> str:
     return keyword.upper().replace(" ", "_").replace("-", "_")
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Decision payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    if key not in payload:
-        raise GameLifecycleError(f"Decision payload missing {key}.")
-    value = payload[key]
-    if type(value) is not str:
-        raise GameLifecycleError(f"Decision payload {key} must be a string.")
-    return value
-
-
-def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    if key not in payload:
-        raise GameLifecycleError(f"Decision payload missing {key}.")
-    value = payload[key]
-    if not isinstance(value, list):
-        raise GameLifecycleError(f"Decision payload {key} must be a list.")
-    return _validate_ordered_identifier_tuple(key, tuple(value))
-
-
 def _mortal_wound_context_from_request(
     request: DecisionRequest,
 ) -> MortalWoundFeelNoPainContextPayload:
@@ -2896,90 +3026,46 @@ def _selected_feel_no_pain_source_from_request(
     raise GameLifecycleError("Selected Feel No Pain source is not in the request.")
 
 
-def _validate_damage_applications(values: object) -> tuple[DamageApplication, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Damage applications must be a tuple.")
-    applications: list[DamageApplication] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not DamageApplication:
-            raise GameLifecycleError("Damage applications must contain DamageApplication values.")
-        applications.append(value)
-    return tuple(applications)
-
-
 def _validate_allocation_groups(values: object) -> tuple[AllocationGroup, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Allocation groups must be a tuple.")
-    groups: list[AllocationGroup] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not AllocationGroup:
-            raise GameLifecycleError("Allocation groups must contain AllocationGroup values.")
-        if value.group_id in seen:
-            raise GameLifecycleError("Allocation groups must not duplicate group IDs.")
-        seen.add(value.group_id)
-        groups.append(value)
-    return tuple(sorted(groups, key=lambda group: group.group_id))
+    return validate_unique_sorted_exact_type_tuple(
+        values,
+        item_type=AllocationGroup,
+        collection_label="Allocation groups",
+        identity=lambda group: group.group_id,
+        duplicate_message="Allocation groups must not duplicate group IDs.",
+    )
 
 
 def _validate_feel_no_pain_rolls(values: object) -> tuple[FeelNoPainRoll, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Feel No Pain rolls must be a tuple.")
-    rolls: list[FeelNoPainRoll] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not FeelNoPainRoll:
-            raise GameLifecycleError("Feel No Pain rolls must contain FeelNoPainRoll values.")
-        rolls.append(value)
-    return tuple(rolls)
-
-
-def _validate_feel_no_pain_resolutions(values: object) -> tuple[FeelNoPainResolution, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Feel No Pain resolutions must be a tuple.")
-    resolutions: list[FeelNoPainResolution] = []
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not FeelNoPainResolution:
-            raise GameLifecycleError(
-                "Feel No Pain resolutions must contain FeelNoPainResolution values."
-            )
-        resolutions.append(value)
-    return tuple(resolutions)
+    return validate_exact_type_tuple(
+        values,
+        item_type=FeelNoPainRoll,
+        collection_label="Feel No Pain rolls",
+    )
 
 
 def _validate_feel_no_pain_sources(values: object) -> tuple[FeelNoPainSource, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Feel No Pain sources must be a tuple.")
-    sources: list[FeelNoPainSource] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not FeelNoPainSource:
-            raise GameLifecycleError("Feel No Pain sources must contain FeelNoPainSource values.")
-        if value.source_id in seen:
-            raise GameLifecycleError("Feel No Pain sources must not duplicate source IDs.")
-        seen.add(value.source_id)
-        sources.append(value)
-    return tuple(sorted(sources, key=lambda source: source.source_id))
+    return validate_unique_sorted_exact_type_tuple(
+        values,
+        item_type=FeelNoPainSource,
+        collection_label="Feel No Pain sources",
+        identity=lambda source: source.source_id,
+        duplicate_message="Feel No Pain sources must not duplicate source IDs.",
+    )
 
 
 def _validate_destruction_reaction_sources(
     values: object,
 ) -> tuple[DestructionReactionSource, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Destruction reaction sources must be a tuple.")
-    sources: list[DestructionReactionSource] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not DestructionReactionSource:
-            raise GameLifecycleError(
-                "Destruction reaction sources must contain DestructionReactionSource values."
-            )
-        if value.source_id in seen:
-            raise GameLifecycleError("Destruction reaction sources must not duplicate source IDs.")
-        if value.source_id == DECLINE_DESTRUCTION_REACTION_OPTION_ID:
-            raise GameLifecycleError("Destruction reaction source ID conflicts with decline.")
-        seen.add(value.source_id)
-        sources.append(value)
-    return tuple(sorted(sources, key=lambda source: source.source_id))
+    return validate_unique_sorted_exact_type_tuple(
+        values,
+        item_type=DestructionReactionSource,
+        collection_label="Destruction reaction sources",
+        identity=lambda source: source.source_id,
+        duplicate_message="Destruction reaction sources must not duplicate source IDs.",
+        forbidden_identity=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        forbidden_message="Destruction reaction source ID conflicts with decline.",
+    )
 
 
 def _state_feel_no_pain_sources(
@@ -3005,84 +3091,4 @@ def _state_feel_no_pain_decline_allowed(
     value = lookup(model_instance_id=model_instance_id)
     if type(value) is not bool:
         raise GameLifecycleError("Feel No Pain decline state must be a bool.")
-    return value
-
-
-def _validate_subset(
-    *,
-    field_name: str,
-    values: tuple[str, ...],
-    universe: tuple[str, ...],
-) -> None:
-    missing = set(values) - set(universe)
-    if missing:
-        raise GameLifecycleError(f"{field_name} contains models outside alive_model_ids.")
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    return tuple(sorted(identifiers))
-
-
-def _validate_ordered_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    if not identifiers:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return tuple(identifiers)
-
-
-_validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
-
-
-def _validate_optional_save(field_name: str, value: object | None) -> int | None:
-    if value is None:
-        return None
-    return _validate_d6_target(field_name, value)
-
-
-def _validate_positive_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an int.")
-    if value < 1:
-        raise GameLifecycleError(f"{field_name} must be at least 1.")
-    return value
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an int.")
-    if value < 0:
-        raise GameLifecycleError(f"{field_name} must not be negative.")
-    return value
-
-
-def _validate_d6_target(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an int.")
-    if value < 2 or value > 6:
-        raise GameLifecycleError(f"{field_name} must be between 2 and 6.")
     return value

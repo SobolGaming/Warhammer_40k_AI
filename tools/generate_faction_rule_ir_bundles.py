@@ -22,6 +22,7 @@ if TYPE_CHECKING or __package__:
     from tools import (
         generate_aeldari_shroud_runners_wraithblades_rule_ir as aeldari_shroud_wraith,
     )
+    from tools import generate_aeldari_solitaire_rule_ir as aeldari_solitaire
     from tools import (
         generate_aeldari_war_walkers_wraithlord_rule_ir as aeldari_war_walkers_wraithlord,
     )
@@ -33,6 +34,9 @@ if TYPE_CHECKING or __package__:
     )
     from tools import generate_chaos_daemons_datasheet_rule_ir as chaos_daemons
     from tools import generate_chaos_maulerfiend_variants_rule_ir as chaos_maulerfiends
+    from tools import (
+        generate_emperors_children_daemon_prince_rule_ir as emperors_children_daemon_prince,
+    )
     from tools import generate_emperors_children_fulgrim_rule_ir as emperors_children_fulgrim
     from tools import (
         generate_emperors_children_infractors_tormentors_rule_ir as emperors_children_battleline,
@@ -59,11 +63,13 @@ else:
     import generate_aeldari_kharseth_rule_ir as aeldari_kharseth
     import generate_aeldari_night_spinner_rule_ir as aeldari_night_spinner
     import generate_aeldari_shroud_runners_wraithblades_rule_ir as aeldari_shroud_wraith
+    import generate_aeldari_solitaire_rule_ir as aeldari_solitaire
     import generate_aeldari_war_walkers_wraithlord_rule_ir as aeldari_war_walkers_wraithlord
     import generate_aeldari_wave_serpent_shining_spears_eldrad_dire_avengers_rule_ir as aeldari_four
     import generate_aeldari_yriel_vypers_starfangs_rule_ir as aeldari_yriel_vypers_starfangs
     import generate_chaos_daemons_datasheet_rule_ir as chaos_daemons
     import generate_chaos_maulerfiend_variants_rule_ir as chaos_maulerfiends
+    import generate_emperors_children_daemon_prince_rule_ir as emperors_children_daemon_prince
     import generate_emperors_children_fulgrim_rule_ir as emperors_children_fulgrim
     import generate_emperors_children_infractors_tormentors_rule_ir as emperors_children_battleline
     import generate_emperors_children_lucius_rule_ir as emperors_children_lucius
@@ -120,6 +126,7 @@ AELDARI_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     aeldari_void_units.generated_artifact_payload,
     aeldari_kharseth.generated_artifact_payload,
     aeldari_night_spinner.generated_artifact_payload,
+    aeldari_solitaire.generated_artifact_payload,
     aeldari_shroud_wraith.generated_artifact_payload,
     aeldari_war_walkers_wraithlord.generated_artifact_payload,
     aeldari_four.generated_artifact_payload,
@@ -130,6 +137,7 @@ EMPERORS_CHILDREN_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     emperors_children_battleline.generated_artifact_payload,
     generate_emperors_children_lord_spawn,
     emperors_children_lucius.generated_artifact_payload,
+    emperors_children_daemon_prince.generated_artifact_payload,
 )
 CHAOS_DAEMONS_SOURCE_PACKAGE_FACTORIES: tuple[PayloadFactory, ...] = (
     chaos_daemons.generated_artifact_payload,

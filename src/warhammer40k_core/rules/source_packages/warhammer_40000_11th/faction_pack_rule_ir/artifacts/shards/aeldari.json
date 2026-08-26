@@ -21,6 +21,7 @@
     "000002531": "aeldari",
     "000002532": "aeldari",
     "000002533": "aeldari",
+    "000002538": "aeldari",
     "000002759": "aeldari",
     "000003909": "aeldari",
     "000004193": "aeldari",
@@ -34,7 +35,7 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "10213d637c5955a7bc07133006a1d90aab8d35eecd7e75a98064e118585a39b1",
+  "package_hash": "6287d78a7ca59f0fd1d684b378c9a41410689b62cd102c575747957dfb97f535",
   "shard_id": "aeldari",
   "source_packages": {
     "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14": {
@@ -4406,6 +4407,355 @@
       },
       "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
       "source_package_id": "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14",
+      "source_snapshot_filename": "Datasheets_abilities.json",
+      "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+    },
+    "gw-11e-aeldari-solitaire-datasheet-2026-08": {
+      "artifact_schema": "core-v2-aeldari-solitaire-rule-ir-v1",
+      "datasheet_id": "000002538",
+      "datasheet_name": "Solitaire",
+      "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
+      "official_document_pages": [],
+      "official_document_sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d",
+      "package_hash": "aac8da08281361d1b4edd05910b4e72ff30f5add9f5793deab2804a2df25ae38",
+      "records": {
+        "000002538:6": {
+          "ability_name": "Blitz",
+          "normalized_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:aeldari:solitaire:datasheet:000002538:6:clause:001",
+                "conditions": [
+                  {
+                    "kind": "frequency_limit",
+                    "parameters": [
+                      {
+                        "key": "activation_kind",
+                        "value": "optional_ability_use"
+                      },
+                      {
+                        "key": "max_uses",
+                        "value": 1
+                      },
+                      {
+                        "key": "scope",
+                        "value": "battle"
+                      },
+                      {
+                        "key": "usage_subject",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 15,
+                      "start": 0,
+                      "text": "Once per battle"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "until_timing_endpoint",
+                  "parameters": [
+                    {
+                      "key": "endpoint",
+                      "value": "turn"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 142,
+                    "start": 117,
+                    "text": "until the end of the turn"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "modify_move_distance",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "movement"
+                      },
+                      {
+                        "key": "operation",
+                        "value": "add"
+                      },
+                      {
+                        "key": "roll_expression",
+                        "value": "2D6"
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 188,
+                      "start": 144,
+                      "text": "add 2D6\" to this model's Move characteristic"
+                    }
+                  },
+                  {
+                    "kind": "modify_characteristic",
+                    "parameters": [
+                      {
+                        "key": "characteristic",
+                        "value": "attacks"
+                      },
+                      {
+                        "key": "delta",
+                        "value": 3
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      },
+                      {
+                        "key": "weapon_names",
+                        "value": [
+                          "Solitaire weapons"
+                        ]
+                      }
+                    ],
+                    "source_span": {
+                      "end": 262,
+                      "start": 193,
+                      "text": "add 3 to the Attacks characteristic of this model's Solitaire weapons"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 263,
+                  "start": 0,
+                  "text": "Once per battle, in your Movement phase, before this model makes a Normal move, it can use this ability. If it does, until the end of the turn, add 2D6\" to this model's Move characteristic and add 3 to the Attacks characteristic of this model's Solitaire weapons."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 58,
+                    "start": 48,
+                    "text": "this model"
+                  }
+                },
+                "template_id": "phase17p:optional-pre-normal-move-random-characteristic-modifiers",
+                "trigger": {
+                  "kind": "unit_selected",
+                  "parameters": [
+                    {
+                      "key": "action",
+                      "value": "normal_move"
+                    },
+                    {
+                      "key": "optional",
+                      "value": true
+                    },
+                    {
+                      "key": "owner",
+                      "value": "active_player"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "movement"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "before_normal_move"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 78,
+                    "start": 41,
+                    "text": "before this model makes a Normal move"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "8f9afabc6d0ec3427dbb309e48bfe90deca83b9b4989eb8cffe4ab947ccc34f3",
+            "normalized_text": "Once per battle, in your Movement phase, before this model makes a Normal move, it can use this ability. If it does, until the end of the turn, add 2D6\" to this model's Move characteristic and add 3 to the Attacks characteristic of this model's Solitaire weapons.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:aeldari:solitaire:datasheet:000002538:6",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-aeldari-solitaire-datasheet-2026-08:datasheet:000002538:6"
+          }
+        },
+        "000002538:7": {
+          "ability_name": "Blur of Movement",
+          "normalized_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:aeldari:solitaire:datasheet:000002538:7:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "permanent",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 74,
+                    "start": 0,
+                    "text": "This model is eligible to declare a charge in a turn in which it Advanced."
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "grant_ability",
+                    "parameters": [
+                      {
+                        "key": "ability",
+                        "value": "can_advance_and_charge"
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "this_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 73,
+                      "start": 14,
+                      "text": "eligible to declare a charge in a turn in which it Advanced"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 74,
+                  "start": 0,
+                  "text": "This model is eligible to declare a charge in a turn in which it Advanced."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 10,
+                    "start": 0,
+                    "text": "This model"
+                  }
+                },
+                "template_id": "phase17c:grant-ability",
+                "trigger": null,
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "31d0acb1dbe2f064a9bde598527dd596fbf9e4fadbe35e0c530e84c707822bf1",
+            "normalized_text": "This model is eligible to declare a charge in a turn in which it Advanced.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:aeldari:solitaire:datasheet:000002538:7",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-aeldari-solitaire-datasheet-2026-08:datasheet:000002538:7"
+          }
+        },
+        "000002538:9": {
+          "ability_name": "Flip Belt",
+          "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17k:aeldari:solitaire:datasheet:000002538:9:clause:001",
+                "conditions": [],
+                "diagnostics": [],
+                "duration": null,
+                "effects": [
+                  {
+                    "kind": "movement_transit_permission",
+                    "parameters": [
+                      {
+                        "key": "movement_modes",
+                        "value": [
+                          "normal",
+                          "advance",
+                          "fall_back",
+                          "charge"
+                        ]
+                      },
+                      {
+                        "key": "permission",
+                        "value": "ignore_vertical_distance"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 107,
+                      "start": 79,
+                      "text": "ignore any vertical distance"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 185,
+                  "start": 0,
+                  "text": "Each time the bearer's unit makes a Normal, Advance, Fall Back or Charge move, ignore any vertical distance when determining the total distance the bearer can be moved during that move."
+                },
+                "target": {
+                  "kind": "this_model",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 20,
+                    "start": 10,
+                    "text": "the bearer"
+                  }
+                },
+                "template_id": "phase17p:movement-ignore-vertical-distance",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "during"
+                    },
+                    {
+                      "key": "movement_modes",
+                      "value": [
+                        "normal",
+                        "advance",
+                        "fall_back",
+                        "charge"
+                      ]
+                    },
+                    {
+                      "key": "phase",
+                      "value": "movement"
+                    },
+                    {
+                      "key": "subject",
+                      "value": "this_model"
+                    },
+                    {
+                      "key": "timing_window",
+                      "value": "model_makes_move"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 77,
+                    "start": 0,
+                    "text": "Each time the bearer's unit makes a Normal, Advance, Fall Back or Charge move"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "0c2557ed62ad9aa6d199f7dcd1baadec9b6cbc33975605cb18d73fa8a3bd644d",
+            "normalized_text": "Each time the bearer's unit makes a Normal, Advance, Fall Back or Charge move, ignore any vertical distance when determining the total distance the bearer can be moved during that move.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17k:aeldari:solitaire:datasheet:000002538:9",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-aeldari-solitaire-datasheet-2026-08:datasheet:000002538:9"
+          }
+        }
+      },
+      "review_manifest_filename": "faction_pack_datasheet_review_v1.json",
+      "review_manifest_sha256": "36c98b702ee0ea168a816a5c080320dcbe4d3c75584049e1441184f6c8c8f23b",
+      "review_row_id": "source:000002538",
+      "review_treatment": "unchanged_predecessor",
+      "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+      "source_package_id": "gw-11e-aeldari-solitaire-datasheet-2026-08",
       "source_snapshot_filename": "Datasheets_abilities.json",
       "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
     },

@@ -2974,18 +2974,30 @@
         {
           "ability_id": "000002538:blitz",
           "ability_name": "Blitz",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
           "raw_text": "Once per battle, in your Movement phase, before this model makes a Normal move, it can use this ability. If it does, until the end of the turn, add 2D6\" to this model's Move characteristic and add 3 to the Attacks characteristic of this model's Solitaire weapons.",
           "raw_text_sha256": "f448046c569cf50472f22eb24e23694891bdb1ce2259330b42a76ec79ec5bc9d",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-action-grant",
+            "catalog-ir:once-per-battle-ability"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:6:description:clause:002:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-action-grant",
+                "catalog-ir:once-per-battle-ability"
+              ],
+              "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:6:clause:001:effect:0",
+              "semantic_kind": "modify_move_distance"
+            },
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-action-grant",
+                "catalog-ir:once-per-battle-ability"
+              ],
+              "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:6:clause:001:effect:1",
               "semantic_kind": "modify_characteristic"
             }
           ],
@@ -2994,7 +3006,7 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000002538:6",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000002538:blur-of-movement",
@@ -3004,11 +3016,15 @@
           "normalized_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
           "raw_text": "This model is eligible to declare a charge in a turn in which it Advanced.",
           "raw_text_sha256": "c12db118b5fdabb537def15f7f957529eaba99d020a3f7703fbce50aa4087f61",
-          "runtime_consumer_ids": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:can-advance-and-charge"
+          ],
           "semantic_consumers": [
             {
-              "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:7:description:clause:001:effect:0",
+              "runtime_consumer_ids": [
+                "catalog-ir:can-advance-and-charge"
+              ],
+              "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:7:clause:001:effect:0",
               "semantic_kind": "grant_ability"
             }
           ],
@@ -3017,7 +3033,7 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000002538:7",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "engine_consumed"
         },
         {
           "ability_id": "000002538:path-of-damnation",
@@ -3049,28 +3065,36 @@
         {
           "ability_id": "000002538:flip-belt",
           "ability_name": "Flip Belt",
-          "catalog_support": "unsupported",
-          "diagnostic_reasons": [
-            "unsupported_language"
-          ],
+          "catalog_support": "generic_rule_ir",
+          "diagnostic_reasons": [],
           "normalized_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
           "raw_text": "Each time the bearer's unit makes a Normal, Advance, Fall Back or Charge move, ignore any vertical distance when determining the total distance the bearer can be moved during that move.",
           "raw_text_sha256": "a77f0c48d79b77c43e29f08b60cc35078c583d3cfc651d20b4d51fa2940aeeb9",
-          "runtime_consumer_ids": [],
-          "semantic_consumers": [],
+          "runtime_consumer_ids": [
+            "catalog-ir:movement-transit-permission"
+          ],
+          "semantic_consumers": [
+            {
+              "runtime_consumer_ids": [
+                "catalog-ir:movement-transit-permission"
+              ],
+              "semantic_id": "phase17k:aeldari:solitaire:datasheet:000002538:9:clause:001:effect:0",
+              "semantic_kind": "movement_transit_permission"
+            }
+          ],
           "source_ids": [
             "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002538:9"
           ],
           "source_kind": "wargear",
           "source_row_id": "000002538:9",
-          "support_stage": "ir_compiled_unsupported"
+          "support_stage": "engine_consumed"
         }
       ],
       "datasheet_id": "000002538",
       "datasheet_name": "Solitaire",
       "group": "Harlequins",
       "pdf_page_reference": null,
-      "semantic_bucket": "Exact ability IR unsupported",
+      "semantic_bucket": "All exact abilities consumed",
       "treatment": "unchanged_predecessor"
     },
     {
@@ -4451,9 +4475,9 @@
   "release_hash": "72b3d3b2ccaf2dd42ef98a77b5fae256b01551df5e20fe644f78623bed802982",
   "schema_version": "aeldari-datasheet-semantic-coverage-v4",
   "semantic_bucket_counts": {
-    "All exact abilities consumed": 29,
+    "All exact abilities consumed": 30,
     "Exact IR parsed; host needed": 3,
-    "Exact ability IR unsupported": 38
+    "Exact ability IR unsupported": 37
   },
   "source_artifact_hashes": {
     "Abilities": "7bade63473d67cda845e6d94c83fd2fad3710964438fe5593a932542671ab577",

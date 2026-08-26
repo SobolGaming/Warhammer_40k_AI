@@ -82,7 +82,10 @@ else:
         maulerfiend_cross_faction_support,
         maulerfiend_cross_faction_support_markdown,
     )
-from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.army_catalog import (
+    ArmyCatalog,
+    datasheet_has_catalog_faction_ownership,
+)
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.faction_aliases import (
     ADEPTUS_CUSTODES_FACTION_ID,
@@ -98,6 +101,7 @@ from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.ability_coverage import (
     SUPREME_COMMANDER_MUSTERING_CONSUMER_ID,
+    WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,
     AbilityCoverageAbilityDatasheetPairPayload,
     AbilityCoverageCategoryRowPayload,
     AbilityCoverageRow,
@@ -137,6 +141,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_custo
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_mechanicus import (
     army_rule as adeptus_mechanicus_army_rule,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import (
+    mustering as aeldari_mustering,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
     army_rule as astra_militarum_army_rule,
@@ -237,6 +244,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES,
     AELDARI_RANGERS_HEIGHT_OVERRIDES,
     AELDARI_SHROUD_RUNNERS_WRAITHBLADES_HEIGHT_OVERRIDES,
+    AELDARI_SOLITAIRE_HEIGHT_OVERRIDES,
     AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES,
     AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES,
     AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES,
@@ -248,6 +256,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     CHAOS_DEFILER_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_CHAOS_SPAWN_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES,
+    EMPERORS_CHILDREN_DAEMON_PRINCE_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES,
@@ -275,6 +284,7 @@ DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
 AELDARI_FACTION_ID = "aeldari"
+DISPARATE_PATHS_MUSTERING_SOURCE_ID = aeldari_mustering.DISPARATE_PATHS_CATALOG_ABILITY_ID
 AELDARI_ASPECT_WARRIORS_DATASHEET_IDS = (
     "000000594",
     "000000595",
@@ -290,6 +300,7 @@ AELDARI_BANSHEES_PHOENIX_LORDS_SPIRITSEER_DATASHEET_IDS = (
     "000003909",
 )
 AELDARI_RANGERS_DATASHEET_IDS = ("000000592",)
+AELDARI_SOLITAIRE_DATASHEET_IDS = ("000002538",)
 AELDARI_SHROUD_RUNNERS_WRAITHBLADES_DATASHEET_IDS = ("000002533", "000000598")
 AELDARI_WAR_WALKERS_WRAITHLORD_DATASHEET_IDS = ("000000612", "000000613")
 AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_DATASHEET_IDS = (
@@ -346,6 +357,7 @@ EMPERORS_CHILDREN_FULGRIM_DATASHEET_IDS = ("000004077",)
 EMPERORS_CHILDREN_LORD_EXULTANT_DATASHEET_IDS = ("000004078",)
 EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_DATASHEET_IDS = ("000004079", "000004080")
 EMPERORS_CHILDREN_CHAOS_TERMINATORS_DATASHEET_IDS = ("000004081",)
+EMPERORS_CHILDREN_DAEMON_PRINCE_DATASHEET_IDS = ("000004086",)
 EMPERORS_CHILDREN_LUCIUS_DATASHEET_IDS = ("000004083",)
 EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS = ("000004084",)
 EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS = ("000004088",)
@@ -361,6 +373,7 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *AELDARI_AUTARCHS_DATASHEET_IDS,
     *AELDARI_BANSHEES_PHOENIX_LORDS_SPIRITSEER_DATASHEET_IDS,
     *AELDARI_RANGERS_DATASHEET_IDS,
+    *AELDARI_SOLITAIRE_DATASHEET_IDS,
     *AELDARI_SHROUD_RUNNERS_WRAITHBLADES_DATASHEET_IDS,
     *AELDARI_WAR_WALKERS_WRAITHLORD_DATASHEET_IDS,
     *AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_DATASHEET_IDS,
@@ -378,6 +391,7 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *EMPERORS_CHILDREN_LORD_EXULTANT_DATASHEET_IDS,
     *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_DATASHEET_IDS,
     *EMPERORS_CHILDREN_CHAOS_TERMINATORS_DATASHEET_IDS,
+    *EMPERORS_CHILDREN_DAEMON_PRINCE_DATASHEET_IDS,
     *EMPERORS_CHILDREN_LUCIUS_DATASHEET_IDS,
     *EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS,
     *EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS,
@@ -1535,6 +1549,31 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             ),
         ),
         MusteringSupportRow(
+            rule_id=aeldari_mustering.DISPARATE_PATHS_MUSTERING_CONSUMER_ID,
+            display_name="Disparate Paths",
+            faction_id="aeldari",
+            allowed_base_faction_ids=("aeldari",),
+            source_id=DISPARATE_PATHS_MUSTERING_SOURCE_ID,
+            enforcement_surface="catalog_generation/list_validation/army_mustering",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id=aeldari_mustering.DISPARATE_PATHS_FACTION_ACCESS_BINDING_ID,
+            tests_evidence=(
+                "tests/unit/rules/test_wahapedia_bridge_catalog.py::"
+                "test_aeldari_disparate_paths_keeps_battle_focus_primary_and_descriptor_source; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_aeldari_disparate_paths_rejects_unlinked_or_unrelated_datasheet; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition"
+            ),
+            notes=(
+                "Allows a source-linked HARLEQUINS datasheet carrying Disparate Paths in an "
+                "ASURYANI Battle Focus army while leaving unrelated or unlinked datasheets "
+                "illegal; datasheet-specific Warlord restrictions remain authoritative."
+            ),
+        ),
+        MusteringSupportRow(
             rule_id="army-mustering:freeblades",
             display_name="Freeblades",
             faction_id="imperial-knights",
@@ -1616,6 +1655,26 @@ def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
             notes=(
                 "Consumes structured Supreme Commander mustering descriptors and requires an "
                 "eligible Supreme Commander unit to be selected as Warlord when present."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id=WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID,
+            display_name="Datasheet Warlord restrictions",
+            faction_id=None,
+            allowed_base_faction_ids=("any",),
+            source_id="core:datasheet-mustering:warlord-restriction",
+            enforcement_surface="army_mustering",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_warlord_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander"
+            ),
+            notes=(
+                "Consumes structured datasheet mustering descriptors and rejects a selected "
+                "Warlord when the source ability marks that datasheet as forbidden."
             ),
         ),
     )
@@ -1728,6 +1787,7 @@ def _ability_support_catalog_package(
             + AELDARI_KHARSETH_HEIGHT_OVERRIDES
             + AELDARI_NIGHT_SPINNER_HEIGHT_OVERRIDES
             + AELDARI_RANGERS_HEIGHT_OVERRIDES
+            + AELDARI_SOLITAIRE_HEIGHT_OVERRIDES
             + AELDARI_SHROUD_RUNNERS_WRAITHBLADES_HEIGHT_OVERRIDES
             + AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES
             + AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES
@@ -1742,6 +1802,7 @@ def _ability_support_catalog_package(
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
             + CHAOS_DEFILER_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES
+            + EMPERORS_CHILDREN_DAEMON_PRINCE_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_CHAOS_SPAWN_HEIGHT_OVERRIDES
             + MAULERFIEND_HEIGHT_OVERRIDES
             + EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES
@@ -1809,24 +1870,6 @@ def _promote_runtime_backed_faction_abilities(
             and row.ability_id == world_eaters_army_rule.BLESSINGS_OF_KHORNE_SOURCE_ABILITY_ID
         ):
             return "faction.army_rule.blessings_of_khorne", _world_eaters_runtime_consumer_ids()
-        if (
-            row.ability_id == emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
-            and row.datasheet_id
-            in {
-                *EMPERORS_CHILDREN_FULGRIM_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_LORD_EXULTANT_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_CHAOS_TERMINATORS_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_LUCIUS_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_FLAWLESS_BLADES_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_CHAOS_SPAWN_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_MAULERFIEND_DATASHEET_IDS,
-                *EMPERORS_CHILDREN_DEFILER_DATASHEET_IDS,
-            }
-        ):
-            return "faction.army_rule.thrill_seekers", _emperors_children_runtime_consumer_ids()
         return None
 
     promoted: list[AbilityCoverageRow] = []
@@ -2048,10 +2091,13 @@ def _faction_doc_id_for_datasheet(
         raise ValueError("Datasheet support faction matching requires an ArmyCatalog.")
     if not faction_keywords:
         raise ValueError("Datasheet support faction matching requires faction keywords.")
+    datasheet = catalog.datasheet_by_id(datasheet_id)
+    if datasheet.keywords.faction_keywords != faction_keywords:
+        raise ValueError("Datasheet support faction keyword input drifted from the catalog.")
     matches = tuple(
         faction
         for faction in catalog.factions
-        if set(faction.faction_keywords).intersection(faction_keywords)
+        if datasheet_has_catalog_faction_ownership(datasheet=datasheet, faction=faction)
     )
     if len(matches) != 1:
         raise ValueError(

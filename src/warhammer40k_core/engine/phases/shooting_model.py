@@ -52,7 +52,6 @@ __all__ = (
 
 SELECT_SHOOTING_UNIT_DECISION_TYPE = "select_shooting_unit"
 SELECT_SHOOTING_TYPE_DECISION_TYPE = "select_shooting_type"
-SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
 COMPLETE_SHOOTING_PHASE_OPTION_ID = "complete_shooting_phase"
 _COMPLETE_SHOOTING_PHASE_STATUS = "shooting_phase_complete"
 

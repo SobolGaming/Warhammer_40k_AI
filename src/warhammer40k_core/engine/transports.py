@@ -45,6 +45,10 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_spec,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.transport_embark_groups import (
     cargo_model_count,
     embark_transition_batch_for_rules_unit,
@@ -291,7 +295,7 @@ _RAPID_DISEMBARK_RULE_ID = "core_rules_rapid_disembark"
 _TACTICAL_DISEMBARK_RULE_ID = "core_rules_tactical_disembark"
 _COMBAT_DISEMBARK_RULE_ID = "core_rules_combat_disembark"
 _DESTROYED_TRANSPORT_RULE_ID = "core_rules_destroyed_transport"
-_EMERGENCY_DISEMBARK_RULE_ID = "core_rules_emergency_disembark"
+EMERGENCY_DISEMBARK_RULE_ID = "core_rules_emergency_disembark"
 TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND = "transport_hazard_mortal_wounds"
 TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE = "transport_hazard_mortal_wounds_resolved"
 
@@ -1057,7 +1061,7 @@ class DisembarkedUnitState:
             can_declare_charge=False,
             battle_shocked_until="end_of_turn",
             source_rule_id=(
-                _EMERGENCY_DISEMBARK_RULE_ID
+                EMERGENCY_DISEMBARK_RULE_ID
                 if mode is DisembarkModeKind.EMERGENCY_DISEMBARK
                 else _DESTROYED_TRANSPORT_RULE_ID
             ),
@@ -3098,7 +3102,6 @@ def _append_disembark_endpoint_violations(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             transport_models=transport_models,
-            transport_player_id=attempted_placement.player_id,
         )
         if mode is DisembarkModeKind.COMBAT_DISEMBARK
         else ()
@@ -3147,10 +3150,13 @@ def _append_disembark_endpoint_violations(
                 horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
                 vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
             ):
-                enemy_unit_id = _model_owner_unit_id(
-                    scenario=scenario,
-                    model_instance_id=enemy_model.model_id,
-                )
+                enemy_unit_id = rules_unit_view_from_armies(
+                    armies=scenario.armies,
+                    unit_instance_id=_model_owner_unit_id(
+                        scenario=scenario,
+                        model_instance_id=enemy_model.model_id,
+                    ),
+                ).unit_instance_id
                 if enemy_unit_id in combat_engagement_units:
                     continue
                 violations.append(
@@ -3287,29 +3293,22 @@ def _enemy_unit_ids_engaged_with_transport(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     transport_models: tuple[Model, ...],
-    transport_player_id: str,
 ) -> tuple[str, ...]:
-    enemy_unit_ids: set[str] = set()
-    for blocker in _placed_geometry_models(scenario):
-        if _model_owner_player_id(scenario=scenario, model_instance_id=blocker.model_id) == (
-            transport_player_id
-        ):
-            continue
-        if any(
-            transport_model.is_within_engagement_range(
-                blocker,
-                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-            )
-            for transport_model in transport_models
-        ):
-            enemy_unit_ids.add(
-                _model_owner_unit_id(
-                    scenario=scenario,
-                    model_instance_id=blocker.model_id,
-                )
-            )
-    return tuple(sorted(enemy_unit_ids))
+    component_ids = {
+        _model_owner_unit_id(scenario=scenario, model_instance_id=model.model_id)
+        for model in transport_models
+    }
+    if len(component_ids) != 1:
+        raise GameLifecycleError("Transport models must share one physical unit.")
+    source_id = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=next(iter(component_ids)),
+    ).unit_instance_id
+    return scenario_physically_engaged_enemy_rules_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=source_id,
+    )
 
 
 def _model_within_any_transport_model(

@@ -57,7 +57,7 @@ class FightRulesUnitPlacementPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class FightRulesUnitPlacement:
-    """Present physical components for one canonical attached Fight rules unit."""
+    """Movable physical components for one canonical attached Fight rules unit."""
 
     rules_unit_instance_id: str
     component_unit_placements: tuple[UnitPlacement, ...]
@@ -563,7 +563,9 @@ def fight_rules_unit_movement_endpoint_from_completed_event(
         raise GameLifecycleError("Fight movement completed resolution must be valid.")
     if resolution.unit_instance_id != event_unit_id:
         raise GameLifecycleError("Fight movement completed rules-unit identity drift.")
-    if resolution.before_rules_unit_placement.component_unit_instance_ids != component_ids:
+    if not set(resolution.before_rules_unit_placement.component_unit_instance_ids).issubset(
+        component_ids
+    ):
         raise GameLifecycleError("Fight movement completed component identity drift.")
     outer_proposal_kind = _fight_proposal_kind(
         proposal_kind_from_token(payload.get("proposal_kind"))

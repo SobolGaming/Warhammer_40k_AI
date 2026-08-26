@@ -701,9 +701,7 @@ def _persisting_effect_id(
 
 
 def _started_battle_round(context: EnhancementEffectContext) -> int:
-    if context.state.battle_round < 1:
-        return 1
-    return context.state.battle_round
+    return context.persisting_effect_started_battle_round
 
 
 def _source_model_instance_id(unit: UnitInstance) -> str:

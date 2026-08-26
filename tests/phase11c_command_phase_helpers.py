@@ -10,6 +10,7 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestRequest,
 )
 from warhammer40k_core.engine.battlefield_state import UnitPlacement
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -108,7 +109,18 @@ def remove_first_models(state: GameState, *, unit_instance_id: str, count: int) 
     removed_ids = tuple(
         placement.model_instance_id for placement in unit_placement.model_placements[:count]
     )
-    state.battlefield_state = state.battlefield_state.with_removed_models(removed_ids)
+    models_by_id = {
+        model.model_instance_id: model for model in unit_by_id(state, unit_instance_id).own_models
+    }
+    for model_id in removed_ids:
+        model = models_by_id[model_id]
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=unit_instance_id,
+            model_instance_id=model_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
 
 
 def unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
@@ -134,12 +146,17 @@ def is_center_objective_id(objective_id: str) -> bool:
 
 def battle_state(
     *,
+    game_id: str = "phase11c-game",
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
 ) -> GameState:
-    config = phase11c_config(player_a_units=player_a_units, player_b_units=player_b_units)
+    config = phase11c_config(
+        game_id=game_id,
+        player_a_units=player_a_units,
+        player_b_units=player_b_units,
+    )
     state = GameState.from_config(config)
     for army in mustered_armies(config):
         state.record_army_definition(army)
@@ -198,12 +215,13 @@ def secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondary
 
 def phase11c_config(
     *,
+    game_id: str = "phase11c-game",
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
-        game_id="phase11c-game",
+        game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=ruleset(),
         army_catalog=catalog,

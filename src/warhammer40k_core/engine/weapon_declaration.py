@@ -17,6 +17,7 @@ from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_
 from warhammer40k_core.engine.transports import FiringDeckSelection, FiringDeckSelectionPayload
 
 SHOOTING_DECLARATION_PROPOSAL_KIND = "shooting_declaration"
+SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
 
 
 class WeaponDeclarationPayload(TypedDict):

@@ -14,6 +14,20 @@ MODEL_DESTROYED_EMITTER_PATHS = {
     "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py",
     "src/warhammer40k_core/engine/rule_model_destruction.py",
 }
+DIRECT_MODEL_DESTROYED_EVENT_OWNERS = {
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py",
+    "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py",
+}
+MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH = (
+    "src/warhammer40k_core/engine/model_destruction_cause_producers.py"
+)
+ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH = (
+    "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
+)
+ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH = (
+    "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py"
+)
 PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS = {
     "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py",
     "src/warhammer40k_core/engine/game_state.py",
@@ -61,6 +75,7 @@ PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
 DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     "with_removed_models": {
         "src/warhammer40k_core/engine/damage_allocation.py": 1,
+        "src/warhammer40k_core/engine/fight_activation_history_integrity.py": 1,
         "src/warhammer40k_core/engine/fight_on_death.py": 1,
         "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": 1,
         "src/warhammer40k_core/engine/reserves.py": 1,
@@ -72,6 +87,7 @@ DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     },
     "without_unit_placement": {
         "src/warhammer40k_core/engine/aircraft.py": 1,
+        "src/warhammer40k_core/engine/fight_movement_source.py": 1,
         "src/warhammer40k_core/engine/prebattle.py": 1,
         "src/warhammer40k_core/engine/rules_unit_placement.py": 1,
         "src/warhammer40k_core/engine/transport_embark_groups.py": 1,
@@ -132,7 +148,8 @@ def test_phase14h_retired_attack_allocation_surface_is_absent() -> None:
 
 
 def test_model_destruction_emitters_remain_converged_on_typed_evidence() -> None:
-    emitters: set[str] = set()
+    direct_event_owners: set[str] = set()
+    wrapped_rule_emitters: set[str] = set()
     for path in (SRC_ROOT / "engine").rglob("*.py"):
         tree = ast_for(path)
         if any(
@@ -140,19 +157,86 @@ def test_model_destruction_emitters_remain_converged_on_typed_evidence() -> None
             and isinstance(node.func, ast.Attribute)
             and node.func.attr == "append"
             and bool(node.args)
-            and isinstance(node.args[0], ast.Constant)
-            and node.args[0].value == "model_destroyed"
+            and (
+                (isinstance(node.args[0], ast.Constant) and node.args[0].value == "model_destroyed")
+                or (
+                    isinstance(node.args[0], ast.Name)
+                    and node.args[0].id == "MODEL_DESTROYED_EVENT_TYPE"
+                )
+            )
             for node in ast.walk(tree)
         ):
-            emitters.add(path.relative_to(ROOT).as_posix())
+            direct_event_owners.add(path.relative_to(ROOT).as_posix())
+        if any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_append_model_destroyed"
+            for node in ast.walk(tree)
+        ):
+            wrapped_rule_emitters.add(path.relative_to(ROOT).as_posix())
 
-    assert emitters == MODEL_DESTROYED_EMITTER_PATHS
+    assert direct_event_owners == DIRECT_MODEL_DESTROYED_EVENT_OWNERS
+    assert (
+        direct_event_owners - {MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH}
+    ) | wrapped_rule_emitters == MODEL_DESTROYED_EMITTER_PATHS
     for relative_path in MODEL_DESTROYED_EMITTER_PATHS:
         emitter_source = source_for(ROOT / relative_path)
         assert "ModelDestructionAttribution" in emitter_source
         assert "transition_batch" in emitter_source
         assert "source_rules_unit_objective_proximity_witness" in emitter_source
         assert "destroyed_rules_unit_objective_proximity_witness" in emitter_source
+
+
+def test_model_destruction_emitters_register_and_consume_typed_cause_authority() -> None:
+    calls_by_path: dict[str, set[str]] = {}
+    for relative_path in (
+        *MODEL_DESTROYED_EMITTER_PATHS,
+        MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH,
+        ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH,
+        ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH,
+    ):
+        calls_by_path[relative_path] = {
+            (node.func.id if isinstance(node.func, ast.Name) else node.func.attr)
+            for node in ast.walk(ast_for(ROOT / relative_path))
+            if isinstance(node, ast.Call) and isinstance(node.func, (ast.Attribute, ast.Name))
+        }
+
+    assert {
+        "finalize_attack_damage_model_destruction_cause",
+        "consume_attack_damage_model_destruction_cause",
+    } <= calls_by_path["src/warhammer40k_core/engine/attack_sequence_hit_wound.py"]
+    assert {
+        "reserve_destroyed_attack_damage_authority",
+        "reserve_attack_deadly_demise_secondary_authorities",
+    } <= calls_by_path[ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH]
+    assert (
+        "reserve_attack_damage_model_destruction_cause"
+        in calls_by_path[ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH]
+    )
+    assert {
+        "record_mortal_wound_model_destruction_cause",
+        "consume_mortal_wound_model_destruction_cause",
+    } <= calls_by_path["src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py"]
+    assert {"_reserve_destruction_cause", "_append_model_destroyed"} <= calls_by_path[
+        "src/warhammer40k_core/engine/rule_model_destruction.py"
+    ]
+    assert {
+        "record_model_destruction_cause",
+        "finalize_model_destruction_cause",
+        "consume_model_destruction_cause",
+    } <= calls_by_path[MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH]
+
+    attack_source = source_for(ROOT / "src/warhammer40k_core/engine/attack_sequence_hit_wound.py")
+    mortal_source = source_for(
+        ROOT / "src/warhammer40k_core/engine/mortal_wound_destruction_evidence.py"
+    )
+    rule_source = source_for(ROOT / "src/warhammer40k_core/engine/rule_model_destruction.py")
+    producer_source = source_for(ROOT / MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH)
+    assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in attack_source
+    assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in mortal_source
+    assert "append_rule_effect_model_destroyed_event as _append_model_destroyed" in rule_source
+    assert "MODEL_DESTRUCTION_CAUSE_ID_FIELD" in producer_source
+    assert "-> ModelDestructionCauseAuthority" in producer_source
 
 
 def test_primary_unit_destruction_tracking_covers_event_and_transition_owners() -> None:
@@ -281,7 +365,7 @@ def test_primary_battlefield_departure_callers_and_provenance_are_fail_closed() 
         )
 
 
-def test_battlefield_removal_owners_converge_or_are_explicitly_prebattle() -> None:
+def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative() -> None:
     calls_by_method: dict[str, dict[str, int]] = {
         method_name: {} for method_name in DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
     }
@@ -299,6 +383,21 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_prebattle() -> No
                 calls_by_method[method_name][relative_path] = count
 
     assert calls_by_method == DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS
+
+    # Fight movement and restore validation construct temporary scenario views.
+    # They never replace authoritative GameState battlefield state.
+    fight_movement_source = source_for(SRC_ROOT / "engine" / "fight_movement_source.py")
+    fight_restore_integrity_source = source_for(
+        SRC_ROOT / "engine" / "fight_activation_history_integrity.py"
+    )
+    assert "Build the resolver view with only living source models" in fight_movement_source
+    assert "battlefield = battlefield.without_unit_placement(component_id)" in (
+        fight_movement_source
+    )
+    assert "battlefield_scenario_for_living_model_coherency" in (fight_restore_integrity_source)
+    assert "scenario.battlefield_state.with_removed_models(" in (fight_restore_integrity_source)
+    assert "replace_battlefield_state" not in fight_movement_source
+    assert "replace_battlefield_state" not in fight_restore_integrity_source
 
     aircraft_source = source_for(SRC_ROOT / "engine" / "aircraft.py")
     aircraft_owner_source = source_for(

@@ -249,4 +249,6 @@ def rules_units_within(
         attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=second_unit_id,
         max_range_inches=distance,
+        placed_alive_attacker_models_only=True,
+        placed_alive_target_models_only=True,
     )

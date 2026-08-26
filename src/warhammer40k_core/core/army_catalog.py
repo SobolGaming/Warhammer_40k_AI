@@ -876,14 +876,34 @@ def _validate_datasheet_faction_keywords(
     datasheets: tuple[DatasheetDefinition, ...],
     factions: tuple[FactionDefinition, ...],
 ) -> None:
-    faction_keywords: set[str] = set()
-    for faction in factions:
-        faction_keywords.update(faction.faction_keywords)
     for datasheet in datasheets:
         if not datasheet.keywords.faction_keywords:
             raise ArmyCatalogError("ArmyCatalog datasheets must declare faction keywords.")
-        if not set(datasheet.keywords.faction_keywords).intersection(faction_keywords):
-            raise ArmyCatalogError("ArmyCatalog datasheet faction keywords must match a faction.")
+        if not any(
+            datasheet_has_catalog_faction_ownership(datasheet=datasheet, faction=faction)
+            for faction in factions
+        ):
+            raise ArmyCatalogError(
+                "ArmyCatalog datasheet faction keywords must match a faction or link its army rule."
+            )
+
+
+def datasheet_has_catalog_faction_ownership(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ArmyCatalogError("Catalog faction ownership requires a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ArmyCatalogError("Catalog faction ownership requires a FactionDefinition.")
+    if set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
+        return True
+    return any(
+        ability.source_kind is CatalogAbilitySourceKind.FACTION
+        and ability.ability_id in faction.army_rule_ids
+        for ability in datasheet.abilities
+    )
 
 
 def _validate_datasheet_wargear_links(

@@ -102,6 +102,10 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingUnitSelection,
     _hidden_target_model_ids,
 )
+from warhammer40k_core.engine.phases.shooting_targeting import (
+    _rules_unit_within_enemy_engagement_range,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.shooting_targets import (
     LONE_OPERATIVE_RULE_ID,
     STEALTH_RULE_ID,
@@ -1574,6 +1578,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
+        placed_alive_models_only=True,
     )
 
     all_inside_light = _scenario_with_unit_pose(
@@ -1600,6 +1605,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
+        placed_alive_models_only=True,
     )
 
     exact_light_area_id = "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
@@ -1685,6 +1691,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
+        placed_alive_models_only=True,
     )
 
 
@@ -1864,6 +1871,7 @@ def test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_k
         ruleset_descriptor=_ruleset(),
         observing_unit=attacker,
         target_unit_id=attached.attached_unit_instance_id,
+        placed_alive_models_only=True,
     )
 
 
@@ -2207,6 +2215,177 @@ def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state
         target_unit_ids=(infantry_units["enemy"].unit_instance_id,),
     )
     assert blast_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+
+
+def test_retained_only_enemy_locks_living_shooter_but_is_not_selectable() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            (
+                "retained-enemy",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+            (
+                "living-enemy",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+        ),
+    )
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    retained_enemy = units["retained-enemy"]
+    living_enemy = units["living-enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(10.0 + (1.4 * index), 20.0) for index in range(5)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=retained_enemy,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(10.0, 21.0),
+            Pose.at(70.0, 50.0),
+            Pose.at(71.4, 50.0),
+            Pose.at(72.8, 50.0),
+            Pose.at(74.2, 50.0),
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=living_enemy,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(10.0 + (1.4 * index), 10.0) for index in range(5)),
+    )
+    retained_enemy = replace(
+        retained_enemy,
+        own_models=tuple(replace(model, wounds_remaining=0) for model in retained_enemy.own_models),
+    )
+    scenario = _scenario_with_replaced_unit(scenario=scenario, replacement=retained_enemy)
+    retained_model_ids = tuple(model.model_instance_id for model in retained_enemy.own_models)
+    scenario = replace(scenario, present_destroyed_model_ids=retained_model_ids)
+
+    assert _rules_unit_within_enemy_engagement_range(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        rules_unit=rules_unit_view_from_armies(
+            armies=scenario.armies,
+            unit_instance_id=attacker.unit_instance_id,
+        ),
+        player_id="player-a",
+    )
+
+    candidates = {
+        candidate.target_unit_instance_id: candidate
+        for candidate in shooting_target_candidates_for_unit(
+            scenario=scenario,
+            ruleset_descriptor=_ruleset(),
+            attacker_unit=attacker,
+            weapon_profile=_first_weapon_profile(lifecycle, attacker),
+            target_unit_ids=(
+                retained_enemy.unit_instance_id,
+                living_enemy.unit_instance_id,
+            ),
+        )
+    }
+
+    assert candidates[retained_enemy.unit_instance_id].violation_code is (
+        ShootingTargetViolationCode.TARGET_HAS_NO_PLACED_LIVING_MODELS
+    )
+    assert candidates[living_enemy.unit_instance_id].violation_code is (
+        ShootingTargetViolationCode.LOCKED_IN_COMBAT
+    )
+
+
+def test_retained_base_alone_establishes_mixed_target_engagement_context() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+    )
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    engaged_friendly = units["intercessor-2"]
+    target = units["enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(10.0 + (1.4 * index), 10.0) for index in range(5)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=engaged_friendly,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=(
+            Pose.at(30.0, 31.0),
+            Pose.at(70.0, 50.0),
+            Pose.at(71.4, 50.0),
+            Pose.at(72.8, 50.0),
+            Pose.at(74.2, 50.0),
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(30.0, 30.0),
+            Pose.at(20.0, 10.0),
+            Pose.at(21.4, 10.0),
+            Pose.at(22.8, 10.0),
+            Pose.at(24.2, 10.0),
+        ),
+    )
+    target = _unit_with_dead_model(target, index=0)
+    scenario = _scenario_with_replaced_unit(scenario=scenario, replacement=target)
+    retained_model_id = target.own_models[0].model_instance_id
+    profile = _first_weapon_profile(lifecycle, attacker)
+
+    without_retained_base = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )[0]
+    retained_scenario = replace(
+        scenario,
+        present_destroyed_model_ids=(retained_model_id,),
+    )
+    with_retained_base = shooting_target_candidates_for_unit(
+        scenario=retained_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )[0]
+
+    assert without_retained_base.is_legal
+    assert with_retained_base.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
+    assert with_retained_base.target_visible_model_ids
+    assert retained_model_id not in with_retained_base.target_visible_model_ids
+    assert retained_model_id not in with_retained_base.target_in_range_model_ids
 
 
 def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() -> None:
@@ -2606,12 +2785,12 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
     target = units["enemy"]
     attacker_poses = (
         Pose.at(10.0, 35.0),
-        Pose.at(0.0, 5.0),
-        Pose.at(0.0, 7.0),
-        Pose.at(0.0, 9.0),
-        Pose.at(0.0, 11.0),
+        Pose.at(10.0, 37.0),
+        Pose.at(9.0, 39.0),
+        Pose.at(8.0, 41.0),
+        Pose.at(7.0, 43.0),
     )
-    target_poses = tuple(Pose.at(33.0 + index * 1.4, 35.0) for index in range(5))
+    target_poses = tuple(Pose.at(34.5 + index * 1.4, 35.0) for index in range(5))
     scenario = _scenario_with_unit_pose(
         scenario=scenario,
         unit=attacker,

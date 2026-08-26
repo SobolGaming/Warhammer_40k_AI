@@ -1169,6 +1169,8 @@ def _capture_surveil_evidence(
                 attacking_unit_instance_id=component.unit.unit_instance_id,
                 target_unit_instance_id=target.unit_instance_id,
                 max_range_inches=18,
+                placed_alive_attacker_models_only=True,
+                placed_alive_target_models_only=True,
             ):
                 range_components.append(component.unit.unit_instance_id)
             if unit_has_line_of_sight_to_target(
@@ -1177,6 +1179,7 @@ def _capture_surveil_evidence(
                 ruleset_descriptor=ruleset,
                 observing_unit=component.unit,
                 target_unit_id=target.unit_instance_id,
+                placed_alive_models_only=True,
                 terrain_features=battlefield.terrain_features,
                 terrain_areas=terrain_areas,
             ):

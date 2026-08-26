@@ -4,6 +4,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from warhammer40k_core.rules import wahapedia_bridge_patterns as _patterns
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, parameter_payload
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 from warhammer40k_core.rules.wahapedia_static_rule_ir import payload_by_source_row_id
@@ -72,6 +73,12 @@ def mustering_loadout(
     loadout: str,
     error_type: type[ValueError],
 ) -> str:
+    normalization = _patterns.LOADOUT_SEPARATOR_NORMALIZATION_BY_DATASHEET_ID.get(datasheet_id)
+    if normalization is not None:
+        expected_source_loadout, normalized_loadout = normalization
+        if loadout != expected_source_loadout:
+            raise error_type("Source-linked loadout separator normalization preimage drifted.")
+        loadout = normalized_loadout
     referenced_profile_ids, _base_size_ids, _source_rows = materialization_profile_source(
         rows_by_table=rows_by_table,
         datasheet_id=datasheet_id,

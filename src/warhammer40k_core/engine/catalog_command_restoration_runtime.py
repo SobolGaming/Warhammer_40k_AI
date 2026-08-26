@@ -12,6 +12,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_presence import rules_unit_has_placed_alive_model
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     CatalogCommandRestorationDescriptor,
     command_restoration_descriptor_for_clause,
@@ -23,9 +24,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_source_matches_unit,
-)
-from warhammer40k_core.engine.catalog_selected_target_effects_support import (
-    rules_unit_has_placed_alive_model,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
@@ -49,7 +47,9 @@ from warhammer40k_core.engine.rule_execution import (
     rule_ir_from_execution_payload,
 )
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
@@ -424,7 +424,7 @@ class CatalogCommandRestorationRuntime:
             raise GameLifecycleError("Catalog command restoration target lookup requires state.")
         source_models = tuple(
             model
-            for model in geometry_models_for_rules_unit(
+            for model in placed_alive_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=source.source_rules_unit.unit_instance_id,
             )
@@ -447,7 +447,7 @@ class CatalogCommandRestorationRuntime:
                 continue
             if any(
                 source_model.range_to(target_model) <= source.descriptor.distance_inches
-                for target_model in geometry_models_for_rules_unit(
+                for target_model in placed_alive_geometry_models_for_rules_unit(
                     state=state,
                     unit_instance_id=view.unit_instance_id,
                 )

@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battlefield_presence import (
+    scenario_rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
@@ -12,6 +15,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -34,6 +38,60 @@ def geometry_models_for_fight_unit(
         unit_placement=placement,
         state=state,
     )
+
+
+def geometry_models_for_fight_attack_target_unit(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+    state: GameState | None = None,
+) -> tuple[GeometryModel, ...]:
+    """Return only living models from a placed melee attack target unit."""
+    models = geometry_models_for_fight_unit(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+        state=state,
+    )
+    unit = scenario.unit_instance_for_placement(
+        scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    )
+    living_model_ids = {model.model_instance_id for model in unit.own_models if model.is_alive}
+    return tuple(model for model in models if model.model_id in living_model_ids)
+
+
+def attack_targetable_engaged_enemy_unit_ids(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    state: GameState | None = None,
+) -> tuple[str, ...]:
+    source_models = geometry_models_for_fight_unit_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        state=state,
+    )
+    engaged: list[str] = []
+    for enemy_unit_id in enemy_unit_ids_for_fight_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    ):
+        enemy_models = geometry_models_for_fight_attack_target_unit(
+            scenario=scenario,
+            unit_instance_id=enemy_unit_id,
+            state=state,
+        )
+        if any(
+            source_model.is_within_engagement_range(
+                enemy_model,
+                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
+                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+            )
+            for source_model in source_models
+            for enemy_model in enemy_models
+        ):
+            engaged.append(enemy_unit_id)
+    return tuple(sorted(engaged))
 
 
 def geometry_model_for_fight_unit_model(
@@ -246,6 +304,13 @@ def enemy_unit_ids_for_fight_placement(
         if army.player_id != unit_placement.player_id
         for unit in army.units
         if scenario.battlefield_state.is_unit_placed(unit.unit_instance_id)
+        and scenario_rules_unit_has_placed_alive_model(
+            scenario=scenario,
+            rules_unit=rules_unit_view_from_armies(
+                armies=scenario.armies,
+                unit_instance_id=unit.unit_instance_id,
+            ),
+        )
     )
 
 

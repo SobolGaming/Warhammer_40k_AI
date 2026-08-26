@@ -357,7 +357,11 @@ def _attack_pools_or_validation(
                 raise GameLifecycleError("Illegal target candidate requires violation_code.")
             return ShootingProposalValidationResult.invalid(
                 proposal_request_id=proposal.proposal_request_id,
-                violation_code=f"target_{violation.value}",
+                violation_code=(
+                    violation.value
+                    if violation is ShootingTargetViolationCode.TARGET_HAS_NO_PLACED_LIVING_MODELS
+                    else f"target_{violation.value}"
+                ),
                 message=candidate.message or "Declared target is not legal.",
                 field="declarations",
             )

@@ -9,13 +9,49 @@ from warhammer40k_core.adapters.access_control import (
 )
 from warhammer40k_core.adapters.projection import public_decision_request_view
 from warhammer40k_core.adapters.redaction import (
+    public_decision_request_payload,
     public_event_record_payload,
     public_victory_point_transaction_payload,
+    redacted_lifecycle_status,
 )
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
+from warhammer40k_core.engine.battlefield_state import ModelPlacement
+from warhammer40k_core.engine.damage_allocation import (
+    DamageApplication,
+    DamageKind,
+    FeelNoPainSource,
+    MortalWoundApplicationProgress,
+    build_feel_no_pain_request,
+)
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventRecord,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    ModelDestructionCauseKind,
+    model_destruction_cause_id,
+)
+from warhammer40k_core.engine.model_logical_death import (
+    MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+    DamageApplicationLogicalDeathTransition,
+    ModelLogicalDeathRecord,
+    model_logical_death_boundary_id,
+)
+from warhammer40k_core.engine.mortal_wound_application_authority import (
+    MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+)
+from warhammer40k_core.engine.mortal_wound_logical_death import (
+    MortalWoundLogicalDeathCauseBinding,
+)
+from warhammer40k_core.engine.phase import (
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
     MISSION_ACTION_OPPORTUNITY_DECLINED_EVENT,
 )
@@ -31,6 +67,123 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
+from warhammer40k_core.geometry.pose import Pose
+
+
+def test_phase17n_model_logical_death_event_is_private_for_every_adapter_viewer() -> None:
+    payload: dict[str, JsonValue] = {"private_boundary": "model-logical-death:private"}
+
+    for viewer in (ViewerContext.for_player("player-a"), _administrator_viewer()):
+        assert (
+            public_event_record_payload(
+                event_id="event-000001",
+                event_type=MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+                payload=payload,
+                viewer=viewer,
+            )
+            is None
+        )
+
+
+def test_phase17n_mortal_wound_start_authority_is_private_for_every_adapter_viewer() -> None:
+    payload: dict[str, JsonValue] = {
+        "game_id": "phase17n-private-mortal-wound-start",
+        "application_id": "phase17n-private-mortal-wound-application",
+        "source_context": {"private_producer": "internal-cause-root"},
+    }
+
+    for viewer in (
+        ViewerContext.for_player("player-a"),
+        ViewerContext.for_player("player-b"),
+        _administrator_viewer(),
+    ):
+        assert (
+            public_event_record_payload(
+                event_id="event-000001",
+                event_type=MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+                payload=payload,
+                viewer=viewer,
+            )
+            is None
+        )
+
+
+def test_phase17n_pending_fnp_logical_death_authority_is_private_on_every_public_path() -> None:
+    request, cause_id, boundary_id = _pending_fnp_request_with_logical_death_authority()
+    result = DecisionResult.for_request(
+        result_id="phase17n-private-fnp-result",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    record = DecisionRecord(
+        record_id="decision-record-000001",
+        request=request,
+        result=result,
+    )
+    raw_request_value = validate_json_value(request.to_payload())
+    raw_record_value = validate_json_value(record.to_payload())
+    assert isinstance(raw_request_value, dict)
+    assert isinstance(raw_record_value, dict)
+    raw_request = raw_request_value
+    raw_record = raw_record_value
+    assert '"logical_death_events"' in canonical_json(raw_request)
+    assert cause_id in canonical_json(raw_request)
+    assert boundary_id in canonical_json(raw_request)
+
+    owner = ViewerContext.for_player("player-a")
+    opponent = ViewerContext.for_player("player-b")
+    administrator = _administrator_viewer()
+    for viewer in (owner, opponent, administrator):
+        _assert_internal_model_destruction_authority_absent(
+            public_decision_request_payload(request, viewer=viewer),
+            cause_id=cause_id,
+            boundary_id=boundary_id,
+        )
+        _assert_internal_model_destruction_authority_absent(
+            public_decision_request_view(request, viewer=viewer),
+            cause_id=cause_id,
+            boundary_id=boundary_id,
+        )
+        _assert_internal_model_destruction_authority_absent(
+            redacted_lifecycle_status(
+                LifecycleStatus.invalid(
+                    stage=GameLifecycleStage.BATTLE,
+                    message="Private FNP authority diagnostic",
+                    payload={"request": raw_request, "record": raw_record},
+                ),
+                viewer=viewer,
+            ),
+            cause_id=cause_id,
+            boundary_id=boundary_id,
+        )
+
+        requested = public_event_record_payload(
+            event_id="phase17n-private-fnp-requested",
+            event_type="decision_requested",
+            payload=raw_request,
+            viewer=viewer,
+        )
+        recorded = public_event_record_payload(
+            event_id="phase17n-private-fnp-recorded",
+            event_type="decision_recorded",
+            payload=raw_record,
+            viewer=viewer,
+        )
+        assert requested is not None
+        assert recorded is not None
+        _assert_internal_model_destruction_authority_absent(
+            requested,
+            cause_id=cause_id,
+            boundary_id=boundary_id,
+        )
+        _assert_internal_model_destruction_authority_absent(
+            recorded,
+            cause_id=cause_id,
+            boundary_id=boundary_id,
+        )
+
+    assert request.to_payload() == raw_request
+    assert record.to_payload() == raw_record
 
 
 def test_phase17n_public_fixed_secondary_metadata_excludes_only_authority_commitments() -> None:
@@ -671,6 +824,120 @@ def _assert_owner_score_context_preserved(payload: JsonValue) -> None:
     assert evidence["evidence_by_rule"] == {
         "beacon": {"selected_unit_instance_ids": ["secret-owner-unit"]}
     }
+
+
+def _pending_fnp_request_with_logical_death_authority() -> tuple[DecisionRequest, str, str]:
+    game_id = "phase17n-private-fnp-game"
+    application_id = "phase17n-private-fnp-application"
+    physical_unit_id = "army-a:unit-a"
+    destroyed_model_id = f"{physical_unit_id}:model-a"
+    next_model_id = f"{physical_unit_id}:model-b"
+    damage = DamageApplication(
+        target_unit_instance_id=physical_unit_id,
+        model_instance_id=destroyed_model_id,
+        damage_kind=DamageKind.MORTAL,
+        requested_damage=1,
+        wounds_lost=1,
+        excess_damage_lost=0,
+        starting_wounds_remaining=1,
+        final_wounds_remaining=0,
+        destroyed=True,
+    )
+    cause_id = model_destruction_cause_id(
+        game_id=game_id,
+        cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+        producer_id=application_id,
+        model_instance_id=destroyed_model_id,
+    )
+    boundary_id = model_logical_death_boundary_id(
+        game_id=game_id,
+        cause_id=cause_id,
+        model_instance_id=destroyed_model_id,
+    )
+    logical_death = ModelLogicalDeathRecord(
+        boundary_id=boundary_id,
+        game_id=game_id,
+        cause_id=cause_id,
+        cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+        producer_id=application_id,
+        model_instance_id=destroyed_model_id,
+        physical_unit_instance_id=physical_unit_id,
+        rules_unit_instance_id=physical_unit_id,
+        destroyed_model_placement=ModelPlacement(
+            army_id="army-a",
+            player_id="player-a",
+            unit_instance_id=physical_unit_id,
+            model_instance_id=destroyed_model_id,
+            pose=Pose.at(x=12.0, y=8.0),
+        ),
+        placement_retained=True,
+        transition=DamageApplicationLogicalDeathTransition(damage_application=damage.to_payload()),
+    )
+    logical_death_event = EventRecord(
+        event_id="event-000001",
+        event_type=MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+        payload=validate_json_value(logical_death.to_payload()),
+    )
+    progress = MortalWoundApplicationProgress(
+        application_id=application_id,
+        source_rule_id="phase17n-private-fnp-source",
+        source_context={"source_result_id": "phase17n-private-fnp-source-result"},
+        target_unit_instance_id=physical_unit_id,
+        defender_player_id="player-a",
+        mortal_wounds=2,
+        remaining_mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=None,
+        logical_death_events=(logical_death_event,),
+        logical_death_cause_binding=MortalWoundLogicalDeathCauseBinding.fixed(
+            cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+            producer_id=application_id,
+        ),
+        applications=(damage,),
+    )
+    return (
+        build_feel_no_pain_request(
+            request_id="phase17n-private-fnp-request",
+            defender_player_id="player-a",
+            lost_wound_context=validate_json_value(
+                progress.to_feel_no_pain_context(model_instance_id=next_model_id)
+            ),
+            sources=(
+                FeelNoPainSource(
+                    source_id="phase17n-private-fnp-source-a",
+                    threshold=5,
+                ),
+                FeelNoPainSource(
+                    source_id="phase17n-private-fnp-source-b",
+                    threshold=6,
+                ),
+            ),
+            decline_allowed=False,
+        ),
+        cause_id,
+        boundary_id,
+    )
+
+
+def _assert_internal_model_destruction_authority_absent(
+    payload: object,
+    *,
+    cause_id: str,
+    boundary_id: str,
+) -> None:
+    encoded = canonical_json(validate_json_value(payload))
+    for key in (
+        "logical_death_cause_binding",
+        "logical_death_event",
+        "logical_death_events",
+        "model_destruction_cause_authorities",
+        "model_destruction_cause_id",
+        "parent_model_destruction_cause_id",
+    ):
+        assert f'"{key}"' not in encoded
+    assert MODEL_LOGICAL_DEATH_RECORDED_EVENT not in encoded
+    assert cause_id not in encoded
+    assert boundary_id not in encoded
 
 
 def _administrator_viewer() -> ViewerContext:

@@ -31,6 +31,7 @@ from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     ConsolidationModeKind,
     FightEligibilityKind,
     FightOrderingBandKind,
@@ -63,6 +64,11 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
+from warhammer40k_core.engine.damage_allocation import (
+    DamageKind,
+    apply_damage_to_model,
+    unit_by_id,
+)
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
@@ -86,6 +92,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
 )
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FightActivationSelection,
@@ -94,7 +101,9 @@ from warhammer40k_core.engine.fight_order import (
 )
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ACTION,
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     FightMovementProposal,
+    MeleeDeclarationProposalRequest,
     fight_movement_maximum_distance_inches,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
@@ -105,7 +114,10 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.list_validation_errors import ListValidationError
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeContext
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeContext,
+    MovementEndSurgeGrant,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -156,6 +168,7 @@ _AELDARI_DATASHEET_ID = "phase17g-aeldari-star-engine-vehicle"
 _AELDARI_ASPECT_DATASHEET_ID = "phase17g-aeldari-aspect-warriors"
 _AELDARI_ASPECT_MODEL_PROFILE_ID = "core-intercessor-like"
 _AELDARI_FIGHT_DATASHEET_ID = "phase17g-aeldari-sudden-strike-fighter"
+_AELDARI_FIGHT_SQUAD_DATASHEET_ID = "phase17g-aeldari-sudden-strike-fight-squad"
 _AELDARI_DETACHMENT_ID = "warhost"
 _OTHER_AELDARI_DETACHMENT_ID = "guardian-battlehost"
 _ASPECT_SHRINE_TOKEN_WARGEAR_ID = f"{_AELDARI_ASPECT_DATASHEET_ID}:aspect-shrine-token"
@@ -1055,6 +1068,151 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
     assert resolution["maximum_distance_inches"] == 6.0
 
 
+def test_retained_only_aeldari_skips_sudden_strike_but_keeps_pending_attacks() -> None:
+    config = _aeldari_config(
+        aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
+        aeldari_model_profile_id="core-character-leader",
+    )
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=(_AELDARI_UNIT_SELECTION_ID,),
+        enemy_unit_ids=(_ENEMY_UNIT_SELECTION_ID,),
+        origins={
+            _AELDARI_UNIT_SELECTION_ID: Pose.at(10.0, 20.0),
+            _ENEMY_UNIT_SELECTION_ID: Pose.at(12.15, 20.0, facing_degrees=180.0),
+        },
+        game_id=config.game_id,
+        config=config,
+    )
+    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+    state = _state(lifecycle)
+    fighter = unit_by_id(state=state, unit_instance_id=_AELDARI_UNIT_ID)
+    model = fighter.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_placement = battlefield.model_placement_by_id(model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=fighter.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id="phase17g:aeldari:sudden-strike:retained-only",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    activation_request = _decision_request(
+        _drain_fight_movement_requests(
+            lifecycle,
+            lifecycle.advance_until_decision_or_terminal(),
+        )
+    )
+    assert activation_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    melee_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-retained-only-activation",
+            request=activation_request,
+            selected_option_id=fight_activation_option_id(
+                unit_instance_id=_AELDARI_UNIT_ID,
+                fight_type=FightTypeKind.NORMAL,
+            ),
+        )
+    )
+    melee_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        melee_status,
+        result_id="phase17g-aeldari-retained-only-decline-stratagem",
+    )
+    melee_request = _decision_request(melee_status)
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    assert {
+        cast(str, cast(dict[str, JsonValue], row)["model_instance_id"])
+        for row in proposal_request.available_weapons
+    } == {model.model_instance_id}
+    assert not any(
+        event.event_type == "fight_activation_ability_requested"
+        for event in lifecycle.decision_controller.event_log.records
+    )
+
+
+def test_mixed_aeldari_with_retained_model_keeps_sudden_strike_authority() -> None:
+    config = _aeldari_config(
+        aeldari_datasheet_id=_AELDARI_FIGHT_SQUAD_DATASHEET_ID,
+        aeldari_model_profile_id="core-intercessor-like",
+        aeldari_model_count=5,
+    )
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=(_AELDARI_UNIT_SELECTION_ID,),
+        enemy_unit_ids=(_ENEMY_UNIT_SELECTION_ID,),
+        origins={
+            _AELDARI_UNIT_SELECTION_ID: Pose.at(10.0, 20.0),
+            _ENEMY_UNIT_SELECTION_ID: Pose.at(12.15, 20.0, facing_degrees=180.0),
+        },
+        game_id=config.game_id,
+        config=config,
+    )
+    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+    state = _state(lifecycle)
+    _place_unit_poses(
+        state,
+        unit_instance_id=_AELDARI_UNIT_ID,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_ENEMY_UNIT_ID,
+        poses=_unit_line_poses(x=12.15, y=20.0),
+    )
+    fighter = unit_by_id(state=state, unit_instance_id=_AELDARI_UNIT_ID)
+    destroyed_model = fighter.own_models[-1]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_placement = battlefield.model_placement_by_id(destroyed_model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=fighter.unit_instance_id,
+        model_instance_id=destroyed_model.model_instance_id,
+        damage=destroyed_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id="phase17g:aeldari:sudden-strike:mixed",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    activation_request = _decision_request(
+        _drain_fight_movement_requests(
+            lifecycle,
+            lifecycle.advance_until_decision_or_terminal(),
+        )
+    )
+    ability_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-mixed-activation",
+            request=activation_request,
+            selected_option_id=fight_activation_option_id(
+                unit_instance_id=_AELDARI_UNIT_ID,
+                fight_type=FightTypeKind.NORMAL,
+            ),
+        )
+    )
+
+    ability_request = _decision_request(ability_status)
+    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+    assert f"use:{army_rule.SUDDEN_STRIKE_MANEUVER}" in {
+        option.option_id for option in ability_request.options
+    }
+
+
 def test_aeldari_opportunity_seized_grants_d6_plus_one_after_enemy_fall_back() -> None:
     config = _aeldari_config()
     lifecycle, _movement_status = _advance_to_movement_unit_selection(config)
@@ -1093,6 +1251,82 @@ def test_aeldari_opportunity_seized_grants_d6_plus_one_after_enemy_fall_back() -
     assert grant.max_distance_bonus_inches == 1
     payload = cast(dict[str, JsonValue], grant.decision_effect_payload)
     assert payload["maneuver"] == army_rule.OPPORTUNITY_SEIZED_MANEUVER
+
+
+def test_opportunity_seized_requires_living_unit_but_measures_retained_physical_base() -> None:
+    def grants_for_state(*, destroy_all: bool) -> tuple[MovementEndSurgeGrant, ...]:
+        config = _aeldari_config(aspect_shrine_token_count=1)
+        lifecycle, _movement_status = _advance_to_movement_unit_selection(config)
+        state = _state(lifecycle)
+        friendly_poses = (
+            Pose.at(20.0, 20.0),
+            Pose.at(40.0, 20.0),
+            Pose.at(40.0, 22.0),
+            Pose.at(40.0, 24.0),
+            Pose.at(40.0, 26.0),
+        )
+        _place_unit_poses(
+            state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            poses=friendly_poses,
+        )
+        enemy_start_poses = _unit_line_poses(x=22.0, y=20.0)
+        enemy_end_poses = _unit_line_poses(x=34.0, y=20.0)
+        _place_unit_poses(state, unit_instance_id=_ENEMY_UNIT_ID, poses=enemy_end_poses)
+        transition_batch = _displacement_batch_for_unit(
+            state=state,
+            unit_instance_id=_ENEMY_UNIT_ID,
+            start_poses=enemy_start_poses,
+            end_poses=enemy_end_poses,
+        )
+        friendly_unit = unit_by_id(state=state, unit_instance_id=_AELDARI_UNIT_ID)
+        battlefield = state.battlefield_state
+        assert battlefield is not None
+        retained_model = friendly_unit.own_models[0]
+        retained_placement = battlefield.model_placement_by_id(retained_model.model_instance_id)
+        models_to_destroy = friendly_unit.own_models if destroy_all else (retained_model,)
+        for model in models_to_destroy:
+            apply_damage_to_model(
+                state=state,
+                target_unit_instance_id=friendly_unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                damage=model.wounds_remaining,
+                damage_kind=DamageKind.NORMAL,
+            )
+        restore_model_awaiting_fight_on_death(
+            state=state,
+            placement=retained_placement,
+            effect_id=(
+                "phase17g:aeldari:opportunity-seized:retained-only"
+                if destroy_all
+                else "phase17g:aeldari:opportunity-seized:mixed"
+            ),
+            source_rule_id="phase17g:test:fight-on-death",
+            source_phase=BattlePhaseKind.MOVEMENT,
+        )
+        return army_rule.opportunity_seized_surge_grants(
+            MovementEndSurgeContext(
+                state=state,
+                ruleset_descriptor=config.ruleset_descriptor,
+                triggering_unit_instance_id=_ENEMY_UNIT_ID,
+                triggering_player_id="player-b",
+                reacting_player_id="player-a",
+                trigger_event_id=(
+                    "phase17g-aeldari-retained-only-fall-back"
+                    if destroy_all
+                    else "phase17g-aeldari-mixed-fall-back"
+                ),
+                movement_phase_action=MovementPhaseActionKind.FALL_BACK.value,
+                trigger_event_payload={
+                    "transition_batch": cast(JsonValue, transition_batch.to_payload())
+                },
+            )
+        )
+
+    assert grants_for_state(destroy_all=True) == ()
+    mixed_grants = grants_for_state(destroy_all=False)
+    assert len(mixed_grants) == 1
+    assert mixed_grants[0].unit_instance_id == _AELDARI_UNIT_ID
 
 
 def test_aeldari_fade_back_grants_d6_plus_one_to_hit_unit_after_enemy_shoots() -> None:
@@ -1207,6 +1441,27 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
     aeldari_fighter = _aeldari_fight_datasheet(
         base_catalog.datasheet_by_id("core-character-leader")
     )
+    aeldari_fight_squad = replace(
+        base_catalog.datasheet_by_id("core-intercessor-like-infantry"),
+        datasheet_id=_AELDARI_FIGHT_SQUAD_DATASHEET_ID,
+        name="Sudden Strike Test Fight Squad",
+        keywords=DatasheetKeywordSet(
+            keywords=("Infantry",),
+            faction_keywords=("Asuryani",),
+        ),
+        attachment_eligibilities=(),
+        wargear_options=tuple(
+            replace(
+                option,
+                default_wargear_ids=("core-leader-blade",),
+                allowed_wargear_ids=("core-leader-blade",),
+            )
+            for option in base_catalog.datasheet_by_id(
+                "core-intercessor-like-infantry"
+            ).wargear_options
+        ),
+        source_ids=("phase17g:test:aeldari:sudden-strike-fight-squad",),
+    )
     aeldari_aspect_warriors = _aeldari_aspect_datasheet(
         base_catalog.datasheet_by_id("core-intercessor-like-infantry")
     )
@@ -1216,6 +1471,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
             *base_catalog.datasheets,
             aeldari_vehicle,
             aeldari_fighter,
+            aeldari_fight_squad,
             *((aeldari_aspect_warriors,) if include_aspect_shrine_token else ()),
         ),
         wargear=(
@@ -1249,6 +1505,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
                 unit_datasheet_ids=(
                     _AELDARI_DATASHEET_ID,
                     _AELDARI_FIGHT_DATASHEET_ID,
+                    _AELDARI_FIGHT_SQUAD_DATASHEET_ID,
                     *((_AELDARI_ASPECT_DATASHEET_ID,) if include_aspect_shrine_token else ()),
                 ),
                 force_disposition_ids=("phase17g-force", "take-and-hold"),
@@ -1262,6 +1519,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
                 unit_datasheet_ids=(
                     _AELDARI_DATASHEET_ID,
                     _AELDARI_FIGHT_DATASHEET_ID,
+                    _AELDARI_FIGHT_SQUAD_DATASHEET_ID,
                     *((_AELDARI_ASPECT_DATASHEET_ID,) if include_aspect_shrine_token else ()),
                 ),
                 force_disposition_ids=("phase17g-force", "take-and-hold"),

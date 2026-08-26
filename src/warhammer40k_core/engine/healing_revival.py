@@ -6,6 +6,7 @@ from typing import TypedDict, cast
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine import healing_source_context as hctx
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRuntimeState,
@@ -400,6 +401,9 @@ def _validate_revival_placement(
     scenario = BattlefieldScenario(
         armies=hypothetical_armies,
         battlefield_state=hypothetical_battlefield,
+        present_destroyed_model_ids=battlefield_scenario_for_state(
+            state=state
+        ).present_destroyed_model_ids,
     )
     hypothetical_rules_unit = rules_unit_view_from_armies(
         armies=hypothetical_armies,
@@ -513,11 +517,10 @@ def _validate_revived_model_engagement(
             continue
         for unit_placement in placed_army.unit_placements:
             for enemy_placement in unit_placement.model_placements:
-                enemy_instance = scenario.model_instance_for_placement(enemy_placement)
-                if not enemy_instance.is_alive:
+                if not scenario.model_is_present_at_placement(enemy_placement):
                     continue
                 enemy_model = geometry_model_for_placement(
-                    model=enemy_instance,
+                    model=scenario.model_instance_for_placement(enemy_placement),
                     placement=enemy_placement,
                 )
                 if revived_model.is_within_engagement_range(

@@ -589,7 +589,7 @@ def test_phase17b_faction_pack_rule_ir_registry_indexes_exact_source_identities(
         "thousand-sons",
         "world-eaters",
     )
-    assert len(faction_pack_rule_ir.supported_datasheet_source_row_ids()) == 86
+    assert len(faction_pack_rule_ir.supported_datasheet_source_row_ids()) == 92
     assert source_row_id in faction_pack_rule_ir.supported_datasheet_source_row_ids(
         "emperors-children"
     )
@@ -604,6 +604,32 @@ def test_phase17b_faction_pack_rule_ir_registry_indexes_exact_source_identities(
     )
     assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000002639") == (
         "gw-11e-world-eaters-maulerfiend-datasheet-2026-07",
+    )
+    solitaire_source_package_id = "gw-11e-aeldari-solitaire-datasheet-2026-08"
+    solitaire_source_row_id = "000002538:6"
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000002538") == (
+        solitaire_source_package_id,
+    )
+    solitaire_payload = faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id(
+        solitaire_source_row_id
+    )
+    assert solitaire_payload is not None
+    assert solitaire_payload["source_id"] == (
+        f"{solitaire_source_package_id}:datasheet:{solitaire_source_row_id}"
+    )
+    daemon_prince_source_package_id = (
+        "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08"
+    )
+    daemon_prince_source_row_id = "000004086:3"
+    assert faction_pack_rule_ir.source_package_ids_by_datasheet_id("000004086") == (
+        daemon_prince_source_package_id,
+    )
+    daemon_prince_payload = faction_pack_rule_ir.datasheet_rule_ir_payload_by_source_row_id(
+        daemon_prince_source_row_id
+    )
+    assert daemon_prince_payload is not None
+    assert daemon_prince_payload["source_id"] == (
+        f"{daemon_prince_source_package_id}:datasheet:{daemon_prince_source_row_id}"
     )
     assert faction_pack_rule_ir.source_faction_id_by_datasheet_id("000004127") == ("thousand-sons")
     assert "000004127" in faction_pack_rule_ir.supported_datasheet_ids("thousand-sons")

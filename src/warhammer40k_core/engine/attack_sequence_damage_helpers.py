@@ -12,11 +12,19 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    MODEL_DESTRUCTION_CAUSE_ID_FIELD,
+)
+from warhammer40k_core.engine.model_logical_death import (
+    model_logical_death_event_for_cause_id,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+    MortalWoundDestructionFinalizationKind,
     record_finalized_mortal_wound_model_destructions,
 )
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.weapon_abilities import DEVASTATING_WOUNDS_RULE_ID
 
@@ -105,4 +113,30 @@ def record_deadly_demise_secondary_destruction_finalization(
         ),
         existing_model_destroyed_event_ids=(model_destroyed_event_id,),
         destroyed_model_placements=(),
+        logical_death_events=(
+            _logical_death_event_for_model_destroyed_event(
+                decisions=decisions,
+                model_destroyed_event_id=model_destroyed_event_id,
+            ),
+        ),
+        finalization_kind=(MortalWoundDestructionFinalizationKind.DEADLY_DEMISE_COLLATERAL_CAUSE),
+    )
+
+
+def _logical_death_event_for_model_destroyed_event(
+    *,
+    decisions: DecisionController,
+    model_destroyed_event_id: str,
+) -> EventRecord:
+    matches = tuple(
+        event for event in decisions.event_log.records if event.event_id == model_destroyed_event_id
+    )
+    if len(matches) != 1 or not isinstance(matches[0].payload, dict):
+        raise GameLifecycleError("Deadly Demise finalization requires one model-destroyed event.")
+    cause_id = matches[0].payload.get(MODEL_DESTRUCTION_CAUSE_ID_FIELD)
+    if type(cause_id) is not str:
+        raise GameLifecycleError("Deadly Demise model-destroyed event lacks cause authority.")
+    return model_logical_death_event_for_cause_id(
+        event_records=decisions.event_log.records,
+        cause_id=cause_id,
     )

@@ -1478,6 +1478,60 @@ def test_lifecycle_restore_rejects_corrupt_fight_phase_authority(
         GameLifecycle.from_payload(payload)
 
 
+@pytest.mark.parametrize(
+    ("corruption", "expected_message"),
+    [
+        ("selection_missing_history", "selection is missing from selected history"),
+        ("active_missing_selection", "must match exactly one selection"),
+        ("active_selection_drift", "Active Fight activation selection drift"),
+        ("duplicate_result_id", "selection result IDs must be unique"),
+    ],
+)
+def test_lifecycle_restore_rejects_corrupt_fight_activation_history(
+    corruption: str,
+    expected_message: str,
+) -> None:
+    payload, alpha_unit_id, beta_unit_id = _phase_state_consistency_payload(phase=BattlePhase.FIGHT)
+    fight_payload = cast(dict[str, object], payload["state"]["fight_phase_state"])
+    fight_order = cast(dict[str, object], fight_payload["fight_order_state"])
+    selection = {
+        "player_id": "player-a",
+        "battle_round": 1,
+        "unit_instance_id": alpha_unit_id,
+        "ordering_band": "remaining_combats",
+        "fight_type": "normal",
+        "eligibility_reasons": ["currently_engaged"],
+        "request_id": "phase9b-fight-history-request",
+        "result_id": "phase9b-fight-history-result",
+        "interrupt_id": None,
+    }
+    if corruption == "selection_missing_history":
+        fight_order["activation_selections"] = [selection]
+    elif corruption == "active_missing_selection":
+        fight_payload["active_activation"] = selection
+    elif corruption == "active_selection_drift":
+        fight_order["selected_to_fight_unit_ids"] = [alpha_unit_id]
+        fight_order["activation_selections"] = [selection]
+        fight_payload["active_activation"] = {
+            **selection,
+            "request_id": "phase9b-fight-history-drift",
+        }
+    elif corruption == "duplicate_result_id":
+        fight_order["selected_to_fight_unit_ids"] = [alpha_unit_id, beta_unit_id]
+        fight_order["activation_selections"] = [
+            selection,
+            {
+                **selection,
+                "player_id": "player-b",
+                "unit_instance_id": beta_unit_id,
+                "request_id": "phase9b-fight-history-request-beta",
+            },
+        ]
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        GameLifecycle.from_payload(payload)
+
+
 def test_lifecycle_from_payload_rejects_mustered_army_state_drift() -> None:
     lifecycle = _start_lifecycle()
     lifecycle.advance_until_decision_or_terminal()

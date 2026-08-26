@@ -20,6 +20,7 @@ from warhammer40k_core.engine import unit_move_completed_hooks as _umc
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.aircraft import AircraftMovementPolicy, HoverModeState
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
@@ -111,6 +112,15 @@ from warhammer40k_core.engine.phases import charge_modifier_ignore as _modifier_
 from warhammer40k_core.engine.phases.charge_move_completed_hooks import (
     resolve_charge_move_completed_hooks,
     validate_charge_move_completed_hook_provider,
+)
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+    scenario_physical_enemy_rules_unit_ids,
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_view_from_armies,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import (
@@ -2668,7 +2678,10 @@ def _charge_target_candidates(
     scenario = _battlefield_scenario(state)
     max_range = ruleset_descriptor.charge_policy.max_declaration_range_inches
     candidates: list[ChargeTargetCandidate] = []
-    for target_id in _enemy_placed_unit_ids(state=state, player_id=_active_player_id(state)):
+    for target in placed_alive_rules_unit_views(state=state):
+        if target.owner_player_id == _active_player_id(state):
+            continue
+        target_id = target.unit_instance_id
         distance = _closest_unit_distance_inches(
             scenario=scenario,
             source_unit_instance_id=unit_instance_id,
@@ -2781,27 +2794,20 @@ def _unit_is_engaged(
     ruleset_descriptor: RulesetDescriptor,
 ) -> bool:
     scenario = _battlefield_scenario(state)
-    source_models = _geometry_models_for_unit(
-        scenario=scenario,
+    source = rules_unit_view_from_armies(
+        armies=scenario.armies,
         unit_instance_id=unit_instance_id,
     )
-    enemy_models = tuple(
-        model
-        for enemy_unit_id in _enemy_placed_unit_ids(state=state, player_id=player_id)
-        for model in _geometry_models_for_unit(
+    if source.owner_player_id != player_id:
+        raise GameLifecycleError(
+            "Charge Engagement Range query player does not own the rules unit."
+        )
+    return bool(
+        scenario_physically_engaged_enemy_rules_unit_ids(
             scenario=scenario,
-            unit_instance_id=enemy_unit_id,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=source.unit_instance_id,
         )
-    )
-    policy = ruleset_descriptor.engagement_policy
-    return any(
-        source_model.is_within_engagement_range(
-            enemy_model,
-            horizontal_inches=policy.horizontal_inches,
-            vertical_inches=policy.vertical_inches,
-        )
-        for source_model in source_models
-        for enemy_model in enemy_models
     )
 
 
@@ -2846,22 +2852,10 @@ def _geometry_models_for_unit(
     scenario: BattlefieldScenario,
     unit_instance_id: str,
 ) -> tuple[GeometryModel, ...]:
-    try:
-        placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Charge unit placement is unavailable.") from exc
-    unit = scenario.unit_instance_for_placement(placement)
-    models: list[GeometryModel] = []
-    for model_placement in placement.model_placements:
-        model_instance = None
-        for model in unit.own_models:
-            if model.model_instance_id == model_placement.model_instance_id:
-                model_instance = model
-                break
-        if model_instance is None:
-            raise GameLifecycleError("Charge model placement is invalid.")
-        models.append(geometry_model_for_placement(model=model_instance, placement=model_placement))
-    return tuple(models)
+    return physical_geometry_models_for_rules_unit(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
 
 
 def _geometry_models_for_unit_placement(
@@ -2994,23 +2988,22 @@ def _charge_endpoint_witness(
             preferred_target_ids.append(target_id)
     non_target_engaged_ids: list[str] = []
     selected_target_set = set(target_ids)
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == after.player_id:
+    for enemy_unit_id in scenario_physical_enemy_rules_unit_ids(
+        scenario=scenario,
+        unit_instance_id=after.unit_instance_id,
+    ):
+        if enemy_unit_id in selected_target_set:
             continue
-        for unit_placement in placed_army.unit_placements:
-            if unit_placement.unit_instance_id in selected_target_set:
-                continue
-            enemy_models = _geometry_models_for_unit_placement(
+        if _model_groups_are_engaged(
+            first_models=after_models,
+            second_models=_geometry_models_for_unit(
                 scenario=scenario,
-                unit_placement=unit_placement,
-            )
-            if _model_groups_are_engaged(
-                first_models=after_models,
-                second_models=enemy_models,
-                horizontal_inches=policy.horizontal_inches,
-                vertical_inches=policy.vertical_inches,
-            ):
-                non_target_engaged_ids.append(unit_placement.unit_instance_id)
+                unit_instance_id=enemy_unit_id,
+            ),
+            horizontal_inches=policy.horizontal_inches,
+            vertical_inches=policy.vertical_inches,
+        ):
+            non_target_engaged_ids.append(enemy_unit_id)
     return ChargeEndpointWitness(
         selected_target_unit_instance_ids=target_ids,
         target_distances_before_inches=target_distances_before,
@@ -3106,10 +3099,7 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     if battlefield_state is None:
         raise GameLifecycleError("Charge phase requires battlefield_state.")
     try:
-        scenario = BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=battlefield_state,
-        )
+        scenario = battlefield_scenario_for_state(state=state)
         scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
     except PlacementError as exc:
         raise GameLifecycleError("Charge battlefield scenario is invalid.") from exc
@@ -3130,18 +3120,6 @@ def _active_player_placed_unit_ids(*, state: GameState, player_id: str) -> tuple
     if placed_army is None:
         return ()
     return tuple(sorted(placement.unit_instance_id for placement in placed_army.unit_placements))
-
-
-def _enemy_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ...]:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Charge phase requires battlefield_state.")
-    unit_ids: list[str] = []
-    for placed_army in battlefield_state.placed_armies:
-        if placed_army.player_id == player_id:
-            continue
-        unit_ids.extend(placement.unit_instance_id for placement in placed_army.unit_placements)
-    return tuple(sorted(unit_ids))
 
 
 def _unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:

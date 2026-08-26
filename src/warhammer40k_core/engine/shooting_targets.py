@@ -16,6 +16,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine.battlefield_presence import (
+    scenario_rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
@@ -24,6 +27,9 @@ from warhammer40k_core.engine.lone_operative import (
     lone_operative_target_allowed,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.ranged_rule_effects import (
     detection_range_bonus_inches_for_effects,
     unit_is_hidden_by_effects,
@@ -40,6 +46,9 @@ from warhammer40k_core.engine.shooting_selection_range import (
 )
 from warhammer40k_core.engine.shooting_selection_range import (
     geometry_models_for_unit_placements as _geometry_models_for_unit_placements,
+)
+from warhammer40k_core.engine.shooting_selection_range import (
+    placed_alive_geometry_models_for_unit_placements as _geometry_models_for_target_placements,
 )
 from warhammer40k_core.engine.shooting_selection_range import (
     target_in_range_model_ids as _target_in_range_model_ids,
@@ -99,6 +108,7 @@ class ShootingTargetViolationCode(StrEnum):
     MELEE_WEAPON = "melee_weapon"
     NOT_ENEMY_UNIT = "not_enemy_unit"
     TARGET_NOT_PLACED = "target_not_placed"
+    TARGET_HAS_NO_PLACED_LIVING_MODELS = "target_has_no_placed_living_models"
     OUT_OF_RANGE = "out_of_range"
     OUTSIDE_DETECTION_RANGE = "outside_detection_range"
     NOT_VISIBLE = "not_visible"
@@ -498,13 +508,17 @@ def unit_has_line_of_sight_to_target(
     observer_model_instance_id: str | None = None,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     terrain_areas: tuple[PlacedTerrainArea, ...] = (),
+    placed_alive_models_only: bool,
 ) -> bool:
+    """Query LOS under the caller's explicit living-model policy for both sides."""
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Line of sight target query requires a BattlefieldScenario.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Line of sight target query requires a RulesetDescriptor.")
     if type(observing_unit) is not UnitInstance:
         raise GameLifecycleError("Line of sight target query requires a UnitInstance.")
+    if type(placed_alive_models_only) is not bool:
+        raise GameLifecycleError("Line of sight placed_alive_models_only must be a bool.")
     _validate_identifier("target_unit_id", target_unit_id)
     observer_model_id = _validate_optional_identifier(
         "observer_model_instance_id",
@@ -527,14 +541,26 @@ def unit_has_line_of_sight_to_target(
     )
     if observing_placement is None or target_placements is None:
         raise GameLifecycleError("Line of sight target query requires placed units.")
+    if placed_alive_models_only and not scenario_rules_unit_has_placed_alive_model(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    ):
+        return False
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
     )
-    target_models = _geometry_models_for_unit_placements(
-        scenario=scenario,
-        unit_placements=target_placements,
+    target_models = (
+        _geometry_models_for_target_placements(
+            scenario=scenario,
+            unit_placements=target_placements,
+        )
+        if placed_alive_models_only
+        else _geometry_models_for_unit_placements(
+            scenario=scenario,
+            unit_placements=target_placements,
+        )
     )
     hidden_model_ids = set(
         terrain_hidden_model_ids(
@@ -569,6 +595,13 @@ def unit_has_line_of_sight_to_target(
         scenario=scenario,
         unit_placement=observing_placement,
     )
+    if placed_alive_models_only:
+        alive_observer_model_ids = {
+            model.model_instance_id for model in observing_unit.own_models if model.is_alive
+        }
+        observer_models = tuple(
+            model for model in observer_models if model.model_id in alive_observer_model_ids
+        )
     if observer_model_id is not None:
         observer_models = tuple(
             model for model in observer_models if model.model_id == observer_model_id
@@ -704,6 +737,18 @@ def _target_candidate(
             message="Ranged target selection requires placed attacker and target units.",
             visibility_cache_key=visibility_cache_key,
         )
+    if not scenario_rules_unit_has_placed_alive_model(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    ):
+        return _invalid_candidate(
+            attacker_unit=attacker_unit,
+            weapon_profile=weapon_profile,
+            target_unit_id=target_unit_id,
+            violation_code=ShootingTargetViolationCode.TARGET_HAS_NO_PLACED_LIVING_MODELS,
+            message="Ranged target selection requires at least one placed living target model.",
+            visibility_cache_key=visibility_cache_key,
+        )
     hunter_rule_ids: tuple[str, ...] = ()
     if WeaponKeyword.HUNTER in weapon_profile.keywords:
         hunter_rule_ids = (HUNTER_RULE_ID,)
@@ -722,7 +767,14 @@ def _target_candidate(
         attacker_placement=attacker_placement,
         attacker_model_instance_id=attacker_model_instance_id,
     )
-    target_models = _geometry_models_for_unit_placements(
+    attacker_models = tuple(
+        model
+        for model in attacker_models
+        if scenario.model_instance_for_placement(
+            scenario.battlefield_state.model_placement_by_id(model.model_id)
+        ).is_alive
+    )
+    target_models = _geometry_models_for_target_placements(
         scenario=scenario,
         unit_placements=target_placements,
     )
@@ -816,7 +868,6 @@ def _target_candidate(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         attacker_unit=attacker_unit,
-        attacker_models=attacker_models,
     )
     target_engagement_context = _target_engagement_context(
         scenario=scenario,
@@ -824,7 +875,6 @@ def _target_candidate(
         attacker_owner=attacker_owner,
         target_rules_unit=target_rules_unit,
         target_unit_id=target_unit_id,
-        target_models=target_models,
     )
     if locked_context.is_locked:
         locked_validation = _locked_in_combat_validation(
@@ -1359,32 +1409,15 @@ def _locked_in_combat_context(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     attacker_unit: UnitInstance,
-    attacker_models: tuple[Model, ...],
 ) -> _LockedInCombatContext:
-    attacker_owner = _player_id_for_unit(scenario, attacker_unit.unit_instance_id)
-    engaged_unit_ids: set[str] = set()
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == attacker_owner:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            enemy_models = _geometry_models_for_unit_placement(
-                scenario=scenario,
-                unit_placement=unit_placement,
-            )
-            if _any_models_in_engagement(
-                attacker_models=attacker_models,
-                target_models=enemy_models,
-                ruleset_descriptor=ruleset_descriptor,
-            ):
-                engaged_unit_ids.add(
-                    rules_unit_view_from_armies(
-                        armies=scenario.armies,
-                        unit_instance_id=unit_placement.unit_instance_id,
-                    ).unit_instance_id
-                )
+    engaged_unit_ids = scenario_physically_engaged_enemy_rules_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=attacker_unit.unit_instance_id,
+    )
     return _LockedInCombatContext(
         is_locked=bool(engaged_unit_ids),
-        engaged_target_unit_ids=tuple(sorted(engaged_unit_ids)),
+        engaged_target_unit_ids=engaged_unit_ids,
     )
 
 
@@ -1395,28 +1428,16 @@ def _target_engagement_context(
     attacker_owner: str,
     target_rules_unit: RulesUnitView,
     target_unit_id: str,
-    target_models: tuple[Model, ...],
 ) -> _TargetEngagementContext:
-    engaged_friendly_unit_ids: set[str] = set()
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != attacker_owner:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            friendly_models = _geometry_models_for_unit_placement(
-                scenario=scenario,
-                unit_placement=unit_placement,
-            )
-            if _any_models_in_engagement(
-                attacker_models=friendly_models,
-                target_models=target_models,
-                ruleset_descriptor=ruleset_descriptor,
-            ):
-                engaged_friendly_unit_ids.add(
-                    rules_unit_view_from_armies(
-                        armies=scenario.armies,
-                        unit_instance_id=unit_placement.unit_instance_id,
-                    ).unit_instance_id
-                )
+    engaged_friendly_unit_ids = {
+        unit_id
+        for unit_id in scenario_physically_engaged_enemy_rules_unit_ids(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=target_unit_id,
+        )
+        if _player_id_for_unit(scenario, unit_id) == attacker_owner
+    }
     if target_unit_id in engaged_friendly_unit_ids:
         raise GameLifecycleError("Target engagement context included the target unit.")
     if set(target_rules_unit.component_unit_instance_ids) & engaged_friendly_unit_ids:
@@ -1435,24 +1456,6 @@ def _target_engagement_context(
         engaged_friendly_unit_ids=tuple(sorted(engaged_friendly_unit_ids)),
         is_engaged_only_by_friendly_fortifications=engaged_only_by_fortifications,
     )
-
-
-def _any_models_in_engagement(
-    *,
-    attacker_models: tuple[Model, ...],
-    target_models: tuple[Model, ...],
-    ruleset_descriptor: RulesetDescriptor,
-) -> bool:
-    policy = ruleset_descriptor.engagement_policy
-    for attacker_model in attacker_models:
-        for target_model in target_models:
-            if attacker_model.is_within_engagement_range(
-                target_model,
-                horizontal_inches=policy.horizontal_inches,
-                vertical_inches=policy.vertical_inches,
-            ):
-                return True
-    return False
 
 
 def _target_engagement_validation(

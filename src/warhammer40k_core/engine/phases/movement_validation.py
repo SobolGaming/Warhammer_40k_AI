@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -280,13 +281,9 @@ def _validate_movement_phase_state(state: GameState) -> None:
 
 
 def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
+    if state.battlefield_state is None:
         raise GameLifecycleError("Movement phase requires placed battlefield state.")
-    return BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield_state,
-    )
+    return battlefield_scenario_for_state(state=state)
 
 
 def _movement_unit_options(

@@ -22,8 +22,6 @@ from warhammer40k_core.engine.abilities import (
     ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.advance_hooks import (
-    AdvanceMoveContext,
-    AdvanceMoveGrant,
     AdvanceMoveHookBinding,
 )
 from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
@@ -66,9 +64,9 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     CatalogFightOnDeathDescriptor,
     CatalogFirstFailedSaveDamageReplacementDescriptor,
     CatalogInvulnerableSaveDescriptor,
-    CatalogMovementActionGrantDescriptor,
     CatalogPassiveHitRerollDescriptor,
     allocated_attack_damage_modifier_descriptor_for_clause,
+    charged_melee_weapon_characteristic_aura_descriptor_for_clause,
     conditional_attack_reroll_descriptor_for_clause,
     conditional_invulnerable_save_descriptor_for_clause,
     conditional_proximity_effects_descriptor_for_clause,
@@ -77,6 +75,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     invulnerable_save_descriptor_for_clause,
     movement_action_grant_descriptor_for_clause,
     passive_hit_reroll_descriptor_for_clause,
+    random_movement_attack_boost_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
@@ -106,10 +105,20 @@ from warhammer40k_core.engine.catalog_defensive_rule_runtime import (
     conditional_invulnerable_save_handler,
     passive_invulnerable_save_handler,
 )
+from warhammer40k_core.engine.catalog_movement_action_grant_runtime import (
+    movement_action_grant_advance_binding,
+    movement_action_grant_movement_binding,
+    random_movement_attack_boost_advance_binding,
+    random_movement_attack_boost_movement_binding,
+    random_movement_attack_boost_weapon_binding,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
+)
+from warhammer40k_core.engine.catalog_weapon_characteristic_aura_runtime import (
+    charged_melee_weapon_characteristic_aura_binding,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
@@ -303,26 +312,29 @@ class CatalogDatasheetRuleRuntime:
             if _source_characteristic(source) is Characteristic.MOVEMENT
         )
         grants = tuple(
-            MovementBudgetModifierBinding(
-                modifier_id=f"{source.binding_id}:movement-action-grant",
-                source_id=source.rule_ir.source_id,
-                handler=self._movement_action_grant_movement_handler(source, descriptor),
-            )
+            movement_action_grant_movement_binding(source, descriptor)
             for source, descriptor in self._described_sources(
                 movement_action_grant_descriptor_for_clause
             )
         )
-        return (*passive, *grants)
+        random_boosts = tuple(
+            random_movement_attack_boost_movement_binding(source, descriptor)
+            for source, descriptor in self._described_sources(
+                random_movement_attack_boost_descriptor_for_clause
+            )
+        )
+        return (*passive, *grants, *random_boosts)
 
     def advance_move_hook_bindings(self) -> tuple[AdvanceMoveHookBinding, ...]:
         return tuple(
-            AdvanceMoveHookBinding(
-                hook_id=f"{source.binding_id}:movement-action-grant",
-                source_id=source.rule_ir.source_id,
-                handler=self._movement_action_grant_handler(source, descriptor),
-            )
+            movement_action_grant_advance_binding(source, descriptor)
             for source, descriptor in self._described_sources(
                 movement_action_grant_descriptor_for_clause
+            )
+        ) + tuple(
+            random_movement_attack_boost_advance_binding(source, descriptor)
+            for source, descriptor in self._described_sources(
+                random_movement_attack_boost_descriptor_for_clause
             )
         )
 
@@ -439,6 +451,18 @@ class CatalogDatasheetRuleRuntime:
                 handler=half_range_weapon_ability_handler(source),
             )
             for source in self._sources(clause_is_half_range_weapon_ability_grant)
+        )
+        bindings.extend(
+            random_movement_attack_boost_weapon_binding(source, descriptor)
+            for source, descriptor in self._described_sources(
+                random_movement_attack_boost_descriptor_for_clause
+            )
+        )
+        bindings.extend(
+            charged_melee_weapon_characteristic_aura_binding(source, descriptor)
+            for source, descriptor in self._described_sources(
+                charged_melee_weapon_characteristic_aura_descriptor_for_clause
+            )
         )
         return tuple(bindings)
 
@@ -791,93 +815,6 @@ class CatalogDatasheetRuleRuntime:
                         ),
                     },
                 },
-            )
-
-        return handler
-
-    def _movement_action_grant_movement_handler(
-        self,
-        source: _CatalogClauseSource,
-        descriptor: CatalogMovementActionGrantDescriptor,
-    ) -> Callable[[MovementBudgetModifierContext], float]:
-        def handler(context: MovementBudgetModifierContext) -> float:
-            if not _source_applies_to_rules_unit(
-                source=source,
-                context_unit_id=context.unit_instance_id,
-                state=context.state,
-            ):
-                return context.current_movement_inches
-            rules_unit = rules_unit_view_by_id(
-                state=context.state, unit_instance_id=context.unit_instance_id
-            )
-            if context.model_instance_id not in {
-                model.model_instance_id for model in rules_unit.alive_models()
-            }:
-                return context.current_movement_inches
-            for effect in context.state.persisting_effects_for_unit(rules_unit.unit_instance_id):
-                payload = effect.effect_payload
-                if (
-                    isinstance(payload, dict)
-                    and payload.get("effect_kind") == "catalog_movement_action_grant"
-                    and payload.get("source_rule_id") == source.rule_ir.source_id
-                ):
-                    value = payload.get("movement_characteristic")
-                    if type(value) is not int or value != descriptor.movement_characteristic:
-                        raise GameLifecycleError(
-                            "Catalog movement action grant characteristic drifted."
-                        )
-                    return float(value)
-            return context.current_movement_inches
-
-        return handler
-
-    def _movement_action_grant_handler(
-        self,
-        source: _CatalogClauseSource,
-        descriptor: CatalogMovementActionGrantDescriptor,
-    ) -> Callable[[AdvanceMoveContext], AdvanceMoveGrant | None]:
-        def handler(context: AdvanceMoveContext) -> AdvanceMoveGrant | None:
-            if (
-                context.player_id != source.player_id
-                or context.movement_phase_action != descriptor.movement_action
-                or not _source_applies_to_rules_unit(
-                    source=source,
-                    context_unit_id=context.unit_instance_id,
-                    state=context.state,
-                )
-            ):
-                return None
-            return AdvanceMoveGrant(
-                hook_id=f"{source.binding_id}:movement-action-grant",
-                source_id=source.rule_ir.source_id,
-                label=source.record.definition.name,
-                granted_ranged_weapon_keywords=(),
-                automatic=False,
-                replay_payload={
-                    "consumer_id": "catalog-ir:movement-action-grant",
-                    "catalog_record_id": source.record.record_id,
-                    "source_rule_id": source.rule_ir.source_id,
-                    "source_unit_instance_id": source.unit.unit_instance_id,
-                    "rules_unit_instance_id": context.unit_instance_id,
-                    "clause_id": source.clause.clause_id,
-                },
-                unit_effect_payload={
-                    "effect_kind": "catalog_movement_action_grant",
-                    "catalog_record_id": source.record.record_id,
-                    "source_rule_id": source.rule_ir.source_id,
-                    "source_unit_instance_id": source.unit.unit_instance_id,
-                    "rules_unit_instance_id": context.unit_instance_id,
-                    "clause_id": source.clause.clause_id,
-                    "movement_characteristic": descriptor.movement_characteristic,
-                    "charge_forbidden": descriptor.charge_forbidden,
-                    "phase_end_mortal_wounds": {
-                        "roll_expression": "D6",
-                        "roll_count_scope": "each_model_in_this_unit_at_phase_end",
-                        "success_value": descriptor.phase_end_roll_success_value,
-                        "mortal_wounds_per_success": descriptor.mortal_wounds_per_success,
-                    },
-                },
-                unit_effect_expiration="end_turn",
             )
 
         return handler

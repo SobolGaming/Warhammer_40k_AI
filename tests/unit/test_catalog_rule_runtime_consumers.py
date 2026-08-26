@@ -33,6 +33,13 @@ from warhammer40k_core.engine import catalog_battle_shock_runtime as battle_shoc
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
 )
+from warhammer40k_core.engine import (
+    catalog_conditional_charge_runtime as conditional_charge_runtime,
+)
+from warhammer40k_core.engine import catalog_rule_consumption as rule_consumption
+from warhammer40k_core.engine import (
+    catalog_unit_move_completed_battle_shock_runtime as unit_move_battle_shock_runtime,
+)
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -212,6 +219,7 @@ from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime i
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support import (
     CATALOG_IR_UNIT_MOVE_COMPLETED_BATTLE_SHOCK_CONSUMER_ID,
 )
+from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -237,6 +245,9 @@ from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityContext
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
+)
+from warhammer40k_core.engine.fight_on_death import (
+    restore_model_awaiting_fight_on_death,
 )
 from warhammer40k_core.engine.fight_order import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
@@ -299,7 +310,10 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
-from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -352,6 +366,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
     TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
 )
+from warhammer40k_core.engine.stratagems_geometry import visible_enemy_unit_ids_for_source
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
     DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
@@ -534,7 +549,6 @@ def test_catalog_desperate_escape_consumer_filters_keywords_distance_and_shape_d
         )
         == ()
     )
-
     monster_target = replace(
         target_unit,
         keywords=tuple(sorted((*target_unit.keywords, "MONSTER"))),
@@ -579,7 +593,7 @@ def test_catalog_desperate_escape_consumer_filters_keywords_distance_and_shape_d
         )
 
 
-def test_catalog_desperate_escape_consumer_ignores_dead_engagement_placements() -> None:
+def test_catalog_desperate_escape_uses_physical_engagement_and_living_authority() -> None:
     target_army, source_army = _mustered_core_armies()
     target_unit = target_army.units[0]
     source_unit = source_army.units[0]
@@ -613,6 +627,37 @@ def test_catalog_desperate_escape_consumer_ignores_dead_engagement_placements() 
         )
         == ()
     )
+    dead_source_battlefield = dead_source_state.battlefield_state
+    assert dead_source_battlefield is not None
+    dead_source_placement = dead_source_battlefield.model_placement_by_id(
+        dead_source_unit.own_models[0].model_instance_id
+    )
+    dead_source_state.replace_battlefield_state(
+        dead_source_battlefield.with_removed_models((dead_source_placement.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=dead_source_state,
+        placement=dead_source_placement,
+        effect_id="catalog-desperate-escape-retained-source",
+        source_rule_id="catalog-desperate-escape-retained-source-rule",
+        source_phase=BattlePhaseKind.MOVEMENT,
+    )
+    assert (
+        len(
+            catalog_forced_desperate_escape_sources_for_unit(
+                state=dead_source_state,
+                unit_instance_id=target_unit.unit_instance_id,
+                ability_indexes_by_player_id={
+                    target_army.player_id: AbilityCatalogIndex.from_records(()),
+                    dead_source_army.player_id: AbilityCatalogIndex.from_records(
+                        (dead_source_record,)
+                    ),
+                },
+                armies=(target_army, dead_source_army),
+            )
+        )
+        == 1
+    )
 
     dead_target_unit = _unit_with_dead_model(target_unit, index=0)
     dead_target_army = _army_with_unit(target_army, dead_target_unit)
@@ -642,6 +687,35 @@ def test_catalog_desperate_escape_consumer_ignores_dead_engagement_placements() 
             armies=(dead_target_army, source_army),
         )
         == ()
+    )
+    dead_target_battlefield = dead_target_state.battlefield_state
+    assert dead_target_battlefield is not None
+    dead_target_placement = dead_target_battlefield.model_placement_by_id(
+        dead_target_unit.own_models[0].model_instance_id
+    )
+    dead_target_state.replace_battlefield_state(
+        dead_target_battlefield.with_removed_models((dead_target_placement.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=dead_target_state,
+        placement=dead_target_placement,
+        effect_id="catalog-desperate-escape-retained-target",
+        source_rule_id="catalog-desperate-escape-retained-target-rule",
+        source_phase=BattlePhaseKind.MOVEMENT,
+    )
+    assert (
+        len(
+            catalog_forced_desperate_escape_sources_for_unit(
+                state=dead_target_state,
+                unit_instance_id=dead_target_unit.unit_instance_id,
+                ability_indexes_by_player_id={
+                    dead_target_army.player_id: AbilityCatalogIndex.from_records(()),
+                    source_army.player_id: AbilityCatalogIndex.from_records((source_record,)),
+                },
+                armies=(dead_target_army, source_army),
+            )
+        )
+        == 1
     )
 
 
@@ -4487,6 +4561,7 @@ def test_catalog_selected_target_support_uses_real_battlefield_target_resolution
             source_models=(),
             target_models=(),
             parameters={"range_kind": "numeric_range"},
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
         )
 
 
@@ -4564,7 +4639,6 @@ def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> No
         active_player_id=source_army.player_id,
         phase=BattlePhase.FIGHT,
     )
-
     assert (
         eligible_selection_target_unit_ids(
             state=blocked_state,
@@ -4576,6 +4650,111 @@ def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> No
         )
         == ()
     )
+
+
+def test_catalog_selected_target_visibility_ignores_retained_dead_los_but_stratagems_do_not() -> (
+    None
+):
+    source_army, target_army = _mustered_core_armies()
+    source_unit = _unit_with_dead_model(source_army.units[0], index=0)
+    target_unit = _unit_with_dead_model(target_army.units[0], index=0)
+    source_army = _army_with_unit(source_army, source_unit)
+    target_army = _army_with_unit(target_army, target_unit)
+    battlefield = _battlefield_for_units_with_model_xs(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_model_xs=(10.0, 6.0, 8.0, 10.0, 12.0),
+        target_army=target_army,
+        target_unit=target_unit,
+        target_model_xs=(20.0, 18.0, 20.0, 22.0, 24.0),
+    )
+    source_placed_army, target_placed_army = battlefield.placed_armies
+    source_placement = source_placed_army.unit_placements[0]
+    target_placement = target_placed_army.unit_placements[0]
+    dead_source_placement = replace(
+        source_placement.model_placements[0],
+        pose=Pose.at(10.0, 25.0),
+    )
+    dead_target_placement = replace(
+        target_placement.model_placements[0],
+        pose=Pose.at(20.0, 25.0),
+    )
+    battlefield = replace(
+        battlefield,
+        placed_armies=(
+            replace(
+                source_placed_army,
+                unit_placements=(
+                    source_placement.with_model_placements(
+                        (dead_source_placement, *source_placement.model_placements[1:])
+                    ),
+                ),
+            ),
+            replace(
+                target_placed_army,
+                unit_placements=(
+                    target_placement.with_model_placements(
+                        (dead_target_placement, *target_placement.model_placements[1:])
+                    ),
+                ),
+            ),
+        ),
+        terrain_features=(_line_blocking_ruin(),),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield.with_removed_models(
+            (
+                dead_source_placement.model_instance_id,
+                dead_target_placement.model_instance_id,
+            )
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=dead_source_placement,
+        effect_id="catalog-selected-target-retained-dead-los-source",
+        source_rule_id="catalog-selected-target-retained-dead-los-source-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=dead_target_placement,
+        effect_id="catalog-selected-target-retained-dead-los-target",
+        source_rule_id="catalog-selected-target-retained-dead-los-target-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    visibility_selection = replace(
+        _fight_start_selection_clause(),
+        conditions=(
+            _condition(
+                RuleConditionKind.VISIBILITY_PREDICATE,
+                ("observer", "this_unit"),
+                ("predicate", "visible_to"),
+                ("target_reference", "selected_unit"),
+            ),
+        ),
+    )
+
+    assert (
+        eligible_selection_target_unit_ids(
+            state=state,
+            source_player_id=source_army.player_id,
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=None,
+            selection_clause=visibility_selection,
+            explicit_target_unit_ids=None,
+        )
+        == ()
+    )
+    assert visible_enemy_unit_ids_for_source(
+        state=state,
+        player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        range_inches=18,
+    ) == (target_unit.unit_instance_id,)
 
 
 def test_catalog_selected_target_conditions_resolve_their_declared_geometry_scope() -> None:
@@ -4624,7 +4803,7 @@ def test_catalog_selected_target_conditions_resolve_their_declared_geometry_scop
     ) == (target_unit.unit_instance_id,)
 
 
-def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None:
+def test_catalog_selected_target_engagement_uses_physical_units_and_living_authority() -> None:
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     target_unit = target_army.units[0]
@@ -4654,7 +4833,7 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
             source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
             target_army=target_army,
             target_unit=target_unit,
-            target_model_xs=(10.4, 40.0, 42.0, 44.0, 46.0),
+            target_model_xs=(12.4, 40.0, 42.0, 44.0, 46.0),
         ),
         active_player_id=dead_source_army.player_id,
         phase=BattlePhase.FIGHT,
@@ -4671,6 +4850,52 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
         )
         == ()
     )
+    assert _move_completed_engagement_candidate_sets(
+        state=dead_source_state,
+        source_unit_instance_id=dead_source_unit.unit_instance_id,
+    ) == ((), ())
+    dead_source_model = dead_source_unit.own_models[0]
+    dead_source_battlefield = dead_source_state.battlefield_state
+    assert dead_source_battlefield is not None
+    dead_source_placement = dead_source_battlefield.model_placement_by_id(
+        dead_source_model.model_instance_id
+    )
+    dead_source_state.replace_battlefield_state(
+        dead_source_battlefield.with_removed_models((dead_source_model.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=dead_source_state,
+        placement=dead_source_placement,
+        effect_id="catalog-selected-target-retained-dead-source-base",
+        source_rule_id="catalog-selected-target-retained-dead-source-base-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    assert (
+        len(
+            rules_unit_view_by_id(
+                state=dead_source_state,
+                unit_instance_id=dead_source_unit.unit_instance_id,
+            ).alive_models()
+        )
+        == 4
+    )
+    unit_distance_selection = replace(
+        _fight_start_selection_clause(),
+        conditions=(_selection_engagement_range_condition(object_kind="unit"),),
+    )
+    assert eligible_selection_target_unit_ids(
+        state=dead_source_state,
+        source_player_id=dead_source_army.player_id,
+        source_unit_instance_id=dead_source_unit.unit_instance_id,
+        source_model_instance_id=None,
+        selection_clause=unit_distance_selection,
+        explicit_target_unit_ids=None,
+    ) == (target_unit.unit_instance_id,)
+    expected_target = ((target_unit.unit_instance_id, target_army.player_id),)
+    assert _move_completed_engagement_candidate_sets(
+        state=dead_source_state,
+        source_unit_instance_id=dead_source_unit.unit_instance_id,
+    ) == (expected_target, expected_target)
 
     dead_target_unit = _unit_with_dead_model(target_unit, index=0)
     dead_target_army = _army_with_unit(target_army, dead_target_unit)
@@ -4682,22 +4907,212 @@ def test_catalog_selected_target_distance_gate_ignores_dead_placements() -> None
             source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
             target_army=dead_target_army,
             target_unit=dead_target_unit,
-            target_model_xs=(10.4, 40.0, 42.0, 44.0, 46.0),
+            target_model_xs=(12.4, 40.0, 42.0, 44.0, 46.0),
         ),
         active_player_id=source_army.player_id,
         phase=BattlePhase.FIGHT,
     )
+    dead_target_model = dead_target_unit.own_models[0]
+    dead_target_battlefield = dead_target_state.battlefield_state
+    assert dead_target_battlefield is not None
+    assert _move_completed_engagement_candidate_sets(
+        state=dead_target_state,
+        source_unit_instance_id=source_unit.unit_instance_id,
+    ) == ((), ())
+    dead_target_placement = dead_target_battlefield.model_placement_by_id(
+        dead_target_model.model_instance_id
+    )
+    dead_target_state.replace_battlefield_state(
+        dead_target_battlefield.with_removed_models((dead_target_model.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=dead_target_state,
+        placement=dead_target_placement,
+        effect_id="catalog-selected-target-retained-dead-base",
+        source_rule_id="catalog-selected-target-retained-dead-base-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    assert (
+        len(
+            rules_unit_view_by_id(
+                state=dead_target_state,
+                unit_instance_id=dead_target_unit.unit_instance_id,
+            ).alive_models()
+        )
+        == 4
+    )
+
+    assert eligible_selection_target_unit_ids(
+        state=dead_target_state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=source_unit.own_models[0].model_instance_id,
+        selection_clause=distance_selection,
+        explicit_target_unit_ids=None,
+    ) == (dead_target_unit.unit_instance_id,)
+    expected_dead_target = ((dead_target_unit.unit_instance_id, dead_target_army.player_id),)
+    assert _move_completed_engagement_candidate_sets(
+        state=dead_target_state,
+        source_unit_instance_id=source_unit.unit_instance_id,
+    ) == (expected_dead_target, expected_dead_target)
+
+    fod_only_target = replace(
+        target_unit,
+        own_models=(replace(target_unit.own_models[0], wounds_remaining=0),),
+    )
+    fod_only_target_army = _army_with_unit(target_army, fod_only_target)
+    fod_only_state = _state_with_battlefield(
+        armies=(source_army, fod_only_target_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
+            target_army=fod_only_target_army,
+            target_unit=fod_only_target,
+            target_model_xs=(12.4,),
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    fod_only_battlefield = fod_only_state.battlefield_state
+    assert fod_only_battlefield is not None
+    fod_only_placement = fod_only_battlefield.model_placement_by_id(
+        fod_only_target.own_models[0].model_instance_id
+    )
+    fod_only_state.replace_battlefield_state(
+        fod_only_battlefield.with_removed_models((fod_only_placement.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=fod_only_state,
+        placement=fod_only_placement,
+        effect_id="catalog-selected-target-fod-only-target",
+        source_rule_id="catalog-selected-target-fod-only-target-rule",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
 
     assert (
         eligible_selection_target_unit_ids(
-            state=dead_target_state,
+            state=fod_only_state,
             source_player_id=source_army.player_id,
             source_unit_instance_id=source_unit.unit_instance_id,
-            source_model_instance_id=source_unit.own_models[0].model_instance_id,
-            selection_clause=distance_selection,
+            source_model_instance_id=None,
+            selection_clause=unit_distance_selection,
             explicit_target_unit_ids=None,
         )
         == ()
+    )
+    assert _move_completed_engagement_candidate_sets(
+        state=fod_only_state,
+        source_unit_instance_id=source_unit.unit_instance_id,
+    ) == ((), ())
+
+
+def test_catalog_conditional_charge_uses_physical_engagement_and_living_authority() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = _unit_with_dead_model(target_army.units[0], index=0)
+    target_army = _army_with_unit(target_army, target_unit)
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
+            target_army=target_army,
+            target_unit=target_unit,
+            target_model_xs=(12.4, 40.0, 42.0, 44.0, 46.0),
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.CHARGE,
+    )
+    context = ChargeDeclarationContext(
+        state=state,
+        player_id=source_army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=source_unit.unit_instance_id,
+        selection_request_id="catalog-conditional-charge-physical-request",
+        selection_result_id="catalog-conditional-charge-physical-result",
+    )
+    source_view = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source_unit.unit_instance_id,
+    )
+    target_view = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit.unit_instance_id,
+    )
+    assert not conditional_charge_runtime._models_are_engaged(  # pyright: ignore[reportPrivateUsage]
+        context,
+        source_view,
+        target_view,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    target_placement = battlefield.model_placement_by_id(
+        target_unit.own_models[0].model_instance_id
+    )
+    state.replace_battlefield_state(
+        battlefield.with_removed_models((target_placement.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=target_placement,
+        effect_id="catalog-conditional-charge-retained-target",
+        source_rule_id="catalog-conditional-charge-retained-target-rule",
+        source_phase=BattlePhaseKind.CHARGE,
+    )
+
+    assert conditional_charge_runtime._models_are_engaged(  # pyright: ignore[reportPrivateUsage]
+        context,
+        source_view,
+        target_view,
+    )
+
+    fod_only_target = replace(
+        target_army.units[0],
+        own_models=(replace(target_army.units[0].own_models[0], wounds_remaining=0),),
+    )
+    fod_only_army = _army_with_unit(target_army, fod_only_target)
+    fod_only_state = _state_with_battlefield(
+        armies=(source_army, fod_only_army),
+        battlefield=_battlefield_for_units_with_model_xs(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_model_xs=(10.0, 30.0, 32.0, 34.0, 36.0),
+            target_army=fod_only_army,
+            target_unit=fod_only_target,
+            target_model_xs=(12.4,),
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.CHARGE,
+    )
+    fod_only_battlefield = fod_only_state.battlefield_state
+    assert fod_only_battlefield is not None
+    fod_only_placement = fod_only_battlefield.model_placement_by_id(
+        fod_only_target.own_models[0].model_instance_id
+    )
+    fod_only_state.replace_battlefield_state(
+        fod_only_battlefield.with_removed_models((fod_only_placement.model_instance_id,))
+    )
+    restore_model_awaiting_fight_on_death(
+        state=fod_only_state,
+        placement=fod_only_placement,
+        effect_id="catalog-conditional-charge-fod-only-target",
+        source_rule_id="catalog-conditional-charge-fod-only-target-rule",
+        source_phase=BattlePhaseKind.CHARGE,
+    )
+    fod_only_context = replace(context, state=fod_only_state)
+
+    assert not conditional_charge_runtime._models_are_engaged(  # pyright: ignore[reportPrivateUsage]
+        fod_only_context,
+        rules_unit_view_by_id(
+            state=fod_only_state,
+            unit_instance_id=source_unit.unit_instance_id,
+        ),
+        rules_unit_view_by_id(
+            state=fod_only_state,
+            unit_instance_id=fod_only_target.unit_instance_id,
+        ),
     )
 
 
@@ -6687,6 +7102,88 @@ def test_catalog_advance_and_fall_back_runtime_exposes_all_source_backed_permiss
             ability_indexes_by_player_id={source_army.player_id: indexes[source_army.player_id]},
             armies=(source_army, target_army),
         )
+
+
+def test_catalog_this_model_advance_eligibility_rejects_multi_model_bearer_widening() -> None:
+    source_army, target_army = _mustered_attached_once_per_battle_armies()
+    source_unit = next(
+        unit for unit in source_army.units if unit.datasheet_id == "core-character-leader"
+    )
+    wargear_id = "test:catalog-advance-eligibility:bearer-wargear"
+    source_unit = replace(
+        source_unit,
+        own_models=(
+            replace(
+                source_unit.own_models[0],
+                wargear_ids=tuple(sorted((*source_unit.own_models[0].wargear_ids, wargear_id))),
+            ),
+            *source_unit.own_models[1:],
+        ),
+    )
+    source_army = replace(
+        source_army,
+        units=tuple(
+            source_unit if unit.unit_instance_id == source_unit.unit_instance_id else unit
+            for unit in source_army.units
+        ),
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=create_deterministic_battlefield_scenario(
+            battlefield_id="catalog-this-model-advance-eligibility-attached",
+            armies=(source_army, target_army),
+        ).battlefield_state,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    clause = RuleClause(
+        clause_id="test:catalog-this-model-advance-eligibility:clause",
+        source_span=_span(),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.GRANT_ABILITY,
+                ("ability", "can_advance_and_charge"),
+                ("target_scope", "this_model"),
+            ),
+        ),
+        duration=RuleDuration(
+            kind=RuleDurationKind.PERMANENT,
+            source_span=_span(),
+        ),
+    )
+    record = _ability_record(
+        record_id="record:catalog-this-model-advance-eligibility",
+        rule_ir=_rule_ir(
+            source_id="test:catalog-this-model-advance-eligibility",
+            clauses=(clause,),
+        ),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        datasheet_id=source_unit.datasheet_id,
+        source_kind=AbilitySourceKind.WARGEAR,
+        wargear_id=wargear_id,
+    )
+    runtime = CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id={
+            source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+            target_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        armies=(source_army, target_army),
+    )
+    context = AdvanceEligibilityContext(
+        state=state,
+        player_id=source_army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=source_unit.unit_instance_id,
+        movement_request_id="request:catalog-this-model-advance-eligibility",
+        movement_result_id="result:catalog-this-model-advance-eligibility",
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="this-model advance eligibility requires a singleton alive rules unit",
+    ):
+        runtime.advance_and_charge_handler(context)
 
 
 def test_catalog_static_attack_modifier_classifier_is_fail_closed() -> None:
@@ -9042,6 +9539,26 @@ def _muster_request(
                     ),
                 ),
             ),
+        ),
+    )
+
+
+def _move_completed_engagement_candidate_sets(
+    *,
+    state: GameState,
+    source_unit_instance_id: str,
+) -> tuple[tuple[tuple[str, str], ...], tuple[tuple[str, str], ...]]:
+    ruleset_descriptor = state.runtime_ruleset_descriptor()
+    return (
+        rule_consumption._unit_move_completed_mortal_wounds_target_candidates(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            source_rules_unit_instance_id=source_unit_instance_id,
+        ),
+        unit_move_battle_shock_runtime._target_candidates(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            source_rules_unit_instance_id=source_unit_instance_id,
         ),
     )
 

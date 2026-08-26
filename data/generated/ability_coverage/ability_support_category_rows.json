@@ -148,6 +148,14 @@
       {
         "ability_id": "000009894",
         "ability_name": "Battle Focus",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/faction/000009894/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009894",
+        "ability_name": "Battle Focus",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/faction/000009894/none",
         "datasheet_id": "000000588",
         "datasheet_name": "Spiritseer",
@@ -215,7 +223,7 @@
     ],
     "category_id": "faction.army_rule.battle_focus",
     "category_name": "Aeldari Army Rule",
-    "coverage_row_count": 26,
+    "coverage_row_count": 27,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002759/faction/000009894/none",
@@ -235,6 +243,7 @@
       "chaos-daemons-bridge-catalog/000000592/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000602/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000002533/faction/000009894/none",
+      "chaos-daemons-bridge-catalog/000002538/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000588/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000004195/faction/000009894/none",
       "chaos-daemons-bridge-catalog/000000595/faction/000009894/none",
@@ -263,6 +272,7 @@
       "Rangers",
       "Shining Spears",
       "Shroud Runners",
+      "Solitaire",
       "Spiritseer",
       "Starfangs",
       "Striking Scorpions",
@@ -281,7 +291,40 @@
       "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
     ],
     "source_kind_counts": {
-      "faction": 26
+      "faction": 27
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000009896",
+        "ability_name": "Disparate Paths",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/faction/000009896/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Disparate Paths"
+    ],
+    "category_id": "faction.army_rule.disparate_paths",
+    "category_name": "Aeldari Army Rule",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002538/faction/000009896/none"
+    ],
+    "datasheet_names": [
+      "Solitaire"
+    ],
+    "runtime_consumer_ids": [
+      "army-mustering:aeldari-disparate-paths"
+    ],
+    "source_kind_counts": {
+      "faction": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -598,6 +641,14 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/core/000008339/none",
+        "datasheet_id": "000004086",
+        "datasheet_name": "Daemon Prince of Slaanesh",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
         "datasheet_id": "000000969",
         "datasheet_name": "Defiler",
@@ -737,12 +788,13 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 21,
+    "coverage_row_count": 22,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004086/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
@@ -766,6 +818,7 @@
       "Bloodthirster",
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
+      "Daemon Prince of Slaanesh",
       "Defiler",
       "Fulgrim",
       "Lord of Change",
@@ -782,7 +835,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 21
+      "core": 22
     },
     "support_stages": [
       "engine_consumed"
@@ -849,6 +902,14 @@
         "datasheet_id": "000000572",
         "datasheet_name": "Jain Zar",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008340",
+        "ability_name": "Fights First",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/core/000008340/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -856,20 +917,22 @@
     ],
     "category_id": "core.fights_first",
     "category_name": "Core Fights First",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
-      "chaos-daemons-bridge-catalog/000000572/core/000008340/none"
+      "chaos-daemons-bridge-catalog/000000572/core/000008340/none",
+      "chaos-daemons-bridge-catalog/000002538/core/000008340/none"
     ],
     "datasheet_names": [
       "Howling Banshees",
-      "Jain Zar"
+      "Jain Zar",
+      "Solitaire"
     ],
     "runtime_consumer_ids": [
       "descriptor:fight-order:fights-first"
     ],
     "source_kind_counts": {
-      "core": 2
+      "core": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -937,6 +1000,14 @@
         "datasheet_id": "000004083",
         "datasheet_name": "Lucius the Eternal",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008336",
+        "ability_name": "Lone Operative",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/core/000008336/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -944,18 +1015,20 @@
     ],
     "category_id": "core.lone_operative",
     "category_name": "Core Lone Operative",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004083/core/000008336/none"
+      "chaos-daemons-bridge-catalog/000004083/core/000008336/none",
+      "chaos-daemons-bridge-catalog/000002538/core/000008336/none"
     ],
     "datasheet_names": [
-      "Lucius the Eternal"
+      "Lucius the Eternal",
+      "Solitaire"
     ],
     "runtime_consumer_ids": [
       "descriptor:shooting-target:lone-operative"
     ],
     "source_kind_counts": {
-      "core": 1
+      "core": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2017,6 +2090,22 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004086:ecstatic-death",
+        "ability_name": "Ecstatic Death",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:ecstatic-death/none",
+        "datasheet_id": "000004086",
+        "datasheet_name": "Daemon Prince of Slaanesh",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004086:lord-of-excess",
+        "ability_name": "Lord of Excess",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:lord-of-excess/none",
+        "datasheet_id": "000004086",
+        "datasheet_name": "Daemon Prince of Slaanesh",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000004077:daemon-primarch-of-slaanesh",
         "ability_name": "Daemon Primarch of Slaanesh",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
@@ -2057,6 +2146,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000002538:blur-of-movement",
+        "ability_name": "Blur of Movement",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blur-of-movement/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000588:spiritseer",
         "ability_name": "Spiritseer",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
@@ -2075,40 +2172,49 @@
     ],
     "ability_names": [
       "ASPECT TRAINING",
+      "Blur of Movement",
       "Daemon Primarch of Slaanesh",
       "Daemonic Lord",
       "Daemonic Speed",
       "Duellist's Hubris",
+      "Ecstatic Death",
       "LORD OF THE HOST",
+      "Lord of Excess",
       "Malevolent Souls",
       "Siege Crawler",
       "Spiritseer"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 9,
+    "coverage_row_count": 12,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
+      "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:ecstatic-death/none",
+      "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:lord-of-excess/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
       "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:lord-of-the-host/none",
       "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
       "chaos-daemons-bridge-catalog/000000968/datasheet/000000968:siege-crawler/none",
+      "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blur-of-movement/none",
       "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
     "datasheet_names": [
       "Autarch",
       "Daemon Prince of Chaos",
+      "Daemon Prince of Slaanesh",
       "Fulgrim",
       "Lord Exultant",
       "Lucius the Eternal",
       "Maulerfiend",
+      "Solitaire",
       "Spiritseer",
       "Wraithblades"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:can-advance-and-charge",
       "catalog-ir:command-phase-ability-mode",
       "catalog-ir:conditional-ability:lone-operative",
       "catalog-ir:conditional-leading-ability:fights-first",
@@ -2120,7 +2226,7 @@
       "catalog-ir:modifier-ignore-permission"
     ],
     "source_kind_counts": {
-      "datasheet": 9
+      "datasheet": 12
     },
     "support_stages": [
       "engine_consumed"
@@ -2523,6 +2629,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004086:excessive-vigour-aura",
+        "ability_name": "Excessive Vigour (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:excessive-vigour-aura/none",
+        "datasheet_id": "000004086",
+        "datasheet_name": "Daemon Prince of Slaanesh",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Excessive Vigour (Aura)"
+    ],
+    "category_id": "datasheet.rule_ir.modify_characteristic.aura_units",
+    "category_name": "Datasheet Rule Ir Modify Characteristic Aura Units",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:excessive-vigour-aura/none"
+    ],
+    "datasheet_names": [
+      "Daemon Prince of Slaanesh"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:charged-melee-weapon-characteristic-aura"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000004194:fury-of-the-void-psychic",
         "ability_name": "Fury of the Void (Psychic)",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/datasheet/000004194:fury-of-the-void-psychic/none",
@@ -2692,6 +2831,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000002538:blitz",
+        "ability_name": "Blitz",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blitz/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000613:psychic-guidance",
         "ability_name": "Psychic Guidance",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:psychic-guidance/none",
@@ -2701,6 +2848,7 @@
       }
     ],
     "ability_names": [
+      "Blitz",
       "Daemon Prince of Khorne",
       "Daemon Prince of Nurgle",
       "Daemon Prince of Slaanesh",
@@ -2711,7 +2859,7 @@
     ],
     "category_id": "datasheet.rule_ir.modify_characteristic.this_model",
     "category_name": "Datasheet Rule Ir Modify Characteristic This Model",
-    "coverage_row_count": 11,
+    "coverage_row_count": 12,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-khorne/none",
       "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:daemon-prince-of-nurgle/none",
@@ -2723,18 +2871,21 @@
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-slaanesh/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemon-prince-of-tzeentch/none",
       "chaos-daemons-bridge-catalog/000004078/datasheet/000004078:euphoric-strikes/none",
+      "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blitz/none",
       "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:psychic-guidance/none"
     ],
     "datasheet_names": [
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Lord Exultant",
+      "Solitaire",
       "Wraithlord"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:attacks-characteristic-modifier",
       "catalog-ir:ballistic-skill-characteristic-modifier",
       "catalog-ir:leadership-characteristic-query",
+      "catalog-ir:movement-action-grant",
       "catalog-ir:movement-characteristic-modifier",
       "catalog-ir:once-per-battle-ability",
       "catalog-ir:strength-characteristic-modifier",
@@ -2742,10 +2893,9 @@
       "catalog-ir:weapon-skill-characteristic-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 11
+      "datasheet": 12
     },
     "support_stages": [
-      "generic_ir_executable",
       "engine_consumed"
     ]
   },
@@ -2876,6 +3026,40 @@
     "runtime_consumer_ids": [
       "catalog-ir:conditional-leading-fixed-advance",
       "catalog-ir:dice-result-override"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002538:blitz",
+        "ability_name": "Blitz",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blitz/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Blitz"
+    ],
+    "category_id": "datasheet.rule_ir.modify_move_distance.this_model",
+    "category_name": "Datasheet Rule Ir Modify Move Distance This Model",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blitz/none"
+    ],
+    "datasheet_names": [
+      "Solitaire"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-action-grant",
+      "catalog-ir:once-per-battle-ability"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -4294,6 +4478,14 @@
       {
         "ability_id": "000009994",
         "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/faction/000009994/none",
+        "datasheet_id": "000004086",
+        "datasheet_name": "Daemon Prince of Slaanesh",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
         "datasheet_id": "000004208",
         "datasheet_name": "Defiler",
@@ -4385,10 +4577,11 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 13,
+    "coverage_row_count": 14,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004090/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004086/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
       "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
@@ -4404,6 +4597,7 @@
     "datasheet_names": [
       "Chaos Spawn",
       "Chaos Terminators",
+      "Daemon Prince of Slaanesh",
       "Defiler",
       "Emperor's Children",
       "Flawless Blades",
@@ -4423,7 +4617,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 13
+      "faction": 14
     },
     "support_stages": [
       "engine_consumed"
@@ -5303,6 +5497,14 @@
       {
         "ability_id": "000008337",
         "ability_name": "Stealth",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/core/000008337/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008337",
+        "ability_name": "Stealth",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/core/000008337/none",
         "datasheet_id": "000000588",
         "datasheet_name": "Spiritseer",
@@ -5322,11 +5524,12 @@
     ],
     "category_id": "core.stealth",
     "category_name": "Stealth",
-    "coverage_row_count": 5,
+    "coverage_row_count": 6,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008337/none",
       "chaos-daemons-bridge-catalog/000000592/core/000008337/none",
       "chaos-daemons-bridge-catalog/000002533/core/000008337/none",
+      "chaos-daemons-bridge-catalog/000002538/core/000008337/none",
       "chaos-daemons-bridge-catalog/000000588/core/000008337/none",
       "chaos-daemons-bridge-catalog/000000595/core/000008337/none"
     ],
@@ -5334,6 +5537,7 @@
       "Be'lakor",
       "Rangers",
       "Shroud Runners",
+      "Solitaire",
       "Spiritseer",
       "Striking Scorpions"
     ],
@@ -5341,7 +5545,7 @@
       "core:stealth"
     ],
     "source_kind_counts": {
-      "core": 5
+      "core": 6
     },
     "support_stages": [
       "engine_consumed"
@@ -5385,6 +5589,39 @@
     ],
     "source_kind_counts": {
       "datasheet": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002538:path-of-damnation",
+        "ability_name": "PATH OF DAMNATION",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:path-of-damnation/none",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "PATH OF DAMNATION"
+    ],
+    "category_id": "unknown.ability_text",
+    "category_name": "Unknown Abilities",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:path-of-damnation/none"
+    ],
+    "datasheet_names": [
+      "Solitaire"
+    ],
+    "runtime_consumer_ids": [
+      "army-mustering:warlord-restriction"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -5570,6 +5807,39 @@
     ],
     "source_kind_counts": {
       "wargear": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002538:flip-belt",
+        "ability_name": "Flip Belt",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/wargear/000002538:flip-belt/000002538:flip-belt",
+        "datasheet_id": "000002538",
+        "datasheet_name": "Solitaire",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Flip Belt"
+    ],
+    "category_id": "wargear.rule_ir.movement_transit_permission.this_model",
+    "category_name": "Wargear Rule Ir Movement Transit Permission This Model",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002538/wargear/000002538:flip-belt/000002538:flip-belt"
+    ],
+    "datasheet_names": [
+      "Solitaire"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-transit-permission"
+    ],
+    "source_kind_counts": {
+      "wargear": 1
     },
     "support_stages": [
       "engine_consumed"

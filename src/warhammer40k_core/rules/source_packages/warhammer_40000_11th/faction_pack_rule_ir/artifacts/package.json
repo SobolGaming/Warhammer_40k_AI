@@ -1,7 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-package-v1",
   "edition": 11,
-  "package_hash": "a310b4bb595385a277cdcc11752108a1dd33e69a49f29f92aaed845a8b643c3c",
+  "package_hash": "96da4b016a58c2160b6ab4c6448acd4d345be15deb1facb99ecc54e60b6fab02",
   "registry_id": "warhammer-40000-11th-faction-pack-rule-ir",
   "shard_artifacts": {
     "aeldari": {
@@ -26,6 +26,7 @@
         "000002531",
         "000002532",
         "000002533",
+        "000002538",
         "000002759",
         "000003909",
         "000004193",
@@ -34,7 +35,7 @@
         "000004196"
       ],
       "path": "shards/aeldari.json",
-      "sha256": "e4cbae65ec4cf20d6a51df7d78c3a1e8e8c47f0f6cbaadf82fb9daa19d4a0451",
+      "sha256": "662cb24c61e66c507b304f6363a24ccd08612bbfedee15ee151392376cf9b7ff",
       "source_package_ids": [
         "gw-11e-aeldari-aspect-warriors-datasheets-2026-06-14",
         "gw-11e-aeldari-autarchs-datasheets-2026-06-14",
@@ -44,6 +45,7 @@
         "gw-11e-aeldari-kharseth-datasheet-2026-06-09",
         "gw-11e-aeldari-night-spinner-datasheet-2026-06-14",
         "gw-11e-aeldari-shroud-runners-wraithblades-datasheets-2026-06-14",
+        "gw-11e-aeldari-solitaire-datasheet-2026-08",
         "gw-11e-aeldari-war-walkers-wraithlord-datasheets-2026-06-14",
         "gw-11e-aeldari-wave-serpent-shining-spears-eldrad-dire-avengers-datasheets-2026-06-14",
         "gw-11e-aeldari-yriel-vypers-starfangs-datasheets-2026-06-09"
@@ -79,6 +81,9 @@
         "000002532:4",
         "000002532:6",
         "000002533:4",
+        "000002538:6",
+        "000002538:7",
+        "000002538:9",
         "000002759:4",
         "000003909:4",
         "000003909:5",
@@ -156,12 +161,14 @@
         "000004079",
         "000004080",
         "000004083",
+        "000004086",
         "000004090",
         "000004091"
       ],
       "path": "shards/emperors-children.json",
-      "sha256": "91a4d20e66ca027bec6808c488a4ec9c5acbdbf434c51ad66cbf9ebea144deff",
+      "sha256": "a81563c0f584b1768ebb5961eff0b4c47ab66dded74986928d89ebb134da01b7",
       "source_package_ids": [
+        "gw-11e-emperors-children-daemon-prince-of-slaanesh-datasheet-2026-08",
         "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
         "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
         "gw-11e-emperors-children-lord-exultant-maulerfiend-chaos-spawn-datasheets-2026-08",
@@ -182,6 +189,9 @@
         "000004080:4",
         "000004083:5",
         "000004083:6",
+        "000004086:3",
+        "000004086:4",
+        "000004086:5",
         "000004090:3",
         "000004091:3"
       ]

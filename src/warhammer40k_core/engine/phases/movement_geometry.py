@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -113,13 +117,14 @@ def _enemy_engagement_model_ids_for_unit(
     ruleset_descriptor: RulesetDescriptor,
     hover_mode_states: tuple[HoverModeState, ...] = (),
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    friendly_models = _geometry_models_for_unit_placement(
+    friendly_models = physical_geometry_models_for_rules_unit(
         scenario=scenario,
-        unit_placement=unit_placement,
+        unit_instance_id=unit_placement.unit_instance_id,
     )
-    enemy_models = _enemy_geometry_models_for_player(
+    engaged_enemy_unit_ids = scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
-        player_id=unit_placement.player_id,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=unit_placement.unit_instance_id,
     )
     aircraft_model_ids = set(
         aircraft_model_ids_for_scenario(
@@ -129,17 +134,24 @@ def _enemy_engagement_model_ids_for_unit(
     )
     enemy_model_ids: set[str] = set()
     enemy_aircraft_model_ids: set[str] = set()
-    for friendly_model in friendly_models:
-        for enemy_model in enemy_models:
-            if friendly_model.is_within_engagement_range(
-                enemy_model,
-                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+    for enemy_unit_id in engaged_enemy_unit_ids:
+        for enemy_model in physical_geometry_models_for_rules_unit(
+            scenario=scenario,
+            unit_instance_id=enemy_unit_id,
+        ):
+            if not any(
+                friendly_model.is_within_engagement_range(
+                    enemy_model,
+                    horizontal_inches=(ruleset_descriptor.engagement_policy.horizontal_inches),
+                    vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+                )
+                for friendly_model in friendly_models
             ):
-                if enemy_model.model_id in aircraft_model_ids:
-                    enemy_aircraft_model_ids.add(enemy_model.model_id)
-                else:
-                    enemy_model_ids.add(enemy_model.model_id)
+                continue
+            if enemy_model.model_id in aircraft_model_ids:
+                enemy_aircraft_model_ids.add(enemy_model.model_id)
+            else:
+                enemy_model_ids.add(enemy_model.model_id)
     return tuple(sorted(enemy_model_ids)), tuple(sorted(enemy_aircraft_model_ids))
 
 
@@ -155,30 +167,11 @@ def _enemy_engaged_unit_ids_for_unit_placement(
         raise GameLifecycleError("Enemy engaged unit query requires a unit placement.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Enemy engaged unit query requires ruleset descriptor.")
-    friendly_models = _geometry_models_for_unit_placement(
+    return scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
-        unit_placement=unit_placement,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=unit_placement.unit_instance_id,
     )
-    engaged_unit_ids: set[str] = set()
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == unit_placement.player_id:
-            continue
-        for enemy_unit_placement in placed_army.unit_placements:
-            enemy_models = _geometry_models_for_unit_placement(
-                scenario=scenario,
-                unit_placement=enemy_unit_placement,
-            )
-            if any(
-                friendly_model.is_within_engagement_range(
-                    enemy_model,
-                    horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                    vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-                )
-                for friendly_model in friendly_models
-                for enemy_model in enemy_models
-            ):
-                engaged_unit_ids.add(enemy_unit_placement.unit_instance_id)
-    return tuple(sorted(engaged_unit_ids))
 
 
 def _hover_mode_state_for_unit(
@@ -413,6 +406,7 @@ def _geometry_models_for_unit_placement(
             placement=placement,
         )
         for placement in unit_placement.model_placements
+        if scenario.model_is_present_at_placement(placement)
     )
 
 
@@ -436,6 +430,8 @@ def _friendly_geometry_models_for_path(
             )
             for placement in placements:
                 if placement.model_instance_id == moving_model_id:
+                    continue
+                if not scenario.model_is_present_at_placement(placement):
                     continue
                 friendly_models.append(
                     geometry_model_for_placement(
@@ -463,6 +459,7 @@ def _enemy_geometry_models_for_player(
                     placement=placement,
                 )
                 for placement in unit_placement.model_placements
+                if scenario.model_is_present_at_placement(placement)
             )
     return tuple(enemy_models)
 

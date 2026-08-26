@@ -29,6 +29,9 @@ EXPECTED_APP_CORE_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
     {
         "01.02.03-embarked-model-return": "embarked_return_requires_remaining_transport_capacity",
         "05.03.02-post-roll-attack-profiles": "post_roll_profile_changes_split_attack_pools",
+        "05.04.05-fight-on-death": (
+            "fight_on_death_models_wait_for_their_units_single_attack_selection"
+        ),
         "09.07.01-desperate-escape-definition": "desperate_escape_test_means_hazard_rolls",
         "09.07.01-forced-desperate-escape": (
             "forced_desperate_escape_tests_all_models_and_battle_shock"

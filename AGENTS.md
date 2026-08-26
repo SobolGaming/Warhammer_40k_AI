@@ -154,7 +154,9 @@ If a test object lacks a required field, fix the fixture. Do not weaken producti
 Stubs are allowed only for pure functions and must be marked `stubbed`.
 
 Full-suite pytest runs must use xdist work stealing by default:
-`uv run pytest -n auto --dist=worksteal tests/`. Do not run the full suite
+`PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/`.
+The `PATH` prefix is required so Codex desktop exposes its bundled Node.js runtime to
+the executable viewer-renderer regressions. Do not run the full suite
 serially unless xdist is unavailable or a specific test is known or suspected
 to be distribution-sensitive; document that reason when reporting checks.
 Focused test subsets may run serially when that is the simpler or faster
@@ -346,7 +348,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-uv run pytest -n auto --dist=worksteal tests/
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 uv run lint-imports
 uv run pre-commit run --all-files

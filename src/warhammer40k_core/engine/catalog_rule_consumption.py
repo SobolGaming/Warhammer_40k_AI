@@ -24,6 +24,9 @@ from warhammer40k_core.core.weapon_profiles import (
     canonical_weapon_keyword_tokens,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.engine import (
+    catalog_advance_eligibility_classification as _advance_eligibility,
+)
 from warhammer40k_core.engine import catalog_attack_condition_classification as _attack_conditions
 from warhammer40k_core.engine import catalog_charge_roll_modifiers as _charge_modifiers
 from warhammer40k_core.engine import catalog_command_point_support as _command_points
@@ -63,11 +66,12 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookBinding,
     successful_hit_target_unit_ids_for_sequence,
 )
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
     PlacementError,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.catalog_model_scope import scoped_roll_model_ids_for_effect
 from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
@@ -106,6 +110,12 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_rules_units_are_physically_engaged,
+)
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
@@ -130,7 +140,6 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
 )
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -157,6 +166,7 @@ CatalogMovementTransitPermission = _t.CatalogMovementTransitPermission
 _is_movement_transit = _t.clause_is_supported_movement_transit_permission
 _movement_mode_token = _t.movement_mode_token
 _movement_transit_permissions_from_clause = _t.movement_transit_permissions_from_clause
+_clause_grants_advance_eligibility = _advance_eligibility.clause_grants_advance_eligibility
 
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
@@ -213,11 +223,13 @@ CATALOG_IR_SETUP_REACTIVE_SHOOT_CHARGE_CONSUMER_ID = "catalog-ir:setup-reactive-
 CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID = (
     _keyword_choice.CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID
 )
-CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
+CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = (
+    _advance_eligibility.CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID
+)
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
 CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
-    "catalog-ir:can-advance-and-shoot-and-charge"
+    _advance_eligibility.CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
 CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID = (
@@ -333,14 +345,6 @@ _CATALOG_IR_FALL_BACK_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = Mappin
         "can_fall_back_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
         "can_fallback_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
         "can_fall_back_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
-    }
-)
-_CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
-    {
-        "can_advance_and_charge": CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
-        "can_advance_and_shoot_and_charge": (
-            CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
-        ),
     }
 )
 
@@ -1277,6 +1281,7 @@ def catalog_weapon_profile_modifier_bindings(
 def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
     hook_ids = {
         *_datasheet.registered_consumer_ids(),
+        *_command_points.registered_consumer_ids(),
         *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
@@ -1287,6 +1292,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
         CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
         CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+        CATALOG_IR_DICE_RESULT_OVERRIDE_CONSUMER_ID,
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         *_contextual.registered_hook_ids(),
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -2119,31 +2125,21 @@ def _unit_move_completed_mortal_wounds_target_candidates(
         state=state,
         unit_instance_id=source_rules_unit_id,
     )
-    source_models = _placed_alive_geometry_models_for_rules_unit(
-        state=state,
-        rules_unit_instance_id=source_rules_unit.unit_instance_id,
-    )
-    if not source_models:
+    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source_rules_unit):
         return ()
+    scenario = battlefield_scenario_for_state(state=state)
     candidates: list[tuple[str, str]] = []
     for target_rules_unit in _rules_unit_views_for_other_players(
         state=state,
         player_id=source_rules_unit.owner_player_id,
     ):
-        target_models = _placed_alive_geometry_models_for_rules_unit(
-            state=state,
-            rules_unit_instance_id=target_rules_unit.unit_instance_id,
-        )
-        if not target_models:
+        if not rules_unit_has_placed_alive_model(state=state, rules_unit=target_rules_unit):
             continue
-        if any(
-            source_model.is_within_engagement_range(
-                target_model,
-                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-            )
-            for source_model in source_models
-            for target_model in target_models
+        if scenario_rules_units_are_physically_engaged(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            first_unit_instance_id=source_rules_unit.unit_instance_id,
+            second_unit_instance_id=target_rules_unit.unit_instance_id,
         ):
             candidates.append(
                 (
@@ -2199,9 +2195,9 @@ def _visible_enemy_rules_unit_ids_for_source(
     if state.battlefield_state is None:
         raise GameLifecycleError("Visible enemy rules-unit query requires battlefield state.")
     source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
-    source_models = _placed_alive_geometry_models_for_rules_unit(
+    source_models = placed_alive_geometry_models_for_rules_unit(
         state=state,
-        rules_unit_instance_id=source_rules_unit.unit_instance_id,
+        unit_instance_id=source_rules_unit.unit_instance_id,
     )
     if not source_models:
         return ()
@@ -2211,9 +2207,9 @@ def _visible_enemy_rules_unit_ids_for_source(
         state=state,
         player_id=source_rules_unit.owner_player_id,
     ):
-        target_models = _placed_alive_geometry_models_for_rules_unit(
+        target_models = placed_alive_geometry_models_for_rules_unit(
             state=state,
-            rules_unit_instance_id=target_rules_unit.unit_instance_id,
+            unit_instance_id=target_rules_unit.unit_instance_id,
         )
         if not target_models or not any(
             source_model.range_to(target_model) <= range_inches
@@ -2230,6 +2226,7 @@ def _visible_enemy_rules_unit_ids_for_source(
                 ruleset_descriptor=ruleset_descriptor,
                 observing_unit=component.unit,
                 target_unit_id=target_rules_unit.unit_instance_id,
+                placed_alive_models_only=True,
                 terrain_features=state.battlefield_state.terrain_features,
                 terrain_areas=(
                     () if state.mission_setup is None else state.mission_setup.terrain_areas
@@ -2472,45 +2469,6 @@ def _placed_alive_model_instance_ids_for_rules_unit(
             if model.model_instance_id in placed_model_ids
         )
     )
-
-
-def _placed_alive_geometry_models_for_rules_unit(
-    *,
-    state: GameState,
-    rules_unit_instance_id: str,
-) -> tuple[GeometryModel, ...]:
-    _validate_game_state(state)
-    rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
-    if state.battlefield_state is None:
-        return ()
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    model_by_id = {
-        model.model_instance_id: model
-        for model in rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=rules_unit_id,
-        ).alive_models()
-    }
-    models: list[GeometryModel] = []
-    for model_id in _placed_alive_model_instance_ids_for_rules_unit(
-        state=state,
-        rules_unit_instance_id=rules_unit_id,
-    ):
-        placement = state.battlefield_state.model_placement_by_id(model_id)
-        model = model_by_id.get(model_id)
-        if model is None:
-            raise GameLifecycleError(
-                "Catalog move-completed mortal wounds model placement drifted."
-            )
-        if scenario.model_instance_for_placement(placement).model_instance_id != model_id:
-            raise GameLifecycleError(
-                "Catalog move-completed mortal wounds placement references wrong model."
-            )
-        models.append(geometry_model_for_placement(model=model, placement=placement))
-    return tuple(models)
 
 
 def _rules_unit_views_for_other_players(
@@ -3770,6 +3728,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _keyword_choice.clause_has_invalid_exact_start_battle_keyword_choice_shape(clause):
         return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
+    consumer_ids.update(_advance_eligibility.consumer_ids_for_clause(clause))
     consumer_ids.update(_extensions.consumer_ids_for_clause(clause))
     consumer_ids.update(_conditional_charge.consumer_ids_for_clause(clause))
     consumer_ids.update(_datasheet.consumer_ids_for_clause(clause))
@@ -3851,9 +3810,6 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
             consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
         if _effect_is_turn_end_reserve_permission(effect):
             consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
-        advance_consumer_id = _advance_eligibility_consumer_id_for_effect(effect)
-        if advance_consumer_id is not None:
-            consumer_ids.add(advance_consumer_id)
         fall_back_consumer_id = _fall_back_eligibility_consumer_id_for_effect(effect)
         if fall_back_consumer_id is not None:
             consumer_ids.add(fall_back_consumer_id)
@@ -3869,6 +3825,11 @@ def catalog_rule_ir_clause_wide_consumer_ids(clause: RuleClause) -> tuple[str, .
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         *_datasheet.CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS,
     }
+    if _frequency.clause_is_runtime_once_per_battle_with_default_execution_consumers(
+        clause,
+        consumer_ids_for_effect=catalog_rule_ir_consumer_ids_for_effect,
+    ):
+        compound_consumer_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)
     return tuple(
         sorted(compound_consumer_ids.intersection(catalog_rule_ir_consumers_for_clause(clause)))
     )
@@ -4465,11 +4426,24 @@ def _matching_advance_eligibility_records(
         current_model_instance_ids=current_model_ids,
         trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
     ):
-        if any(
-            _clause_grants_advance_eligibility(clause, ability=requested_ability)
+        matching_clauses = tuple(
+            clause
             for clause in _clauses_from_record(record)
+            if _clause_grants_advance_eligibility(clause, ability=requested_ability)
+        )
+        if not matching_clauses:
+            continue
+        if not any(
+            clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT
+            for clause in matching_clauses
         ):
-            matching_records.append(record)
+            _validate_model_scoped_advance_eligibility_source(
+                state=context.state,
+                record=record,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+            )
+        matching_records.append(record)
     return tuple(sorted(matching_records, key=lambda record: record.record_id))
 
 
@@ -4614,6 +4588,32 @@ def _validate_this_model_source_id(
             raise GameLifecycleError("Catalog this-model source must be alive.")
         return source_model_id
     raise GameLifecycleError("Catalog this-model source is not owned by the unit.")
+
+
+def _validate_model_scoped_advance_eligibility_source(
+    *,
+    state: GameState,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> None:
+    source_model_id = _validate_this_model_source_id(
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    _advance_eligibility.validate_model_scoped_source_evidence(
+        source_model_instance_id=source_model_id,
+        source_is_wargear=record.source_kind is AbilitySourceKind.WARGEAR,
+        wargear_bearer_model_instance_ids=_record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_model_instance_ids,
+        ),
+        rules_unit=rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+        ),
+    )
 
 
 def _this_model_restore_missing_wounds(
@@ -5221,15 +5221,6 @@ def _effect_is_minimum_unmodified_hit_success(effect: RuleEffectSpec) -> bool:
     )
 
 
-def _clause_grants_advance_eligibility(clause: RuleClause, *, ability: str) -> bool:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Catalog advance eligibility requires RuleClause.")
-    requested_ability = _validate_identifier("ability", ability)
-    return _clause_targets_this_unit(clause) and any(
-        _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
-    )
-
-
 def _clause_grants_fall_back_eligibility(clause: RuleClause, *, ability: str) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog Fall Back eligibility requires RuleClause.")
@@ -5237,18 +5228,6 @@ def _clause_grants_fall_back_eligibility(clause: RuleClause, *, ability: str) ->
     return _clause_targets_this_unit(clause) and any(
         _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
     )
-
-
-def _advance_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
-    if type(effect) is not RuleEffectSpec:
-        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
-    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
-        return None
-    parameters = parameter_payload(effect.parameters)
-    ability = parameters.get("ability")
-    if type(ability) is not str:
-        return None
-    return _CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS.get(_catalog_ir_lookup_token(ability))
 
 
 def _fall_back_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:

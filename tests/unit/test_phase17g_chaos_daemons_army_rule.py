@@ -2638,15 +2638,24 @@ def _kairos_realm_lifecycle(
         formation = target_army.attached_units[0]
         primary_id = formation.attached_unit_instance_id
         primary_component_id = formation.bodyguard_unit_instance_id
+        primary_leader_id = formation.leader_unit_instance_ids[0]
     else:
         primary_id = "army-beta:target-primary"
         primary_component_id = primary_id
+        primary_leader_id = None
     battlefield = state.battlefield_state
     if battlefield is None:
         raise AssertionError("Kairos test requires battlefield state.")
     primary_position = (
         battlefield.unit_placement_by_id(primary_component_id).model_placements[0].pose.position
     )
+    if primary_leader_id is not None:
+        _relocate_unit(
+            state=state,
+            unit_instance_id=primary_leader_id,
+            x=primary_position.x,
+            y=primary_position.y + 2.0,
+        )
     companion_y = (
         primary_position.y + 20.0
         if primary_position.y <= battlefield.battlefield_depth_inches / 2.0

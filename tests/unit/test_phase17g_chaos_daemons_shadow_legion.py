@@ -35,7 +35,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
-from warhammer40k_core.engine import healing_source_context
+from warhammer40k_core.engine import healing_geometry, healing_source_context
 from warhammer40k_core.engine import (
     stratagems_generic_metadata as generic_metadata,
 )
@@ -66,7 +66,9 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.damage_allocation import (
+    DamageKind,
     FeelNoPainSource,
+    apply_damage_to_model,
     feel_no_pain_roll_spec,
     is_mortal_wound_feel_no_pain_request,
     mortal_wound_feel_no_pain_source_context,
@@ -98,6 +100,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
@@ -1524,7 +1527,7 @@ def test_shadow_legion_generic_runtime_mortal_threshold_edges() -> None:
         )
 
 
-def test_shadow_legion_generic_runtime_phase_start_engagement_ignores_dead_enemy() -> None:
+def test_shared_healing_phase_start_engagement_ignores_dead_enemy() -> None:
     state = _shadow_legion_state()
     source_unit = _unit_for_player(state, player_id="player-a")
     enemy_unit = _unit_for_player(state, player_id="player-b")
@@ -1546,7 +1549,7 @@ def test_shadow_legion_generic_runtime_phase_start_engagement_ignores_dead_enemy
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit.unit_instance_id)
 
     assert (
-        generic_rule_ir_runtime._phase_start_enemy_engagement_model_ids(
+        healing_geometry.healing_phase_start_enemy_engagement_model_ids(
             state=state,
             rules_unit=rules_unit,
         )
@@ -1679,6 +1682,141 @@ def test_mantle_of_gloom_reduces_enemy_oc_in_engagement_with_bearers_attached_un
             )
         )
         == 2
+    )
+
+
+def test_mantle_of_gloom_requires_living_source_but_measures_retained_physical_base() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_mantle_of_gloom(state, unit=bearer)
+    _place_unit_poses(
+        state,
+        unit_instance_id=bearer.unit_instance_id,
+        poses=(
+            Pose.at(10.0, 20.0),
+            Pose.at(30.0, 20.0),
+            Pose.at(30.0, 22.0),
+            Pose.at(30.0, 24.0),
+            Pose.at(30.0, 26.0),
+        ),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=_unit_line_poses(x=12.0, y=20.0),
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_model = bearer.own_models[0]
+    retained_placement = battlefield.model_placement_by_id(retained_model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=bearer.unit_instance_id,
+        model_instance_id=retained_model.model_instance_id,
+        damage=retained_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id="phase17g:mantle-of-gloom:mixed-source",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    assert (
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=2,
+        )
+        == 1
+    )
+
+    current_bearer = _unit_for_player(state, player_id="player-a")
+    for model in current_bearer.own_models[1:]:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=current_bearer.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+
+    assert (
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=2,
+        )
+        == 2
+    )
+
+
+def test_malice_manifest_requires_living_target_but_measures_retained_physical_base() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_unit_poses(
+        state,
+        unit_instance_id=bearer.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=(
+            Pose.at(12.0, 20.0),
+            Pose.at(30.0, 20.0),
+            Pose.at(30.0, 22.0),
+            Pose.at(30.0, 24.0),
+            Pose.at(30.0, 26.0),
+        ),
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_model = target.own_models[0]
+    retained_placement = battlefield.model_placement_by_id(retained_model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=target.unit_instance_id,
+        model_instance_id=retained_model.model_instance_id,
+        damage=retained_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id="phase17g:malice-made-manifest:mixed-target",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    assert enhancements._enemy_rules_unit_ids_within_engagement_range(
+        state=state,
+        bearer_unit_instance_id=bearer.unit_instance_id,
+    ) == (target.unit_instance_id,)
+
+    current_target = _unit_for_player(state, player_id="player-b")
+    for model in current_target.own_models[1:]:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=current_target.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+
+    assert (
+        enhancements._enemy_rules_unit_ids_within_engagement_range(
+            state=state,
+            bearer_unit_instance_id=bearer.unit_instance_id,
+        )
+        == ()
     )
 
 

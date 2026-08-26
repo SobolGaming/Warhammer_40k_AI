@@ -17,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequencePayload
+from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fights_first import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND as CHARGE_FIGHTS_FIRST_EFFECT_KIND,
@@ -34,14 +35,15 @@ from warhammer40k_core.engine.fights_first import (
     FightsFirstSource as FightsFirstSource,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.physical_engagement import (
+    current_closest_physical_enemy_distance_inches,
+    current_rules_unit_is_physically_engaged,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    placed_alive_rules_unit_views,
     rules_unit_identity_history_contains,
     rules_unit_view_by_id,
 )
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -1319,16 +1321,11 @@ def eligible_fight_contexts_for_player(
     requested_player_id = _validate_identifier("player_id", player_id)
     if state.army_definition_for_player(requested_player_id) is None:
         raise GameLifecycleError("Fight phase requires mustered army definitions.")
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
+    placed_rules_units = fight_present_rules_unit_views(state=state)
     player_rules_units = tuple(
         rules_unit
         for rules_unit in placed_rules_units
         if rules_unit.owner_player_id == requested_player_id
-    )
-    enemy_rules_units = tuple(
-        rules_unit
-        for rules_unit in placed_rules_units
-        if rules_unit.owner_player_id != requested_player_id
     )
     contexts: list[FightEligibilityContext] = []
     for rules_unit in player_rules_units:
@@ -1343,7 +1340,6 @@ def eligible_fight_contexts_for_player(
             state=state,
             fight_state=fight_state,
             rules_unit=rules_unit,
-            enemy_rules_units=enemy_rules_units,
             policy=policy,
         )
         if not reasons:
@@ -1367,7 +1363,6 @@ def eligible_fight_contexts_for_player(
                 closest_enemy_distance_inches=_closest_enemy_distance_inches(
                     state=state,
                     rules_unit=rules_unit,
-                    enemy_rules_units=enemy_rules_units,
                 ),
                 pass_distance_inches=policy.eligible_pass_distance_inches,
             )
@@ -1377,20 +1372,9 @@ def eligible_fight_contexts_for_player(
 
 def unit_is_currently_engaged(*, state: GameState, unit_instance_id: str) -> bool:
     """Return current Engagement Range state for the whole attached rules unit."""
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    rules_unit = rules_unit_view_by_id(
+    return current_rules_unit_is_physically_engaged(
         state=state,
-        unit_instance_id=requested_unit_id,
-    )
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
-    return _unit_is_engaged(
-        state=state,
-        rules_unit=rules_unit,
-        enemy_rules_units=tuple(
-            candidate
-            for candidate in placed_rules_units
-            if candidate.owner_player_id != rules_unit.owner_player_id
-        ),
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
     )
 
 
@@ -1425,17 +1409,12 @@ def engaged_unit_ids_at_fight_start(
     policy: FightPolicyDescriptor,
 ) -> tuple[str, ...]:
     del policy
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
+    placed_rules_units = fight_present_rules_unit_views(state=state)
     engaged: set[str] = set()
     for rules_unit in placed_rules_units:
         if _unit_is_engaged(
             state=state,
             rules_unit=rules_unit,
-            enemy_rules_units=tuple(
-                candidate
-                for candidate in placed_rules_units
-                if candidate.owner_player_id != rules_unit.owner_player_id
-            ),
         ):
             engaged.add(rules_unit.unit_instance_id)
     return tuple(sorted(engaged))
@@ -1609,16 +1588,10 @@ def fight_eligibility_reasons_for_unit(
         state=state,
         unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
     )
-    placed_rules_units = placed_alive_rules_unit_views(state=state)
     return _fight_eligibility_reasons_for_rules_unit(
         state=state,
         fight_state=fight_state,
         rules_unit=requested_rules_unit,
-        enemy_rules_units=tuple(
-            candidate
-            for candidate in placed_rules_units
-            if candidate.owner_player_id != requested_rules_unit.owner_player_id
-        ),
         policy=policy,
     )
 
@@ -1628,7 +1601,6 @@ def _fight_eligibility_reasons_for_rules_unit(
     state: GameState,
     fight_state: FightPhaseState,
     rules_unit: RulesUnitView,
-    enemy_rules_units: tuple[RulesUnitView, ...],
     policy: FightPolicyDescriptor,
 ) -> tuple[FightEligibilityKind, ...]:
     reasons: list[FightEligibilityKind] = []
@@ -1653,7 +1625,6 @@ def _fight_eligibility_reasons_for_rules_unit(
     if FightEligibilityKind.CURRENTLY_ENGAGED in policy.eligibility_kinds and _unit_is_engaged(
         state=state,
         rules_unit=rules_unit,
-        enemy_rules_units=enemy_rules_units,
     ):
         reasons.append(FightEligibilityKind.CURRENTLY_ENGAGED)
     return tuple(reasons)
@@ -1663,69 +1634,22 @@ def _unit_is_engaged(
     *,
     state: GameState,
     rules_unit: RulesUnitView,
-    enemy_rules_units: tuple[RulesUnitView, ...],
 ) -> bool:
-    unit_models = geometry_models_for_rules_unit(
+    return current_rules_unit_is_physically_engaged(
         state=state,
         unit_instance_id=rules_unit.unit_instance_id,
     )
-    if not unit_models:
-        return False
-    for enemy_rules_unit in enemy_rules_units:
-        enemy_models = geometry_models_for_rules_unit(
-            state=state,
-            unit_instance_id=enemy_rules_unit.unit_instance_id,
-        )
-        if _any_models_within_engagement_range(
-            first_models=unit_models,
-            second_models=enemy_models,
-            state=state,
-        ):
-            return True
-    return False
 
 
 def _closest_enemy_distance_inches(
     *,
     state: GameState,
     rules_unit: RulesUnitView,
-    enemy_rules_units: tuple[RulesUnitView, ...],
 ) -> float | None:
-    unit_models = geometry_models_for_rules_unit(
+    return current_closest_physical_enemy_distance_inches(
         state=state,
         unit_instance_id=rules_unit.unit_instance_id,
     )
-    if not unit_models:
-        return None
-    distances: list[float] = []
-    for enemy_rules_unit in enemy_rules_units:
-        for first_model in unit_models:
-            for second_model in geometry_models_for_rules_unit(
-                state=state,
-                unit_instance_id=enemy_rules_unit.unit_instance_id,
-            ):
-                distances.append(first_model.range_to(second_model))
-    if not distances:
-        return None
-    return min(distances)
-
-
-def _any_models_within_engagement_range(
-    *,
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-    state: GameState,
-) -> bool:
-    policy = state.runtime_ruleset_descriptor().engagement_policy
-    for first_model in first_models:
-        for second_model in second_models:
-            if first_model.is_within_engagement_range(
-                second_model,
-                horizontal_inches=policy.horizontal_inches,
-                vertical_inches=policy.vertical_inches,
-            ):
-                return True
-    return False
 
 
 def _step_states_for_current_step(

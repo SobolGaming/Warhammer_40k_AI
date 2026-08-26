@@ -42,7 +42,10 @@ from warhammer40k_core.engine.attack_sequence import (
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookRegistry,
 )
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
@@ -83,7 +86,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
 )
 from warhammer40k_core.engine.fight_activation_units import (
     active_fight_activation_rules_unit,
-    finalize_rule_destruction_after_fight_activation,
+    finalize_rule_destructions_after_fight_activation,
     split_attached_rules_unit_after_fight_activation,
 )
 from warhammer40k_core.engine.fight_attack_completion import (
@@ -92,6 +95,9 @@ from warhammer40k_core.engine.fight_attack_completion import (
 )
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_eligible_to_fight_this_phase,
+)
+from warhammer40k_core.engine.fight_movement_target_authority import (
+    build_fight_movement_target_authority_witness,
 )
 from warhammer40k_core.engine.fight_order import (
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
@@ -201,8 +207,11 @@ from warhammer40k_core.engine.phases.fight_attack_sequence_selection import (
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
-    apply_rule_destruction_reaction_and_schedule_fight_on_death,
-    remove_rule_fight_on_death_models_for_completed_activation,
+    apply_rule_destruction_fight_on_death_reaction,
+    fight_on_death_completion_requires_rule_finalization,
+    finalize_next_rule_fight_on_death_at_phase_end,
+    remove_remaining_fight_on_death_models_at_phase_end,
+    remove_rule_fight_on_death_contexts_for_completed_activation,
 )
 from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
@@ -481,12 +490,11 @@ class FightPhaseHandler:
         if result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
             request = decisions.record_for_result(result).request
             if rule_model_destruction.is_rule_model_destruction_reaction_request(request):
-                apply_rule_destruction_reaction_and_schedule_fight_on_death(
+                return apply_rule_destruction_fight_on_death_reaction(
                     state=state,
                     decisions=decisions,
                     result=result,
                 )
-                return None
         if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
             return _apply_fight_attack_sequence_decision(
                 handler=self,
@@ -655,6 +663,18 @@ def _advance_fight_phase_body(
         )
         if phase_end_status is not None:
             return phase_end_status
+        fight_on_death_status = finalize_next_rule_fight_on_death_at_phase_end(
+            state=state,
+            decisions=decisions,
+        )
+        if type(fight_on_death_status) is LifecycleStatus:
+            return fight_on_death_status
+        if fight_on_death_status:
+            return None
+        remove_remaining_fight_on_death_models_at_phase_end(
+            state=state,
+            decisions=decisions,
+        )
         state.replace_fight_phase_state(fight_state.with_phase_complete())
         return None
     raise GameLifecycleError("Fight phase body has unsupported current_step.")
@@ -699,7 +719,6 @@ def _advance_fight_attack_sequence(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=continuation,
-        unit_attacked=True,
     )
 
 
@@ -728,7 +747,6 @@ def _resolve_completed_fight_attack_sequence_continuation(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=continuation,
-        unit_attacked=True,
     )
 
 
@@ -765,6 +783,26 @@ def _advance_active_fight_activation(
             activation_result_id=activation.result_id,
         )
     ):
+        if not melee_rules_unit.alive_models():
+            state.replace_fight_phase_state(
+                fight_state.with_overrun_pile_in_completed(
+                    activation_result_id=activation.result_id,
+                )
+            )
+            decisions.event_log.append(
+                "overrun_pile_in_not_available",
+                validate_json_value(
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "phase": BattlePhase.FIGHT.value,
+                        "phase_body_status": "overrun_pile_in_not_available",
+                        "activation_selection": activation.to_payload(),
+                        "reason": "no_living_movable_models",
+                    }
+                ),
+            )
+            return None
         return _request_overrun_pile_in(
             state=state,
             decisions=decisions,
@@ -895,7 +933,6 @@ def _complete_active_fight_activation_without_melee_declaration(
         reaction_queue=reaction_queue,
         policy=policy,
         activation=activation,
-        unit_attacked=False,
     )
 
 
@@ -907,7 +944,6 @@ def _complete_active_fight_activation(
     reaction_queue: ReactionQueue | None,
     policy: FightPolicyDescriptor,
     activation: FightActivationSelection,
-    unit_attacked: bool,
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
     activation_rules_unit_instance_id = rules_unit_view_by_id(
@@ -915,13 +951,12 @@ def _complete_active_fight_activation(
         unit_instance_id=activation.unit_instance_id,
     ).unit_instance_id
     state.replace_fight_phase_state(fight_state.with_active_activation(None))
-    fight_on_death_completion = remove_rule_fight_on_death_models_for_completed_activation(
+    fight_on_death_completions = remove_rule_fight_on_death_contexts_for_completed_activation(
         state=state,
         decisions=decisions,
         activation=activation,
-        unit_attacked=unit_attacked,
     )
-    if fight_on_death_completion is None:
+    if not fight_on_death_completions:
         split_attached_rules_unit_after_fight_activation(
             state=state,
             event_log=decisions.event_log,
@@ -939,11 +974,14 @@ def _complete_active_fight_activation(
             }
         ),
     )
-    if fight_on_death_completion is not None:
-        finalization_status = finalize_rule_destruction_after_fight_activation(
+    for fight_on_death_completion in fight_on_death_completions:
+        if not fight_on_death_completion_requires_rule_finalization(fight_on_death_completion):
+            raise GameLifecycleError("Fight On Death completion finalization kind drift.")
+    if fight_on_death_completions:
+        finalization_status = finalize_rule_destructions_after_fight_activation(
             state=state,
             decisions=decisions,
-            context=fight_on_death_completion,
+            contexts=fight_on_death_completions,
             rules_unit_instance_id=activation_rules_unit_instance_id,
         )
         if finalization_status is not None:
@@ -978,6 +1016,12 @@ def _request_fight_activation_ability_if_available(
     activation: FightActivationSelection,
     target_unit_instance_ids: tuple[str, ...],
 ) -> LifecycleStatus | None:
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=activation.unit_instance_id,
+    )
+    if not rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit):
+        return None
     if _fight_activation_ability_window_resolved(
         state=state,
         decisions=decisions,
@@ -1546,6 +1590,10 @@ def _apply_fight_movement_proposal(
     record = decisions.record_for_result(result)
     proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
     proposal = fight_movement_proposal_from_payload(result.payload)
+    target_authority_witness = build_fight_movement_target_authority_witness(
+        state=state,
+        target_unit_instance_ids=proposal.target_unit_instance_ids,
+    )
     proposal_validation = proposal.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         if not _proposal_validation_has_code(
@@ -1560,6 +1608,7 @@ def _apply_fight_movement_proposal(
             proposal_request=proposal_request,
             proposal_validation=proposal_validation,
             resolution=None,
+            target_authority_witness=target_authority_witness,
             message="Fight movement PathWitness must not repeat only endpoint poses.",
         )
     scenario = _battlefield_scenario(state)
@@ -1592,6 +1641,7 @@ def _apply_fight_movement_proposal(
             proposal_request=proposal_request,
             proposal_validation=resolution_violation,
             resolution=resolution,
+            target_authority_witness=target_authority_witness,
             message=_fight_movement_invalid_message(violation_code),
         )
     battlefield_state = state.battlefield_state
@@ -1641,6 +1691,7 @@ def _apply_fight_movement_proposal(
         "unit_instance_id": proposal.unit_instance_id,
         "transition_batch": validate_json_value(transition_batch.to_payload()),
         "resolution": validate_json_value(resolution.to_payload()),
+        "target_authority_witness": target_authority_witness,
     }
     if isinstance(resolution, FightMovementResolution):
         completed_payload["movement_endpoint_placement"] = validate_json_value(
@@ -2078,6 +2129,7 @@ def _reject_recorded_invalid_fight_movement(
     proposal_request: MovementProposalRequest,
     proposal_validation: ProposalValidationResult,
     resolution: FightRulesUnitMovementResolution | None,
+    target_authority_witness: JsonValue,
     message: str,
 ) -> LifecycleStatus:
     violation_code = _first_proposal_violation_code(proposal_validation)
@@ -2095,6 +2147,7 @@ def _reject_recorded_invalid_fight_movement(
         "proposal_kind": proposal_request.proposal_kind.value,
         "movement_phase_action": proposal_request.movement_phase_action,
         "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        "target_authority_witness": target_authority_witness,
     }
     if resolution is not None:
         event_payload["resolution"] = validate_json_value(resolution.to_payload())

@@ -5,7 +5,7 @@ from dataclasses import replace
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
     RangeProfile,
@@ -25,6 +25,7 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_proximity_keyword_gate_applies,
@@ -649,7 +650,7 @@ def test_ws14_attached_target_proximity_uses_keywords_and_geometry_from_all_comp
     )
     state = _state(*armies)
     _place_armies(state, armies=armies)
-    _move_unit_to(state, unit_instance_id=bodyguard.unit_instance_id, x=40.0, y=40.0)
+    _move_unit_to(state, unit_instance_id=bodyguard.unit_instance_id, x=40.0, y=10.0)
     _move_unit_to(state, unit_instance_id=leader.unit_instance_id, x=10.0, y=10.0)
     _move_unit_to(state, unit_instance_id=defender.unit_instance_id, x=12.0, y=10.0)
     state.record_persisting_effect(
@@ -740,6 +741,107 @@ def test_ws14_attached_attacker_closest_target_constraint_uses_rules_unit_geomet
         )
         == 0
     )
+
+
+@pytest.mark.parametrize(
+    ("target_constraint", "maximum_distance_inches"),
+    [
+        ("closest_eligible_target_within_18", 18.0),
+        ("eligible_unit_within_12", 12.0),
+    ],
+)
+def test_ws14_attack_distance_constraint_uses_actual_attacker_not_retained_dead_member(
+    target_constraint: str,
+    maximum_distance_inches: float,
+) -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(
+        catalog=catalog,
+        army_id="army-a",
+        unit_selection_id="attacker",
+        datasheet_id="core-intercessor-like-infantry",
+        model_count=5,
+    )
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
+    armies = (
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    state = _state(*armies)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _place_armies(state, armies=armies)
+    _move_unit_to(state, unit_instance_id=defender.unit_instance_id, x=20.0, y=10.0)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    attacker_placement = battlefield.unit_placement_by_id(attacker.unit_instance_id)
+    retained_model_id = attacker.own_models[0].model_instance_id
+    living_attacker_model = attacker.own_models[1]
+    separated_attacker_placement = replace(
+        attacker_placement,
+        model_placements=tuple(
+            replace(
+                placement,
+                pose=Pose.at(
+                    x=(
+                        10.0
+                        if placement.model_instance_id == retained_model_id
+                        else 22.0 + maximum_distance_inches
+                    ),
+                    y=10.0,
+                ),
+            )
+            for placement in attacker_placement.model_placements
+        ),
+    )
+    separated_battlefield = battlefield.with_unit_placement(separated_attacker_placement)
+    state.replace_battlefield_state(separated_battlefield)
+    retained_placement = separated_battlefield.model_placement_by_id(retained_model_id)
+    attacker_with_retained_dead_model = _unit_with_model_wounds(
+        attacker,
+        wounds_remaining=0,
+    )
+    _replace_unit(state, attacker_with_retained_dead_model)
+    state.replace_battlefield_state(separated_battlefield.with_removed_models((retained_model_id,)))
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id=f"ws14:retained-attacker:{target_constraint}",
+        source_rule_id=f"ws14:retained-attacker-rule:{target_constraint}",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id=f"ws14:actual-attacker-distance:{target_constraint}",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={
+                "roll_type": "hit",
+                "delta": 1,
+                "attack_role": "attacker",
+                "target_constraint": target_constraint,
+            },
+        )
+    )
+    registry = RuntimeModifierRegistry.empty()
+
+    def modifier_for_model(model_index: int) -> int:
+        model = attacker_with_retained_dead_model.own_models[model_index]
+        return registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=model.model_instance_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=_weapon_profile(catalog, model.wargear_ids[0]),
+            )
+        )
+
+    assert modifier_for_model(1) == 0
+    assert living_attacker_model.is_alive
+    assert modifier_for_model(0) == 1
 
 
 def test_ws14_attached_target_half_strength_uses_complete_rules_unit_strength() -> None:
@@ -1334,6 +1436,7 @@ def _unit(
     army_id: str,
     unit_selection_id: str,
     datasheet_id: str = "core-character-leader",
+    model_count: int = 1,
 ) -> UnitInstance:
     datasheet = catalog.datasheet_by_id(datasheet_id)
     profile = datasheet.model_profiles[0]
@@ -1346,7 +1449,7 @@ def _unit(
             model_profile_selections=(
                 ModelProfileSelection(
                     model_profile_id=profile.model_profile_id,
-                    model_count=1,
+                    model_count=model_count,
                 ),
             ),
             wargear_selections=(

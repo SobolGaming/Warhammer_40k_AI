@@ -413,7 +413,7 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
 
 def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -> None:
     session, status = _daemonforge_fight_status(
-        game_id="daemonforge-fight-refreshed-19",
+        game_id="daemonforge-fight-refreshed-41",
     )
     request = _decision_request(status.decision_request)
 

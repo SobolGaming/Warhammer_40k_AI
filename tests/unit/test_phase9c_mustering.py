@@ -30,7 +30,7 @@ from warhammer40k_core.core.detachment import (
     EnhancementSubtype,
     StratagemDefinition,
 )
-from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.faction import ArmyRuleDefinition, FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
@@ -51,9 +51,19 @@ from warhammer40k_core.engine.attached_unit_formation import (
     AttachedUnitFormation,
     AttachedUnitFormationError,
 )
+from warhammer40k_core.engine.datasheet_faction_access import (
+    DatasheetFactionAccessBinding,
+    DatasheetFactionAccessRegistry,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.deployment import deployment_unit_selection_request
 from warhammer40k_core.engine.event_log import EventRecordPayload
+from warhammer40k_core.engine.faction_content.datasheet_faction_access import (
+    default_datasheet_faction_access_registry,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import (
+    mustering as aeldari_mustering,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
@@ -67,6 +77,7 @@ from warhammer40k_core.engine.list_validation import (
     resolve_wargear_selections,
     selected_force_disposition_ids,
     validate_detachment_selection,
+    validate_unit_selection_for_army,
     validate_unit_selection_for_faction,
 )
 from warhammer40k_core.engine.list_validation_errors import (
@@ -854,6 +865,110 @@ def _drukhari_corsairs_and_travelling_players_catalog() -> ArmyCatalog:
         detachments=detachments,
         enhancements=enhancements,
         source_ids=("phase17g:drukhari-corsairs-catalog",),
+    )
+
+
+def _aeldari_disparate_paths_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    battle_focus = DatasheetAbilityDescriptor(
+        ability_id="000009894",
+        name="Battle Focus",
+        source_id="000009894",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.FACTION,
+        effect_description="Source-backed Aeldari army rule.",
+    )
+    disparate_paths = DatasheetAbilityDescriptor(
+        ability_id="000009896",
+        name="Disparate Paths",
+        source_id="000009896",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.FACTION,
+        effect_description="Source-backed Aeldari Harlequins mustering permission.",
+    )
+    path_of_damnation = DatasheetAbilityDescriptor(
+        ability_id="000002538:path-of-damnation",
+        name="PATH OF DAMNATION",
+        source_id="000002538:path-of-damnation",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="This model cannot be your WARLORD.",
+        rule_ir_payload={MUSTERING_WARLORD_RULE_KEY: MUSTERING_WARLORD_FORBIDDEN},
+    )
+    datasheets = (
+        replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id="phase17g-aeldari-autarch",
+                name="Autarch",
+                keywords=("Aeldari", "Character", "Infantry"),
+                faction_keywords=("Asuryani",),
+            ),
+            abilities=(),
+        ),
+        replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id="phase17g-aeldari-solitaire",
+                name="Solitaire",
+                keywords=("Aeldari", "Character", "Epic Hero", "Infantry"),
+                faction_keywords=("Harlequins",),
+            ),
+            abilities=(battle_focus, disparate_paths, path_of_damnation),
+        ),
+        replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id="phase17g-harlequin-without-disparate-paths",
+                name="Unlinked Harlequin",
+                keywords=("Aeldari", "Infantry"),
+                faction_keywords=("Harlequins",),
+            ),
+            abilities=(battle_focus,),
+        ),
+        replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id="phase17g-imperial-disparate-paths-outsider",
+                name="Imperial Outsider",
+                keywords=("Character", "Infantry"),
+                faction_keywords=("Imperium",),
+            ),
+            abilities=(battle_focus, disparate_paths),
+        ),
+    )
+    army_rule = ArmyRuleDefinition(
+        rule_id="000009894",
+        name="Battle Focus",
+        source_id="000009894",
+    )
+    faction = FactionDefinition(
+        faction_id="aeldari",
+        name="Aeldari",
+        faction_keywords=("Asuryani",),
+        army_rule_ids=(army_rule.rule_id,),
+        source_ids=("test-source:aeldari:faction",),
+    )
+    detachment = DetachmentDefinition(
+        detachment_id="phase17g-aeldari-detachment",
+        name="Phase 17G Aeldari Detachment",
+        faction_id=faction.faction_id,
+        detachment_point_cost=1,
+        unit_datasheet_ids=("phase17g-aeldari-autarch",),
+        force_disposition_ids=("phase17g-force",),
+        source_ids=("phase17g:aeldari-detachment",),
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-aeldari-disparate-paths-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-aeldari-disparate-paths-source",
+        datasheets=datasheets,
+        wargear=base_catalog.wargear,
+        factions=(faction,),
+        army_rules=(army_rule,),
+        detachments=(detachment,),
+        source_ids=("phase17g:aeldari-disparate-paths-catalog",),
     )
 
 
@@ -3127,6 +3242,128 @@ def test_phase17g_pact_army_factions_are_forbidden_by_default(
 
     assert report.violations[0].violation_code == "detachment_selection_invalid"
     assert "forbids selecting" in report.violations[0].message
+
+
+def test_aeldari_disparate_paths_allows_source_linked_harlequin_in_asuryani_army() -> None:
+    catalog = _aeldari_disparate_paths_catalog()
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="aeldari",
+            detachment_ids=("phase17g-aeldari-detachment",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="autarch",
+                datasheet_id="phase17g-aeldari-autarch",
+            ),
+            _unit_selection(
+                unit_selection_id="solitaire",
+                datasheet_id="phase17g-aeldari-solitaire",
+            ),
+        ),
+        unit_points=(
+            _unit_points("autarch", 70),
+            _unit_points("solitaire", 115),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="autarch",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+
+    assert army.roster_legality_report.is_legal
+    assert {unit.datasheet_id for unit in army.units} == {
+        "phase17g-aeldari-autarch",
+        "phase17g-aeldari-solitaire",
+    }
+
+
+def test_aeldari_disparate_paths_uses_registered_source_ability_access() -> None:
+    registry = default_datasheet_faction_access_registry()
+
+    assert registry.bindings == aeldari_mustering.datasheet_faction_access_bindings()
+    assert registry.bindings[0].source_ability_id == (
+        aeldari_mustering.DISPARATE_PATHS_CATALOG_ABILITY_ID
+    )
+    assert registry.runtime_consumer_ids == (
+        aeldari_mustering.DISPARATE_PATHS_MUSTERING_CONSUMER_ID,
+    )
+
+    def allow_all(
+        *,
+        datasheet: DatasheetDefinition,
+        faction: FactionDefinition,
+    ) -> bool:
+        return True
+
+    duplicate_source_binding = DatasheetFactionAccessBinding(
+        binding_id="datasheet-faction-access:test-duplicate-source",
+        source_ability_id=aeldari_mustering.DISPARATE_PATHS_CATALOG_ABILITY_ID,
+        runtime_consumer_id="army-mustering:test-duplicate-source",
+        predicate=allow_all,
+    )
+    with pytest.raises(ListValidationError, match="duplicate source_ability_id"):
+        DatasheetFactionAccessRegistry.from_bindings((*registry.bindings, duplicate_source_binding))
+
+
+@pytest.mark.parametrize(
+    "datasheet_id",
+    [
+        "phase17g-harlequin-without-disparate-paths",
+        "phase17g-imperial-disparate-paths-outsider",
+    ],
+)
+def test_aeldari_disparate_paths_rejects_unlinked_or_unrelated_datasheet(
+    datasheet_id: str,
+) -> None:
+    catalog = _aeldari_disparate_paths_catalog()
+
+    with pytest.raises(ListValidationError, match="not legal for faction"):
+        validate_unit_selection_for_army(
+            catalog=catalog,
+            selection=_unit_selection(unit_selection_id="outsider", datasheet_id=datasheet_id),
+            faction=catalog.faction_by_id("aeldari"),
+            detachment_selection=DetachmentSelection(
+                faction_id="aeldari",
+                detachment_ids=("phase17g-aeldari-detachment",),
+            ),
+        )
+
+
+def test_aeldari_disparate_paths_preserves_path_of_damnation_warlord_prohibition() -> None:
+    catalog = _aeldari_disparate_paths_catalog()
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="aeldari",
+            detachment_ids=("phase17g-aeldari-detachment",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="autarch",
+                datasheet_id="phase17g-aeldari-autarch",
+            ),
+            _unit_selection(
+                unit_selection_id="solitaire",
+                datasheet_id="phase17g-aeldari-solitaire",
+            ),
+        ),
+        unit_points=(
+            _unit_points("autarch", 70),
+            _unit_points("solitaire", 115),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="solitaire",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert "warlord_forbidden" in {violation.violation_code for violation in report.violations}
 
 
 def test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies() -> None:

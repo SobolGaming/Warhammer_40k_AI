@@ -88,6 +88,10 @@ from warhammer40k_core.engine.phases.movement import (
     _roll_desperate_escape_dice,
     resolve_fall_back_move,
 )
+from warhammer40k_core.engine.phases.movement_geometry import (
+    _enemy_engaged_unit_ids_for_unit_placement,
+    _enemy_engagement_model_ids_for_unit,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -203,6 +207,76 @@ def test_fall_back_allows_engagement_transit_but_rejects_endpoint_in_engagement(
         invalid_resolution.path_validation_results[0].violations[0].violation_code
         == "enemy_engagement_range_end_forbidden"
     )
+
+
+def test_fall_back_engagement_context_keeps_only_retained_destroyed_enemy_geometry() -> None:
+    scenario = _engaged_scenario()
+    enemy_unit_id = "army-beta:intercessor-unit-2"
+    enemy_placement = scenario.battlefield_state.unit_placement_by_id(enemy_unit_id)
+    retained_placement = enemy_placement.model_placements[0]
+    distant_placements = tuple(
+        placement.with_pose(Pose.at(50.0 + index, 40.0, facing_degrees=180.0))
+        for index, placement in enumerate(enemy_placement.model_placements[1:])
+    )
+    battlefield = scenario.battlefield_state.with_unit_placement(
+        enemy_placement.with_model_placements((retained_placement, *distant_placements))
+    )
+    updated_armies = tuple(
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0)
+                        if model.model_instance_id == retained_placement.model_instance_id
+                        else model
+                        for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == enemy_unit_id
+                else unit
+                for unit in army.units
+            ),
+        )
+        for army in scenario.armies
+    )
+    retained_scenario = BattlefieldScenario(
+        armies=updated_armies,
+        battlefield_state=battlefield,
+        present_destroyed_model_ids=(retained_placement.model_instance_id,),
+    )
+    source_placement = battlefield.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    ruleset_descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+
+    assert _enemy_engaged_unit_ids_for_unit_placement(
+        scenario=retained_scenario,
+        unit_placement=source_placement,
+        ruleset_descriptor=ruleset_descriptor,
+    ) == (enemy_unit_id,)
+    assert _enemy_engagement_model_ids_for_unit(
+        scenario=retained_scenario,
+        unit_placement=source_placement,
+        ruleset_descriptor=ruleset_descriptor,
+    ) == ((retained_placement.model_instance_id,), ())
+
+    ordinary_dead_scenario = replace(
+        retained_scenario,
+        present_destroyed_model_ids=(),
+    )
+    assert (
+        _enemy_engaged_unit_ids_for_unit_placement(
+            scenario=ordinary_dead_scenario,
+            unit_placement=source_placement,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+        == ()
+    )
+    assert _enemy_engagement_model_ids_for_unit(
+        scenario=ordinary_dead_scenario,
+        unit_placement=source_placement,
+        ruleset_descriptor=ruleset_descriptor,
+    ) == ((), ())
 
 
 def test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requirement() -> None:

@@ -15,8 +15,10 @@ from warhammer40k_core.engine import (
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
+from warhammer40k_core.engine import fight_activation_history_integrity as _fahi
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
+from warhammer40k_core.engine import model_destruction_cause_producers as _mdcp
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_historical_event_integrity as _phei
@@ -209,6 +211,9 @@ from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
     required_movement_proposal_context_string,
+)
+from warhammer40k_core.engine.normal_move_history import (
+    validate_normal_move_state_consistency,
 )
 from warhammer40k_core.engine.opportunity_windows import (
     OPPORTUNITY_REQUEST_FAMILY,
@@ -3525,6 +3530,12 @@ def _validate_payload_consistency(
         event_records=event_records,
     )
     _tsi.validate_transport_cargo_state_consistency(state=state)
+    _mdcp.validate_model_destruction_cause_restore(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
+    )
     _validate_battlefield_state_consistency(state=state, config=config)
     _rsi.validate_initial_reserve_destruction_policy_authority(
         state=state,
@@ -3534,10 +3545,11 @@ def _validate_payload_consistency(
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)
+    _fahi.validate_restore(state, event_records, decision_records, pending_decision_requests)
     validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
-    _validate_normal_move_state_consistency(state=state)
+    validate_normal_move_state_consistency(state=state)
     validate_config_state_payload_consistency(
         state=state,
         config=config,
@@ -3584,7 +3596,10 @@ def _validate_battlefield_state_consistency(
             scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
         if config is not None and _state_requires_deployed_battlefield_state(state):
             assert_battlefield_units_in_coherency(
-                scenario=scenario,
+                scenario=_fahi.battlefield_scenario_for_living_model_coherency(
+                    scenario=scenario,
+                    state=state,
+                ),
                 ruleset_descriptor=config.ruleset_descriptor,
             )
     except PlacementError as exc:
@@ -3785,7 +3800,7 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
         record.attached_unit_instance_id: record.player_id
         for record in state.starting_attached_unit_records
     }
-    known_unit_ids = set(unit_owner_by_id)
+    known_unit_ids = set(unit_owner_by_id) | set(historical_attached_owner_by_id)
     for unit_id in (
         *fight_order_state.engaged_at_fight_step_start_unit_ids,
         *fight_order_state.selected_to_fight_unit_ids,
@@ -3897,21 +3912,3 @@ def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
             and fell_back_state.unit_instance_id not in fully_removed_active_player_unit_ids
         ):
             raise GameLifecycleError("fell_back_unit_states unit is not active player's unit.")
-
-
-def _validate_normal_move_state_consistency(*, state: GameState) -> None:
-    if not state.normal_move_states:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("normal_move_states require battle stage.")
-    unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    for normal_move_state in state.normal_move_states:
-        owner = unit_owner_by_id.get(normal_move_state.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("normal_move_states unit is unknown.")
-        if owner != normal_move_state.player_id:
-            raise GameLifecycleError("normal_move_states player_id does not match unit owner.")

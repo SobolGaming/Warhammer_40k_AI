@@ -1,0 +1,499 @@
+{
+  "artifact_schema": "core-v2-player-army-list-v1",
+  "army_list_id": "anvanth-11th",
+  "name": "Anvanth 11th",
+  "faction_id": "aeldari",
+  "detachment_selection": {
+    "faction_id": "aeldari",
+    "detachment_ids": [
+      "corsair-coterie",
+      "path-of-the-outcast"
+    ],
+    "enhancement_ids": [
+      "aeldari:path-of-the-outcast:assassins-eye-upgrade",
+      "voidstone",
+      "webway-pathstone"
+    ],
+    "stratagem_ids": []
+  },
+  "force_disposition_id": "reconnaissance",
+  "battle_size": "strike_force",
+  "declared_total_points": 1995,
+  "units": [
+    {
+      "selection": {
+        "unit_selection_id": "autarch-wayleaper",
+        "datasheet_id": "000002759",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002759:autarch-wayleaper",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 70
+    },
+    {
+      "selection": {
+        "unit_selection_id": "warp-spiders-1",
+        "datasheet_id": "000000601",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000601:warp-spider-exarch",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000000601:warp-spiders",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000601:aspect-shrine-token:option-2",
+            "model_profile_id": "000000601:warp-spider-exarch",
+            "wargear_ids": [
+              "000000601:aspect-shrine-token"
+            ],
+            "selection_count": 1
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 105
+    },
+    {
+      "selection": {
+        "unit_selection_id": "kharseth",
+        "datasheet_id": "000004194",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000004194:kharseth-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 85
+    },
+    {
+      "selection": {
+        "unit_selection_id": "corsair-voidreavers-1",
+        "datasheet_id": "000002531",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002531:corsair-voidreavers",
+            "model_count": 4
+          },
+          {
+            "model_profile_id": "000002531:voidreaver-felarch",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000002531:mistshield:option-2",
+            "model_profile_id": "000002531:voidreaver-felarch",
+            "wargear_ids": [
+              "000002531:mistshield"
+            ]
+          },
+          {
+            "option_id": "000002531:voidreaver-felarch-replacement:option-1",
+            "model_profile_id": "000002531:voidreaver-felarch",
+            "wargear_ids": [
+              "000002531:neuro-disruptor"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 90
+    },
+    {
+      "selection": {
+        "unit_selection_id": "lhykhis",
+        "datasheet_id": "000003909",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000003909:lhykhis-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 135
+    },
+    {
+      "selection": {
+        "unit_selection_id": "warp-spiders-2",
+        "datasheet_id": "000000601",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000601:warp-spider-exarch",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000000601:warp-spiders",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000601:aspect-shrine-token:option-2",
+            "model_profile_id": "000000601:warp-spider-exarch",
+            "wargear_ids": [
+              "000000601:aspect-shrine-token"
+            ],
+            "selection_count": 1
+          },
+          {
+            "option_id": "000000601:warp-spider-exarch-replacement-powerblade-array:option-1",
+            "model_profile_id": "000000601:warp-spider-exarch",
+            "wargear_ids": [
+              "000000601:powerblade-array"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 105
+    },
+    {
+      "selection": {
+        "unit_selection_id": "solitaire",
+        "datasheet_id": "000002538",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002538:solitaire-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 115
+    },
+    {
+      "selection": {
+        "unit_selection_id": "corsair-voidreavers-2",
+        "datasheet_id": "000002531",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002531:corsair-voidreavers",
+            "model_count": 4
+          },
+          {
+            "model_profile_id": "000002531:voidreaver-felarch",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 80
+    },
+    {
+      "selection": {
+        "unit_selection_id": "fire-dragons",
+        "datasheet_id": "000000596",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000596:fire-dragon-exarch",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000000596:fire-dragons",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000596:aspect-shrine-token:option-2",
+            "model_profile_id": "000000596:fire-dragon-exarch",
+            "wargear_ids": [
+              "000000596:aspect-shrine-token"
+            ],
+            "selection_count": 1
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 120
+    },
+    {
+      "selection": {
+        "unit_selection_id": "night-spinner",
+        "datasheet_id": "000000611",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000611:night-spinner",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000611:shuriken-cannon:option-1",
+            "model_profile_id": "000000611:night-spinner",
+            "wargear_ids": [
+              "000000611:shuriken-cannon"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 170
+    },
+    {
+      "selection": {
+        "unit_selection_id": "rangers-1",
+        "datasheet_id": "000000592",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000592:rangers",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 60
+    },
+    {
+      "selection": {
+        "unit_selection_id": "rangers-2",
+        "datasheet_id": "000000592",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000592:rangers",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 60
+    },
+    {
+      "selection": {
+        "unit_selection_id": "shroud-runners-1",
+        "datasheet_id": "000002533",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002533:shroud-runners",
+            "model_count": 3
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 90
+    },
+    {
+      "selection": {
+        "unit_selection_id": "shroud-runners-2",
+        "datasheet_id": "000002533",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000002533:shroud-runners",
+            "model_count": 6
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 190
+    },
+    {
+      "selection": {
+        "unit_selection_id": "swooping-hawks",
+        "datasheet_id": "000000600",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000600:swooping-hawk-exarch",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000000600:swooping-hawks",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000600:aspect-shrine-token:option-2",
+            "model_profile_id": "000000600:swooping-hawk-exarch",
+            "wargear_ids": [
+              "000000600:aspect-shrine-token"
+            ],
+            "selection_count": 1
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 95
+    },
+    {
+      "selection": {
+        "unit_selection_id": "war-walkers",
+        "datasheet_id": "000000612",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000612:war-walkers",
+            "model_count": 2
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000612:shuriken-cannon-bright-lance:option-1",
+            "model_profile_id": "000000612:war-walkers",
+            "wargear_ids": [
+              "000000612:bright-lance"
+            ],
+            "selection_count": 2,
+            "bearer_assignments": [
+              {
+                "wargear_id": "000000612:bright-lance",
+                "model_ordinal": 1,
+                "selection_count": 1
+              },
+              {
+                "wargear_id": "000000612:bright-lance",
+                "model_ordinal": 2,
+                "selection_count": 1
+              }
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 160
+    },
+    {
+      "selection": {
+        "unit_selection_id": "wraithblades",
+        "datasheet_id": "000000598",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000598:wraithblades",
+            "model_count": 5
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000598:ghostaxe-forceshield:option-1",
+            "model_profile_id": "000000598:wraithblades",
+            "wargear_ids": [
+              "000000598:forceshield",
+              "000000598:ghostaxe"
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 140
+    },
+    {
+      "selection": {
+        "unit_selection_id": "wraithlord",
+        "datasheet_id": "000000613",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000000613:wraithlord",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000000613:shuriken-catapults-flamer:option-1",
+            "model_profile_id": "000000613:wraithlord",
+            "wargear_ids": [
+              "000000613:flamer"
+            ],
+            "selection_count": 2,
+            "bearer_assignments": [
+              {
+                "wargear_id": "000000613:flamer",
+                "model_ordinal": 1,
+                "selection_count": 2
+              }
+            ]
+          },
+          {
+            "option_id": "000000613:ghostglaive:option-2",
+            "model_profile_id": "000000613:wraithlord",
+            "wargear_ids": [
+              "000000613:ghostglaive"
+            ]
+          },
+          {
+            "option_id": "000000613:additive-choice:option-3",
+            "model_profile_id": "000000613:wraithlord",
+            "wargear_ids": [
+              "000000613:bright-lance",
+              "000000613:starcannon"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000000613:bright-lance",
+                "model_ordinal": 1,
+                "selection_count": 1
+              },
+              {
+                "wargear_id": "000000613:starcannon",
+                "model_ordinal": 1,
+                "selection_count": 1
+              }
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 125
+    }
+  ],
+  "attachment_declarations": [
+    {
+      "source_unit_selection_id": "autarch-wayleaper",
+      "bodyguard_unit_selection_id": "warp-spiders-1"
+    },
+    {
+      "source_unit_selection_id": "kharseth",
+      "bodyguard_unit_selection_id": "corsair-voidreavers-1"
+    },
+    {
+      "source_unit_selection_id": "lhykhis",
+      "bodyguard_unit_selection_id": "warp-spiders-2"
+    }
+  ],
+  "enhancement_assignments": [
+    {
+      "enhancement_id": "webway-pathstone",
+      "target_unit_selection_id": "corsair-voidreavers-1",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie:enhancement:webway-pathstone"
+    },
+    {
+      "enhancement_id": "voidstone",
+      "target_unit_selection_id": "corsair-voidreavers-2",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:corsair-coterie:enhancement:voidstone"
+    },
+    {
+      "enhancement_id": "aeldari:path-of-the-outcast:assassins-eye-upgrade",
+      "target_unit_selection_id": "shroud-runners-2",
+      "source_id": "gw-11e-mfm-2026-07:faction:aeldari:detachment:path-of-the-outcast:enhancement:assassins-eye"
+    }
+  ],
+  "warlord_selection": {
+    "unit_selection_id": "autarch-wayleaper",
+    "source_id": "player-army-list:anvanth-11th:warlord"
+  },
+  "dedicated_transport_manifests": [],
+  "provenance": {
+    "source_format": "warhammer-40000-app-text",
+    "app_version": "v2.4.0 (139)",
+    "data_version": "v925",
+    "points_source_package_id": "gw-11e-mfm-2026-07"
+  }
+}

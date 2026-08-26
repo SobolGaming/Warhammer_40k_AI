@@ -8,7 +8,8 @@ Start here:
 uv python install 3.14.5
 uv lock
 uv sync
-uv run pytest
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
+  uv run pytest -n auto --dist=worksteal tests/
 ```
 
 ## Test commands
@@ -31,10 +32,16 @@ uv run pytest tests/code_quality -q -n0 --no-cov
 The unsharded full behavioral coverage gate is:
 
 ```bash
-uv run pytest tests --ignore=tests/code_quality \
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
+  uv run pytest tests --ignore=tests/code_quality \
   -n auto --dist=worksteal \
   --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
 ```
+
+The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
+viewer-renderer regressions. It is safe when that directory is absent: an independently installed
+`node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
+tests do not fail only because the desktop shell omitted the bundled runtime.
 
 CI shards this same behavioral suite, combines branch coverage, and applies the single 85%
 gate after every shard succeeds. Full type checking and architecture checks also remain required
@@ -495,9 +502,11 @@ Milestone A is complete only when these commands pass:
 
 ```bash
 uv run ruff check .
+uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-uv run pytest
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 uv run lint-imports
 uv run pre-commit run --all-files
 ```

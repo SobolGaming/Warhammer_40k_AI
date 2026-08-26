@@ -4,11 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     placement_kinds_for_reserve_state,
     proposal_kind_for_reserve_state,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -17,6 +21,10 @@ from warhammer40k_core.engine.stratagems_selection import *
 from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
+from warhammer40k_core.engine.physical_engagement import (
+    current_physically_engaged_enemy_rules_unit_ids,
+    current_rules_unit_is_physically_engaged,
+)
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.shooting_terrain_visibility import (
     shooting_terrain_areas_for_state,
@@ -293,15 +301,13 @@ def _units_are_engaged(
     first_unit_instance_id: str,
     second_unit_instance_id: str,
 ) -> bool:
-    return _any_models_within_engagement_range(
-        first_models=_geometry_models_for_unit(
-            state=state,
-            unit_instance_id=first_unit_instance_id,
-        ),
-        second_models=_geometry_models_for_unit(
-            state=state,
-            unit_instance_id=second_unit_instance_id,
-        ),
+    second_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=second_unit_instance_id,
+    )
+    return second_rules_unit.unit_instance_id in current_physically_engaged_enemy_rules_unit_ids(
+        state=state,
+        unit_instance_id=first_unit_instance_id,
     )
 
 
@@ -350,8 +356,12 @@ def _model_is_alive_and_placed(*, state: GameState, model_instance_id: str) -> b
         for unit in army.units:
             for model in unit.own_models:
                 if model.model_instance_id == requested_model_id:
-                    return model_is_present_on_battlefield(
+                    return rules_unit_has_placed_alive_model(
                         state=state,
+                        rules_unit=rules_unit_view_by_id(
+                            state=state,
+                            unit_instance_id=unit.unit_instance_id,
+                        ),
                         model_instance_id=requested_model_id,
                     )
     raise GameLifecycleError("model_instance_id is unknown.")
@@ -556,6 +566,7 @@ def _visible_enemy_target_is_visible_and_in_range(
         ruleset_descriptor=_stratagem_ruleset_descriptor(),
         observing_unit=source_unit,
         target_unit_id=target_unit_instance_id,
+        placed_alive_models_only=False,
         terrain_features=_stratagem_terrain_features(state),
         terrain_areas=shooting_terrain_areas_for_state(state),
     )
@@ -575,20 +586,13 @@ def _unit_is_within_enemy_engagement_range(
     player_id: str,
     unit_instance_id: str,
 ) -> bool:
-    unit_models = _geometry_models_for_unit(state=state, unit_instance_id=unit_instance_id)
-    for army in state.army_definitions:
-        if army.player_id == player_id:
-            continue
-        for unit in army.units:
-            if _any_models_within_engagement_range(
-                first_models=unit_models,
-                second_models=_geometry_models_for_unit(
-                    state=state,
-                    unit_instance_id=unit.unit_instance_id,
-                ),
-            ):
-                return True
-    return False
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    if rules_unit.owner_player_id != player_id:
+        raise GameLifecycleError("Stratagem Engagement source owner drift.")
+    return current_rules_unit_is_physically_engaged(
+        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
 
 
 def _enemy_unit_is_within_friendly_engagement_range(
@@ -597,23 +601,20 @@ def _enemy_unit_is_within_friendly_engagement_range(
     player_id: str,
     target_unit_instance_id: str,
 ) -> bool:
-    target_models = _geometry_models_for_unit(
+    target_rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    for army in state.army_definitions:
-        if army.player_id != player_id:
-            continue
-        for unit in army.units:
-            if _any_models_within_engagement_range(
-                first_models=_geometry_models_for_unit(
-                    state=state,
-                    unit_instance_id=unit.unit_instance_id,
-                ),
-                second_models=target_models,
-            ):
-                return True
-    return False
+    if target_rules_unit.owner_player_id == player_id:
+        raise GameLifecycleError("Stratagem Engagement target owner drift.")
+    return any(
+        rules_unit_view_by_id(state=state, unit_instance_id=engaged_unit_id).owner_player_id
+        == player_id
+        for engaged_unit_id in current_physically_engaged_enemy_rules_unit_ids(
+            state=state,
+            unit_instance_id=target_rules_unit.unit_instance_id,
+        )
+    )
 
 
 def _any_models_within_engagement_range(

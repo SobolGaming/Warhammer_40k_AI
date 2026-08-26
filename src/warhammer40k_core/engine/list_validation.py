@@ -18,6 +18,9 @@ from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
+from warhammer40k_core.engine.faction_content.datasheet_faction_access import (
+    default_datasheet_faction_access_registry,
+)
 from warhammer40k_core.engine.list_validation_errors import ListValidationError
 from warhammer40k_core.engine.scaled_wargear_limits import (
     ScaledWargearSelection,
@@ -629,6 +632,10 @@ def validate_unit_selection_for_army(
         datasheet=datasheet,
         faction=faction,
     )
+    source_bound_faction_access_allowed = default_datasheet_faction_access_registry().allows(
+        datasheet=datasheet,
+        faction=faction,
+    )
     shadow_legion_thralls_allowed = shadow_legion_thralls_datasheet_has_faction_access(
         datasheet=datasheet,
         faction=faction,
@@ -641,6 +648,7 @@ def validate_unit_selection_for_army(
         and not cult_of_dark_gods_allowed
         and not drukhari_corsairs_allowed
         and not freeblades_allowed
+        and not source_bound_faction_access_allowed
         and not shadow_legion_thralls_allowed
     ):
         raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
@@ -659,6 +667,7 @@ def validate_unit_selection_for_army(
         and not cult_of_dark_gods_allowed
         and not drukhari_corsairs_allowed
         and not freeblades_allowed
+        and not source_bound_faction_access_allowed
         and not shadow_legion_thralls_allowed
     ):
         raise ListValidationError(

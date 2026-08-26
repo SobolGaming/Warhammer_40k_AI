@@ -3069,6 +3069,184 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008340",
+    "ability_name": "Fights First",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/core/000008340/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:fight-order:fights-first"
+    ],
+    "semantic_categories": [
+      "core.fights_first"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008336",
+    "ability_name": "Lone Operative",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/core/000008336/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:shooting-target:lone-operative"
+    ],
+    "semantic_categories": [
+      "core.lone_operative"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008337",
+    "ability_name": "Stealth",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/core/000008337/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "core:stealth"
+    ],
+    "semantic_categories": [
+      "core.stealth"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002538:blitz",
+    "ability_name": "Blitz",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blitz/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-action-grant",
+      "catalog-ir:once-per-battle-ability"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.this_model",
+      "datasheet.rule_ir.modify_move_distance.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002538:blur-of-movement",
+    "ability_name": "Blur of Movement",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:blur-of-movement/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:can-advance-and-charge"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002538:path-of-damnation",
+    "ability_name": "PATH OF DAMNATION",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/datasheet/000002538:path-of-damnation/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:warlord-restriction"
+    ],
+    "semantic_categories": [
+      "unknown.ability_text"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009894",
+    "ability_name": "Battle Focus",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/faction/000009894/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:aeldari:army_rule:fade_back",
+      "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+      "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+      "warhammer_40000_11th:aeldari:army_rule:star_engines",
+      "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+      "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.battle_focus"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009896",
+    "ability_name": "Disparate Paths",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/faction/000009896/none",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:aeldari-disparate-paths"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.disparate_paths"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002538:flip-belt",
+    "ability_name": "Flip Belt",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002538/wargear/000002538:flip-belt/000002538:flip-belt",
+    "datasheet_id": "000002538",
+    "datasheet_name": "Solitaire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-transit-permission"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.movement_transit_permission.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000002538:flip-belt",
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008339",
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",
@@ -3901,7 +4079,7 @@
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "generic_ir_executable"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000004078:lord-of-the-host",
@@ -4370,6 +4548,105 @@
     "coverage_row_id": "chaos-daemons-bridge-catalog/000004084/faction/000009994/none",
     "datasheet_id": "000004084",
     "datasheet_name": "Lord Kakophonist",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/core/000008339/none",
+    "datasheet_id": "000004086",
+    "datasheet_name": "Daemon Prince of Slaanesh",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004086:ecstatic-death",
+    "ability_name": "Ecstatic Death",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:ecstatic-death/none",
+    "datasheet_id": "000004086",
+    "datasheet_name": "Daemon Prince of Slaanesh",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:fight-on-death-source"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004086:excessive-vigour-aura",
+    "ability_name": "Excessive Vigour (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:excessive-vigour-aura/none",
+    "datasheet_id": "000004086",
+    "datasheet_name": "Daemon Prince of Slaanesh",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:charged-melee-weapon-characteristic-aura"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.modify_characteristic.aura_units"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004086:lord-of-excess",
+    "ability_name": "Lord of Excess",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/datasheet/000004086:lord-of-excess/none",
+    "datasheet_id": "000004086",
+    "datasheet_name": "Daemon Prince of Slaanesh",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-ability:lone-operative"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004086/faction/000009994/none",
+    "datasheet_id": "000004086",
+    "datasheet_name": "Daemon Prince of Slaanesh",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
