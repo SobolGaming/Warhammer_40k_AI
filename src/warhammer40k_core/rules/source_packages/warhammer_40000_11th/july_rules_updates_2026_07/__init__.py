@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import date
 from typing import Final
 
@@ -12,6 +13,7 @@ from warhammer40k_core.rules.data_package import (
 )
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_evidence import RuleEvidenceRecord
 from warhammer40k_core.rules.source_packages.artifact_loader import (
     SourcePackageArtifactError,
     package_artifact_bytes,
@@ -19,6 +21,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 from ._artifacts import (
     AppCoreRuleUpdateRecord,
+    AppCoreTranscriptionProvenanceArtifact,
     EventCompanionRuleUpdateRecord,
     EventLayoutRevisionRecord,
     JulyRulesUpdateArtifactError,
@@ -28,6 +31,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
+EXPECTED_ARTIFACT_SHA256: Final = "427f6117cb86e63aefd6b115e8ce43dfc2a368cc22c77580df1742170b0ca06a"
 
 
 def _load_artifact() -> JulyRulesUpdatesPackageArtifact:
@@ -37,6 +41,10 @@ def _load_artifact() -> JulyRulesUpdatesPackageArtifact:
         raise JulyRulesUpdateArtifactError(
             "July rules-update generated data package could not be loaded."
         ) from exc
+    if hashlib.sha256(raw).hexdigest() != EXPECTED_ARTIFACT_SHA256:
+        raise JulyRulesUpdateArtifactError(
+            "July rules-update artifact bytes drifted from their reviewed pin."
+        )
     return july_rules_updates_package_artifact_from_json_bytes(raw)
 
 
@@ -45,6 +53,7 @@ SOURCE_PACKAGE_ID: Final = _ARTIFACT.source_package_id
 SOURCE_TITLE: Final = _ARTIFACT.source_title
 SOURCE_VERSION: Final = _ARTIFACT.source_version
 SOURCE_DATE: Final = _ARTIFACT.source_date
+PACKAGE_HASH: Final = _ARTIFACT.package_hash
 UNIVERSAL_RULES_SOURCE_URL: Final = _ARTIFACT.universal_rules_update.source_url
 UNIVERSAL_RULES_LOCAL_PDF: Final = _ARTIFACT.universal_rules_update.local_pdf
 UNIVERSAL_RULES_PDF_SHA256: Final = _ARTIFACT.universal_rules_update.source_pdf_sha256
@@ -78,6 +87,27 @@ def event_companion_rule_records() -> tuple[EventCompanionRuleUpdateRecord, ...]
 
 def app_core_rule_records() -> tuple[AppCoreRuleUpdateRecord, ...]:
     return _ARTIFACT.app_core_rules_update.rules
+
+
+def app_core_rule_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
+    return tuple(
+        evidence.to_rule_evidence_record(
+            context=_ARTIFACT.app_core_rules_update.mirror_evidence_context
+        )
+        for evidence in _ARTIFACT.app_core_rules_update.evidence_records
+    )
+
+
+def app_core_transcription_provenance() -> AppCoreTranscriptionProvenanceArtifact:
+    return _ARTIFACT.app_core_rules_update.transcription_provenance
+
+
+def validate_july_rules_update_artifact_bytes(raw: bytes) -> None:
+    if hashlib.sha256(raw).hexdigest() != EXPECTED_ARTIFACT_SHA256:
+        raise JulyRulesUpdateArtifactError(
+            "July rules-update artifact bytes drifted from their reviewed pin."
+        )
+    july_rules_updates_package_artifact_from_json_bytes(raw)
 
 
 def source_catalog() -> SourceCatalog:
@@ -205,8 +235,10 @@ __all__ = (
     "EVENT_COMPANION_PDF_SHA256",
     "EVENT_COMPANION_SOURCE_PACKAGE_ID",
     "EVENT_COMPANION_SOURCE_URL",
+    "EXPECTED_ARTIFACT_SHA256",
     "IDENTICAL_UNIT_REPLACEMENT_STRATAGEM_SOURCE_IDS",
     "NON_CORE_CP_GAIN_CAP_SOURCE_ID",
+    "PACKAGE_HASH",
     "PROTECTIVE_TARGETING_STRATAGEM_SOURCE_IDS",
     "SOURCE_DATE",
     "SOURCE_PACKAGE_ID",
@@ -216,10 +248,13 @@ __all__ = (
     "UNIVERSAL_RULES_PDF_SHA256",
     "UNIVERSAL_RULES_SOURCE_URL",
     "JulyRulesUpdateArtifactError",
+    "app_core_rule_evidence_records",
     "app_core_rule_records",
+    "app_core_transcription_provenance",
     "changed_event_layouts",
     "event_companion_rule_records",
     "july_rules_updates_package_artifact_from_json_bytes",
     "source_catalog",
     "universal_rule_records",
+    "validate_july_rules_update_artifact_bytes",
 )

@@ -428,6 +428,11 @@ Current status:
   and hashes remain authoritative provenance. Reviewed provider observations may
   be retained as assignment-level evidence under `data/source_audits/39k_pro`,
   but no provider content is loaded by the runtime.
+- The checked-in [40k.app core-rules comparison](docs/CORE_RULES_40K_APP_COMPARISON.md)
+  inventories all 25 core-rules category locators as offline, secondary review evidence under
+  `data/source_audits/40k_app`. The mirror is unofficial and never runtime input; official GW
+  artifacts and versioned, hashed official-App captures remain authoritative. This audit excludes
+  factions, faction detachments, and faction datasheet content.
 - README milestone anchors retained for code-quality audits: Phase 14H is complete;
   Phase 14I is complete; Phase 14K is complete; Phase 17A.1 is complete.
   Phase 14H anchors: runtime Attached Unit formation; structured army-list Leader/Support declarations; first-class attached rules-unit formation records; healing, revival, persisting effects; Movement-phase Combat Disembark fallback with engine-owned evidence; setup-time Strategic Reserve declarations; repositioned-unit Advance/Fall Back/Disembark history.

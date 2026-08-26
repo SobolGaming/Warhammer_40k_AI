@@ -10,6 +10,14 @@ import pytest
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.rules.source_catalog import SourceCatalog
+from warhammer40k_core.rules.source_evidence import (
+    RuleEvidenceAuthority,
+    RuleEvidenceError,
+    RuleEvidenceKind,
+    RuleEvidencePayload,
+    RuleEvidenceRecord,
+    RuleVerificationStatus,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     app_core_rules_hidden_2026_08_09,
     chapter_approved_2026_27,
@@ -38,7 +46,7 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
     assert SourceCatalog.from_payload(payload).to_payload() == payload
 
 
-def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> None:
+def test_july_rules_updates_source_catalog_cites_pdfs_and_preserves_identity() -> None:
     catalog = july_rules_updates_2026_07.source_catalog()
     payload = catalog.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
@@ -123,6 +131,12 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> No
     }
     assert any("Bane of Cowards" in rule.source_text for rule in app_core_rules)
     assert SourceCatalog.from_payload(payload).to_payload() == payload
+    assert (
+        hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == "5dc3a27783541c49a3ffbd90c4deab9874f364c5bf3a2237133d7af2d6188d59"
+    )
 
     for relative_path, expected_sha256 in (
         (
@@ -135,6 +149,222 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> No
         ),
     ):
         assert hashlib.sha256(Path(relative_path).read_bytes()).hexdigest() == expected_sha256
+
+
+def test_july_app_rows_are_hash_pinned_and_quarantined_from_official_authority() -> None:
+    evidence_records = july_rules_updates_2026_07.app_core_rule_evidence_records()
+    rules_by_source_id = {
+        rule.source_id: rule for rule in july_rules_updates_2026_07.app_core_rule_records()
+    }
+    evidence_by_source_id = {record.rule_source_id: record for record in evidence_records}
+
+    assert hashlib.sha256(_july_rules_update_artifact_path().read_bytes()).hexdigest() == (
+        july_rules_updates_2026_07.EXPECTED_ARTIFACT_SHA256
+    )
+    assert july_rules_updates_2026_07.PACKAGE_HASH == (
+        "d9e36c4522463da052d3458568aaa5ad5c5279d649f1a0489ced6f80f9e3b08a"
+    )
+    assert len(evidence_records) == len(rules_by_source_id) == 16
+    assert set(evidence_by_source_id) == set(rules_by_source_id)
+    assert all(record.evidence_kind == "third_party_mirror" for record in evidence_records)
+    assert all(record.authority == "secondary_mirror_only" for record in evidence_records)
+    assert all(record.provider_name == "40k.app" for record in evidence_records)
+    assert all(record.official_corroborating_source_ids == () for record in evidence_records)
+    assert all(record.provider_non_affiliation_recorded for record in evidence_records)
+    assert all(
+        RuleEvidenceRecord.from_payload(record.to_payload()) == record
+        for record in evidence_records
+    )
+    assert all(
+        hashlib.sha256(rules_by_source_id[source_id].source_text.encode()).hexdigest()
+        == evidence.transcription_sha256
+        for source_id, evidence in evidence_by_source_id.items()
+    )
+
+    fight_on_death_source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
+        "05.04.05-fight-on-death"
+    ]
+    fight_on_death = evidence_by_source_id[fight_on_death_source_id]
+    assert fight_on_death.transcription_sha256 == (
+        "d2b9c094f1eda640ccfa76817e741497d960ff5d6015d7d9afa7616e3cd77741"
+    )
+    assert fight_on_death.verification_status == "mirror_only"
+    assert fight_on_death.load_support_status == "loaded"
+    assert fight_on_death.semantic_execution_status == "partial_engine_runtime"
+    assert fight_on_death.runtime_consumer_ids == (
+        "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
+        "warhammer40k_core.engine.rule_model_destruction_fight_continuation:"
+        "remove_remaining_fight_on_death_models_at_phase_end",
+    )
+
+    objective_consolidation = evidence_by_source_id[
+        july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS["12.08-objective-consolidation"]
+    ]
+    assert objective_consolidation.verification_status == "conflict"
+    assert objective_consolidation.semantic_execution_status == "blocked_by_source_conflict"
+    not_observed_rule_ids = {
+        "faq-heavy-fly-horizontal-distance",
+        "faq-hazardous-mixed-unit-keywords",
+    }
+    assert {
+        rule_id
+        for rule_id in not_observed_rule_ids
+        if evidence_by_source_id[
+            july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[rule_id]
+        ].verification_status
+        == "not_observed_on_mirror"
+    } == not_observed_rule_ids
+    provenance = july_rules_updates_2026_07.app_core_transcription_provenance()
+    assert provenance.provenance_kind == ("repository_transcription_without_retained_app_capture")
+    assert provenance.authority == "unverified_transcription_only"
+    assert provenance.observation_date is None
+    assert provenance.app_version is None
+    assert provenance.source_url is None
+    assert provenance.screenshot_sha256 is None
+    assert provenance.source_binary_sha256 is None
+    catalog_encoded = json.dumps(
+        july_rules_updates_2026_07.source_catalog().to_payload(), sort_keys=True
+    )
+    assert "40k.app" not in catalog_encoded
+    assert not any(record.evidence_id in catalog_encoded for record in evidence_records)
+    assert "secondary_mirror_only" not in catalog_encoded
+
+
+def test_rule_evidence_rejects_mirror_official_authority_and_uncaptured_app_claims() -> None:
+    def invalid_record(
+        *,
+        evidence_kind: RuleEvidenceKind,
+        authority: RuleEvidenceAuthority,
+        verification_status: RuleVerificationStatus,
+    ) -> RuleEvidenceRecord:
+        return RuleEvidenceRecord(
+            evidence_id="evidence:test",
+            rule_source_id="source:test",
+            evidence_kind=evidence_kind,
+            authority=authority,
+            provider_name="40k.app",
+            source_title="Core Concepts",
+            source_platform="Web",
+            source_url="https://www.40k.app/rules/01-core-concepts",
+            observed_at="2026-08-25T12:00:00-04:00",
+            app_version=None,
+            app_build=None,
+            capture_artifact_path=None,
+            capture_sha256=None,
+            transcription_sha256="0" * 64,
+            official_corroborating_source_ids=(),
+            provider_non_affiliation_recorded=True,
+            observation_sha256="0" * 64,
+            load_support_status="loaded",
+            semantic_execution_status="not_certified",
+            runtime_consumer_ids=(),
+            verification_status=verification_status,
+        )
+
+    with pytest.raises(RuleEvidenceError, match="secondary mirror authority"):
+        invalid_record(
+            evidence_kind="third_party_mirror",
+            authority="official_primary",
+            verification_status="official_corroborated",
+        )
+
+    with pytest.raises(RuleEvidenceError, match="version, build, and a hashed retained capture"):
+        invalid_record(
+            evidence_kind="official_app_capture",
+            authority="official_primary",
+            verification_status="official_app_captured",
+        )
+
+
+def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() -> None:
+    capture_content = b"retained official App capture"
+    payload: RuleEvidencePayload = {
+        "evidence_id": "evidence:official-app-capture",
+        "rule_source_id": "source:official-app-rule",
+        "evidence_kind": "official_app_capture",
+        "authority": "official_primary",
+        "provider_name": "Games Workshop",
+        "source_title": "Warhammer 40,000 App Core Rules",
+        "source_platform": "Warhammer 40,000 App",
+        "source_url": None,
+        "observed_at": "2026-08-25T12:00:00-04:00",
+        "app_version": "11.0.0",
+        "app_build": "test-build",
+        "capture_artifact_path": "docs/source_rules/app_captures/core-rules.bin",
+        "capture_sha256": hashlib.sha256(capture_content).hexdigest(),
+        "transcription_sha256": hashlib.sha256(b"captured official rule text").hexdigest(),
+        "official_corroborating_source_ids": [],
+        "verification_status": "official_app_captured",
+        "provider_non_affiliation_recorded": False,
+        "observation_sha256": "",
+        "load_support_status": "loaded",
+        "semantic_execution_status": "not_certified",
+        "runtime_consumer_ids": [],
+    }
+    observation_payload = dict(payload)
+    observation_payload["observation_sha256"] = ""
+    observation_payload["load_support_status"] = "not_loaded"
+    observation_payload["semantic_execution_status"] = "not_certified"
+    observation_payload["runtime_consumer_ids"] = []
+    payload["observation_sha256"] = hashlib.sha256(
+        json.dumps(observation_payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+    record = RuleEvidenceRecord.from_payload(payload, capture_content=capture_content)
+    assert (
+        RuleEvidenceRecord.from_payload(record.to_payload(), capture_content=capture_content)
+        == record
+    )
+
+    with pytest.raises(RuleEvidenceError, match="retained capture bytes"):
+        RuleEvidenceRecord.from_payload(payload)
+    with pytest.raises(RuleEvidenceError, match="retained capture bytes"):
+        RuleEvidenceRecord.from_payload(payload, capture_content=b"different capture")
+
+    mirror_claim = dict(payload)
+    mirror_claim["provider_name"] = "40k.app"
+    mirror_claim["source_platform"] = "Web"
+    mirror_claim["source_url"] = "https://www.40k.app/rules/01-core-concepts"
+    with pytest.raises(RuleEvidenceError, match="requires the Games Workshop App"):
+        RuleEvidenceRecord.from_payload(mirror_claim, capture_content=capture_content)
+
+    traversal_claim = dict(payload)
+    traversal_claim["capture_artifact_path"] = "../capture.bin"
+    with pytest.raises(RuleEvidenceError, match="normalized relative POSIX path"):
+        RuleEvidenceRecord.from_payload(traversal_claim, capture_content=capture_content)
+    for invalid_path in ("C:/escape.bin", r"safe\..\escape.bin"):
+        platform_escape_claim = dict(payload)
+        platform_escape_claim["capture_artifact_path"] = invalid_path
+        with pytest.raises(RuleEvidenceError, match="normalized relative POSIX path"):
+            RuleEvidenceRecord.from_payload(
+                platform_escape_claim,
+                capture_content=capture_content,
+            )
+
+    unknown_field_claim = dict(payload)
+    unknown_field_claim["unexpected"] = True
+    with pytest.raises(RuleEvidenceError, match="payload fields drifted"):
+        RuleEvidenceRecord.from_payload(unknown_field_claim, capture_content=capture_content)
+
+    invalid_list_claim = dict(payload)
+    invalid_list_claim["runtime_consumer_ids"] = "not-a-list"
+    with pytest.raises(RuleEvidenceError, match="runtime_consumer_ids must be a list"):
+        RuleEvidenceRecord.from_payload(invalid_list_claim, capture_content=capture_content)
+
+    mirror_payload = july_rules_updates_2026_07.app_core_rule_evidence_records()[0].to_payload()
+    mislabeled_mirror = dict(mirror_payload)
+    mislabeled_mirror["provider_name"] = "Games Workshop"
+    mislabeled_mirror["source_platform"] = "Warhammer 40,000 App"
+    with pytest.raises(RuleEvidenceError, match="third-party mirror"):
+        RuleEvidenceRecord.from_payload(mislabeled_mirror)
+    invalid_mirror_url = dict(mirror_payload)
+    invalid_mirror_url["source_url"] = "https://www.40k.app/rulesevil"
+    with pytest.raises(RuleEvidenceError, match="canonical HTTPS rules URL"):
+        RuleEvidenceRecord.from_payload(invalid_mirror_url)
+    false_conflict_claim = dict(mirror_payload)
+    false_conflict_claim["semantic_execution_status"] = "blocked_by_source_conflict"
+    with pytest.raises(RuleEvidenceError, match="must coincide"):
+        RuleEvidenceRecord.from_payload(false_conflict_claim)
 
 
 def test_app_hidden_transcription_is_source_hashed_honest_and_cataloged() -> None:
@@ -233,6 +463,50 @@ def test_july_rules_updates_artifact_rejects_unknown_fields() -> None:
     with pytest.raises(july_rules_updates_2026_07.JulyRulesUpdateArtifactError):
         july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
             json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_july_rules_updates_artifact_rejects_unknown_app_evidence_reference() -> None:
+    payload = _july_rules_update_payload()
+    app_update = cast(dict[str, object], payload["app_core_rules_update"])
+    rules = cast(list[dict[str, object]], app_update["rules"])
+    rules[0]["evidence_ids"] = ["40k-app:missing-evidence"]
+
+    with pytest.raises(
+        july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
+        match="unknown evidence",
+    ):
+        july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_july_rules_updates_artifact_rejects_transcription_and_raw_byte_drift() -> None:
+    payload = _july_rules_update_payload()
+    app_update = cast(dict[str, object], payload["app_core_rules_update"])
+    rules = cast(list[dict[str, object]], app_update["rules"])
+    rules[0]["source_text"] = f"{rules[0]['source_text']} altered"
+
+    with pytest.raises(
+        july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
+        match="transcription hash is stale",
+    ):
+        july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+    raw = _july_rules_update_artifact_path().read_bytes()
+    july_rules_updates_2026_07.validate_july_rules_update_artifact_bytes(raw)
+    semantically_equivalent_bytes = json.dumps(
+        _july_rules_update_payload(), sort_keys=True
+    ).encode()
+    assert semantically_equivalent_bytes != raw
+    with pytest.raises(
+        july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
+        match="artifact bytes drifted",
+    ):
+        july_rules_updates_2026_07.validate_july_rules_update_artifact_bytes(
+            semantically_equivalent_bytes
         )
 
 
@@ -336,6 +610,13 @@ def _july_rules_update_payload() -> dict[str, object]:
                 "july_rules_updates_2026_07/artifacts/package.json"
             ).read_text()
         ),
+    )
+
+
+def _july_rules_update_artifact_path() -> Path:
+    return Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "july_rules_updates_2026_07/artifacts/package.json"
     )
 
 

@@ -1,100 +1,311 @@
 {
-  "artifact_schema": "core-v2-july-rules-updates-source-package-v2",
+  "artifact_schema": "core-v2-july-rules-updates-source-package-v3",
   "app_core_rules_update": {
     "document_id": "warhammer-40000-app-core-rules-2026-07-22",
+    "evidence_records": [
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:01.02.03-embarked-model-return",
+        "load_support_status": "loaded",
+        "observation_sha256": "28a1e6379d62c6426a6735849a37f7663bd96d18d69f50493854592641dd7a04",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:01.02.03-embarked-model-return",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/01-core-concepts",
+        "transcription_sha256": "715f2b38b9bb6ad652f73d6fa5e2b7cf75e0365ad5f12d29027dc8a69f670e5f",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:05.03.02-post-roll-attack-profiles",
+        "load_support_status": "loaded",
+        "observation_sha256": "3544c785accbfa4175264f987a07b4010bdbe955258bb38b747d419878afeb1a",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/05-attack-sequence",
+        "transcription_sha256": "6cf944a1442e0b385dbdc13c6cf910aca8ca4eda6d719010b53f2427026184e2",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:05.04.05-fight-on-death",
+        "load_support_status": "loaded",
+        "observation_sha256": "68e8fb8026b68228377e200851a3c96ad72d397e43d759b9a41562df57bffeca",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.04.05-fight-on-death",
+        "runtime_consumer_ids": [
+          "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
+          "warhammer40k_core.engine.rule_model_destruction_fight_continuation:remove_remaining_fight_on_death_models_at_phase_end"
+        ],
+        "semantic_execution_status": "partial_engine_runtime",
+        "source_url": "https://www.40k.app/rules/05-attack-sequence",
+        "transcription_sha256": "d2b9c094f1eda640ccfa76817e741497d960ff5d6015d7d9afa7616e3cd77741",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:09.07.01-desperate-escape-definition",
+        "load_support_status": "loaded",
+        "observation_sha256": "80b70ca6002dfea3677119cbadef14da657bbe9780342d429932205918f199b7",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-desperate-escape-definition",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/09-movement-phase",
+        "transcription_sha256": "3b9c3a6a07f2d347ab3affc01b725beec3b0d13c3e4f78c762de4d068ea9d895",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:09.07.01-forced-desperate-escape",
+        "load_support_status": "loaded",
+        "observation_sha256": "76f3a8ad9346a0b1159922deee0cda7daa7704ab05863e2e3d39749d61bf764a",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-forced-desperate-escape",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/09-movement-phase",
+        "transcription_sha256": "02ecc5b2abf16a5d4c5e7dc35114b2ca668fb053d608084146e042fa5e888bb9",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:09-normal-move-one-per-phase",
+        "load_support_status": "loaded",
+        "observation_sha256": "21af7666df8a7bffc2a0b8a13088131d3873663b06ed80eb66dc11d497c254b6",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/09-movement-phase",
+        "transcription_sha256": "cf34178e5aca13a70c5c3880cbfce78cff905bcf929fc8a0b72830cf4d7fde9f",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:12.08-objective-consolidation",
+        "load_support_status": "loaded",
+        "observation_sha256": "15797837733836044510939bdbe407c68bb2a38e025f734a6250a1557b3ed036",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "blocked_by_source_conflict",
+        "source_url": "https://www.40k.app/rules/12-fight-phase",
+        "transcription_sha256": "557420c234568774372b66bcd38d71c436c28e6da1a95d4abc6e9ef2113478a6",
+        "verification_status": "conflict"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:14.02.01-control-first",
+        "load_support_status": "loaded",
+        "observation_sha256": "b912e8f432e5a8475db7f64dbbf3820882a23977a870ac93af264ac71915b95c",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/14-objectives",
+        "transcription_sha256": "a267290551c3f73d1279486dc2e8e9f2d5e3d7d5c9ed517b695b5d8bc0ab0a33",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:18.01-dedicated-transport",
+        "load_support_status": "loaded",
+        "observation_sha256": "8c0b8c43c08dec89a05b8c690a4b3abb3f1dd65b065c3946f265f32f07dc2a2e",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:18.01-dedicated-transport",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/18-transports",
+        "transcription_sha256": "44160b6df089669f0044b4dbfa2ec776eb09f51559340b6f875946c8b7e4cb3f",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:20.01.02-strategic-reserves",
+        "load_support_status": "loaded",
+        "observation_sha256": "9444b4d7832ba096f9605812ef7b7d6b47e6e1312effae318162d554e1832ec2",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/20-strategic-reserves",
+        "transcription_sha256": "b8cf8f50d8efeb6d38fedeb47b737f6e6faa3a383e08fc96893bacc9437221ba",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:faq-heavy-fly-horizontal-distance",
+        "load_support_status": "loaded",
+        "observation_sha256": "26a065d9a1f9a94c6f55488dd3911f4225aa25f6716d9c30ebf43a352cca7512",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/21-flying-and-surging",
+        "transcription_sha256": "a816efff6ced403ec871e89201d373c86e6d5fdfacb24aa12ef4026ab7b9797a",
+        "verification_status": "not_observed_on_mirror"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:faq-hazardous-mixed-unit-keywords",
+        "load_support_status": "loaded",
+        "observation_sha256": "0508a2fa4bc9bd6792fa7ba552ffdd59ecf2a1fc2e57895a6cdbd0c8c89f5d5f",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/24-core-abilities",
+        "transcription_sha256": "44706d49e76984f524a1bfa5eacd93a2da201e7494b68a8c46840d3a0eea0bd0",
+        "verification_status": "not_observed_on_mirror"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:24.28.01-precision-devastating-wounds",
+        "load_support_status": "loaded",
+        "observation_sha256": "092a03f675e132106f412954c57258ef683a10e96a624262a21ed0178c5bdc7d",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.28.01-precision-devastating-wounds",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/24-core-abilities",
+        "transcription_sha256": "c864b915dcf7a0d6f172d74b5d30de2eff77eee587a2286926d140f480fd845b",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:24.37.01-torrent",
+        "load_support_status": "loaded",
+        "observation_sha256": "039f4344e5599d8ff1c5f5497f0842ba22d1747319f196003fac22f9056b0760",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.37.01-torrent",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/24-core-abilities",
+        "transcription_sha256": "7cfa480890f6e9a7abf28a643171cb7aaf1577bd0d6e4e7fb25c4c494faaa6b7",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:25.04-epic-hero-enhancements",
+        "load_support_status": "loaded",
+        "observation_sha256": "1a8e09b6a427eda6b6e92c40e8de9fa3af6a55bc516f08a2682c196285d37bbb",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-epic-hero-enhancements",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/25-muster-armies",
+        "transcription_sha256": "9e1d5d93169fd2da663a4ec94337a8eb2758e4bce92c0fe8c89355253d4e39df",
+        "verification_status": "mirror_only"
+      },
+      {
+        "evidence_id": "40k-app-core-rules-2026-08-25:25.04-incursion-detachment",
+        "load_support_status": "loaded",
+        "observation_sha256": "92849ff13ff06fd38a1e69bb90c71cfe0b8f9712ba78fbe920966833322cd45e",
+        "rule_source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
+        "runtime_consumer_ids": [],
+        "semantic_execution_status": "not_certified",
+        "source_url": "https://www.40k.app/rules/25-muster-armies",
+        "transcription_sha256": "ccdcec776c186d934bbeefe61307a9608dfa47e95b0b4e95f0f18cd3add37835",
+        "verification_status": "mirror_only"
+      }
+    ],
+    "mirror_evidence_context": {
+      "app_build": null,
+      "app_version": null,
+      "authority": "secondary_mirror_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_kind": "third_party_mirror",
+      "observed_at": "2026-08-25T00:00:00-04:00",
+      "official_corroborating_source_ids": [],
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules"
+    },
     "rules": [
       {
         "behavior_descriptor": "embarked_return_requires_remaining_transport_capacity",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:01.02.03-embarked-model-return"],
         "rule_id": "01.02.03-embarked-model-return",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:01.02.03-embarked-model-return",
         "source_text": "When a model revives, resurrects, returns or is added to an embarked unit, if that TRANSPORT has sufficient remaining transport capacity for that model, that model is returned to that unit and is embarked. Otherwise, that model is destroyed, but it does not trigger rules that apply when a model is destroyed."
       },
       {
         "behavior_descriptor": "post_roll_profile_changes_split_attack_pools",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:05.03.02-post-roll-attack-profiles"],
         "rule_id": "05.03.02-post-roll-attack-profiles",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles",
         "source_text": "Some attacks may be modified as a result of the values of hit/wound rolls made for those attacks. When this happens, split those attacks into attack pools based on their new identical attack profiles. The active player can decide which attack pool to resolve first for steps 5.3 and 5.4. Once those steps have been completed for that attack pool, the active player can decide the next pool to resolve and repeat until all new attack pools are resolved."
       },
       {
         "behavior_descriptor": "fight_on_death_models_wait_for_their_units_single_attack_selection",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:05.04.05-fight-on-death"],
         "rule_id": "05.04.05-fight-on-death",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.04.05-fight-on-death",
         "source_text": "Some rules enable models to attack after they have been destroyed. When a model under such an effect is destroyed, do not remove it from play. Those models will stay on the battlefield until their unit is selected to attack and has attacked, or until the end of the phase (whichever comes first). Any rules triggered by those models being destroyed are resolved, and then those destroyed models are removed. If a rule instructs a destroyed model to fight immediately after the attacking unit, instead that model is not removed from the battlefield until that model's unit has fought, or until the end of the phase (whichever comes first). This allows the models in the unit to fight all at once, and Stratagems that target that unit will also affect that destroyed model."
       },
       {
         "behavior_descriptor": "desperate_escape_test_means_hazard_rolls",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:09.07.01-desperate-escape-definition"],
         "rule_id": "09.07.01-desperate-escape-definition",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-desperate-escape-definition",
         "source_text": "Some rules may reference the term 'Desperate Escape test'. In all instances this means the hazard rolls made for the desperate escape mode of a fall-back move. Abilities that subtract from a unit's Desperate Escape test instead subtract from those hazard rolls. Example: A battle-shocked unit makes a fall-back move away from a unit of Bloodletters that have the Bane of Cowards ability. As a result of Bane of Cowards, because the unit making the fall-back move is battle-shocked, the hazard rolls they make as part of their desperate escape will be at -1."
       },
       {
         "behavior_descriptor": "forced_desperate_escape_tests_all_models_and_battle_shock",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:09.07.01-forced-desperate-escape"],
         "rule_id": "09.07.01-forced-desperate-escape",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09.07.01-forced-desperate-escape",
         "source_text": "If a Stratagem or ability forces a unit to make a Desperate Escape test, that unit must make one hazard roll for each model in that unit and must make a battle-shock roll."
       },
       {
         "behavior_descriptor": "normal_move_limited_to_once_per_unit_per_phase",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:09-normal-move-one-per-phase"],
         "rule_id": "09-normal-move-one-per-phase",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:09-normal-move-one-per-phase",
         "source_text": "A unit cannot make more than one Normal move per phase."
       },
       {
         "behavior_descriptor": "objective_consolidation_requires_unengaged_endpoint",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:12.08-objective-consolidation"],
         "rule_id": "12.08-objective-consolidation",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation",
         "source_text": "After Moving - Objective Consolidation: Your unit must be unengaged and within range of the selected objective."
       },
       {
         "behavior_descriptor": "objective_control_determined_first_at_phase_and_turn_end",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:14.02.01-control-first"],
         "rule_id": "14.02.01-control-first",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first",
         "source_text": "At the end of each phase and turn, the first thing players do (before any other 'at the end of the phase/end of the turn' rules or abilities) is determine which objectives are controlled by which player."
       },
       {
         "behavior_descriptor": "empty_dedicated_transport_models_destroyed_without_triggers",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:18.01-dedicated-transport"],
         "rule_id": "18.01-dedicated-transport",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:18.01-dedicated-transport",
         "source_text": "A friendly unit must be embarked within each friendly DEDICATED TRANSPORT model. At the end of this step, each friendly DEDICATED TRANSPORT model without an embarked unit is destroyed, but they do not trigger rules that are triggered when a model is destroyed."
       },
       {
         "behavior_descriptor": "strategic_reserves_destroyed_at_final_turn_without_triggers",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:20.01.02-strategic-reserves"],
         "rule_id": "20.01.02-strategic-reserves",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:20.01.02-strategic-reserves",
         "source_text": "At the end of the final turn, units in Strategic Reserves are destroyed, but they do not trigger rules that apply when a model is destroyed."
       },
       {
         "behavior_descriptor": "fly_heavy_uses_horizontal_distance_for_three_inch_limit",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:faq-heavy-fly-horizontal-distance"],
         "rule_id": "faq-heavy-fly-horizontal-distance",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance",
         "source_text": "A unit that has FLY still benefits from HEAVY if none of its models moved more than 3 inches horizontally, regardless of the vertical distance those models moved."
       },
       {
         "behavior_descriptor": "infantry_monster_vehicle_hazard_failure_inflicts_one_mortal_wound",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:faq-hazardous-mixed-unit-keywords"],
         "rule_id": "faq-hazardous-mixed-unit-keywords",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
         "source_text": "If a unit has both INFANTRY and MONSTER or VEHICLE keywords, it suffers 1 mortal wound for each failed Hazard roll."
       },
       {
         "behavior_descriptor": "precision_mortals_prioritize_selected_character_group",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:24.28.01-precision-devastating-wounds"],
         "rule_id": "24.28.01-precision-devastating-wounds",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.28.01-precision-devastating-wounds",
         "source_text": "Mortal Wounds inflicted by a [PRECISION] attack with the [DEVASTATING WOUNDS] ability are first applied to the CHARACTER group that was selected for those [PRECISION] attacks (if that group is not already destroyed)."
       },
       {
         "behavior_descriptor": "torrent_excludes_indirect_fire_and_precision",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:24.37.01-torrent"],
         "rule_id": "24.37.01-torrent",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:24.37.01-torrent",
         "source_text": "[TORRENT] weapons cannot have [INDIRECT FIRE] or [PRECISION]."
       },
       {
         "behavior_descriptor": "epic_hero_models_cannot_be_given_enhancements",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:25.04-epic-hero-enhancements"],
         "rule_id": "25.04-epic-hero-enhancements",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-epic-hero-enhancements",
         "source_text": "EPIC HEROES models cannot be given enhancements."
       },
       {
         "behavior_descriptor": "incursion_allows_one_three_dp_detachment",
+        "evidence_ids": ["40k-app-core-rules-2026-08-25:25.04-incursion-detachment"],
         "rule_id": "25.04-incursion-detachment",
         "source_id": "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
         "source_text": "If you are playing an Incursion battle, you can select a 3DP detachment as your only detachment."
@@ -102,7 +313,17 @@
     ],
     "source_platform": "Warhammer 40,000 App",
     "source_title": "Warhammer 40,000 App Core Rules",
-    "source_version": "2026-07-22"
+    "source_version": "2026-07-22",
+    "transcription_provenance": {
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "availability": "transcription_only_no_source_url_app_version_screenshot_or_binary",
+      "observation_date": null,
+      "provenance_kind": "repository_transcription_without_retained_app_capture",
+      "screenshot_sha256": null,
+      "source_binary_sha256": null,
+      "source_url": null
+    }
   },
   "event_companion": {
     "changed_layouts": [
@@ -187,6 +408,7 @@
     "source_version": "1.1",
     "updated_source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07"
   },
+  "package_hash": "d9e36c4522463da052d3458568aaa5ad5c5279d649f1a0489ced6f80f9e3b08a",
   "source_date": "2026-07-22",
   "source_package_id": "gw-11e-rules-and-event-updates-2026-07-22",
   "source_title": "Warhammer 40,000 July 2026 Rules and Event Updates",

@@ -1,0 +1,406 @@
+{
+  "audit_schema": "core-v2-40k-app-core-rules-audit-v1",
+  "audit_id": "40k-app-core-rules-2026-08-25",
+  "observed_at": "2026-08-25T00:00:00-04:00",
+  "scope": {
+    "edition": "warhammer_40000_11th",
+    "review_scope": "core_rules_only",
+    "expected_category_count": 25,
+    "excluded_scopes": [
+      "factions",
+      "faction_detachments",
+      "faction_datasheets"
+    ]
+  },
+  "provider": {
+    "provider_id": "40k-app",
+    "root_url": "https://www.40k.app/rules",
+    "authority_status": "secondary_unofficial",
+    "affiliation": "not_affiliated_with_or_endorsed_by_games_workshop",
+    "runtime_input": false,
+    "network_capture_retained": false
+  },
+  "official_source": {
+    "package_id": "gw-11e-core-rules",
+    "pdf_path": "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
+    "pdf_sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "catalog_source_id": "gw-11e-core-rules:manifest:local-core-rules-pdf",
+    "authority_statement": "official_gw_artifacts_and_captured_official_app_evidence_are_authoritative"
+  },
+  "categories": [
+    {
+      "category_id": "01",
+      "category_title": "Core Concepts",
+      "display_order": 1,
+      "provider_url": "https://www.40k.app/rules/01-core-concepts",
+      "section_id": "01.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "660296b0bb1b2c877cff5bc14ba003132f4545f35793dedfc70d6be650a4e708"
+    },
+    {
+      "category_id": "02",
+      "category_title": "Datasheets",
+      "display_order": 2,
+      "provider_url": "https://www.40k.app/rules/02-datasheets",
+      "section_id": "02.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "1779b88d46069fbb6e731a28356aeafc21a9997360fe50552ef7cfee5d191ce0"
+    },
+    {
+      "category_id": "03",
+      "category_title": "Moving",
+      "display_order": 3,
+      "provider_url": "https://www.40k.app/rules/03-moving",
+      "section_id": "03.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "ebbe5b69716fe69f836dc49b8c078aa58af77c405a5adf15c21502117bcce31f"
+    },
+    {
+      "category_id": "04",
+      "category_title": "Making Attacks",
+      "display_order": 4,
+      "provider_url": "https://www.40k.app/rules/04-making-attacks",
+      "section_id": "04.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "906117c8ed7a8cd03abb701d6c25781016e24662ca67a8d60a2e2aa809310cd9"
+    },
+    {
+      "category_id": "05",
+      "category_title": "Attack Sequence",
+      "display_order": 5,
+      "provider_url": "https://www.40k.app/rules/05-attack-sequence",
+      "section_id": "05.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [
+        "40k-app-numbering-05-03-02"
+      ],
+      "evidence_sha256": "3cc617c1b8f3dd3561b12f8a5ad513f14a5a444a8b7b503ba0174a488c1e305a"
+    },
+    {
+      "category_id": "06",
+      "category_title": "Other Concepts",
+      "display_order": 6,
+      "provider_url": "https://www.40k.app/rules/06-other-concepts",
+      "section_id": "06.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "92d0bcb2bc204694621798357568d34b320995efaea660faa60c9d7c8380ce78"
+    },
+    {
+      "category_id": "07",
+      "category_title": "The Battle Round",
+      "display_order": 7,
+      "provider_url": "https://www.40k.app/rules/07-the-battle-round",
+      "section_id": "07.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "543bf6aa33f116337f7e9bfa6118097e5e326dae344333842c3b49d7005a869b"
+    },
+    {
+      "category_id": "08",
+      "category_title": "Command Phase",
+      "display_order": 8,
+      "provider_url": "https://www.40k.app/rules/08-command-phase",
+      "section_id": "08.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "c41215ba776b25915f0c6b21c250965c7d086ae0812c38dfb62d8daf3cf99a66"
+    },
+    {
+      "category_id": "09",
+      "category_title": "Movement Phase",
+      "display_order": 9,
+      "provider_url": "https://www.40k.app/rules/09-movement-phase",
+      "section_id": "09.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [
+        "40k-app-duplicate-09-07-01"
+      ],
+      "evidence_sha256": "42db33310b19e465c5a7d72b1ff5feaeb6de67afdbbdada054deae18b361d611"
+    },
+    {
+      "category_id": "10",
+      "category_title": "Shooting Phase",
+      "display_order": 10,
+      "provider_url": "https://www.40k.app/rules/10-shooting-phase",
+      "section_id": "10.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "2379c72f8ef7d4cbcb84cd7245eff8e3df3de4907789504102434750cd6ce792"
+    },
+    {
+      "category_id": "11",
+      "category_title": "Charge Phase",
+      "display_order": 11,
+      "provider_url": "https://www.40k.app/rules/11-charge-phase",
+      "section_id": "11.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "0f8addf68541e60613440bb641d53c7df25672a4674ca94b5d4b6da31d880c87"
+    },
+    {
+      "category_id": "12",
+      "category_title": "Fight Phase",
+      "display_order": 12,
+      "provider_url": "https://www.40k.app/rules/12-fight-phase",
+      "section_id": "12.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "conflict",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [
+        "july-transcription-conflict-12-08"
+      ],
+      "evidence_sha256": "7a9504213711730382eab8e58bd735643053ff4c3d09f16cce681e017b455402"
+    },
+    {
+      "category_id": "13",
+      "category_title": "Terrain",
+      "display_order": 13,
+      "provider_url": "https://www.40k.app/rules/13-terrain",
+      "section_id": "13.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "547220f842a99bcc2ad6e98d16b35f0a44926b29d649bfd6ef991191383dd14f"
+    },
+    {
+      "category_id": "14",
+      "category_title": "Objectives",
+      "display_order": 14,
+      "provider_url": "https://www.40k.app/rules/14-objectives",
+      "section_id": "14.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "21e7819c1b151ae64d3ebd59a87ff82e373f51dc59a5cfd3062f20a56789383d"
+    },
+    {
+      "category_id": "15",
+      "category_title": "Stratagems",
+      "display_order": 15,
+      "provider_url": "https://www.40k.app/rules/15-stratagems",
+      "section_id": "15.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "conflict",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [
+        "official-pdf-mirror-order-15-05-15-06"
+      ],
+      "evidence_sha256": "4cdbd550e12208cf779c8325225d1026aa1b183303e34033b3002eb280a82160"
+    },
+    {
+      "category_id": "16",
+      "category_title": "Actions",
+      "display_order": 16,
+      "provider_url": "https://www.40k.app/rules/16-actions",
+      "section_id": "16.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "37a45edba24afe57b3cec6a0387d77bbf7e202a5b4a7bcbd300e9af193759613"
+    },
+    {
+      "category_id": "17",
+      "category_title": "Monsters And Vehicles",
+      "display_order": 17,
+      "provider_url": "https://www.40k.app/rules/17-monsters-and-vehicles",
+      "section_id": "17.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "c4cac7330424619194077938f5e342a8e68647252142d797da98b809534461e6"
+    },
+    {
+      "category_id": "18",
+      "category_title": "Transports",
+      "display_order": 18,
+      "provider_url": "https://www.40k.app/rules/18-transports",
+      "section_id": "18.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "605a081ef58701c5b83c6d1090f29b0551fd5c0772ca512fbbbb9982e7d9cb10"
+    },
+    {
+      "category_id": "19",
+      "category_title": "Attached Units",
+      "display_order": 19,
+      "provider_url": "https://www.40k.app/rules/19-attached-units",
+      "section_id": "19.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "f1e9e56c509b35515ce51c6721d307996c4c7d0915cfb6b083ed9a8e45343bfc"
+    },
+    {
+      "category_id": "20",
+      "category_title": "Strategic Reserves",
+      "display_order": 20,
+      "provider_url": "https://www.40k.app/rules/20-strategic-reserves",
+      "section_id": "20.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "d2b6cad9452cca565b8de0a5e210f48d5eec85da8cc0c743c021102c996148c2"
+    },
+    {
+      "category_id": "21",
+      "category_title": "Flying and Surging",
+      "display_order": 21,
+      "provider_url": "https://www.40k.app/rules/21-flying-and-surging",
+      "section_id": "21.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "transcription_not_observed",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [
+        "july-transcription-not-observed-fly-heavy"
+      ],
+      "evidence_sha256": "3cae283762958f5156ec1ed02c14a8643c1c1b848556068204ee5e3b6e7c5311"
+    },
+    {
+      "category_id": "22",
+      "category_title": "Other Rules And Abilities",
+      "display_order": 22,
+      "provider_url": "https://www.40k.app/rules/22-other-rules-and-abilities",
+      "section_id": "22.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "5e68e4e17d822d41575ac947e5b15fad221099ee0ae4e6879c27065a7f885775"
+    },
+    {
+      "category_id": "23",
+      "category_title": "Aircraft",
+      "display_order": 23,
+      "provider_url": "https://www.40k.app/rules/23-aircraft",
+      "section_id": "23.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "3f4f7af7f19999b36193de04c10bf336970832d7d9c6a5e4b13dd3838da1967f"
+    },
+    {
+      "category_id": "24",
+      "category_title": "Core Abilities",
+      "display_order": 24,
+      "provider_url": "https://www.40k.app/rules/24-core-abilities",
+      "section_id": "24.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "transcription_not_observed",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [
+        "july-transcription-not-observed-mixed-hazard"
+      ],
+      "evidence_sha256": "0dab0d8f50b59950843fba14128cdafdb5365f1779842c7a39e15741788e5b3e"
+    },
+    {
+      "category_id": "25",
+      "category_title": "Muster Armies",
+      "display_order": 25,
+      "provider_url": "https://www.40k.app/rules/25-muster-armies",
+      "section_id": "25.00",
+      "official_source_status": "retained_official_pdf_anchor",
+      "provider_comparison_status": "mirror_only",
+      "implementation_status": "not_assessed_in_p00",
+      "finding_ids": [],
+      "evidence_sha256": "e6899931e05367f894c4bed93f9a8567c102a0191fcf74c2be1269a2cbfb1d2e"
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "40k-app-numbering-05-03-02",
+      "category_id": "05",
+      "finding_kind": "provider_numbering_anomaly",
+      "how_currently_recorded": "The retained July transcription uses 05.03.02 for the post-roll attack-pool statement, while mirror display observations can omit the leading zeroes as 5.3.2.",
+      "how_it_should_be_treated": "Treat the mirror locator as provider-local display metadata and preserve the stable project rule ID until a captured official App source establishes current numbering.",
+      "specific_source_basis": "Attack Sequence provider category 05 and source row gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles; no official App capture is retained.",
+      "verification_status": "provider_local_only",
+      "evidence_sha256": "f333ae330fa96c9268044dfb17e2c5da76657de30d00f4e3aa9d3dcf74e9e8af"
+    },
+    {
+      "finding_id": "40k-app-duplicate-09-07-01",
+      "category_id": "09",
+      "finding_kind": "provider_numbering_anomaly",
+      "how_currently_recorded": "The mirror and July artifact associate both the Desperate Escape definition and the forced Desperate Escape statement with locator 09.07.01.",
+      "how_it_should_be_treated": "Keep provider numbering separate from canonical project identity; retain the distinct definition and forced-test source-ID suffixes.",
+      "specific_source_basis": "Movement Phase 09.07.01 observations and the two stable July source rows ending desperate-escape-definition and forced-desperate-escape.",
+      "verification_status": "provider_local_only",
+      "evidence_sha256": "ee52ef89e15408f725ab28f2ce94323afd6619b2fe6c0d7a33c445b12e2bf9cd"
+    },
+    {
+      "finding_id": "july-transcription-conflict-12-08",
+      "category_id": "12",
+      "finding_kind": "repository_transcription_conflict",
+      "how_currently_recorded": "The July artifact attributes an unengaged endpoint requirement to Objective Consolidation, but the current mirror observation does not substantiate treating that phrase as captured official wording.",
+      "how_it_should_be_treated": "Block source and semantic certification for this statement until a versioned, hashed official App capture resolves the wording.",
+      "specific_source_basis": "Fight Phase rule 12.08 at https://www.40k.app/rules/12-fight-phase versus gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation.",
+      "verification_status": "needs_official_app_capture",
+      "evidence_sha256": "b39dcd085257a77b2d5d95a4628775f1ce1b20b7d3b04b0a938b0a1ea760da1f"
+    },
+    {
+      "finding_id": "official-pdf-mirror-order-15-05-15-06",
+      "category_id": "15",
+      "finding_kind": "official_pdf_and_provider_internal_numbering_conflict",
+      "how_currently_recorded": "The mirror's Stratagem headings assign Crushing Impact to 15.05 and Explosives to 15.06, but its Fight Phase 12.01 example itself refers to Crushing Impact as 15.06. The retained official Core Rules PDF assigns Explosives to 15.05 and Crushing Impact to 15.06.",
+      "how_it_should_be_treated": "Use the retained official PDF for authoritative numbering. Treat the mirror's 15.05 Crushing Impact heading as an internally inconsistent provider-local locator, not as canonical project identity.",
+      "specific_source_basis": "Official Core Rules PDF SHA-256 f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833 at Stratagem entries 15.05 and 15.06; https://www.40k.app/rules/15-stratagems headings; and the Crushing Impact reference in the 12.01 example at https://www.40k.app/rules/12-fight-phase.",
+      "verification_status": "official_pdf_controls",
+      "evidence_sha256": "aa097e7d9600cca643091c8f8eecfa259ac57ced043aa125f3ea5320e1765660"
+    },
+    {
+      "finding_id": "july-transcription-not-observed-fly-heavy",
+      "category_id": "21",
+      "finding_kind": "repository_transcription_not_observed_on_provider",
+      "how_currently_recorded": "The July artifact states an explicit FLY and HEAVY horizontal-distance clarification and previously labeled the 40k.app mirror as corroborating evidence. The current mirror pages describe FLY movement and HEAVY separately but do not expose that combined clarification.",
+      "how_it_should_be_treated": "Preserve the stable source row as an uncaptured repository transcription, but mark it not observed on the mirror and do not claim mirror corroboration until matching text or captured official App evidence is retained.",
+      "specific_source_basis": "The current https://www.40k.app/rules/21-flying-and-surging page describes ignoring vertical distance while taking to the skies, and https://www.40k.app/rules/24-core-abilities states the HEAVY movement condition; neither page displays the July row's explicit combined FAQ statement.",
+      "verification_status": "needs_official_app_capture",
+      "evidence_sha256": "4ab122dfb478baf739b720aff3060ebeece94a8fed5e92da9a6b2643e33ad0ef"
+    },
+    {
+      "finding_id": "july-transcription-not-observed-mixed-hazard",
+      "category_id": "24",
+      "finding_kind": "repository_transcription_not_observed_on_provider",
+      "how_currently_recorded": "The July artifact states an explicit mixed-keyword Hazard clarification and previously labeled the 40k.app mirror as corroborating evidence. The current mirror pages expose the general Hazard rules but not that clarification.",
+      "how_it_should_be_treated": "Preserve the stable source row as an uncaptured repository transcription, but mark it not observed on the mirror and do not claim mirror corroboration until matching text or captured official App evidence is retained.",
+      "specific_source_basis": "The current https://www.40k.app/rules/24-core-abilities page triggers hazard rolls and https://www.40k.app/rules/06-other-concepts distinguishes the damage result based on whether every model is MONSTER/VEHICLE; neither page displays the July row's explicit mixed-keyword FAQ statement.",
+      "verification_status": "needs_official_app_capture",
+      "evidence_sha256": "483b9739fe1af11a5c8d5b1f280b4460ae59a072396ba5a2983c1d149e6e8601"
+    }
+  ]
+}

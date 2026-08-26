@@ -48,14 +48,14 @@ _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "WE": "world-eaters",
 }
 _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
-    "app_core_rules_hidden_2026_08_09": "official_app_capture",
+    "app_core_rules_hidden_2026_08_09": "owner_supplied_app_transcription",
     "chaos_daemons_roster_2026_07": "official_roster_source",
     "court_of_slaughter_anvanth_2026_08": "official_roster_source",
     "event_companion_2026_06_artifacts": "official_event_source",
     "event_companion_layouts_2026_06": "official_event_source",
     "faction_pack_rule_ir": "datasheet_rule_ir_registry",
     "july_faction_packs_2026_07": "official_faction_pack_source",
-    "july_rules_updates_2026_07": "official_rules_update_source",
+    "july_rules_updates_2026_07": "mixed_official_pdf_and_uncaptured_app_transcription_source",
     "mfm_2026_06": "official_points_source",
     "mfm_2026_07": "official_points_source",
 }
@@ -264,6 +264,18 @@ def test_edition_source_package_directories_are_explicitly_classified() -> None:
         for package_name, package_kind in _EDITION_SOURCE_PACKAGE_CLASSIFICATION.items()
         if package_kind == "datasheet_rule_ir_registry"
     ) == ("faction_pack_rule_ir",)
+
+
+def test_uncaptured_app_transcriptions_are_not_classified_as_official_captures() -> None:
+    assert (
+        _EDITION_SOURCE_PACKAGE_CLASSIFICATION["app_core_rules_hidden_2026_08_09"]
+        == "owner_supplied_app_transcription"
+    )
+    assert (
+        _EDITION_SOURCE_PACKAGE_CLASSIFICATION["july_rules_updates_2026_07"]
+        == "mixed_official_pdf_and_uncaptured_app_transcription_source"
+    )
+    assert "official_app_capture" not in _EDITION_SOURCE_PACKAGE_CLASSIFICATION.values()
 
 
 @pytest.mark.parametrize(

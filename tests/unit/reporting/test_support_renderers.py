@@ -12,6 +12,17 @@ from tools.aeldari_39k_pro_audit import (
     aeldari_thirty_nine_k_pro_audit,
     load_aeldari_thirty_nine_k_pro_audit,
 )
+from tools.core_rules_40k_app_audit import (
+    AUDIT_PATH as CORE_RULES_40K_APP_AUDIT_PATH,
+)
+from tools.core_rules_40k_app_audit import (
+    REPORT_PATH as CORE_RULES_40K_APP_REPORT_PATH,
+)
+from tools.core_rules_40k_app_audit import (
+    core_rules_forty_k_app_audit,
+    core_rules_forty_k_app_audit_markdown,
+    load_core_rules_forty_k_app_audit,
+)
 from tools.emperors_children_39k_pro_audit import (
     AUDIT_PATH,
     emperors_children_thirty_nine_k_pro_audit,
@@ -245,6 +256,80 @@ def test_aeldari_39k_pro_audit_rejects_official_source_hash_drift(tmp_path: Path
 
     with pytest.raises(ValueError, match="official PDF hash is stale"):
         load_aeldari_thirty_nine_k_pro_audit(tampered_path)
+
+
+def test_core_rules_40k_app_audit_retains_exact_review_only_category_inventory() -> None:
+    audit = core_rules_forty_k_app_audit()
+
+    assert audit.scope == "core_rules_only"
+    assert audit.excluded_scopes == (
+        "factions",
+        "faction_detachments",
+        "faction_datasheets",
+    )
+    assert audit.provider_authority == "secondary_unofficial"
+    assert not audit.runtime_input
+    assert not audit.network_capture_retained
+    assert tuple(row.category_id for row in audit.categories) == tuple(
+        f"{number:02d}" for number in range(1, 26)
+    )
+    assert audit.categories[0].category_title == "Core Concepts"
+    assert audit.categories[-1].category_title == "Muster Armies"
+    assert len({row.provider_url for row in audit.categories}) == 25
+    assert all(row.implementation_status == "not_assessed_in_p00" for row in audit.categories)
+    assert {row.provider_comparison_status for row in audit.categories} == {
+        "mirror_only",
+        "conflict",
+        "transcription_not_observed",
+    }
+    assert all(row.evidence_sha256 for row in audit.categories)
+    assert all(row.evidence_sha256 for row in audit.findings)
+
+    report = core_rules_forty_k_app_audit_markdown(audit)
+    assert CORE_RULES_40K_APP_REPORT_PATH.read_text(encoding="utf-8") == report
+    assert "40k.app is a secondary, unofficial comparison source" in report
+    assert "How it is currently recorded" in report
+    assert "How it should be treated" in report
+    assert "Specific rule/source basis" in report
+    assert "Faction review is explicitly excluded" in report
+
+
+def test_core_rules_40k_app_audit_rejects_url_and_scope_drift(tmp_path: Path) -> None:
+    payload = json.loads(CORE_RULES_40K_APP_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["categories"][0]["provider_url"] = "https://example.invalid/rules/01"
+    tampered_path = tmp_path / "tampered-url.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match=r"40k\.app rules URL"):
+        load_core_rules_forty_k_app_audit(tampered_path)
+
+    payload = json.loads(CORE_RULES_40K_APP_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["scope"]["review_scope"] = "factions"
+    tampered_path = tmp_path / "tampered-scope.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="core-rules-only scope"):
+        load_core_rules_forty_k_app_audit(tampered_path)
+
+
+def test_core_rules_40k_app_audit_rejects_unhashed_or_raw_provider_content(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(CORE_RULES_40K_APP_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["categories"][0]["category_title"] = "Changed title"
+    tampered_path = tmp_path / "unhashed-observation.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="category evidence hash drifted"):
+        load_core_rules_forty_k_app_audit(tampered_path)
+
+    payload = json.loads(CORE_RULES_40K_APP_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["categories"][0]["raw_rule_text"] = "Mirror body must not be retained."
+    tampered_path = tmp_path / "raw-provider-content.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="category fields drifted"):
+        load_core_rules_forty_k_app_audit(tampered_path)
 
 
 def test_emperors_children_39k_pro_audit_rejects_swapped_provider_urls(tmp_path: Path) -> None:

@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1b8444147aede4ba18a4da9b78dd7ef269e3b3714d9893a38640dd2a36fe3af9",
-  "fingerprint": "1b8444147aede4ba18a4da9b78dd7ef269e3b3714d9893a38640dd2a36fe3af9",
-  "resource_count": 2417,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e5aa0ada4290b70bf7c22734e0a7412a0ed234437ee7a2ada6766b63106093b0",
+  "fingerprint": "e5aa0ada4290b70bf7c22734e0a7412a0ed234437ee7a2ada6766b63106093b0",
+  "resource_count": 2418,
   "resources": [
     {
       "byte_length": 113,
@@ -11165,6 +11165,11 @@
       "sha256": "3a0825f1d4a711315e27b460ccae058593bff39253573d1472b07e1291aa1170"
     },
     {
+      "byte_length": 17373,
+      "path": "warhammer40k_core/rules/source_evidence.py",
+      "sha256": "6d37d55df58469120c7c84896a03d794fe8bdb3180348ae6b61d7c8a3b75650c"
+    },
+    {
       "byte_length": 45065,
       "path": "warhammer40k_core/rules/source_overlay.py",
       "sha256": "9438ed145afeb952166c2699e91b94b23ea41ff80de84e5dfe326d6732951002"
@@ -11610,19 +11615,19 @@
       "sha256": "743ee6b9f454e0ec1fe5ba65f74a420de1e093321ba891c5e2052540fa1320f5"
     },
     {
-      "byte_length": 8605,
+      "byte_length": 10047,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/july_rules_updates_2026_07/__init__.py",
-      "sha256": "d63beff184441c5aea65bc0611bf58daad2a10520fdd601c61639d3d2fd83eba"
+      "sha256": "98ce76a2acbfe405c15198499e1be2bcf6328d8b77ac40c77091f17c1820dff4"
     },
     {
-      "byte_length": 14613,
+      "byte_length": 27228,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/july_rules_updates_2026_07/_artifacts.py",
-      "sha256": "f0f58660063a7ba6386e27dbd59a69aecd87db37bf4cf79b075e4c30096ed189"
+      "sha256": "5f4a8cec57f9324f6fa381fb7c458b0e2446a74afa8aaaa1d64abaeeba5fe096"
     },
     {
-      "byte_length": 16869,
+      "byte_length": 30178,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/july_rules_updates_2026_07/artifacts/package.json",
-      "sha256": "b9a07492efc4ffc07cf606cb8579a65ed3d15577876bae689e3a15c6d3a4573f"
+      "sha256": "427f6117cb86e63aefd6b115e8ce43dfc2a368cc22c77580df1742170b0ca06a"
     },
     {
       "byte_length": 3245,
