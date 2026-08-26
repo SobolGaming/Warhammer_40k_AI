@@ -12,9 +12,12 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT_PATH = ROOT / "data" / "source_audits" / "40k_app" / "core_rules_2026_08_25.audit.json"
 REPORT_PATH = ROOT / "docs" / "CORE_RULES_40K_APP_COMPARISON.md"
-EXPECTED_SCHEMA = "core-v2-40k-app-core-rules-audit-v1"
+EXPECTED_SCHEMA = "core-v2-40k-app-core-rules-audit-v3"
 EXPECTED_AUDIT_ID = "40k-app-core-rules-2026-08-25"
 EXPECTED_OBSERVED_AT = "2026-08-25T00:00:00-04:00"
+EXPECTED_PROJECT_AUTHORITY_POLICY_ID = (
+    "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
+)
 EXPECTED_OFFICIAL_PDF_PATH = (
     "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf"
 )
@@ -50,9 +53,37 @@ EXPECTED_FINDING_IDS_BY_CATEGORY = {
     "05": ("40k-app-numbering-05-03-02",),
     "09": ("40k-app-duplicate-09-07-01",),
     "12": ("july-transcription-conflict-12-08",),
+    "13": ("hidden-unverified-source-13-09",),
     "15": ("official-pdf-mirror-order-15-05-15-06",),
     "21": ("july-transcription-not-observed-fly-heavy",),
     "24": ("july-transcription-not-observed-mixed-hazard",),
+}
+EXPECTED_REMEDIATION_PR_IDS_BY_CATEGORY = {
+    "01": ("P01",),
+    "02": ("P02A", "P02B", "P02C"),
+    "03": ("P03A", "P03B"),
+    "04": ("P04",),
+    "05": ("P05A", "P05B", "P05C"),
+    "06": ("P06A", "P06B"),
+    "07": (),
+    "08": ("P08A", "P08B"),
+    "09": ("P09A", "P09B"),
+    "10": ("P10",),
+    "11": ("P11A",),
+    "12": ("P12",),
+    "13": (),
+    "14": ("P14",),
+    "15": ("P15A", "P15B", "P15C", "P15D", "P15E"),
+    "16": (),
+    "17": (),
+    "18": ("P18A", "P18B", "P18C"),
+    "19": ("P19",),
+    "20": ("P20",),
+    "21": ("P21A", "P21B"),
+    "22": ("P22",),
+    "23": ("P23",),
+    "24": ("P24A", "P24B", "P24C1", "P24C2", "P24D", "P24E"),
+    "25": ("P25A", "P25B", "P25C"),
 }
 
 
@@ -66,7 +97,9 @@ class CoreRulesCategoryAuditRow:
     official_source_status: str
     provider_comparison_status: str
     implementation_status: str
+    remediation_pr_ids: tuple[str, ...]
     finding_ids: tuple[str, ...]
+    source_observation_sha256: str
     evidence_sha256: str
 
 
@@ -79,6 +112,7 @@ class CoreRulesFindingAuditRow:
     how_it_should_be_treated: str
     specific_source_basis: str
     verification_status: str
+    source_observation_sha256: str
     evidence_sha256: str
 
 
@@ -93,6 +127,7 @@ class CoreRulesFortyKAppAudit:
     provider_id: str
     provider_root_url: str
     provider_authority: str
+    project_authority_policy_id: str
     provider_affiliation: str
     runtime_input: bool
     network_capture_retained: bool
@@ -138,6 +173,7 @@ def load_core_rules_forty_k_app_audit(path: Path) -> CoreRulesFortyKAppAudit:
             "provider_id",
             "root_url",
             "authority_status",
+            "project_authority_policy_id",
             "affiliation",
             "runtime_input",
             "network_capture_retained",
@@ -171,6 +207,7 @@ def load_core_rules_forty_k_app_audit(path: Path) -> CoreRulesFortyKAppAudit:
         provider_id=_text(provider, "provider_id"),
         provider_root_url=_text(provider, "root_url"),
         provider_authority=_text(provider, "authority_status"),
+        project_authority_policy_id=_text(provider, "project_authority_policy_id"),
         provider_affiliation=_text(provider, "affiliation"),
         runtime_input=_boolean(provider, "runtime_input"),
         network_capture_retained=_boolean(provider, "network_capture_retained"),
@@ -193,9 +230,10 @@ def core_rules_forty_k_app_audit_markdown(
     lines = [
         "# Core Rules 40k.app Comparison Evidence",
         "",
-        "This report is generated from the checked-in offline audit artifact. 40k.app is a "
-        "secondary, unofficial comparison source; it is not an official Games Workshop source "
-        "and is never runtime catalog input.",
+        "This report is generated from the checked-in offline audit artifact. By explicit "
+        "repository-owner policy, 40k.app is treated as a verbatim authoritative mirror of the "
+        "maintained Warhammer 40,000 App for Core Rules. The site remains a non-affiliated "
+        "hosting provider and is never queried by the runtime engine.",
         "",
         "Faction review is explicitly excluded, including faction detachments and faction "
         "datasheet content.",
@@ -203,22 +241,38 @@ def core_rules_forty_k_app_audit_markdown(
         "## Authority boundary",
         "",
         f"- Official anchor: `{reviewed.official_pdf_path}` (`{reviewed.official_pdf_sha256}`).",
-        "- Official GW artifacts and captured official-App evidence outrank mirror observations.",
-        "- A mirror conflict remains blocked until a pinned primary source resolves it.",
-        "- Observation hashes protect the committed review rows; they do not authenticate the "
-        "external website.",
+        "- Maintained App wording, represented by the project-authoritative 40k.app mirror, "
+        "supersedes older PDF wording where they differ.",
+        "- Direct user observation of an actual App/40k.app divergence opens a conflict and "
+        "requires the exception workflow in `docs/CORE_RULES_SOURCE_POLICY.md`.",
+        "- Source-observation hashes exclude implementation status and PR planning; full row "
+        "hashes detect any checked-in review change. Neither authenticates the external website.",
         "",
         "## Category inventory",
         "",
-        "| Category | Provider locator | Provider comparison | Implementation evaluation |",
-        "|---|---|---|---|",
+        "| Category | Provider locator | Provider comparison | Implementation evaluation | "
+        "Planned PRs |",
+        "|---|---|---|---|---|",
     ]
     lines.extend(
         f"| {row.category_id} {row.category_title} | [{row.section_id}]({row.provider_url}) | "
-        f"{row.provider_comparison_status} | {row.implementation_status} |"
+        f"{row.provider_comparison_status} | {row.implementation_status} | "
+        f"{', '.join(row.remediation_pr_ids) if row.remediation_pr_ids else 'PFINAL'} |"
         for row in reviewed.categories
     )
-    lines.extend(("", "## Source and provider findings", ""))
+    lines.extend(
+        (
+            "",
+            "Implementation findings were assessed for every category. Their itemized current "
+            "behavior, required behavior, exact App rule basis, dependencies, and one-PR-at-a-time "
+            "sequence are retained in `docs/CORE_RULES_REMEDIATION_ROADMAP.md`. Source/provider "
+            "findings below are tracked separately so corpus provenance does not imply gameplay "
+            "execution.",
+            "",
+            "## Source and provider findings",
+            "",
+        )
+    )
     for finding in reviewed.findings:
         lines.extend(
             (
@@ -236,10 +290,13 @@ def core_rules_forty_k_app_audit_markdown(
             "## P00 implementation boundary",
             "",
             "The July App-core rows retain their stable package, document, rule, and source IDs. "
-            "Their separate evidence records now state that no official App version, build, URL, "
-            "screenshot, or binary is retained. Fight On Death is recorded as partial runtime "
-            "execution, and Objective Consolidation is blocked by a source conflict. No gameplay "
-            "semantics are changed by P00.",
+            "Each row is available only through a composed source package that requires both "
+            "owner-transcription provenance and a separate App-mirror record. The mirror record "
+            "carries the owner-approved source-policy ID without claiming Games Workshop owns "
+            "the hosting site. Fight On Death remains partial runtime execution; stale or absent "
+            "repository transcriptions remain uncertified. Category-13 Hidden matches the "
+            "authoritative App mirror, whose maintained wording supersedes the older PDF under "
+            "project policy. No gameplay semantics are changed by P00.",
             "",
         )
     )
@@ -283,8 +340,12 @@ def _write_refreshed_audit_hashes() -> None:
     )
     for key in ("categories", "findings"):
         for row in _object_rows(root, key, context=key):
-            if "evidence_sha256" not in row:
-                raise ValueError(f"40k.app audit {key} row is missing evidence_sha256.")
+            if "source_observation_sha256" not in row or "evidence_sha256" not in row:
+                raise ValueError(f"40k.app audit {key} row is missing a required fingerprint.")
+            row["source_observation_sha256"] = _source_observation_hash(
+                row,
+                row_kind=key,
+            )
             row["evidence_sha256"] = _evidence_hash(row)
     AUDIT_PATH.write_text(
         json.dumps(root, indent=2, ensure_ascii=False) + "\n",
@@ -305,7 +366,9 @@ def _category_row(payload: dict[str, object]) -> CoreRulesCategoryAuditRow:
             "official_source_status",
             "provider_comparison_status",
             "implementation_status",
+            "remediation_pr_ids",
             "finding_ids",
+            "source_observation_sha256",
             "evidence_sha256",
         },
         context="category",
@@ -319,10 +382,17 @@ def _category_row(payload: dict[str, object]) -> CoreRulesCategoryAuditRow:
         official_source_status=_text(row, "official_source_status"),
         provider_comparison_status=_text(row, "provider_comparison_status"),
         implementation_status=_text(row, "implementation_status"),
+        remediation_pr_ids=_text_tuple(row, "remediation_pr_ids", allow_empty=True),
         finding_ids=_text_tuple(row, "finding_ids", allow_empty=True),
+        source_observation_sha256=_sha256(row, "source_observation_sha256"),
         evidence_sha256=_sha256(row, "evidence_sha256"),
     )
     _validate_rules_url(category.provider_url)
+    if category.source_observation_sha256 != _source_observation_hash(
+        row,
+        row_kind="categories",
+    ):
+        raise ValueError("40k.app category source-observation hash drifted.")
     if category.evidence_sha256 != _evidence_hash(row):
         raise ValueError("40k.app category evidence hash drifted.")
     return category
@@ -339,6 +409,7 @@ def _finding_row(payload: dict[str, object]) -> CoreRulesFindingAuditRow:
             "how_it_should_be_treated",
             "specific_source_basis",
             "verification_status",
+            "source_observation_sha256",
             "evidence_sha256",
         },
         context="finding",
@@ -351,8 +422,14 @@ def _finding_row(payload: dict[str, object]) -> CoreRulesFindingAuditRow:
         how_it_should_be_treated=_text(row, "how_it_should_be_treated"),
         specific_source_basis=_text(row, "specific_source_basis"),
         verification_status=_text(row, "verification_status"),
+        source_observation_sha256=_sha256(row, "source_observation_sha256"),
         evidence_sha256=_sha256(row, "evidence_sha256"),
     )
+    if finding.source_observation_sha256 != _source_observation_hash(
+        row,
+        row_kind="findings",
+    ):
+        raise ValueError("40k.app finding source-observation hash drifted.")
     if finding.evidence_sha256 != _evidence_hash(row):
         raise ValueError("40k.app finding evidence hash drifted.")
     return finding
@@ -372,7 +449,8 @@ def _validate_audit(audit: CoreRulesFortyKAppAudit) -> None:
     if (
         audit.provider_id != "40k-app"
         or audit.provider_root_url != "https://www.40k.app/rules"
-        or audit.provider_authority != "secondary_unofficial"
+        or audit.provider_authority != "project_authoritative_verbatim_official_app_mirror"
+        or audit.project_authority_policy_id != EXPECTED_PROJECT_AUTHORITY_POLICY_ID
         or audit.provider_affiliation != "not_affiliated_with_or_endorsed_by_games_workshop"
         or audit.runtime_input
         or audit.network_capture_retained
@@ -384,7 +462,7 @@ def _validate_audit(audit: CoreRulesFortyKAppAudit) -> None:
         or audit.official_pdf_sha256 != EXPECTED_OFFICIAL_PDF_SHA256
         or audit.official_catalog_source_id != "gw-11e-core-rules:manifest:local-core-rules-pdf"
         or audit.authority_statement
-        != "official_gw_artifacts_and_captured_official_app_evidence_are_authoritative"
+        != "maintained_app_mirror_supersedes_older_official_pdf_under_project_policy"
     ):
         raise ValueError("40k.app audit official-source anchor drifted.")
     official_path = ROOT / audit.official_pdf_path
@@ -392,6 +470,16 @@ def _validate_audit(audit: CoreRulesFortyKAppAudit) -> None:
         raise ValueError("40k.app audit official PDF content hash drifted.")
     if len(audit.categories) != audit.expected_category_count:
         raise ValueError("40k.app audit must retain exactly 25 core-rules categories.")
+    expected_category_ids = {category_id for category_id, _, _ in EXPECTED_CATEGORIES}
+    if set(EXPECTED_REMEDIATION_PR_IDS_BY_CATEGORY) != expected_category_ids:
+        raise ValueError("40k.app implementation-review category mapping drifted.")
+    expected_remediation_pr_ids = tuple(
+        pr_id
+        for category_id in sorted(EXPECTED_REMEDIATION_PR_IDS_BY_CATEGORY)
+        for pr_id in EXPECTED_REMEDIATION_PR_IDS_BY_CATEGORY[category_id]
+    )
+    if len(expected_remediation_pr_ids) != 43 or len(set(expected_remediation_pr_ids)) != 43:
+        raise ValueError("40k.app implementation-review PR inventory drifted.")
     expected_category_rows = tuple(
         (
             category_id,
@@ -419,16 +507,24 @@ def _validate_audit(audit: CoreRulesFortyKAppAudit) -> None:
     for row in audit.categories:
         _validate_rules_url(row.provider_url)
         expected_finding_ids = EXPECTED_FINDING_IDS_BY_CATEGORY.get(row.category_id, ())
-        if row.category_id in {"12", "15"}:
-            expected_comparison = "conflict"
-        elif row.category_id in {"21", "24"}:
-            expected_comparison = "transcription_not_observed"
-        else:
-            expected_comparison = "mirror_only"
+        expected_remediation_pr_ids = EXPECTED_REMEDIATION_PR_IDS_BY_CATEGORY[row.category_id]
+        expected_implementation_status = (
+            "assessed_remediation_planned"
+            if expected_remediation_pr_ids
+            else "assessed_no_standalone_remediation"
+        )
+        expected_comparison = {
+            "12": "authoritative_app_mirror_controls_repository_conflict",
+            "13": "authoritative_app_mirror_supersedes_pdf",
+            "15": "authoritative_app_internal_numbering_drift",
+            "21": "repository_transcription_not_observed_on_authoritative_app_mirror",
+            "24": "repository_transcription_not_observed_on_authoritative_app_mirror",
+        }.get(row.category_id, "authoritative_app_mirror")
         if (
             row.official_source_status != "retained_official_pdf_anchor"
             or row.provider_comparison_status != expected_comparison
-            or row.implementation_status != "not_assessed_in_p00"
+            or row.implementation_status != expected_implementation_status
+            or row.remediation_pr_ids != expected_remediation_pr_ids
             or row.finding_ids != expected_finding_ids
         ):
             raise ValueError("40k.app category conclusion drifted from retained findings.")
@@ -444,24 +540,35 @@ def _validate_audit(audit: CoreRulesFortyKAppAudit) -> None:
         if any(finding_by_id[finding_id].category_id != category_id for finding_id in finding_ids):
             raise ValueError("40k.app finding parent category drifted.")
     if {row.verification_status for row in audit.findings} - {
-        "provider_local_only",
-        "needs_official_app_capture",
-        "official_pdf_controls",
+        "authoritative_app_numbering",
+        "authoritative_app_mirror_controls",
+        "authoritative_app_text_controls",
     }:
         raise ValueError("40k.app finding verification status is unsupported.")
 
 
 def _validate_rules_url(value: str) -> str:
+    has_ascii_control = any(ord(character) < 32 or ord(character) == 127 for character in value)
     split = urlsplit(value)
+    rule_slug = split.path.removeprefix("/rules/")
+    has_canonical_rules_path = (
+        split.path == f"/rules/{rule_slug}"
+        and bool(rule_slug)
+        and rule_slug[0] != "-"
+        and rule_slug[-1] != "-"
+        and "--" not in rule_slug
+        and all(character in "abcdefghijklmnopqrstuvwxyz0123456789-" for character in rule_slug)
+    )
     if (
-        split.scheme != "https"
+        has_ascii_control
+        or split.scheme != "https"
         or split.hostname != "www.40k.app"
         or split.username is not None
         or split.password is not None
         or split.port is not None
         or split.query
         or split.fragment
-        or not split.path.startswith("/rules/")
+        or not has_canonical_rules_path
     ):
         raise ValueError("40k.app audit contains an invalid 40k.app rules URL.")
     return value
@@ -471,6 +578,36 @@ def _evidence_hash(payload: dict[str, object]) -> str:
     hashed_payload = dict(payload)
     hashed_payload["evidence_sha256"] = ""
     encoded = json.dumps(hashed_payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _source_observation_hash(
+    payload: dict[str, object],
+    *,
+    row_kind: str,
+) -> str:
+    fields: tuple[str, ...]
+    if row_kind == "categories":
+        fields = (
+            "category_id",
+            "category_title",
+            "display_order",
+            "provider_url",
+            "section_id",
+            "provider_comparison_status",
+        )
+    elif row_kind == "findings":
+        fields = (
+            "finding_id",
+            "category_id",
+            "finding_kind",
+            "specific_source_basis",
+            "verification_status",
+        )
+    else:
+        raise ValueError("40k.app audit source-observation row kind is unsupported.")
+    source_payload = {field: payload[field] for field in fields}
+    encoded = json.dumps(source_payload, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest()
 
 

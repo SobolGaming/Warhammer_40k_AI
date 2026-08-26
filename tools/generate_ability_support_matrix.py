@@ -6134,7 +6134,10 @@ def _structured_support_sections_markdown() -> list[str]:
                 SupportSectionRow(
                     "Hidden and Detection Range",
                     "Terrain visibility policy plus Shooting target detection gate",
-                    "Official App transcription source package, architecture, and adapter contract",
+                    (
+                        "Project-authoritative 40k.app App-mirror evidence, source package, "
+                        "architecture, and adapter contract"
+                    ),
                     (
                         "Source-identity, ruleset descriptor, Shooting target, and Path of the "
                         "Outcast tests"
@@ -6147,7 +6150,10 @@ def _structured_support_sections_markdown() -> list[str]:
                         "ranged attacks; "
                         "detection modifiers are consumed from "
                         "engine-owned persisting effects. Detection Range gates visibility "
-                        "and does not independently prohibit Indirect Fire."
+                        "and does not independently prohibit Indirect Fire. The separate owner "
+                        "transcription remains unverified historical provenance; certification "
+                        "comes from source policy "
+                        "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26."
                     ),
                 ),
                 SupportSectionRow(

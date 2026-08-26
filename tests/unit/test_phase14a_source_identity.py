@@ -16,7 +16,9 @@ from warhammer40k_core.rules.source_evidence import (
     RuleEvidenceKind,
     RuleEvidencePayload,
     RuleEvidenceRecord,
+    RuleSourcePackage,
     RuleVerificationStatus,
+    SourceEvidenceCatalog,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     app_core_rules_hidden_2026_08_09,
@@ -26,6 +28,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_stratagems,
     july_rules_updates_2026_07,
 )
+
+PROJECT_AUTHORITY_POLICY_ID = (
+    "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
+)
+CORE_RULES_REVIEW_AUDIT_ID = "40k-app-core-rules-2026-08-25"
+CORE_RULES_REVIEW_AUDIT_PATH = Path("data/source_audits/40k_app/core_rules_2026_08_25.audit.json")
 
 
 def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() -> None:
@@ -47,7 +55,8 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
 
 
 def test_july_rules_updates_source_catalog_cites_pdfs_and_preserves_identity() -> None:
-    catalog = july_rules_updates_2026_07.source_catalog()
+    source_package = july_rules_updates_2026_07.source_package()
+    catalog = source_package.source_catalog
     payload = catalog.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
 
@@ -74,7 +83,10 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_preserves_identity() -
     event_companion_document = event_companion_documents[0]
     universal_rules = july_rules_updates_2026_07.universal_rule_records()
     event_rules = july_rules_updates_2026_07.event_companion_rule_records()
-    app_core_rules = july_rules_updates_2026_07.app_core_rule_records()
+    artifact = july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+        _july_rules_update_artifact_path().read_bytes()
+    )
+    app_core_rules = artifact.app_core_rules_update.rules
     assert {rule.rule_id: rule.behavior_descriptor for rule in universal_rules} == {
         "modifying-a-stratagem-cp-cost": "unnamed_zero_cp_reduces_cost_by_one",
         "stratagem-repeat-and-limit-exceptions": (
@@ -151,26 +163,86 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_preserves_identity() -
         assert hashlib.sha256(Path(relative_path).read_bytes()).hexdigest() == expected_sha256
 
 
-def test_july_app_rows_are_hash_pinned_and_quarantined_from_official_authority() -> None:
-    evidence_records = july_rules_updates_2026_07.app_core_rule_evidence_records()
-    rules_by_source_id = {
-        rule.source_id: rule for rule in july_rules_updates_2026_07.app_core_rule_records()
+def test_july_app_rows_pin_historical_owner_and_project_authoritative_mirror_evidence() -> None:
+    source_package = july_rules_updates_2026_07.source_package()
+    evidence_records = source_package.source_evidence_catalog.records
+    artifact = july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+        _july_rules_update_artifact_path().read_bytes()
+    )
+    rules_by_source_id = {rule.source_id: rule for rule in artifact.app_core_rules_update.rules}
+    evidence_by_source_id = {
+        source_id: source_package.source_evidence_catalog.records_for_source_id(source_id)
+        for source_id in rules_by_source_id
     }
-    evidence_by_source_id = {record.rule_source_id: record for record in evidence_records}
+    review_context, review_source_observation_by_row_id = _core_rules_review_audit_context()
 
     assert hashlib.sha256(_july_rules_update_artifact_path().read_bytes()).hexdigest() == (
         july_rules_updates_2026_07.EXPECTED_ARTIFACT_SHA256
     )
-    assert july_rules_updates_2026_07.PACKAGE_HASH == (
-        "d9e36c4522463da052d3458568aaa5ad5c5279d649f1a0489ced6f80f9e3b08a"
+    assert july_rules_updates_2026_07.EXPECTED_ARTIFACT_SHA256 == (
+        "d87e8847ac50ac483e93792be8af7a19b340873fbe3c9f8b9047d036f14d3249"
     )
-    assert len(evidence_records) == len(rules_by_source_id) == 16
+    assert july_rules_updates_2026_07.PACKAGE_HASH == (
+        "3608f6c6a26dabb2952482d8a47c1a153244af7bbf602a278b7b9d4eb5df3c3d"
+    )
+    assert len(evidence_records) == 32
+    assert len(rules_by_source_id) == len(source_package.evidence_required_source_ids) == 16
     assert set(evidence_by_source_id) == set(rules_by_source_id)
-    assert all(record.evidence_kind == "third_party_mirror" for record in evidence_records)
-    assert all(record.authority == "secondary_mirror_only" for record in evidence_records)
-    assert all(record.provider_name == "40k.app" for record in evidence_records)
+    assert all(len(records) == 2 for records in evidence_by_source_id.values())
+    owner_records = tuple(
+        record
+        for record in evidence_records
+        if record.evidence_kind == "owner_supplied_app_transcription"
+    )
+    mirror_records = tuple(
+        record for record in evidence_records if record.evidence_kind == "third_party_mirror"
+    )
+    assert len(owner_records) == len(mirror_records) == 16
+    assert all(record.authority == "unverified_transcription_only" for record in owner_records)
+    assert all(record.verification_status == "unverified" for record in owner_records)
+    assert all(record.project_authority_policy_id is None for record in owner_records)
+    assert all(record.review_audit_id is None for record in owner_records)
+    assert all(record.review_audit_row_id is None for record in owner_records)
+    assert all(record.review_audit_source_observation_sha256 is None for record in owner_records)
+    assert all(record.observed_at is None for record in owner_records)
+    assert all(record.source_url is None for record in owner_records)
+    assert all(record.authority == "project_authoritative_app_mirror" for record in mirror_records)
+    assert all(
+        record.project_authority_policy_id == PROJECT_AUTHORITY_POLICY_ID
+        for record in mirror_records
+    )
+    assert review_context == {
+        "audit_id": CORE_RULES_REVIEW_AUDIT_ID,
+        "observed_at": "2026-08-25T00:00:00-04:00",
+        "project_authority_policy_id": PROJECT_AUTHORITY_POLICY_ID,
+        "provider_affiliation": "not_affiliated_with_or_endorsed_by_games_workshop",
+    }
+    assert all(record.review_audit_id == review_context["audit_id"] for record in mirror_records)
+    assert all(
+        record.review_audit_row_id in review_source_observation_by_row_id
+        for record in mirror_records
+    )
+    assert all(
+        record.review_audit_source_observation_sha256
+        == review_source_observation_by_row_id[cast(str, record.review_audit_row_id)]
+        for record in mirror_records
+    )
+    assert all(record.observed_at == review_context["observed_at"] for record in mirror_records)
+    assert all(
+        record.project_authority_policy_id == review_context["project_authority_policy_id"]
+        for record in mirror_records
+    )
+    assert all(record.provider_name == "40k.app" for record in mirror_records)
     assert all(record.official_corroborating_source_ids == () for record in evidence_records)
-    assert all(record.provider_non_affiliation_recorded for record in evidence_records)
+    assert all(
+        record.provider_non_affiliation_recorded
+        == (
+            review_context["provider_affiliation"]
+            == "not_affiliated_with_or_endorsed_by_games_workshop"
+        )
+        for record in mirror_records
+    )
+    assert not any(record.provider_non_affiliation_recorded for record in owner_records)
     assert all(
         RuleEvidenceRecord.from_payload(record.to_payload()) == record
         for record in evidence_records
@@ -178,30 +250,70 @@ def test_july_app_rows_are_hash_pinned_and_quarantined_from_official_authority()
     assert all(
         hashlib.sha256(rules_by_source_id[source_id].source_text.encode()).hexdigest()
         == evidence.transcription_sha256
-        for source_id, evidence in evidence_by_source_id.items()
+        for source_id, records in evidence_by_source_id.items()
+        for evidence in records
     )
 
     fight_on_death_source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
         "05.04.05-fight-on-death"
     ]
-    fight_on_death = evidence_by_source_id[fight_on_death_source_id]
-    assert fight_on_death.transcription_sha256 == (
-        "d2b9c094f1eda640ccfa76817e741497d960ff5d6015d7d9afa7616e3cd77741"
-    )
-    assert fight_on_death.verification_status == "mirror_only"
-    assert fight_on_death.load_support_status == "loaded"
-    assert fight_on_death.semantic_execution_status == "partial_engine_runtime"
-    assert fight_on_death.runtime_consumer_ids == (
-        "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
-        "warhammer40k_core.engine.rule_model_destruction_fight_continuation:"
-        "remove_remaining_fight_on_death_models_at_phase_end",
-    )
+    fight_on_death_records = evidence_by_source_id[fight_on_death_source_id]
+    assert {record.verification_status for record in fight_on_death_records} == {
+        "unverified",
+        "authoritative_app_mirror",
+    }
+    for fight_on_death in fight_on_death_records:
+        assert fight_on_death.transcription_sha256 == (
+            "d2b9c094f1eda640ccfa76817e741497d960ff5d6015d7d9afa7616e3cd77741"
+        )
+        assert fight_on_death.load_support_status == "loaded"
+        assert fight_on_death.semantic_execution_status == "partial_engine_runtime"
+        assert fight_on_death.runtime_consumer_ids == (
+            "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
+            "warhammer40k_core.engine.rule_model_destruction_fight_continuation:"
+            "remove_remaining_fight_on_death_models_at_phase_end",
+        )
 
-    objective_consolidation = evidence_by_source_id[
+    objective_consolidation_records = evidence_by_source_id[
         july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS["12.08-objective-consolidation"]
     ]
-    assert objective_consolidation.verification_status == "conflict"
-    assert objective_consolidation.semantic_execution_status == "blocked_by_source_conflict"
+    objective_consolidation_rule = rules_by_source_id[
+        july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS["12.08-objective-consolidation"]
+    ]
+    objective_owner = next(
+        record
+        for record in objective_consolidation_records
+        if record.evidence_kind == "owner_supplied_app_transcription"
+    )
+    objective_mirror = next(
+        record
+        for record in objective_consolidation_records
+        if record.evidence_kind == "third_party_mirror"
+    )
+    assert objective_consolidation_rule.behavior_descriptor == (
+        "objective_consolidation_requires_unengaged_endpoint"
+    )
+    assert "must be unengaged" in objective_consolidation_rule.source_text
+    assert objective_owner.authority == "unverified_transcription_only"
+    assert objective_owner.verification_status == "unverified"
+    assert objective_mirror.authority == "project_authoritative_app_mirror"
+    assert objective_mirror.project_authority_policy_id == PROJECT_AUTHORITY_POLICY_ID
+    assert objective_mirror.review_audit_id == CORE_RULES_REVIEW_AUDIT_ID
+    assert objective_mirror.review_audit_row_id == ("finding:july-transcription-conflict-12-08")
+    assert objective_mirror.review_audit_source_observation_sha256 == (
+        "726ce364500c7f1d6b9776651f430ac05ad144a5899877fdbd857128e6cf041c"
+    )
+    assert objective_mirror.source_url == "https://www.40k.app/rules/12-fight-phase"
+    assert objective_mirror.verification_status == "conflict"
+    assert {record.verification_status for record in objective_consolidation_records} == {
+        "unverified",
+        "conflict",
+    }
+    assert all(
+        record.semantic_execution_status == "blocked_by_source_conflict"
+        for record in objective_consolidation_records
+    )
+    assert all(not record.runtime_consumer_ids for record in objective_consolidation_records)
     not_observed_rule_ids = {
         "faq-heavy-fly-horizontal-distance",
         "faq-hazardous-mixed-unit-keywords",
@@ -209,25 +321,155 @@ def test_july_app_rows_are_hash_pinned_and_quarantined_from_official_authority()
     assert {
         rule_id
         for rule_id in not_observed_rule_ids
-        if evidence_by_source_id[
-            july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[rule_id]
-        ].verification_status
-        == "not_observed_on_mirror"
+        if any(
+            record.verification_status == "not_observed_on_mirror"
+            for record in evidence_by_source_id[
+                july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[rule_id]
+            ]
+        )
     } == not_observed_rule_ids
-    provenance = july_rules_updates_2026_07.app_core_transcription_provenance()
-    assert provenance.provenance_kind == ("repository_transcription_without_retained_app_capture")
+    provenance = artifact.app_core_rules_update.transcription_provenance
+    assert provenance.provenance_kind == "repository_transcription_without_retained_app_capture"
     assert provenance.authority == "unverified_transcription_only"
-    assert provenance.observation_date is None
-    assert provenance.app_version is None
-    assert provenance.source_url is None
-    assert provenance.screenshot_sha256 is None
-    assert provenance.source_binary_sha256 is None
-    catalog_encoded = json.dumps(
-        july_rules_updates_2026_07.source_catalog().to_payload(), sort_keys=True
-    )
+    assert provenance.observation_date is provenance.app_version is provenance.source_url is None
+    assert provenance.screenshot_sha256 is provenance.source_binary_sha256 is None
+    catalog_encoded = json.dumps(source_package.source_catalog.to_payload(), sort_keys=True)
     assert "40k.app" not in catalog_encoded
     assert not any(record.evidence_id in catalog_encoded for record in evidence_records)
     assert "secondary_mirror_only" not in catalog_encoded
+    assert "project_authoritative_app_mirror" not in catalog_encoded
+    assert not hasattr(july_rules_updates_2026_07, "source_catalog")
+    assert not hasattr(july_rules_updates_2026_07, "app_core_rule_evidence_records")
+
+
+def test_rule_source_package_rejects_provenance_and_grouped_status_gaps() -> None:
+    package = july_rules_updates_2026_07.source_package()
+    source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
+        "01.02.03-embarked-model-return"
+    ]
+    records = package.source_evidence_catalog.records_for_source_id(source_id)
+    owner = next(
+        record for record in records if record.evidence_kind == "owner_supplied_app_transcription"
+    )
+    mirror = next(record for record in records if record.evidence_kind == "third_party_mirror")
+
+    evidence_catalog = SourceEvidenceCatalog(records=(owner, mirror))
+    assert evidence_catalog.records == tuple(
+        sorted((owner, mirror), key=lambda record: record.evidence_id)
+    )
+    assert evidence_catalog.records_for_source_id(source_id) == evidence_catalog.records
+    with pytest.raises(RuleEvidenceError, match="evidence IDs must be unique"):
+        SourceEvidenceCatalog(records=(owner, owner))
+    with pytest.raises(RuleEvidenceError, match="mirror comparison alone is insufficient"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(mirror,)),
+            evidence_required_source_ids=(source_id,),
+        )
+
+    contradictory_payload = mirror.to_payload()
+    contradictory_payload["semantic_execution_status"] = "unsupported"
+    contradictory = RuleEvidenceRecord.from_payload(contradictory_payload)
+    with pytest.raises(RuleEvidenceError, match="must agree on load and semantic"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(owner, contradictory)),
+            evidence_required_source_ids=(source_id,),
+        )
+
+    mismatched_payload = mirror.to_payload()
+    mismatched_payload["transcription_sha256"] = "0" * 64
+    mismatched_payload["observation_sha256"] = _observation_sha256(mismatched_payload)
+    mismatched = RuleEvidenceRecord.from_payload(mismatched_payload)
+    with pytest.raises(RuleEvidenceError, match="does not match its source row"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(owner, mismatched)),
+            evidence_required_source_ids=(source_id,),
+        )
+
+
+def test_rule_source_package_requires_exact_evidence_inventory_and_catalog_ownership() -> None:
+    package = july_rules_updates_2026_07.source_package()
+    source_ids = tuple(sorted(july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS.values()))[:2]
+    first_records = package.source_evidence_catalog.records_for_source_id(source_ids[0])
+    second_records = package.source_evidence_catalog.records_for_source_id(source_ids[1])
+
+    with pytest.raises(RuleEvidenceError, match="must exactly cover required source IDs"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=first_records),
+            evidence_required_source_ids=source_ids,
+        )
+    with pytest.raises(RuleEvidenceError, match="must exactly cover required source IDs"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=first_records + second_records),
+            evidence_required_source_ids=(source_ids[0],),
+        )
+
+    absent_source_id = f"{july_rules_updates_2026_07.SOURCE_PACKAGE_ID}:app-core-rules:absent"
+    absent_payload = first_records[0].to_payload()
+    absent_payload["evidence_id"] = "repository-app-core-rules-transcription:absent"
+    absent_payload["rule_source_id"] = absent_source_id
+    absent_payload["observation_sha256"] = _observation_sha256(absent_payload)
+    absent_record = RuleEvidenceRecord.from_payload(absent_payload)
+    with pytest.raises(RuleEvidenceError, match="required evidence source ID is absent"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(absent_record,)),
+            evidence_required_source_ids=(absent_source_id,),
+        )
+
+
+def test_rule_source_package_requires_grouped_conflict_block_equivalence() -> None:
+    package = july_rules_updates_2026_07.source_package()
+    source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
+        "01.02.03-embarked-model-return"
+    ]
+    records = package.source_evidence_catalog.records_for_source_id(source_id)
+    blocked_records: list[RuleEvidenceRecord] = []
+    for record in records:
+        payload = record.to_payload()
+        payload["semantic_execution_status"] = "blocked_by_source_conflict"
+        blocked_records.append(RuleEvidenceRecord.from_payload(payload))
+
+    with pytest.raises(RuleEvidenceError, match="source-conflict evidence and blocked semantic"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=tuple(blocked_records)),
+            evidence_required_source_ids=(source_id,),
+        )
+
+    mirror = next(record for record in records if record.evidence_kind == "third_party_mirror")
+    unblocked_conflict_payload = mirror.to_payload()
+    unblocked_conflict_payload["verification_status"] = "conflict"
+    unblocked_conflict_payload["observation_sha256"] = _observation_sha256(
+        unblocked_conflict_payload
+    )
+    with pytest.raises(RuleEvidenceError, match="Conflicting source evidence must block"):
+        RuleEvidenceRecord.from_payload(unblocked_conflict_payload)
+
+
+def test_rule_source_package_rejects_executable_hidden_owner_without_authoritative_evidence() -> (
+    None
+):
+    package = app_core_rules_hidden_2026_08_09.source_package()
+    owner = next(
+        record
+        for record in package.source_evidence_catalog.records
+        if record.evidence_kind == "owner_supplied_app_transcription"
+    )
+
+    with pytest.raises(
+        RuleEvidenceError,
+        match="executable or partial semantics require an official App capture or project",
+    ):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(owner,)),
+            evidence_required_source_ids=(app_core_rules_hidden_2026_08_09.RULE_SOURCE_ID,),
+        )
 
 
 def test_rule_evidence_rejects_mirror_official_authority_and_uncaptured_app_claims() -> None:
@@ -236,17 +478,26 @@ def test_rule_evidence_rejects_mirror_official_authority_and_uncaptured_app_clai
         evidence_kind: RuleEvidenceKind,
         authority: RuleEvidenceAuthority,
         verification_status: RuleVerificationStatus,
+        project_authority_policy_id: str | None = None,
+        review_audit_id: str | None = None,
+        review_audit_row_id: str | None = None,
+        review_audit_source_observation_sha256: str | None = None,
+        observed_at: str | None = "2026-08-25T12:00:00-04:00",
     ) -> RuleEvidenceRecord:
         return RuleEvidenceRecord(
             evidence_id="evidence:test",
             rule_source_id="source:test",
             evidence_kind=evidence_kind,
             authority=authority,
+            project_authority_policy_id=project_authority_policy_id,
+            review_audit_id=review_audit_id,
+            review_audit_row_id=review_audit_row_id,
+            review_audit_source_observation_sha256=review_audit_source_observation_sha256,
             provider_name="40k.app",
             source_title="Core Concepts",
             source_platform="Web",
             source_url="https://www.40k.app/rules/01-core-concepts",
-            observed_at="2026-08-25T12:00:00-04:00",
+            observed_at=observed_at,
             app_version=None,
             app_build=None,
             capture_artifact_path=None,
@@ -261,11 +512,39 @@ def test_rule_evidence_rejects_mirror_official_authority_and_uncaptured_app_clai
             verification_status=verification_status,
         )
 
-    with pytest.raises(RuleEvidenceError, match="secondary mirror authority"):
+    with pytest.raises(RuleEvidenceError, match="mirror authority classification is invalid"):
         invalid_record(
             evidence_kind="third_party_mirror",
             authority="official_primary",
-            verification_status="official_corroborated",
+            verification_status="mirror_only",
+        )
+
+    with pytest.raises(RuleEvidenceError, match="requires its authority policy ID"):
+        invalid_record(
+            evidence_kind="third_party_mirror",
+            authority="project_authoritative_app_mirror",
+            verification_status="authoritative_app_mirror",
+        )
+
+    with pytest.raises(RuleEvidenceError, match="must retain its declared project"):
+        invalid_record(
+            evidence_kind="third_party_mirror",
+            authority="project_authoritative_app_mirror",
+            verification_status="authoritative_app_mirror",
+            project_authority_policy_id=PROJECT_AUTHORITY_POLICY_ID,
+            review_audit_id=CORE_RULES_REVIEW_AUDIT_ID,
+            review_audit_row_id="category:01",
+            review_audit_source_observation_sha256=(
+                "3668da89d60d6234672f11be41cb08ddca6816354db062b47c4b4adf8ebf2ec5"
+            ),
+            observed_at=None,
+        )
+
+    with pytest.raises(RuleEvidenceError, match="verification_status is unsupported"):
+        invalid_record(
+            evidence_kind="third_party_mirror",
+            authority="secondary_mirror_only",
+            verification_status=cast(RuleVerificationStatus, "official_corroborated"),
         )
 
     with pytest.raises(RuleEvidenceError, match="version, build, and a hashed retained capture"):
@@ -276,6 +555,31 @@ def test_rule_evidence_rejects_mirror_official_authority_and_uncaptured_app_clai
         )
 
 
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "review_audit_id",
+        "review_audit_row_id",
+        "review_audit_source_observation_sha256",
+    ],
+)
+def test_project_authoritative_mirror_requires_complete_retained_audit_link(
+    field_name: str,
+) -> None:
+    record = next(
+        evidence
+        for evidence in july_rules_updates_2026_07.source_package().source_evidence_catalog.records
+        if evidence.evidence_kind == "third_party_mirror"
+        and evidence.verification_status == "authoritative_app_mirror"
+    )
+    payload = cast(dict[str, object], record.to_payload())
+    payload[field_name] = None
+    payload["observation_sha256"] = _observation_sha256(cast(RuleEvidencePayload, payload))
+
+    with pytest.raises(RuleEvidenceError, match=r"40k\.app record"):
+        RuleEvidenceRecord.from_payload(payload)
+
+
 def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() -> None:
     capture_content = b"retained official App capture"
     payload: RuleEvidencePayload = {
@@ -283,6 +587,10 @@ def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() 
         "rule_source_id": "source:official-app-rule",
         "evidence_kind": "official_app_capture",
         "authority": "official_primary",
+        "project_authority_policy_id": None,
+        "review_audit_id": None,
+        "review_audit_row_id": None,
+        "review_audit_source_observation_sha256": None,
         "provider_name": "Games Workshop",
         "source_title": "Warhammer 40,000 App Core Rules",
         "source_platform": "Warhammer 40,000 App",
@@ -315,6 +623,14 @@ def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() 
         RuleEvidenceRecord.from_payload(record.to_payload(), capture_content=capture_content)
         == record
     )
+
+    missing_timestamp = dict(payload)
+    missing_timestamp["observed_at"] = None
+    missing_timestamp["observation_sha256"] = _observation_sha256(
+        cast(RuleEvidencePayload, missing_timestamp)
+    )
+    with pytest.raises(RuleEvidenceError, match="requires the Games Workshop App"):
+        RuleEvidenceRecord.from_payload(missing_timestamp, capture_content=capture_content)
 
     with pytest.raises(RuleEvidenceError, match="retained capture bytes"):
         RuleEvidenceRecord.from_payload(payload)
@@ -351,40 +667,90 @@ def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() 
     with pytest.raises(RuleEvidenceError, match="runtime_consumer_ids must be a list"):
         RuleEvidenceRecord.from_payload(invalid_list_claim, capture_content=capture_content)
 
-    mirror_payload = july_rules_updates_2026_07.app_core_rule_evidence_records()[0].to_payload()
+    mirror_payload = next(
+        record
+        for record in july_rules_updates_2026_07.source_package().source_evidence_catalog.records
+        if record.evidence_kind == "third_party_mirror"
+        and record.verification_status == "authoritative_app_mirror"
+    ).to_payload()
     mislabeled_mirror = dict(mirror_payload)
     mislabeled_mirror["provider_name"] = "Games Workshop"
     mislabeled_mirror["source_platform"] = "Warhammer 40,000 App"
-    with pytest.raises(RuleEvidenceError, match="third-party mirror"):
+    with pytest.raises(RuleEvidenceError, match=r"40k\.app record"):
         RuleEvidenceRecord.from_payload(mislabeled_mirror)
-    invalid_mirror_url = dict(mirror_payload)
-    invalid_mirror_url["source_url"] = "https://www.40k.app/rulesevil"
-    with pytest.raises(RuleEvidenceError, match="canonical HTTPS rules URL"):
-        RuleEvidenceRecord.from_payload(invalid_mirror_url)
+    for invalid_url in (
+        "https://www.40k.app/rulesevil",
+        "https://www.40k.app/rules/../evil",
+        "https://www.40k.app/rules//evil",
+        "https://www.40k.app/rules/%2e%2e/evil",
+        "https://www.40k.app/rules/evil\nsuffix",
+        "https://www.40k.app/rules/evil\rsuffix",
+        "https://www.40k.app/rules/evil\tsuffix",
+    ):
+        invalid_mirror_url = dict(mirror_payload)
+        invalid_mirror_url["source_url"] = invalid_url
+        with pytest.raises(RuleEvidenceError, match="canonical HTTPS rules URL"):
+            RuleEvidenceRecord.from_payload(invalid_mirror_url)
     false_conflict_claim = dict(mirror_payload)
     false_conflict_claim["semantic_execution_status"] = "blocked_by_source_conflict"
-    with pytest.raises(RuleEvidenceError, match="must coincide"):
-        RuleEvidenceRecord.from_payload(false_conflict_claim)
+    false_conflict_record = RuleEvidenceRecord.from_payload(false_conflict_claim)
+    package = july_rules_updates_2026_07.source_package()
+    with pytest.raises(RuleEvidenceError, match="must agree on load and semantic"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=(
+                    *tuple(
+                        record
+                        for record in package.source_evidence_catalog.records_for_source_id(
+                            false_conflict_record.rule_source_id
+                        )
+                        if record.evidence_id != false_conflict_record.evidence_id
+                    ),
+                    false_conflict_record,
+                )
+            ),
+            evidence_required_source_ids=(false_conflict_record.rule_source_id,),
+        )
 
 
-def test_app_hidden_transcription_is_source_hashed_honest_and_cataloged() -> None:
-    artifact = app_core_rules_hidden_2026_08_09.hidden_transcription_artifact()
+def test_app_hidden_retains_historical_owner_and_authoritative_mirror_evidence() -> None:
     payload = _app_hidden_transcription_payload()
     raw = _app_hidden_transcription_artifact_path().read_bytes()
-    catalog = app_core_rules_hidden_2026_08_09.source_catalog()
+    artifact = app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
+        raw
+    )
+    source_package = app_core_rules_hidden_2026_08_09.source_package()
+    catalog = source_package.source_catalog
     catalog_payload = catalog.to_payload()
     source_capture = cast(dict[str, object], payload["source_capture"])
+    evidence_records = source_package.source_evidence_catalog.records_for_source_id(
+        app_core_rules_hidden_2026_08_09.RULE_SOURCE_ID
+    )
+    owner = next(
+        record
+        for record in evidence_records
+        if record.evidence_kind == "owner_supplied_app_transcription"
+    )
+    mirror = next(
+        record for record in evidence_records if record.evidence_kind == "third_party_mirror"
+    )
+    review_context, review_source_observation_by_row_id = _core_rules_review_audit_context()
 
     assert hashlib.sha256(raw).hexdigest() == (
         app_core_rules_hidden_2026_08_09.EXPECTED_ARTIFACT_SHA256
+    )
+    assert app_core_rules_hidden_2026_08_09.EXPECTED_ARTIFACT_SHA256 == (
+        "a63c25996e95c03f0953fc3841e47228d6d9533cdb4ef34a8e2324bc29d0f902"
+    )
+    assert app_core_rules_hidden_2026_08_09.PACKAGE_HASH == (
+        "b65d4058463a2825b8808d1d7dfff2e82c8c87641f4241bf600e1bb82a866058"
     )
     assert hashlib.sha256(artifact.rule.source_text.encode()).hexdigest() == (
         app_core_rules_hidden_2026_08_09.TRANSCRIPTION_SHA256
     )
     assert artifact.source_capture.observation_date == "2026-08-09"
-    assert artifact.source_capture.provenance_kind == (
-        "project_owner_supplied_official_app_transcription"
-    )
+    assert artifact.source_capture.provenance_kind == "owner_supplied_app_transcription"
     assert artifact.source_capture.availability == (
         "transcription_only_no_source_url_app_version_or_binary"
     )
@@ -396,12 +762,69 @@ def test_app_hidden_transcription_is_source_hashed_honest_and_cataloged() -> Non
         "source_title",
         "supplied_by",
     }
-    assert artifact.supersession.supersedes_source_package_id == core_rules.SOURCE_PACKAGE_ID
-    assert artifact.supersession.supersedes_rule_reference == "13.09 Hidden"
-    assert artifact.supersession.supersession_scope == ("hidden_terrain_area_feature_eligibility")
+    assert "supersession" not in payload
+    assert artifact.source_relationship.official_pdf_source_package_id == (
+        core_rules.SOURCE_PACKAGE_ID
+    )
+    assert artifact.source_relationship.official_pdf_rule_reference == "13.09 Hidden"
+    assert artifact.source_relationship.comparison_scope == (
+        "hidden_terrain_area_feature_eligibility"
+    )
+    assert artifact.source_relationship.relationship_status == (
+        "maintained_app_wording_supersedes_pdf_by_project_source_policy"
+    )
+    assert len(evidence_records) == 2
+    assert owner.authority == "unverified_transcription_only"
+    assert owner.project_authority_policy_id is None
+    assert owner.review_audit_id is None
+    assert owner.review_audit_row_id is None
+    assert owner.review_audit_source_observation_sha256 is None
+    assert owner.observed_at is None
+    assert owner.verification_status == "unverified"
+    assert not owner.provider_non_affiliation_recorded
+    assert owner.source_url is owner.app_version is owner.app_build is None
+    assert owner.capture_artifact_path is owner.capture_sha256 is None
+    assert mirror.authority == "project_authoritative_app_mirror"
+    assert (
+        mirror.project_authority_policy_id
+        == review_context["project_authority_policy_id"]
+        == PROJECT_AUTHORITY_POLICY_ID
+    )
+    assert mirror.review_audit_id == review_context["audit_id"] == CORE_RULES_REVIEW_AUDIT_ID
+    assert mirror.review_audit_row_id == "finding:hidden-unverified-source-13-09"
+    assert (
+        mirror.review_audit_source_observation_sha256
+        == (review_source_observation_by_row_id[mirror.review_audit_row_id])
+    )
+    assert mirror.review_audit_source_observation_sha256 == (
+        "62d982be96a81f69059f11def8a0ee75e6ae64f2dfd6f7132e4913140e9aaaf4"
+    )
+    assert mirror.observed_at == review_context["observed_at"]
+    assert mirror.verification_status == "authoritative_app_mirror"
+    assert mirror.provider_name == "40k.app"
+    assert mirror.provider_non_affiliation_recorded == (
+        review_context["provider_affiliation"]
+        == "not_affiliated_with_or_endorsed_by_games_workshop"
+    )
+    assert mirror.source_url == "https://www.40k.app/rules/13-terrain"
+    assert all(record.load_support_status == "loaded" for record in evidence_records)
+    assert all(
+        record.semantic_execution_status == "executable_engine_runtime"
+        for record in evidence_records
+    )
+    assert {record.runtime_consumer_ids for record in evidence_records} == {
+        (
+            "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target",
+            "warhammer40k_core.engine.terrain_hidden:terrain_hidden_model_ids",
+        )
+    }
+    assert all(
+        RuleEvidenceRecord.from_payload(record.to_payload()) == record
+        for record in evidence_records
+    )
     assert len(catalog.documents) == 1
     assert catalog.catalog_version.source_date == "2026-08-09"
-    assert "App version unavailable" in catalog.documents[0].title
+    assert "project-authoritative 40k.app App mirror" in catalog.documents[0].title
     assert (
         catalog.source_text_by_id(app_core_rules_hidden_2026_08_09.RULE_SOURCE_ID).raw_text
         == artifact.rule.source_text
@@ -409,9 +832,13 @@ def test_app_hidden_transcription_is_source_hashed_honest_and_cataloged() -> Non
     provenance = catalog.source_text_by_id(
         f"{app_core_rules_hidden_2026_08_09.SOURCE_PACKAGE_ID}:manifest:provenance"
     )
-    assert "no upstream artifact hash is claimed" in provenance.raw_text
-    assert "supersedes" in provenance.raw_text
+    assert (
+        "historical transcription remains explicitly unverified on its own" in provenance.raw_text
+    )
+    assert PROJECT_AUTHORITY_POLICY_ID in provenance.raw_text
+    assert "non-affiliated hosting provider" in provenance.raw_text
     assert SourceCatalog.from_payload(catalog_payload).to_payload() == catalog_payload
+    assert not hasattr(app_core_rules_hidden_2026_08_09, "source_catalog")
 
 
 def test_app_hidden_transcription_artifact_rejects_unrecorded_source_metadata() -> None:
@@ -425,6 +852,95 @@ def test_app_hidden_transcription_artifact_rejects_unrecorded_source_metadata() 
     ):
         app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
             json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_app_source_artifacts_reject_project_authority_policy_id_drift() -> None:
+    july_payload = _july_rules_update_payload()
+    app_update = cast(dict[str, object], july_payload["app_core_rules_update"])
+    contexts = cast(list[dict[str, object]], app_update["evidence_contexts"])
+    mirror_context = next(
+        context for context in contexts if context["evidence_kind"] == "third_party_mirror"
+    )
+    mirror_context["project_authority_policy_id"] = "core-rules-source-policy:wrong"
+
+    with pytest.raises(
+        july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
+        match="mirror provenance drifted",
+    ):
+        july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+            json.dumps(july_payload, sort_keys=True).encode()
+        )
+
+    hidden_payload = _app_hidden_transcription_payload()
+    hidden_evidence = cast(list[dict[str, object]], hidden_payload["evidence_records"])
+    hidden_mirror = next(
+        record for record in hidden_evidence if record["evidence_kind"] == "third_party_mirror"
+    )
+    hidden_mirror["project_authority_policy_id"] = "core-rules-source-policy:wrong"
+    hidden_mirror["observation_sha256"] = _observation_sha256(
+        cast(RuleEvidencePayload, hidden_mirror)
+    )
+
+    with pytest.raises(
+        app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
+        match="authoritative-mirror evidence provenance drifted",
+    ):
+        app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
+            json.dumps(hidden_payload, sort_keys=True).encode()
+        )
+
+
+def test_app_source_artifacts_reject_retained_audit_link_drift() -> None:
+    july_package = july_rules_updates_2026_07.source_package()
+    july_payload = _july_rules_update_payload()
+    app_update = cast(dict[str, object], july_payload["app_core_rules_update"])
+    july_evidence = cast(list[dict[str, object]], app_update["evidence_records"])
+    july_mirror_artifact = next(
+        record
+        for record in july_evidence
+        if record["evidence_context_id"] == "40k-app-comparison-2026-08-25"
+    )
+    july_mirror_record = next(
+        record
+        for record in july_package.source_evidence_catalog.records
+        if record.evidence_id == july_mirror_artifact["evidence_id"]
+    )
+    july_mirror_artifact["review_audit_row_id"] = "category:02"
+    july_mirror_payload = july_mirror_record.to_payload()
+    july_mirror_payload["review_audit_row_id"] = "category:02"
+    july_mirror_artifact["observation_sha256"] = _observation_sha256(july_mirror_payload)
+
+    with pytest.raises(
+        july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
+        match="retained audit source-observation link drifted",
+    ):
+        july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+            json.dumps(july_payload, sort_keys=True).encode()
+        )
+
+    hidden_package = app_core_rules_hidden_2026_08_09.source_package()
+    hidden_payload = _app_hidden_transcription_payload()
+    hidden_evidence = cast(list[dict[str, object]], hidden_payload["evidence_records"])
+    hidden_mirror_artifact = next(
+        record for record in hidden_evidence if record["evidence_kind"] == "third_party_mirror"
+    )
+    hidden_mirror_record = next(
+        record
+        for record in hidden_package.source_evidence_catalog.records
+        if record.evidence_id == hidden_mirror_artifact["evidence_id"]
+    )
+    hidden_mirror_artifact["review_audit_row_id"] = "category:13"
+    hidden_mirror_payload = hidden_mirror_record.to_payload()
+    hidden_mirror_payload["review_audit_row_id"] = "category:13"
+    hidden_mirror_artifact["observation_sha256"] = _observation_sha256(hidden_mirror_payload)
+
+    with pytest.raises(
+        app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
+        match="authoritative-mirror evidence provenance drifted",
+    ):
+        app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
+            json.dumps(hidden_payload, sort_keys=True).encode()
         )
 
 
@@ -470,11 +986,36 @@ def test_july_rules_updates_artifact_rejects_unknown_app_evidence_reference() ->
     payload = _july_rules_update_payload()
     app_update = cast(dict[str, object], payload["app_core_rules_update"])
     rules = cast(list[dict[str, object]], app_update["rules"])
-    rules[0]["evidence_ids"] = ["40k-app:missing-evidence"]
+    evidence_ids = cast(list[str], rules[0]["evidence_ids"])
+    rules[0]["evidence_ids"] = [evidence_ids[0], "40k-app:missing-evidence"]
 
     with pytest.raises(
         july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
         match="unknown evidence",
+    ):
+        july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_july_rules_updates_artifact_rejects_cross_rule_evidence_links() -> None:
+    payload = _july_rules_update_payload()
+    app_update = cast(dict[str, object], payload["app_core_rules_update"])
+    rules = cast(list[dict[str, object]], app_update["rules"])
+    first_evidence_ids = cast(list[str], rules[0]["evidence_ids"])
+    second_evidence_ids = cast(list[str], rules[1]["evidence_ids"])
+    first_mirror_id = next(
+        evidence_id for evidence_id in first_evidence_ids if evidence_id.startswith("40k-app-")
+    )
+    second_mirror_id = next(
+        evidence_id for evidence_id in second_evidence_ids if evidence_id.startswith("40k-app-")
+    )
+    first_evidence_ids[first_evidence_ids.index(first_mirror_id)] = second_mirror_id
+    second_evidence_ids[second_evidence_ids.index(second_mirror_id)] = first_mirror_id
+
+    with pytest.raises(
+        july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
+        match="evidence links cross source-rule identities",
     ):
         july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
             json.dumps(payload, sort_keys=True).encode()
@@ -634,7 +1175,45 @@ def _app_hidden_transcription_payload() -> dict[str, object]:
     )
 
 
+def _core_rules_review_audit_context() -> tuple[dict[str, str], dict[str, str]]:
+    payload = cast(
+        dict[str, object],
+        json.loads(CORE_RULES_REVIEW_AUDIT_PATH.read_text(encoding="utf-8")),
+    )
+    categories = cast(list[dict[str, object]], payload["categories"])
+    findings = cast(list[dict[str, object]], payload["findings"])
+    provider = cast(dict[str, object], payload["provider"])
+    context = {
+        "audit_id": cast(str, payload["audit_id"]),
+        "observed_at": cast(str, payload["observed_at"]),
+        "project_authority_policy_id": cast(str, provider["project_authority_policy_id"]),
+        "provider_affiliation": cast(str, provider["affiliation"]),
+    }
+    source_observation_by_row_id = {
+        **{
+            f"category:{cast(str, row['category_id'])}": cast(str, row["source_observation_sha256"])
+            for row in categories
+        },
+        **{
+            f"finding:{cast(str, row['finding_id'])}": cast(str, row["source_observation_sha256"])
+            for row in findings
+        },
+    }
+    return context, source_observation_by_row_id
+
+
 def _universal_rule_payload(payload: dict[str, object]) -> dict[str, object]:
     universal_update = cast(dict[str, object], payload["universal_rules_update"])
     rules = cast(list[dict[str, object]], universal_update["rules"])
     return rules[0]
+
+
+def _observation_sha256(payload: RuleEvidencePayload) -> str:
+    observation_payload = dict(payload)
+    observation_payload["observation_sha256"] = ""
+    observation_payload["load_support_status"] = "not_loaded"
+    observation_payload["semantic_execution_status"] = "not_certified"
+    observation_payload["runtime_consumer_ids"] = []
+    return hashlib.sha256(
+        json.dumps(observation_payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()

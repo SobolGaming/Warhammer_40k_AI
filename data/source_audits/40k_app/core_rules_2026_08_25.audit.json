@@ -1,5 +1,5 @@
 {
-  "audit_schema": "core-v2-40k-app-core-rules-audit-v1",
+  "audit_schema": "core-v2-40k-app-core-rules-audit-v3",
   "audit_id": "40k-app-core-rules-2026-08-25",
   "observed_at": "2026-08-25T00:00:00-04:00",
   "scope": {
@@ -15,17 +15,18 @@
   "provider": {
     "provider_id": "40k-app",
     "root_url": "https://www.40k.app/rules",
-    "authority_status": "secondary_unofficial",
+    "authority_status": "project_authoritative_verbatim_official_app_mirror",
     "affiliation": "not_affiliated_with_or_endorsed_by_games_workshop",
     "runtime_input": false,
-    "network_capture_retained": false
+    "network_capture_retained": false,
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
   },
   "official_source": {
     "package_id": "gw-11e-core-rules",
     "pdf_path": "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
     "pdf_sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
     "catalog_source_id": "gw-11e-core-rules:manifest:local-core-rules-pdf",
-    "authority_statement": "official_gw_artifacts_and_captured_official_app_evidence_are_authoritative"
+    "authority_statement": "maintained_app_mirror_supersedes_older_official_pdf_under_project_policy"
   },
   "categories": [
     {
@@ -35,10 +36,14 @@
       "provider_url": "https://www.40k.app/rules/01-core-concepts",
       "section_id": "01.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P01"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "660296b0bb1b2c877cff5bc14ba003132f4545f35793dedfc70d6be650a4e708"
+      "source_observation_sha256": "3668da89d60d6234672f11be41cb08ddca6816354db062b47c4b4adf8ebf2ec5",
+      "evidence_sha256": "7f8432dff4b13cead0c550a2feed6724f14cad9e29440fc0f3f85e5ece23d9cc"
     },
     {
       "category_id": "02",
@@ -47,10 +52,16 @@
       "provider_url": "https://www.40k.app/rules/02-datasheets",
       "section_id": "02.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P02A",
+        "P02B",
+        "P02C"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "1779b88d46069fbb6e731a28356aeafc21a9997360fe50552ef7cfee5d191ce0"
+      "source_observation_sha256": "0e11ace01b5e417429dd752bc4ce3cf51ab1f2dc57a93f0dc5f7e628275161dc",
+      "evidence_sha256": "d5aa00c9f0d05df48b51553968bb8c40dffd51e2642eaca11046a3e4a6785048"
     },
     {
       "category_id": "03",
@@ -59,10 +70,15 @@
       "provider_url": "https://www.40k.app/rules/03-moving",
       "section_id": "03.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P03A",
+        "P03B"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "ebbe5b69716fe69f836dc49b8c078aa58af77c405a5adf15c21502117bcce31f"
+      "source_observation_sha256": "27da884f8f88931a3cd10608eeb7cbc3c6fbc172c9eb45d91ea360dbca625114",
+      "evidence_sha256": "fc73057f314aaa3a26636086adfd21af487cebb84698f33edea5175b59561781"
     },
     {
       "category_id": "04",
@@ -71,10 +87,14 @@
       "provider_url": "https://www.40k.app/rules/04-making-attacks",
       "section_id": "04.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P04"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "906117c8ed7a8cd03abb701d6c25781016e24662ca67a8d60a2e2aa809310cd9"
+      "source_observation_sha256": "2034aaa716e966c3af702eaffbf3bf019e69519cc61cf40633a5b8799e17287b",
+      "evidence_sha256": "413cd047db61cf5e2bc5b92d2a20e5cc5a97e6e19dde2daad9a7a5f1ba5ce211"
     },
     {
       "category_id": "05",
@@ -83,12 +103,18 @@
       "provider_url": "https://www.40k.app/rules/05-attack-sequence",
       "section_id": "05.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P05A",
+        "P05B",
+        "P05C"
+      ],
       "finding_ids": [
         "40k-app-numbering-05-03-02"
       ],
-      "evidence_sha256": "3cc617c1b8f3dd3561b12f8a5ad513f14a5a444a8b7b503ba0174a488c1e305a"
+      "source_observation_sha256": "c771b8acbb62f912cc21c649a6a1ec0cac5d5a1f02e5454747b9427a8571892e",
+      "evidence_sha256": "108c222661a9f0fc56bd0193f7dcc21f029984e3cf572e5d671590af62c60db9"
     },
     {
       "category_id": "06",
@@ -97,10 +123,15 @@
       "provider_url": "https://www.40k.app/rules/06-other-concepts",
       "section_id": "06.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P06A",
+        "P06B"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "92d0bcb2bc204694621798357568d34b320995efaea660faa60c9d7c8380ce78"
+      "source_observation_sha256": "646b405724eb9f1a7f441fed3b3af0cae62925c72fb4b069fc17118fbab13b73",
+      "evidence_sha256": "03b3af0e02e68c0428594c4776d8f7014fc5fd6eac2defed37067846d29c5d75"
     },
     {
       "category_id": "07",
@@ -109,10 +140,12 @@
       "provider_url": "https://www.40k.app/rules/07-the-battle-round",
       "section_id": "07.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_no_standalone_remediation",
+      "remediation_pr_ids": [],
       "finding_ids": [],
-      "evidence_sha256": "543bf6aa33f116337f7e9bfa6118097e5e326dae344333842c3b49d7005a869b"
+      "source_observation_sha256": "ba289accfe6207de38af2832239f5ca0bdfa9d8d74ed859998422237949b0c84",
+      "evidence_sha256": "49ec76e1dc76fc81f8ea3b1cd9b8bb2adf177f5fee41245fa029bb5af5329f29"
     },
     {
       "category_id": "08",
@@ -121,10 +154,15 @@
       "provider_url": "https://www.40k.app/rules/08-command-phase",
       "section_id": "08.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P08A",
+        "P08B"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "c41215ba776b25915f0c6b21c250965c7d086ae0812c38dfb62d8daf3cf99a66"
+      "source_observation_sha256": "0920fa00c1f4ecbc9e46795c1d72695872b61e7577eeaa693c57eb12c26c871e",
+      "evidence_sha256": "cd6e35d6f3f22047e79b34ae45a2496f3616b42fc300ea85498b89b949aa664b"
     },
     {
       "category_id": "09",
@@ -133,12 +171,17 @@
       "provider_url": "https://www.40k.app/rules/09-movement-phase",
       "section_id": "09.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P09A",
+        "P09B"
+      ],
       "finding_ids": [
         "40k-app-duplicate-09-07-01"
       ],
-      "evidence_sha256": "42db33310b19e465c5a7d72b1ff5feaeb6de67afdbbdada054deae18b361d611"
+      "source_observation_sha256": "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+      "evidence_sha256": "bf71111dd7f17a228da5e4f896ea9cb4d8c3d82ec6dc896985c6ade0f46abe6d"
     },
     {
       "category_id": "10",
@@ -147,10 +190,14 @@
       "provider_url": "https://www.40k.app/rules/10-shooting-phase",
       "section_id": "10.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P10"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "2379c72f8ef7d4cbcb84cd7245eff8e3df3de4907789504102434750cd6ce792"
+      "source_observation_sha256": "ce3a68840e30726e81884dd440fc46e8404d7cdd922753d845f84da6d626e162",
+      "evidence_sha256": "e384f55d7ee3b911f9e010412337a4ef9fd271223404e7aff74e919560adc898"
     },
     {
       "category_id": "11",
@@ -159,10 +206,14 @@
       "provider_url": "https://www.40k.app/rules/11-charge-phase",
       "section_id": "11.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P11A"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "0f8addf68541e60613440bb641d53c7df25672a4674ca94b5d4b6da31d880c87"
+      "source_observation_sha256": "df487690f77cd0d3b9d0c5e0d0d6594e6cf2dfeec261c0b67d9aa321aa311d40",
+      "evidence_sha256": "69b305cdf256c0c5a92faf24bab49d88b95ce4516b1e6d246303366c9e388532"
     },
     {
       "category_id": "12",
@@ -171,12 +222,16 @@
       "provider_url": "https://www.40k.app/rules/12-fight-phase",
       "section_id": "12.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "conflict",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror_controls_repository_conflict",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P12"
+      ],
       "finding_ids": [
         "july-transcription-conflict-12-08"
       ],
-      "evidence_sha256": "7a9504213711730382eab8e58bd735643053ff4c3d09f16cce681e017b455402"
+      "source_observation_sha256": "e993a6133af95dc2f1361b32dc95b7d9b7502eb4aabc226f9e5e6dff34b92a63",
+      "evidence_sha256": "924cfca132f1b4cc7035de29fb89ea59f63fc21e029ae7bed5dc0187c0653846"
     },
     {
       "category_id": "13",
@@ -185,10 +240,14 @@
       "provider_url": "https://www.40k.app/rules/13-terrain",
       "section_id": "13.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
-      "finding_ids": [],
-      "evidence_sha256": "547220f842a99bcc2ad6e98d16b35f0a44926b29d649bfd6ef991191383dd14f"
+      "provider_comparison_status": "authoritative_app_mirror_supersedes_pdf",
+      "implementation_status": "assessed_no_standalone_remediation",
+      "remediation_pr_ids": [],
+      "finding_ids": [
+        "hidden-unverified-source-13-09"
+      ],
+      "source_observation_sha256": "02ea53d2341fe361461cb3938fc5d268e3a6a9b9645ce95f4e4ebd8a8eba7748",
+      "evidence_sha256": "748343cb725c898bf5f97e319e878e651afae38704ba10973998d3be28b59560"
     },
     {
       "category_id": "14",
@@ -197,10 +256,14 @@
       "provider_url": "https://www.40k.app/rules/14-objectives",
       "section_id": "14.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P14"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "21e7819c1b151ae64d3ebd59a87ff82e373f51dc59a5cfd3062f20a56789383d"
+      "source_observation_sha256": "ff60f2ecfd3c0e16b9815c05183d66dcbe940fd0fca006046a08f93ba67a80fc",
+      "evidence_sha256": "800458535b4b13829aacb64c69c3c40c60e4dd7ee5a9d34dd23b1020adb9fd6c"
     },
     {
       "category_id": "15",
@@ -209,12 +272,20 @@
       "provider_url": "https://www.40k.app/rules/15-stratagems",
       "section_id": "15.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "conflict",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_internal_numbering_drift",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P15A",
+        "P15B",
+        "P15C",
+        "P15D",
+        "P15E"
+      ],
       "finding_ids": [
         "official-pdf-mirror-order-15-05-15-06"
       ],
-      "evidence_sha256": "4cdbd550e12208cf779c8325225d1026aa1b183303e34033b3002eb280a82160"
+      "source_observation_sha256": "90d660a2388e7f6799e71fe8c2305d019409614b70ee9fcb962609851ab15f59",
+      "evidence_sha256": "76cad1a1fc532e66f48a17c753d4adccb4b0ab2fa88a382808613d9eb3b82c5b"
     },
     {
       "category_id": "16",
@@ -223,10 +294,12 @@
       "provider_url": "https://www.40k.app/rules/16-actions",
       "section_id": "16.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_no_standalone_remediation",
+      "remediation_pr_ids": [],
       "finding_ids": [],
-      "evidence_sha256": "37a45edba24afe57b3cec6a0387d77bbf7e202a5b4a7bcbd300e9af193759613"
+      "source_observation_sha256": "eb27b3d331dfd5b465afd3ec11e714fb688d2859259a658766450093177eac12",
+      "evidence_sha256": "ad9da141624095f642196c64000a09fbb95812a7b5841e6387059e84228d3d2a"
     },
     {
       "category_id": "17",
@@ -235,10 +308,12 @@
       "provider_url": "https://www.40k.app/rules/17-monsters-and-vehicles",
       "section_id": "17.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_no_standalone_remediation",
+      "remediation_pr_ids": [],
       "finding_ids": [],
-      "evidence_sha256": "c4cac7330424619194077938f5e342a8e68647252142d797da98b809534461e6"
+      "source_observation_sha256": "8aa7827d8d29631814f3f10d421af5ef4701b5d521f0b479bc6e4156bdd5c985",
+      "evidence_sha256": "ea3f69f9dad4f1d59d3dfd8e13697c4b4048b3a3d052fccb45eac46a827f0c3c"
     },
     {
       "category_id": "18",
@@ -247,10 +322,16 @@
       "provider_url": "https://www.40k.app/rules/18-transports",
       "section_id": "18.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P18A",
+        "P18B",
+        "P18C"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "605a081ef58701c5b83c6d1090f29b0551fd5c0772ca512fbbbb9982e7d9cb10"
+      "source_observation_sha256": "d9a06d3c5b350f66bad9e4b89f62242fd0f0b4c54579ea3ad6bbf2c2674b8d0e",
+      "evidence_sha256": "fa080ce3e9ab02baae56420d38312398ffd97de6b7212f7fb2905aeddb1c1123"
     },
     {
       "category_id": "19",
@@ -259,10 +340,14 @@
       "provider_url": "https://www.40k.app/rules/19-attached-units",
       "section_id": "19.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P19"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "f1e9e56c509b35515ce51c6721d307996c4c7d0915cfb6b083ed9a8e45343bfc"
+      "source_observation_sha256": "9328cc0ae8f0c22dc52418c3238a105d7031cdfdb5daf78bd377c56f36c795bd",
+      "evidence_sha256": "1cb1ddc1ab20641be54f24f82f5cc781287ac78ed2ed5dca03122bb4c9217c96"
     },
     {
       "category_id": "20",
@@ -271,10 +356,14 @@
       "provider_url": "https://www.40k.app/rules/20-strategic-reserves",
       "section_id": "20.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P20"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "d2b6cad9452cca565b8de0a5e210f48d5eec85da8cc0c743c021102c996148c2"
+      "source_observation_sha256": "e286a7f886f625a18def11dc4fcbd41fd6fee12aad88a575471fed0e77186729",
+      "evidence_sha256": "8b1647e5d71be606b96a601385d6deab4c6b0ada85c03fe78dad0ae76ee050a9"
     },
     {
       "category_id": "21",
@@ -283,12 +372,17 @@
       "provider_url": "https://www.40k.app/rules/21-flying-and-surging",
       "section_id": "21.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "transcription_not_observed",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "repository_transcription_not_observed_on_authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P21A",
+        "P21B"
+      ],
       "finding_ids": [
         "july-transcription-not-observed-fly-heavy"
       ],
-      "evidence_sha256": "3cae283762958f5156ec1ed02c14a8643c1c1b848556068204ee5e3b6e7c5311"
+      "source_observation_sha256": "4e086bf2452707ef7936fb2c86296910d45ae05fd6e84ad9b3ea0c1e1eddc1de",
+      "evidence_sha256": "d027064739bd220eb7c1689713b5a24bf8a962eb3ee1b5b312ca190811da3f62"
     },
     {
       "category_id": "22",
@@ -297,10 +391,14 @@
       "provider_url": "https://www.40k.app/rules/22-other-rules-and-abilities",
       "section_id": "22.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P22"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "5e68e4e17d822d41575ac947e5b15fad221099ee0ae4e6879c27065a7f885775"
+      "source_observation_sha256": "57ca2143f8d413941a9e802ab944c8d35ac833e05a1816749ac8f9020d50f822",
+      "evidence_sha256": "eaa21cbfb0bddd4b95d73f1f9a3015150b074d6a821450d130ba1c05f52b5fc8"
     },
     {
       "category_id": "23",
@@ -309,10 +407,14 @@
       "provider_url": "https://www.40k.app/rules/23-aircraft",
       "section_id": "23.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P23"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "3f4f7af7f19999b36193de04c10bf336970832d7d9c6a5e4b13dd3838da1967f"
+      "source_observation_sha256": "94abac99e6b702878f77c71c8e9e7eef02afea129913c8b95c059e6a15f9f72a",
+      "evidence_sha256": "6627dc38b2221c139b56384959b6c85306e911d925a9c5b072aaf007a497a6f2"
     },
     {
       "category_id": "24",
@@ -321,12 +423,21 @@
       "provider_url": "https://www.40k.app/rules/24-core-abilities",
       "section_id": "24.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "transcription_not_observed",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "repository_transcription_not_observed_on_authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P24A",
+        "P24B",
+        "P24C1",
+        "P24C2",
+        "P24D",
+        "P24E"
+      ],
       "finding_ids": [
         "july-transcription-not-observed-mixed-hazard"
       ],
-      "evidence_sha256": "0dab0d8f50b59950843fba14128cdafdb5365f1779842c7a39e15741788e5b3e"
+      "source_observation_sha256": "5f68585a913965b35453a1d3e6d8278583c85e20a6dcf0721fef6f899080877a",
+      "evidence_sha256": "081e467fd5fbc31f195c04c3804f1099138a8ead2eb2bfe25ace6c71fb21e72b"
     },
     {
       "category_id": "25",
@@ -335,10 +446,16 @@
       "provider_url": "https://www.40k.app/rules/25-muster-armies",
       "section_id": "25.00",
       "official_source_status": "retained_official_pdf_anchor",
-      "provider_comparison_status": "mirror_only",
-      "implementation_status": "not_assessed_in_p00",
+      "provider_comparison_status": "authoritative_app_mirror",
+      "implementation_status": "assessed_remediation_planned",
+      "remediation_pr_ids": [
+        "P25A",
+        "P25B",
+        "P25C"
+      ],
       "finding_ids": [],
-      "evidence_sha256": "e6899931e05367f894c4bed93f9a8567c102a0191fcf74c2be1269a2cbfb1d2e"
+      "source_observation_sha256": "11ec20d47a3a15ae3a01377c5591ed22e14cf3e39a8f04d25424166d5d0e4ac7",
+      "evidence_sha256": "78a8f90f9dda44e289384c359d59ab1b0d1d616e6c2be85af38eb6a5d12e16a1"
     }
   ],
   "findings": [
@@ -347,60 +464,77 @@
       "category_id": "05",
       "finding_kind": "provider_numbering_anomaly",
       "how_currently_recorded": "The retained July transcription uses 05.03.02 for the post-roll attack-pool statement, while mirror display observations can omit the leading zeroes as 5.3.2.",
-      "how_it_should_be_treated": "Treat the mirror locator as provider-local display metadata and preserve the stable project rule ID until a captured official App source establishes current numbering.",
-      "specific_source_basis": "Attack Sequence provider category 05 and source row gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles; no official App capture is retained.",
-      "verification_status": "provider_local_only",
-      "evidence_sha256": "f333ae330fa96c9268044dfb17e2c5da76657de30d00f4e3aa9d3dcf74e9e8af"
+      "how_it_should_be_treated": "Treat 5.3.2 as the current authoritative App display locator under the project source policy while preserving the stable project rule/source ID. Formatting differences in leading zeroes do not create a second rule.",
+      "specific_source_basis": "Authoritative App-mirror Attack Sequence category 05, stable source row gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.03.02-post-roll-attack-profiles, and policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26.",
+      "verification_status": "authoritative_app_numbering",
+      "source_observation_sha256": "05f23eceb90b1a3096c104858f0fa19be6e9d0c62a2932e63e01539098d9bd9f",
+      "evidence_sha256": "3747f98f2f3b0b55a7734af08279dfe0ca2d564c5851aa2a6fc43b697f7b78eb"
     },
     {
       "finding_id": "40k-app-duplicate-09-07-01",
       "category_id": "09",
       "finding_kind": "provider_numbering_anomaly",
       "how_currently_recorded": "The mirror and July artifact associate both the Desperate Escape definition and the forced Desperate Escape statement with locator 09.07.01.",
-      "how_it_should_be_treated": "Keep provider numbering separate from canonical project identity; retain the distinct definition and forced-test source-ID suffixes.",
-      "specific_source_basis": "Movement Phase 09.07.01 observations and the two stable July source rows ending desperate-escape-definition and forced-desperate-escape.",
-      "verification_status": "provider_local_only",
-      "evidence_sha256": "ee52ef89e15408f725ab28f2ce94323afd6619b2fe6c0d7a33c445b12e2bf9cd"
+      "how_it_should_be_treated": "Accept the duplicate 09.07.01 locators as current authoritative App corpus data, keep numbering separate from canonical project identity, and retain distinct definition and forced-test source-ID suffixes.",
+      "specific_source_basis": "Authoritative App-mirror Movement Phase 09.07.01 observations, the two stable July source rows ending desperate-escape-definition and forced-desperate-escape, and policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26.",
+      "verification_status": "authoritative_app_numbering",
+      "source_observation_sha256": "176af8d44bd405c13a3da73fa4d06eab83c81fa4784112fa34d24d1861c93cb9",
+      "evidence_sha256": "bdb434e53b6b68dc5441d2d497e529138eecbc6817fa25cde83f89d9dcf61eb2"
     },
     {
       "finding_id": "july-transcription-conflict-12-08",
       "category_id": "12",
       "finding_kind": "repository_transcription_conflict",
       "how_currently_recorded": "The July artifact attributes an unengaged endpoint requirement to Objective Consolidation, but the current mirror observation does not substantiate treating that phrase as captured official wording.",
-      "how_it_should_be_treated": "Block source and semantic certification for this statement until a versioned, hashed official App capture resolves the wording.",
-      "specific_source_basis": "Fight Phase rule 12.08 at https://www.40k.app/rules/12-fight-phase versus gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation.",
-      "verification_status": "needs_official_app_capture",
-      "evidence_sha256": "b39dcd085257a77b2d5d95a4628775f1ce1b20b7d3b04b0a938b0a1ea760da1f"
+      "how_it_should_be_treated": "The authoritative App-mirror 12.08 operative text controls. Keep the stale repository row conflict-blocked until P12 replaces or narrows it; implement the mode eligibility, per-model movement, and final unit-within-range requirements shown by the maintained App corpus.",
+      "specific_source_basis": "Authoritative App-mirror Fight Phase 12.08 at https://www.40k.app/rules/12-fight-phase versus gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:12.08-objective-consolidation, under policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26.",
+      "verification_status": "authoritative_app_mirror_controls",
+      "source_observation_sha256": "726ce364500c7f1d6b9776651f430ac05ad144a5899877fdbd857128e6cf041c",
+      "evidence_sha256": "134e4f740df11313bb9b372cb1df61a2af7dc89a1efba735707025dacb7bb5ff"
+    },
+    {
+      "finding_id": "hidden-unverified-source-13-09",
+      "category_id": "13",
+      "finding_kind": "uncaptured_transcription_conflicts_official_pdf",
+      "how_currently_recorded": "The engine enables terrain-derived Hidden for Light or Dense terrain areas. The historical owner transcription is uncaptured and unverified on its own, while the separate 40k.app observation matches that wording and the older retained PDF records the narrower Dense-feature condition.",
+      "how_it_should_be_treated": "Keep the owner transcription unverified as historical provenance, classify the matching 40k.app row as the project-authoritative App mirror, and record the maintained App wording as superseding the older PDF for Hidden. The existing runtime path is executable against that authoritative wording.",
+      "specific_source_basis": "Authoritative App-mirror Terrain 13.09 at https://www.40k.app/rules/13-terrain; stable source row gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden; older official PDF SHA-256 f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833; and policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26.",
+      "verification_status": "authoritative_app_mirror_controls",
+      "source_observation_sha256": "62d982be96a81f69059f11def8a0ee75e6ae64f2dfd6f7132e4913140e9aaaf4",
+      "evidence_sha256": "d61d3b849afbf3748e316fa14149eb9661836bbc29f2534aa0e7cdf61487dbf6"
     },
     {
       "finding_id": "official-pdf-mirror-order-15-05-15-06",
       "category_id": "15",
       "finding_kind": "official_pdf_and_provider_internal_numbering_conflict",
       "how_currently_recorded": "The mirror's Stratagem headings assign Crushing Impact to 15.05 and Explosives to 15.06, but its Fight Phase 12.01 example itself refers to Crushing Impact as 15.06. The retained official Core Rules PDF assigns Explosives to 15.05 and Crushing Impact to 15.06.",
-      "how_it_should_be_treated": "Use the retained official PDF for authoritative numbering. Treat the mirror's 15.05 Crushing Impact heading as an internally inconsistent provider-local locator, not as canonical project identity.",
-      "specific_source_basis": "Official Core Rules PDF SHA-256 f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833 at Stratagem entries 15.05 and 15.06; https://www.40k.app/rules/15-stratagems headings; and the Crushing Impact reference in the 12.01 example at https://www.40k.app/rules/12-fight-phase.",
-      "verification_status": "official_pdf_controls",
-      "evidence_sha256": "aa097e7d9600cca643091c8f8eecfa259ac57ced043aa125f3ea5320e1765660"
+      "how_it_should_be_treated": "The maintained App corpus controls over the older PDF: use the App headings Crushing Impact 15.05 and Explosives 15.06 as current locators. Bind semantics by stable rule title and complete operative text, and retain the Fight example's stale 15.06 Crushing Impact cross-reference as an internal corpus anomaly rather than changing behavior identity.",
+      "specific_source_basis": "Authoritative App-mirror headings at https://www.40k.app/rules/15-stratagems, the stale Crushing Impact 15.06 cross-reference at https://www.40k.app/rules/12-fight-phase, older PDF SHA-256 f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833, and policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26.",
+      "verification_status": "authoritative_app_text_controls",
+      "source_observation_sha256": "743ece521c82481891e362e74ca916da5b24910e2dbf75ee27c9aed133e9480d",
+      "evidence_sha256": "0a6c634d33a983794ec930304c14382d279d6439916d73f15ebe03ff24c4ab10"
     },
     {
       "finding_id": "july-transcription-not-observed-fly-heavy",
       "category_id": "21",
       "finding_kind": "repository_transcription_not_observed_on_provider",
       "how_currently_recorded": "The July artifact states an explicit FLY and HEAVY horizontal-distance clarification and previously labeled the 40k.app mirror as corroborating evidence. The current mirror pages describe FLY movement and HEAVY separately but do not expose that combined clarification.",
-      "how_it_should_be_treated": "Preserve the stable source row as an uncaptured repository transcription, but mark it not observed on the mirror and do not claim mirror corroboration until matching text or captured official App evidence is retained.",
-      "specific_source_basis": "The current https://www.40k.app/rules/21-flying-and-surging page describes ignoring vertical distance while taking to the skies, and https://www.40k.app/rules/24-core-abilities states the HEAVY movement condition; neither page displays the July row's explicit combined FAQ statement.",
-      "verification_status": "needs_official_app_capture",
-      "evidence_sha256": "4ab122dfb478baf739b720aff3060ebeece94a8fed5e92da9a6b2643e33ad0ef"
+      "how_it_should_be_treated": "Preserve the stable row as historical uncaptured provenance, but do not certify or implement the combined clarification because it is absent from the authoritative App mirror. Use the current Take to the Skies and HEAVY operative statements independently.",
+      "specific_source_basis": "Authoritative App-mirror https://www.40k.app/rules/21-flying-and-surging and https://www.40k.app/rules/24-core-abilities under policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26; neither observation displays the combined July statement.",
+      "verification_status": "authoritative_app_mirror_controls",
+      "source_observation_sha256": "06190cdde3ed1cb3dbb9a1eaabd7fb8d0844ad09d117b0515090befdcf38aebb",
+      "evidence_sha256": "5fbd88bd75258e4b0ba8f3968095a5e2a339a01189c141420bbe2a7fcf0d7587"
     },
     {
       "finding_id": "july-transcription-not-observed-mixed-hazard",
       "category_id": "24",
       "finding_kind": "repository_transcription_not_observed_on_provider",
       "how_currently_recorded": "The July artifact states an explicit mixed-keyword Hazard clarification and previously labeled the 40k.app mirror as corroborating evidence. The current mirror pages expose the general Hazard rules but not that clarification.",
-      "how_it_should_be_treated": "Preserve the stable source row as an uncaptured repository transcription, but mark it not observed on the mirror and do not claim mirror corroboration until matching text or captured official App evidence is retained.",
-      "specific_source_basis": "The current https://www.40k.app/rules/24-core-abilities page triggers hazard rolls and https://www.40k.app/rules/06-other-concepts distinguishes the damage result based on whether every model is MONSTER/VEHICLE; neither page displays the July row's explicit mixed-keyword FAQ statement.",
-      "verification_status": "needs_official_app_capture",
-      "evidence_sha256": "483b9739fe1af11a5c8d5b1f280b4460ae59a072396ba5a2983c1d149e6e8601"
+      "how_it_should_be_treated": "Preserve the stable row as historical uncaptured provenance, but do not certify or implement that combined clarification because it is absent from the authoritative App mirror. Apply the current Hazard and mortal-wound operative statements as written.",
+      "specific_source_basis": "Authoritative App-mirror https://www.40k.app/rules/24-core-abilities and https://www.40k.app/rules/06-other-concepts under policy core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26; neither observation displays the combined July statement.",
+      "verification_status": "authoritative_app_mirror_controls",
+      "source_observation_sha256": "3e631ef574fa9c00dab7d1a6621d8f63252017925f1413f8fe1d1bf328f61b82",
+      "evidence_sha256": "dcf2cc62e134fbac1b9dee88a9523fdef8210991b7e05ee6eff1a7c4bf135ae1"
     }
   ]
 }

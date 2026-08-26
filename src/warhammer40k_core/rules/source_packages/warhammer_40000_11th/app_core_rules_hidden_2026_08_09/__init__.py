@@ -13,20 +13,23 @@ from warhammer40k_core.rules.data_package import (
 )
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_evidence import (
+    RuleSourcePackage,
+    SourceEvidenceCatalog,
+)
 from warhammer40k_core.rules.source_packages.artifact_loader import (
     SourcePackageArtifactError,
     package_artifact_bytes,
 )
 
 from ._artifacts import (
-    AppHiddenRuleArtifact,
     AppHiddenTranscriptionArtifactError,
     AppHiddenTranscriptionPackageArtifact,
     app_hidden_transcription_artifact_from_json_bytes,
 )
 
 _ARTIFACT_PATH: Final = "artifacts/hidden.json"
-EXPECTED_ARTIFACT_SHA256: Final = "808b7ad12c18f500efc84a21cdd91d5e7db98d6f8290c6610f1f5377765c5ceb"
+EXPECTED_ARTIFACT_SHA256: Final = "a63c25996e95c03f0953fc3841e47228d6d9533cdb4ef34a8e2324bc29d0f902"
 
 
 def _load_artifact() -> AppHiddenTranscriptionPackageArtifact:
@@ -53,14 +56,6 @@ TRANSCRIPTION_SHA256: Final = _ARTIFACT.rule.transcription_sha256
 PACKAGE_HASH: Final = _ARTIFACT.package_hash
 
 
-def hidden_rule_record() -> AppHiddenRuleArtifact:
-    return _ARTIFACT.rule
-
-
-def hidden_transcription_artifact() -> AppHiddenTranscriptionPackageArtifact:
-    return _ARTIFACT
-
-
 def validate_hidden_transcription_artifact_bytes(raw: bytes) -> None:
     if hashlib.sha256(raw).hexdigest() != EXPECTED_ARTIFACT_SHA256:
         raise AppHiddenTranscriptionArtifactError(
@@ -69,7 +64,7 @@ def validate_hidden_transcription_artifact_bytes(raw: bytes) -> None:
     app_hidden_transcription_artifact_from_json_bytes(raw)
 
 
-def source_catalog() -> SourceCatalog:
+def _build_source_catalog() -> SourceCatalog:
     package_id = DataPackageId(
         namespace="games-workshop",
         package_name=SOURCE_PACKAGE_ID,
@@ -86,11 +81,14 @@ def source_catalog() -> SourceCatalog:
     provenance_text = RuleSourceText.from_raw(
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:provenance",
         raw_text=(
-            "Project-owner-supplied official Warhammer 40,000 App transcription, "
-            "observed 2026-08-09. The App version, source URL, screenshot, and source "
-            "binary were not supplied, so no upstream artifact hash is claimed. The "
-            "later App wording supersedes the terrain-area feature eligibility in "
-            "Warhammer 40,000 11th Edition Core Rules section 13.09 Hidden."
+            "Project-owner-supplied transcription attributed to the Warhammer 40,000 "
+            "App, observed 2026-08-09. That historical transcription remains explicitly "
+            "unverified on its own. A separate 40k.app observation on 2026-08-25 matches "
+            "the wording and is governed by project source policy "
+            "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26. "
+            "Under that owner-approved policy, the maintained App wording supersedes the "
+            "older official Core Rules PDF wording for this rule. 40k.app remains "
+            "identified as a non-affiliated hosting provider, not as Games Workshop."
         ),
     )
     return SourceCatalog(
@@ -100,8 +98,8 @@ def source_catalog() -> SourceCatalog:
             SourceDocument(
                 document_id=document_id,
                 title=(
-                    f"{SOURCE_TITLE} (project-owner-supplied official App transcription; "
-                    f"observed {OBSERVATION_DATE}; App version unavailable)"
+                    f"Hidden ({SOURCE_TITLE}; owner transcription observed {OBSERVATION_DATE}; "
+                    "matched by project-authoritative 40k.app App mirror)"
                 ),
                 source_texts=(
                     provenance_text,
@@ -126,6 +124,17 @@ def source_catalog() -> SourceCatalog:
     )
 
 
+def source_package() -> RuleSourcePackage:
+    evidence_catalog = SourceEvidenceCatalog(
+        records=tuple(evidence.to_rule_evidence_record() for evidence in _ARTIFACT.evidence_records)
+    )
+    return RuleSourcePackage(
+        source_catalog=_build_source_catalog(),
+        source_evidence_catalog=evidence_catalog,
+        evidence_required_source_ids=(RULE_SOURCE_ID,),
+    )
+
+
 __all__ = (
     "EXPECTED_ARTIFACT_SHA256",
     "OBSERVATION_DATE",
@@ -137,8 +146,6 @@ __all__ = (
     "TRANSCRIPTION_SHA256",
     "AppHiddenTranscriptionArtifactError",
     "app_hidden_transcription_artifact_from_json_bytes",
-    "hidden_rule_record",
-    "hidden_transcription_artifact",
-    "source_catalog",
+    "source_package",
     "validate_hidden_transcription_artifact_bytes",
 )

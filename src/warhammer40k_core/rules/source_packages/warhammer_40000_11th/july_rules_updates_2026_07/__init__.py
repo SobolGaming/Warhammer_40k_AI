@@ -13,7 +13,11 @@ from warhammer40k_core.rules.data_package import (
 )
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
-from warhammer40k_core.rules.source_evidence import RuleEvidenceRecord
+from warhammer40k_core.rules.source_evidence import (
+    RuleEvidenceRecord,
+    RuleSourcePackage,
+    SourceEvidenceCatalog,
+)
 from warhammer40k_core.rules.source_packages.artifact_loader import (
     SourcePackageArtifactError,
     package_artifact_bytes,
@@ -21,7 +25,6 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 from ._artifacts import (
     AppCoreRuleUpdateRecord,
-    AppCoreTranscriptionProvenanceArtifact,
     EventCompanionRuleUpdateRecord,
     EventLayoutRevisionRecord,
     JulyRulesUpdateArtifactError,
@@ -31,7 +34,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "427f6117cb86e63aefd6b115e8ce43dfc2a368cc22c77580df1742170b0ca06a"
+EXPECTED_ARTIFACT_SHA256: Final = "d87e8847ac50ac483e93792be8af7a19b340873fbe3c9f8b9047d036f14d3249"
 
 
 def _load_artifact() -> JulyRulesUpdatesPackageArtifact:
@@ -85,21 +88,18 @@ def event_companion_rule_records() -> tuple[EventCompanionRuleUpdateRecord, ...]
     return _ARTIFACT.event_companion.rules
 
 
-def app_core_rule_records() -> tuple[AppCoreRuleUpdateRecord, ...]:
+def _app_core_rule_records() -> tuple[AppCoreRuleUpdateRecord, ...]:
     return _ARTIFACT.app_core_rules_update.rules
 
 
-def app_core_rule_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
+def _build_app_core_rule_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
+    contexts_by_id = {
+        context.context_id: context for context in _ARTIFACT.app_core_rules_update.evidence_contexts
+    }
     return tuple(
-        evidence.to_rule_evidence_record(
-            context=_ARTIFACT.app_core_rules_update.mirror_evidence_context
-        )
+        evidence.to_rule_evidence_record(context=contexts_by_id[evidence.evidence_context_id])
         for evidence in _ARTIFACT.app_core_rules_update.evidence_records
     )
-
-
-def app_core_transcription_provenance() -> AppCoreTranscriptionProvenanceArtifact:
-    return _ARTIFACT.app_core_rules_update.transcription_provenance
 
 
 def validate_july_rules_update_artifact_bytes(raw: bytes) -> None:
@@ -110,7 +110,7 @@ def validate_july_rules_update_artifact_bytes(raw: bytes) -> None:
     july_rules_updates_package_artifact_from_json_bytes(raw)
 
 
-def source_catalog() -> SourceCatalog:
+def _build_source_catalog() -> SourceCatalog:
     package_id = DataPackageId(
         namespace="games-workshop",
         package_name=SOURCE_PACKAGE_ID,
@@ -207,7 +207,7 @@ def source_catalog() -> SourceCatalog:
                         source_id=rule.source_id,
                         raw_text=rule.source_text,
                     )
-                    for rule in app_core_rule_records()
+                    for rule in _app_core_rule_records()
                 ),
             ),
         ),
@@ -226,6 +226,16 @@ def source_catalog() -> SourceCatalog:
                 ),
             ),
         ),
+    )
+
+
+def source_package() -> RuleSourcePackage:
+    return RuleSourcePackage(
+        source_catalog=_build_source_catalog(),
+        source_evidence_catalog=SourceEvidenceCatalog(
+            records=_build_app_core_rule_evidence_records()
+        ),
+        evidence_required_source_ids=tuple(sorted(APP_CORE_RULE_SOURCE_IDS.values())),
     )
 
 
@@ -248,13 +258,10 @@ __all__ = (
     "UNIVERSAL_RULES_PDF_SHA256",
     "UNIVERSAL_RULES_SOURCE_URL",
     "JulyRulesUpdateArtifactError",
-    "app_core_rule_evidence_records",
-    "app_core_rule_records",
-    "app_core_transcription_provenance",
     "changed_event_layouts",
     "event_companion_rule_records",
     "july_rules_updates_package_artifact_from_json_bytes",
-    "source_catalog",
+    "source_package",
     "universal_rule_records",
     "validate_july_rules_update_artifact_bytes",
 )
