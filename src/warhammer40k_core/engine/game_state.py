@@ -21,6 +21,7 @@ from warhammer40k_core.engine import (
     mission_scoring_evidence_validation as _scoring_evidence_validation,
 )
 from warhammer40k_core.engine import mission_terrain as _mission_terrain
+from warhammer40k_core.engine import model_destruction_cause_authority as _mdca
 from warhammer40k_core.engine import objective_control_record_authority as _oc_authority
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_scoring_transaction_integrity as _primary_vp_integrity
@@ -82,7 +83,11 @@ from warhammer40k_core.engine.effects import (
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
-from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventLog,
+    JsonValue,
+    validate_json_value,
+)
 from warhammer40k_core.engine.faction_resources import (
     FactionResourceLedger,
     FactionResourceResult,
@@ -1146,6 +1151,9 @@ class GameState:
     ranged_attack_history_records: list[RangedAttackHistoryRecord] = field(
         default_factory=_new_ranged_attack_history_records
     )
+    model_destruction_cause_authorities: list[_mdca.ModelDestructionCauseAuthority] = field(
+        default_factory=lambda: list[_mdca.ModelDestructionCauseAuthority]()
+    )
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     cult_ambush_markers: list[CultAmbushMarker] = field(default_factory=_new_cult_ambush_markers)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
@@ -1390,6 +1398,12 @@ class GameState:
             starting_strength_records=self.starting_strength_records,
             starting_attached_unit_records=self.starting_attached_unit_records,
             player_ids=self.player_ids,
+        )
+        self.model_destruction_cause_authorities = (
+            _mdca.validate_model_destruction_cause_authorities(
+                self.model_destruction_cause_authorities,
+                game_id=self.game_id,
+            )
         )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
@@ -1951,6 +1965,13 @@ class GameState:
     ) -> tuple[DestructionReactionSource, ...]:
         model_id = _validate_identifier("model_instance_id", model_instance_id)
         return self.destruction_reaction_sources_by_model_id.get(model_id, ())
+
+    def replace_model_destruction_cause_authorities(
+        self, authorities: list[_mdca.ModelDestructionCauseAuthority]
+    ) -> None:
+        self.model_destruction_cause_authorities = (
+            _mdca.validate_model_destruction_cause_authorities(authorities, game_id=self.game_id)
+        )
 
     def complete_current_setup_step(self) -> SetupStep:
         if self.stage is not GameLifecycleStage.SETUP:
@@ -4845,6 +4866,9 @@ class GameState:
             "ranged_attack_history_records": [
                 record.to_payload() for record in self.ranged_attack_history_records
             ],
+            "model_destruction_cause_authorities": [
+                authority.to_payload() for authority in self.model_destruction_cause_authorities
+            ],
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "cult_ambush_markers": [marker.to_payload() for marker in self.cult_ambush_markers],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
@@ -4966,6 +4990,7 @@ class GameState:
 
         payload = cast(dict[str, JsonValue], self.to_payload())
         payload["objective_control_record_authorities"] = []
+        payload["model_destruction_cause_authorities"] = []
         payload["primary_scoring_state_evidence_records"] = []
         payload["secondary_scoring_state_evidence_records"] = []
         payload["primary_scoring_boundary_lifecycles"] = []
@@ -5186,6 +5211,10 @@ class GameState:
             ranged_attack_history_records=[
                 RangedAttackHistoryRecord.from_payload(record)
                 for record in payload["ranged_attack_history_records"]
+            ],
+            model_destruction_cause_authorities=[
+                _mdca.ModelDestructionCauseAuthority.from_payload(authority)
+                for authority in payload["model_destruction_cause_authorities"]
             ],
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]

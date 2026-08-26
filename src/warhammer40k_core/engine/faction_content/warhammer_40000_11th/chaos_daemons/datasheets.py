@@ -15,6 +15,10 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockModifierContext,
 )
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
@@ -67,6 +71,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+    scenario_rules_units_are_physically_engaged,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -819,32 +827,33 @@ def _enemy_rules_unit_within_source_engagement_range(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    target_models = _alive_geometry_models_for_rules_unit(
+    if not rules_unit_has_placed_alive_model(
         state=state,
-        scenario=scenario,
         rules_unit=target_rules_unit,
-    )
-    if not target_models:
+    ):
         return False
+    scenario = battlefield_scenario_for_state(state=state)
     for army in _chaos_daemons_armies(state):
         if army.player_id == target_rules_unit.owner_player_id:
             continue
         for source_unit in army.units:
             if not _unit_has_datasheet_ability(source_unit, ability_id):
                 continue
-            source_models = _alive_geometry_models_for_unit(
+            source_rules_unit = rules_unit_view_by_id(
                 state=state,
-                scenario=scenario,
-                unit=source_unit,
+                unit_instance_id=source_unit.unit_instance_id,
             )
-            if _any_models_within_engagement_range(
+            if not _component_unit_has_placed_alive_model(
                 state=state,
-                first_models=source_models,
-                second_models=target_models,
+                rules_unit=source_rules_unit,
+                component_unit=source_unit,
+            ):
+                continue
+            if scenario_rules_units_are_physically_engaged(
+                scenario=scenario,
+                ruleset_descriptor=state.runtime_ruleset_descriptor(),
+                first_unit_instance_id=source_rules_unit.unit_instance_id,
+                second_unit_instance_id=target_rules_unit.unit_instance_id,
             ):
                 return True
     return False
@@ -1177,42 +1186,61 @@ def _enemy_rules_unit_ids_within_source_engagement_range(
         state=state,
         unit_instance_id=source_unit_instance_id,
     )
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
+    source_army = _shared_army_for_player(
+        tuple(state.army_definitions),
+        player_id=source_rules_unit.owner_player_id,
+        context="Relentless Carnage",
     )
-    source_models = _alive_geometry_models_for_rules_unit(
+    source_component = _unit_by_id(
+        source_army.units,
+        unit_instance_id=source_unit_instance_id,
+    )
+    if not _component_unit_has_placed_alive_model(
         state=state,
-        scenario=scenario,
         rules_unit=source_rules_unit,
-    )
-    if not source_models:
+        component_unit=source_component,
+    ):
         return ()
-    enemy_rules_unit_ids: set[str] = set()
-    checked_rules_unit_ids: set[str] = set()
-    for army in state.army_definitions:
-        if army.player_id == source_rules_unit.owner_player_id:
-            continue
-        for unit in army.units:
-            enemy_rules_unit = rules_unit_view_by_id(
+    scenario = battlefield_scenario_for_state(state=state)
+    return tuple(
+        enemy_unit_id
+        for enemy_unit_id in scenario_physically_engaged_enemy_rules_unit_ids(
+            scenario=scenario,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            unit_instance_id=source_rules_unit.unit_instance_id,
+        )
+        if rules_unit_has_placed_alive_model(
+            state=state,
+            rules_unit=rules_unit_view_by_id(
                 state=state,
-                unit_instance_id=unit.unit_instance_id,
-            )
-            if enemy_rules_unit.unit_instance_id in checked_rules_unit_ids:
-                continue
-            checked_rules_unit_ids.add(enemy_rules_unit.unit_instance_id)
-            enemy_models = _alive_geometry_models_for_rules_unit(
-                state=state,
-                scenario=scenario,
-                rules_unit=enemy_rules_unit,
-            )
-            if _any_models_within_engagement_range(
-                state=state,
-                first_models=source_models,
-                second_models=enemy_models,
-            ):
-                enemy_rules_unit_ids.add(enemy_rules_unit.unit_instance_id)
-    return tuple(sorted(enemy_rules_unit_ids))
+                unit_instance_id=enemy_unit_id,
+            ),
+        )
+    )
+
+
+def _component_unit_has_placed_alive_model(
+    *,
+    state: object,
+    rules_unit: RulesUnitView,
+    component_unit: UnitInstance,
+) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Component model presence lookup requires GameState.")
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Component model presence lookup requires rules unit.")
+    if type(component_unit) is not UnitInstance:
+        raise GameLifecycleError("Component model presence lookup requires UnitInstance.")
+    return any(
+        rules_unit_has_placed_alive_model(
+            state=state,
+            rules_unit=rules_unit,
+            model_instance_id=model.model_instance_id,
+        )
+        for model in component_unit.own_models
+    )
 
 
 def _alive_geometry_models_for_rules_unit(
@@ -1291,28 +1319,6 @@ def _models_within_distance(
                     second_model.pose,
                 )
                 <= distance_inches
-            ):
-                return True
-    return False
-
-
-def _any_models_within_engagement_range(
-    *,
-    state: object,
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-) -> bool:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Engagement range lookup requires GameState.")
-    policy = state.runtime_ruleset_descriptor().engagement_policy
-    for first_model in first_models:
-        for second_model in second_models:
-            if first_model.is_within_engagement_range(
-                second_model,
-                horizontal_inches=policy.horizontal_inches,
-                vertical_inches=policy.vertical_inches,
             ):
                 return True
     return False

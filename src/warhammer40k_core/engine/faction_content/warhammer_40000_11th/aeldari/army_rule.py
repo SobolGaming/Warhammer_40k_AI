@@ -11,12 +11,14 @@ from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveHookBinding,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
-    UnitPlacement,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     conditional_faction_resource_refund_roll_payload,
@@ -47,16 +49,19 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookBinding,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_rules_units_are_physically_engaged,
+)
 from warhammer40k_core.engine.ranged_weapon_keyword_effects import (
     ranged_weapon_keyword_grant_payload,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeContext,
     ShootingEndSurgeGrant,
     ShootingEndSurgeHookBinding,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 CONTRIBUTION_ID = "warhammer_40000_11th:aeldari:army_rule:scaffold"
 SWIFT_AS_THE_WIND_HOOK_ID = "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind"
@@ -390,9 +395,7 @@ def opportunity_seized_surge_grants(
         maneuver=OPPORTUNITY_SEIZED_MANEUVER,
     ):
         return ()
-    scenario = _battlefield_scenario(context.state)
-    triggering_start = _triggering_unit_start_placement(
-        scenario=scenario,
+    scenario = _scenario_at_triggering_unit_start(
         context=context,
     )
     grants: list[MovementEndSurgeGrant] = []
@@ -409,18 +412,24 @@ def opportunity_seized_surge_grants(
             unit=unit,
         ):
             continue
-        unit_placement = _placed_unit_or_none(
-            scenario=scenario,
-            player_id=context.reacting_player_id,
+        source_rules_unit = rules_unit_view_by_id(
+            state=context.state,
             unit_instance_id=unit.unit_instance_id,
         )
-        if unit_placement is None:
+        if not any(
+            rules_unit_has_placed_alive_model(
+                state=context.state,
+                rules_unit=source_rules_unit,
+                model_instance_id=model.model_instance_id,
+            )
+            for model in unit.own_models
+        ):
             continue
-        if not _unit_placements_within_engagement_range(
+        if not scenario_rules_units_are_physically_engaged(
             scenario=scenario,
-            ruleset_context=context,
-            first=unit_placement,
-            second=triggering_start,
+            ruleset_descriptor=context.ruleset_descriptor,
+            first_unit_instance_id=source_rules_unit.unit_instance_id,
+            second_unit_instance_id=context.triggering_unit_instance_id,
         ):
             continue
         grants.append(
@@ -791,19 +800,17 @@ def _unit_is_eligible_agile_manoeuvre_unit(
     return _unit_has_faction_keyword(unit, ASURYANI) or _unit_has_faction_keyword(unit, AELDARI)
 
 
-def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Aeldari Agile Manoeuvres requires battlefield state.")
-    return BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
+def _scenario_at_triggering_unit_start(*, context: MovementEndSurgeContext) -> BattlefieldScenario:
+    scenario = battlefield_scenario_for_state(state=context.state)
+    triggering_rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.triggering_unit_instance_id,
     )
-
-
-def _triggering_unit_start_placement(
-    *, scenario: BattlefieldScenario, context: MovementEndSurgeContext
-) -> UnitPlacement:
-    current = scenario.battlefield_state.unit_placement_by_id(context.triggering_unit_instance_id)
+    if not rules_unit_has_placed_alive_model(
+        state=context.state,
+        rules_unit=triggering_rules_unit,
+    ):
+        raise GameLifecycleError("Aeldari Opportunity Seized triggering unit is not placed alive.")
     trigger_payload = context.trigger_event_payload
     if not isinstance(trigger_payload, dict):
         raise GameLifecycleError("Aeldari Opportunity Seized trigger payload is malformed.")
@@ -816,70 +823,30 @@ def _triggering_unit_start_placement(
     start_poses = {
         record.model_instance_id: record.start_pose for record in transition_batch.displacements
     }
-    start_model_placements = tuple(
-        placement.with_pose(start_poses.get(placement.model_instance_id, placement.pose))
-        for placement in current.model_placements
-    )
-    return current.with_model_placements(start_model_placements)
-
-
-def _placed_unit_or_none(
-    *,
-    scenario: BattlefieldScenario,
-    player_id: str,
-    unit_instance_id: str,
-) -> UnitPlacement | None:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            if unit_placement.unit_instance_id == requested_unit_id:
-                return unit_placement
-    return None
-
-
-def _unit_placements_within_engagement_range(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_context: MovementEndSurgeContext,
-    first: UnitPlacement,
-    second: UnitPlacement,
-) -> bool:
-    first_models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=first,
-    )
-    second_models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=second,
-    )
-    engagement_policy = ruleset_context.ruleset_descriptor.engagement_policy
-    for first_model in first_models:
-        for second_model in second_models:
-            if first_model.is_within_engagement_range(
-                second_model,
-                horizontal_inches=engagement_policy.horizontal_inches,
-                vertical_inches=engagement_policy.vertical_inches,
-            ):
-                return True
-    return False
-
-
-def _geometry_models_for_unit_placement(
-    *, scenario: BattlefieldScenario, unit_placement: UnitPlacement
-) -> tuple[GeometryModel, ...]:
-    if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("Aeldari Agile Manoeuvres scenario is malformed.")
-    if type(unit_placement) is not UnitPlacement:
-        raise GameLifecycleError("Aeldari Agile Manoeuvres unit placement is malformed.")
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
+    triggering_model_ids = {model.model_instance_id for model in triggering_rules_unit.own_models}
+    if not triggering_model_ids.intersection(start_poses):
+        raise GameLifecycleError(
+            "Aeldari Opportunity Seized trigger transition has no triggering-unit models."
         )
-        for model_placement in unit_placement.model_placements
+    battlefield = scenario.battlefield_state
+    for component in triggering_rules_unit.components:
+        current = battlefield.unit_placement_or_none(component.unit.unit_instance_id)
+        if current is None:
+            continue
+        battlefield = battlefield.with_unit_placement(
+            current.with_model_placements(
+                tuple(
+                    placement.with_pose(
+                        start_poses.get(placement.model_instance_id, placement.pose)
+                    )
+                    for placement in current.model_placements
+                )
+            )
+        )
+    return BattlefieldScenario(
+        armies=scenario.armies,
+        battlefield_state=battlefield,
+        present_destroyed_model_ids=scenario.present_destroyed_model_ids,
     )
 
 

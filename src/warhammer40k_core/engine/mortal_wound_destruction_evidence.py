@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -9,6 +10,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
     ModelPlacement,
+    ModelPlacementPayload,
     ModelRemovalRecord,
     PlacementError,
 )
@@ -22,7 +24,22 @@ from warhammer40k_core.engine.destruction_source_attribution import (
     resolve_non_attack_destruction_source_identity,
     validate_destruction_source_identity,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_on_death import (
+    FIGHT_ON_DEATH_AWAITING_EFFECT_KIND,
+    fight_on_death_model_ids_awaiting_attack,
+)
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    MODEL_DESTRUCTION_CAUSE_ID_FIELD,
+    consumed_model_destruction_cause_authority_for_event,
+)
+from warhammer40k_core.engine.model_destruction_cause_producers import (
+    consume_mortal_wound_model_destruction_cause,
+    record_mortal_wound_model_destruction_cause,
+)
+from warhammer40k_core.engine.model_logical_death import (
+    model_logical_death_record_from_event,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_destruction_evidence import (
     destruction_source_objective_proximity_witness,
@@ -39,6 +56,11 @@ if TYPE_CHECKING:
 
 
 MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT = "mortal_wound_model_destructions_finalized"
+
+
+class MortalWoundDestructionFinalizationKind(StrEnum):
+    APPLICATION_PACKET = "application_packet"
+    DEADLY_DEMISE_COLLATERAL_CAUSE = "deadly_demise_collateral_cause"
 
 
 class MortalWoundDestructionEvidencePayload(TypedDict):
@@ -218,6 +240,8 @@ def record_finalized_mortal_wound_model_destructions(
     evidence: MortalWoundDestructionEvidence,
     existing_model_destroyed_event_ids: tuple[str, ...],
     destroyed_model_placements: tuple[ModelPlacement, ...],
+    logical_death_events: tuple[EventRecord, ...],
+    finalization_kind: MortalWoundDestructionFinalizationKind,
 ) -> None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Mortal wound destruction evidence requires decisions.")
@@ -227,8 +251,10 @@ def record_finalized_mortal_wound_model_destructions(
     model_ids = _validate_identifier_tuple(
         "destroyed_model_instance_ids", destroyed_model_instance_ids
     )
-    if not model_ids:
-        return
+    if type(finalization_kind) is not MortalWoundDestructionFinalizationKind:
+        raise GameLifecycleError("Mortal wound destruction finalization kind is invalid.")
+    if not model_ids and logical_death_events:
+        raise GameLifecycleError("Mortal wound logical-death events require destroyed models.")
     if type(evidence) is not MortalWoundDestructionEvidence:
         raise GameLifecycleError("Mortal wound destruction finalization requires typed evidence.")
     evidence.validate_for_state(state)
@@ -244,6 +270,7 @@ def record_finalized_mortal_wound_model_destructions(
     validated_source_context = validate_json_value(source_context)
     validated_application = validate_json_value(application_payload)
     existing_events_by_model = _existing_model_destroyed_events_by_model(
+        state=state,
         decisions=decisions,
         event_ids=existing_model_destroyed_event_ids,
         evidence=evidence,
@@ -253,6 +280,9 @@ def record_finalized_mortal_wound_model_destructions(
             "Existing mortal wound model-destroyed events contain an unrelated model."
         )
     placements_by_model = _destroyed_model_placements_by_model(destroyed_model_placements)
+    logical_death_events_by_model = _logical_death_events_by_model(logical_death_events)
+    if set(logical_death_events_by_model) != set(model_ids):
+        raise GameLifecycleError("Mortal wound logical-death events do not match destroyed models.")
     required_placement_model_ids = set(model_ids) - set(existing_events_by_model)
     if set(placements_by_model) != required_placement_model_ids:
         raise GameLifecycleError(
@@ -270,11 +300,12 @@ def record_finalized_mortal_wound_model_destructions(
         ).unit_instance_id
         physical_unit_ids.add(physical_unit_id)
         rules_unit_ids.add(rules_unit_id)
-        battlefield = state.battlefield_state
-        if battlefield is None or battlefield.model_placement_or_none(model_id) is not None:
-            raise GameLifecycleError(
-                "Finalized mortal wound destruction requires battlefield removal."
-            )
+        _validate_finalized_model_battlefield_state(
+            state=state,
+            decisions=decisions,
+            model_instance_id=model_id,
+            existing_model_destroyed_event=existing_events_by_model.get(model_id),
+        )
         removal = ModelRemovalRecord(
             model_instance_id=model_id,
             removal_kind=BattlefieldRemovalKind.DESTROYED,
@@ -284,9 +315,9 @@ def record_finalized_mortal_wound_model_destructions(
             source_event_id=requested_application_id,
         )
         removals.append(removal)
-        existing_event_id = existing_events_by_model.get(model_id)
-        if existing_event_id is not None:
-            canonical_model_destroyed_event_ids.append(existing_event_id)
+        existing_event = existing_events_by_model.get(model_id)
+        if existing_event is not None:
+            canonical_model_destroyed_event_ids.append(existing_event.event_id)
             continue
         damage_application = _destroyed_damage_application_for_model(
             application_payload=validated_application,
@@ -307,6 +338,20 @@ def record_finalized_mortal_wound_model_destructions(
             destroyed_model_placement=destroyed_model_placement,
         )
         transition_batch = BattlefieldTransitionBatch(removals=(removal,))
+        destruction_cause = record_mortal_wound_model_destruction_cause(
+            state=state,
+            application_id=requested_application_id,
+            source_rule_id=requested_rule_id,
+            source_context=validated_source_context,
+            application_payload=validated_application,
+            evidence=evidence,
+            model_instance_id=model_id,
+            physical_unit_instance_id=physical_unit_id,
+            rules_unit_instance_id=rules_unit_id,
+            logical_death_event=logical_death_events_by_model[model_id],
+            destroyed_model_placement=destroyed_model_placement,
+            removal_record=removal,
+        )
         destroyed_event = decisions.event_log.append(
             "model_destroyed",
             validate_json_value(
@@ -339,6 +384,7 @@ def record_finalized_mortal_wound_model_destructions(
                     "source_rule_id": requested_rule_id,
                     "source_effect_ids": [],
                     "mortal_wound_application_id": requested_application_id,
+                    MODEL_DESTRUCTION_CAUSE_ID_FIELD: destruction_cause.cause_id,
                     "source_context": validated_source_context,
                     "removal_record": removal.to_payload(),
                     "transition_batch": transition_batch.to_payload(),
@@ -347,6 +393,11 @@ def record_finalized_mortal_wound_model_destructions(
                     "destroyed_model_rules_triggered": False,
                 }
             ),
+        )
+        consume_mortal_wound_model_destruction_cause(
+            state=state,
+            cause_id=destruction_cause.cause_id,
+            model_destroyed_event=destroyed_event,
         )
         canonical_model_destroyed_event_ids.append(destroyed_event.event_id)
     transition_batch = BattlefieldTransitionBatch(removals=tuple(removals))
@@ -358,6 +409,7 @@ def record_finalized_mortal_wound_model_destructions(
                 "battle_round": state.battle_round,
                 "active_player_id": state.active_player_id,
                 "application_id": requested_application_id,
+                "finalization_kind": finalization_kind.value,
                 "source_rule_id": requested_rule_id,
                 "source_context": validated_source_context,
                 "target_unit_instance_id": requested_target_id,
@@ -423,6 +475,7 @@ def record_finalized_mortal_wound_progress_destructions(
         application=progress.to_application(),
         evidence=evidence,
         destroyed_model_placements=progress.destroyed_model_placements,
+        logical_death_events=progress.logical_death_events,
     )
 
 
@@ -436,6 +489,7 @@ def record_finalized_mortal_wound_application_destructions(
     application: MortalWoundApplication,
     evidence: MortalWoundDestructionEvidence,
     destroyed_model_placements: tuple[ModelPlacement, ...],
+    logical_death_events: tuple[EventRecord, ...],
 ) -> None:
     record_finalized_mortal_wound_model_destructions(
         state=state,
@@ -451,7 +505,28 @@ def record_finalized_mortal_wound_application_destructions(
         evidence=evidence,
         existing_model_destroyed_event_ids=(),
         destroyed_model_placements=destroyed_model_placements,
+        logical_death_events=logical_death_events,
+        finalization_kind=MortalWoundDestructionFinalizationKind.APPLICATION_PACKET,
     )
+
+
+def mortal_wound_destruction_finalization_kind_from_event(
+    event: EventRecord,
+) -> MortalWoundDestructionFinalizationKind:
+    if type(event) is not EventRecord or event.event_type != (
+        MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT
+    ):
+        raise GameLifecycleError("Mortal wound finalization requires its exact event.")
+    payload = event.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Mortal wound finalization payload must be an object.")
+    raw_kind = payload.get("finalization_kind")
+    if type(raw_kind) is not str:
+        raise GameLifecycleError("Mortal wound finalization kind is invalid.")
+    try:
+        return MortalWoundDestructionFinalizationKind(raw_kind)
+    except ValueError as exc:
+        raise GameLifecycleError("Mortal wound finalization kind is unsupported.") from exc
 
 
 def pre_removal_model_placement_for_mortal_wound_destruction(
@@ -489,6 +564,28 @@ def _destroyed_model_placements_by_model(
     return placements_by_model
 
 
+def _logical_death_events_by_model(
+    events: tuple[EventRecord, ...],
+) -> dict[str, EventRecord]:
+    if type(events) is not tuple:
+        raise GameLifecycleError("Mortal wound logical-death events must be a tuple.")
+    events_by_model: dict[str, EventRecord] = {}
+    previous_event_id: str | None = None
+    for event in events:
+        if type(event) is not EventRecord:
+            raise GameLifecycleError(
+                "Mortal wound logical-death events must contain EventRecord values."
+            )
+        record = model_logical_death_record_from_event(event)
+        if record.model_instance_id in events_by_model:
+            raise GameLifecycleError("Mortal wound logical-death events duplicate a model.")
+        if previous_event_id is not None and event.event_id <= previous_event_id:
+            raise GameLifecycleError("Mortal wound logical-death event order drift.")
+        previous_event_id = event.event_id
+        events_by_model[record.model_instance_id] = event
+    return events_by_model
+
+
 def validate_mortal_wound_destroyed_model_placements(
     *,
     placements: object,
@@ -517,20 +614,23 @@ def validate_mortal_wound_destroyed_model_placements(
 
 def _existing_model_destroyed_events_by_model(
     *,
+    state: GameState,
     decisions: DecisionController,
     event_ids: tuple[str, ...],
     evidence: MortalWoundDestructionEvidence,
-) -> dict[str, str]:
+) -> dict[str, EventRecord]:
     requested_event_ids = _validate_identifier_tuple(
         "existing_model_destroyed_event_ids",
         event_ids,
     )
-    records_by_id = {record.event_id: record for record in decisions.event_log.records}
-    events_by_model: dict[str, str] = {}
+    events_by_model: dict[str, EventRecord] = {}
     for event_id in requested_event_ids:
-        record = records_by_id.get(event_id)
-        if record is None or record.event_type != "model_destroyed":
+        matches = tuple(
+            record for record in decisions.event_log.records if record.event_id == event_id
+        )
+        if len(matches) != 1 or matches[0].event_type != "model_destroyed":
             raise GameLifecycleError("Existing mortal wound model-destroyed event is missing.")
+        record = matches[0]
         if not isinstance(record.payload, dict):
             raise GameLifecycleError(
                 "Existing mortal wound model-destroyed payload must be an object."
@@ -538,14 +638,109 @@ def _existing_model_destroyed_events_by_model(
         attribution = ModelDestructionAttribution.from_model_destroyed_payload(record.payload)
         if attribution != evidence.destruction_attribution:
             raise GameLifecycleError("Existing mortal wound model-destroyed attribution drift.")
+        consumed_model_destruction_cause_authority_for_event(
+            state=state,
+            event=record,
+        )
         model_id = _validate_identifier(
             "existing_model_destroyed_model_instance_id",
             record.payload.get("model_instance_id"),
         )
         if model_id in events_by_model:
             raise GameLifecycleError("Existing mortal wound model-destroyed model is duplicated.")
-        events_by_model[model_id] = event_id
+        events_by_model[model_id] = record
     return events_by_model
+
+
+def _validate_finalized_model_battlefield_state(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    model_instance_id: str,
+    existing_model_destroyed_event: EventRecord | None,
+) -> None:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Finalized mortal wound destruction requires battlefield state.")
+    current_placement = battlefield.model_placement_or_none(model_instance_id)
+    if current_placement is None:
+        return
+    if existing_model_destroyed_event is None:
+        raise GameLifecycleError("Finalized mortal wound destruction requires battlefield removal.")
+    authority = consumed_model_destruction_cause_authority_for_event(
+        state=state,
+        event=existing_model_destroyed_event,
+    )
+    destroyed_payload = existing_model_destroyed_event.payload
+    if not isinstance(destroyed_payload, dict):
+        raise GameLifecycleError("Fight On Death model-destroyed payload must be an object.")
+    raw_placement = destroyed_payload.get("destroyed_model_placement")
+    if not isinstance(raw_placement, dict):
+        raise GameLifecycleError("Fight On Death destroyed placement is missing.")
+    destroyed_placement = ModelPlacement.from_payload(cast(ModelPlacementPayload, raw_placement))
+    if (
+        authority.model_instance_id != model_instance_id
+        or authority.physical_unit_instance_id != destroyed_placement.unit_instance_id
+        or destroyed_placement.model_instance_id != model_instance_id
+        or current_placement != destroyed_placement
+    ):
+        raise GameLifecycleError("Fight On Death awaiting placement drift.")
+
+    expected_effect_id = f"fight-on-death-awaiting:{existing_model_destroyed_event.event_id}"
+    effects = tuple(
+        effect for effect in state.persisting_effects if effect.effect_id == expected_effect_id
+    )
+    if len(effects) != 1:
+        raise GameLifecycleError(
+            "Restored mortal wound casualty lacks one Fight On Death awaiting effect."
+        )
+    effect = effects[0]
+    effect_payload = effect.effect_payload
+    if (
+        not isinstance(effect_payload, dict)
+        or effect_payload.get("effect_kind") != FIGHT_ON_DEATH_AWAITING_EFFECT_KIND
+        or effect_payload.get("model_instance_id") != model_instance_id
+        or effect.target_unit_instance_ids != (authority.physical_unit_instance_id,)
+        or model_instance_id not in fight_on_death_model_ids_awaiting_attack(state=state)
+    ):
+        raise GameLifecycleError("Restored mortal wound casualty is not awaiting Fight On Death.")
+
+    indexed_records = tuple(enumerate(decisions.event_log.records))
+    destroyed_matches = tuple(
+        index for index, event in indexed_records if event == existing_model_destroyed_event
+    )
+    awaiting_matches = tuple(
+        (index, event)
+        for index, event in indexed_records
+        if event.event_type == "fight_on_death_model_awaiting_attack"
+        and isinstance(event.payload, dict)
+        and event.payload.get("effect_id") == expected_effect_id
+    )
+    if len(destroyed_matches) != 1 or len(awaiting_matches) != 1:
+        raise GameLifecycleError(
+            "Restored mortal wound casualty lacks one Fight On Death awaiting event."
+        )
+    awaiting_index, awaiting_event = awaiting_matches[0]
+    awaiting_payload = awaiting_event.payload
+    if not isinstance(awaiting_payload, dict):
+        raise GameLifecycleError("Fight On Death awaiting event payload must be an object.")
+    source_id = _validate_identifier(
+        "Fight On Death awaiting source_id",
+        awaiting_payload.get("source_id"),
+    )
+    expected_awaiting_payload = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": None if effect.started_phase is None else effect.started_phase.value,
+        "model_instance_id": model_instance_id,
+        "unit_instance_id": authority.physical_unit_instance_id,
+        "source_id": source_id,
+        "source_rule_id": effect.source_rule_id,
+        "effect_id": expected_effect_id,
+        "model_placement": destroyed_placement.to_payload(),
+    }
+    if awaiting_index <= destroyed_matches[0] or awaiting_payload != expected_awaiting_payload:
+        raise GameLifecycleError("Fight On Death awaiting event placement authority drift.")
 
 
 def _destroyed_damage_application_for_model(
@@ -598,8 +793,10 @@ __all__ = (
     "MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT",
     "MortalWoundDestructionEvidence",
     "MortalWoundDestructionEvidencePayload",
+    "MortalWoundDestructionFinalizationKind",
     "evidence_from_json",
     "evidence_to_json",
+    "mortal_wound_destruction_finalization_kind_from_event",
     "pre_removal_model_placement_for_mortal_wound_destruction",
     "record_finalized_mortal_wound_application_destructions",
     "record_finalized_mortal_wound_model_destructions",

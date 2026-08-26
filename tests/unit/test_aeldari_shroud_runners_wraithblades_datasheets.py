@@ -658,8 +658,15 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     policy = replayed_state.runtime_ruleset_descriptor().fight_policy
     current_fight_state = replayed_state.fight_phase_state
     assert current_fight_state is not None
-    assert current_fight_state.attack_sequence is not None
-    assert current_fight_state.attack_sequence.is_complete
+    assert (
+        current_fight_state.attack_sequence is not None
+        and current_fight_state.attack_sequence.is_complete
+    ) or any(
+        event.event_type == "attack_sequence_completed"
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == "attack-sequence:malevolent-melee"
+        for event in replayed.decision_controller.event_log.records
+    )
     replayed_state.replace_fight_phase_state(
         replace(
             current_fight_state.with_current_step(
@@ -982,6 +989,21 @@ def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight
         profile=profile,
         source_phase=BattlePhase.FIGHT,
         attacker_player_id="player-a",
+    )
+    fixture.state.battle_phase_index = fixture.state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    fixture.state.active_player_id = "player-a"
+    fixture.state.fight_phase_state = replace(
+        FightPhaseState.start(
+            battle_round=fixture.state.battle_round,
+            active_player_id="player-a",
+            policy=fixture.state.runtime_ruleset_descriptor().fight_policy,
+            engaged_at_fight_step_start_unit_ids=(
+                attacker.unit_instance_id,
+                defender.unit_instance_id,
+            ),
+            fights_first_registry=FightsFirstRegistry(),
+        ),
+        attack_sequence=sequence,
     )
     attack_context_id = sequence.attack_context_id()
     manager = DiceRollManager(

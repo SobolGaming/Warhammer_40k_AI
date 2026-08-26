@@ -7,6 +7,9 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    current_rules_unit_is_physically_engaged,
+)
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
@@ -24,27 +27,10 @@ def unit_within_enemy_engagement_range(
     unit_instance_id: str,
 ) -> bool:
     _require_game_state(state, operation="Engagement range check")
-    source_view = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
-    engagement_policy = state.runtime_ruleset_descriptor().engagement_policy
-    unit_models = _geometry_models_for_alive_models(
+    return current_rules_unit_is_physically_engaged(
         state=state,
-        models=source_view.alive_models(),
+        unit_instance_id=unit_instance_id,
     )
-    for enemy_view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
-        if enemy_view.owner_player_id == source_view.owner_player_id:
-            continue
-        enemy_models = _geometry_models_for_alive_models(
-            state=state,
-            models=enemy_view.alive_models(),
-        )
-        if _any_models_within_engagement_range(
-            unit_models,
-            enemy_models,
-            horizontal_inches=engagement_policy.horizontal_inches,
-            vertical_inches=engagement_policy.vertical_inches,
-        ):
-            return True
-    return False
 
 
 def rules_unit_within_friendly_keyworded_models(
@@ -150,24 +136,6 @@ def _geometry_models_for_alive_models(
         )
         for model in placed_models
     )
-
-
-def _any_models_within_engagement_range(
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-    *,
-    horizontal_inches: float,
-    vertical_inches: float,
-) -> bool:
-    for first_model in first_models:
-        for second_model in second_models:
-            if first_model.is_within_engagement_range(
-                second_model,
-                horizontal_inches=horizontal_inches,
-                vertical_inches=vertical_inches,
-            ):
-                return True
-    return False
 
 
 def _required_keyword_sequence(values: tuple[str, ...]) -> frozenset[str]:

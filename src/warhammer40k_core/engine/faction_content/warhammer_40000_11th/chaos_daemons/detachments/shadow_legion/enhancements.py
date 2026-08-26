@@ -11,9 +11,9 @@ from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
-    geometry_model_for_placement,
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -68,6 +68,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+    scenario_rules_units_are_physically_engaged,
+)
 from warhammer40k_core.engine.primary_historical_events import (
     primary_reserve_entry_source_terminal_bindings_payload,
     record_primary_reserve_entry_provider_terminal_event,
@@ -94,7 +98,6 @@ from warhammer40k_core.engine.turn_end_hooks import (
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 
 class _MaliceMadeManifestMortalWoundSourceContextPayload(TypedDict):
@@ -907,17 +910,12 @@ def _unit_is_enemy_within_mantle_of_gloom(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    target_models = _alive_geometry_models_for_rules_unit(
+    if not rules_unit_has_placed_alive_model(
         state=state,
-        scenario=scenario,
         rules_unit=target_rules_unit,
-    )
-    if not target_models:
+    ):
         return False
+    scenario = battlefield_scenario_for_state(state=state)
     for army in _shadow_legion_armies(state):
         if army.player_id == target_rules_unit.owner_player_id:
             continue
@@ -927,23 +925,23 @@ def _unit_is_enemy_within_mantle_of_gloom(
         ):
             if not _unit_has_keyword(bearer, SHADOW_LEGION_KEYWORD):
                 raise GameLifecycleError("Mantle of Gloom requires a Shadow Legion model.")
-            if not bearer.alive_own_models():
-                continue
             bearer_rules_unit = rules_unit_view_by_id(
                 state=state,
                 unit_instance_id=bearer.unit_instance_id,
             )
             if bearer_rules_unit.owner_player_id != army.player_id:
                 raise GameLifecycleError("Mantle of Gloom rules unit owner drift.")
-            bearer_models = _alive_geometry_models_for_rules_unit(
+            if not _component_unit_has_placed_alive_model(
                 state=state,
-                scenario=scenario,
                 rules_unit=bearer_rules_unit,
-            )
-            if _any_models_within_engagement_range(
-                state=state,
-                first_models=bearer_models,
-                second_models=target_models,
+                component_unit=bearer,
+            ):
+                continue
+            if scenario_rules_units_are_physically_engaged(
+                scenario=scenario,
+                ruleset_descriptor=state.runtime_ruleset_descriptor(),
+                first_unit_instance_id=bearer_rules_unit.unit_instance_id,
+                second_unit_instance_id=target_rules_unit.unit_instance_id,
             ):
                 return True
     return False
@@ -964,100 +962,69 @@ def _enemy_rules_unit_ids_within_engagement_range(
         state=state,
         unit_instance_id=bearer_unit_instance_id,
     )
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    bearer_models = _alive_geometry_models_for_rules_unit(
+    bearer_component = _component_unit_by_id(
         state=state,
-        scenario=scenario,
-        rules_unit=bearer_rules_unit,
+        unit_instance_id=bearer_unit_instance_id,
     )
-    if not bearer_models:
+    if not _component_unit_has_placed_alive_model(
+        state=state,
+        rules_unit=bearer_rules_unit,
+        component_unit=bearer_component,
+    ):
         return ()
-    enemy_rules_unit_ids: set[str] = set()
-    checked_rules_unit_ids: set[str] = set()
-    for army in state.army_definitions:
-        if army.player_id == bearer_rules_unit.owner_player_id:
-            continue
-        for unit in army.units:
-            enemy_rules_unit = rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=unit.unit_instance_id,
-            )
-            if enemy_rules_unit.unit_instance_id in checked_rules_unit_ids:
-                continue
-            checked_rules_unit_ids.add(enemy_rules_unit.unit_instance_id)
-            enemy_models = _alive_geometry_models_for_rules_unit(
-                state=state,
-                scenario=scenario,
-                rules_unit=enemy_rules_unit,
-            )
-            if _any_models_within_engagement_range(
-                state=state,
-                first_models=bearer_models,
-                second_models=enemy_models,
-            ):
-                enemy_rules_unit_ids.add(enemy_rules_unit.unit_instance_id)
-    return tuple(sorted(enemy_rules_unit_ids))
-
-
-def _alive_geometry_models_for_rules_unit(
-    *,
-    state: object,
-    scenario: BattlefieldScenario,
-    rules_unit: RulesUnitView,
-) -> tuple[GeometryModel, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Malice Made Manifest model lookup requires GameState.")
-    if type(scenario) is not BattlefieldScenario:
-        raise GameLifecycleError("Malice Made Manifest model lookup requires scenario.")
-    if type(rules_unit) is not RulesUnitView:
-        raise GameLifecycleError("Malice Made Manifest model lookup requires rules unit.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Malice Made Manifest model lookup requires battlefield_state.")
-    models: list[GeometryModel] = []
-    for component in rules_unit.components:
-        unit_placement = state.battlefield_state.unit_placement_or_none(
-            component.unit.unit_instance_id
+    scenario = battlefield_scenario_for_state(state=state)
+    return tuple(
+        enemy_unit_id
+        for enemy_unit_id in scenario_physically_engaged_enemy_rules_unit_ids(
+            scenario=scenario,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            unit_instance_id=bearer_rules_unit.unit_instance_id,
         )
-        if unit_placement is None:
-            continue
-        for model_placement in unit_placement.model_placements:
-            model = scenario.model_instance_for_placement(model_placement)
-            if not model.is_alive:
-                continue
-            models.append(
-                geometry_model_for_placement(
-                    model=model,
-                    placement=model_placement,
-                )
-            )
-    return tuple(models)
+        if rules_unit_has_placed_alive_model(
+            state=state,
+            rules_unit=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=enemy_unit_id,
+            ),
+        )
+    )
 
 
-def _any_models_within_engagement_range(
+def _component_unit_has_placed_alive_model(
     *,
     state: object,
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
+    rules_unit: RulesUnitView,
+    component_unit: UnitInstance,
 ) -> bool:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
-        raise GameLifecycleError("Malice Made Manifest engagement lookup requires GameState.")
-    engagement_policy = state.runtime_ruleset_descriptor().engagement_policy
-    for first_model in first_models:
-        for second_model in second_models:
-            if first_model.is_within_engagement_range(
-                second_model,
-                horizontal_inches=engagement_policy.horizontal_inches,
-                vertical_inches=engagement_policy.vertical_inches,
-            ):
-                return True
-    return False
+        raise GameLifecycleError("Shadow Legion model presence lookup requires GameState.")
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Shadow Legion model presence lookup requires rules unit.")
+    if type(component_unit) is not UnitInstance:
+        raise GameLifecycleError("Shadow Legion model presence lookup requires UnitInstance.")
+    return any(
+        rules_unit_has_placed_alive_model(
+            state=state,
+            rules_unit=rules_unit,
+            model_instance_id=model.model_instance_id,
+        )
+        for model in component_unit.own_models
+    )
+
+
+def _component_unit_by_id(*, state: object, unit_instance_id: str) -> UnitInstance:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Shadow Legion unit lookup requires GameState.")
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return unit
+    raise GameLifecycleError("Shadow Legion unit is unknown.")
 
 
 def _shadow_legion_armies(state: object) -> tuple[ArmyDefinition, ...]:

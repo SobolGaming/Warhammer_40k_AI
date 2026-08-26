@@ -6,6 +6,13 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.attack_sequence_imports import *
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, ModelPlacementPayload
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    MODEL_DESTRUCTION_CAUSE_ID_FIELD,
+)
+from warhammer40k_core.engine.model_destruction_cause_producers import (
+    consume_attack_damage_model_destruction_cause,
+    finalize_attack_damage_model_destruction_cause,
+)
 from warhammer40k_core.engine.primary_destruction_evidence import (
     destruction_source_objective_proximity_witness,
     rules_unit_objective_proximity_witness,
@@ -470,6 +477,16 @@ def _emit_damage_event(
         source_phase=attack_sequence.source_phase.value,
         source_event_id=damage_event.event_id,
     )
+    destruction_cause = finalize_attack_damage_model_destruction_cause(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        damage=damage,
+        damage_event=damage_event,
+        destruction_attribution=destruction_attribution,
+        destroyed_model_placement=typed_destroyed_model_placement,
+        removal_record=removal_record,
+    )
     transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
     destroyed_event = decisions.event_log.append(
         "model_destroyed",
@@ -490,14 +507,21 @@ def _emit_damage_event(
             "sequence_id": attack_sequence.sequence_id,
             "attack_context_id": attack_sequence.attack_context_id(),
             "target_unit_instance_id": damage.target_unit_instance_id,
+            "rules_unit_instance_id": destroyed_rules_unit.unit_instance_id,
             "model_instance_id": damage.model_instance_id,
             "damage_kind": damage.damage_kind.value,
             "damage_event_id": damage_event.event_id,
+            MODEL_DESTRUCTION_CAUSE_ID_FIELD: destruction_cause.cause_id,
             "removal_record": removal_record.to_payload(),
             "transition_batch": transition_batch.to_payload(),
             "destroyed_model_placement": validate_json_value(destroyed_model_placement),
             "destroyed_model_rules_triggered": True,
         },
+    )
+    consume_attack_damage_model_destruction_cause(
+        state=state,
+        cause_id=destruction_cause.cause_id,
+        model_destroyed_event=destroyed_event,
     )
     return DestroyedModelEmission(
         damage_event_id=damage_event.event_id,

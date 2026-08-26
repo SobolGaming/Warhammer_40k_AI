@@ -27,6 +27,9 @@ from warhammer40k_core.engine.lone_operative import (
     lone_operative_target_allowed,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.ranged_rule_effects import (
     detection_range_bonus_inches_for_effects,
     unit_is_hidden_by_effects,
@@ -865,7 +868,6 @@ def _target_candidate(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         attacker_unit=attacker_unit,
-        attacker_models=attacker_models,
     )
     target_engagement_context = _target_engagement_context(
         scenario=scenario,
@@ -873,7 +875,6 @@ def _target_candidate(
         attacker_owner=attacker_owner,
         target_rules_unit=target_rules_unit,
         target_unit_id=target_unit_id,
-        target_models=target_models,
     )
     if locked_context.is_locked:
         locked_validation = _locked_in_combat_validation(
@@ -1408,32 +1409,15 @@ def _locked_in_combat_context(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     attacker_unit: UnitInstance,
-    attacker_models: tuple[Model, ...],
 ) -> _LockedInCombatContext:
-    attacker_owner = _player_id_for_unit(scenario, attacker_unit.unit_instance_id)
-    engaged_unit_ids: set[str] = set()
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == attacker_owner:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            enemy_models = _geometry_models_for_unit_placement(
-                scenario=scenario,
-                unit_placement=unit_placement,
-            )
-            if _any_models_in_engagement(
-                attacker_models=attacker_models,
-                target_models=enemy_models,
-                ruleset_descriptor=ruleset_descriptor,
-            ):
-                engaged_unit_ids.add(
-                    rules_unit_view_from_armies(
-                        armies=scenario.armies,
-                        unit_instance_id=unit_placement.unit_instance_id,
-                    ).unit_instance_id
-                )
+    engaged_unit_ids = scenario_physically_engaged_enemy_rules_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_instance_id=attacker_unit.unit_instance_id,
+    )
     return _LockedInCombatContext(
         is_locked=bool(engaged_unit_ids),
-        engaged_target_unit_ids=tuple(sorted(engaged_unit_ids)),
+        engaged_target_unit_ids=engaged_unit_ids,
     )
 
 
@@ -1444,28 +1428,16 @@ def _target_engagement_context(
     attacker_owner: str,
     target_rules_unit: RulesUnitView,
     target_unit_id: str,
-    target_models: tuple[Model, ...],
 ) -> _TargetEngagementContext:
-    engaged_friendly_unit_ids: set[str] = set()
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id != attacker_owner:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            friendly_models = _geometry_models_for_unit_placement(
-                scenario=scenario,
-                unit_placement=unit_placement,
-            )
-            if _any_models_in_engagement(
-                attacker_models=friendly_models,
-                target_models=target_models,
-                ruleset_descriptor=ruleset_descriptor,
-            ):
-                engaged_friendly_unit_ids.add(
-                    rules_unit_view_from_armies(
-                        armies=scenario.armies,
-                        unit_instance_id=unit_placement.unit_instance_id,
-                    ).unit_instance_id
-                )
+    engaged_friendly_unit_ids = {
+        unit_id
+        for unit_id in scenario_physically_engaged_enemy_rules_unit_ids(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=target_unit_id,
+        )
+        if _player_id_for_unit(scenario, unit_id) == attacker_owner
+    }
     if target_unit_id in engaged_friendly_unit_ids:
         raise GameLifecycleError("Target engagement context included the target unit.")
     if set(target_rules_unit.component_unit_instance_ids) & engaged_friendly_unit_ids:
@@ -1484,24 +1456,6 @@ def _target_engagement_context(
         engaged_friendly_unit_ids=tuple(sorted(engaged_friendly_unit_ids)),
         is_engaged_only_by_friendly_fortifications=engaged_only_by_fortifications,
     )
-
-
-def _any_models_in_engagement(
-    *,
-    attacker_models: tuple[Model, ...],
-    target_models: tuple[Model, ...],
-    ruleset_descriptor: RulesetDescriptor,
-) -> bool:
-    policy = ruleset_descriptor.engagement_policy
-    for attacker_model in attacker_models:
-        for target_model in target_models:
-            if attacker_model.is_within_engagement_range(
-                target_model,
-                horizontal_inches=policy.horizontal_inches,
-                vertical_inches=policy.vertical_inches,
-            ):
-                return True
-    return False
 
 
 def _target_engagement_validation(

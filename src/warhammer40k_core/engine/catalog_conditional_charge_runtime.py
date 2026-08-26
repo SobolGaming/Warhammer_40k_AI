@@ -13,6 +13,10 @@ from warhammer40k_core.engine.abilities import (
     ability_record_is_active_generic_rule_ir,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.catalog_conditional_charge_support import (
     CATALOG_IR_FRIENDLY_ENGAGED_ANCHOR_CHARGE_CONSUMER_ID,
@@ -37,6 +41,9 @@ from warhammer40k_core.engine.charge_required_targets import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_rules_units_are_physically_engaged,
+)
 from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
 from warhammer40k_core.engine.rule_target_resolution import canonical_keyword
 from warhammer40k_core.engine.rules_units import (
@@ -147,7 +154,7 @@ class _ConditionalChargeSource:
             self.semantic.maximum_anchor_distance_inches
         ):
             return None
-        if not _models_are_engaged(context, anchor_models, enemy_models):
+        if not _models_are_engaged(context, anchor_view, enemy_view):
             return None
         return self._grant_for_current_pair(
             context=context,
@@ -523,18 +530,22 @@ def _minimum_distance(
 
 def _models_are_engaged(
     context: ChargeDeclarationContext,
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
+    first_view: RulesUnitView,
+    second_view: RulesUnitView,
 ) -> bool:
-    policy = context.state.runtime_ruleset_descriptor().engagement_policy
-    return any(
-        first.is_within_engagement_range(
-            second,
-            horizontal_inches=policy.horizontal_inches,
-            vertical_inches=policy.vertical_inches,
-        )
-        for first in first_models
-        for second in second_models
+    if not rules_unit_has_placed_alive_model(
+        state=context.state,
+        rules_unit=first_view,
+    ) or not rules_unit_has_placed_alive_model(
+        state=context.state,
+        rules_unit=second_view,
+    ):
+        return False
+    return scenario_rules_units_are_physically_engaged(
+        scenario=battlefield_scenario_for_state(state=context.state),
+        ruleset_descriptor=context.state.runtime_ruleset_descriptor(),
+        first_unit_instance_id=first_view.unit_instance_id,
+        second_unit_instance_id=second_view.unit_instance_id,
     )
 
 

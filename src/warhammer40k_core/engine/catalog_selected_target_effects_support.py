@@ -14,7 +14,10 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_presence import rules_unit_has_placed_alive_model
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
@@ -64,6 +67,9 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_rules_unit,
 )
@@ -118,9 +124,6 @@ __all__ = (
     "selected_target_effect_weapon_scope",
     "shooting_start_effect_clauses_after",
 )
-
-_ENGAGEMENT_RANGE_HORIZONTAL_INCHES = 1.0
-_ENGAGEMENT_RANGE_VERTICAL_INCHES = 5.0
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -181,10 +184,7 @@ def eligible_selection_target_unit_ids(
         return ()
     source_player = _validate_identifier("source_player_id", source_player_id)
     source_unit_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
+    scenario = battlefield_scenario_for_state(state=state)
     source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id)
     if source_rules_unit.owner_player_id != source_player:
         raise GameLifecycleError("Catalog selected-target source owner drift.")
@@ -279,6 +279,8 @@ def selection_target_conditions_apply(
         raise GameLifecycleError("Catalog selected-target selection condition is unsupported.")
     if not selection_distance_conditions_apply(
         state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
         source_rules_unit=source_rules_unit,
         source_model_instance_id=source_model_instance_id,
         target_rules_unit=target_rules_unit,
@@ -299,6 +301,8 @@ def selection_target_conditions_apply(
 def selection_distance_conditions_apply(
     *,
     state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
     source_rules_unit: RulesUnitView,
     source_model_instance_id: str | None,
     target_rules_unit: RulesUnitView,
@@ -311,10 +315,6 @@ def selection_distance_conditions_apply(
     )
     if not distance_conditions:
         return True
-    target_models = placed_alive_geometry_models_for_rules_unit(
-        state=state,
-        unit_instance_id=target_rules_unit.unit_instance_id,
-    )
     for condition in distance_conditions:
         parameters = parameter_payload(condition.parameters)
         if parameters.get("negated") is True:
@@ -334,9 +334,28 @@ def selection_distance_conditions_apply(
             condition_source_model_id = None
         else:
             raise GameLifecycleError("Catalog selected-target distance object kind is unsupported.")
-        source_models = placed_alive_geometry_models_for_rules_unit(
-            state=state,
-            unit_instance_id=source_rules_unit.unit_instance_id,
+        uses_physical_engagement_geometry = parameters.get("range_kind") == "engagement_range"
+        target_models = (
+            physical_geometry_models_for_rules_unit(
+                scenario=scenario,
+                unit_instance_id=target_rules_unit.unit_instance_id,
+            )
+            if uses_physical_engagement_geometry
+            else placed_alive_geometry_models_for_rules_unit(
+                state=state,
+                unit_instance_id=target_rules_unit.unit_instance_id,
+            )
+        )
+        source_models = (
+            physical_geometry_models_for_rules_unit(
+                scenario=scenario,
+                unit_instance_id=source_rules_unit.unit_instance_id,
+            )
+            if uses_physical_engagement_geometry and condition_source_model_id is None
+            else placed_alive_geometry_models_for_rules_unit(
+                state=state,
+                unit_instance_id=source_rules_unit.unit_instance_id,
+            )
         )
         if condition_source_model_id is not None:
             source_models = tuple(
@@ -346,6 +365,7 @@ def selection_distance_conditions_apply(
             source_models=source_models,
             target_models=target_models,
             parameters=parameters,
+            ruleset_descriptor=ruleset_descriptor,
         ):
             return False
     return True
@@ -419,13 +439,15 @@ def any_models_satisfy_distance(
     source_models: tuple[Model, ...],
     target_models: tuple[Model, ...],
     parameters: Mapping[str, RuleParameterValue],
+    ruleset_descriptor: RulesetDescriptor,
 ) -> bool:
     if parameters.get("range_kind") == "engagement_range":
+        policy = ruleset_descriptor.engagement_policy
         return any(
             source_model.is_within_engagement_range(
                 target_model,
-                horizontal_inches=_ENGAGEMENT_RANGE_HORIZONTAL_INCHES,
-                vertical_inches=_ENGAGEMENT_RANGE_VERTICAL_INCHES,
+                horizontal_inches=policy.horizontal_inches,
+                vertical_inches=policy.vertical_inches,
             )
             for source_model in source_models
             for target_model in target_models

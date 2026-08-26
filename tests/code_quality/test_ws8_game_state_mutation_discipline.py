@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 GAME_STATE_PATH = ENGINE_ROOT / "game_state.py"
 RULE_MODEL_DESTRUCTION_PATH = ENGINE_ROOT / "rule_model_destruction.py"
+RULE_MODEL_DESTRUCTION_UNPLACED_PATH = ENGINE_ROOT / "rule_model_destruction_unplaced.py"
 ATTACK_DAMAGE_RESOLUTION_PATH = ENGINE_ROOT / "attack_sequence_damage_resolution.py"
 
 # Defense-in-depth audit for the production pattern used today: functions that name
@@ -34,7 +35,7 @@ def test_engine_game_state_mutations_go_through_game_state_methods() -> None:
 def test_direct_rule_model_destruction_uses_shared_reaction_host() -> None:
     violations: list[str] = []
     for path in sorted(ENGINE_ROOT.rglob("*.py")):
-        if path == RULE_MODEL_DESTRUCTION_PATH:
+        if path in {RULE_MODEL_DESTRUCTION_PATH, RULE_MODEL_DESTRUCTION_UNPLACED_PATH}:
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         violations.extend(

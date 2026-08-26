@@ -30,8 +30,10 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-uv run pytest tests/
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 uv run lint-imports
+uv run pre-commit run --all-files
 ```
 
 ## Stub usage

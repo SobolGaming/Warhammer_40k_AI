@@ -37,7 +37,9 @@ from warhammer40k_core.engine.command_points import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+    DamageKind,
     FeelNoPainSource,
+    apply_damage_to_model,
     model_by_id,
 )
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
@@ -61,6 +63,10 @@ from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     july_2026_candidate as thousand_sons_july_candidate,
+)
+from warhammer40k_core.engine.fight_on_death import (
+    model_is_present_on_battlefield,
+    restore_model_awaiting_fight_on_death,
 )
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
@@ -3046,6 +3052,71 @@ def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
     assert 0 <= cast(int, event["enemy_mortal_wounds"]) <= 6
 
 
+def test_phase15e_crushing_impact_rejects_retained_destroyed_source_model() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    state.active_player_id = "player-a"
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Vehicle", "Monster"),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=source_unit_id,
+        poses=tuple(Pose.at(x=index * 4.0, y=0.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-unit",
+        poses=tuple(Pose.at(x=2.0 + index * 4.0, y=0.0) for index in range(5)),
+    )
+    source_model_id = _first_model_id(state, unit_instance_id=source_unit_id)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_placement = battlefield.model_placement_by_id(source_model_id)
+    source_model = model_by_id(state=state, model_instance_id=source_model_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=source_unit_id,
+        model_instance_id=source_model_id,
+        damage=source_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id="phase12c:fight-on-death:crushing-impact-source",
+        source_rule_id="phase12c:test:fight-on-death",
+        source_phase=BattlePhase.CHARGE,
+    )
+    assert model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=source_model_id,
+    )
+    assert not model_by_id(state=state, model_instance_id=source_model_id).is_alive
+    _grant_cp(state, player_id="player-a", amount=1)
+
+    status = _submit_source_stratagem_target(
+        lifecycle,
+        stratagem_id="crushing-impact",
+        player_id="player-a",
+        target_unit_id=source_unit_id,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        result_id="phase15e-crushing-impact-retained-source-model",
+        effect_selection={
+            CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY: "army-beta:enemy-unit",
+            CRUSHING_IMPACT_MODEL_CONTEXT_KEY: source_model_id,
+        },
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.payload == {"invalid_reason": "crushing_impact_model_not_alive_and_placed"}
+    assert state.command_point_total("player-a") == 1
+
+
 def test_phase15e_epic_challenge_registers_selected_character_model_precision() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
@@ -5359,6 +5430,87 @@ def test_engaged_fall_back_policy_validates_snapshot_and_enemy_context(
     assert _invalid_reason_or_none(status) == expected_reason
 
 
+def test_engaged_fall_back_policy_can_target_fight_on_death_only_unit_from_snapshot() -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:enemy-unit"
+    _replace_unit_poses(
+        state,
+        unit_instance_id=target_unit_id,
+        poses=tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id=enemy_unit_id,
+        poses=tuple(Pose.at(x=2.0 + index * 2.0, y=0.0) for index in range(5)),
+    )
+    target_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == target_unit_id
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_placement = battlefield.model_placement_by_id(
+        target_unit.own_models[0].model_instance_id
+    )
+    for model in target_unit.own_models:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=target_unit_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_placement,
+        effect_id="phase12c:fight-on-death:engaged-fall-back-target",
+        source_rule_id="phase12c:test:fight-on-death",
+        source_phase=BattlePhase.MOVEMENT,
+    )
+    retained_model_id = retained_placement.model_instance_id
+    assert model_is_present_on_battlefield(
+        state=state,
+        model_instance_id=retained_model_id,
+    )
+    assert not model_by_id(state=state, model_instance_id=retained_model_id).is_alive
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_payload={
+            FALL_BACK_UNIT_CONTEXT_KEY: enemy_unit_id,
+            ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: [target_unit_id],
+        },
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_id=target_unit_id,
+        player_id="player-a",
+    )
+
+    assert status is None
+
+    current_physical_status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+        trigger_payload={FALL_BACK_UNIT_CONTEXT_KEY: enemy_unit_id},
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_id=target_unit_id,
+        player_id="player-a",
+    )
+
+    assert current_physical_status is None
+
+
 @pytest.mark.parametrize(
     ("scenario", "expected_reason"),
     [
@@ -6302,7 +6454,15 @@ def _remove_first_models(state: GameState, *, unit_instance_id: str, count: int)
     removed_ids = tuple(
         placement.model_instance_id for placement in unit_placement.model_placements[:count]
     )
-    state.battlefield_state = state.battlefield_state.with_removed_models(removed_ids)
+    for model_id in removed_ids:
+        model = model_by_id(state=state, model_instance_id=model_id)
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=unit_instance_id,
+            model_instance_id=model_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
 
 
 def _record_secondary_choices(

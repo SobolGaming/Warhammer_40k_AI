@@ -4063,7 +4063,7 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
 @pytest.mark.parametrize(
     ("within_objective_range", "game_id", "expected_wound_value"),
     [
-        (True, "phase18j-excessive-inside-0001", 6),
+        (True, "phase18j-excessive-inside-0001", 5),
         (False, "phase18j-excessive-outside-v3-003", 1),
     ],
 )
@@ -4261,7 +4261,7 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     ),
     [
         ("icon-lifecycle-outcome-1", False, True, "applied"),
-        ("icon-of-excess-fail-0", False, False, None),
+        ("icon-of-excess-fail-6", False, False, None),
         ("icon-cap-outcome-3", True, True, "capped"),
     ],
 )

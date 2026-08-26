@@ -32,6 +32,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookRegistry,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -51,6 +52,7 @@ from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityContext
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -105,6 +107,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
 )
 from warhammer40k_core.engine.turn_start_engagement import (
     TURN_START_ENGAGEMENT_SNAPSHOT_EFFECT_KIND,
+    _engaged_unit_pairs,  # pyright: ignore[reportPrivateUsage]
     record_turn_start_engagement_snapshot,
     turn_start_enemy_unit_ids_for_friendly_unit,
 )
@@ -894,6 +897,143 @@ def test_turn_start_engagement_snapshot_is_idempotent_and_fails_fast() -> None:
             battle_round=state.battle_round,
             friendly_unit_instance_id=EMPERORS_CHILDREN_UNIT_ID,
         )
+
+
+def test_turn_start_engagement_snapshot_uses_fight_on_death_physical_presence() -> None:
+    state = _emperors_children_battle_state()
+    assert state.battlefield_state is not None
+    friendly_placement = state.battlefield_state.unit_placement_by_id(EMPERORS_CHILDREN_UNIT_ID)
+    enemy_placement = state.battlefield_state.unit_placement_by_id(ENEMY_UNIT_ID)
+    retained_enemy_placement = enemy_placement.model_placements[0].with_pose(
+        Pose.at(21.0, 20.0, facing_degrees=180.0)
+    )
+    friendly_placements = tuple(
+        placement.with_pose(Pose.at(20.0, 20.0) if index == 0 else Pose.at(5.0 + index, 5.0))
+        for index, placement in enumerate(friendly_placement.model_placements)
+    )
+    enemy_placements = (
+        retained_enemy_placement,
+        *tuple(
+            placement.with_pose(Pose.at(50.0 + index, 40.0, facing_degrees=180.0))
+            for index, placement in enumerate(enemy_placement.model_placements[1:])
+        ),
+    )
+    battlefield = state.battlefield_state.with_unit_placement(
+        friendly_placement.with_model_placements(friendly_placements)
+    ).with_unit_placement(enemy_placement.with_model_placements(enemy_placements))
+    updated_armies = tuple(
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == ENEMY_UNIT_ID
+                else unit
+                for unit in army.units
+            ),
+        )
+        for army in state.army_definitions
+    )
+    retained_scenario = BattlefieldScenario(
+        armies=updated_armies,
+        battlefield_state=battlefield,
+        present_destroyed_model_ids=(retained_enemy_placement.model_instance_id,),
+    )
+    friendly = (battlefield.unit_placement_by_id(EMPERORS_CHILDREN_UNIT_ID),)
+    enemy = (battlefield.unit_placement_by_id(ENEMY_UNIT_ID),)
+
+    assert _engaged_unit_pairs(
+        scenario=retained_scenario,
+        friendly_placements=friendly,
+        enemy_placements=enemy,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    ) == (
+        {
+            "friendly_unit_instance_id": EMPERORS_CHILDREN_UNIT_ID,
+            "enemy_unit_instance_id": ENEMY_UNIT_ID,
+        },
+    )
+    assert (
+        _engaged_unit_pairs(
+            scenario=replace(retained_scenario, present_destroyed_model_ids=()),
+            friendly_placements=friendly,
+            enemy_placements=enemy,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        )
+        == ()
+    )
+
+
+def test_turn_start_engagement_snapshot_reconciles_attached_unit_split() -> None:
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 22.0),
+            "enemy": Pose.at(12.0, 20.0, facing_degrees=180.0),
+        },
+        game_id="phase17g-turn-start-attached-lineage",
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+        },
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    state = _state(lifecycle)
+    source_army = state.army_definition_for_player("player-a")
+    assert source_army is not None
+    attached = source_army.attached_units[0]
+    enemy_id = units["enemy"].unit_instance_id
+
+    snapshot = record_turn_start_engagement_snapshot(state=state, player_id="player-a")
+
+    assert snapshot is not None
+    assert turn_start_enemy_unit_ids_for_friendly_unit(
+        state,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        friendly_unit_instance_id=attached.attached_unit_instance_id,
+    ) == (enemy_id,)
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached.attached_unit_instance_id,
+        surviving_unit_instance_ids=attached.component_unit_instance_ids,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+
+    assert all(
+        turn_start_enemy_unit_ids_for_friendly_unit(
+            state,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            friendly_unit_instance_id=component_id,
+        )
+        == (enemy_id,)
+        for component_id in attached.component_unit_instance_ids
+    )
+
+    restored = GameState.from_payload(state.to_payload())
+    assert restored.to_payload() == state.to_payload()
+    assert all(
+        turn_start_enemy_unit_ids_for_friendly_unit(
+            restored,
+            player_id="player-a",
+            battle_round=restored.battle_round,
+            friendly_unit_instance_id=component_id,
+        )
+        == (enemy_id,)
+        for component_id in attached.component_unit_instance_ids
+    )
 
 
 def _emperors_children_lifecycle_to_movement_unit_selection(

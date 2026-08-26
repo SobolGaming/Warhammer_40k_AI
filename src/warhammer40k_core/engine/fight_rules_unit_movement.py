@@ -19,6 +19,12 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.fight_movement_mode_authority import (
+    legal_consolidation_modes as _legal_consolidation_modes,
+)
+from warhammer40k_core.engine.fight_movement_mode_authority import (
+    legal_pile_in_target_rules_unit_ids as _legal_pile_in_target_rules_unit_ids,
+)
 from warhammer40k_core.engine.fight_movement_source import (
     fight_movement_source_component_placement as _movement_source_component_placement,
 )
@@ -43,7 +49,6 @@ from warhammer40k_core.engine.fight_movement_source import (
 )
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ENEMY_DISTANCE_INCHES,
-    PILE_IN_TARGET_DISTANCE_INCHES,
     FightMovementEndpointPayload,
     FightMovementProposal,
     FightMovementResolution,
@@ -63,8 +68,13 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalValidationResult,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
+    placed_alive_rules_unit_views,
     rules_unit_identity_ids,
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
@@ -119,30 +129,11 @@ def legal_rules_unit_pile_in_target_unit_ids(
     unit_instance_id: str,
     state: GameState,
 ) -> tuple[str, ...]:
-    rules_unit = _canonical_rules_unit(state=state, unit_instance_id=unit_instance_id)
-    engaged = _engaged_enemy_rules_unit_ids(
+    return _legal_pile_in_target_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        rules_unit=rules_unit,
+        unit_instance_id=unit_instance_id,
         state=state,
-    )
-    if engaged:
-        return engaged
-    source_models = _movement_source_geometry_models_for_rules_unit(
-        scenario=scenario,
-        rules_unit=rules_unit,
-    )
-    return tuple(
-        target.unit_instance_id
-        for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
-        if _closest_distance(
-            source_models,
-            _measurement_target_geometry_models_for_rules_unit(
-                scenario=scenario,
-                rules_unit=target,
-            ),
-        )
-        <= PILE_IN_TARGET_DISTANCE_INCHES
     )
 
 
@@ -154,44 +145,13 @@ def legal_rules_unit_consolidation_modes(
     objective_markers: tuple[ObjectiveMarker, ...],
     state: GameState,
 ) -> tuple[ConsolidationModeKind, ...]:
-    rules_unit = _canonical_rules_unit(state=state, unit_instance_id=unit_instance_id)
-    if _engaged_enemy_rules_unit_ids(
+    return _legal_consolidation_modes(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        rules_unit=rules_unit,
+        unit_instance_id=unit_instance_id,
+        objective_markers=objective_markers,
         state=state,
-    ):
-        return (ConsolidationModeKind.ONGOING,)
-    source_models = _movement_source_geometry_models_for_rules_unit(
-        scenario=scenario,
-        rules_unit=rules_unit,
     )
-    if any(
-        _closest_distance(
-            source_models,
-            _measurement_target_geometry_models_for_rules_unit(
-                scenario=scenario,
-                rules_unit=target,
-            ),
-        )
-        <= CONSOLIDATE_ENEMY_DISTANCE_INCHES
-        for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
-    ):
-        return (ConsolidationModeKind.ENGAGING,)
-    source_placements = _movement_source_model_placements(
-        scenario=scenario,
-        rules_unit=rules_unit,
-    )
-    if any(
-        _rules_unit_distance_to_objective(
-            model_placements=source_placements,
-            objective_marker=marker,
-        )
-        <= 3.0
-        for marker in objective_markers
-    ):
-        return (ConsolidationModeKind.OBJECTIVE,)
-    return ()
 
 
 def fight_rules_unit_movement_rule_validation(
@@ -679,13 +639,12 @@ def _pile_in_rule_validation(
             message="Pile In movement requires one or more target units.",
             field="pile_in_target_unit_instance_ids",
         )
-    engaged = _engaged_enemy_rules_unit_ids(
+    physically_engaged_ids = scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        rules_unit=rules_unit,
-        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
     )
-    if engaged and set(selected) != set(engaged):
+    if physically_engaged_ids and set(selected) != set(legal_targets):
         return _invalid(
             request=request,
             code="pile_in_engaged_targets_must_be_complete",
@@ -722,13 +681,28 @@ def _consolidation_rule_validation(
             message="Consolidation movement requires a consolidation mode.",
             field="consolidation_mode",
         )
-    engaged = _engaged_enemy_rules_unit_ids(
+    targetable_enemy_ids = {
+        target.unit_instance_id for target in _enemy_rules_units(state=state, rules_unit=rules_unit)
+    }
+    physically_engaged_ids = scenario_physically_engaged_enemy_rules_unit_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        rules_unit=rules_unit,
-        state=state,
+        unit_instance_id=rules_unit.unit_instance_id,
     )
-    if engaged:
+    engaged = tuple(
+        target_id for target_id in physically_engaged_ids if target_id in targetable_enemy_ids
+    )
+    if physically_engaged_ids:
+        if not engaged:
+            return _invalid(
+                request=request,
+                code="consolidation_no_selectable_engaged_target",
+                message=(
+                    "Physical Engagement with only destroyed enemy units grants no "
+                    "Consolidation target."
+                ),
+                field="consolidation_mode",
+            )
         if mode is not ConsolidationModeKind.ONGOING:
             return _invalid_consolidation_mode(request=request, expected="ongoing")
         if set(proposal.consolidate_target_unit_instance_ids) != set(engaged):
@@ -742,9 +716,9 @@ def _consolidation_rule_validation(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
         )
-    source_models = _movement_source_geometry_models_for_rules_unit(
+    source_models = physical_geometry_models_for_rules_unit(
         scenario=scenario,
-        rules_unit=rules_unit,
+        unit_instance_id=rules_unit.unit_instance_id,
     )
     enemies_within_three = tuple(
         target.unit_instance_id
@@ -831,21 +805,21 @@ def _endpoint_validation(
         placement=after,
     )
     after_by_id = {model.model_id: model for model in after_models}
+    enemy_models_before = _enemy_geometry_models(
+        scenario=before_scenario,
+        state=state,
+        player_id=rules_unit.owner_player_id,
+    )
+    for model in before_models:
+        if (
+            any(model.range_to(enemy) <= _BASE_CONTACT_EPSILON for enemy in enemy_models_before)
+            and after_by_id[model.model_id].pose != model.pose
+        ):
+            return _endpoint_invalid(request=request, code="base_contact_model_moved")
     if proposal.proposal_kind is ProposalKind.PILE_IN or proposal.consolidation_mode in {
         ConsolidationModeKind.ONGOING,
         ConsolidationModeKind.ENGAGING,
     }:
-        enemy_models_before = _enemy_geometry_models(
-            scenario=before_scenario,
-            state=state,
-            player_id=rules_unit.owner_player_id,
-        )
-        for model in before_models:
-            if (
-                any(model.range_to(enemy) <= _BASE_CONTACT_EPSILON for enemy in enemy_models_before)
-                and after_by_id[model.model_id].pose != model.pose
-            ):
-                return _endpoint_invalid(request=request, code="base_contact_model_moved")
         closer_violation = _moved_model_closer_violation(
             before_scenario=before_scenario,
             after_scenario=after_scenario,
@@ -901,11 +875,10 @@ def _endpoint_validation(
                 )
         return None
     if proposal.consolidation_mode is ConsolidationModeKind.OBJECTIVE:
-        if _engaged_enemy_rules_unit_ids(
+        if scenario_physically_engaged_enemy_rules_unit_ids(
             scenario=after_scenario,
             ruleset_descriptor=ruleset_descriptor,
-            rules_unit=rules_unit,
-            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
         ):
             return _endpoint_invalid(
                 request=request,
@@ -973,7 +946,7 @@ def _continuing_engagement_violation(
     state: GameState,
 ) -> str | None:
     after_by_id = {model.model_id: model for model in after_models}
-    for target in _enemy_rules_units(state=state, rules_unit=rules_unit):
+    for target in _physical_enemy_rules_units(state=state, rules_unit=rules_unit):
         target_before = _measurement_target_geometry_models_for_rules_unit(
             scenario=before_scenario,
             rules_unit=target,
@@ -1350,6 +1323,18 @@ def _require_witness_matches_placement(
 
 
 def _enemy_rules_units(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+) -> tuple[RulesUnitView, ...]:
+    return tuple(
+        view
+        for view in placed_alive_rules_unit_views(state=state)
+        if view.owner_player_id != rules_unit.owner_player_id
+    )
+
+
+def _physical_enemy_rules_units(
     *,
     state: GameState,
     rules_unit: RulesUnitView,

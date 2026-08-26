@@ -230,9 +230,10 @@ def fight_movement_source_scenario(
 ) -> BattlefieldScenario:
     """Build the resolver view with only living source models as movable models.
 
-    Retained destroyed models belonging to other rules units remain present so they
-    can still serve as measurement targets. Retained destroyed source placements
-    are validated separately as fixed friendly bases.
+    Retained destroyed models belonging to other rules units remain present as
+    collision geometry and, for a selectable mixed target rules unit, measurement
+    geometry. Retained destroyed source placements are validated separately as fixed
+    friendly bases.
     """
     attempted_by_component_id = {
         placement.unit_instance_id: placement for placement in component_unit_placements

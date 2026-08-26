@@ -12,6 +12,9 @@ from warhammer40k_core.engine.phases.shooting_requests import *
 from warhammer40k_core.engine.phases.shooting_unit_selection import *
 from warhammer40k_core.engine.phases.shooting_decisions import *
 from warhammer40k_core.engine.phases.shooting_declaration_validation import *
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.shooting_selection_range import (
     target_within_shooting_selection_range,
 )
@@ -281,40 +284,17 @@ def _rules_unit_within_enemy_engagement_range(
     rules_unit: RulesUnitView,
     player_id: str,
 ) -> bool:
-    unit_placements = _unit_placements_for_rules_unit_or_none(
-        scenario=scenario,
-        rules_unit=rules_unit,
-    )
-    if unit_placements is None:
-        return False
-    policy = ruleset_descriptor.engagement_policy
-    friendly_models = tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
+    if rules_unit.owner_player_id != player_id:
+        raise GameLifecycleError(
+            "Shooting Engagement Range query player does not own the rules unit."
         )
-        for unit_placement in unit_placements
-        for model_placement in unit_placement.model_placements
+    return bool(
+        scenario_physically_engaged_enemy_rules_unit_ids(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
     )
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == player_id:
-            continue
-        for enemy_unit_placement in placed_army.unit_placements:
-            for enemy_model_placement in enemy_unit_placement.model_placements:
-                enemy_model = geometry_model_for_placement(
-                    model=scenario.model_instance_for_placement(enemy_model_placement),
-                    placement=enemy_model_placement,
-                )
-                if any(
-                    friendly_model.is_within_engagement_range(
-                        enemy_model,
-                        horizontal_inches=policy.horizontal_inches,
-                        vertical_inches=policy.vertical_inches,
-                    )
-                    for friendly_model in friendly_models
-                ):
-                    return True
-    return False
 
 
 def _target_visible_to_friendly_unit(

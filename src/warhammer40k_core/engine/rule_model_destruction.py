@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import rule_deadly_demise_mortal_wound_routing as _r
 from warhammer40k_core.engine.attached_unit_reconciliation import (
     split_attached_rules_unit_if_required,
 )
@@ -18,7 +19,6 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     DamageApplication,
     DestructionReactionDecision,
     DestructionReactionKind,
@@ -29,9 +29,7 @@ from warhammer40k_core.engine.damage_allocation import (
     build_destruction_reaction_request,
     continue_mortal_wound_application,
     destroy_model_by_rule,
-    is_mortal_wound_feel_no_pain_request,
     model_owner_player_id,
-    mortal_wound_feel_no_pain_source_context,
     remove_destroyed_model_from_battlefield,
     resolve_mortal_wound_feel_no_pain_decision,
     unit_owner_player_id,
@@ -60,6 +58,12 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_on_death import (
     restore_selected_model_awaiting_fight_on_death,
 )
+from warhammer40k_core.engine.model_destruction_cause_producers import (
+    append_rule_effect_model_destroyed_event as _append_model_destroyed,
+)
+from warhammer40k_core.engine.model_destruction_cause_producers import (
+    reserve_rule_effect_model_destruction_cause as _reserve_destruction_cause,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -81,6 +85,9 @@ from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     destroyed_damage_applications,
     destruction_provenance_from_rule_context,
 )
+from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
+    RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
+)
 from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
     DEFER_ATTACHED_SPLIT_FIELD,
     defer_attached_split_from_rule_destruction_context,
@@ -97,8 +104,9 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND = "rule_model_destruction_deadly_demise"
 RULE_MODEL_DESTRUCTION_FINALIZED_EVENT = "rule_model_destruction_finalized"
+is_rule_model_destruction_mortal_wound_request = _r.is_rule_model_destruction_mortal_wound_request
+_mortal_wound_waiting_status = _r.rule_deadly_demise_mortal_wound_waiting_status
 
 
 @dataclass(frozen=True, slots=True)
@@ -180,7 +188,9 @@ def destroy_model_with_rule_reactions(
         raise GameLifecycleError("Rule destruction requires DecisionController.")
     if state.current_battle_phase is not source_phase:
         raise GameLifecycleError("Rule destruction source phase drift.")
-    active_player_id = _active_player_id(state)
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise GameLifecycleError("Rule destruction requires active player.")
     physical_unit_id = state.unit_instance_id_for_model(requested_model_id)
     controller_player_id = model_owner_player_id(
         state=state,
@@ -254,15 +264,6 @@ def destroy_model_with_rule_reactions(
     )
 
 
-def is_rule_model_destruction_mortal_wound_request(request: DecisionRequest) -> bool:
-    if not is_mortal_wound_feel_no_pain_request(request):
-        return False
-    source_context = mortal_wound_feel_no_pain_source_context(request)
-    return isinstance(source_context, dict) and source_context.get("source_kind") == (
-        RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND
-    )
-
-
 def invalid_rule_model_destruction_mortal_wound_status(
     *,
     state: GameState,
@@ -273,7 +274,7 @@ def invalid_rule_model_destruction_mortal_wound_status(
         raise GameLifecycleError("Rule destruction mortal-wound request kind drift.")
     try:
         result.validate_for_request(request)
-        source_context = _rule_deadly_demise_source_context(request)
+        source_context = _r.rule_deadly_demise_source_context(request)
         root_context = _payload_object_value(source_context, "root_context")
         _validate_pre_removal_context_matches_state(state=state, context=root_context)
     except GameLifecycleError as exc:
@@ -301,9 +302,18 @@ def apply_rule_model_destruction_mortal_wound_decision(
     request = record.request
     if not is_rule_model_destruction_mortal_wound_request(request):
         raise GameLifecycleError("Rule destruction mortal-wound result request kind drift.")
-    source_context = _rule_deadly_demise_source_context(request)
+    source_context = _r.rule_deadly_demise_source_context(request)
     root_context = _payload_object_value(source_context, "root_context")
     _validate_pre_removal_context_matches_state(state=state, context=root_context)
+    source = DestructionReactionSource.from_payload(
+        cast(DestructionReactionSourcePayload, _payload_object_value(source_context, "source"))
+    )
+    request_payload = request.payload
+    if not isinstance(request_payload, dict):
+        raise GameLifecycleError("Rule destruction mortal-wound request payload drift.")
+    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
+        request_payload.get("lost_wound_context")
+    )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
@@ -313,15 +323,19 @@ def apply_rule_model_destruction_mortal_wound_decision(
         next_request_id=state.next_decision_request_id(),
         dice_manager=manager,
         remove_destroyed_models=False,
+        logical_death_recorder=_r.rule_deadly_demise_logical_death_recorder(
+            state=state,
+            decisions=decisions,
+            parent_root_context=root_context,
+            source=source,
+            progress=progress,
+        ),
     )
     if routed.request is not None:
         decisions.request_decision(routed.request)
         return _mortal_wound_waiting_status(state=state, request=routed.request)
     if routed.application is None:
         raise GameLifecycleError("Rule destruction mortal wounds did not produce application.")
-    source = DestructionReactionSource.from_payload(
-        cast(DestructionReactionSourcePayload, _payload_object_value(source_context, "source"))
-    )
     descriptor = _payload_object_value(source_context, "descriptor")
     trigger_roll = validate_json_value(source_context.get("trigger_roll"))
     affected_target_ids = _payload_identifier_list(source_context, "affected_target_unit_ids")
@@ -482,6 +496,11 @@ def _continue_rule_deadly_demise_sources(
     root_context: dict[str, JsonValue],
     sources: tuple[DestructionReactionSource, ...],
 ) -> LifecycleStatus | None:
+    _reserve_destruction_cause(
+        state=state,
+        decisions=decisions,
+        root_context=root_context,
+    )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     model_id = _payload_string(root_context, "model_instance_id")
     controller_player_id = _payload_string(root_context, "destroyed_model_controller_player_id")
@@ -575,6 +594,7 @@ def _route_rule_deadly_demise_targets(
                 "pending_sources": [item.to_payload() for item in pending_sources],
             }
         )
+        logical_death_binding = _r.rule_deadly_demise_logical_death_binding()
         progress = MortalWoundApplicationProgress.start(
             application_id=(
                 f"{_payload_string(root_context, 'source_result_id')}:deadly-demise:"
@@ -587,6 +607,7 @@ def _route_rule_deadly_demise_targets(
             mortal_wounds=mortal_wounds,
             spill_over=True,
             destruction_evidence=None,
+            logical_death_cause_binding=logical_death_binding,
         )
         routed = continue_mortal_wound_application(
             state=state,
@@ -595,6 +616,12 @@ def _route_rule_deadly_demise_targets(
             progress=progress,
             dice_manager=manager,
             remove_destroyed_models=False,
+            logical_death_recorder=_r.rule_deadly_demise_logical_death_recorder(
+                state=state,
+                decisions=decisions,
+                parent_root_context=root_context,
+                source=source,
+            ),
         )
         if routed.request is not None:
             decisions.request_decision(routed.request)
@@ -625,23 +652,6 @@ def _route_rule_deadly_demise_targets(
         if status is not None:
             return status
     return None
-
-
-def _mortal_wound_waiting_status(*, state: GameState, request: DecisionRequest) -> LifecycleStatus:
-    phase = state.current_battle_phase
-    if phase is None:
-        raise GameLifecycleError("Rule destruction mortal wounds require a battle phase.")
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload=validate_json_value(
-            {
-                "phase": phase.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-                "source_kind": RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
-            }
-        ),
-    )
 
 
 def _remove_rule_destroyed_model_and_continue(
@@ -703,39 +713,37 @@ def _remove_rule_destroyed_model_and_continue(
         attribution=attribution,
         destroyed_model_placement=destroyed_model_placement,
     )
-    destroyed_event = decisions.event_log.append(
-        "model_destroyed",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": _payload_string(root_context, "active_player_id"),
-                "phase": _payload_string(root_context, "phase"),
-                **attribution.to_payload(),
-                "source_rules_unit_objective_proximity_witness": (
-                    None
-                    if source_rules_unit_objective_witness is None
-                    else source_rules_unit_objective_witness.to_payload()
-                ),
-                "destroyed_rules_unit_objective_proximity_witness": (
-                    destroyed_rules_unit_objective_witness.to_payload()
-                ),
-                "target_unit_instance_id": physical_unit_id,
-                "rules_unit_instance_id": rules_unit_id,
-                "model_instance_id": model_id,
-                "damage_kind": None if damage is None else damage.damage_kind.value,
-                "damage_event_id": None,
-                "source_rule_id": _payload_string(root_context, "source_rule_id"),
-                "source_effect_ids": list(
-                    _payload_identifier_list(root_context, "source_effect_ids")
-                ),
-                "removal_record": removal_record.to_payload(),
-                "transition_batch": transition_batch.to_payload(),
-                "destroyed_model_placement": root_context.get("destroyed_model_placement"),
-                "damage_application": None if damage is None else damage.to_payload(),
-                "destroyed_model_rules_triggered": True,
-            }
-        ),
+    destroyed_event = _append_model_destroyed(
+        state=state,
+        decisions=decisions,
+        root_context=root_context,
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": _payload_string(root_context, "active_player_id"),
+            "phase": _payload_string(root_context, "phase"),
+            **attribution.to_payload(),
+            "source_rules_unit_objective_proximity_witness": (
+                None
+                if source_rules_unit_objective_witness is None
+                else source_rules_unit_objective_witness.to_payload()
+            ),
+            "destroyed_rules_unit_objective_proximity_witness": (
+                destroyed_rules_unit_objective_witness.to_payload()
+            ),
+            "target_unit_instance_id": physical_unit_id,
+            "rules_unit_instance_id": rules_unit_id,
+            "model_instance_id": model_id,
+            "damage_kind": None if damage is None else damage.damage_kind.value,
+            "damage_event_id": None,
+            "source_rule_id": _payload_string(root_context, "source_rule_id"),
+            "source_effect_ids": list(_payload_identifier_list(root_context, "source_effect_ids")),
+            "removal_record": removal_record.to_payload(),
+            "transition_batch": transition_batch.to_payload(),
+            "destroyed_model_placement": root_context.get("destroyed_model_placement"),
+            "damage_application": None if damage is None else damage.to_payload(),
+            "destroyed_model_rules_triggered": True,
+        },
     )
     destruction_context = cast(
         dict[str, JsonValue],
@@ -903,24 +911,38 @@ def _continue_rule_deadly_demise_secondary_destroyed_models(
     pending_sources: tuple[DestructionReactionSource, ...],
     secondary_damage_applications: tuple[DamageApplication, ...],
 ) -> LifecycleStatus | None:
-    for damage_index, damage in enumerate(secondary_damage_applications):
-        continuation = RuleDeadlyDemiseSecondaryContinuation(
-            root_context=root_context,
-            source=source,
-            descriptor=descriptor,
-            trigger_roll_payload=trigger_roll_payload,
-            affected_target_unit_ids=affected_target_unit_ids,
-            pending_target_unit_ids=pending_target_unit_ids,
-            pending_sources=pending_sources,
-            pending_secondary_damage_applications=secondary_damage_applications[damage_index + 1 :],
-        ).to_payload()
-        secondary_context = build_rule_deadly_demise_secondary_root_context(
+    secondary_contexts = tuple(
+        build_rule_deadly_demise_secondary_root_context(
             state=state,
             parent_root_context=root_context,
             source=source,
             damage=damage,
-            completion_continuation=continuation,
+            completion_continuation=RuleDeadlyDemiseSecondaryContinuation(
+                root_context=root_context,
+                source=source,
+                descriptor=descriptor,
+                trigger_roll_payload=trigger_roll_payload,
+                affected_target_unit_ids=affected_target_unit_ids,
+                pending_target_unit_ids=pending_target_unit_ids,
+                pending_sources=pending_sources,
+                pending_secondary_damage_applications=secondary_damage_applications[
+                    damage_index + 1 :
+                ],
+            ).to_payload(),
         )
+        for damage_index, damage in enumerate(secondary_damage_applications)
+    )
+    for secondary_context in secondary_contexts:
+        _reserve_destruction_cause(
+            state=state,
+            decisions=decisions,
+            root_context=secondary_context,
+        )
+    for damage, secondary_context in zip(
+        secondary_damage_applications,
+        secondary_contexts,
+        strict=True,
+    ):
         sources = state.destruction_reaction_sources_for_model(
             model_instance_id=damage.model_instance_id
         )
@@ -1451,23 +1473,6 @@ def _payload_source_tuple(
         DestructionReactionSource.from_payload(cast(DestructionReactionSourcePayload, item))
         for item in value
     )
-
-
-def _rule_deadly_demise_source_context(
-    request: DecisionRequest,
-) -> dict[str, JsonValue]:
-    source_context = mortal_wound_feel_no_pain_source_context(request)
-    if not isinstance(source_context, dict):
-        raise GameLifecycleError("Rule destruction mortal-wound source context must be an object.")
-    if source_context.get("source_kind") != RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND:
-        raise GameLifecycleError("Rule destruction mortal-wound source kind drift.")
-    return source_context
-
-
-def _active_player_id(state: GameState) -> str:
-    if state.active_player_id is None:
-        raise GameLifecycleError("Rule destruction requires active player.")
-    return state.active_player_id
 
 
 def _validate_identifier_tuple(

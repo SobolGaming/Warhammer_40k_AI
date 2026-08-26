@@ -9,7 +9,7 @@ uv python install 3.14.5
 uv lock
 uv sync
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
-  uv run pytest
+  uv run pytest -n auto --dist=worksteal tests/
 ```
 
 ## Test commands
@@ -502,9 +502,11 @@ Milestone A is complete only when these commands pass:
 
 ```bash
 uv run ruff check .
+uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-uv run pytest
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 uv run lint-imports
 uv run pre-commit run --all-files
 ```

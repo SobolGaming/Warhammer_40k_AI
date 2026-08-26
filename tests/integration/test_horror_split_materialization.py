@@ -114,6 +114,7 @@ from warhammer40k_core.engine.phases.movement import MovementPhaseHandler
 from warhammer40k_core.engine.phases.shooting import (
     OutOfPhaseShootingState,
     ShootingPhaseHandler,
+    ShootingPhaseState,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue, ReactionQueueFrame
 from warhammer40k_core.engine.rule_model_destruction import (
@@ -559,7 +560,7 @@ def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() ->
     attack_sequence = AttackSequence.start(
         sequence_id="real-hazardous:horror-split",
         attacker_player_id=scenario.source_army.player_id,
-        attacking_unit_instance_id=scenario.bodyguard.unit_instance_id,
+        attacking_unit_instance_id=scenario.attached_unit_instance_id,
         attack_pools=(hazardous_pool,),
     )
     wound_spec = attack_sequence_wound_roll_spec(
@@ -569,9 +570,9 @@ def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() ->
     )
     hazardous_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
-        reason=(f"Hazardous test for {scenario.bodyguard.unit_instance_id} after shooting"),
+        reason=(f"Hazardous test for {scenario.attached_unit_instance_id} after shooting"),
         roll_type="hazardous_test",
-        actor_id=scenario.bodyguard.unit_instance_id,
+        actor_id=scenario.attached_unit_instance_id,
     )
 
     remaining, _allocated_ids, blocked = resolve_attack_sequence_until_blocked(
@@ -1317,6 +1318,16 @@ def test_deadly_demise_collateral_finalizes_horror_composition_handoff() -> None
         attacking_unit_instance_id=scenario.attached_unit_instance_id,
         attack_pools=(lethal_pool,),
         source_phase=BattlePhase.SHOOTING,
+    )
+    scenario.state.replace_shooting_phase_state(
+        ShootingPhaseState(
+            battle_round=scenario.state.battle_round,
+            active_player_id=scenario.source_army.player_id,
+            selected_unit_ids=(scenario.attached_unit_instance_id,),
+            shot_unit_ids=(scenario.attached_unit_instance_id,),
+            attack_pools=attack_sequence.attack_pools,
+            attack_sequence=attack_sequence,
+        )
     )
     wound_spec = attack_sequence_wound_roll_spec(
         weapon_profile_id=lethal_pool.weapon_profile_id,

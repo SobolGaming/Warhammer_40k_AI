@@ -83,11 +83,13 @@ from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -126,6 +128,7 @@ from warhammer40k_core.engine.phases.charge import (
     ChargePhaseHandler,
     ChargePhaseState,
     ChargingUnitSelection,
+    _unit_is_engaged,  # pyright: ignore[reportPrivateUsage]
     legal_charge_target_unit_instance_ids,
     resolve_charge_move,
 )
@@ -2638,6 +2641,180 @@ def test_selected_target_charge_reroll_rejects_target_drift_before_queue_pop() -
     assert len(lifecycle.decision_controller.records) == 1
 
 
+def test_charge_targets_use_canonical_attached_rules_unit_identity_after_round_trip() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("marked-bodyguard", "marked-leader"),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        enemy_origins={
+            "marked-bodyguard": Pose.at(20.0, 20.0),
+            "marked-leader": Pose.at(20.0, 24.0),
+        },
+        enemy_attached_unit_ids=("marked-bodyguard", "marked-leader"),
+        selected_attached_target_effect_id="phase15a-canonical-attached-charge-target",
+        split_enemy_attached_target=False,
+        game_id="phase15a-canonical-attached-charge-target",
+    )
+    source_id = units["intercessor-1"].unit_instance_id
+    component_ids = {
+        units["marked-bodyguard"].unit_instance_id,
+        units["marked-leader"].unit_instance_id,
+    }
+
+    target_ids = legal_charge_target_unit_instance_ids(
+        state=_state(lifecycle),
+        unit_instance_id=source_id,
+        ruleset_descriptor=_state(lifecycle).runtime_ruleset_descriptor(),
+    )
+    restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    restored_target_ids = legal_charge_target_unit_instance_ids(
+        state=_state(restored),
+        unit_instance_id=source_id,
+        ruleset_descriptor=_state(restored).runtime_ruleset_descriptor(),
+    )
+
+    assert target_ids == (_ATTACHED_CHARGE_TARGET_ID,)
+    assert component_ids.isdisjoint(target_ids)
+    assert restored_target_ids == target_ids
+
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    reroll_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=source_id,
+            result_id="phase15a-canonical-attached-charge-target-selection",
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=reroll_request,
+            option_id="decline",
+            result_id="phase15a-canonical-attached-charge-target-reroll-decline",
+        )
+    )
+    assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    status = _submit_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id="phase15a-canonical-attached-charge-target-move",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=source_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(_ATTACHED_CHARGE_TARGET_ID,),
+            witness=_charge_path_witness_for_unit(
+                lifecycle,
+                unit_instance_id=source_id,
+                dx=3.0,
+            ),
+        ),
+    )
+    completed = _last_event_payload(lifecycle, "charge_move_completed")
+    endpoint_witness = cast(dict[str, object], completed["endpoint_witness"])
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert endpoint_witness["selected_target_unit_instance_ids"] == [_ATTACHED_CHARGE_TARGET_ID]
+    assert endpoint_witness["non_target_engaged_unit_instance_ids"] == []
+
+
+def test_charge_targets_require_living_authority_but_measure_mixed_unit_from_retained_base() -> (
+    None
+):
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("retained-only", "mixed-target"),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(40.0, 20.0),
+            model_count=5,
+        ),
+        enemy_origins={
+            "retained-only": Pose.at(44.0, 20.0),
+            "mixed-target": Pose.at(40.0, 30.0),
+        },
+        game_id="phase15a-retained-charge-target-authority",
+    )
+    state = _state(lifecycle)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    retained_only = units["retained-only"]
+    mixed_target = units["mixed-target"]
+    retained_placement = battlefield.unit_placement_by_id(retained_only.unit_instance_id)
+    mixed_placement = battlefield.unit_placement_by_id(mixed_target.unit_instance_id)
+    retained_model_placement = retained_placement.model_placements[0].with_pose(Pose.at(11.0, 20.0))
+    mixed_model_placement = mixed_placement.model_placements[0].with_pose(Pose.at(20.0, 20.0))
+    state.replace_battlefield_state(
+        battlefield.with_unit_placement(
+            retained_placement.with_model_placements(
+                (retained_model_placement, *retained_placement.model_placements[1:])
+            )
+        ).with_unit_placement(
+            mixed_placement.with_model_placements(
+                (mixed_model_placement, *mixed_placement.model_placements[1:])
+            )
+        )
+    )
+    for model in retained_only.own_models:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=retained_only.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=retained_model_placement,
+        effect_id="phase15a:fight-on-death:retained-only-charge-target",
+        source_rule_id="phase15a:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    mixed_model = mixed_target.own_models[0]
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=mixed_target.unit_instance_id,
+        model_instance_id=mixed_model.model_instance_id,
+        damage=mixed_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=mixed_model_placement,
+        effect_id="phase15a:fight-on-death:mixed-charge-target",
+        source_rule_id="phase15a:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    target_ids = legal_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )
+
+    assert _unit_is_engaged(
+        state=state,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        player_id="player-a",
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )
+    assert mixed_target.unit_instance_id in target_ids
+    assert retained_only.unit_instance_id not in target_ids
+
+
 def test_selected_attached_target_with_alive_unplaced_successor_blocks_charge_after_restore() -> (
     None
 ):
@@ -3325,6 +3502,7 @@ def _charge_lifecycle(
     enemy_origins: dict[str, Pose] | None = None,
     enemy_attached_unit_ids: tuple[str, str] | None = None,
     selected_attached_target_effect_id: str | None = None,
+    split_enemy_attached_target: bool = True,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _config(
         game_id=game_id,
@@ -3405,14 +3583,15 @@ def _charge_lifecycle(
                 selected_target_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
             )
         )
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-b",
-            attached_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
-            surviving_unit_instance_ids=tuple(
-                sorted(f"army-beta:{unit_id}" for unit_id in enemy_attached_unit_ids)
-            ),
-            event_log=decision_controller.event_log,
-        )
+        if split_enemy_attached_target:
+            state.recover_starting_strength_after_attached_unit_split(
+                player_id="player-b",
+                attached_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
+                surviving_unit_instance_ids=tuple(
+                    sorted(f"army-beta:{unit_id}" for unit_id in enemy_attached_unit_ids)
+                ),
+                event_log=decision_controller.event_log,
+            )
     elif selected_attached_target_effect_id is not None:
         raise AssertionError("Selected Attached Unit target fixture requires a formation.")
     payload = cast(

@@ -66,7 +66,10 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookBinding,
     successful_hit_target_unit_ids_for_sequence,
 )
-from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.battlefield_presence import (
+    battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
 )
@@ -106,6 +109,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_rules_units_are_physically_engaged,
 )
 from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_rules_unit,
@@ -2119,31 +2125,21 @@ def _unit_move_completed_mortal_wounds_target_candidates(
         state=state,
         unit_instance_id=source_rules_unit_id,
     )
-    source_models = placed_alive_geometry_models_for_rules_unit(
-        state=state,
-        unit_instance_id=source_rules_unit.unit_instance_id,
-    )
-    if not source_models:
+    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source_rules_unit):
         return ()
+    scenario = battlefield_scenario_for_state(state=state)
     candidates: list[tuple[str, str]] = []
     for target_rules_unit in _rules_unit_views_for_other_players(
         state=state,
         player_id=source_rules_unit.owner_player_id,
     ):
-        target_models = placed_alive_geometry_models_for_rules_unit(
-            state=state,
-            unit_instance_id=target_rules_unit.unit_instance_id,
-        )
-        if not target_models:
+        if not rules_unit_has_placed_alive_model(state=state, rules_unit=target_rules_unit):
             continue
-        if any(
-            source_model.is_within_engagement_range(
-                target_model,
-                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-            )
-            for source_model in source_models
-            for target_model in target_models
+        if scenario_rules_units_are_physically_engaged(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            first_unit_instance_id=source_rules_unit.unit_instance_id,
+            second_unit_instance_id=target_rules_unit.unit_instance_id,
         ):
             candidates.append(
                 (

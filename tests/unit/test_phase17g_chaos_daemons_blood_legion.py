@@ -202,8 +202,10 @@ from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
 )
-from warhammer40k_core.engine.rule_model_destruction import (
+from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
     RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
+)
+from warhammer40k_core.engine.rule_model_destruction import (
     RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
     RuleModelDestructionResult,
     destroy_model_with_rule_reactions,
@@ -1292,7 +1294,7 @@ def test_furys_cage_self_mortal_wounds_resume_through_fnp_adapter_decisions() ->
 
 
 def test_furys_cage_lethal_damage_routes_deadly_demise_through_nested_fnp_and_replay() -> None:
-    game_id = "phase17g-furys-cage-dd-fnp-02"
+    game_id = "phase17g-furys-cage-dd-fnp-32"
     lifecycle = _furys_cage_fight_lifecycle(
         game_id=game_id,
         attached=False,

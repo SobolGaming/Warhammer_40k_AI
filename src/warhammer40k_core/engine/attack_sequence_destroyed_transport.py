@@ -15,6 +15,9 @@ from warhammer40k_core.engine.primary_historical_events import (
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_unit_destructions_for_destroyed_models,
 )
+from warhammer40k_core.engine.rule_model_destruction_unplaced import (
+    destroy_emergency_disembark_omitted_model,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -832,6 +835,12 @@ def _apply_valid_destroyed_transport_disembark(
         raise GameLifecycleError("Destroyed Transport disembark requires updated cargo state.")
     if disembark.placement.disembarked_unit_state is None:
         raise GameLifecycleError("Destroyed Transport disembark requires disembarked state.")
+    for model_instance_id in disembark.destroyed_model_instance_ids:
+        destroy_emergency_disembark_omitted_model(
+            state=state,
+            disembark=disembark,
+            model_instance_id=model_instance_id,
+        )
     state.replace_battlefield_state(
         apply_destroyed_transport_disembark_to_battlefield(
             battlefield_state=battlefield_state,

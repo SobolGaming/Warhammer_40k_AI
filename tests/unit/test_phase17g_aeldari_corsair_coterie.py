@@ -36,7 +36,11 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
@@ -78,6 +82,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -106,6 +111,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
     FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
 )
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FightPhaseState,
@@ -1040,6 +1046,85 @@ def test_corsair_stratagem_validators_reject_ineligible_targets_and_phase_state(
     )
 
 
+def test_vengeful_sorrow_uses_retained_physical_engagement_and_keeps_fod_target_exception() -> None:
+    engaged_state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=30.5,
+    )
+    enemy = _unit_by_id(engaged_state, _ENEMY_UNIT_ID)
+    engaged_battlefield = engaged_state.battlefield_state
+    assert engaged_battlefield is not None
+    enemy_model = enemy.own_models[0]
+    enemy_placement = engaged_battlefield.model_placement_by_id(enemy_model.model_instance_id)
+    apply_damage_to_model(
+        state=engaged_state,
+        target_unit_instance_id=enemy.unit_instance_id,
+        model_instance_id=enemy_model.model_instance_id,
+        damage=enemy_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=engaged_state,
+        placement=enemy_placement,
+        effect_id="phase17g:corsair:vengeful-sorrow:retained-enemy",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.SHOOTING,
+    )
+    engaged_context = _corsair_stratagem_handler_context(
+        state=engaged_state,
+        player_id="player-a",
+        stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+        handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+        trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert (
+        stratagems.validate_vengeful_sorrow(engaged_context).reason
+        == "target_within_engagement_range"
+    )
+
+    retained_target_state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=55.0,
+    )
+    corsair = _unit_by_id(retained_target_state, _CORSAIR_UNIT_ID)
+    target_battlefield = retained_target_state.battlefield_state
+    assert target_battlefield is not None
+    corsair_model = corsair.own_models[0]
+    corsair_placement = target_battlefield.model_placement_by_id(corsair_model.model_instance_id)
+    apply_damage_to_model(
+        state=retained_target_state,
+        target_unit_instance_id=corsair.unit_instance_id,
+        model_instance_id=corsair_model.model_instance_id,
+        damage=corsair_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=retained_target_state,
+        placement=corsair_placement,
+        effect_id="phase17g:corsair:vengeful-sorrow:retained-target",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.SHOOTING,
+    )
+    retained_target_context = _corsair_stratagem_handler_context(
+        state=retained_target_state,
+        player_id="player-a",
+        stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+        handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+        trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert stratagems.validate_vengeful_sorrow(retained_target_context).reason is None
+
+
 def test_lethal_ruse_handles_non_anhrathe_and_rejects_invalid_enemy_selection() -> None:
     non_anhrathe_state, _corsair_army, _enemy_army = _corsair_state(
         phase=BattlePhase.MOVEMENT,
@@ -1620,8 +1705,6 @@ def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> Non
     unit_in_army = vars(stratagems)["_unit_in_army"]
     unit_by_id_for_state = vars(stratagems)["_unit_by_id_for_state"]
     unit_owner = vars(stratagems)["_unit_owner"]
-    model_instance_by_id = vars(stratagems)["_model_instance_by_id"]
-    armies_for_state = vars(stratagems)["_armies_for_state"]
     validate_identifier = vars(stratagems)["_validate_identifier"]
 
     assert stratagems.apply_pirates_due(context).reason == "wrong_stratagem"
@@ -1769,10 +1852,6 @@ def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> Non
         unit_by_id_for_state(state, unit_instance_id="unknown-unit")
     with pytest.raises(GameLifecycleError, match="unit owner is unknown"):
         unit_owner(context, unit_instance_id="unknown-unit")
-    with pytest.raises(GameLifecycleError, match="model is unknown"):
-        model_instance_by_id(state, "unknown-model")
-    with pytest.raises(GameLifecycleError, match="army lookup requires GameState"):
-        armies_for_state(object())
     with pytest.raises(GameLifecycleError, match="must be a string"):
         validate_identifier("test", object())
     with pytest.raises(GameLifecycleError, match="must not be empty"):

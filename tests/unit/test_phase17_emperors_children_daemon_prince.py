@@ -491,7 +491,7 @@ def test_ecstatic_death_registers_idempotent_serializable_two_plus_model_source(
 
 
 def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() -> None:
-    session, attacker, target = _ecstatic_death_fight_session()
+    session, attacker, target = _ecstatic_death_fight_session(game_id="ecstatic-integrity-002")
     state = session.lifecycle.state
     assert state is not None
     target_model_id = target.own_models[0].model_instance_id
@@ -520,7 +520,7 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         result_id_prefix="ecstatic-death:attacker",
-        melee_profile_suffix=":strike",
+        melee_profile_suffix=":sweep",
     )
 
     reaction_request = status.decision_request
@@ -701,7 +701,7 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         result_id_prefix="ecstatic-death-integrity:attacker",
-        melee_profile_suffix=":strike",
+        melee_profile_suffix=":sweep",
     )
     reaction_request = status.decision_request
     assert reaction_request is not None
@@ -810,7 +810,7 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         result_id_prefix="ecstatic-death-chain:retained",
-        melee_profile_suffix=":strike",
+        melee_profile_suffix=":sweep",
         melee_target_unit_instance_id=child.unit_instance_id,
     )
     reaction_request = status.decision_request
@@ -824,6 +824,12 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
         ),
         result_id="ecstatic-death-chain:child-accept",
     )
+    status = _advance_ecstatic_death_session(
+        session=session,
+        status=status,
+        stop_at_decision_type="select_fight_activation",
+        result_id_prefix="ecstatic-death-chain:after-retained",
+    )
     assert state.fight_phase_state is not None
     assert state.fight_phase_state.active_activation is None
     assert status.decision_request is not None
@@ -833,12 +839,6 @@ def test_ecstatic_death_chain_uses_ordinary_fight_alternation_without_nesting() 
         for event in session.lifecycle.decision_controller.event_log.records
     )
 
-    status = _advance_ecstatic_death_session(
-        session=session,
-        status=status,
-        stop_at_decision_type="select_fight_activation",
-        result_id_prefix="ecstatic-death-chain:after-retained",
-    )
     request = status.decision_request
     assert request is not None
     assert request.actor_id == "player-a"
@@ -1045,7 +1045,7 @@ def _advance_ecstatic_death_until_model_removed(
             current = _submit_ecstatic_death_melee(
                 session=session,
                 status=current,
-                profile_suffix=":strike",
+                profile_suffix=":sweep",
                 result_id=f"{result_id_prefix}:melee-{result_index:03d}",
             )
             continue

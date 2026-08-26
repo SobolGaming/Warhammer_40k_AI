@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
-    BattlefieldScenario,
     ModelPlacement,
     UnitPlacement,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    physical_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.rules_units import RulesUnitView
 
 if TYPE_CHECKING:
@@ -38,36 +41,33 @@ def healing_phase_start_enemy_engagement_model_ids(
     rules_unit: RulesUnitView,
 ) -> tuple[str, ...]:
     battlefield = healing_battlefield_state(state)
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield,
-    )
+    scenario = battlefield_scenario_for_state(state=state)
     ruleset_descriptor = state.runtime_ruleset_descriptor()
-    own_placements = healing_rules_unit_placements(state=state, rules_unit=rules_unit)
+    own_models = physical_geometry_models_for_rules_unit(
+        scenario=scenario,
+        unit_instance_id=rules_unit.unit_instance_id,
+    )
     engaged_enemy_ids: set[str] = set()
-    for own_placement in own_placements:
-        own_model_instance = scenario.model_instance_for_placement(own_placement)
-        if not own_model_instance.is_alive:
+    for placed_army in battlefield.placed_armies:
+        if placed_army.player_id == rules_unit.owner_player_id:
             continue
-        own_model = geometry_model_for_placement(model=own_model_instance, placement=own_placement)
-        for placed_army in battlefield.placed_armies:
-            if placed_army.player_id == rules_unit.owner_player_id:
-                continue
-            for unit_placement in placed_army.unit_placements:
-                for enemy_placement in unit_placement.model_placements:
-                    enemy_model_instance = scenario.model_instance_for_placement(enemy_placement)
-                    if not enemy_model_instance.is_alive:
-                        continue
-                    enemy_model = geometry_model_for_placement(
-                        model=enemy_model_instance,
-                        placement=enemy_placement,
-                    )
-                    if own_model.is_within_engagement_range(
+        for unit_placement in placed_army.unit_placements:
+            for enemy_placement in unit_placement.model_placements:
+                if not scenario.model_is_present_at_placement(enemy_placement):
+                    continue
+                enemy_model = geometry_model_for_placement(
+                    model=scenario.model_instance_for_placement(enemy_placement),
+                    placement=enemy_placement,
+                )
+                if any(
+                    own_model.is_within_engagement_range(
                         enemy_model,
-                        horizontal_inches=(ruleset_descriptor.engagement_policy.horizontal_inches),
+                        horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
                         vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-                    ):
-                        engaged_enemy_ids.add(enemy_placement.model_instance_id)
+                    )
+                    for own_model in own_models
+                ):
+                    engaged_enemy_ids.add(enemy_placement.model_instance_id)
     return tuple(sorted(engaged_enemy_ids))
 
 

@@ -50,7 +50,10 @@ from warhammer40k_core.engine.damage_allocation import (
     model_by_id,
 )
 from warhammer40k_core.engine.deadly_demise import deadly_demise_target_unit_ids
-from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_controller import (
+    DecisionController,
+    DecisionControllerPayload,
+)
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
@@ -88,8 +91,21 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    ModelDestructionCauseKind,
+)
+from warhammer40k_core.engine.model_destruction_cause_producers import (
+    validate_model_destruction_cause_restore,
+)
+from warhammer40k_core.engine.model_logical_death import (
+    MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_logical_death import (
+    MortalWoundLogicalDeathCauseBinding,
+    append_mortal_wound_damage_logical_death_event,
 )
 from warhammer40k_core.engine.opportunity_windows import (
     OpportunityActionKind,
@@ -154,6 +170,21 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
+
+
+def _validate_model_destruction_restore_payloads(
+    *,
+    state_payload: GameStatePayload,
+    decisions_payload: DecisionControllerPayload,
+) -> None:
+    restored_state = GameState.from_payload(state_payload)
+    restored_decisions = DecisionController.from_payload(decisions_payload)
+    validate_model_destruction_cause_restore(
+        state=restored_state,
+        event_records=restored_decisions.event_log.records,
+        decision_records=restored_decisions.records,
+        pending_decision_requests=restored_decisions.queue.pending_requests,
+    )
 
 
 def test_reaction_window_emits_interrupt_decision_and_resumes_parent_phase() -> None:
@@ -1848,6 +1879,139 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         )
         is None
     )
+    checkpoint_authorities = {
+        authority.model_instance_id: authority
+        for authority in state.model_destruction_cause_authorities
+        if authority.model_instance_id in {root_model_id, bodyguard_model_id}
+    }
+    assert set(checkpoint_authorities) == {root_model_id, bodyguard_model_id}
+    root_authority = checkpoint_authorities[root_model_id]
+    collateral_authority = checkpoint_authorities[bodyguard_model_id]
+    assert root_authority.logical_death_event is not None
+    assert collateral_authority.logical_death_event is not None
+    assert root_authority.model_destroyed_event is None
+    assert collateral_authority.model_destroyed_event is not None
+    assert model_by_id(state=state, model_instance_id=root_model_id).wounds_remaining == 0
+    assert model_by_id(state=state, model_instance_id=bodyguard_model_id).wounds_remaining == 0
+    assert state.battlefield_state is not None
+    assert root_model_id in state.battlefield_state.placed_model_ids()
+    assert bodyguard_model_id in state.battlefield_state.placed_model_ids()
+
+    checkpoint_records = decisions.event_log.records
+    checkpoint_indexes = {event.event_id: index for index, event in enumerate(checkpoint_records)}
+    deadly_demise_applied_index = next(
+        index
+        for index, event in enumerate(checkpoint_records)
+        if event.event_type == "deadly_demise_mortal_wounds_applied"
+        and cast(dict[str, JsonValue], event.payload)["target_unit_instance_id"] == _attached_id
+    )
+    fight_on_death_awaiting_index = next(
+        index
+        for index, event in enumerate(checkpoint_records)
+        if event.event_type == "fight_on_death_model_awaiting_attack"
+        and cast(dict[str, JsonValue], event.payload)["model_instance_id"] == bodyguard_model_id
+    )
+    assert (
+        checkpoint_indexes[root_authority.logical_death_event.event_id]
+        < checkpoint_indexes[collateral_authority.logical_death_event.event_id]
+        < deadly_demise_applied_index
+        < checkpoint_indexes[collateral_authority.model_destroyed_event.event_id]
+        < fight_on_death_awaiting_index
+    )
+    assert tuple(
+        cast(dict[str, JsonValue], event.payload)["model_instance_id"]
+        for event in checkpoint_records
+        if event.event_type == MODEL_LOGICAL_DEATH_RECORDED_EVENT
+    ) == (root_model_id, bodyguard_model_id)
+
+    checkpoint_state = GameState.from_payload(state.to_payload())
+    checkpoint_decisions = DecisionController.from_payload(decisions.to_payload())
+    validate_model_destruction_cause_restore(
+        state=checkpoint_state,
+        event_records=checkpoint_decisions.event_log.records,
+        decision_records=checkpoint_decisions.records,
+        pending_decision_requests=checkpoint_decisions.queue.pending_requests,
+    )
+    orphan_logical_death = replace(
+        root_authority.logical_death_event,
+        event_id="event-999999",
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Every model logical-death event must have exactly one authority",
+    ):
+        validate_model_destruction_cause_restore(
+            state=checkpoint_state,
+            event_records=(*checkpoint_decisions.event_log.records, orphan_logical_death),
+            decision_records=checkpoint_decisions.records,
+            pending_decision_requests=checkpoint_decisions.queue.pending_requests,
+        )
+
+    authority_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    drifted_collateral_authority = next(
+        authority
+        for authority in authority_drift_payload["model_destruction_cause_authorities"]
+        if authority["model_instance_id"] == bodyguard_model_id
+    )
+    drifted_logical_event = cast(
+        dict[str, object],
+        drifted_collateral_authority["logical_death_event"],
+    )
+    cast(dict[str, object], drifted_logical_event["payload"])["model_instance_id"] = root_model_id
+    with pytest.raises(GameLifecycleError):
+        _validate_model_destruction_restore_payloads(
+            state_payload=authority_drift_payload,
+            decisions_payload=decisions.to_payload(),
+        )
+
+    relocated_state_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    relocated_decisions_payload = cast(
+        DecisionControllerPayload,
+        json.loads(json.dumps(decisions.to_payload(), sort_keys=True)),
+    )
+    relocated_collateral_authority = next(
+        authority
+        for authority in relocated_state_payload["model_destruction_cause_authorities"]
+        if authority["model_instance_id"] == bodyguard_model_id
+    )
+    stored_logical_event = cast(
+        dict[str, object],
+        relocated_collateral_authority["logical_death_event"],
+    )
+    canonical_logical_event = next(
+        event
+        for event in relocated_decisions_payload["event_log"]
+        if event["event_id"] == stored_logical_event["event_id"]
+    )
+    canonical_awaiting_event = next(
+        event
+        for event in relocated_decisions_payload["event_log"]
+        if event["event_type"] == "fight_on_death_model_awaiting_attack"
+        and cast(dict[str, object], event["payload"])["model_instance_id"] == bodyguard_model_id
+    )
+    canonical_logical_event["event_type"], canonical_awaiting_event["event_type"] = (
+        canonical_awaiting_event["event_type"],
+        canonical_logical_event["event_type"],
+    )
+    canonical_logical_event["payload"], canonical_awaiting_event["payload"] = (
+        canonical_awaiting_event["payload"],
+        canonical_logical_event["payload"],
+    )
+    relocated_collateral_authority["logical_death_event"] = json.loads(
+        json.dumps(canonical_awaiting_event, sort_keys=True)
+    )
+    with pytest.raises(GameLifecycleError):
+        _validate_model_destruction_restore_payloads(
+            state_payload=relocated_state_payload,
+            decisions_payload=relocated_decisions_payload,
+        )
+
     round_tripped_state = GameState.from_payload(state.to_payload())
     round_tripped_decisions = DecisionController.from_payload(decisions.to_payload())
     completed = handler.begin_phase(
@@ -1861,6 +2025,33 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     assert bodyguard_model_id not in round_tripped_state.battlefield_state.placed_model_ids()
     assert all(
         effect.effect_id != liability.effect_id for effect in round_tripped_state.persisting_effects
+    )
+    completed_authorities = {
+        authority.model_instance_id: authority
+        for authority in round_tripped_state.model_destruction_cause_authorities
+        if authority.model_instance_id in {root_model_id, bodyguard_model_id}
+    }
+    completed_root_authority = completed_authorities[root_model_id]
+    completed_collateral_authority = completed_authorities[bodyguard_model_id]
+    assert completed_root_authority.logical_death_event is not None
+    assert completed_root_authority.model_destroyed_event is not None
+    assert completed_collateral_authority.logical_death_event is not None
+    assert completed_collateral_authority.model_destroyed_event is not None
+    completed_records = round_tripped_decisions.event_log.records
+    completed_indexes = {event.event_id: index for index, event in enumerate(completed_records)}
+    fight_on_death_cleanup_index = next(
+        index
+        for index, event in enumerate(completed_records)
+        if event.event_type == "fight_on_death_models_removed"
+        and bodyguard_model_id
+        in cast(list[str], cast(dict[str, JsonValue], event.payload)["model_instance_ids"])
+    )
+    assert (
+        completed_indexes[completed_root_authority.logical_death_event.event_id]
+        < completed_indexes[completed_collateral_authority.logical_death_event.event_id]
+        < completed_indexes[completed_collateral_authority.model_destroyed_event.event_id]
+        < fight_on_death_cleanup_index
+        < completed_indexes[completed_root_authority.model_destroyed_event.event_id]
     )
     destroyed_ids = tuple(
         cast(dict[str, JsonValue], event.payload)["model_instance_id"]
@@ -1933,6 +2124,18 @@ def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_proven
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
     )
+    assert state.battlefield_state is not None
+    append_mortal_wound_damage_logical_death_event(
+        state=state,
+        event_log=decisions.event_log,
+        cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
+        producer_id="phase12a:applied-damage-completion:result",
+        damage_application=damage,
+        destroyed_model_placement=state.battlefield_state.model_placement_by_id(
+            model.model_instance_id
+        ),
+        placement_retained=True,
+    )
     state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
 
     destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
@@ -1972,8 +2175,39 @@ def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_proven
     )
     assert finalized["completion_kind"] == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
     assert finalized[DEFER_ATTACHED_SPLIT_FIELD] is False
-    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
-    assert DecisionController.from_payload(decisions.to_payload()) == decisions
+    restored_state = GameState.from_payload(state.to_payload())
+    restored_decisions = DecisionController.from_payload(decisions.to_payload())
+    assert restored_state.to_payload() == state.to_payload()
+    assert restored_decisions == decisions
+    validate_model_destruction_cause_restore(
+        state=restored_state,
+        event_records=restored_decisions.event_log.records,
+        decision_records=restored_decisions.records,
+        pending_decision_requests=restored_decisions.queue.pending_requests,
+    )
+
+    tampered_decisions_payload = cast(
+        DecisionControllerPayload,
+        json.loads(json.dumps(decisions.to_payload(), sort_keys=True)),
+    )
+    tampered_finalizations = [
+        event_payload["payload"]
+        for event_payload in tampered_decisions_payload["event_log"]
+        if event_payload["event_type"]
+        == rule_model_destruction.RULE_MODEL_DESTRUCTION_FINALIZED_EVENT
+    ]
+    assert len(tampered_finalizations) == 1
+    tampered_finalization = tampered_finalizations[0]
+    assert isinstance(tampered_finalization, dict)
+    tampered_finalization[DEFER_ATTACHED_SPLIT_FIELD] = True
+    tampered_decisions = DecisionController.from_payload(tampered_decisions_payload)
+    with pytest.raises(GameLifecycleError, match="Rule destruction finalization binding drift"):
+        validate_model_destruction_cause_restore(
+            state=restored_state,
+            event_records=tampered_decisions.event_log.records,
+            decision_records=tampered_decisions.records,
+            pending_decision_requests=tampered_decisions.queue.pending_requests,
+        )
 
 
 def test_applied_destruction_filters_optional_sources_then_decline_resumes_completion() -> None:
@@ -2040,6 +2274,18 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
         damage=model.wounds_remaining,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
+    )
+    assert state.battlefield_state is not None
+    append_mortal_wound_damage_logical_death_event(
+        state=state,
+        event_log=decisions.event_log,
+        cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
+        producer_id="phase12a:applied-optional-filter:result",
+        damage_application=damage,
+        destroyed_model_placement=state.battlefield_state.model_placement_by_id(
+            model.model_instance_id
+        ),
+        placement_retained=True,
     )
 
     destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
@@ -2156,6 +2402,18 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
         damage=model.wounds_remaining,
         damage_kind=DamageKind.MORTAL,
         remove_destroyed_model=False,
+    )
+    assert state.battlefield_state is not None
+    append_mortal_wound_damage_logical_death_event(
+        state=state,
+        event_log=decisions.event_log,
+        cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
+        producer_id="phase12a:applied-active-fight:damage-result",
+        damage_application=damage,
+        destroyed_model_placement=state.battlefield_state.model_placement_by_id(
+            model.model_instance_id
+        ),
+        placement_retained=True,
     )
 
     destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
@@ -3020,7 +3278,7 @@ def test_self_mortal_wound_nested_payload_validators_fail_closed() -> None:
             {}
         )
     with pytest.raises(GameLifecycleError, match="progress is invalid"):
-        fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+        fight_unit_selected_grant_resolution.validate_selected_to_fight_self_mortal_wound_progress(
             object()  # type: ignore[arg-type]
         )
 
@@ -3120,7 +3378,7 @@ def test_self_mortal_wound_progress_rejects_routing_drift(
         raise AssertionError(f"Unhandled test case: {case}")
 
     with pytest.raises(GameLifecycleError, match=expected_error):
-        fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+        fight_unit_selected_grant_resolution.validate_selected_to_fight_self_mortal_wound_progress(
             value
         )
 
@@ -3165,7 +3423,7 @@ def test_self_mortal_wound_progress_rejects_destruction_evidence_drift(
     drifted_progress = replace(progress, source_context=value)
 
     with pytest.raises(GameLifecycleError, match=expected_error):
-        fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+        fight_unit_selected_grant_resolution.validate_selected_to_fight_self_mortal_wound_progress(
             drifted_progress
         )
 
@@ -3173,7 +3431,7 @@ def test_self_mortal_wound_progress_rejects_destruction_evidence_drift(
 def test_self_mortal_wound_progress_accepts_canonical_routing_context() -> None:
     progress, _context, _evidence = _self_mortal_wound_progress_fixture()
 
-    fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+    fight_unit_selected_grant_resolution.validate_selected_to_fight_self_mortal_wound_progress(
         progress
     )
 
@@ -3698,8 +3956,9 @@ def _self_mortal_wound_progress_fixture() -> tuple[
         "mortal_wounds": mortal_wounds,
         "mortal_wound_destruction_evidence": cast(JsonValue, evidence.to_payload()),
     }
+    application_id = "phase12a:grant-result:phase12a:self-mortal-hook:self-mortal-wounds"
     progress = MortalWoundApplicationProgress.start(
-        application_id="phase12a:self-mortal-application",
+        application_id=application_id,
         source_rule_id="phase12a:self-mortal-execution",
         source_context=source_context,
         target_unit_instance_id=unit.unit_instance_id,
@@ -3708,6 +3967,10 @@ def _self_mortal_wound_progress_fixture() -> tuple[
         spill_over=False,
         destruction_evidence=None,
         priority_model_ids=(model.model_instance_id,),
+        logical_death_cause_binding=MortalWoundLogicalDeathCauseBinding.fixed(
+            cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
+            producer_id=application_id,
+        ),
     )
     return progress, source_context, evidence
 

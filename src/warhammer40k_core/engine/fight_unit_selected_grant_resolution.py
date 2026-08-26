@@ -32,12 +32,19 @@ from warhammer40k_core.engine.faction_resources import (
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_unit_selected_hooks import FightUnitSelectedGrant
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.model_destruction_cause_authority import (
+    ModelDestructionCauseKind,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
     MortalWoundDestructionEvidencePayload,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
+)
+from warhammer40k_core.engine.mortal_wound_logical_death import (
+    MortalWoundLogicalDeathCauseBinding,
+    fixed_mortal_wound_logical_death_recorder,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -263,8 +270,13 @@ def apply_fight_unit_selected_grant_immediate_effect(
             "mortal_wound_destruction_evidence": destruction_evidence.to_payload(),
         }
     )
+    application_id = f"{result.result_id}:{grant.hook_id}:self-mortal-wounds"
+    logical_death_binding = MortalWoundLogicalDeathCauseBinding.fixed(
+        cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
+        producer_id=application_id,
+    )
     progress = MortalWoundApplicationProgress.start(
-        application_id=f"{result.result_id}:{grant.hook_id}:self-mortal-wounds",
+        application_id=application_id,
         source_rule_id=grant.source_id,
         source_context=source_context,
         target_unit_instance_id=selected_rules_unit.unit_instance_id,
@@ -273,6 +285,7 @@ def apply_fight_unit_selected_grant_immediate_effect(
         spill_over=False,
         priority_model_ids=(source_model_id,),
         destruction_evidence=None,
+        logical_death_cause_binding=logical_death_binding,
     )
     routed = continue_mortal_wound_application(
         state=state,
@@ -281,6 +294,11 @@ def apply_fight_unit_selected_grant_immediate_effect(
         progress=progress,
         dice_manager=dice_manager,
         remove_destroyed_models=False,
+        logical_death_recorder=fixed_mortal_wound_logical_death_recorder(
+            state=state,
+            event_log=decisions.event_log,
+            binding=logical_death_binding,
+        ),
     )
     return _resolve_routed_self_mortal_wounds(
         state=state,
@@ -305,7 +323,10 @@ def apply_selected_to_fight_self_mortal_wound_feel_no_pain_decision(
     )
     if progress.source_context != context.source_context:
         raise GameLifecycleError("Self mortal-wound FNP source context drift.")
-    _validate_self_mortal_wound_progress(progress)
+    validate_selected_to_fight_self_mortal_wound_progress(progress)
+    logical_death_binding = progress.logical_death_cause_binding
+    if logical_death_binding is None:
+        raise GameLifecycleError("Self mortal-wound logical-death binding is missing.")
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=context.state,
         decisions=context.decisions,
@@ -314,6 +335,11 @@ def apply_selected_to_fight_self_mortal_wound_feel_no_pain_decision(
         next_request_id=context.state.next_decision_request_id(),
         dice_manager=context.dice_manager,
         remove_destroyed_models=False,
+        logical_death_recorder=fixed_mortal_wound_logical_death_recorder(
+            state=context.state,
+            event_log=context.decisions.event_log,
+            binding=logical_death_binding,
+        ),
     )
     return _resolve_routed_self_mortal_wounds(
         state=context.state,
@@ -330,7 +356,7 @@ def _resolve_routed_self_mortal_wounds(
     feel_no_pain_result_id: str | None,
     routed: MortalWoundRoutingResult,
 ) -> LifecycleStatus | None:
-    _validate_self_mortal_wound_progress(routed.progress)
+    validate_selected_to_fight_self_mortal_wound_progress(routed.progress)
     source_context = _self_mortal_wound_source_context(routed.progress.source_context)
     if routed.request is not None:
         decisions.request_decision(routed.request)
@@ -565,10 +591,22 @@ def _self_mortal_wound_destruction_evidence(
     )
 
 
-def _validate_self_mortal_wound_progress(progress: MortalWoundApplicationProgress) -> None:
+def validate_selected_to_fight_self_mortal_wound_progress(
+    progress: MortalWoundApplicationProgress,
+) -> None:
     if type(progress) is not MortalWoundApplicationProgress:
         raise GameLifecycleError("Self mortal-wound progress is invalid.")
     source_context = _self_mortal_wound_source_context(progress.source_context)
+    expected_application_id = (
+        f"{source_context['grant_result_id']}:{source_context['hook_id']}:self-mortal-wounds"
+    )
+    if progress.application_id != expected_application_id:
+        raise GameLifecycleError("Self mortal-wound progress application identity drift.")
+    if progress.logical_death_cause_binding != MortalWoundLogicalDeathCauseBinding.fixed(
+        cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
+        producer_id=expected_application_id,
+    ):
+        raise GameLifecycleError("Self mortal-wound logical-death binding drift.")
     if progress.source_rule_id != source_context["source_rule_id"]:
         raise GameLifecycleError("Self mortal-wound progress source rule drift.")
     if progress.target_unit_instance_id != source_context["unit_instance_id"]:
@@ -742,4 +780,5 @@ __all__ = (
     "record_fight_unit_selected_grant_effects",
     "validate_fight_unit_selected_grant_effects",
     "validate_fight_unit_selected_grant_immediate_effect",
+    "validate_selected_to_fight_self_mortal_wound_progress",
 )

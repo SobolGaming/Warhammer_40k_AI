@@ -9,6 +9,7 @@ import pytest
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     MovementMode,
     RulesetDescriptor,
     TerrainFeatureKind,
@@ -18,6 +19,7 @@ from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRemovalKind,
@@ -27,9 +29,11 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
+    apply_damage_to_model,
     is_mortal_wound_feel_no_pain_request,
     model_by_id,
 )
+from warhammer40k_core.engine.damage_allocation_targets import DamageKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -40,6 +44,7 @@ from warhammer40k_core.engine.event_log import (
     JsonValue,
     validate_json_value,
 )
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.hazard import (
     HAZARD_ROLL_FAILURE_THRESHOLD,
@@ -2919,6 +2924,118 @@ def test_combat_disembark_can_only_set_up_engaged_with_transport_engagement() ->
     }
 
 
+def test_combat_disembark_uses_retained_attached_engagement_as_canonical_permission() -> None:
+    scenario, passenger, transport, bodyguard, _catalog = _transport_scenario(enemy_attached=True)
+    leader = scenario.armies[1].unit_by_id("army-beta:enemy-leader")
+    disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
+    bodyguard_placement = _unit_placement_at(
+        bodyguard,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(16.4, 10.0),
+            *tuple(Pose.at(35.0 + index * 2.0, 35.0) for index in range(4)),
+        ),
+    )
+    leader_placement = _unit_placement_at(
+        leader,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(10.0, 13.2),),
+    )
+    disembark_scenario = BattlefieldScenario(
+        armies=disembark_scenario.armies,
+        battlefield_state=(
+            disembark_scenario.battlefield_state.with_unit_placement(
+                bodyguard_placement
+            ).with_unit_placement(leader_placement)
+        ),
+    )
+    state = _battle_state(
+        disembark_scenario,
+        game_id="phase10q-combat-disembark-retained-attached",
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    leader_model = leader.own_models[0]
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=leader.unit_instance_id,
+        model_instance_id=leader_model.model_instance_id,
+        damage=leader_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    restore_model_awaiting_fight_on_death(
+        state=state,
+        placement=leader_placement.model_placements[0],
+        effect_id="phase10q-combat-disembark-retained-attached-leader",
+        source_rule_id="phase10q-test-fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+    retained_scenario = battlefield_scenario_for_state(state=state)
+    attempted_placement = _unit_placement_at(
+        passenger,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=(
+            Pose.at(14.85, 10.0),
+            Pose.at(13.5, 10.0),
+            Pose.at(13.5, 11.3),
+            Pose.at(14.85, 11.35),
+            Pose.at(14.85, 8.65),
+        ),
+    )
+    selection = DisembarkSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        attempted_placement=attempted_placement,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    cargo_state = _cargo_state(
+        transport=transport,
+        embarked_unit_ids=(passenger.unit_instance_id,),
+        started_unit_ids=(passenger.unit_instance_id,),
+        battle_round=1,
+    )
+
+    result = resolve_combat_disembark(
+        scenario=retained_scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo_state,
+        selection=selection,
+        unit=passenger,
+        transport_placement=retained_scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+        dice_manager=DiceRollManager("phase10q-combat-disembark-retained-attached"),
+    )
+    without_retained_presence = BattlefieldScenario(
+        armies=retained_scenario.armies,
+        battlefield_state=retained_scenario.battlefield_state,
+    )
+    without_retained_result = resolve_combat_disembark(
+        scenario=without_retained_presence,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo_state,
+        selection=selection,
+        unit=passenger,
+        transport_placement=without_retained_presence.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+        dice_manager=DiceRollManager("phase10q-combat-disembark-no-retained-authority"),
+    )
+
+    assert retained_scenario.present_destroyed_model_ids == (leader_model.model_instance_id,)
+    assert result.placement.is_valid
+    assert not without_retained_result.placement.is_valid
+    assert TransportOperationViolationCode.ENEMY_ENGAGEMENT_RANGE in {
+        violation.violation_code for violation in without_retained_result.placement.violations
+    }
+
+
 def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battleshocks_unit() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
@@ -4131,6 +4248,7 @@ def _transport_scenario(
     passenger_model_profile_id: str = "core-intercessor-like",
     passenger_model_count: int = 5,
     passenger_unit_selection_id: str = "passenger-unit",
+    enemy_attached: bool = False,
 ) -> tuple[BattlefieldScenario, UnitInstance, UnitInstance, UnitInstance, ArmyCatalog]:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     alpha_request = _army_muster_request(
@@ -4163,12 +4281,42 @@ def _transport_scenario(
                 model_profile_id="core-intercessor-like",
                 model_count=5,
             ),
+            *(
+                (
+                    _unit_selection(
+                        unit_selection_id="enemy-leader",
+                        datasheet_id="core-character-leader",
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                )
+                if enemy_attached
+                else ()
+            ),
         ),
     )
-    armies = (
-        muster_army(catalog=catalog, request=alpha_request),
-        muster_army(catalog=catalog, request=beta_request),
-    )
+    alpha = muster_army(catalog=catalog, request=alpha_request)
+    beta = muster_army(catalog=catalog, request=beta_request)
+    if enemy_attached:
+        enemy_bodyguard = beta.unit_by_id("army-beta:enemy-unit")
+        enemy_leader = beta.unit_by_id("army-beta:enemy-leader")
+        component_ids = tuple(
+            sorted((enemy_bodyguard.unit_instance_id, enemy_leader.unit_instance_id))
+        )
+        beta = replace(
+            beta,
+            attached_units=(
+                AttachedUnitFormation(
+                    attached_unit_instance_id="attached-unit:army-beta:enemy-attached",
+                    bodyguard_unit_instance_id=enemy_bodyguard.unit_instance_id,
+                    leader_unit_instance_ids=(enemy_leader.unit_instance_id,),
+                    component_unit_instance_ids=component_ids,
+                    source_id="test:phase10q-combat-disembark-attached-enemy",
+                    attachment_source_ids=("test:phase10q-combat-disembark-attached-eligibility",),
+                ),
+            ),
+        )
+    armies = (alpha, beta)
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase10q-battlefield",
         armies=armies,

@@ -23,6 +23,7 @@ from warhammer40k_core.engine.aircraft import (
     HoverModeState,
     aircraft_model_ids_for_scenario,
 )
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -53,13 +54,23 @@ from warhammer40k_core.engine.normal_move_history import (
     NormalMoveState,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowPayload
+from warhammer40k_core.engine.triggered_movement_physical_authority import (
+    merge_triggered_movement_source_endpoints,
+    require_triggered_movement_source_model_placements,
+    resolve_triggered_movement_source_coherency,
+    retained_triggered_movement_blocker_ids,
+    triggered_movement_unit_has_placed_living_source,
+    validate_triggered_movement_source_witness,
+)
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     MovementRollbackRecordPayload,
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
-    resolve_unit_movement_endpoint_coherency,
 )
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
@@ -710,14 +721,22 @@ def _eligible_units_after_normal_move_restriction(
     descriptor: TriggeredMovementDescriptor,
     eligible_units: tuple[TriggeredMovementEligibleUnit, ...],
 ) -> tuple[TriggeredMovementEligibleUnit, ...]:
+    living_source_units = tuple(
+        unit
+        for unit in eligible_units
+        if triggered_movement_unit_has_placed_living_source(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+        )
+    )
     if descriptor.movement_mode is not MovementMode.NORMAL:
-        return eligible_units
+        return living_source_units
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Triggered movement requires current battle phase.")
     return tuple(
         unit
-        for unit in eligible_units
+        for unit in living_source_units
         if not state.normal_move_states_for_unit_phase(
             player_id=player_id,
             battle_round=state.battle_round,
@@ -810,9 +829,13 @@ def resolve_triggered_movement(
     if type(path_witness) is not PathWitness:
         raise GameLifecycleError("Triggered movement requires a PathWitness.")
     triggered_round = _validate_positive_int("battle_round", battle_round)
-    _validate_move_witness_matches_unit(
-        witness=path_witness,
+    source_model_placements = require_triggered_movement_source_model_placements(
+        scenario=scenario,
         unit_placement=unit_placement,
+    )
+    validate_triggered_movement_source_witness(
+        witness=path_witness,
+        source_model_placements=source_model_placements,
     )
     restriction_violations = _triggered_movement_restriction_violations(
         scenario=scenario,
@@ -823,11 +846,11 @@ def resolve_triggered_movement(
         battle_shocked_unit_ids=battle_shocked_unit_ids,
         normal_move_states=normal_move_states,
     )
-    moved_placements = tuple(
-        placement.with_pose(path_witness.final_pose_for_model(placement.model_instance_id))
-        for placement in unit_placement.model_placements
+    attempted_placement = merge_triggered_movement_source_endpoints(
+        unit_placement=unit_placement,
+        source_model_placements=source_model_placements,
+        witness=path_witness,
     )
-    attempted_placement = unit_placement.with_model_placements(moved_placements)
     unit = scenario.unit_instance_for_placement(unit_placement)
     hover_mode_state = _hover_mode_state_for_unit(
         hover_mode_states=hover_mode_states,
@@ -845,7 +868,12 @@ def resolve_triggered_movement(
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
     model_movements: list[JsonValue] = []
-    for placement in unit_placement.model_placements:
+    friendly_retained_ids, enemy_retained_ids = retained_triggered_movement_blocker_ids(
+        scenario=scenario,
+        moving_player_id=unit_placement.player_id,
+    )
+    retained_model_ids = frozenset((*friendly_retained_ids, *enemy_retained_ids))
+    for placement in source_model_placements:
         model = scenario.model_instance_for_placement(placement)
         moving_model = geometry_model_for_placement(model=model, placement=placement)
         model_poses = path_witness.poses_for_model(placement.model_instance_id)
@@ -882,10 +910,12 @@ def resolve_triggered_movement(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
             ),
+            friendly_model_transit_blocker_ids=friendly_retained_ids,
+            enemy_model_transit_blocker_ids=enemy_retained_ids,
             aircraft_model_ids=tuple(
                 model_id
                 for model_id in aircraft_model_ids
-                if model_id != placement.model_instance_id
+                if model_id != placement.model_instance_id and model_id not in retained_model_ids
             ),
             movement_distance_budget_inches=descriptor.max_distance_inches,
         ).validate()
@@ -916,11 +946,12 @@ def resolve_triggered_movement(
                 }
             )
         )
-    _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
+    coherency_result, rollback_record = resolve_triggered_movement_source_coherency(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         before=unit_placement,
         attempted=attempted_placement,
+        source_model_placements=source_model_placements,
         displacement_kind=descriptor.displacement_kind,
     )
     movement_payload: dict[str, JsonValue] = {
@@ -1087,10 +1118,10 @@ def _triggered_movement_restriction_violations(
                 )
             )
         if (
-            _enemy_engagement_model_ids_for_unit(
+            scenario_physically_engaged_enemy_rules_unit_ids(
                 scenario=scenario,
-                unit_placement=unit_placement,
                 ruleset_descriptor=ruleset_descriptor,
+                unit_instance_id=unit_placement.unit_instance_id,
             )
             and not descriptor.allow_within_engagement_range
         ):
@@ -1130,46 +1161,6 @@ def _triggered_movement_restriction_violations(
     return tuple(violations)
 
 
-def _enemy_engagement_model_ids_for_unit(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    ruleset_descriptor: RulesetDescriptor,
-) -> tuple[str, ...]:
-    friendly_models = _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=unit_placement,
-    )
-    enemy_models = _enemy_geometry_models_for_player(
-        scenario=scenario,
-        player_id=unit_placement.player_id,
-    )
-    enemy_model_ids: set[str] = set()
-    for friendly_model in friendly_models:
-        for enemy_model in enemy_models:
-            if friendly_model.is_within_engagement_range(
-                enemy_model,
-                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-            ):
-                enemy_model_ids.add(enemy_model.model_id)
-    return tuple(sorted(enemy_model_ids))
-
-
-def _geometry_models_for_unit_placement(
-    *,
-    scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-) -> tuple[Model, ...]:
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(placement),
-            placement=placement,
-        )
-        for placement in unit_placement.model_placements
-    )
-
-
 def _friendly_geometry_models_for_path(
     *,
     scenario: BattlefieldScenario,
@@ -1190,6 +1181,8 @@ def _friendly_geometry_models_for_path(
             )
             for placement in placements:
                 if placement.model_instance_id == moving_model_id:
+                    continue
+                if not scenario.model_is_present_at_placement(placement):
                     continue
                 friendly_models.append(
                     geometry_model_for_placement(
@@ -1217,6 +1210,7 @@ def _enemy_geometry_models_for_player(
                     placement=placement,
                 )
                 for placement in unit_placement.model_placements
+                if scenario.model_is_present_at_placement(placement)
             )
     return tuple(enemy_models)
 
@@ -1241,6 +1235,7 @@ def _friendly_vehicle_monster_model_ids(
                 placement.model_instance_id
                 for placement in unit_placement.model_placements
                 if placement.model_instance_id != moving_model_id
+                and scenario.model_is_present_at_placement(placement)
             )
     return tuple(sorted(model_ids))
 
@@ -1260,7 +1255,9 @@ def _enemy_vehicle_monster_model_ids_for_player(
             if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
                 continue
             model_ids.extend(
-                placement.model_instance_id for placement in unit_placement.model_placements
+                placement.model_instance_id
+                for placement in unit_placement.model_placements
+                if scenario.model_is_present_at_placement(placement)
             )
     return tuple(sorted(model_ids))
 
@@ -1908,13 +1905,7 @@ def _request_payload_for_result(  # pyright: ignore[reportUnusedFunction]
 
 
 def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Triggered movement requires battlefield_state.")
-    return BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield_state,
-    )
+    return battlefield_scenario_for_state(state=state)
 
 
 def _current_battle_phase_value(state: GameState) -> str | None:
@@ -1957,20 +1948,6 @@ def _ruleset_descriptor_for_handler(  # pyright: ignore[reportUnusedFunction]
     if handler.ruleset_descriptor is None:
         raise GameLifecycleError("Triggered movement requires a RulesetDescriptor.")
     return handler.ruleset_descriptor
-
-
-def _validate_move_witness_matches_unit(
-    *,
-    witness: PathWitness,
-    unit_placement: UnitPlacement,
-) -> None:
-    if type(witness) is not PathWitness:
-        raise GameLifecycleError("Triggered movement requires a PathWitness.")
-    expected_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
-    )
-    if tuple(sorted(witness.model_ids())) != expected_model_ids:
-        raise GameLifecycleError("Triggered movement witness must match selected unit models.")
 
 
 def _hover_mode_state_for_unit(

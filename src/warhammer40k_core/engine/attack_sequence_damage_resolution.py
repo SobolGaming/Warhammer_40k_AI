@@ -4,11 +4,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine import attack_sequence_destruction_authority as _asda
 from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     no_save_damage_order_roll_spec as _no_save_damage_order_roll_spec,
     record_deadly_demise_secondary_destruction_finalization as _record_deadly_demise_secondary_destruction_finalization,
 )
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.attack_sequence_mortal_wound_logical_death import (
+    attack_deadly_demise_logical_death_binding,
+    attack_deadly_demise_logical_death_recorder,
+)
 from warhammer40k_core.engine.destruction_reaction_conditions import (
     optional_destruction_reaction_active_effect_requirement_is_met as _optional_destruction_reaction_active_effect_requirement_is_met,
 )
@@ -275,6 +280,12 @@ def _apply_damage_after_feel_no_pain(
             damage_kind=damage_kind,
             remove_destroyed_model=False,
         )
+    _asda.reserve_destroyed_attack_damage_authority(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        damage=damage,
+    )
     destroyed_model_controller_player_id = attack_context["defender_player_id"]
     attack_sequence, destroyed_transport_status = _begin_destroyed_transport_disembark_if_needed(
         state=state,
@@ -588,9 +599,17 @@ def _resolve_mandatory_destruction_reactions_before_removal(
     feel_no_pain: FeelNoPainResolution,
     destroyed_model_controller_player_id: str | None = None,
     sources: tuple[DestructionReactionSource, ...] | None = None,
+    parent_cause_ids: tuple[str, ...] = (),
 ) -> LifecycleStatus | None:
     if damage is None or not damage.destroyed:
         return None
+    _asda.reserve_destroyed_attack_damage_authority(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        damage=damage,
+        parent_cause_ids=parent_cause_ids,
+    )
     controller_player_id = (
         attack_context["defender_player_id"]
         if destroyed_model_controller_player_id is None
@@ -795,6 +814,7 @@ def _route_deadly_demise_mortal_wounds(
             player_id=destroyed_model_controller_player_id,
             target_unit_instance_id=target_unit_id,
         )
+        logical_death_binding = attack_deadly_demise_logical_death_binding(attack_sequence)
         progress = MortalWoundApplicationProgress.start(
             application_id=(
                 f"{attack_sequence.sequence_id}:deadly-demise:{source.source_id}:"
@@ -824,6 +844,7 @@ def _route_deadly_demise_mortal_wounds(
             mortal_wounds=mortal_wounds,
             spill_over=True,
             destruction_evidence=None,
+            logical_death_cause_binding=logical_death_binding,
         )
         routed = continue_mortal_wound_application(
             state=state,
@@ -832,6 +853,11 @@ def _route_deadly_demise_mortal_wounds(
             progress=progress,
             dice_manager=manager,
             remove_destroyed_models=False,
+            logical_death_recorder=attack_deadly_demise_logical_death_recorder(
+                state=state,
+                decisions=decisions,
+                attack_sequence=attack_sequence,
+            ),
         )
         if routed.request is not None:
             decisions.request_decision(routed.request)
@@ -901,6 +927,13 @@ def _resolve_deadly_demise_secondary_destroyed_models(
     pending_sources: tuple[DestructionReactionSource, ...],
     secondary_damage_applications: tuple[DamageApplication, ...],
 ) -> LifecycleStatus | None:
+    parent_cause_ids = _asda.reserve_attack_deadly_demise_secondary_authorities(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        source_damage=source_damage,
+        secondary_damage_applications=secondary_damage_applications,
+    )
     for damage_index, secondary_damage in enumerate(secondary_damage_applications):
         secondary_controller_player_id = unit_owner_player_id(
             state=state,
@@ -919,6 +952,7 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             saving_throw_payload=None,
             feel_no_pain=secondary_feel_no_pain,
             destroyed_model_controller_player_id=secondary_controller_player_id,
+            parent_cause_ids=parent_cause_ids,
         )
         if mandatory_status is not None:
             return mandatory_status

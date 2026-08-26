@@ -19,7 +19,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import PlacementError, geometry_model_for_placement
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -50,6 +50,10 @@ from warhammer40k_core.engine.objective_control import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.charge import CHARGE_AFTER_FALL_BACK_EFFECT_KIND
+from warhammer40k_core.engine.physical_engagement import (
+    current_rules_unit_is_physically_engaged,
+    physical_geometry_models_for_rules_unit,
+)
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -91,7 +95,7 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementKind,
     triggered_movement_unit_selection_request,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_coterie_ir,
 )
@@ -1115,39 +1119,18 @@ def _unit_is_engaged(
     *,
     unit_instance_id: str,
 ) -> bool:
-    battlefield = context.state.battlefield_state
-    if battlefield is None:
+    if context.state.battlefield_state is None:
         raise GameLifecycleError("Corsair Coterie engagement checks require battlefield state.")
-    try:
-        unit_placement = battlefield.unit_placement_by_id(unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Corsair Coterie target unit is not placed.") from exc
-    friendly_models = tuple(
-        geometry_model_for_placement(
-            model=_model_instance_by_id(context.state, placement.model_instance_id),
-            placement=placement,
-        )
-        for placement in unit_placement.model_placements
+    scenario = battlefield_scenario_for_state(state=context.state)
+    if not physical_geometry_models_for_rules_unit(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    ):
+        raise GameLifecycleError("Corsair Coterie target unit is not placed.")
+    return current_rules_unit_is_physically_engaged(
+        state=context.state,
+        unit_instance_id=unit_instance_id,
     )
-    for placed_army in battlefield.placed_armies:
-        if placed_army.player_id == unit_placement.player_id:
-            continue
-        for enemy_unit_placement in placed_army.unit_placements:
-            for enemy_placement in enemy_unit_placement.model_placements:
-                enemy_model = geometry_model_for_placement(
-                    model=_model_instance_by_id(context.state, enemy_placement.model_instance_id),
-                    placement=enemy_placement,
-                )
-                if any(
-                    friendly_model.is_within_engagement_range(
-                        enemy_model,
-                        horizontal_inches=context.ruleset_descriptor.engagement_policy.horizontal_inches,
-                        vertical_inches=context.ruleset_descriptor.engagement_policy.vertical_inches,
-                    )
-                    for friendly_model in friendly_models
-                ):
-                    return True
-    return False
 
 
 def _alive_wounds_for_unit(
@@ -1342,24 +1325,6 @@ def _unit_owner(context: StratagemHandlerContext, *, unit_instance_id: str) -> s
         if any(unit.unit_instance_id == requested_unit_id for unit in army.units):
             return army.player_id
     raise GameLifecycleError("Corsair Coterie unit owner is unknown.")
-
-
-def _model_instance_by_id(state: object, model_instance_id: str) -> ModelInstance:
-    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
-    for army in _armies_for_state(state):
-        for unit in army.units:
-            for model in unit.own_models:
-                if model.model_instance_id == requested_model_id:
-                    return model
-    raise GameLifecycleError("Corsair Coterie model is unknown.")
-
-
-def _armies_for_state(state: object) -> tuple[ArmyDefinition, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Corsair Coterie army lookup requires GameState.")
-    return tuple(state.army_definitions)
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:

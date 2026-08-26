@@ -63,6 +63,7 @@ from warhammer40k_core.engine.command_points import (
     command_point_gain_status_from_token,
     command_point_source_kind_from_token,
 )
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -2359,7 +2360,18 @@ def _remove_first_models(state: GameState, *, unit_instance_id: str, count: int)
     removed_ids = tuple(
         placement.model_instance_id for placement in unit_placement.model_placements[:count]
     )
-    state.battlefield_state = state.battlefield_state.with_removed_models(removed_ids)
+    models_by_id = {
+        model.model_instance_id: model for model in _unit_by_id(state, unit_instance_id).own_models
+    }
+    for model_id in removed_ids:
+        model = models_by_id[model_id]
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=unit_instance_id,
+            model_instance_id=model_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
 
 
 def _set_single_model_wounds(state: GameState, *, unit_instance_id: str, wounds: int) -> None:

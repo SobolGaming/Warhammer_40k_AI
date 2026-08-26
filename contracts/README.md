@@ -136,6 +136,50 @@ both fields are non-null when a mission is bound and both are null otherwise.
 Loading rejects a partial pair or any hash drift from the reconstructed
 lifecycle.
 
+Fight/Shooting destruction history additionally persists an engine-private,
+producer-owned inventory of typed `ModelDestructionCauseAuthority` records
+inside `GameState`. Cause-aware attack and rule-destruction producers reserve
+and finalize one cause before emitting `model_destroyed`; cause-aware
+mortal-wound producers register a finalized cause before that emission. A
+`model_destroyed` event carrying `model_destruction_cause_id` consumes the cause
+exactly once. Generic destruction producers outside this typed boundary remain
+valid without that field, while every Fight On Death continuation requires an
+exact consumed cause. Restore binds each cause to the exact source events and
+decisions required by that producer kind, requires every parent to be registered
+before its child and every consumed child event to precede its consumed parent
+event, and preserves stable model/unit/source identity. Missing, duplicate,
+relocated, or cloned typed destruction histories fail closed. Cause IDs and
+authority records are redacted from public projections and event streams. This
+adds no player-facing decision or adapter submission shape and is an internal
+consistency/replay safeguard, not cryptographic protection against a writer that
+can rewrite the whole artifact.
+
+The authoritative event log also records an engine-private, closed
+`model_logical_death_recorded` boundary at the exact alive-to-dead transition.
+It binds the model and physical/rules-unit lineage, event-time placement,
+placement-retention policy, and either the exact damage application or direct
+rule source before any later destruction reaction or physical-removal event.
+Every boundary is owned exactly once by a persisted destruction cause or, while
+a multi-model mortal-wound packet is paused, by the typed progress of its
+pending Feel No Pain request. Recovery rejects orphaned, duplicated, forged,
+reordered, or cross-producer boundaries. Raw replay and operator persistence
+retain the event; shared adapter redaction hides it from every public viewer.
+If a mortal-wound packet pauses for Feel No Pain, the authoritative pending
+request and decision record retain the event and its cause binding for recovery;
+public request, recorded-decision, status, and event projections remove those
+containers wholesale for every viewer role.
+
+Every shared mortal-wound packet also begins with one engine-private
+`mortal_wound_application_started` authority event before damage is applied.
+It freezes the game/application identity, source rule and context, target and
+defender, packet size and spillover mode, destruction evidence, priority models,
+and initial logical-death producer mode. Recovery requires that root to precede
+and bind exactly one pending Feel No Pain continuation or supported terminal;
+the reverse terminal inventory rejects completed packets whose root was removed.
+Ordinary packet terminals are explicitly distinguished from auxiliary Deadly
+Demise collateral-cause finalization. Raw replay retains the start event, while
+the shared adapter redaction owner hides the whole event from every public role.
+
 Contract 10.1 adds the optional `active_secondary_mission_card_jsons`,
 `completed_mission_action_state_jsons`, `primary_unit_destruction_state_jsons`,
 and `starting_strength_record_jsons` members to the closed Primary boundary
@@ -164,6 +208,17 @@ command-to-history evidence.
 Bearer credentials are not persisted. The protected cursor secret and registry
 are authority-private fields used only to preserve existing cursor validity and
 scope across restart.
+
+The authoritative lifecycle state persisted inside that operator artifact
+includes the engine-private typed `ModelDestructionCauseAuthority` inventory.
+Producer registration/finalization and exactly-once consumption are checked
+against the source evidence required by each cause kind during restore,
+including causal registration/consumption order and exact placement. Cause IDs
+and authority records are never published in a player projection, reconnect
+payload, or viewer-scoped event delta. This internal-consistency boundary
+detects accidental corruption, history mismatch, and cloned or relocated
+destruction evidence; it is not a keyed attestation and does not defend against
+a malicious database writer who can rewrite and rehash the complete artifact.
 
 The SQLite reference store uses an explicit initialization operation that
 reserves a new database path with exclusive creation, then transactionally

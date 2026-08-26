@@ -18,6 +18,12 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_decisions import (
     TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
 )
+from warhammer40k_core.engine.model_logical_death import (
+    MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+)
+from warhammer40k_core.engine.mortal_wound_application_authority import (
+    MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
@@ -60,6 +66,16 @@ _INTERNAL_SECONDARY_AUTHORITY_COMMITMENT_KEYS = frozenset(
         "scoring_commit_checkpoint_hash",
         "secondary_scoring_state_evidence_id",
         "secondary_scoring_state_evidence_hash",
+    }
+)
+_INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
+    {
+        "logical_death_cause_binding",
+        "logical_death_event",
+        "logical_death_events",
+        "model_destruction_cause_authorities",
+        "model_destruction_cause_id",
+        "parent_model_destruction_cause_id",
     }
 )
 
@@ -333,6 +349,7 @@ def public_decision_request_payload(
         validate_json_value(request.to_payload()),
         viewer=viewer,
     )
+    payload = _without_internal_model_destruction_authority(payload)
     if not isinstance(payload, dict):
         raise GameLifecycleError("Public DecisionRequest payload must be an object.")
     return payload
@@ -375,7 +392,7 @@ def redacted_lifecycle_status(
         "stage": status.stage.value,
         "status_kind": status.status_kind.value,
         "message": status.message,
-        "payload": metadata_payload,
+        "payload": _without_internal_model_destruction_authority(metadata_payload),
         "pending_request_id": None if decision_request is None else decision_request.request_id,
         "decision_type": None if decision_request is None else decision_request.decision_type,
         "actor_id": None if decision_request is None else decision_request.actor_id,
@@ -400,6 +417,7 @@ def public_event_record_payload(
         payload=payload,
         viewer=viewer,
     )
+    public_payload = _without_internal_model_destruction_authority(public_payload)
     if _is_generic_hidden_event_payload(public_payload):
         return None
     return cast(
@@ -418,6 +436,11 @@ def _event_record_hidden_from_context(
     payload: JsonValue,
     viewer: ViewerContext,
 ) -> bool:
+    if event_type in {
+        MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+        MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+    }:
+        return True
     if _player_owned_secret_event_hidden_from_context(payload=payload, viewer=viewer):
         return True
     if event_type == "decision_requested":
@@ -684,6 +707,18 @@ def _without_internal_secondary_authority_commitments(value: JsonValue) -> JsonV
         }
     if isinstance(value, list):
         return [_without_internal_secondary_authority_commitments(nested) for nested in value]
+    return value
+
+
+def _without_internal_model_destruction_authority(value: JsonValue) -> JsonValue:
+    if isinstance(value, dict):
+        return {
+            key: _without_internal_model_destruction_authority(nested)
+            for key, nested in value.items()
+            if key not in _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS
+        }
+    if isinstance(value, list):
+        return [_without_internal_model_destruction_authority(nested) for nested in value]
     return value
 
 

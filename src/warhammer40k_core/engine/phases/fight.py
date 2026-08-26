@@ -44,6 +44,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
+    rules_unit_has_placed_alive_model,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
@@ -94,6 +95,9 @@ from warhammer40k_core.engine.fight_attack_completion import (
 )
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_eligible_to_fight_this_phase,
+)
+from warhammer40k_core.engine.fight_movement_target_authority import (
+    build_fight_movement_target_authority_witness,
 )
 from warhammer40k_core.engine.fight_order import (
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
@@ -1012,6 +1016,12 @@ def _request_fight_activation_ability_if_available(
     activation: FightActivationSelection,
     target_unit_instance_ids: tuple[str, ...],
 ) -> LifecycleStatus | None:
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=activation.unit_instance_id,
+    )
+    if not rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit):
+        return None
     if _fight_activation_ability_window_resolved(
         state=state,
         decisions=decisions,
@@ -1580,6 +1590,10 @@ def _apply_fight_movement_proposal(
     record = decisions.record_for_result(result)
     proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
     proposal = fight_movement_proposal_from_payload(result.payload)
+    target_authority_witness = build_fight_movement_target_authority_witness(
+        state=state,
+        target_unit_instance_ids=proposal.target_unit_instance_ids,
+    )
     proposal_validation = proposal.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         if not _proposal_validation_has_code(
@@ -1594,6 +1608,7 @@ def _apply_fight_movement_proposal(
             proposal_request=proposal_request,
             proposal_validation=proposal_validation,
             resolution=None,
+            target_authority_witness=target_authority_witness,
             message="Fight movement PathWitness must not repeat only endpoint poses.",
         )
     scenario = _battlefield_scenario(state)
@@ -1626,6 +1641,7 @@ def _apply_fight_movement_proposal(
             proposal_request=proposal_request,
             proposal_validation=resolution_violation,
             resolution=resolution,
+            target_authority_witness=target_authority_witness,
             message=_fight_movement_invalid_message(violation_code),
         )
     battlefield_state = state.battlefield_state
@@ -1675,6 +1691,7 @@ def _apply_fight_movement_proposal(
         "unit_instance_id": proposal.unit_instance_id,
         "transition_batch": validate_json_value(transition_batch.to_payload()),
         "resolution": validate_json_value(resolution.to_payload()),
+        "target_authority_witness": target_authority_witness,
     }
     if isinstance(resolution, FightMovementResolution):
         completed_payload["movement_endpoint_placement"] = validate_json_value(
@@ -2112,6 +2129,7 @@ def _reject_recorded_invalid_fight_movement(
     proposal_request: MovementProposalRequest,
     proposal_validation: ProposalValidationResult,
     resolution: FightRulesUnitMovementResolution | None,
+    target_authority_witness: JsonValue,
     message: str,
 ) -> LifecycleStatus:
     violation_code = _first_proposal_violation_code(proposal_validation)
@@ -2129,6 +2147,7 @@ def _reject_recorded_invalid_fight_movement(
         "proposal_kind": proposal_request.proposal_kind.value,
         "movement_phase_action": proposal_request.movement_phase_action,
         "proposal_validation": validate_json_value(proposal_validation.to_payload()),
+        "target_authority_witness": target_authority_witness,
     }
     if resolution is not None:
         event_payload["resolution"] = validate_json_value(resolution.to_payload())

@@ -19,7 +19,11 @@ from warhammer40k_core.core.datasheet import (
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
 )
-from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    FightPhaseStepKind,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
     DamageProfile,
@@ -36,7 +40,11 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockModifierContext,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
-from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
+from warhammer40k_core.engine.damage_allocation import (
+    DamageKind,
+    MortalWoundApplicationProgress,
+    apply_damage_to_model,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -45,6 +53,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
 )
+from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.fight_phase_decisions import (
     invalid_fight_phase_faction_rule_status,
@@ -557,6 +566,83 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
             FightPhaseEndRequestContext(state=state, decisions=decisions)
         )
         is None
+    )
+
+
+def test_relentless_carnage_requires_living_target_but_measures_retained_physical_base() -> None:
+    target_unit_id = "army-beta:intercessor-unit-3"
+    source_unit_id = "army-alpha:intercessor-unit-1"
+
+    def eligible_targets(*, destroy_all: bool) -> tuple[str, ...]:
+        state = _relentless_carnage_state(
+            game_id=(
+                "phase17g-relentless-carnage-retained-only"
+                if destroy_all
+                else "phase17g-relentless-carnage-mixed"
+            )
+        )
+        target = unit_by_id(state, target_unit_id)
+        battlefield = state.battlefield_state
+        assert battlefield is not None
+        retained_model = target.own_models[0]
+        retained_placement = battlefield.model_placement_by_id(retained_model.model_instance_id)
+        models_to_destroy = target.own_models if destroy_all else (retained_model,)
+        for model in models_to_destroy:
+            apply_damage_to_model(
+                state=state,
+                target_unit_instance_id=target_unit_id,
+                model_instance_id=model.model_instance_id,
+                damage=model.wounds_remaining,
+                damage_kind=DamageKind.NORMAL,
+            )
+        restore_model_awaiting_fight_on_death(
+            state=state,
+            placement=retained_placement,
+            effect_id=(
+                "phase17g:relentless-carnage:retained-only"
+                if destroy_all
+                else "phase17g:relentless-carnage:mixed"
+            ),
+            source_rule_id="phase17g:test:fight-on-death",
+            source_phase=BattlePhaseKind.FIGHT,
+        )
+        return datasheets._enemy_rules_unit_ids_within_source_engagement_range(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            source_unit_instance_id=source_unit_id,
+        )
+
+    assert eligible_targets(destroy_all=True) == ()
+    assert eligible_targets(destroy_all=False) == (target_unit_id,)
+
+    retained_source_state = _relentless_carnage_state(
+        game_id="phase17g-relentless-carnage-retained-source"
+    )
+    source = unit_by_id(retained_source_state, source_unit_id)
+    source_model = source.alive_own_models()[0]
+    source_battlefield = retained_source_state.battlefield_state
+    assert source_battlefield is not None
+    source_placement = source_battlefield.model_placement_by_id(source_model.model_instance_id)
+    apply_damage_to_model(
+        state=retained_source_state,
+        target_unit_instance_id=source_unit_id,
+        model_instance_id=source_model.model_instance_id,
+        damage=source_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    restore_model_awaiting_fight_on_death(
+        state=retained_source_state,
+        placement=source_placement,
+        effect_id="phase17g:relentless-carnage:retained-source",
+        source_rule_id="phase17g:test:fight-on-death",
+        source_phase=BattlePhaseKind.FIGHT,
+    )
+
+    assert (
+        datasheets._enemy_rules_unit_ids_within_source_engagement_range(  # pyright: ignore[reportPrivateUsage]
+            state=retained_source_state,
+            source_unit_instance_id=source_unit_id,
+        )
+        == ()
     )
 
 
@@ -1098,12 +1184,6 @@ def test_datasheet_private_helpers_fail_fast_on_invalid_inputs() -> None:
             state=object(),
             scenario=cast(BattlefieldScenario, object()),
             unit=cast(UnitInstance, object()),
-        )
-    with pytest.raises(GameLifecycleError, match="Engagement range lookup requires GameState"):
-        datasheets._any_models_within_engagement_range(  # pyright: ignore[reportPrivateUsage]
-            state=object(),
-            first_models=(),
-            second_models=(),
         )
     with pytest.raises(GameLifecycleError, match="Datasheet ability lookup requires UnitInstance"):
         datasheets._unit_has_datasheet_ability(  # pyright: ignore[reportPrivateUsage]

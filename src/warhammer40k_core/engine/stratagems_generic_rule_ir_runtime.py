@@ -13,11 +13,7 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestRequest,
 )
 from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldRuntimeState,
-    BattlefieldScenario,
-    ModelPlacement,
     PlacementError,
-    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
     BATTLE_SHOCK_TEST_ROLL_TYPE,
@@ -29,6 +25,10 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.healing_geometry import (
+    healing_phase_start_enemy_engagement_model_ids,
+    healing_phase_start_model_ids,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -43,7 +43,7 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
     primary_reserve_entry_provider_from_accepted_stratagem_use,
 )
 from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveState
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     generic_rule_ir_execution_target_unit_ids,
     unit_by_id,
@@ -817,83 +817,15 @@ def _healing_effect(
         ),
         source_rule_id=_rule_effect_source_id(effect_payload),
         source_context=validate_json_value(source_context),
-        phase_start_model_ids=_phase_start_model_ids(state=state, rules_unit=rules_unit),
-        phase_start_enemy_engagement_model_ids=_phase_start_enemy_engagement_model_ids(
+        phase_start_model_ids=healing_phase_start_model_ids(
+            state=state,
+            rules_unit=rules_unit,
+        ),
+        phase_start_enemy_engagement_model_ids=healing_phase_start_enemy_engagement_model_ids(
             state=state,
             rules_unit=rules_unit,
         ),
     )
-
-
-def _phase_start_model_ids(*, state: GameState, rules_unit: RulesUnitView) -> tuple[str, ...]:
-    return tuple(
-        sorted(
-            placement.model_instance_id
-            for placement in _rules_unit_placements(state=state, rules_unit=rules_unit)
-        )
-    )
-
-
-def _phase_start_enemy_engagement_model_ids(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[str, ...]:
-    battlefield = _battlefield_state(state)
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=battlefield,
-    )
-    ruleset_descriptor = state.runtime_ruleset_descriptor()
-    own_placements = _rules_unit_placements(state=state, rules_unit=rules_unit)
-    engaged_enemy_ids: set[str] = set()
-    for own_placement in own_placements:
-        own_model_instance = scenario.model_instance_for_placement(own_placement)
-        if not own_model_instance.is_alive:
-            continue
-        own_model = geometry_model_for_placement(model=own_model_instance, placement=own_placement)
-        for placed_army in battlefield.placed_armies:
-            if placed_army.player_id == rules_unit.owner_player_id:
-                continue
-            for unit_placement in placed_army.unit_placements:
-                for enemy_placement in unit_placement.model_placements:
-                    enemy_model_instance = scenario.model_instance_for_placement(enemy_placement)
-                    if not enemy_model_instance.is_alive:
-                        continue
-                    enemy_model = geometry_model_for_placement(
-                        model=enemy_model_instance,
-                        placement=enemy_placement,
-                    )
-                    if own_model.is_within_engagement_range(
-                        enemy_model,
-                        horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
-                        vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
-                    ):
-                        engaged_enemy_ids.add(enemy_placement.model_instance_id)
-    return tuple(sorted(engaged_enemy_ids))
-
-
-def _rules_unit_placements(
-    *,
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> tuple[ModelPlacement, ...]:
-    battlefield = _battlefield_state(state)
-    component_ids = set(rules_unit.component_unit_instance_ids)
-    model_ids = {model.model_instance_id for model in rules_unit.own_models}
-    placements: list[ModelPlacement] = []
-    for placed_army in battlefield.placed_armies:
-        if placed_army.player_id != rules_unit.owner_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            if unit_placement.unit_instance_id not in component_ids:
-                continue
-            placements.extend(
-                placement
-                for placement in unit_placement.model_placements
-                if placement.model_instance_id in model_ids
-            )
-    return tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
 
 
 def _emit_healing_runtime_event(
@@ -1041,13 +973,6 @@ def _opposing_player_id(*, state: GameState, player_id: str) -> str:
 
 def _unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> str:
     return rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id).owner_player_id
-
-
-def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Generic RuleIR runtime effect requires battlefield_state.")
-    return battlefield
 
 
 def _event_payload(

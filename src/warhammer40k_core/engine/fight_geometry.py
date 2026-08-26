@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battlefield_presence import (
+    scenario_rules_unit_has_placed_alive_model,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
@@ -12,6 +15,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -300,6 +304,13 @@ def enemy_unit_ids_for_fight_placement(
         if army.player_id != unit_placement.player_id
         for unit in army.units
         if scenario.battlefield_state.is_unit_placed(unit.unit_instance_id)
+        and scenario_rules_unit_has_placed_alive_model(
+            scenario=scenario,
+            rules_unit=rules_unit_view_from_armies(
+                armies=scenario.armies,
+                unit_instance_id=unit.unit_instance_id,
+            ),
+        )
     )
 
 
