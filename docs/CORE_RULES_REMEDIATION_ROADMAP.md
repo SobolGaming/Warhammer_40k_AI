@@ -246,7 +246,7 @@ Completion requires all of the following:
 
 ### P15D — C15-04
 
-Status: Implementation and validation complete; PR publication, review, and merge pending.
+Status: Implementation and validation complete; PR #406 is open pending review and merge.
 
 Finding IDs: `C15-04`.
 
@@ -346,7 +346,8 @@ Validation results:
   `npm run` wrappers could not be invoked verbatim. Their repository-pinned local equivalents
   (`check-generated`, `tsc --noEmit`, `tsx --test`, and `tsx src/main.ts`) passed.
 
-PR URL and merge commit: PR URL pending publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/406`;
+merge commit pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
