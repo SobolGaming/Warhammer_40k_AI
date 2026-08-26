@@ -48,14 +48,18 @@ _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "WE": "world-eaters",
 }
 _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
-    "app_core_rules_hidden_2026_08_09": "official_app_capture",
+    "app_core_rules_hidden_2026_08_09": (
+        "owner_transcription_with_project_authoritative_app_mirror_source"
+    ),
     "chaos_daemons_roster_2026_07": "official_roster_source",
     "court_of_slaughter_anvanth_2026_08": "official_roster_source",
     "event_companion_2026_06_artifacts": "official_event_source",
     "event_companion_layouts_2026_06": "official_event_source",
     "faction_pack_rule_ir": "datasheet_rule_ir_registry",
     "july_faction_packs_2026_07": "official_faction_pack_source",
-    "july_rules_updates_2026_07": "official_rules_update_source",
+    "july_rules_updates_2026_07": (
+        "mixed_official_pdf_owner_transcription_and_project_authoritative_app_mirror_source"
+    ),
     "mfm_2026_06": "official_points_source",
     "mfm_2026_07": "official_points_source",
 }
@@ -264,6 +268,37 @@ def test_edition_source_package_directories_are_explicitly_classified() -> None:
         for package_name, package_kind in _EDITION_SOURCE_PACKAGE_CLASSIFICATION.items()
         if package_kind == "datasheet_rule_ir_registry"
     ) == ("faction_pack_rule_ir",)
+
+
+def test_core_rules_app_mirror_sources_use_project_authority_not_official_capture() -> None:
+    assert (
+        _EDITION_SOURCE_PACKAGE_CLASSIFICATION["app_core_rules_hidden_2026_08_09"]
+        == "owner_transcription_with_project_authoritative_app_mirror_source"
+    )
+    assert (
+        _EDITION_SOURCE_PACKAGE_CLASSIFICATION["july_rules_updates_2026_07"]
+        == "mixed_official_pdf_owner_transcription_and_project_authoritative_app_mirror_source"
+    )
+    assert "official_app_capture" not in _EDITION_SOURCE_PACKAGE_CLASSIFICATION.values()
+
+
+def test_live_40k_app_site_is_not_an_engine_runtime_input() -> None:
+    forbidden_runtime_references = tuple(
+        sorted(
+            path.relative_to(ROOT).as_posix()
+            for path in ENGINE.rglob("*.py")
+            if any(
+                marker in path.read_text(encoding="utf-8")
+                for marker in (
+                    "40k.app",
+                    "data/source_audits/40k_app",
+                    "core_rules_40k_app_audit",
+                )
+            )
+        )
+    )
+
+    assert forbidden_runtime_references == ()
 
 
 @pytest.mark.parametrize(

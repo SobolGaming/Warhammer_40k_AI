@@ -1,14 +1,27 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping
 from types import MappingProxyType
 
 import msgspec
 
-ARTIFACT_SCHEMA = "core-v2-july-rules-updates-source-package-v2"
+from warhammer40k_core.rules.source_evidence import (
+    LoadSupportStatus,
+    RuleEvidenceAuthority,
+    RuleEvidenceError,
+    RuleEvidenceKind,
+    RuleEvidenceRecord,
+    RuleVerificationStatus,
+    SemanticExecutionStatus,
+)
+
+ARTIFACT_SCHEMA = "core-v2-july-rules-updates-source-package-v6"
 EXPECTED_SOURCE_PACKAGE_ID = "gw-11e-rules-and-event-updates-2026-07-22"
 EXPECTED_SOURCE_TITLE = "Warhammer 40,000 July 2026 Rules and Event Updates"
 EXPECTED_SOURCE_VERSION = "2026-07-22"
+EXPECTED_PACKAGE_HASH = "3608f6c6a26dabb2952482d8a47c1a153244af7bbf602a278b7b9d4eb5df3c3d"
 EXPECTED_EVENT_SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
 EXPECTED_UNIVERSAL_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
     {
@@ -62,6 +75,117 @@ EXPECTED_APP_CORE_DOCUMENT_METADATA = (
     "Warhammer 40,000 App Core Rules",
     "2026-07-22",
     "Warhammer 40,000 App",
+)
+EXPECTED_APP_TRANSCRIPTION_PROVENANCE = (
+    "repository_transcription_without_retained_app_capture",
+    "unverified_transcription_only",
+    "transcription_only_no_source_url_app_version_screenshot_or_binary",
+    None,
+    None,
+    None,
+    None,
+    None,
+)
+PROJECT_AUTHORITY_POLICY_ID = (
+    "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
+)
+OWNER_TRANSCRIPTION_EVIDENCE_CONTEXT_ID = "repository-owner-transcription"
+MIRROR_COMPARISON_EVIDENCE_CONTEXT_ID = "40k-app-comparison-2026-08-25"
+EXPECTED_REVIEW_AUDIT_ID = "40k-app-core-rules-2026-08-25"
+EXPECTED_APP_MIRROR_URL_BY_RULE_ID: Mapping[str, str] = MappingProxyType(
+    {
+        "01.02.03-embarked-model-return": "https://www.40k.app/rules/01-core-concepts",
+        "05.03.02-post-roll-attack-profiles": "https://www.40k.app/rules/05-attack-sequence",
+        "05.04.05-fight-on-death": "https://www.40k.app/rules/05-attack-sequence",
+        "09.07.01-desperate-escape-definition": ("https://www.40k.app/rules/09-movement-phase"),
+        "09.07.01-forced-desperate-escape": ("https://www.40k.app/rules/09-movement-phase"),
+        "09-normal-move-one-per-phase": "https://www.40k.app/rules/09-movement-phase",
+        "12.08-objective-consolidation": "https://www.40k.app/rules/12-fight-phase",
+        "14.02.01-control-first": "https://www.40k.app/rules/14-objectives",
+        "18.01-dedicated-transport": "https://www.40k.app/rules/18-transports",
+        "20.01.02-strategic-reserves": ("https://www.40k.app/rules/20-strategic-reserves"),
+        "faq-heavy-fly-horizontal-distance": ("https://www.40k.app/rules/21-flying-and-surging"),
+        "faq-hazardous-mixed-unit-keywords": ("https://www.40k.app/rules/24-core-abilities"),
+        "24.28.01-precision-devastating-wounds": ("https://www.40k.app/rules/24-core-abilities"),
+        "24.37.01-torrent": "https://www.40k.app/rules/24-core-abilities",
+        "25.04-epic-hero-enhancements": "https://www.40k.app/rules/25-muster-armies",
+        "25.04-incursion-detachment": "https://www.40k.app/rules/25-muster-armies",
+    }
+)
+EXPECTED_APP_REVIEW_AUDIT_SOURCE_OBSERVATION_BY_RULE_ID: Mapping[str, tuple[str, str]] = (
+    MappingProxyType(
+        {
+            "01.02.03-embarked-model-return": (
+                "category:01",
+                "3668da89d60d6234672f11be41cb08ddca6816354db062b47c4b4adf8ebf2ec5",
+            ),
+            "05.03.02-post-roll-attack-profiles": (
+                "finding:40k-app-numbering-05-03-02",
+                "05f23eceb90b1a3096c104858f0fa19be6e9d0c62a2932e63e01539098d9bd9f",
+            ),
+            "05.04.05-fight-on-death": (
+                "category:05",
+                "c771b8acbb62f912cc21c649a6a1ec0cac5d5a1f02e5454747b9427a8571892e",
+            ),
+            "09.07.01-desperate-escape-definition": (
+                "finding:40k-app-duplicate-09-07-01",
+                "176af8d44bd405c13a3da73fa4d06eab83c81fa4784112fa34d24d1861c93cb9",
+            ),
+            "09.07.01-forced-desperate-escape": (
+                "finding:40k-app-duplicate-09-07-01",
+                "176af8d44bd405c13a3da73fa4d06eab83c81fa4784112fa34d24d1861c93cb9",
+            ),
+            "09-normal-move-one-per-phase": (
+                "category:09",
+                "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+            ),
+            "12.08-objective-consolidation": (
+                "finding:july-transcription-conflict-12-08",
+                "726ce364500c7f1d6b9776651f430ac05ad144a5899877fdbd857128e6cf041c",
+            ),
+            "14.02.01-control-first": (
+                "category:14",
+                "ff60f2ecfd3c0e16b9815c05183d66dcbe940fd0fca006046a08f93ba67a80fc",
+            ),
+            "18.01-dedicated-transport": (
+                "category:18",
+                "d9a06d3c5b350f66bad9e4b89f62242fd0f0b4c54579ea3ad6bbf2c2674b8d0e",
+            ),
+            "20.01.02-strategic-reserves": (
+                "category:20",
+                "e286a7f886f625a18def11dc4fcbd41fd6fee12aad88a575471fed0e77186729",
+            ),
+            "faq-heavy-fly-horizontal-distance": (
+                "finding:july-transcription-not-observed-fly-heavy",
+                "06190cdde3ed1cb3dbb9a1eaabd7fb8d0844ad09d117b0515090befdcf38aebb",
+            ),
+            "faq-hazardous-mixed-unit-keywords": (
+                "finding:july-transcription-not-observed-mixed-hazard",
+                "3e631ef574fa9c00dab7d1a6621d8f63252017925f1413f8fe1d1bf328f61b82",
+            ),
+            "24.28.01-precision-devastating-wounds": (
+                "category:24",
+                "5f68585a913965b35453a1d3e6d8278583c85e20a6dcf0721fef6f899080877a",
+            ),
+            "24.37.01-torrent": (
+                "category:24",
+                "5f68585a913965b35453a1d3e6d8278583c85e20a6dcf0721fef6f899080877a",
+            ),
+            "25.04-epic-hero-enhancements": (
+                "category:25",
+                "11ec20d47a3a15ae3a01377c5591ed22e14cf3e39a8f04d25424166d5d0e4ac7",
+            ),
+            "25.04-incursion-detachment": (
+                "category:25",
+                "11ec20d47a3a15ae3a01377c5591ed22e14cf3e39a8f04d25424166d5d0e4ac7",
+            ),
+        }
+    )
+)
+EXPECTED_FIGHT_ON_DEATH_RUNTIME_CONSUMERS = (
+    "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
+    "warhammer40k_core.engine.rule_model_destruction_fight_continuation:"
+    "remove_remaining_fight_on_death_models_at_phase_end",
 )
 EXPECTED_UNIVERSAL_DOCUMENT_METADATA = (
     "eng_22-07_warhammer40000_universal_rules_updates",
@@ -125,6 +249,92 @@ class AppCoreRuleUpdateRecord(msgspec.Struct, frozen=True, forbid_unknown_fields
     source_id: str
     source_text: str
     behavior_descriptor: str
+    evidence_ids: tuple[str, ...]
+
+
+class AppCoreTranscriptionProvenanceArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    provenance_kind: str
+    authority: str
+    availability: str
+    observation_date: str | None
+    app_version: str | None
+    source_url: str | None
+    screenshot_sha256: str | None
+    source_binary_sha256: str | None
+
+
+class AppCoreEvidenceContextArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    context_id: str
+    evidence_kind: RuleEvidenceKind
+    authority: RuleEvidenceAuthority
+    project_authority_policy_id: str | None
+    review_audit_id: str | None
+    provider_name: str
+    source_title: str
+    source_platform: str
+    observed_at: str | None
+    app_version: str | None
+    app_build: str | None
+    capture_artifact_path: str | None
+    capture_sha256: str | None
+    official_corroborating_source_ids: tuple[str, ...]
+    provider_non_affiliation_recorded: bool
+
+
+class AppCoreRuleEvidenceArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+    evidence_id: str
+    evidence_context_id: str
+    rule_source_id: str
+    source_url: str | None
+    review_audit_row_id: str | None
+    review_audit_source_observation_sha256: str | None
+    transcription_sha256: str
+    verification_status: RuleVerificationStatus
+    observation_sha256: str
+    load_support_status: LoadSupportStatus
+    semantic_execution_status: SemanticExecutionStatus
+    runtime_consumer_ids: tuple[str, ...]
+
+    def to_rule_evidence_record(
+        self,
+        *,
+        context: AppCoreEvidenceContextArtifact,
+    ) -> RuleEvidenceRecord:
+        return RuleEvidenceRecord(
+            evidence_id=self.evidence_id,
+            rule_source_id=self.rule_source_id,
+            evidence_kind=context.evidence_kind,
+            authority=context.authority,
+            project_authority_policy_id=context.project_authority_policy_id,
+            review_audit_id=context.review_audit_id,
+            review_audit_row_id=self.review_audit_row_id,
+            review_audit_source_observation_sha256=self.review_audit_source_observation_sha256,
+            provider_name=context.provider_name,
+            source_title=context.source_title,
+            source_platform=context.source_platform,
+            source_url=self.source_url,
+            observed_at=context.observed_at,
+            app_version=context.app_version,
+            app_build=context.app_build,
+            capture_artifact_path=context.capture_artifact_path,
+            capture_sha256=context.capture_sha256,
+            transcription_sha256=self.transcription_sha256,
+            official_corroborating_source_ids=context.official_corroborating_source_ids,
+            verification_status=self.verification_status,
+            provider_non_affiliation_recorded=context.provider_non_affiliation_recorded,
+            observation_sha256=self.observation_sha256,
+            load_support_status=self.load_support_status,
+            semantic_execution_status=self.semantic_execution_status,
+            runtime_consumer_ids=self.runtime_consumer_ids,
+        )
 
 
 class EventLayoutRevisionRecord(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
@@ -165,6 +375,9 @@ class AppCoreRulesUpdateArtifact(msgspec.Struct, frozen=True, forbid_unknown_fie
     source_title: str
     source_version: str
     source_platform: str
+    transcription_provenance: AppCoreTranscriptionProvenanceArtifact
+    evidence_contexts: tuple[AppCoreEvidenceContextArtifact, ...]
+    evidence_records: tuple[AppCoreRuleEvidenceArtifact, ...]
     rules: tuple[AppCoreRuleUpdateRecord, ...]
 
 
@@ -177,6 +390,7 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
     universal_rules_update: UniversalRulesUpdateArtifact
     event_companion: EventCompanionUpdateArtifact
     app_core_rules_update: AppCoreRulesUpdateArtifact
+    package_hash: str
 
     def validate(self) -> None:
         if self.artifact_schema != ARTIFACT_SCHEMA:
@@ -198,6 +412,13 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
         self._validate_universal_rules_update()
         self._validate_event_companion_update()
         self._validate_app_core_rules_update()
+        _validate_sha256("package_hash", self.package_hash)
+        if self.package_hash != july_rules_updates_package_hash(self):
+            raise JulyRulesUpdateArtifactError("July rules-update package hash is stale.")
+        if self.package_hash != EXPECTED_PACKAGE_HASH:
+            raise JulyRulesUpdateArtifactError(
+                "July rules-update package hash drifted from its reviewed pin."
+            )
 
     def _validate_universal_rules_update(self) -> None:
         update = self.universal_rules_update
@@ -301,6 +522,92 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
             update.source_platform,
         ) != EXPECTED_APP_CORE_DOCUMENT_METADATA:
             raise JulyRulesUpdateArtifactError("App core-rules document metadata drifted.")
+        provenance = update.transcription_provenance
+        if (
+            provenance.provenance_kind,
+            provenance.authority,
+            provenance.availability,
+            provenance.observation_date,
+            provenance.app_version,
+            provenance.source_url,
+            provenance.screenshot_sha256,
+            provenance.source_binary_sha256,
+        ) != EXPECTED_APP_TRANSCRIPTION_PROVENANCE:
+            raise JulyRulesUpdateArtifactError("App core-rules transcription provenance drifted.")
+        contexts_by_id = {context.context_id: context for context in update.evidence_contexts}
+        if len(contexts_by_id) != len(update.evidence_contexts) or set(contexts_by_id) != {
+            OWNER_TRANSCRIPTION_EVIDENCE_CONTEXT_ID,
+            MIRROR_COMPARISON_EVIDENCE_CONTEXT_ID,
+        }:
+            raise JulyRulesUpdateArtifactError("App core-rules evidence-context inventory drifted.")
+        owner_context = contexts_by_id[OWNER_TRANSCRIPTION_EVIDENCE_CONTEXT_ID]
+        if (
+            owner_context.evidence_kind,
+            owner_context.authority,
+            owner_context.project_authority_policy_id,
+            owner_context.review_audit_id,
+            owner_context.provider_name,
+            owner_context.source_title,
+            owner_context.source_platform,
+            owner_context.observed_at,
+            owner_context.app_version,
+            owner_context.app_build,
+            owner_context.capture_artifact_path,
+            owner_context.capture_sha256,
+            owner_context.official_corroborating_source_ids,
+            owner_context.provider_non_affiliation_recorded,
+        ) != (
+            "owner_supplied_app_transcription",
+            "unverified_transcription_only",
+            None,
+            None,
+            "Project Repository",
+            "Uncaptured repository transcription attributed to Warhammer 40,000 App",
+            "Repository",
+            None,
+            None,
+            None,
+            None,
+            None,
+            (),
+            False,
+        ):
+            raise JulyRulesUpdateArtifactError(
+                "App core-rules owner-transcription provenance drifted."
+            )
+        mirror_context = contexts_by_id[MIRROR_COMPARISON_EVIDENCE_CONTEXT_ID]
+        if (
+            mirror_context.evidence_kind,
+            mirror_context.authority,
+            mirror_context.project_authority_policy_id,
+            mirror_context.review_audit_id,
+            mirror_context.provider_name,
+            mirror_context.source_title,
+            mirror_context.source_platform,
+            mirror_context.observed_at,
+            mirror_context.app_version,
+            mirror_context.app_build,
+            mirror_context.capture_artifact_path,
+            mirror_context.capture_sha256,
+            mirror_context.official_corroborating_source_ids,
+            mirror_context.provider_non_affiliation_recorded,
+        ) != (
+            "third_party_mirror",
+            "project_authoritative_app_mirror",
+            PROJECT_AUTHORITY_POLICY_ID,
+            EXPECTED_REVIEW_AUDIT_ID,
+            "40k.app",
+            "40k.app Core Rules",
+            "Web",
+            "2026-08-25T00:00:00-04:00",
+            None,
+            None,
+            None,
+            None,
+            (),
+            True,
+        ):
+            raise JulyRulesUpdateArtifactError("App core-rules mirror provenance drifted.")
         rule_behaviors = {rule.rule_id: rule.behavior_descriptor for rule in update.rules}
         if rule_behaviors != EXPECTED_APP_CORE_RULE_BEHAVIORS or len(rule_behaviors) != len(
             update.rules
@@ -315,6 +622,124 @@ class JulyRulesUpdatesPackageArtifact(msgspec.Struct, frozen=True, forbid_unknow
             )
             if rule.source_id != f"{self.source_package_id}:app-core-rules:{rule.rule_id}":
                 raise JulyRulesUpdateArtifactError("App core-rules source identity drifted.")
+            if len(rule.evidence_ids) < 2 or len(set(rule.evidence_ids)) != len(rule.evidence_ids):
+                raise JulyRulesUpdateArtifactError(
+                    "Each App core-rules row must reference distinct provenance and comparison "
+                    "evidence records."
+                )
+        evidence_by_id = {record.evidence_id: record for record in update.evidence_records}
+        if len(evidence_by_id) != len(update.evidence_records):
+            raise JulyRulesUpdateArtifactError(
+                "App core-rules evidence identity inventory drifted."
+            )
+        rules_by_source_id = {rule.source_id: rule for rule in update.rules}
+        if len(rules_by_source_id) != len(update.rules):
+            raise JulyRulesUpdateArtifactError("App core-rules source IDs must be unique.")
+        referenced_evidence_ids = {
+            evidence_id for rule in update.rules for evidence_id in rule.evidence_ids
+        }
+        unknown_evidence_ids = referenced_evidence_ids - set(evidence_by_id)
+        if unknown_evidence_ids:
+            raise JulyRulesUpdateArtifactError("App core-rules row references unknown evidence.")
+        if referenced_evidence_ids != set(evidence_by_id):
+            raise JulyRulesUpdateArtifactError("App core-rules evidence contains orphan records.")
+        records_by_source_id: dict[str, list[AppCoreRuleEvidenceArtifact]] = {}
+        for evidence in update.evidence_records:
+            records_by_source_id.setdefault(evidence.rule_source_id, []).append(evidence)
+        for rule in update.rules:
+            rule_evidence = records_by_source_id.get(rule.source_id, [])
+            if set(rule.evidence_ids) != {record.evidence_id for record in rule_evidence}:
+                raise JulyRulesUpdateArtifactError(
+                    "App core-rules row evidence links cross source-rule identities."
+                )
+            if {record.evidence_context_id for record in rule_evidence} != {
+                OWNER_TRANSCRIPTION_EVIDENCE_CONTEXT_ID,
+                MIRROR_COMPARISON_EVIDENCE_CONTEXT_ID,
+            }:
+                raise JulyRulesUpdateArtifactError(
+                    "Each App core-rules row requires owner transcription and mirror comparison "
+                    "evidence."
+                )
+        for evidence_id, evidence in evidence_by_id.items():
+            context = contexts_by_id.get(evidence.evidence_context_id)
+            if context is None:
+                raise JulyRulesUpdateArtifactError(
+                    "App core-rules evidence references an unknown context."
+                )
+            try:
+                record = evidence.to_rule_evidence_record(context=context)
+            except RuleEvidenceError as exc:
+                raise JulyRulesUpdateArtifactError(
+                    "App core-rules evidence record is invalid."
+                ) from exc
+            evidenced_rule = rules_by_source_id.get(record.rule_source_id)
+            if evidenced_rule is None or evidence_id not in evidenced_rule.evidence_ids:
+                raise JulyRulesUpdateArtifactError(
+                    "App core-rules evidence is attached to the wrong source row."
+                )
+            if evidence.evidence_context_id == OWNER_TRANSCRIPTION_EVIDENCE_CONTEXT_ID:
+                expected_evidence_id = (
+                    f"repository-app-core-rules-transcription:{evidenced_rule.rule_id}"
+                )
+                expected_verification_status = "unverified"
+                expected_source_url = None
+                expected_review_audit_row_id = None
+                expected_review_audit_source_observation_sha256 = None
+            else:
+                expected_evidence_id = f"40k-app-core-rules-2026-08-25:{evidenced_rule.rule_id}"
+                if evidenced_rule.rule_id == "12.08-objective-consolidation":
+                    expected_verification_status = "conflict"
+                elif evidenced_rule.rule_id in {
+                    "faq-heavy-fly-horizontal-distance",
+                    "faq-hazardous-mixed-unit-keywords",
+                }:
+                    expected_verification_status = "not_observed_on_mirror"
+                else:
+                    expected_verification_status = "authoritative_app_mirror"
+                expected_source_url = EXPECTED_APP_MIRROR_URL_BY_RULE_ID[evidenced_rule.rule_id]
+                (
+                    expected_review_audit_row_id,
+                    expected_review_audit_source_observation_sha256,
+                ) = EXPECTED_APP_REVIEW_AUDIT_SOURCE_OBSERVATION_BY_RULE_ID[evidenced_rule.rule_id]
+            if evidence_id != expected_evidence_id:
+                raise JulyRulesUpdateArtifactError("App core-rules evidence identity drifted.")
+            if record.source_url != expected_source_url:
+                raise JulyRulesUpdateArtifactError("App core-rules evidence URL drifted.")
+            if (
+                record.review_audit_row_id,
+                record.review_audit_source_observation_sha256,
+            ) != (
+                expected_review_audit_row_id,
+                expected_review_audit_source_observation_sha256,
+            ):
+                raise JulyRulesUpdateArtifactError(
+                    "App core-rules retained audit source-observation link drifted."
+                )
+            transcription_sha256 = hashlib.sha256(evidenced_rule.source_text.encode()).hexdigest()
+            if record.transcription_sha256 != transcription_sha256:
+                raise JulyRulesUpdateArtifactError("App core-rules transcription hash is stale.")
+            if record.verification_status != expected_verification_status:
+                raise JulyRulesUpdateArtifactError("App core-rules verification status drifted.")
+            if record.load_support_status != "loaded":
+                raise JulyRulesUpdateArtifactError("App core-rules load support drifted.")
+            if evidenced_rule.rule_id == "05.04.05-fight-on-death":
+                if (
+                    record.semantic_execution_status != "partial_engine_runtime"
+                    or record.runtime_consumer_ids != EXPECTED_FIGHT_ON_DEATH_RUNTIME_CONSUMERS
+                ):
+                    raise JulyRulesUpdateArtifactError("Fight On Death execution evidence drifted.")
+            elif evidenced_rule.rule_id == "12.08-objective-consolidation":
+                if (
+                    record.semantic_execution_status != "blocked_by_source_conflict"
+                    or record.runtime_consumer_ids
+                ):
+                    raise JulyRulesUpdateArtifactError(
+                        "Objective Consolidation conflict evidence drifted."
+                    )
+            elif record.semantic_execution_status != "not_certified" or record.runtime_consumer_ids:
+                raise JulyRulesUpdateArtifactError(
+                    "Uncertified App core-rules execution evidence drifted."
+                )
 
 
 def july_rules_updates_package_artifact_from_json_bytes(
@@ -330,6 +755,15 @@ def july_rules_updates_package_artifact_from_json_bytes(
     return artifact
 
 
+def july_rules_updates_package_hash(artifact: JulyRulesUpdatesPackageArtifact) -> str:
+    payload = msgspec.to_builtins(artifact)
+    if type(payload) is not dict:
+        raise JulyRulesUpdateArtifactError("July rules-update artifact payload is invalid.")
+    payload["package_hash"] = ""
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def _validate_unique_source_ids(source_ids: tuple[str, ...], *, expected_count: int) -> None:
     if len(source_ids) != expected_count or len(set(source_ids)) != expected_count:
         raise JulyRulesUpdateArtifactError("July rules-update source-ID inventory drifted.")
@@ -343,3 +777,35 @@ def _validate_non_empty_strings(*values: object) -> None:
         raise JulyRulesUpdateArtifactError(
             "July rules-update text values must be non-empty stripped strings."
         )
+
+
+def _validate_sha256(field_name: str, value: object) -> str:
+    if (
+        type(value) is not str
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
+    ):
+        raise JulyRulesUpdateArtifactError(
+            f"July rules-update {field_name} must be lowercase SHA-256."
+        )
+    return value
+
+
+__all__ = (
+    "ARTIFACT_SCHEMA",
+    "EXPECTED_PACKAGE_HASH",
+    "AppCoreEvidenceContextArtifact",
+    "AppCoreRuleEvidenceArtifact",
+    "AppCoreRuleUpdateRecord",
+    "AppCoreRulesUpdateArtifact",
+    "AppCoreTranscriptionProvenanceArtifact",
+    "EventCompanionRuleUpdateRecord",
+    "EventCompanionUpdateArtifact",
+    "EventLayoutRevisionRecord",
+    "JulyRulesUpdateArtifactError",
+    "JulyRulesUpdatesPackageArtifact",
+    "UniversalRuleUpdateRecord",
+    "UniversalRulesUpdateArtifact",
+    "july_rules_updates_package_artifact_from_json_bytes",
+    "july_rules_updates_package_hash",
+)

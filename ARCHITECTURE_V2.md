@@ -2059,10 +2059,13 @@ Invariants:
 - a model is Hidden when it is at least partially within a terrain area
   containing one or more Light or Dense terrain features and its unit did not
   make ranged attacks in the current or previous player turn;
-- the project-owner-supplied official Warhammer 40,000 App transcription
-  observed on 2026-08-09 (source package
-  `gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09`) supersedes
-  the older Core Rules section 13.09 Dense-only wording for Hidden;
+- the project-owner transcription observed on 2026-08-09 (source package
+  `gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09`) remains
+  unverified historical provenance on its own; a separate hash-pinned 40k.app
+  observation matches it and, under source policy
+  `core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`,
+  is the project-authoritative maintained-App wording that supersedes the older
+  Core Rules section 13.09 Dense-only wording for Hidden;
   Light, Dense, and Mixed terrain areas qualify, while an Unknown
   classification does not establish the required Light/Dense feature;
 - on the first turn, the previous-turn no-ranged-attacks condition is true;

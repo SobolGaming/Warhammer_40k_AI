@@ -76,6 +76,15 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "app_core_rules_hidden_2026_08_09"
     / "artifacts"
     / "hidden.json",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "july_rules_updates_2026_07"
+    / "artifacts"
+    / "package.json",
 )
 
 

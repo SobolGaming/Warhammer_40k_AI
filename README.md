@@ -428,6 +428,25 @@ Current status:
   and hashes remain authoritative provenance. Reviewed provider observations may
   be retained as assignment-level evidence under `data/source_audits/39k_pro`,
   but no provider content is loaded by the runtime.
+- The checked-in [40k.app core-rules comparison](docs/CORE_RULES_40K_APP_COMPARISON.md)
+  inventories all 25 Core Rules category locators under
+  `data/source_audits/40k_app`. Under the owner-approved
+  [Core Rules source authority policy](docs/CORE_RULES_SOURCE_POLICY.md), each
+  pinned observation is the project's authoritative verbatim mirror of the
+  maintained Games Workshop App for this scope. Its App wording supersedes
+  older PDF wording where they differ. 40k.app remains a non-affiliated host,
+  and the live website is never runtime input: loaders consume only reviewed,
+  normalized, hash-pinned artifacts. Routine official-App capture is
+  unnecessary; a source-policy disambiguation exception instead requires an
+  owner check and prefers a retained capture when mirror equivalence is itself
+  disputed. This audit excludes factions, faction detachments, and faction
+  datasheet content.
+- The dependency-ordered
+  [Core Rules remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md)
+  tracks the itemized implementation findings from the accompanying
+  25-category code review; the comparison artifact records each category's
+  assessed disposition and planned PR IDs without conflating source provenance
+  with semantic execution.
 - README milestone anchors retained for code-quality audits: Phase 14H is complete;
   Phase 14I is complete; Phase 14K is complete; Phase 17A.1 is complete.
   Phase 14H anchors: runtime Attached Unit formation; structured army-list Leader/Support declarations; first-class attached rules-unit formation records; healing, revival, persisting effects; Movement-phase Combat Disembark fallback with engine-owned evidence; setup-time Strategic Reserve declarations; repositioned-unit Advance/Fall Back/Disembark history.

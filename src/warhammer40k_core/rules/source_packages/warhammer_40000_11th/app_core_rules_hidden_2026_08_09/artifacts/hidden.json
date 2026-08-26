@@ -1,8 +1,8 @@
 {
-  "artifact_schema": "core-v2-warhammer-40000-app-hidden-transcription-v1",
+  "artifact_schema": "core-v2-warhammer-40000-app-hidden-transcription-v4",
   "source_package_id": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09",
   "source_capture": {
-    "provenance_kind": "project_owner_supplied_official_app_transcription",
+    "provenance_kind": "owner_supplied_app_transcription",
     "source_title": "Warhammer 40,000 App Core Rules",
     "source_platform": "Warhammer 40,000 App",
     "observation_date": "2026-08-09",
@@ -16,12 +16,74 @@
     "source_text": "A model is hidden while all of the following apply to it:\n\nThat model has the INFANTRY/BEASTS/SWARM keyword and is within a terrain area that contains one or more light/dense terrain features\nThat model's unit did not make one or more ranged attacks during this turn or during the previous turn. While a model is hidden, it can only be visible to enemy models that are within its detection range. Unless otherwise stated, a model's detection range is 15\".\n\nNOTE: During the first turn, conditions that require something not have happened during the previous turn are true. For the Hidden rule, this means that during the first turn a unit has not made ranged attacks during the previous turn.",
     "transcription_sha256": "f296139496b5385347ec6c91bf2b898b9ac7ead996ae4f345cc2122002cf769e"
   },
-  "supersession": {
-    "supersedes_source_package_id": "gw-11e-core-rules",
-    "supersedes_document_id": "eng_01-06_warhammer40k_new40k_core_rules",
-    "supersedes_rule_reference": "13.09 Hidden",
-    "supersession_scope": "hidden_terrain_area_feature_eligibility",
-    "relationship": "later_official_app_wording_supersedes_older_core_rules_pdf"
+  "source_relationship": {
+    "official_pdf_source_package_id": "gw-11e-core-rules",
+    "official_pdf_document_id": "eng_01-06_warhammer40k_new40k_core_rules",
+    "official_pdf_rule_reference": "13.09 Hidden",
+    "comparison_scope": "hidden_terrain_area_feature_eligibility",
+    "relationship_status": "maintained_app_wording_supersedes_pdf_by_project_source_policy"
   },
-  "package_hash": "12061dc13eda2edeeb1efaaec2725ed0048a306858fbb8a92e9a9d3ac603f984"
+  "package_hash": "b65d4058463a2825b8808d1d7dfff2e82c8c87641f4241bf600e1bb82a866058",
+  "evidence_records": [
+    {
+      "evidence_id": "project-owner-hidden-transcription-2026-08-09:13.09-hidden",
+      "rule_source_id": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden",
+      "evidence_kind": "owner_supplied_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "Project Owner",
+      "source_title": "Uncaptured transcription attributed to Warhammer 40,000 App Core Rules",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f296139496b5385347ec6c91bf2b898b9ac7ead996ae4f345cc2122002cf769e",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "0c7652852155708375f092b14427daf6dc936c3d44cae5e9eaa75df6f4a5465b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target",
+        "warhammer40k_core.engine.terrain_hidden:terrain_hidden_model_ids"
+      ]
+    },
+    {
+      "evidence_id": "40k-app-core-rules-2026-08-25:13.09-hidden",
+      "rule_source_id": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "finding:hidden-unverified-source-13-09",
+      "review_audit_source_observation_sha256": "62d982be96a81f69059f11def8a0ee75e6ae64f2dfd6f7132e4913140e9aaaf4",
+      "provider_name": "40k.app",
+      "source_title": "40k.app Core Rules",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/13-terrain",
+      "observed_at": "2026-08-25T00:00:00-04:00",
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "f296139496b5385347ec6c91bf2b898b9ac7ead996ae4f345cc2122002cf769e",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "ed53f99a6e521d8af5cabdce5f56aa981dc2003cc25ba3d8ae51a8ed0c51dd8e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target",
+        "warhammer40k_core.engine.terrain_hidden:terrain_hidden_model_ids"
+      ]
+    }
+  ]
 }

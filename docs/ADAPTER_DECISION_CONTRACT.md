@@ -1759,6 +1759,22 @@ Phase 13E implements this destroyed-model attack-resolution decision:
 
 - `select_destruction_reaction`: finite controlling-player choice emitted after attack-sequence damage destroys a model with one or more optional structured destruction-reaction sources. Option IDs are optional source IDs plus `decline_destruction_reaction`. Source options carry `payload.source_id`, `payload.reaction_kind`, and `payload.optional: true`, where supported optional `reaction_kind` values include `shoot_on_death` and `fight_on_death`; the decline option uses null source and kind values. `payload.destruction_context` contains the JSON-safe attack context, damage application, `model_destroyed` event ID, damage event ID, removal record, transition batch, `destroyed_model_controller_player_id`, a typed `destruction_provenance`, and a nullable engine continuation payload. The provenance records `destruction_source_kind` (`attack`, `deadly_demise`, `hazardous`, or `ability`), `attack_kind` (`melee`, `ranged`, or `none`), and, only for attack destructions, the full typed source weapon profile and attack-context ID. Attack kind is derived from that typed weapon profile rather than inferred from the current phase, and replay validation rejects attack-kind, weapon-profile, or attack-context drift. Adapters must submit one pending option ID through `GameLifecycle.submit_decision(...)` and must not start shooting, fighting, explosion, continuation, or removal mutations locally from the option payload. Accepted selections are recorded as destruction-reaction resolutions for the appropriate engine action host. Source rule `gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:05.04.05-fight-on-death` makes an accepted `fight_on_death` source retain the destroyed model at its recorded placement, emit `fight_on_death_model_awaiting_attack`, and let that model contribute its attacks when its rules unit takes the applicable single ordinary attack selection. The fixed retained placement remains available for source-required physical measurement and deterministic replay, but is not general living-model authority: the retained model cannot use ordinary abilities, move, Pile In, Consolidate, or become ranged or melee target geometry. A target rules unit requires at least one placed living model; a mixed unit remains targetable, but target geometry and damage allocation use only its living models. Ranged rejection uses `target_has_no_placed_living_models`. The source rule's separate narrow exception remains explicit: a Stratagem that targets the retained model's unit also affects that destroyed model. Restore rejects a retained pose that differs from the authoritative destruction event. The cleanup emits `fight_on_death_models_removed` with `reason: "unit_fight_completed"` or `reason: "phase_end"`; adapters must not remove it locally. The model's zero-wound state means it does not contribute keywords while waiting. Mandatory sources such as `deadly_demise` resolve automatically before destroyed-model removal, including trigger rolls, eligible nearby-unit mortal-wound packets, any secondary-casualty removal/reaction host, and any routed `select_feel_no_pain` choices; they must not be presented as destruction-reaction options.
 
+P00 preserves that adapter behavior and stable source ID but does not certify it
+as complete rule execution. Its repository transcription remains unverified on
+its own, but a separate matching observation at
+`https://www.40k.app/rules/05-attack-sequence` is governed by source policy
+`core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`.
+Under that owner-approved policy, 40k.app is the project-authoritative verbatim
+mirror of the maintained App for Core Rules, while remaining a non-affiliated
+host. The current engine path is partial because of the recorded attack-sequence
+timing/removal gap, not because the mirror is secondary evidence. A later
+behavioral PR must close that gap against the authoritative App-mirror wording;
+routine official-App capture is unnecessary. A source-policy disambiguation
+exception instead requires an owner check and prefers a retained capture when
+mirror equivalence is itself disputed. Adapters must not infer or patch that gap
+locally, and neither adapters nor the engine may query the live website or treat
+it as runtime input.
+
 The authoritative log marks logical death before any resulting destruction
 reaction or physical-removal event. `model_logical_death_recorded` is a private
 engine boundary, not a player-visible timing window: it makes historical
@@ -1811,11 +1827,19 @@ targeting prohibition. An eligible `[INDIRECT FIRE]` weapon can therefore
 target an in-range Hidden model outside Detection Range through the normal
 not-visible Indirect path and restrictions. Lone Operative remains distinct
 because its rule separately prohibits Indirect Fire outside its stated range.
-The project-owner-supplied official Warhammer 40,000 App transcription observed
-on 2026-08-09 (source package
-`gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09`) supersedes the
-older Core Rules section 13.09 Dense-only wording for terrain-derived Hidden,
-so Light as well as Dense terrain can grant it.
+The current engine allows Light as well as Dense terrain to grant Hidden. Its
+supporting source row (package
+`gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09`) is an
+uncaptured project-owner transcription attributed to the Warhammer 40,000 App;
+that historical record remains unverified on its own. A separate observation at
+`https://www.40k.app/rules/13-terrain` matches it. Under source policy
+`core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`,
+40k.app is the project-authoritative verbatim mirror of the maintained App, and
+the App wording supersedes the older PDF’s Dense-only wording for this rule.
+The evidence continues to identify 40k.app as a non-affiliated provider. P00
+corrects provenance and certification without changing gameplay behavior. The
+live website is not adapter or engine input; only reviewed, normalized,
+hash-pinned source artifacts may cross the runtime data boundary.
 
 Defender allocation/save/defensive/destruction-reaction decisions may auto-resolve only when the rules leave exactly one legal outcome and no optional player choice. Otherwise the defending or destroyed-model controlling player is the `DecisionRequest.actor_id`, even though they may not be the active player. Adapters must not infer that Shooting phase decisions always belong to the active player. Stale, drifted, wrong-actor, wrong-option, or payload-mismatched destruction-reaction submissions return typed invalid diagnostics before queue pop and before a `DecisionRecord` is created.
 
