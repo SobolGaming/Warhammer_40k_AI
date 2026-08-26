@@ -351,7 +351,7 @@ PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/4
 
 ### P08A — C08-03
 
-Status: Implementation and validation complete; PR publication is pending.
+Status: Implementation and validation complete; PR #407 is open pending review and merge.
 
 Finding IDs: `C08-03`.
 
@@ -480,7 +480,8 @@ Validation results:
   repository-pinned direct equivalents (`check-generated`, `tsc --noEmit`, `tsx --test`, and
   `tsx src/main.ts`) were run instead of the unavailable `npm` wrappers.
 
-PR URL and merge commit: pending publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/407`;
+merge commit pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
