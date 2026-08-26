@@ -242,6 +242,113 @@ Completion requires all of the following:
 10. Run every command required by `AGENTS.md` after the last production change,
     push the branch, open the PR, and stop until the user merges it.
 
+## Implementation finding updates
+
+### P15D — C15-04
+
+Status: Implementation and validation complete; PR #406 is open pending review and merge.
+
+Finding IDs: `C15-04`.
+
+Dependencies and evidence gate: P00/PR #405 is merged. `APP-INTERNAL-DRIFT` is resolved by stable
+title plus complete operative text; no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: Current maintained App source rows must cross the runtime boundary through
+reviewed, typed, hash-pinned data with stable identity, complete provenance, and truthful separation
+of load support from semantic execution. Provider numbering is locator metadata, not behavior
+identity.
+
+How it is currently done: The embedded Fire Overwatch row omits its unengaged/non-`TITANIC` target
+and Snap Shooting relationship. The embedded Crushing Impact row says Vehicle/Strength despite the
+maintained App's Monster-or-Vehicle/Toughness wording. No reviewed exact 15.05–15.09 artifact pins
+the text, URL, timestamp, transcription hashes, or source-observation fingerprints. The Fight 12.01
+example's stale Crushing Impact `15.06` reference is recorded only in the broad comparison audit.
+
+How it should be done: Load exact reviewed 15.05–15.09 source records from one offline JSON
+artifact through a typed fail-closed loader. Preserve the four existing Stratagem source IDs and all
+runtime handler/policy/record IDs; add one title-based Snap Shooting source ID. Resolve the stale
+Fight example to current Crushing Impact heading 15.05 by stable title and complete operative text,
+and retain the contrary number as a typed anomaly.
+
+Specific authoritative 40k.app rule/statement and source ID: Crushing Impact 15.05
+`gw-11e-core-stratagems:core:crushing-impact`; Explosives 15.06
+`gw-11e-core-stratagems:core:explosives`; Rapid Ingress 15.07
+`gw-11e-core-stratagems:core:rapid-ingress`; Fire Overwatch 15.08
+`gw-11e-core-stratagems:core:fire-overwatch`; and Snap Shooting 15.09
+`gw-11e-core-stratagems:rule:snap-shooting`.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/15-stratagems`, observed `2026-08-26T11:15:23-04:00`:
+
+- Crushing Impact: transcription `63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060`;
+  observation `329f378b3cb1f78f28f7f32047e01e2b78295d155c30df9fde775bf0cab3afa4`.
+- Explosives: transcription `c3b1f80f88da3e8772eed3d8fa49694c0f2c2539498a74aadd1b39cc859f897f`;
+  observation `45c1a404c497f2d3d1cb0feb00ce09371fd3520bce8af43214930bc474dd9c41`.
+- Rapid Ingress: transcription `2e9028ed2bf0c1fa19d7774ceb7bb81d415097e38b47c78ab67d7cff303955f6`;
+  observation `42c4328d54aa18d826225dedd0b1e0043f4d8e3fe0f2e09d1ab12db7913314a6`.
+- Fire Overwatch: transcription `7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0`;
+  observation `6cfdfa59d51b3bc1302101ac70a142bc3926ac2f532fb035254f4cc08eb6f9a1`.
+- Snap Shooting: transcription `d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545`;
+  observation `b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26`.
+- Fight 12.01 complete example statement at `https://www.40k.app/rules/12-fight-phase`:
+  transcription `b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff`;
+  observation `561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46`.
+
+Load and execution support: All five current source rows are `loaded`. Crushing Impact, Explosives,
+Rapid Ingress, Fire Overwatch, and Snap Shooting are each `partial_engine_runtime`. Rapid Ingress
+remains partial because the existing runtime does not yet enforce its `AIRCRAFT` exclusion or
+first-battle-round prohibition; P15D records those gaps without changing gameplay.
+
+Scope and explicit exclusions: Source/evidence records, descriptive catalog text, stable identity,
+the typed numbering anomaly, offline builder, tests, build identity, and affected generated contract
+fixtures only. No validation, mutation, decision, movement, shooting, damage, event, replay, adapter,
+network, UI, headless, AI, faction, detachment, datasheet, or out-of-scope content semantics change.
+P15B still owns Explosives runtime remediation. The same-bug-class audit also records but does not
+broaden P15D into Crushing Impact lifecycle/continuation, Rapid Ingress `AIRCRAFT`/battle-round
+eligibility, Fire Overwatch trigger-target, or Snap post-shoot Action-lock remediation.
+
+Owning state/validation/mutation/event/replay path: Reviewed JSON → typed
+`core_stratagems_2026_08` loader → `RuleSourcePackage`/`SourceEvidenceCatalog` → preserved
+`core_stratagems.py` facade → engine Stratagem catalog descriptive fields. Existing engine-owned
+target validation, handler mutation, event emission, replay serialization, and adapter submission
+paths remain unchanged. Engine build identity and its published external-contract examples consume
+the reviewed packaged bytes.
+
+Decision and viewer-visibility impact: None. No decision type, option family, proposal kind, payload
+shape, visibility rule, redaction set, or adapter contract changes. Descriptive source text is public;
+no hidden information is added.
+
+Regression scenarios and same-bug-class search: A pre-fix regression failed on the stale
+Vehicle-only Crushing Impact source. Coverage pins the five heading/title/source/runtime mappings,
+operative hashes and fingerprints, stable handler/policy IDs, truthful support states, audit links,
+and the complete category-12 anomaly statement; it rejects text, locator, identity, evidence-ID,
+status, package, and raw-byte drift with typed errors.
+The repository-wide search found no second current runtime-consumed Core Stratagem source copy.
+Historical PDF/Wahapedia rows, legacy name aliases, audit prose, and the unrelated Orks rule named
+Crushing Impact are explicit non-current exclusions.
+
+Generated artifacts/documentation: Packaged `core_stratagems_2026_08/artifacts/package.json`, typed
+loader, offline hash builder and its documented check command, engine build manifest, external
+contract examples/manifest, and this finding update.
+
+Validation results:
+
+- All required `AGENTS.md` gates passed: Ruff check, Ruff format check, mypy, Pyright, the
+  coverage-enabled xdist work-stealing suite (`6082 passed`), four-shard inventory, import-linter,
+  and all-files pre-commit.
+- The P15D source/evidence, source-only routing, malformed-artifact, and generated-data focused
+  audit passed (`84 passed`); 13 unchanged runtime-path regressions also passed.
+- Core-Stratagem builder check, 40k.app audit check, engine-build check, external-contract
+  base-ref check, installed-wheel smoke (`2421` resources), generated ability-support audit
+  (`19 passed`), and TypeScript generated/type/unit/conformance checks passed (`5` unit tests and
+  `342` conformance assertions).
+- This host exposes the required Node 24 binary but no `npm` executable, so `npm ci` and the two
+  `npm run` wrappers could not be invoked verbatim. Their repository-pinned local equivalents
+  (`check-generated`, `tsc --noEmit`, `tsx --test`, and `tsx src/main.ts`) passed.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/406`;
+merge commit pending review and merge.
+
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
 25 categories before opening PFINAL. The audit must select one maintained-App

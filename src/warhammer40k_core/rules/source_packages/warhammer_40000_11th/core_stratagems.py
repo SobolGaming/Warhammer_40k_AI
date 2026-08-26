@@ -4,11 +4,15 @@ import hashlib
 import json
 from dataclasses import dataclass
 
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_stratagems_2026_08 as app_source,
+)
+
 EDITION_ID = "warhammer_40000_11th"
-SOURCE_PACKAGE_ID = "gw-11e-core-stratagems"
+SOURCE_PACKAGE_ID = app_source.SOURCE_PACKAGE_ID
 SOURCE_TITLE = "Warhammer 40,000 11th Edition Core Stratagems"
-SOURCE_VERSION = "11e-core-rules"
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-stratagem-source-v1"
+SOURCE_VERSION = app_source.SOURCE_VERSION
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-stratagem-source-v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,6 +86,10 @@ def source_package_identity_payload() -> dict[str, str]:
 
 def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
     source_prefix = f"{SOURCE_PACKAGE_ID}:core"
+    crushing_impact_source = app_source.source_rule_by_id("crushing-impact")
+    explosives_source = app_source.source_rule_by_id("explosives")
+    fire_overwatch_source = app_source.source_rule_by_id("fire-overwatch")
+    rapid_ingress_source = app_source.source_rule_by_id("rapid-ingress")
     return (
         SourceStratagemRow(
             stratagem_id="command-reroll",
@@ -160,9 +168,13 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:fire-overwatch",
-            when_descriptor="end of the opponent movement phase",
-            target_descriptor="one eligible unit from the player's army that can shoot",
-            effect_descriptor="the target unit shoots as if it were the shooting phase",
+            when_descriptor=fire_overwatch_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                fire_overwatch_source.target_text,
+                rule_id=fire_overwatch_source.rule_id,
+                field_name="target_text",
+            ),
+            effect_descriptor=fire_overwatch_source.effect_text,
             restrictions_descriptor="matched play same stratagem per phase",
             trigger_kind="end_phase",
             phase="movement",
@@ -179,11 +191,13 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:explosives",
-            when_descriptor="shooting phase before selecting targets",
-            target_descriptor=(
-                "one GRENADES unit from the player's army and one enemy unit in range"
+            when_descriptor=explosives_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                explosives_source.target_text,
+                rule_id=explosives_source.rule_id,
+                field_name="target_text",
             ),
-            effect_descriptor="roll six dice and inflict mortal wounds for each high result",
+            effect_descriptor=explosives_source.effect_text,
             restrictions_descriptor="matched play same stratagem per phase",
             trigger_kind="start_phase",
             phase="shooting",
@@ -251,10 +265,18 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:rapid-ingress",
-            when_descriptor="end of the opponent movement phase",
-            target_descriptor="one unit from the player's army in reserves",
-            effect_descriptor="arrive from reserves during the opponent Movement phase end window",
-            restrictions_descriptor="matched play same stratagem per phase",
+            when_descriptor=rapid_ingress_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                rapid_ingress_source.target_text,
+                rule_id=rapid_ingress_source.rule_id,
+                field_name="target_text",
+            ),
+            effect_descriptor=rapid_ingress_source.effect_text,
+            restrictions_descriptor=_required_source_descriptor(
+                rapid_ingress_source.restrictions_text,
+                rule_id=rapid_ingress_source.rule_id,
+                field_name="restrictions_text",
+            ),
             trigger_kind="end_phase",
             phase="movement",
             target_kind="friendly_unit",
@@ -309,11 +331,13 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             availability_kind="core",
             detachment_id=None,
             source_id=f"{source_prefix}:crushing-impact",
-            when_descriptor="charge phase after a vehicle unit ends a charge move",
-            target_descriptor=(
-                "one vehicle unit from the player's army and one enemy unit within engagement range"
+            when_descriptor=crushing_impact_source.when_text,
+            target_descriptor=_required_source_descriptor(
+                crushing_impact_source.target_text,
+                rule_id=crushing_impact_source.rule_id,
+                field_name="target_text",
             ),
-            effect_descriptor="roll dice based on strength and inflict mortal wounds",
+            effect_descriptor=crushing_impact_source.effect_text,
             restrictions_descriptor="matched play same stratagem per phase",
             trigger_kind="after_unit_ends_charge_move",
             phase="charge",
@@ -367,9 +391,23 @@ def _import_hash() -> str:
             "source_title": SOURCE_TITLE,
             "source_version": SOURCE_VERSION,
             "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
+            "app_source_package_hash": app_source.PACKAGE_HASH,
             "stratagems": [row.to_payload() for row in stratagem_rows()],
         },
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _required_source_descriptor(
+    value: str | None,
+    *,
+    rule_id: str,
+    field_name: str,
+) -> str:
+    if value is None:
+        raise app_source.CoreStratagemAppSourceArtifactError(
+            f"Core Stratagem App-source {rule_id} requires {field_name}."
+        )
+    return value

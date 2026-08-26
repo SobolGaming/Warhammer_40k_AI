@@ -13,6 +13,7 @@ from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceCatalogE
 RuleEvidenceKind = Literal[
     "official_app_capture",
     "owner_supplied_app_transcription",
+    "project_reviewed_app_transcription",
     "third_party_mirror",
 ]
 RuleEvidenceAuthority = Literal[
@@ -120,6 +121,7 @@ class RuleEvidenceRecord:
             {
                 "official_app_capture",
                 "owner_supplied_app_transcription",
+                "project_reviewed_app_transcription",
                 "third_party_mirror",
             },
         )
@@ -233,7 +235,10 @@ class RuleEvidenceRecord:
             raise RuleEvidenceError(
                 "Only official App capture evidence may receive retained capture bytes."
             )
-        if self.evidence_kind == "owner_supplied_app_transcription":
+        if self.evidence_kind in {
+            "owner_supplied_app_transcription",
+            "project_reviewed_app_transcription",
+        }:
             if (
                 self.authority != "unverified_transcription_only"
                 or self.verification_status != "unverified"
@@ -254,7 +259,16 @@ class RuleEvidenceRecord:
                 )
             ):
                 raise RuleEvidenceError(
-                    "An owner-supplied App transcription must remain unverified and uncaptured."
+                    "An App transcription must remain unverified and uncaptured on its own."
+                )
+            if self.evidence_kind == "project_reviewed_app_transcription" and (
+                self.provider_name != "CORE V2 Source Review"
+                or self.source_platform != "Repository"
+                or self.provider_non_affiliation_recorded
+            ):
+                raise RuleEvidenceError(
+                    "A project-reviewed App transcription must retain repository-review "
+                    "provenance without a provider-affiliation claim."
                 )
             return
         if self.authority == "project_authoritative_app_mirror":
@@ -517,7 +531,12 @@ class RuleSourcePackage:
                 ) from exc
             records = self.source_evidence_catalog.records_for_source_id(source_id)
             if not any(
-                record.evidence_kind in {"owner_supplied_app_transcription", "official_app_capture"}
+                record.evidence_kind
+                in {
+                    "owner_supplied_app_transcription",
+                    "project_reviewed_app_transcription",
+                    "official_app_capture",
+                }
                 for record in records
             ):
                 raise RuleEvidenceError(

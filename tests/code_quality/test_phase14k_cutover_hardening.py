@@ -25,6 +25,15 @@ RESERVES_PATH = SRC_ROOT / "engine" / "reserves.py"
 CORE_STRATAGEMS_PATH = (
     SRC_ROOT / "rules" / "source_packages" / "warhammer_40000_11th" / "core_stratagems.py"
 )
+CORE_STRATAGEM_APP_SOURCE_PATH = (
+    SRC_ROOT
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "core_stratagems_2026_08"
+    / "artifacts"
+    / "package.json"
+)
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
 README_PATH = ROOT / "README.md"
@@ -193,11 +202,98 @@ def test_phase14k_core_stratagem_source_package_uses_current_names() -> None:
     rapid_ingress = next(row for row in rows if row.stratagem_id == "rapid-ingress")
     assert "reinforcements step" not in rapid_ingress.effect_descriptor.lower()
 
+    rows_by_id = {row.stratagem_id: row for row in rows}
+    crushing_impact = rows_by_id["crushing-impact"]
+    assert crushing_impact.source_id == "gw-11e-core-stratagems:core:crushing-impact"
+    assert (
+        crushing_impact.trigger_kind,
+        crushing_impact.phase,
+        crushing_impact.target_kind,
+        crushing_impact.enumerable,
+        crushing_impact.target_policy_id,
+        crushing_impact.handler_id,
+    ) == (
+        "after_unit_ends_charge_move",
+        "charge",
+        "friendly_unit",
+        False,
+        "crushing_impact_unit",
+        "core:crushing-impact",
+    )
+    assert "MONSTER/VEHICLE" in crushing_impact.target_descriptor
+    assert "T characteristic" in crushing_impact.effect_descriptor
+    assert "strength" not in crushing_impact.effect_descriptor.lower()
+
+    explosives = rows_by_id["explosives"]
+    assert (
+        explosives.source_id,
+        explosives.trigger_kind,
+        explosives.phase,
+        explosives.target_kind,
+        explosives.enumerable,
+        explosives.target_policy_id,
+        explosives.handler_id,
+    ) == (
+        "gw-11e-core-stratagems:core:explosives",
+        "start_phase",
+        "shooting",
+        "friendly_unit",
+        False,
+        "explosives_unit_and_enemy_target",
+        "core:explosives",
+    )
+
+    rapid_ingress = rows_by_id["rapid-ingress"]
+    assert (
+        rapid_ingress.source_id,
+        rapid_ingress.trigger_kind,
+        rapid_ingress.phase,
+        rapid_ingress.target_kind,
+        rapid_ingress.enumerable,
+        rapid_ingress.target_policy_id,
+        rapid_ingress.handler_id,
+    ) == (
+        "gw-11e-core-stratagems:core:rapid-ingress",
+        "end_phase",
+        "movement",
+        "friendly_unit",
+        False,
+        "reserves_unit",
+        "core:rapid-ingress",
+    )
+
+    fire_overwatch = rows_by_id["fire-overwatch"]
+    assert fire_overwatch.source_id == "gw-11e-core-stratagems:core:fire-overwatch"
+    assert (
+        fire_overwatch.trigger_kind,
+        fire_overwatch.phase,
+        fire_overwatch.target_kind,
+        fire_overwatch.enumerable,
+        fire_overwatch.target_policy_id,
+        fire_overwatch.handler_id,
+    ) == (
+        "end_phase",
+        "movement",
+        "friendly_unit",
+        False,
+        "out_of_phase_shooting_unit",
+        "core:fire-overwatch",
+    )
+    assert "unengaged" in fire_overwatch.target_descriptor
+    assert "TITANIC" in fire_overwatch.target_descriptor
+    assert "Snap Shooting" in fire_overwatch.effect_descriptor
+
     source = source_for(CORE_STRATAGEMS_PATH)
+    current_source_artifact = source_for(CORE_STRATAGEM_APP_SOURCE_PATH)
     assert "Counter-offensive" not in source
     assert "stratagem_id=" + '"grenade"' not in source
     assert "stratagem_id=" + '"tank-shock"' not in source
     assert "stratagem_id=" + '"go-to-ground"' not in source
+    assert "one vehicle unit from the player's army" not in source
+    assert "roll dice based on strength" not in source
+    assert "one eligible unit from the player's army that can shoot" not in source
+    assert "shoots as if it were the shooting phase" not in source
+    assert "roll dice based on strength" not in current_source_artifact
 
 
 def test_phase14k_docs_mark_phase_complete() -> None:

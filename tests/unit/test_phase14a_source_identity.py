@@ -26,6 +26,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities,
     core_rules,
     core_stratagems,
+    core_stratagems_2026_08,
     july_rules_updates_2026_07,
 )
 
@@ -1134,6 +1135,242 @@ def test_eleventh_source_package_identity_payloads_are_json_safe() -> None:
     )
 
 
+def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
+    raw = _core_stratagem_app_source_artifact_path().read_bytes()
+    source_package = core_stratagems_2026_08.source_package()
+    rules = core_stratagems_2026_08.source_rule_records()
+    rules_by_id = {rule.rule_id: rule for rule in rules}
+    evidence_by_source_id = {
+        source_id: source_package.source_evidence_catalog.records_for_source_id(source_id)
+        for source_id in source_package.evidence_required_source_ids
+    }
+    catalog_payload = source_package.source_catalog.to_payload()
+
+    assert hashlib.sha256(raw).hexdigest() == (core_stratagems_2026_08.EXPECTED_ARTIFACT_SHA256)
+    assert core_stratagems_2026_08.PACKAGE_HASH == (
+        "c6bfeb538aa1a5b933c561c3c554691792259400234dc9ec303d36ff400c5a09"
+    )
+    assert [(rule.section_id, rule.title) for rule in rules] == [
+        ("15.05", "Crushing Impact"),
+        ("15.06", "Explosives"),
+        ("15.07", "Rapid Ingress"),
+        ("15.08", "Fire Overwatch"),
+        ("15.09", "Snap Shooting"),
+    ]
+    assert core_stratagems_2026_08.RULE_SOURCE_IDS == {
+        "crushing-impact": "gw-11e-core-stratagems:core:crushing-impact",
+        "explosives": "gw-11e-core-stratagems:core:explosives",
+        "rapid-ingress": "gw-11e-core-stratagems:core:rapid-ingress",
+        "fire-overwatch": "gw-11e-core-stratagems:core:fire-overwatch",
+        "snap-shooting": "gw-11e-core-stratagems:rule:snap-shooting",
+    }
+    assert {rule.rule_id: rule.runtime_rule_id for rule in rules} == {
+        "crushing-impact": "core:crushing-impact",
+        "explosives": "core:explosives",
+        "rapid-ingress": "core:rapid-ingress",
+        "fire-overwatch": "core:fire-overwatch",
+        "snap-shooting": "core:snap-shooting",
+    }
+    assert "MONSTER/VEHICLE" in rules_by_id["crushing-impact"].source_text
+    assert "T characteristic" in rules_by_id["crushing-impact"].source_text
+    assert "EXPLOSIVES/GRENADES model" in rules_by_id["explosives"].source_text
+    assert "excluding AIRCRAFT" in rules_by_id["rapid-ingress"].source_text
+    assert "shoots using Snap Shooting" in rules_by_id["fire-overwatch"].source_text
+    assert "unmodified hit roll of 6" in rules_by_id["snap-shooting"].source_text
+    assert "not eligible to start an action" in rules_by_id["snap-shooting"].source_text
+    assert all(
+        hashlib.sha256(rule.source_text.encode()).hexdigest()
+        == core_stratagems_2026_08.TRANSCRIPTION_SHA256_BY_RULE_ID[rule.rule_id]
+        == rule.transcription_sha256
+        for rule in rules
+    )
+    assert all(
+        rule.source_observation_sha256
+        == core_stratagems_2026_08.SOURCE_OBSERVATION_SHA256_BY_RULE_ID[rule.rule_id]
+        for rule in rules
+    )
+    assert {rule.rule_id: rule.semantic_execution_status for rule in rules} == {
+        "crushing-impact": "partial_engine_runtime",
+        "explosives": "partial_engine_runtime",
+        "rapid-ingress": "partial_engine_runtime",
+        "fire-overwatch": "partial_engine_runtime",
+        "snap-shooting": "partial_engine_runtime",
+    }
+    assert all(rule.load_support_status == "loaded" for rule in rules)
+    assert all(rule.runtime_consumer_ids for rule in rules)
+
+    review_context, review_source_observation_by_row_id = _core_rules_review_audit_context()
+    assert len(evidence_by_source_id) == len(rules) == 5
+    assert all(len(records) == 2 for records in evidence_by_source_id.values())
+    for rule in rules:
+        records = evidence_by_source_id[rule.source_id]
+        project_review = next(
+            record
+            for record in records
+            if record.evidence_kind == "project_reviewed_app_transcription"
+        )
+        mirror = next(record for record in records if record.evidence_kind == "third_party_mirror")
+        assert project_review.evidence_kind == "project_reviewed_app_transcription"
+        assert project_review.authority == "unverified_transcription_only"
+        assert project_review.provider_name == "CORE V2 Source Review"
+        assert project_review.source_url is project_review.observed_at is None
+        assert project_review.verification_status == "unverified"
+        assert mirror.evidence_kind == "third_party_mirror"
+        assert mirror.authority == "project_authoritative_app_mirror"
+        assert mirror.project_authority_policy_id == PROJECT_AUTHORITY_POLICY_ID
+        assert mirror.review_audit_id == review_context["audit_id"]
+        assert mirror.source_url == "https://www.40k.app/rules/15-stratagems"
+        assert mirror.observed_at == "2026-08-26T11:15:23-04:00"
+        assert mirror.provider_non_affiliation_recorded
+        assert mirror.verification_status == "authoritative_app_mirror"
+        assert mirror.review_audit_row_id is not None
+        assert (
+            mirror.review_audit_source_observation_sha256
+            == (review_source_observation_by_row_id[mirror.review_audit_row_id])
+        )
+        assert mirror.observation_sha256 == rule.source_observation_sha256
+        assert all(
+            record.transcription_sha256 == rule.transcription_sha256
+            and record.load_support_status == rule.load_support_status
+            and record.semantic_execution_status == rule.semantic_execution_status
+            and record.runtime_consumer_ids == rule.runtime_consumer_ids
+            and RuleEvidenceRecord.from_payload(record.to_payload()) == record
+            for record in (project_review, mirror)
+        )
+
+    anomaly = core_stratagems_2026_08.numbering_anomalies()[0]
+    assert anomaly.section_id == "12.01"
+    assert anomaly.stale_section_id == "15.06"
+    assert anomaly.resolved_section_id == "15.05"
+    assert anomaly.resolved_source_id == rules_by_id["crushing-impact"].source_id
+    assert anomaly.resolution_basis == "stable_title_and_complete_operative_text"
+    assert anomaly.source_text == (
+        "Because both RED**** units made charge moves this turn, they are both Fights First "
+        "units this phase and are both eligible to make pile-in moves, even though the MONSTER "
+        "is unengaged as it destroyed its charge target in the Charge phase using the Crushing "
+        "Impact stratagem (15.06)."
+    )
+    assert hashlib.sha256(anomaly.source_text.encode()).hexdigest() == (
+        anomaly.transcription_sha256
+    )
+    assert anomaly.transcription_sha256 == (
+        core_stratagems_2026_08.EXPECTED_ANOMALY_TRANSCRIPTION_SHA256
+    )
+    assert anomaly.source_observation_sha256 == (
+        core_stratagems_2026_08.EXPECTED_ANOMALY_OBSERVATION_SHA256
+    )
+    assert (
+        anomaly.review_audit_source_observation_sha256
+        == (review_source_observation_by_row_id["category:12"])
+    )
+    assert SourceCatalog.from_payload(catalog_payload).to_payload() == catalog_payload
+
+
+@pytest.mark.parametrize(
+    ("target", "field_name", "replacement"),
+    [
+        ("rule", "section_id", "15.06"),
+        ("rule", "source_id", "gw-11e-core-stratagems:core:wrong"),
+        ("rule", "source_text", "stale source text"),
+        ("mirror", "source_url", "https://example.invalid/rules/15-stratagems"),
+        ("rule", "semantic_execution_status", "executable_engine_runtime"),
+        ("anomaly", "resolved_section_id", "15.06"),
+    ],
+)
+def test_p15d_core_stratagem_app_source_rejects_identity_evidence_and_status_drift(
+    target: str,
+    field_name: str,
+    replacement: str,
+) -> None:
+    payload = _core_stratagem_app_source_payload()
+    rules = cast(list[dict[str, object]], payload["rules"])
+    evidence = cast(list[dict[str, object]], payload["evidence_records"])
+    anomalies = cast(list[dict[str, object]], payload["numbering_anomalies"])
+    if target == "rule":
+        rules[0][field_name] = replacement
+    elif target == "mirror":
+        mirror = next(
+            record
+            for record in evidence
+            if record["evidence_id"] == "40k-app-core-stratagems-2026-08-26:crushing-impact"
+        )
+        mirror[field_name] = replacement
+    else:
+        anomalies[0][field_name] = replacement
+
+    with pytest.raises(core_stratagems_2026_08.CoreStratagemAppSourceArtifactError):
+        core_stratagems_2026_08.core_stratagem_app_source_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_p15d_core_stratagem_app_source_rejects_raw_byte_drift() -> None:
+    raw = _core_stratagem_app_source_artifact_path().read_bytes()
+    core_stratagems_2026_08.validate_core_stratagem_app_source_artifact_bytes(raw)
+
+    with pytest.raises(
+        core_stratagems_2026_08.CoreStratagemAppSourceArtifactError,
+        match="artifact bytes drifted",
+    ):
+        core_stratagems_2026_08.validate_core_stratagem_app_source_artifact_bytes(raw + b"\n")
+
+
+def test_p15d_core_stratagem_app_source_rejects_unknown_evidence_id_as_typed_error() -> None:
+    payload = _core_stratagem_app_source_payload()
+    evidence = cast(list[dict[str, object]], payload["evidence_records"])
+    record = next(
+        value
+        for value in evidence
+        if value["evidence_id"] == "core-v2-p15d-source-review:crushing-impact"
+    )
+    renamed_id = "core-v2-p15d-source-review:unknown"
+    source_record = next(
+        value
+        for value in core_stratagems_2026_08.source_evidence_records()
+        if value.evidence_id == record["evidence_id"]
+    )
+    source_record_payload = source_record.to_payload()
+    source_record_payload["evidence_id"] = renamed_id
+    source_record_payload["observation_sha256"] = _observation_sha256(source_record_payload)
+    record["evidence_id"] = renamed_id
+    record["observation_sha256"] = source_record_payload["observation_sha256"]
+
+    with pytest.raises(
+        core_stratagems_2026_08.CoreStratagemAppSourceArtifactError,
+        match="evidence inventory drifted",
+    ):
+        core_stratagems_2026_08.core_stratagem_app_source_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_project_reviewed_app_transcription_is_truthful_and_insufficient_alone() -> None:
+    package = core_stratagems_2026_08.source_package()
+    source_id = core_stratagems_2026_08.RULE_SOURCE_IDS["crushing-impact"]
+    records = package.source_evidence_catalog.records_for_source_id(source_id)
+    project_review = next(
+        record for record in records if record.evidence_kind == "project_reviewed_app_transcription"
+    )
+    payload = project_review.to_payload()
+    payload["provider_name"] = "Project Owner"
+    payload["observation_sha256"] = _observation_sha256(payload)
+
+    with pytest.raises(
+        RuleEvidenceError,
+        match="project-reviewed App transcription must retain repository-review provenance",
+    ):
+        RuleEvidenceRecord.from_payload(payload)
+    with pytest.raises(
+        RuleEvidenceError,
+        match="executable or partial semantics require an official App capture or project",
+    ):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(project_review,)),
+            evidence_required_source_ids=(source_id,),
+        )
+
+
 def test_ruleset_descriptor_hash_is_eleventh_only_and_deterministic() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     payload = descriptor.to_payload()
@@ -1172,6 +1409,20 @@ def _app_hidden_transcription_payload() -> dict[str, object]:
     return cast(
         dict[str, object],
         json.loads(_app_hidden_transcription_artifact_path().read_text()),
+    )
+
+
+def _core_stratagem_app_source_artifact_path() -> Path:
+    return Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_stratagems_2026_08/artifacts/package.json"
+    )
+
+
+def _core_stratagem_app_source_payload() -> dict[str, object]:
+    return cast(
+        dict[str, object],
+        json.loads(_core_stratagem_app_source_artifact_path().read_text()),
     )
 
 
