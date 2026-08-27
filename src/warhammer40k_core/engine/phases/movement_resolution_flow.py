@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
     apply_battle_shock_reroll_resolution_decision,
     is_battle_shock_reroll_request,
 )
@@ -562,6 +563,7 @@ def _apply_forced_desperate_escape_battle_shock_reroll_decision(
         result=result,
         battle_shock_hooks=battle_shock_hooks,
         expected_source_kind=FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
+        expected_passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
     )
     fall_back_payload = _payload_object(resolved_payload, key="fall_back_result")
     action_result_payload = _payload_object(resolved_payload, key="action_result")

@@ -29,6 +29,11 @@ from ._artifacts import (
     EXPECTED_CATEGORY_URL,
     EXPECTED_OFFICIAL_PDF_SHA256,
     EXPECTED_PACKAGE_HASH,
+    EXPECTED_SEARCH_INDEX_OBSERVED_AT,
+    EXPECTED_SEARCH_INDEX_SEQUENCE_TRANSCRIPTION_SHA256,
+    EXPECTED_SEARCH_INDEX_SOURCE_OBSERVATION_SHA256,
+    EXPECTED_SEARCH_INDEX_URL,
+    CoreCommandPhaseSearchIndexObservationArtifact,
     CoreCommandPhaseSourceArtifactError,
     CoreCommandPhaseSourcePackageArtifact,
     CoreCommandPhaseSourceRuleArtifact,
@@ -56,12 +61,15 @@ _ARTIFACT: Final = _load_artifact()
 SOURCE_PACKAGE_ID: Final = _ARTIFACT.source_package_id
 SOURCE_VERSION: Final = _ARTIFACT.source_version
 SOURCE_TITLE: Final = _ARTIFACT.source_document.source_title
-SOURCE_URL: Final = EXPECTED_CATEGORY_URL
-OBSERVED_AT: Final = EXPECTED_CATEGORY_OBSERVED_AT
+SOURCE_URL: Final = EXPECTED_SEARCH_INDEX_URL
+OBSERVED_AT: Final = EXPECTED_SEARCH_INDEX_OBSERVED_AT
+CATEGORY_URL: Final = EXPECTED_CATEGORY_URL
+CATEGORY_OBSERVED_AT: Final = EXPECTED_CATEGORY_OBSERVED_AT
 PACKAGE_HASH: Final = _ARTIFACT.package_hash
 RULE_SOURCE_IDS: Final = {rule.rule_id: rule.source_id for rule in _ARTIFACT.rules}
 START_OF_COMMAND_PHASE_SOURCE_ID: Final = RULE_SOURCE_IDS["start-of-command-phase"]
 GAIN_CORE_CP_SOURCE_ID: Final = RULE_SOURCE_IDS["gain-core-cp"]
+BATTLE_SHOCK_SOURCE_ID: Final = RULE_SOURCE_IDS["battle-shock"]
 TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
     rule.rule_id: rule.transcription_sha256 for rule in _ARTIFACT.rules
 }
@@ -100,6 +108,10 @@ def source_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
     return tuple(evidence.to_rule_evidence_record() for evidence in _ARTIFACT.evidence_records)
 
 
+def search_index_observation() -> CoreCommandPhaseSearchIndexObservationArtifact:
+    return _ARTIFACT.search_index_observation
+
+
 def _build_source_catalog() -> SourceCatalog:
     package_id = DataPackageId(
         namespace="games-workshop",
@@ -108,23 +120,27 @@ def _build_source_catalog() -> SourceCatalog:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 8, 25),
+        source_date=date(2026, 8, 26),
     )
     document_id = SourceDocumentId(
         package_id=package_id,
         document_id=_ARTIFACT.source_document.document_id,
     )
     provenance = RuleSourceText.from_raw(
-        source_id=f"{SOURCE_PACKAGE_ID}:manifest:p08a-source-provenance",
+        source_id=f"{SOURCE_PACKAGE_ID}:manifest:p08ab-source-provenance",
         raw_text=(
-            "P08A pairs reviewed Command-phase section headings with the checked-in 40k.app "
-            f"category-08 audit observed {OBSERVED_AT}; that audit retains no page body. A "
-            "search-indexed /rules result observed by the project at "
-            f"{_ARTIFACT.source_document.search_index_context_observed_at} supplies secondary "
-            "sequence context only and is not RuleEvidence. Exact operative text is separately "
-            "transcribed from retained official Core Rules PDF source "
+            "P08A and P08B pair reviewed Command-phase section headings with the retained "
+            f"project-authoritative 40k.app search-index observation at {SOURCE_URL}, observed "
+            f"{OBSERVED_AT}. That RuleEvidence pins the exact five-heading sequence only and "
+            "contains no operative body text; the "
+            f"older category-08 audit at {CATEGORY_URL}, observed {CATEGORY_OBSERVED_AT}, remains "
+            "category-locator metadata and retains no page body. Complete operative text for "
+            "sections 08.01 through 08.03 is separately transcribed from official Core Rules PDF "
+            "source "
             f"{_ARTIFACT.source_document.official_pdf_source_id}, SHA-256 "
-            f"{EXPECTED_OFFICIAL_PDF_SHA256}."
+            f"{EXPECTED_OFFICIAL_PDF_SHA256}. Battle-shock runtime support remains partial only "
+            "because P01 retains the off-battlefield embarked and Strategic Reserve extension; "
+            "P08B's on-battlefield scope is executable."
         ),
     )
     source_texts = [provenance]
@@ -148,7 +164,7 @@ def _build_source_catalog() -> SourceCatalog:
             SourceDocument(
                 document_id=document_id,
                 title=(
-                    f"{SOURCE_TITLE} (audited category evidence plus retained official-PDF text)"
+                    f"{SOURCE_TITLE} (observed heading sequence plus retained official-PDF text)"
                 ),
                 source_texts=tuple(source_texts),
             ),
@@ -157,7 +173,7 @@ def _build_source_catalog() -> SourceCatalog:
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-command-phase-source-audited-2026-08-25"
+                    version="core-v2-command-phase-source-observed-2026-08-26"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
@@ -176,9 +192,14 @@ def source_package() -> RuleSourcePackage:
 
 
 __all__ = (
+    "BATTLE_SHOCK_SOURCE_ID",
+    "CATEGORY_OBSERVED_AT",
+    "CATEGORY_URL",
     "EXPECTED_ARTIFACT_SHA256",
     "EXPECTED_OFFICIAL_PDF_SHA256",
     "EXPECTED_PACKAGE_HASH",
+    "EXPECTED_SEARCH_INDEX_SEQUENCE_TRANSCRIPTION_SHA256",
+    "EXPECTED_SEARCH_INDEX_SOURCE_OBSERVATION_SHA256",
     "GAIN_CORE_CP_SOURCE_ID",
     "OBSERVED_AT",
     "OFFICIAL_PDF_TRANSCRIPTION_SHA256_BY_RULE_ID",
@@ -193,6 +214,7 @@ __all__ = (
     "TRANSCRIPTION_SHA256_BY_RULE_ID",
     "CoreCommandPhaseSourceArtifactError",
     "core_command_phase_source_artifact_from_json_bytes",
+    "search_index_observation",
     "source_evidence_records",
     "source_package",
     "source_rule_by_id",

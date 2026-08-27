@@ -60,6 +60,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
+from warhammer40k_core.engine.battle_shock_test_service import BattleShockTestRuntime
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     ModelPlacement,
@@ -122,6 +123,7 @@ from warhammer40k_core.engine.healing_revival import (
     healing_effect_from_revival_request,
 )
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     BattleSize,
     DetachmentSelection,
     UnitMusterSelection,
@@ -464,6 +466,83 @@ def test_shadow_legion_shade_path_modifies_charge_and_forces_battle_shock() -> N
 
     assert [modifier.operand for modifier in modifiers] == [-1]
     assert _event_count(decisions, "battle_shock_test_resolved") == 1
+
+
+def test_shadow_legion_shade_path_battle_shock_targets_attached_rules_unit() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion", "Nurgle"),
+        player_b_units=(
+            _core_unit_selection("shade-path-bodyguard"),
+            UnitMusterSelection(
+                unit_selection_id="shade-path-leader",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+        player_b_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="shade-path-leader",
+                bodyguard_unit_selection_id="shade-path-bodyguard",
+            ),
+        ),
+    )
+    defender = _unit_for_player(state, player_id="player-a")
+    enemy_army = state.army_definition_for_player("player-b")
+    assert enemy_army is not None
+    bodyguard = next(
+        unit for unit in enemy_army.units if unit.unit_instance_id.endswith("shade-path-bodyguard")
+    )
+    leader = next(
+        unit for unit in enemy_army.units if unit.unit_instance_id.endswith("shade-path-leader")
+    )
+    attached_id = enemy_army.attached_units[0].attached_unit_instance_id
+    _replace_unit_leadership(state, unit_instance_id=bodyguard.unit_instance_id, leadership=8)
+    _replace_unit_leadership(state, unit_instance_id=leader.unit_instance_id, leadership=4)
+    _place_unit_poses(
+        state,
+        unit_instance_id=defender.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=bodyguard.unit_instance_id,
+        poses=_unit_line_poses(x=18.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=leader.unit_instance_id,
+        poses=(Pose.at(18.5, 19.0),),
+    )
+
+    decisions, _use_record = _use_shadow_legion_stratagem(
+        state,
+        stratagem_id=shadow_legion_ir.SHADE_PATH_STRATAGEM_ID,
+        target_unit_id=defender.unit_instance_id,
+        phase=BattlePhase.CHARGE,
+        active_player_id="player-b",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        effect_selection=visible_enemy_unit_effect_selection(attached_id),
+    )
+
+    assert _event_count(decisions, "battle_shock_test_requested") == 1
+    assert _event_count(decisions, "battle_shock_test_resolved") == 1
+    requested = _last_event_payload(decisions, "battle_shock_test_requested")
+    request = cast(dict[str, JsonValue], requested["battle_shock_test_request"])
+    strength = cast(dict[str, JsonValue], request["below_half_strength_context"])
+    assert request["unit_instance_id"] == attached_id
+    assert request["player_id"] == "player-b"
+    assert request["leadership_target"] == 4
+    assert strength["unit_instance_id"] == attached_id
+    assert strength["starting_model_count"] == 6
+    assert strength["current_model_count"] == 6
+    resolved = _last_event_payload(decisions, "battle_shock_test_resolved")
+    result = cast(dict[str, JsonValue], resolved["battle_shock_result"])
+    assert result["request"] == request
 
 
 def test_shadow_legion_binding_shadow_removes_target_and_companion_to_reserves() -> None:
@@ -3312,12 +3391,16 @@ def _shadow_legion_state(
     unit_keywords: tuple[str, ...] = ("Shadow Legion", "Undivided"),
     faction_keywords: tuple[str, ...] = ("Legiones Daemonica",),
     player_a_unit_selection_ids: tuple[str, ...] = ("intercessor-unit-1",),
+    player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> GameState:
     state = battle_state(
         player_a_units=tuple(
             _core_unit_selection(unit_selection_id)
             for unit_selection_id in player_a_unit_selection_ids
-        )
+        ),
+        player_b_units=player_b_units,
+        player_b_attachment_declarations=player_b_attachment_declarations,
     )
     updated_armies: list[ArmyDefinition] = []
     for army in state.army_definitions:
@@ -3541,6 +3624,9 @@ def _use_shadow_legion_stratagem(
         use_record=use_record,
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
+        battle_shock_runtime=BattleShockTestRuntime.from_runtime_content_bundle(
+            _shadow_legion_runtime_bundle(state)
+        ),
         shooting_unit_selected_grant_hooks=None,
     )
     return decisions, use_record
@@ -4138,6 +4224,47 @@ def _replace_unit_keywords(
                 continue
             updated_units.append(
                 replace(unit, keywords=keywords, faction_keywords=faction_keywords)
+            )
+            did_replace = True
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not did_replace:
+        raise AssertionError(f"Missing unit {unit_instance_id}.")
+    state.army_definitions = updated_armies
+
+
+def _replace_unit_leadership(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    leadership: int,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    did_replace = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            if unit.unit_instance_id != unit_instance_id:
+                updated_units.append(unit)
+                continue
+            updated_units.append(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(
+                            model,
+                            characteristics=tuple(
+                                CharacteristicValue.from_raw(
+                                    Characteristic.LEADERSHIP,
+                                    leadership,
+                                )
+                                if value.characteristic is Characteristic.LEADERSHIP
+                                else value
+                                for value in model.characteristics
+                            ),
+                        )
+                        for model in unit.own_models
+                    ),
+                )
             )
             did_replace = True
         updated_armies.append(replace(army, units=tuple(updated_units)))

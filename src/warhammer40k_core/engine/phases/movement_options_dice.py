@@ -33,6 +33,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
 )
 from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
     resolve_battle_shock_test_with_optional_reroll,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
@@ -657,6 +658,8 @@ def _resolve_forced_desperate_escape_battle_shock(
     base_payload: dict[str, JsonValue] = {
         "game_id": state.game_id,
         "battle_round": state.battle_round,
+        "active_player_id": _active_player_id(state),
+        "phase": BattlePhase.MOVEMENT.value,
         "unit_instance_id": unit.unit_instance_id,
         "source_kind": FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
         "source_rule_ids": list(source_rule_ids),
@@ -665,12 +668,14 @@ def _resolve_forced_desperate_escape_battle_shock(
         "action_result": validate_json_value(action_result.to_payload()),
         "movement_proposal_request_id": movement_proposal_request_id,
     }
+    requested_payload = {
+        **base_payload,
+        "battle_shock_test_request": request.to_payload(),
+    }
+    decisions.event_log.append("battle_shock_test_requested", requested_payload)
     decisions.event_log.append(
         "forced_desperate_escape_battle_shock_requested",
-        {
-            **base_payload,
-            "battle_shock_test_request": request.to_payload(),
-        },
+        requested_payload,
     )
     manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
     battle_shock_resolution = resolve_battle_shock_test_with_optional_reroll(
@@ -683,9 +688,13 @@ def _resolve_forced_desperate_escape_battle_shock(
         active_player_id=_active_player_id(state),
         phase=BattlePhase.MOVEMENT,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
         source_kind=FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
         base_payload=base_payload,
-        resolved_event_types=("forced_desperate_escape_battle_shock_resolved",),
+        resolved_event_types=(
+            "battle_shock_test_resolved",
+            "forced_desperate_escape_battle_shock_resolved",
+        ),
         pending_phase_body_status=("forced_desperate_escape_battle_shock_reroll_pending"),
     )
     if battle_shock_resolution.pending_status is not None:

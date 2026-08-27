@@ -1480,12 +1480,18 @@ Required tests:
 
 ## Phase 11C: Command phase body: Command step, CP, Battle-shock, and OC updates
 
-Status: Complete.
+Status: Complete for the on-battlefield Command-phase slice. P01 retains the embarked and Strategic
+Reserve Battle-shock extension.
 
 Modules:
 
 - `engine/phases/command.py`
 - `engine/battle_shock.py`
+- `engine/battle_shock_event_authority.py`
+- `engine/battle_shock_state_history.py`
+- `engine/battle_shock_state.py`
+- `engine/attached_unit_split_history.py`
+- `engine/command_battle_shock_history.py`
 - `engine/command_points.py`
 - `engine/objective_control.py`
 - `engine/unit_state.py`
@@ -1509,10 +1515,39 @@ Invariants:
   accepted submission resumes the lifecycle automatically until the next start choice or boundary
   completion, and only after completion does the engine grant both players 1CP and emit
   `command_step_started`;
+- Battle-shock state is preserved through the generic phase-start window, every Command-start hook,
+  Core CP gain, `command_step_started`, and Command-step scoring; entering a Command phase never
+  clears it by itself;
 - outside the normal Command-phase CP gain, each player can gain only 1CP per battle round, regardless of source, unless a rule explicitly overrides this;
-- below-half-strength units on the battlefield create Battle-shock test requests during the Battle-shock step;
+- on first entry to the Battle-shock step, the engine snapshots each active-player attached rules
+  unit with at least one alive model on the battlefield that is currently Battle-shocked or at/below
+  Half-strength; canonical rules-unit identity prevents component duplication;
+- the ordered Battle-shock-step snapshot and its completed-request progress are immutable across
+  reroll decisions, serialization, replay, and lifecycle re-entry, so each snapshot member receives
+  exactly one required core test even when it satisfies both predicates;
+- snapshot, request, dice, reroll/decline, resolved-result, and completion authority remains
+  fail-closed after the Command phase advances and its live `CommandStepState` is discarded;
+- every resolved test has one exact `battle_shock_modifier_applications_recorded` event after its
+  final roll authority and before its result; application rows bind loaded producer hook identity,
+  actual source identity, and exact modifiers without adapter recomputation;
+- a successful required Battle-shock-step test clears Battle-shock carried by that snapshot member;
+  a failed test preserves or applies Battle-shock through the ordinary outcome path;
+- every Attached Unit split emits one `attached_rules_unit_split_reconciled` event carrying the
+  immutable starting lineage and complete deterministic survivor IDs; when the historical rules
+  unit was Battle-shocked, the immediately following event is one
+  `battle_shock_state_transferred_after_attached_unit_split` event carrying the exact source state,
+  the same survivor IDs, and exact successor states; replay validation consumes those events at
+  their historical positions rather than projecting earlier state through the final army;
+- optional Battle-shock rerolls use the existing `select_dice_reroll` lifecycle path with an
+  immutable passed-state policy, exact roll/permission/options authority, and pre-pop context drift
+  validation;
+- an outcome-enqueued nested decision remains the queue head and pauses before the next required
+  snapshot test, while the exact completed-test prefix is retained;
+- embarked and Strategic Reserve rules units with no placed model remain deferred to P01 and must
+  not be presented as covered by the on-battlefield snapshot;
 - a Battle-shock test rolls 2D6 and passes if the total is greater than or equal to the best Leadership in that unit;
-- non-reroll Battle-shock dice are deterministic engine-internal dice; future reroll or choice hooks must pause through `DecisionRequest` before mutation;
+- non-reroll Battle-shock dice are deterministic engine-internal dice; every reroll or nested choice
+  pauses through `DecisionRequest` before further Command-step progress;
 - if a unit is forced to test for being below Starting Strength, it does not also test for being Below Half-strength unless a rule says otherwise;
 - failed Battle-shock marks the unit and all its models Battle-shocked until it passes a later recovery roll or another rule clears the state;
 - Battle-shocked units have OC `-`, not OC 0, and OC `-` cannot be increased by numeric modifiers;
@@ -1531,8 +1566,27 @@ Required tests:
 - a pending Command-start choice leaves both players' Core CP unchanged, each accepted lifecycle
   submission auto-advances to the next request or completion without repeating prior hooks, and final
   completion performs the one-time Core CP gain;
+- a currently Battle-shocked active-player rules unit remains Battle-shocked through Command start,
+  Core CP gain, and Command-step scoring;
 - non-Command CP gain cap of 1CP per battle round is enforced;
-- below-half-strength unit emits Battle-shock test request;
+- above-half but currently Battle-shocked, at/below-half but not currently Battle-shocked, and
+  dual-reason on-battlefield rules units enter the one-time Battle-shock-step snapshot correctly;
+- an Attached Unit is snapshotted and tested once by canonical rules-unit identity rather than once
+  per physical component;
+- the Battle-shock-step snapshot and completed-request ledger survive JSON round-trip, reroll pause,
+  replay, and lifecycle re-entry without membership drift or duplicate tests;
+- deleting, reordering, or altering a historical snapshot, completion, reroll closure, auto-pass
+  provenance, state update, or Command-step anchor rejects even after the live Command state is gone;
+- deleting, reordering, or altering modifier-application producer/source identity or exact modifier
+  content rejects, including a structurally plausible operand change;
+- stale or tampered Battle-shock reroll roll state, passed-state policy, permission, option inventory,
+  event authority, or snapshot position rejects before queue pop, record creation, or mutation;
+- an outcome-enqueued nested choice resolves before the next snapshot member is requested or rolled;
+- a successful required test clears carried phase-start Battle-shock, while failure preserves it;
+- authentic fail/clear histories remain valid across a later Attached Unit split, and authentic
+  fail/split/clear histories require the exact universal split event, immediate split-transfer
+  event when shocked, complete survivor set, and complete successor lineage;
+- off-battlefield rules units are explicitly excluded pending P01 coverage;
 - below-Starting-Strength forced test suppresses duplicate Below Half-strength test unless overridden;
 - failed Battle-shock persists and changes OC to `-`;
 - passed Battle-shock avoids Battle-shocked state;

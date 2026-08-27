@@ -154,6 +154,7 @@ from warhammer40k_core.engine.sequencing import (
     create_sequencing_decision_request,
     request_sequencing_decision,
 )
+from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.timing_windows import (
     OutOfPhaseActionContext,
     ReactionWindow,
@@ -694,6 +695,36 @@ def test_persisting_effect_survives_attached_unit_split() -> None:
         )
     )
     state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+    first_unit_id = "army-alpha:intercessor-unit-1"
+    second_unit_id = "army-alpha:intercessor-unit-2"
+    first_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == first_unit_id
+    )
+    second_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == second_unit_id
+    )
+    state.starting_attached_unit_records.append(
+        StartingAttachedUnitRecord(
+            player_id="player-a",
+            attached_unit_instance_id=attached_id,
+            bodyguard_unit_instance_id=first_unit_id,
+            leader_unit_instance_ids=(second_unit_id,),
+            support_unit_instance_ids=(),
+            component_unit_instance_ids=(first_unit_id, second_unit_id),
+            starting_model_instance_ids_by_component=(
+                (first_unit_id, first_unit.own_model_ids()),
+                (second_unit_id, second_unit.own_model_ids()),
+            ),
+            starting_model_count=10,
+            source_id="phase12a-attached-unit-join",
+        )
+    )
     effect = _persisting_effect(
         effect_id="phase12a-effect-attached-split",
         target_unit_instance_ids=(attached_id,),

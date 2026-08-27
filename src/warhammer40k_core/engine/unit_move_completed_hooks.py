@@ -34,8 +34,11 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_rules_unit,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.battle_shock import BattleShockTestReason
@@ -64,6 +67,23 @@ UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT = "unit_move_completed_mortal_w
 UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT = "unit_move_completed_mortal_wounds_rolled"
 UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_IGNORED_EVENT = "unit_move_completed_mortal_wounds_ignored"
 UNIT_MOVE_COMPLETED_BATTLE_SHOCK_RESOLVED_EVENT = "unit_move_completed_battle_shock_resolved"
+UNIT_MOVE_COMPLETED_BATTLE_SHOCK_BASE_PAYLOAD_KEYS = frozenset(
+    {
+        "game_id",
+        "battle_round",
+        "active_player_id",
+        "phase",
+        "trigger_event_id",
+        "movement_action",
+        "hook_id",
+        "effect_key",
+        "source_kind",
+        "source_rule_id",
+        "target_unit_instance_id",
+        "target_player_id",
+        "replay_payload",
+    }
+)
 _SETUP_COMPLETION_ACTION_BY_EVENT_TYPE = MappingProxyType(
     {
         "reinforcement_unit_arrived": "set_up",
@@ -585,7 +605,7 @@ def resolve_unit_move_completed_battle_shock_hooks(
             decisions=decisions,
         )
         for effect in registry.effects_for(context):
-            if _battle_shock_effect_key(effect) in processed_effect_keys:
+            if unit_move_completed_battle_shock_effect_key(effect) in processed_effect_keys:
                 continue
             status = _resolve_battle_shock_effect(
                 state=state,
@@ -619,6 +639,7 @@ def apply_unit_move_completed_battle_shock_reroll_decision(
     battle_shock_hooks: BattleShockHookRegistry,
 ) -> LifecycleStatus | None:
     from warhammer40k_core.engine.battle_shock_resolution import (
+        BattleShockPassedStatePolicy,
         apply_battle_shock_reroll_resolution_decision,
     )
 
@@ -628,6 +649,7 @@ def apply_unit_move_completed_battle_shock_reroll_decision(
         result=result,
         battle_shock_hooks=battle_shock_hooks,
         expected_source_kind=UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
+        expected_passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
     )
     return None
 
@@ -870,20 +892,31 @@ def _resolve_battle_shock_effect(
 ) -> LifecycleStatus | None:
     from warhammer40k_core.engine.battle_shock import (
         BattleShockTestRequest,
-        battle_shock_leadership_target_for_unit,
+        battle_shock_leadership_target_for_rules_unit,
     )
     from warhammer40k_core.engine.battle_shock_hooks import BattleShockDiceExpressionContext
     from warhammer40k_core.engine.battle_shock_resolution import (
+        BattleShockPassedStatePolicy,
         resolve_battle_shock_test_with_optional_reroll,
     )
 
-    target_unit, target_player_id = _unit_and_player_by_id(
-        state=state,
-        unit_instance_id=effect.target_unit_instance_id,
+    target_rules_unit = rules_unit_view_by_id(
+        state=state, unit_instance_id=effect.target_unit_instance_id
     )
-    if target_player_id != effect.target_player_id:
+    if (
+        target_rules_unit.unit_instance_id != effect.target_unit_instance_id
+        or target_rules_unit.owner_player_id != effect.target_player_id
+    ):
         raise GameLifecycleError("Unit move completed Battle-shock target player drift.")
-    current_model_ids = _current_battlefield_model_ids(state=state, unit=target_unit)
+    current_model_ids = tuple(
+        sorted(
+            model.model_id
+            for model in placed_alive_geometry_models_for_rules_unit(
+                state=state,
+                unit_instance_id=target_rules_unit.unit_instance_id,
+            )
+        )
+    )
     if not current_model_ids:
         raise GameLifecycleError("Unit move completed Battle-shock target is not placed.")
     ability_index = _ability_index_for_player(
@@ -891,13 +924,10 @@ def _resolve_battle_shock_effect(
         player_id=effect.target_player_id,
     )
     phase_start_battle_shocked_unit_ids = tuple(state.battle_shocked_unit_ids)
-    below_half_context = BelowHalfStrengthContext.from_unit(
-        player_id=effect.target_player_id,
-        unit=target_unit,
-        starting_strength=_starting_strength_record(
-            state=state,
-            player_id=effect.target_player_id,
-            unit_instance_id=target_unit.unit_instance_id,
+    below_half_context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=target_rules_unit,
+        starting_strength=state.starting_strength_record_for_unit(
+            target_rules_unit.unit_instance_id
         ),
         current_model_ids=current_model_ids,
     )
@@ -914,18 +944,17 @@ def _resolve_battle_shock_effect(
         )
     )
     request = BattleShockTestRequest.for_unit(
-        request_id=(
-            f"unit-move-completed-battle-shock:{state.battle_round:02d}:"
-            f"{effect.trigger_event_id}:{effect.hook_id}:{effect.target_unit_instance_id}:"
-            f"{_battle_shock_effect_digest(effect)}"
+        request_id=unit_move_completed_battle_shock_request_id(
+            battle_round=state.battle_round,
+            effect=effect,
         ),
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id=effect.target_player_id,
         unit_instance_id=effect.target_unit_instance_id,
         reason=effect.reason,
-        leadership_target=battle_shock_leadership_target_for_unit(
-            target_unit,
+        leadership_target=battle_shock_leadership_target_for_rules_unit(
+            target_rules_unit,
             current_model_ids=current_model_ids,
             ability_index=ability_index,
             state=state,
@@ -934,21 +963,14 @@ def _resolve_battle_shock_effect(
         below_half_strength_context=below_half_context,
         dice_expression=dice_expression,
     )
-    base_payload: dict[str, JsonValue] = {
-        "game_id": state.game_id,
-        "battle_round": state.battle_round,
-        "active_player_id": _active_player_id(state),
-        "phase": completed_phase.value,
-        "trigger_event_id": effect.trigger_event_id,
-        "movement_action": movement_action,
-        "hook_id": effect.hook_id,
-        "effect_key": _battle_shock_effect_key(effect),
-        "source_kind": UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
-        "source_rule_id": effect.source_rule_id,
-        "target_unit_instance_id": effect.target_unit_instance_id,
-        "target_player_id": effect.target_player_id,
-        "replay_payload": effect.replay_payload,
-    }
+    base_payload = unit_move_completed_battle_shock_base_payload(
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=_active_player_id(state),
+        completed_phase=completed_phase,
+        movement_action=movement_action,
+        effect=effect,
+    )
     decisions.event_log.append(
         "battle_shock_test_requested",
         {
@@ -968,6 +990,7 @@ def _resolve_battle_shock_effect(
         active_player_id=_active_player_id(state),
         phase=completed_phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
         source_kind=UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
         base_payload=base_payload,
         resolved_event_types=(
@@ -1084,7 +1107,11 @@ def _effect_key(effect: UnitMoveCompletedMortalWoundEffect) -> str:
     return canonical_json(payload)
 
 
-def _battle_shock_effect_key(effect: UnitMoveCompletedBattleShockEffect) -> str:
+def unit_move_completed_battle_shock_effect_key(
+    effect: UnitMoveCompletedBattleShockEffect,
+) -> str:
+    if type(effect) is not UnitMoveCompletedBattleShockEffect:
+        raise GameLifecycleError("Unit move completed Battle-shock effect key requires an effect.")
     payload = {
         "trigger_event_id": effect.trigger_event_id,
         "hook_id": effect.hook_id,
@@ -1098,12 +1125,77 @@ def _battle_shock_effect_key(effect: UnitMoveCompletedBattleShockEffect) -> str:
     return canonical_json(payload)
 
 
+def unit_move_completed_battle_shock_base_payload(
+    *,
+    game_id: str,
+    battle_round: int,
+    active_player_id: str,
+    completed_phase: BattlePhase,
+    movement_action: str,
+    effect: UnitMoveCompletedBattleShockEffect,
+) -> dict[str, JsonValue]:
+    """Build the one canonical source payload retained for this effect family."""
+
+    requested_game_id = _validate_identifier("game_id", game_id)
+    if type(battle_round) is not int or battle_round <= 0:
+        raise GameLifecycleError(
+            "Unit move completed Battle-shock source battle_round must be positive."
+        )
+    player_id = _validate_identifier("active_player_id", active_player_id)
+    phase = _battle_phase_from_token(completed_phase)
+    action = _validate_identifier("movement_action", movement_action)
+    if type(effect) is not UnitMoveCompletedBattleShockEffect:
+        raise GameLifecycleError(
+            "Unit move completed Battle-shock source payload requires an effect."
+        )
+    payload: dict[str, JsonValue] = {
+        "game_id": requested_game_id,
+        "battle_round": battle_round,
+        "active_player_id": player_id,
+        "phase": phase.value,
+        "trigger_event_id": effect.trigger_event_id,
+        "movement_action": action,
+        "hook_id": effect.hook_id,
+        "effect_key": unit_move_completed_battle_shock_effect_key(effect),
+        "source_kind": UNIT_MOVE_COMPLETED_BATTLE_SHOCK_SOURCE_KIND,
+        "source_rule_id": effect.source_rule_id,
+        "target_unit_instance_id": effect.target_unit_instance_id,
+        "target_player_id": effect.target_player_id,
+        "replay_payload": effect.replay_payload,
+    }
+    if frozenset(payload) != UNIT_MOVE_COMPLETED_BATTLE_SHOCK_BASE_PAYLOAD_KEYS:
+        raise GameLifecycleError("Unit move completed Battle-shock source schema drifted.")
+    return cast(dict[str, JsonValue], validate_json_value(payload))
+
+
 def _effect_digest(effect: UnitMoveCompletedMortalWoundEffect) -> str:
     return hashlib.sha256(_effect_key(effect).encode("utf-8")).hexdigest()[:16]
 
 
 def _battle_shock_effect_digest(effect: UnitMoveCompletedBattleShockEffect) -> str:
-    return hashlib.sha256(_battle_shock_effect_key(effect).encode("utf-8")).hexdigest()[:16]
+    return hashlib.sha256(
+        unit_move_completed_battle_shock_effect_key(effect).encode("utf-8")
+    ).hexdigest()[:16]
+
+
+def unit_move_completed_battle_shock_request_id(
+    *,
+    battle_round: int,
+    effect: UnitMoveCompletedBattleShockEffect,
+) -> str:
+    if type(battle_round) is not int or battle_round <= 0:
+        raise GameLifecycleError(
+            "Unit move completed Battle-shock request battle_round must be positive."
+        )
+    if type(effect) is not UnitMoveCompletedBattleShockEffect:
+        raise GameLifecycleError(
+            "Unit move completed Battle-shock request identity requires an effect."
+        )
+    return (
+        f"unit-move-completed-battle-shock:{battle_round:02d}:"
+        f"{effect.trigger_event_id}:{effect.hook_id}:{effect.target_unit_instance_id}:"
+        f"{_battle_shock_effect_digest(effect)}"
+    )
 
 
 def _movement_action_from_payload(
@@ -1160,60 +1252,6 @@ def _source_context_event_payload(source_context: dict[str, JsonValue]) -> dict[
         "mortal_wound_cap_group_id": source_context.get("mortal_wound_cap_group_id"),
         "replay_payload": source_context["replay_payload"],
     }
-
-
-def _unit_and_player_by_id(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> tuple[UnitInstance, str]:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit, army.player_id
-    raise GameLifecycleError("Unit move completed Battle-shock target unit is unknown.")
-
-
-def _current_battlefield_model_ids(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-) -> tuple[str, ...]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Unit move completed Battle-shock requires battlefield_state.")
-    placement = state.battlefield_state.unit_placement_or_none(unit.unit_instance_id)
-    if placement is None:
-        return ()
-    unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
-    current_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        model = unit_model_by_id.get(model_placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError(
-                "Unit move completed Battle-shock placement contains unknown model."
-            )
-        if model.is_alive:
-            current_ids.append(model.model_instance_id)
-    return tuple(sorted(current_ids))
-
-
-def _starting_strength_record(
-    *,
-    state: GameState,
-    player_id: str,
-    unit_instance_id: str,
-) -> StartingStrengthRecord:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    matching = tuple(
-        record
-        for record in state.starting_strength_records
-        if record.player_id == requested_player_id and record.unit_instance_id == requested_unit_id
-    )
-    if len(matching) != 1:
-        raise GameLifecycleError("Unit move completed Battle-shock requires one strength record.")
-    return matching[0]
 
 
 def _active_player_id(state: GameState) -> str:

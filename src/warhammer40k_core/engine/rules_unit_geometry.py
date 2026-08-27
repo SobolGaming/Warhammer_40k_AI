@@ -62,3 +62,39 @@ def placed_alive_geometry_models_for_rules_unit(
         )
         if model.model_id in alive_model_ids
     )
+
+
+def placed_alive_geometry_models_for_component_unit(
+    *,
+    state: GameState,
+    component_unit_instance_id: str,
+) -> tuple[GeometryModel, ...]:
+    """Return placed living geometry owned by one physical rules-unit component."""
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=component_unit_instance_id,
+    )
+    matching_components = tuple(
+        component
+        for component in rules_unit.components
+        if component.unit.unit_instance_id == component_unit_instance_id
+    )
+    if len(matching_components) != 1:
+        raise GameLifecycleError(
+            "Component-unit geometry requires a physical component unit instance ID."
+        )
+    alive_model_ids = {
+        model.model_instance_id
+        for model in matching_components[0].unit.own_models
+        if model.is_alive
+    }
+    if not alive_model_ids:
+        return ()
+    return tuple(
+        model
+        for model in placed_alive_geometry_models_for_rules_unit(
+            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
+        if model.model_id in alive_model_ids
+    )

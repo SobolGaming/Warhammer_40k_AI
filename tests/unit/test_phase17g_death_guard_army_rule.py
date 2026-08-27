@@ -1242,13 +1242,14 @@ def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
         army=enemy_army,
         battlefield_state=state.battlefield_state,
         starting_strength_records=tuple(state.starting_strength_records),
+        battle_shocked_unit_ids=(),
         state=state,
         ability_index=AbilityCatalogIndex.from_records(()),
         runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
     )
 
     assert len(requests) == 1
-    assert requests[0].reason is BattleShockTestReason.BELOW_HALF_STRENGTH
+    assert requests[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED
     assert requests[0].leadership_target == (
         enemy_model.characteristic(Characteristic.LEADERSHIP).final + 1
     )

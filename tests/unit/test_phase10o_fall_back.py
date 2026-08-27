@@ -14,21 +14,25 @@ from tests.movement_submission_helpers import (
     submit_default_movement_proposal_if_pending,
     submit_movement_proposal,
 )
-from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.setup_completion_helpers import (
+    record_completed_command_occurrences_for_fixture,
+    record_current_battlefield_placements_for_fixture,
+    record_primary_turn_start_evidence_for_fixture,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
-from warhammer40k_core.engine.abilities import (
-    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
-    AbilityCatalogIndex,
-    AbilityCatalogRecord,
-    AbilityDefinition,
-    AbilitySourceKind,
-    AbilityTimingDescriptor,
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
 )
-from warhammer40k_core.engine.advance_hooks import AdvanceMoveHookRegistry
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.abilities import AbilityCatalogRecord
+from warhammer40k_core.engine.ability_catalog import (
+    catalog_ability_records_from_catalog,
+)
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.battle_shock import BattleShockedUnitState
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldScenario,
@@ -49,7 +53,7 @@ from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -103,16 +107,13 @@ from warhammer40k_core.engine.primary_battlefield_departure import (
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-    StratagemCatalogIndex,
     stratagem_decline_payload,
 )
-from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
     unit_placement_coherency_result,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -126,13 +127,10 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-one-0009"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-authenticated-001-003-0002"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-authenticated-001-003-0001"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
-)
-_DESPERATE_FALL_BACK_OPTION_ID = (
-    f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}"
 )
 
 
@@ -514,27 +512,17 @@ def test_forced_desperate_escape_rolls_every_model() -> None:
 
 
 def test_catalog_ability_forces_desperate_escape_on_immediate_fall_back_path() -> None:
-    lifecycle, movement_status = _advance_to_movement_unit_selection(
-        _config(game_id="phase10o-catalog-forced-desperate-escape")
+    config = _config(
+        game_id="phase10o-catalog-forced-desperate-escape",
+        with_forced_desperate_escape_ability=True,
     )
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
     _move_first_enemy_model_into_side_engagement(lifecycle)
     state = _state(lifecycle)
     target_army = state.army_definition_for_player("player-a")
-    source_army = state.army_definition_for_player("player-b")
     assert target_army is not None
-    assert source_army is not None
     target_unit = target_army.unit_by_id("army-alpha:intercessor-unit-1")
-    source_unit = source_army.unit_by_id("army-beta:intercessor-unit-2")
-    record = _forced_desperate_escape_ability_record(source_unit=source_unit)
-    lifecycle._movement_phase_handler = replace(  # pyright: ignore[reportPrivateUsage]
-        lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
-        stratagem_index=StratagemCatalogIndex.from_records(()),
-        advance_move_hooks=AdvanceMoveHookRegistry.empty(),
-        ability_indexes_by_player_id={
-            "player-a": AbilityCatalogIndex.from_records(()),
-            "player-b": AbilityCatalogIndex.from_records((record,)),
-        },
-    )
+    record = _forced_desperate_escape_catalog_record(config.army_catalog)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase10o-catalog-select-unit",
@@ -617,7 +605,7 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
     fall_back_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
-        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        option_id=_ORDERED_FALL_BACK_OPTION_ID,
         action_result_id="phase10o-result-000004",
         proposal_result_id="phase10o-desperate-failed-proposal",
         unit_instance_id=unit_placement.unit_instance_id,
@@ -760,7 +748,7 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
     fall_back_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
-        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        option_id=_ORDERED_FALL_BACK_OPTION_ID,
         action_result_id="phase10o-two-failed-action",
         proposal_result_id="phase10o-two-failed-proposal",
         unit_instance_id=unit_placement.unit_instance_id,
@@ -1038,7 +1026,7 @@ def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_
     fall_back_status = _submit_result(
         lifecycle,
         request=action_request,
-        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        option_id=_ORDERED_FALL_BACK_OPTION_ID,
         result_id="phase10o-desperate-destroy-set-0001",
     )
     removal_request = _decision_request(fall_back_status)
@@ -1543,10 +1531,7 @@ def _generic_movement_transit_effect(*, target_unit_instance_id: str) -> Persist
     )
 
 
-def _forced_desperate_escape_ability_record(
-    *,
-    source_unit: UnitInstance,
-) -> AbilityCatalogRecord:
+def _forced_desperate_escape_descriptor() -> DatasheetAbilityDescriptor:
     source_text = RuleSourceText.from_raw(
         source_id="phase10o:catalog-ability:forced-desperate-escape",
         raw_text=(
@@ -1561,24 +1546,53 @@ def _forced_desperate_escape_ability_record(
             datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
         ),
     ).rule_ir
-    return AbilityCatalogRecord(
-        record_id="phase10o:catalog-record:forced-desperate-escape",
-        definition=AbilityDefinition(
-            ability_id="phase10o:catalog-ability:forced-desperate-escape",
-            name="Forced Desperate Escape",
-            source_id=source_text.source_id,
-            when_descriptor="Enemy selected to Fall Back.",
-            effect_descriptor="Force Desperate Escape tests.",
-            restrictions_descriptor="Non-Monster non-Vehicle enemy unit.",
-            timing=AbilityTimingDescriptor(
-                trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK
-            ),
-            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
-            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
-        ),
-        source_kind=AbilitySourceKind.DATASHEET,
-        datasheet_id=source_unit.datasheet_id,
+    return DatasheetAbilityDescriptor(
+        ability_id="phase10o:catalog-ability:forced-desperate-escape",
+        name="Forced Desperate Escape",
+        source_id=source_text.source_id,
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Force Desperate Escape tests.",
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
     )
+
+
+def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyCatalog:
+    descriptor = _forced_desperate_escape_descriptor()
+    target_datasheet_id = "core-intercessor-like-infantry"
+    matches = tuple(
+        datasheet
+        for datasheet in catalog.datasheets
+        if datasheet.datasheet_id == target_datasheet_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("Forced Desperate Escape fixture datasheet is ambiguous.")
+    datasheets = tuple(
+        replace(
+            datasheet,
+            abilities=(*datasheet.abilities, descriptor),
+            source_ids=tuple(sorted({*datasheet.source_ids, descriptor.source_id})),
+        )
+        if datasheet.datasheet_id == target_datasheet_id
+        else datasheet
+        for datasheet in catalog.datasheets
+    )
+    return replace(
+        catalog,
+        datasheets=datasheets,
+        source_ids=tuple(sorted({*catalog.source_ids, descriptor.source_id})),
+    )
+
+
+def _forced_desperate_escape_catalog_record(catalog: ArmyCatalog) -> AbilityCatalogRecord:
+    matches = tuple(
+        record
+        for record in catalog_ability_records_from_catalog(catalog)
+        if record.definition.source_id == "phase10o:catalog-ability:forced-desperate-escape"
+    )
+    if len(matches) != 1:
+        raise AssertionError("Forced Desperate Escape catalog record is ambiguous.")
+    return matches[0]
 
 
 def _state_for_scenario_with_effects(
@@ -1612,9 +1626,8 @@ def _advance_to_fall_back_action_request(
     game_id: str = "phase10o-desperate",
 ) -> tuple[GameLifecycle, DecisionRequest]:
     lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
-        _config(game_id=game_id)
+        _config(game_id=game_id, with_forced_desperate_escape_ability=True)
     )
-    _mark_first_unit_battle_shocked(_state(lifecycle))
     action_status = _submit_result(
         lifecycle,
         request=_decision_request(movement_status),
@@ -1625,28 +1638,10 @@ def _advance_to_fall_back_action_request(
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert {option.option_id for option in action_request.options} == {
         MovementPhaseActionKind.REMAIN_STATIONARY.value,
-        _DESPERATE_FALL_BACK_OPTION_ID,
+        _ORDERED_FALL_BACK_OPTION_ID,
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}",
     }
     return lifecycle, action_request
-
-
-def _mark_first_unit_battle_shocked(state: GameState) -> None:
-    unit_id = "army-alpha:intercessor-unit-1"
-    army = state.army_definition_for_player("player-a")
-    assert army is not None
-    unit = army.unit_by_id(unit_id)
-    state.battle_shocked_unit_ids = [unit_id]
-    state.battle_shocked_unit_states = [
-        BattleShockedUnitState(
-            player_id="player-a",
-            unit_instance_id=unit_id,
-            model_instance_ids=unit.own_model_ids(),
-            source_result_id="phase10o-battle-shock-fixture",
-            battle_round_started=1,
-            expires_at_player_command_phase_start="player-a",
-            expires_at_battle_round=2,
-        )
-    ]
 
 
 def _advance_to_movement_unit_selection(
@@ -1744,6 +1739,12 @@ def _movement_lifecycle_with_overflight_engagement(
     state.battle_round = 1
     state.active_player_id = "player-a"
     decisions = DecisionController()
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=config,
+    )
     record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     lifecycle = GameLifecycle.from_payload(
         cast(
@@ -1868,8 +1869,14 @@ def _scenario() -> BattlefieldScenario:
     )
 
 
-def _config(*, game_id: str = "phase10o-desperate") -> GameConfig:
+def _config(
+    *,
+    game_id: str = "phase10o-desperate",
+    with_forced_desperate_escape_ability: bool = False,
+) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    if with_forced_desperate_escape_ability:
+        catalog = _catalog_with_forced_desperate_escape_ability(catalog)
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,

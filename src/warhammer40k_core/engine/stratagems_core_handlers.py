@@ -18,6 +18,7 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir import *
 # fmt: off
 if TYPE_CHECKING:
     from warhammer40k_core.core.modifiers import RollModifier
+    from warhammer40k_core.engine.battle_shock_test_service import BattleShockTestRuntime
     from warhammer40k_core.engine.faction_content.stratagem_handlers import StratagemHandlerRegistry
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.rule_execution import RuleExecutionResult
@@ -79,6 +80,7 @@ def _apply_supported_stratagem_handler(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None,
+    battle_shock_runtime: BattleShockTestRuntime | None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
 ) -> None:
     if definition.handler_id == "record_only":
@@ -105,6 +107,7 @@ def _apply_supported_stratagem_handler(
                     use_record=use_record,
                     ruleset_descriptor=ruleset_descriptor,
                     army_catalog=army_catalog,
+                    battle_shock_runtime=battle_shock_runtime,
                 ),
             )
             if handler_result.status is not StratagemHandlerExecutionStatus.APPLIED:
@@ -256,6 +259,7 @@ def _apply_supported_stratagem_handler(
             use_record=use_record,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            battle_shock_runtime=battle_shock_runtime,
             shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
         )
         return
@@ -311,6 +315,7 @@ def _validate_supported_stratagem_handler_preflight(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None,
+    battle_shock_runtime: BattleShockTestRuntime | None,
 ) -> None:
     _validate_supported_stratagem_handler_available(
         definition=definition,
@@ -340,6 +345,7 @@ def _validate_supported_stratagem_handler_preflight(
             use_record=use_record,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            battle_shock_runtime=battle_shock_runtime,
         ),
     )
     if validation_result.status is not StratagemHandlerExecutionStatus.APPLIED:

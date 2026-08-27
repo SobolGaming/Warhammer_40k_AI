@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.engine import command_battle_shock_candidates as _cbsc
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock import (
     BattleShockTestReason,
@@ -17,15 +18,27 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
 )
 from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
+    apply_battle_shock_reroll_resolution_decision,
+    is_battle_shock_reroll_request,
     record_battle_shock_result_and_outcome_events,
     resolve_battle_shock_test_with_optional_reroll,
 )
+from warhammer40k_core.engine.command_battle_shock_history import (
+    COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
+    ordered_completed_command_battle_shock_results,
+    record_command_battle_shock_snapshot,
+    validate_command_battle_shock_completion_authority,
+    validate_command_battle_shock_snapshot_authority,
+)
+from warhammer40k_core.engine.command_phase_start_authority import (
+    resolve_command_phase_start_boundary,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
+    COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
-    CommandPhaseStartContext,
-    CommandPhaseStartEffectContext,
     CommandPhaseStartHookRegistry,
-    CommandPhaseStartRequestContext,
+    CommandPhaseStartNestedResultContext,
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.command_points import (
@@ -53,11 +66,16 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.phases.command_battle_shock_rerolls import (
-    COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
     apply_battle_shock_reroll_decision,
+    invalid_command_battle_shock_reroll_status,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_is_battle_shocked,
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
@@ -72,6 +90,7 @@ from warhammer40k_core.engine.stratagems import (
     StratagemCatalogIndex,
     StratagemEligibilityContext,
     create_stratagem_use_decision_request,
+    is_command_reroll_decision_request,
     request_stratagem_target_proposal,
     stratagem_decline_option,
     stratagem_target_proposal_from_index,
@@ -165,7 +184,7 @@ class CommandPhaseHandler:
 
         command_state = _ensure_command_step_state(state, active_player_id=active_player_id)
         if not command_state.command_points_granted:
-            command_start_status = _resolve_command_phase_start_boundary(
+            command_start_status = resolve_command_phase_start_boundary(
                 state=state,
                 decisions=decisions,
                 command_phase_start_hooks=self.command_phase_start_hooks,
@@ -173,6 +192,7 @@ class CommandPhaseHandler:
             )
             if command_start_status is not None:
                 return command_start_status
+            _resolve_gain_core_command_points_step(state=state, decisions=decisions)
             command_state = _command_step_state(state)
         if not command_state.scoring_hooks_resolved:
             _resolve_command_phase_scoring_hooks(state=state, decisions=decisions)
@@ -246,6 +266,12 @@ class CommandPhaseHandler:
                 return battle_shock_status
             command_state = _command_step_state(state)
 
+        validate_command_battle_shock_completion_authority(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+        )
+
         if not command_state.tactical_secondary_replacement_resolved:
             replacement_status = _request_tactical_secondary_replacement_if_available(
                 state=state,
@@ -305,6 +331,36 @@ class CommandPhaseHandler:
                 raise GameLifecycleError("Command-phase start faction rule result was not handled.")
             return
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
+            record = decisions.record_for_result(result)
+            if is_battle_shock_reroll_request(
+                record.request,
+                source_kind=COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
+            ):
+                apply_battle_shock_reroll_resolution_decision(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    battle_shock_hooks=self.battle_shock_hooks,
+                    expected_source_kind=COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
+                    expected_passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
+                )
+                handled = self.command_phase_start_hooks.apply_nested_result(
+                    CommandPhaseStartNestedResultContext(
+                        state=state,
+                        decisions=decisions,
+                        request=record.request,
+                        result=result,
+                        active_player_id=_active_player_id(state),
+                        battle_shock_hooks=self.battle_shock_hooks,
+                        runtime_modifier_registry=self.runtime_modifier_registry,
+                        ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                    )
+                )
+                if not handled:
+                    raise GameLifecycleError(
+                        "Command-start Battle-shock continuation was not handled."
+                    )
+                return
             apply_battle_shock_reroll_decision(
                 state=state,
                 result=result,
@@ -314,17 +370,61 @@ class CommandPhaseHandler:
             return
         raise GameLifecycleError("CommandPhaseHandler received an unsupported decision_type.")
 
+    def apply_command_phase_start_nested_result(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> bool:
+        command_state = state.command_step_state
+        if (
+            state.current_battle_phase is not BattlePhase.COMMAND
+            or command_state is None
+            or not command_state.command_phase_start_synchronous_hooks_resolved
+            or command_state.command_phase_start_boundary_resolved
+        ):
+            return False
+        return self.command_phase_start_hooks.apply_nested_result(
+            CommandPhaseStartNestedResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                active_player_id=_active_player_id(state),
+                battle_shock_hooks=self.battle_shock_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            )
+        )
+
 
 def invalid_command_phase_decision_status(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
 ) -> LifecycleStatus | None:
     if request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
         return None
     if request.decision_type == DICE_REROLL_DECISION_TYPE:
-        return None
+        if is_command_reroll_decision_request(request):
+            return None
+        if is_battle_shock_reroll_request(
+            request,
+            source_kind=COMMAND_PHASE_START_BATTLE_SHOCK_SOURCE_KIND,
+        ):
+            return None
+        return invalid_command_battle_shock_reroll_status(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            battle_shock_hooks=battle_shock_hooks,
+        )
     if request.decision_type == SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE:
         return _invalid_command_phase_start_faction_rule_status(
             state=state,
@@ -874,57 +974,6 @@ def _command_step_state(state: GameState) -> CommandStepState:
     return state.command_step_state
 
 
-def _resolve_command_phase_start_boundary(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    command_phase_start_hooks: CommandPhaseStartHookRegistry,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> LifecycleStatus | None:
-    active_player_id = _active_player_id(state)
-    command_state = _command_step_state(state)
-    if command_state.command_points_granted:
-        raise GameLifecycleError("Command-start boundary cannot run after Core CP is granted.")
-    if not command_state.command_phase_start_synchronous_hooks_resolved:
-        cleared_battle_shocked_unit_ids = state.clear_battle_shock_for_player(active_player_id)
-        command_phase_start_hooks.resolve(
-            CommandPhaseStartContext(
-                state=state,
-                decisions=decisions,
-                active_player_id=active_player_id,
-            )
-        )
-        state.replace_command_step_state(
-            _command_step_state(state).with_command_phase_start_synchronous_hooks_resolved(
-                cleared_battle_shocked_unit_ids=cleared_battle_shocked_unit_ids,
-            )
-        )
-        command_state = _command_step_state(state)
-    if not command_state.command_phase_start_boundary_resolved:
-        command_start_effect_status = command_phase_start_hooks.resolve_effects(
-            CommandPhaseStartEffectContext(
-                state=state,
-                decisions=decisions,
-                active_player_id=active_player_id,
-                runtime_modifier_registry=runtime_modifier_registry,
-            )
-        )
-        if command_start_effect_status is not None:
-            return command_start_effect_status
-        command_start_status = _request_command_phase_start_faction_rule_if_available(
-            state=state,
-            decisions=decisions,
-            command_phase_start_hooks=command_phase_start_hooks,
-        )
-        if command_start_status is not None:
-            return command_start_status
-        state.replace_command_step_state(
-            _command_step_state(state).with_command_phase_start_boundary_resolved()
-        )
-    _resolve_gain_core_command_points_step(state=state, decisions=decisions)
-    return None
-
-
 def _resolve_gain_core_command_points_step(
     *,
     state: GameState,
@@ -959,48 +1008,6 @@ def _resolve_gain_core_command_points_step(
             "active_player_id": active_player_id,
             "phase": BattlePhase.COMMAND.value,
             "command_point_gains": gain_payloads,
-            "cleared_battle_shocked_unit_ids": list(
-                command_state.command_phase_start_cleared_battle_shocked_unit_ids
-            ),
-        },
-    )
-
-
-def _request_command_phase_start_faction_rule_if_available(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    command_phase_start_hooks: CommandPhaseStartHookRegistry,
-) -> LifecycleStatus | None:
-    active_player_id = _active_player_id(state)
-    faction_rule_request = command_phase_start_hooks.next_request_for(
-        CommandPhaseStartRequestContext(
-            state=state,
-            decisions=decisions,
-            active_player_id=active_player_id,
-        )
-    )
-    if faction_rule_request is None:
-        return None
-    decisions.request_decision(faction_rule_request)
-    decisions.event_log.append(
-        "command_phase_start_faction_rule_requested",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": active_player_id,
-            "phase": BattlePhase.COMMAND.value,
-            "decision_type": faction_rule_request.decision_type,
-            "request_id": faction_rule_request.request_id,
-        },
-    )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=faction_rule_request,
-        payload={
-            "phase": BattlePhase.COMMAND.value,
-            "active_player_id": active_player_id,
-            "phase_body_status": "command_phase_start_faction_rule_pending",
         },
     )
 
@@ -1260,22 +1267,8 @@ def _battle_shock_result_base_payload(
         "battle_round": state.battle_round,
         "active_player_id": active_player_id,
         "phase": BattlePhase.COMMAND.value,
+        "source_kind": COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
     }
-
-
-def _battle_shock_result_payload(resolved_payload: dict[str, JsonValue]) -> JsonValue:
-    return validate_json_value(
-        _json_object(
-            resolved_payload.get("battle_shock_result"),
-            context="Battle-shock result payload",
-        )
-    )
-
-
-def _json_object(value: JsonValue, *, context: str) -> dict[str, JsonValue]:
-    if not isinstance(value, dict):
-        raise GameLifecycleError(f"{context} must be an object.")
-    return value
 
 
 def _resolve_battle_shock_step(
@@ -1296,51 +1289,73 @@ def _resolve_battle_shock_step(
 
     command_state = _command_step_state(state)
     if command_state.current_step is not CommandPhaseStep.BATTLE_SHOCK:
-        command_state = command_state.enter_battle_shock_step(
-            phase_start_battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+        phase_start_battle_shocked_unit_ids = tuple(
+            rules_unit.unit_instance_id
+            for rules_unit in placed_alive_rules_unit_views(state=state)
+            if rules_unit.owner_player_id == active_player_id
+            and rules_unit_is_battle_shocked(
+                state=state,
+                unit_instance_id=rules_unit.unit_instance_id,
+            )
         )
-        state.replace_command_step_state(command_state)
-    phase_start_battle_shocked_unit_ids = command_state.battle_shock_phase_start_unit_ids
-    forced_below_starting_strength_unit_ids = (
-        battle_shock_hooks.forced_below_starting_strength_unit_ids(
+        forced_test_applications = battle_shock_hooks.forced_test_applications_for(
             BattleShockForcedTestContext(
                 state=state,
                 active_player_id=active_player_id,
                 phase=BattlePhase.COMMAND,
-                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+                phase_start_battle_shocked_unit_ids=(phase_start_battle_shocked_unit_ids),
             )
         )
-    )
-    dice_expressions_by_unit_id = {
-        unit.unit_instance_id: battle_shock_hooks.dice_expression_for(
-            BattleShockDiceExpressionContext(
-                state=state,
-                player_id=active_player_id,
-                unit_instance_id=unit.unit_instance_id,
-                reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
-                active_player_id=active_player_id,
-                phase=BattlePhase.COMMAND,
-                default_expression=DiceExpression(quantity=2, sides=6),
-                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
-            )
+        forced_unit_ids = _cbsc.forced_test_unit_ids(forced_test_applications)
+        candidate_inventory = _cbsc.command_battle_shock_candidate_inventory(
+            state, active_player_id, forced_test_applications
         )
-        for unit in army.units
-    }
-    requests = collect_battle_shock_test_requests(
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id=active_player_id,
-        army=army,
-        battlefield_state=battlefield_state,
-        starting_strength_records=tuple(state.starting_strength_records),
+        dice_expressions_by_unit_id = {
+            unit.unit_instance_id: battle_shock_hooks.dice_expression_for(
+                BattleShockDiceExpressionContext(
+                    state=state,
+                    player_id=active_player_id,
+                    unit_instance_id=unit.unit_instance_id,
+                    reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
+                    active_player_id=active_player_id,
+                    phase=BattlePhase.COMMAND,
+                    default_expression=DiceExpression(quantity=2, sides=6),
+                    phase_start_battle_shocked_unit_ids=(phase_start_battle_shocked_unit_ids),
+                )
+            )
+            for unit in rules_unit_views_from_armies(armies=(army,))
+        }
+        required_test_requests = collect_battle_shock_test_requests(
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            player_id=active_player_id,
+            army=army,
+            battlefield_state=battlefield_state,
+            starting_strength_records=tuple(state.starting_strength_records),
+            battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+            state=state,
+            forced_below_starting_strength_unit_ids=forced_unit_ids,
+            ability_index=ability_index,
+            runtime_modifier_registry=runtime_modifier_registry,
+            battle_shock_dice_expressions_by_unit_id=dice_expressions_by_unit_id,
+        )
+        command_state = command_state.enter_battle_shock_step(
+            phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+            candidate_inventory=candidate_inventory,
+            required_test_requests=required_test_requests,
+        )
+        state.replace_command_step_state(command_state)
+        record_command_battle_shock_snapshot(
+            state=state,
+            event_log=decisions.event_log,
+        )
+    validate_command_battle_shock_snapshot_authority(
         state=state,
-        forced_below_starting_strength_unit_ids=forced_below_starting_strength_unit_ids,
-        ability_index=ability_index,
-        runtime_modifier_registry=runtime_modifier_registry,
-        battle_shock_dice_expressions_by_unit_id=dice_expressions_by_unit_id,
+        event_records=decisions.event_log.records,
     )
+    phase_start_battle_shocked_unit_ids = command_state.battle_shock_phase_start_unit_ids
+    requests = command_state.battle_shock_required_test_requests
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    result_payloads: list[JsonValue] = []
     completed_request_ids = set(command_state.completed_battle_shock_test_request_ids)
     for request in requests:
         if request.request_id in completed_request_ids:
@@ -1352,6 +1367,7 @@ def _resolve_battle_shock_step(
                 "battle_round": state.battle_round,
                 "active_player_id": active_player_id,
                 "phase": BattlePhase.COMMAND.value,
+                "source_kind": COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
                 "battle_shock_test_request": validate_json_value(request.to_payload()),
             },
         )
@@ -1375,6 +1391,7 @@ def _resolve_battle_shock_step(
                 active_player_id=active_player_id,
                 phase=BattlePhase.COMMAND,
                 phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+                passed_state_policy=(BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED),
                 source_kind=COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
                 base_payload=base_payload,
                 resolved_event_types=("battle_shock_test_resolved",),
@@ -1384,7 +1401,6 @@ def _resolve_battle_shock_step(
                 return resolution.pending_status
             if resolution.resolved_payload is None:
                 raise GameLifecycleError("Battle-shock resolution did not return a result.")
-            result_payload = _battle_shock_result_payload(resolution.resolved_payload)
         else:
             roll_state = manager.roll_fixed(
                 request.spec,
@@ -1401,7 +1417,7 @@ def _resolve_battle_shock_step(
                     "persisting_effect": validate_json_value(auto_pass_effect.to_payload()),
                 },
             )
-            resolved_payload = record_battle_shock_result_and_outcome_events(
+            record_battle_shock_result_and_outcome_events(
                 state=state,
                 decisions=decisions,
                 manager=manager,
@@ -1412,21 +1428,32 @@ def _resolve_battle_shock_step(
                 phase=BattlePhase.COMMAND,
                 auto_passed=True,
                 phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+                passed_state_policy=(BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED),
                 base_payload=base_payload,
                 resolved_event_types=("battle_shock_test_resolved",),
             )
-            result_payload = _battle_shock_result_payload(
-                _json_object(
-                    resolved_payload,
-                    context="Battle-shock resolved payload",
-                )
-            )
-        result_payloads.append(result_payload)
         command_state = _command_step_state(state).with_completed_battle_shock_test_request(
             request.request_id
         )
         state.replace_command_step_state(command_state)
         completed_request_ids.add(request.request_id)
+        pending_requests = decisions.queue.pending_requests
+        if pending_requests:
+            pending_request = pending_requests[0]
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=pending_request,
+                payload={
+                    "phase": BattlePhase.COMMAND.value,
+                    "phase_body_status": "battle_shock_outcome_decision_pending",
+                    "pending_request_id": pending_request.request_id,
+                },
+            )
+    completed_results = ordered_completed_command_battle_shock_results(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+    )
     state.replace_command_step_state(_command_step_state(state).with_battle_shock_step_resolved())
     decisions.event_log.append(
         "battle_shock_step_completed",
@@ -1436,7 +1463,9 @@ def _resolve_battle_shock_step(
             "active_player_id": active_player_id,
             "phase": BattlePhase.COMMAND.value,
             "battle_shock_test_count": len(requests),
-            "battle_shock_results": result_payloads,
+            "battle_shock_results": [
+                validate_json_value(result.to_payload()) for result in completed_results
+            ],
             "completed_battle_shock_test_request_ids": list(
                 _command_step_state(state).completed_battle_shock_test_request_ids
             ),

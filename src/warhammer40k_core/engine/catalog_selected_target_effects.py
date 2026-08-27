@@ -17,6 +17,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
     apply_battle_shock_reroll_resolution_decision,
     is_battle_shock_reroll_request,
 )
@@ -651,6 +652,7 @@ def apply_catalog_selected_target_battle_shock_reroll_decision(
         result=result,
         battle_shock_hooks=battle_shock_hooks,
         expected_source_kind=CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND,
+        expected_passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
     )
     original_result = DecisionResult.from_payload(
         cast(

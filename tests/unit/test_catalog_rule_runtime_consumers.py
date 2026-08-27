@@ -7,6 +7,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.phase15a_charge_declaration_helpers import mission_setup as charge_mission_setup
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -17,6 +18,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     FightOrderingBandKind,
     FightPhaseStepKind,
     FightTypeKind,
+    MovementMode,
     ReserveDestructionTimingKind,
     RulesetDescriptor,
     TerrainFeatureKind,
@@ -29,6 +31,8 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine import battle_shock_event_authority
+from warhammer40k_core.engine import battle_shock_lifecycle_authority as battle_shock_lifecycle
 from warhammer40k_core.engine import catalog_battle_shock_runtime as battle_shock_runtime
 from warhammer40k_core.engine import (
     catalog_command_point_runtime as command_point_runtime,
@@ -64,12 +68,19 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.battle_shock import (
+    BattleShockResult,
     BattleShockTestReason,
     BattleShockTestRequest,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
     BattleShockRerollPermissionContext,
+)
+from warhammer40k_core.engine.battle_shock_resolution import BattleShockPassedStatePolicy
+from warhammer40k_core.engine.battle_shock_test_service import (
+    STRATAGEM_BATTLE_SHOCK_SOURCE_KIND,
+    BattleShockTestRuntime,
+    resolve_battle_shock_test,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -203,6 +214,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     validate_effect_record_tuple,
     validate_identifier_tuple,
 )
+from warhammer40k_core.engine.catalog_selected_target_history_authority import (
+    validate_catalog_selected_target_loaded_source_authority,
+)
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     fight_start_selected_target_selection_is_supported,
     selected_target_persisting_effect_clause_is_supported,
@@ -221,7 +235,11 @@ from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support i
 )
 from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionOption,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
@@ -229,7 +247,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.events import (
@@ -279,6 +297,7 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeDistanceSpec,
     MovementEndSurgeGrant,
 )
+from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -286,6 +305,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.charge import ChargeMoveProposal, ChargePhaseHandler
 from warhammer40k_core.engine.phases.movement_reactions import (
     _movement_end_surge_event_already_processed,
     _movement_end_surge_grant_groups,  # pyright: ignore[reportPrivateUsage]
@@ -293,6 +313,10 @@ from warhammer40k_core.engine.phases.movement_reactions import (
     _request_movement_end_surge_if_available,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    record_primary_mission_boundary_checkpoint,
+)
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalRestrictionContext,
     ReserveArrivalRestrictionHookRegistry,
@@ -375,16 +399,23 @@ from warhammer40k_core.engine.triggered_movement import (
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.engine.unit_move_completed_hooks import UnitMoveCompletedContext
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedContext,
+    resolve_unit_move_completed_battle_shock_hooks,
+    unit_move_completed_battle_shock_base_payload,
+    unit_move_completed_battle_shock_effect_key,
+    unit_move_completed_battle_shock_request_id,
+)
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
-    starting_strength_records_for_units,
+    StartingStrengthRecord,
 )
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -735,7 +766,7 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
                 ),
             ),
             UnitMusterSelection(
-                unit_selection_id="khorne-target",
+                unit_selection_id="khorne-bodyguard",
                 datasheet_id="core-intercessor-like-infantry",
                 model_profile_selections=(
                     ModelProfileSelection(
@@ -743,6 +774,22 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
                         model_count=5,
                     ),
                 ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="khorne-leader",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="khorne-leader",
+                bodyguard_unit_selection_id="khorne-bodyguard",
             ),
         ),
     )
@@ -755,7 +802,10 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
         unit for unit in army.units if unit.unit_instance_id.endswith("skull-altar-source")
     )
     target_unit = next(
-        unit for unit in army.units if unit.unit_instance_id.endswith("khorne-target")
+        unit for unit in army.units if unit.unit_instance_id.endswith("khorne-bodyguard")
+    )
+    target_leader = next(
+        unit for unit in army.units if unit.unit_instance_id.endswith("khorne-leader")
     )
     source_unit = replace(
         source_unit,
@@ -766,7 +816,8 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
         target_unit,
         faction_keywords=("KHORNE", "LEGIONES DAEMONICA"),
     )
-    army = replace(army, units=(source_unit, target_unit))
+    army = replace(army, units=(source_unit, target_unit, target_leader))
+    target_rules_unit_id = army.attached_units[0].attached_unit_instance_id
     battlefield = BattlefieldRuntimeState(
         battlefield_id="catalog-battle-shock-reroll",
         battlefield_width_inches=60.0,
@@ -786,6 +837,11 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
                         unit=target_unit,
                         model_xs=_model_xs_for_unit(unit=target_unit, start_x=14.0),
                     ),
+                    _unit_placement_for_test(
+                        army=army,
+                        unit=target_leader,
+                        model_xs=_model_xs_for_unit(unit=target_leader, start_x=14.5),
+                    ),
                 ),
             ),
         ),
@@ -796,23 +852,25 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
         active_player_id=army.player_id,
         phase=BattlePhase.COMMAND,
     )
-    starting_record = starting_strength_records_for_units(
-        player_id=army.player_id,
-        units=(target_unit,),
-    )[0]
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_rules_unit_id,
+    )
     request = BattleShockTestRequest.for_unit(
         request_id="catalog-battle-shock-reroll-test",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id=army.player_id,
-        unit_instance_id=target_unit.unit_instance_id,
+        unit_instance_id=target_rules_unit_id,
         reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
         leadership_target=6,
-        below_half_strength_context=BelowHalfStrengthContext.from_unit(
+        below_half_strength_context=BelowHalfStrengthContext(
             player_id=army.player_id,
-            unit=target_unit,
-            starting_strength=starting_record,
-            current_model_ids=target_unit.own_model_ids(),
+            unit_instance_id=target_rules_unit_id,
+            starting_model_count=len(target_rules_unit.own_models),
+            current_model_count=len(target_rules_unit.alive_models()),
+            single_model_starting_wounds=None,
+            single_model_wounds_remaining=None,
         ),
     )
     record = _compiled_record(
@@ -883,22 +941,83 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
             second_model_ids=target_unit.own_model_ids(),
             distance_inches=6.0,
         )
-    scenario = BattlefieldScenario(
-        armies=(army, enemy_army),
-        battlefield_state=battlefield,
-    )
     with pytest.raises(GameLifecycleError, match="placement evidence drifted"):
         battle_shock_runtime._geometry_models_for_unit_ids(  # pyright: ignore[reportPrivateUsage]
-            scenario=scenario,
+            state=state,
             unit=source_unit,
             model_ids=("missing-model",),
         )
-    with pytest.raises(GameLifecycleError, match="unit placement is missing"):
+    with pytest.raises(GameLifecycleError, match="placement evidence drifted"):
         battle_shock_runtime._geometry_models_for_unit_ids(  # pyright: ignore[reportPrivateUsage]
-            scenario=scenario,
+            state=state,
             unit=enemy_army.units[0],
             model_ids=enemy_army.units[0].own_model_ids(),
         )
+
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=(army, enemy_army),
+            catalog=catalog,
+        ),
+        armies=(army, enemy_army),
+        catalog=catalog,
+        contributions=(),
+        base_ability_records=(record,),
+    )
+    state.starting_strength_records = [
+        StartingStrengthRecord(
+            player_id=army.player_id,
+            unit_instance_id=target_rules_unit_id,
+            starting_model_count=len(target_rules_unit.own_models),
+            single_model_starting_wounds=None,
+            source_id="test:catalog-battle-shock-reroll:attached-starting-strength",
+        )
+    ]
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    decisions = DecisionController()
+    execution = resolve_battle_shock_test(
+        runtime=BattleShockTestRuntime.from_runtime_content_bundle(bundle),
+        state=state,
+        decisions=decisions,
+        request_id="catalog-stratagem-battle-shock-request",
+        target_unit_instance_id=target_rules_unit_id,
+        reason=BattleShockTestReason.FORCED_BY_STRATAGEM,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+        phase_start_battle_shocked_unit_ids=(),
+        passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
+        source_kind=STRATAGEM_BATTLE_SHOCK_SOURCE_KIND,
+        source_payload={"stratagem_use_id": "test:catalog-stratagem-battle-shock"},
+        resolved_event_types=("stratagem_battle_shock_resolved",),
+        pending_phase_body_status="stratagem_battle_shock_reroll_pending",
+    )
+    assert execution.resolution.pending_status is not None
+    reroll_request = decisions.queue.peek_next()
+    reroll_result = DecisionResult.for_request(
+        result_id="catalog-stratagem-battle-shock-reroll-result",
+        request=reroll_request,
+        selected_option_id=reroll_request.options[0].option_id,
+    )
+    decisions.submit_result(reroll_result)
+    advanced = LifecycleStatus.advanced(stage=state.stage)
+
+    status = battle_shock_lifecycle.apply_global_reroll_if_applicable(
+        state=state,
+        decisions=decisions,
+        request=reroll_request,
+        result=reroll_result,
+        runtime_content_bundle=bundle,
+        reaction_queue=ReactionQueue(),
+        resolves_reaction_frame=False,
+        advance_until_decision_or_terminal=lambda: advanced,
+    )
+
+    assert status is advanced
+    assert not decisions.queue.pending_requests
+    assert any(
+        event.event_type == "stratagem_battle_shock_resolved"
+        for event in decisions.event_log.records
+    )
 
 
 def test_catalog_battle_shock_runtime_helpers_fail_fast_on_contract_drift() -> None:
@@ -984,6 +1103,10 @@ def test_catalog_battle_shock_reroll_clause_helpers_are_strict() -> None:
         source_army.units[0],
         faction_keywords=("LEGIONES", "DAEMONICA", "KHORNE"),
     )
+    fortification_rules_unit = rules_unit_view_from_armies(
+        armies=(_army_with_unit(source_army, fortification_unit),),
+        unit_instance_id=fortification_unit.unit_instance_id,
+    )
 
     def reroll_clause(
         *,
@@ -1063,17 +1186,17 @@ def test_catalog_battle_shock_reroll_clause_helpers_are_strict() -> None:
     )
     assert battle_shock_runtime._battle_shock_reroll_clause_matches_target(  # pyright: ignore[reportPrivateUsage]
         clause,
-        target_unit=fortification_unit,
+        target_rules_unit=fortification_rules_unit,
     )
     with pytest.raises(GameLifecycleError, match="clause is invalid"):
         battle_shock_runtime._battle_shock_reroll_clause_matches_target(  # pyright: ignore[reportPrivateUsage]
             cast(Any, object()),
-            target_unit=fortification_unit,
+            target_rules_unit=fortification_rules_unit,
         )
-    with pytest.raises(GameLifecycleError, match="target unit is invalid"):
+    with pytest.raises(GameLifecycleError, match="target rules unit is invalid"):
         battle_shock_runtime._battle_shock_reroll_clause_matches_target(  # pyright: ignore[reportPrivateUsage]
             clause,
-            target_unit=cast(Any, object()),
+            target_rules_unit=cast(Any, object()),
         )
 
     assert battle_shock_runtime._unit_has_required_keyword(  # pyright: ignore[reportPrivateUsage]
@@ -3203,6 +3326,27 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
         source_unit=source_unit,
         trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
     )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=(source_army, target_army),
+            catalog=catalog,
+        ),
+        armies=(source_army, target_army),
+        catalog=catalog,
+        contributions=(),
+        base_ability_records=(record,),
+    )
+    state.mission_setup = charge_mission_setup()
+    state.starting_strength_records = [
+        StartingStrengthRecord.from_unit(
+            player_id=army.player_id,
+            unit=unit,
+            source_id=f"test:catalog-post-shoot:{unit.unit_instance_id}",
+        )
+        for army in (source_army, target_army)
+        for unit in army.units
+    ]
     ability_indexes_by_player_id = {
         source_army.player_id: AbilityCatalogIndex.from_records((record,)),
         target_army.player_id: AbilityCatalogIndex.from_records(()),
@@ -3212,8 +3356,9 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
         armies=(source_army, target_army),
     )
     profile = _first_catalog_weapon_profile()
+    declaration_result_id = "result:post-shoot-battle-shock:declaration"
     sequence = AttackSequence(
-        sequence_id="attack-sequence:post-shoot-battle-shock",
+        sequence_id=f"attack-sequence:{declaration_result_id}",
         attacker_player_id=source_army.player_id,
         attacking_unit_instance_id=source_unit.unit_instance_id,
         source_phase=BattlePhase.SHOOTING,
@@ -3231,8 +3376,52 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
                 target_in_range_model_ids=target_unit.own_model_ids(),
             ),
         ),
-    )
+    ).advanced_after_attack()
     decisions = DecisionController()
+    record_primary_mission_boundary_checkpoint(
+        state=state,
+        event_log=decisions.event_log,
+        boundary_kind="action_request",
+        player_id=source_army.player_id,
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
+    )
+    declaration_request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type="test:catalog-post-shoot:declaration",
+        actor_id=source_army.player_id,
+        payload=validate_json_value(
+            {"attack_pools": [pool.to_payload() for pool in sequence.attack_pools]}
+        ),
+        options=(
+            DecisionOption(
+                option_id="accept",
+                label="Accept declaration",
+                payload=validate_json_value(
+                    {"attack_pools": [pool.to_payload() for pool in sequence.attack_pools]}
+                ),
+            ),
+        ),
+    )
+    decisions.request_decision(declaration_request)
+    declaration_result = DecisionResult.for_request(
+        result_id=declaration_result_id,
+        request=declaration_request,
+        selected_option_id="accept",
+    )
+    decisions.submit_result(declaration_result)
+    decisions.event_log.append(
+        "shooting_declaration_accepted",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": source_army.player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "unit_instance_id": source_unit.unit_instance_id,
+            "request_id": declaration_request.request_id,
+            "result_id": declaration_result.result_id,
+            "attack_pools": [pool.to_payload() for pool in sequence.attack_pools],
+        },
+    )
     decisions.event_log.append(
         "attack_sequence_step",
         {
@@ -3240,6 +3429,14 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
             "step": AttackSequenceStep.HIT.value,
             "pool_index": 0,
             "payload": {"successful": True},
+        },
+    )
+    completion_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": sequence.sequence_id,
+            "attacker_player_id": source_army.player_id,
+            "attacking_unit_instance_id": source_unit.unit_instance_id,
         },
     )
 
@@ -3252,7 +3449,7 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=sequence,
-            attack_sequence_completed_event_id="event:post-shoot-battle-shock:completed",
+            attack_sequence_completed_event_id=completion_event.event_id,
         )
     )
 
@@ -3285,6 +3482,50 @@ def test_catalog_post_shoot_hit_target_runtime_resolves_immediate_battle_shock()
     assert "battle_shock_test_resolved" in event_types
     assert "catalog_selected_target_battle_shock_resolved" in event_types
     assert CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT in event_types
+
+    battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        runtime_content_bundle=bundle,
+    )
+    source_decision_record = next(
+        row for row in decisions.records if row.result.result_id == result.result_id
+    )
+    request_event_index, request_event = next(
+        (index, event)
+        for index, event in enumerate(decisions.event_log.records)
+        if event.event_type == "battle_shock_test_requested"
+    )
+    request_event_payload = cast(dict[str, JsonValue], request_event.payload)
+    battle_shock_request = BattleShockTestRequest.from_payload(
+        cast(Any, request_event_payload["battle_shock_test_request"])
+    )
+    bundle_without_record = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=(source_army, target_army),
+            catalog=catalog,
+        ),
+        armies=(source_army, target_army),
+        catalog=catalog,
+        contributions=(),
+        base_ability_records=(),
+    )
+    with pytest.raises(GameLifecycleError, match="loaded catalog authority drifted"):
+        validate_catalog_selected_target_loaded_source_authority(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            request_event_index=request_event_index,
+            request=battle_shock_request,
+            source_decision_record=source_decision_record,
+            request_base={
+                key: value
+                for key, value in request_event_payload.items()
+                if key != "battle_shock_test_request"
+            },
+            runtime_content_bundle=bundle_without_record,
+        )
 
 
 def test_catalog_once_per_battle_runtimes_ignore_disabled_records_before_parsing() -> None:
@@ -4116,16 +4357,21 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     target_unit = target_army.units[0]
-    state = _state_with_battlefield(
-        armies=(source_army, target_army),
-        battlefield=_battlefield_for_units(
+    battlefield = replace(
+        _battlefield_for_units(
             source_army=source_army,
             source_unit=source_unit,
             source_x=10.0,
             target_army=target_army,
             target_unit=target_unit,
-            target_x=10.4,
+            target_x=22.0,
         ),
+        battlefield_width_inches=100.0,
+        battlefield_depth_inches=100.0,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
         active_player_id=source_army.player_id,
         phase=BattlePhase.CHARGE,
     )
@@ -4146,25 +4392,54 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=(source_army, target_army),
     )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=(source_army, target_army),
+            catalog=catalog,
+        ),
+        armies=(source_army, target_army),
+        catalog=catalog,
+        contributions=(),
+        base_ability_records=(record,),
+    )
+    state.mission_setup = charge_mission_setup()
+    state.starting_strength_records = [
+        StartingStrengthRecord.from_unit(
+            player_id=army.player_id,
+            unit=unit,
+            source_id=f"test:catalog-charge-end:{unit.unit_instance_id}",
+        )
+        for army in (source_army, target_army)
+        for unit in army.units
+    ]
+    decisions = DecisionController()
+    record_primary_mission_boundary_checkpoint(
+        state=state,
+        event_log=decisions.event_log,
+        boundary_kind="action_request",
+        player_id=source_army.player_id,
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
+    )
+    trigger = _complete_real_catalog_charge_move(
+        state=state,
+        decisions=decisions,
+        source_unit=source_unit,
+        target_unit=target_unit,
+        ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
+    )
     context = UnitMoveCompletedContext(
         state=state,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         completed_phase=BattlePhase.CHARGE,
-        trigger_event_id="event:catalog:charge-end-battle-shock",
-        trigger_event_payload={
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.CHARGE.value,
-            "unit_instance_id": source_unit.unit_instance_id,
-            "active_player_id": source_army.player_id,
-            "movement_phase_action": "charge_move",
-        },
+        trigger_event_id=trigger.event_id,
+        trigger_event_payload=cast(dict[str, JsonValue], trigger.payload),
         triggering_unit_instance_id=source_unit.unit_instance_id,
         triggering_player_id=source_army.player_id,
         movement_action="charge_move",
         ability_indexes_by_player_id=ability_indexes_by_player_id,
-        decisions=DecisionController(),
+        decisions=decisions,
     )
 
     assert len(bindings) == 1
@@ -4176,11 +4451,180 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
     assert effect.source_rule_id == record.definition.source_id
     assert effect.target_unit_instance_id == target_unit.unit_instance_id
     assert effect.target_player_id == target_army.player_id
-    assert effect.trigger_event_id == "event:catalog:charge-end-battle-shock"
+    assert effect.trigger_event_id == trigger.event_id
     replay_payload = cast(dict[str, JsonValue], effect.replay_payload)
     assert replay_payload["source_unit_instance_id"] == source_unit.unit_instance_id
+    assert replay_payload["source_model_instance_id"] == source_unit.own_models[0].model_instance_id
     assert replay_payload["target_unit_instance_id"] == target_unit.unit_instance_id
     assert replay_payload["movement_action"] == "charge_move"
+    effect_key = unit_move_completed_battle_shock_effect_key(effect)
+    request_id = unit_move_completed_battle_shock_request_id(
+        battle_round=state.battle_round,
+        effect=effect,
+    )
+    drifted_effect = replace(
+        effect,
+        replay_payload={**replay_payload, "movement_action": "normal_move"},
+    )
+    assert unit_move_completed_battle_shock_effect_key(drifted_effect) != effect_key
+    assert (
+        unit_move_completed_battle_shock_request_id(
+            battle_round=state.battle_round,
+            effect=drifted_effect,
+        )
+        != request_id
+    )
+
+    status = resolve_unit_move_completed_battle_shock_hooks(
+        state=state,
+        decisions=decisions,
+        registry=bundle.unit_move_completed_battle_shock_hook_registry,
+        battle_shock_hooks=bundle.battle_shock_hook_registry,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
+        completed_phase=BattlePhase.CHARGE,
+        event_type="charge_move_completed",
+        movement_actions=("charge_move",),
+        ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
+    )
+
+    assert status is None
+    battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        runtime_content_bundle=bundle,
+    )
+
+    authoritative_events = decisions.event_log.records
+    trigger_index = authoritative_events.index(trigger)
+    trigger_payload = cast(dict[str, JsonValue], trigger.payload)
+    transition_payload = cast(dict[str, JsonValue], trigger_payload["transition_batch"])
+    displacement_payloads = cast(list[dict[str, JsonValue]], transition_payload["displacements"])
+    assert displacement_payloads
+    tampered_transition = {
+        **transition_payload,
+        "displacements": [
+            {**displacement_payloads[0], "source_step": "normal_move"},
+            *displacement_payloads[1:],
+        ],
+    }
+    tampered_trigger_events = (
+        *authoritative_events[:trigger_index],
+        replace(
+            trigger,
+            payload=validate_json_value(
+                {**trigger_payload, "transition_batch": tampered_transition}
+            ),
+        ),
+        *authoritative_events[trigger_index + 1 :],
+    )
+    with pytest.raises(GameLifecycleError):
+        battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
+            state=state,
+            event_records=tampered_trigger_events,
+            decision_records=decisions.records,
+            runtime_content_bundle=bundle,
+        )
+    with pytest.raises(GameLifecycleError):
+        battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
+            state=state,
+            event_records=(
+                *authoritative_events[:trigger_index],
+                *authoritative_events[trigger_index + 1 :],
+            ),
+            decision_records=decisions.records,
+            runtime_content_bundle=bundle,
+        )
+    with pytest.raises(GameLifecycleError):
+        battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
+            state=state,
+            event_records=(
+                *authoritative_events[:trigger_index],
+                trigger,
+                trigger,
+                *authoritative_events[trigger_index + 1 :],
+            ),
+            decision_records=decisions.records,
+            runtime_content_bundle=bundle,
+        )
+
+    resolved_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+    )
+    resolved_payload = cast(dict[str, JsonValue], resolved_event.payload)
+    result = BattleShockResult.from_payload(cast(Any, resolved_payload["battle_shock_result"]))
+    forged_replay_payload = {
+        **replay_payload,
+        "source_unit_instance_id": target_unit.unit_instance_id,
+        "source_model_instance_id": target_unit.own_models[0].model_instance_id,
+        "ability_name": "Forged loaded ability name",
+        "reason": "forged_reason",
+    }
+    forged_effect = replace(effect, replay_payload=forged_replay_payload)
+    forged_request = replace(
+        result.request,
+        request_id=unit_move_completed_battle_shock_request_id(
+            battle_round=state.battle_round,
+            effect=forged_effect,
+        ),
+    )
+    forged_result = replace(result, request=forged_request)
+    forged_base = unit_move_completed_battle_shock_base_payload(
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id=source_army.player_id,
+        completed_phase=BattlePhase.CHARGE,
+        movement_action="charge_move",
+        effect=forged_effect,
+    )
+    tampered_events = tuple(
+        replace(
+            event,
+            payload=validate_json_value(
+                {
+                    **cast(dict[str, JsonValue], event.payload),
+                    **forged_base,
+                    **(
+                        {"battle_shock_test_request": forged_request.to_payload()}
+                        if event.event_type
+                        in {
+                            "battle_shock_test_requested",
+                            "battle_shock_modifier_applications_recorded",
+                        }
+                        else {}
+                    ),
+                    **(
+                        {"battle_shock_result": forged_result.to_payload()}
+                        if event.event_type
+                        in {
+                            "battle_shock_test_resolved",
+                            "unit_move_completed_battle_shock_resolved",
+                        }
+                        else {}
+                    ),
+                }
+            ),
+        )
+        if event.event_type
+        in {
+            "battle_shock_test_requested",
+            "battle_shock_modifier_applications_recorded",
+            "battle_shock_test_resolved",
+            "unit_move_completed_battle_shock_resolved",
+        }
+        else event
+        for event in decisions.event_log.records
+    )
+    with pytest.raises(GameLifecycleError, match="effect identity drifted"):
+        battle_shock_event_authority.validate_battle_shock_runtime_content_authority(
+            state=state,
+            event_records=tampered_events,
+            decision_records=decisions.records,
+            runtime_content_bundle=bundle,
+        )
 
 
 def test_catalog_selected_target_runtime_fail_fast_and_empty_paths() -> None:
@@ -9509,6 +9953,94 @@ def _mustered_attached_once_per_battle_armies() -> tuple[ArmyDefinition, ArmyDef
             ),
         ),
     )
+
+
+def _complete_real_catalog_charge_move(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    source_unit: UnitInstance,
+    target_unit: UnitInstance,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> EventRecord:
+    handler = ChargePhaseHandler(
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+    )
+    selection_status = handler.begin_phase(state=state, decisions=decisions)
+    assert selection_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    selection_request = selection_status.decision_request
+    assert selection_request is not None
+    selection_result = DecisionResult.for_request(
+        result_id="result:catalog-charge-end:select-source",
+        request=selection_request,
+        selected_option_id=source_unit.unit_instance_id,
+    )
+    decisions.submit_result(selection_result)
+    proposal_status = handler.apply_decision(
+        state=state,
+        result=selection_result,
+        decisions=decisions,
+    )
+    assert proposal_status is not None
+    assert proposal_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    proposal_decision_request = proposal_status.decision_request
+    assert proposal_decision_request is not None
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        proposal_decision_request.payload
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.unit_placement_by_id(source_unit.unit_instance_id)
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for model_placement in placement.model_placements:
+        start = model_placement.pose
+        midpoint = Pose.at(
+            start.position.x + 1.25,
+            start.position.y,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        end = Pose.at(
+            start.position.x + 2.5,
+            start.position.y,
+            start.position.z,
+            facing_degrees=start.facing.degrees,
+        )
+        model_paths.append((model_placement.model_instance_id, (start, midpoint, end)))
+    proposal = ChargeMoveProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=source_unit.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=(target_unit.unit_instance_id,),
+        witness=PathWitness.for_paths(tuple(model_paths)),
+    )
+    proposal_result = DecisionResult(
+        result_id="result:catalog-charge-end:move-source",
+        request_id=proposal_decision_request.request_id,
+        decision_type=proposal_decision_request.decision_type,
+        actor_id=proposal_decision_request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=cast(JsonValue, proposal.to_payload()),
+    )
+    decisions.submit_result(proposal_result)
+    assert (
+        handler.apply_decision(
+            state=state,
+            result=proposal_result,
+            decisions=decisions,
+        )
+        is None
+    )
+    completed = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "charge_move_completed"
+    )
+    assert len(completed) == 1
+    return completed[0]
 
 
 def _muster_request(

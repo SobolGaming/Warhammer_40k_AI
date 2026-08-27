@@ -17,6 +17,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockOutcomeContext,
@@ -35,7 +38,11 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    EffectExpiration,
+    PersistingEffect,
+    PersistingEffectPayload,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import (
@@ -45,6 +52,9 @@ from warhammer40k_core.engine.faction_content.common import (
     payload_string as _payload_string,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -181,6 +191,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=UNIT_CHARACTERISTIC_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=voice_of_command_unit_characteristic_modifier,
+                historical_leadership_handler=historical_voice_of_command_leadership,
             ),
         ),
         movement_budget_modifier_bindings=(
@@ -387,6 +398,102 @@ def voice_of_command_unit_characteristic_modifier(
     ):
         return context.current_value + 1
     return context.current_value
+
+
+def historical_voice_of_command_leadership(
+    context: HistoricalBattleShockAuthorityContext,
+    current: int,
+) -> int:
+    if type(context) is not HistoricalBattleShockAuthorityContext:
+        raise GameLifecycleError("Voice of Command historical authority requires context.")
+    target = context.rules_unit(context.request.unit_instance_id)
+    if ASTRA_MILITARUM_FACTION_KEYWORD not in target.faction_keywords:
+        return current
+    shocked = {target.unit_instance_id, *target.component_unit_instance_ids}.intersection(
+        context.battle_shocked_unit_ids
+    )
+    if shocked:
+        return current
+    effects: dict[str, PersistingEffect] = {}
+    for event_index, event in enumerate(context.event_records[: context.boundary_event_index]):
+        if not isinstance(event.payload, dict):
+            continue
+        if event.event_type == "astra_militarum_voice_of_command_order_issued":
+            raw_effect = event.payload.get("persisting_effect")
+            raw_replaced = event.payload.get("replaced_effect_ids")
+            request_id = event.payload.get("request_id")
+            result_id = event.payload.get("result_id")
+            if (
+                not isinstance(raw_effect, dict)
+                or not isinstance(raw_replaced, list)
+                or any(type(value) is not str for value in raw_replaced)
+                or type(request_id) is not str
+                or type(result_id) is not str
+            ):
+                raise GameLifecycleError("Voice of Command historical event is invalid.")
+            validate_mutation_decision_closure(
+                event_records=context.event_records,
+                decision_records=context.decision_records,
+                mutation_index=event_index,
+                request_id=request_id,
+                result_id=result_id,
+            )
+            for effect_id in cast(list[str], raw_replaced):
+                if effects.pop(effect_id, None) is None:
+                    raise GameLifecycleError(
+                        "Voice of Command historical replacement is discontinuous."
+                    )
+            effect = PersistingEffect.from_payload(cast(PersistingEffectPayload, raw_effect))
+            if effect.effect_id in effects:
+                raise GameLifecycleError("Voice of Command historical effect is duplicated.")
+            effects[effect.effect_id] = effect
+        elif event.event_type == "astra_militarum_voice_of_command_order_ceased_battle_shock":
+            raw_removed = event.payload.get("removed_effect_ids")
+            if not isinstance(raw_removed, list) or any(
+                type(value) is not str for value in raw_removed
+            ):
+                raise GameLifecycleError("Voice of Command historical cease event is invalid.")
+            for effect_id in cast(list[str], raw_removed):
+                if effects.pop(effect_id, None) is None:
+                    raise GameLifecycleError(
+                        "Voice of Command historical cease event is discontinuous."
+                    )
+    matching = tuple(
+        effect
+        for effect in effects.values()
+        if target.unit_instance_id in effect.target_unit_instance_ids
+        and effect.source_rule_id == SOURCE_RULE_ID
+        and _historical_voice_effect_is_active(context=context, effect=effect)
+    )
+    if len(matching) > 1:
+        raise GameLifecycleError("Voice of Command historical effect is ambiguous.")
+    if not matching:
+        return current
+    payload = _payload_object(matching[0].effect_payload)
+    return (
+        _improve_leadership(current)
+        if _order_from_token(_payload_string(payload, key="order_id"))
+        is VoiceOfCommandOrder.DUTY_AND_HONOUR
+        else current
+    )
+
+
+def _historical_voice_effect_is_active(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    effect: PersistingEffect,
+) -> bool:
+    expiration = effect.expiration
+    if expiration.battle_round is None or expiration.player_id is None:
+        raise GameLifecycleError("Voice of Command historical expiration is incomplete.")
+    current_player = context.turn_order.index(context.active_player_id)
+    expiration_player = context.turn_order.index(expiration.player_id)
+    current_phase = context.battle_phase_sequence.index(context.phase)
+    return (context.request.battle_round, current_player, current_phase) < (
+        expiration.battle_round,
+        expiration_player,
+        -1,
+    )
 
 
 def voice_of_command_movement_modifier(context: MovementBudgetModifierContext) -> float:

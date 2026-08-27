@@ -18,7 +18,11 @@ from tests.phase10p_reserves_helpers import (
     submit_reserve_placement_payload,
     with_model_pose,
 )
-from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.setup_completion_helpers import (
+    enter_battle_for_fixture,
+    record_completed_command_occurrences_for_fixture,
+    record_current_battlefield_placements_for_fixture,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -70,8 +74,11 @@ from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldRemovalKind,
     BattlefieldScenario,
+    BattlefieldTransitionBatch,
     ModelPlacement,
+    ModelRemovalRecord,
     UnitPlacement,
 )
 from warhammer40k_core.engine.charge_effects import (
@@ -116,7 +123,12 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
     stratagems as daemonic_stratagems,
 )
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -1381,7 +1393,7 @@ def test_realm_of_chaos_replay_rejects_forged_arrived_status() -> None:
 
     with pytest.raises(
         GameLifecycleError,
-        match="Arrived ReserveState lacks one authenticated arrival",
+        match=r"Primary mission physical history .* drifted from restored state",
     ):
         GameLifecycle.from_payload(lifecycle.to_payload())
 
@@ -1402,7 +1414,7 @@ def test_realm_of_chaos_replay_rejects_forged_destroyed_status() -> None:
 
     with pytest.raises(
         GameLifecycleError,
-        match="lacks one authenticated reserve-deadline destruction",
+        match=r"Primary mission physical history .* drifted from restored state",
     ):
         GameLifecycle.from_payload(lifecycle.to_payload())
 
@@ -1435,7 +1447,10 @@ def test_realm_of_chaos_real_reinforcement_arrival_replays_and_rejects_clone() -
             "payload": deepcopy(arrival_event["payload"]),
         }
     )
-    with pytest.raises(GameLifecycleError, match="Reserve arrival decision record is reused"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary mission placement history starts on battlefield",
+    ):
         GameLifecycle.from_payload(cloned_payload)
 
 
@@ -1558,7 +1573,7 @@ def test_realm_of_chaos_replay_rejects_invented_arrival_model_identity(
 
     with pytest.raises(
         GameLifecycleError,
-        match="Reserve arrival request/result proposal authority drift",
+        match="Physical placement model lacks starting-wounds authority",
     ):
         GameLifecycle.from_payload(payload)
 
@@ -3221,6 +3236,7 @@ def _apply_daemonic_stratagem(
         use_record=use_record,
         ruleset_descriptor=_ruleset(),
         army_catalog=_daemonic_incursion_catalog(),
+        battle_shock_runtime=None,
         shooting_unit_selected_grant_hooks=None,
     )
 
@@ -3342,40 +3358,28 @@ def _config_backed_realm_of_chaos_lifecycle(
     state = GameState.from_config(config)
     for army in armies:
         state.record_army_definition(army)
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=army.player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase17g-daemonic-incursion-realm-authority-battlefield",
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
     decisions = DecisionController()
-    enter_battle_for_fixture(state, decisions=decisions)
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
-    state.active_player_id = "player-a"
-    runtime_bundle = build_runtime_content_bundle_for_armies(
-        config=config,
-        armies=armies,
-    )
-    realm_records = tuple(
-        record
-        for record in runtime_bundle.stratagem_indexes_by_player_id["player-a"].all_records()
-        if record.definition.stratagem_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
-        and record.definition.source_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_RULE_ID
-        and isinstance(record.definition.effect_payload, dict)
-        and record.definition.effect_payload.get("effect_selection_kind") is None
-    )
-    if len(realm_records) != 1:
-        raise AssertionError("test requires one active Realm of Chaos single-target record")
-    definition = realm_records[0].definition
     target_unit_id = armies[0].units[0].unit_instance_id
-    lifecycle = GameLifecycle(
-        state=state,
-        decision_controller=decisions,
-        _config=config,
-        _runtime_content_bundle=runtime_bundle,
-    )
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     if prior_declared_arrival:
         if state.battlefield_state is None:
             raise AssertionError("test requires a battlefield state")
+        target_placement = state.battlefield_state.unit_placement_by_id(target_unit_id)
+        removed_model_ids = tuple(
+            placement.model_instance_id for placement in target_placement.model_placements
+        )
         state.replace_battlefield_state(
             state.battlefield_state.without_unit_placement(target_unit_id)
         )
@@ -3400,6 +3404,59 @@ def _config_backed_realm_of_chaos_lifecycle(
                 "reserve_state": declared_state.to_payload(),
             },
         )
+        transition = BattlefieldTransitionBatch(
+            removals=tuple(
+                ModelRemovalRecord(
+                    model_instance_id=model_instance_id,
+                    removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
+                    source_phase="setup",
+                    source_step="declare_battle_formations",
+                    source_rule_id=declared_state.source_rule_ids[0],
+                )
+                for model_instance_id in removed_model_ids
+            )
+        )
+        decisions.event_log.append(
+            "battlefield_models_placed",
+            {
+                "game_id": state.game_id,
+                "setup_step": "declare_battle_formations",
+                "battlefield_id": state.battlefield_state.battlefield_id,
+                "removal_kind": BattlefieldRemovalKind.INTO_RESERVES.value,
+                "removed_model_count": len(transition.removals),
+                "transition_batch": transition.to_payload(),
+            },
+        )
+    enter_battle_for_fixture(state, decisions=decisions)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.active_player_id = "player-a"
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=config,
+    )
+    runtime_bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=armies,
+    )
+    realm_records = tuple(
+        record
+        for record in runtime_bundle.stratagem_indexes_by_player_id["player-a"].all_records()
+        if record.definition.stratagem_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
+        and record.definition.source_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_RULE_ID
+        and isinstance(record.definition.effect_payload, dict)
+        and record.definition.effect_payload.get("effect_selection_kind") is None
+    )
+    if len(realm_records) != 1:
+        raise AssertionError("test requires one active Realm of Chaos single-target record")
+    definition = realm_records[0].definition
+    lifecycle = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _config=config,
+        _runtime_content_bundle=runtime_bundle,
+    )
+    if prior_declared_arrival:
         _arrive_realm_target_from_reserves(
             lifecycle=lifecycle,
             battle_round=2,
@@ -3500,6 +3557,14 @@ def _arrive_realm_target_from_reserves(
     state.battle_round = battle_round
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     state.active_player_id = "player-a"
+    config = lifecycle._config
+    if config is None:
+        raise AssertionError("test lifecycle requires config")
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     state.movement_phase_state = MovementPhaseState(
         battle_round=battle_round,
         active_player_id="player-a",
@@ -3634,6 +3699,14 @@ def _submit_config_backed_ingress(
     state.active_player_id = active_player_id
     state.battle_round = 3
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    config = lifecycle._config
+    if config is None:
+        raise AssertionError("test lifecycle requires config")
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     state.movement_phase_state = MovementPhaseState(
         battle_round=3,
         active_player_id=active_player_id,

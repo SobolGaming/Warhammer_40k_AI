@@ -7,6 +7,7 @@ from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
+from warhammer40k_core.engine import battle_shock_lifecycle_authority as _bsa
 from warhammer40k_core.engine import catalog_model_materialization_decision_dispatch as _cmmd
 from warhammer40k_core.engine import catalog_start_battle_keyword_choice as _sbkc
 from warhammer40k_core.engine import (
@@ -43,6 +44,9 @@ from warhammer40k_core.engine.attack_sequence import (
     is_destroyed_transport_disembark_proposal_request,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.battle_shock_test_service import (
+    is_stratagem_battle_shock_reroll_request,
+)
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
@@ -336,7 +340,6 @@ from warhammer40k_core.engine.stratagems import (
     StratagemCatalogRecord,
     StratagemEligibilityContext,
     StratagemTargetBinding,
-    apply_command_reroll_decision,
     apply_explosives_mortal_wound_feel_no_pain_decision,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
@@ -524,6 +527,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        DICE_REROLL_DECISION_TYPE,
         SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE,
         *HEALING_DECISION_TYPES,
     )
@@ -1278,6 +1282,19 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
+        invalid_status = None
+        if _bsa.requires_command_prevalidation(state=state, request=request):
+            invalid_status = self._pre_validate_command_phase_decision(request, result)
+        if invalid_status is None and request.decision_type == DICE_REROLL_DECISION_TYPE:
+            invalid_status = _bsa.invalid_live_pending(
+                state,
+                self.decision_controller,
+                request,
+                result,
+                self._require_runtime_content_bundle(),
+            )
+        if invalid_status is not None:
+            return invalid_status
         selected_target_reroll_status = invalid_charge_roll_reroll_context_status(
             state=state,
             request=request,
@@ -1431,8 +1448,18 @@ class GameLifecycle:
             return self.advance_until_decision_or_terminal()
         if is_stratagem_placement_proposal_request(record.request):
             return self._apply_stratagem_placement_decision(record=record, result=result)
-        if is_command_reroll_decision_request(record.request):
-            return self._apply_command_reroll_decision(record=record, result=result)
+        reroll_status = _bsa.apply_global_reroll_if_applicable(
+            state=state,
+            decisions=self.decision_controller,
+            request=record.request,
+            result=result,
+            runtime_content_bundle=self._require_runtime_content_bundle(),
+            reaction_queue=self.reaction_queue,
+            resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
+            advance_until_decision_or_terminal=self.advance_until_decision_or_terminal,
+        )
+        if reroll_status is not None:
+            return reroll_status
         setup_reactive_status = apply_setup_reactive_lifecycle_decision_if_applicable(
             state=state,
             config=self._require_config(),
@@ -1539,26 +1566,6 @@ class GameLifecycle:
                         decisions=self.decision_controller,
                     )
             return placement_status
-        if resolves_reaction_frame:
-            self.reaction_queue.resolve_reaction(
-                result=result,
-                decisions=self.decision_controller,
-            )
-        return self.advance_until_decision_or_terminal()
-
-    def _apply_command_reroll_decision(
-        self,
-        record: DecisionRecord,
-        result: DecisionResult,
-    ) -> LifecycleStatus:
-        state = self._require_state()
-        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-        apply_command_reroll_decision(
-            state=state,
-            request=record.request,
-            result=result,
-            decisions=self.decision_controller,
-        )
         if resolves_reaction_frame:
             self.reaction_queue.resolve_reaction(
                 result=result,
@@ -2205,8 +2212,10 @@ class GameLifecycle:
             return restoration_invalid_status
         return invalid_command_phase_decision_status(
             state=state,
+            decisions=self.decision_controller,
             request=request,
             result=result,
+            battle_shock_hooks=self._command_phase_handler.battle_shock_hooks,
         )
 
     def _apply_command_phase_decision(
@@ -2410,20 +2419,28 @@ class GameLifecycle:
                     decisions=self.decision_controller,
                 )
             return healing_status
-        advanced_status = self.advance_until_decision_or_terminal()
+        command_start_nested_handled = (
+            self._command_phase_handler.apply_command_phase_start_nested_result(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+            )
+        )
         if resolves_reaction_frame:
-            if advanced_status.decision_request is not None:
-                self.reaction_queue.continue_reaction(
-                    result=result,
-                    next_request_id=advanced_status.decision_request.request_id,
-                    decisions=self.decision_controller,
+            if command_start_nested_handled:
+                raise GameLifecycleError(
+                    "Command-start nested healing cannot also own a reaction frame."
                 )
-            else:
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
+            if self.decision_controller.queue.pending_requests:
+                raise GameLifecycleError(
+                    "Completed reaction healing retained an unsupported nested decision."
                 )
-        return advanced_status
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+        return self.advance_until_decision_or_terminal()
 
     def _pre_validate_stratagem_cost_choice_decision(
         self,
@@ -2519,26 +2536,24 @@ class GameLifecycle:
         )
         if cost_choice_status is not None:
             return cost_choice_status
+        runtime_content_bundle = self._require_runtime_content_bundle()
         apply_stratagem_decision(
             state=state,
             result=result,
             decisions=self.decision_controller,
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             army_catalog=self._require_config().army_catalog,
-            stratagem_handler_registry=(
-                self._require_runtime_content_bundle().stratagem_handler_registry
-            ),
-            stratagem_cost_modifier_registry=(
-                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-            ),
+            runtime_content_bundle=runtime_content_bundle,
+            stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
             shooting_unit_selected_grant_hooks=(
-                self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+                runtime_content_bundle.shooting_unit_selected_grant_hook_registry
             ),
         )
         if self._result_resolves_active_reaction_frame(result):
             follow_up_request = self._pending_decision_request()
-            if follow_up_request is not None and is_command_reroll_decision_request(
-                follow_up_request
+            if follow_up_request is not None and (
+                is_command_reroll_decision_request(follow_up_request)
+                or is_stratagem_battle_shock_reroll_request(follow_up_request)
             ):
                 self.reaction_queue.continue_reaction(
                     result=result,
@@ -2615,20 +2630,17 @@ class GameLifecycle:
         )
         if cost_choice_status is not None:
             return cost_choice_status
+        runtime_content_bundle = self._require_runtime_content_bundle()
         apply_stratagem_target_proposal(
             state=state,
             result=result,
             decisions=self.decision_controller,
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             army_catalog=self._require_config().army_catalog,
-            stratagem_handler_registry=(
-                self._require_runtime_content_bundle().stratagem_handler_registry
-            ),
-            stratagem_cost_modifier_registry=(
-                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-            ),
+            runtime_content_bundle=runtime_content_bundle,
+            stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
             shooting_unit_selected_grant_hooks=(
-                self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+                runtime_content_bundle.shooting_unit_selected_grant_hook_registry
             ),
         )
         advanced_status = self.advance_until_decision_or_terminal()
@@ -2885,6 +2897,7 @@ class GameLifecycle:
             Mapping[str, JsonValue],
             validate_json_value(summary),
         )
+        _bsa.validate_loaded(state, self.decision_controller, bundle)
 
     def _reconcile_catalog_model_state_changes(self) -> bool:
         if self._config is None or self._runtime_content_bundle is None:
@@ -2993,22 +3006,21 @@ class GameLifecycle:
         )
         if next_choice_status is not None:
             return next_choice_status
+        runtime_content_bundle = self._require_runtime_content_bundle()
         if source_record.request.decision_type == STRATAGEM_DECISION_TYPE:
             invalid_status = invalid_stratagem_use_status(
                 state=state,
                 request=source_record.request,
                 result=source_result,
                 decisions=self.decision_controller,
-                stratagem_cost_modifier_registry=(
-                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                ),
+                stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
             )
             cost_increase_unaffordable = invalid_status_is_unaffordable_cost_increase(
                 invalid_status=invalid_status,
                 state=state,
                 result=source_result,
                 decisions=self.decision_controller,
-                stratagem_cost_modifier_registry=self._require_runtime_content_bundle().stratagem_cost_modifier_registry,
+                stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
             )
             if invalid_status is not None and not cost_increase_unaffordable:
                 return invalid_status
@@ -3018,12 +3030,10 @@ class GameLifecycle:
                 decisions=self.decision_controller,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
-                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
-                stratagem_cost_modifier_registry=(
-                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                ),
+                runtime_content_bundle=runtime_content_bundle,
+                stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
                 shooting_unit_selected_grant_hooks=(
-                    self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+                    runtime_content_bundle.shooting_unit_selected_grant_hook_registry
                 ),
                 resolve_unaffordable_cost_increase_as_used=cost_increase_unaffordable,
             )
@@ -3050,16 +3060,14 @@ class GameLifecycle:
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             army_catalog=self._require_config().army_catalog,
             decisions=self.decision_controller,
-            stratagem_cost_modifier_registry=(
-                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-            ),
+            stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
         )
         cost_increase_unaffordable = invalid_status_is_unaffordable_cost_increase(
             invalid_status=invalid_status,
             state=state,
             result=source_result,
             decisions=self.decision_controller,
-            stratagem_cost_modifier_registry=self._require_runtime_content_bundle().stratagem_cost_modifier_registry,
+            stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
         )
         if invalid_status is not None and not cost_increase_unaffordable:
             return invalid_status
@@ -3069,12 +3077,10 @@ class GameLifecycle:
             decisions=self.decision_controller,
             ruleset_descriptor=self._require_config().ruleset_descriptor,
             army_catalog=self._require_config().army_catalog,
-            stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
-            stratagem_cost_modifier_registry=(
-                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-            ),
+            runtime_content_bundle=runtime_content_bundle,
+            stratagem_cost_modifier_registry=runtime_content_bundle.stratagem_cost_modifier_registry,
             shooting_unit_selected_grant_hooks=(
-                self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+                runtime_content_bundle.shooting_unit_selected_grant_hook_registry
             ),
             resolve_unaffordable_cost_increase_as_used=cost_increase_unaffordable,
         )
@@ -3545,6 +3551,7 @@ def _validate_payload_consistency(
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)
+    _bsa.validate_restore(state, event_records, decision_records, pending_decision_requests)
     _fahi.validate_restore(state, event_records, decision_records, pending_decision_requests)
     validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)

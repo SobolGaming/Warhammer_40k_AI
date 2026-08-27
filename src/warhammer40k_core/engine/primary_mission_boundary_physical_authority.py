@@ -15,13 +15,22 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.battlefield_transition_history import (
     authoritative_battlefield_transition_batch_or_none,
 )
+from warhammer40k_core.engine.charge_move_event_authority import (
+    validate_charge_move_completed_event_authority,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
     DamageApplicationPayload,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventLog, EventRecord
-from warhammer40k_core.engine.healing import HealingStep, HealingStepKind, HealingStepPayload
+from warhammer40k_core.engine.mortal_wound_application_authority import (
+    direct_mortal_wound_damage_applications_from_event,
+    validate_direct_mortal_wound_application_event_authority,
+)
+from warhammer40k_core.engine.objective_control_record_authority import (
+    objective_control_record_hash,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -36,6 +45,26 @@ from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence impor
 )
 from warhammer40k_core.engine.primary_mission_event_decision_authority import (
     validate_primary_mission_movement_event_decision_authority,
+)
+from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
+    PhysicalAuthorityState as _PhysicalAuthority,
+)
+from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
+    apply_fight_on_death_awaiting as _apply_fight_on_death_awaiting,
+)
+from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
+    apply_fight_on_death_removed as _apply_fight_on_death_removed,
+)
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PrimaryScoringBoundaryStatus,
+)
+from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+    PRIMARY_SCORING_COMMIT_BOUNDARY_KIND,
+    PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+    primary_scoring_commit_checkpoint_from_events,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
 )
 from warhammer40k_core.engine.return_on_death import (
     RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE,
@@ -66,10 +95,337 @@ _EMERGENCY_DISEMBARK_DEPARTURE_SOURCE_PREFIX = "core-rules:emergency-disembark:"
 
 
 @dataclass(frozen=True, slots=True)
-class _PhysicalAuthority:
-    presence: str | None
+class PhysicalModelAuthority:
+    """Exact authenticated physical state for one model at an event boundary."""
+
+    model_instance_id: str
+    presence: str
     pose: Pose | None
-    wounds_remaining: int | None
+    wounds_remaining: int
+
+    def __post_init__(self) -> None:
+        if type(self.model_instance_id) is not str or not self.model_instance_id:
+            raise GameLifecycleError("Physical model authority identity is invalid.")
+        if self.presence not in {
+            "battlefield",
+            "destroyed",
+            "embarked",
+            "reserves",
+            "off_battlefield",
+        }:
+            raise GameLifecycleError("Physical model authority presence is invalid.")
+        if type(self.wounds_remaining) is not int or self.wounds_remaining < 0:
+            raise GameLifecycleError("Physical model authority wounds are invalid.")
+        if self.presence == "battlefield":
+            if type(self.pose) is not Pose or self.wounds_remaining < 1:
+                raise GameLifecycleError(
+                    "Battlefield physical model authority requires a living pose."
+                )
+        elif self.pose is not None:
+            raise GameLifecycleError(
+                "Off-battlefield physical model authority must not retain a pose."
+            )
+
+
+def physical_model_authority_before_event(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    event_index: int,
+) -> tuple[PhysicalModelAuthority, ...]:
+    """Reconstruct exact physical rows before one event and bind them to final state."""
+
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Physical event-bound authority requires GameState.")
+    if type(event_records) is not tuple or any(
+        type(event) is not EventRecord for event in event_records
+    ):
+        raise GameLifecycleError("Physical event-bound authority requires events.")
+    if type(decision_records) is not tuple or any(
+        type(record) is not DecisionRecord for record in decision_records
+    ):
+        raise GameLifecycleError("Physical event-bound authority requires decisions.")
+    if type(event_index) is not int or not 0 <= event_index < len(event_records):
+        raise GameLifecycleError("Physical event-bound authority index is invalid.")
+
+    validate_direct_mortal_wound_application_event_authority(
+        state=state,
+        event_records=event_records,
+    )
+    _validate_model_restoration_event_decision_authority(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+    _validate_physical_transition_decision_authority(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+    if any(event.event_type == "fight_on_death_model_awaiting_attack" for event in event_records):
+        from warhammer40k_core.engine.fight_model_authority_history import (
+            build_model_authority_timeline,
+        )
+
+        build_model_authority_timeline(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+        )
+
+    current = _current_authority_by_model(state=state)
+    current_model_ids = frozenset(current)
+    initial_model_ids = _initial_model_ids(state=state)
+    if not initial_model_ids <= current_model_ids:
+        raise GameLifecycleError("Physical event-bound initial model inventory drifted.")
+    model_ids_by_rules_unit_id = _model_ids_by_rules_unit_id(state=state)
+    starting_wounds_by_model_id = _starting_wounds_by_model_id(state=state)
+    destruction_by_id = _primary_unit_destruction_by_id(state=state)
+    departure_by_id = _primary_battlefield_departure_by_id(state=state)
+    no_trigger_destroyed_departure_ids = _no_trigger_destroyed_departure_ids(state=state)
+    before = _physical_authority_before_event(
+        event_records=event_records,
+        event_index=event_index,
+        expected_game_id=state.game_id,
+        expected_battlefield_id=_current_battlefield_id(state=state),
+        allowed_model_ids=current_model_ids,
+        initial_model_ids=initial_model_ids,
+        model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
+        starting_wounds_by_model_id=starting_wounds_by_model_id,
+        destruction_by_id=destruction_by_id,
+        departure_by_id=departure_by_id,
+        no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+    )
+    if not frozenset(before) <= current_model_ids:
+        raise GameLifecycleError("Physical event-bound model inventory drifted.")
+    replay_start_index = event_index
+    forward_anchor = _forward_scoring_commit_anchor_or_none(
+        state=state,
+        event_records=event_records,
+        event_index=event_index,
+        expected_game_id=state.game_id,
+        expected_battlefield_id=_current_battlefield_id(state=state),
+        allowed_model_ids=current_model_ids,
+        initial_model_ids=initial_model_ids,
+        model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
+        starting_wounds_by_model_id=starting_wounds_by_model_id,
+        destruction_by_id=destruction_by_id,
+        departure_by_id=departure_by_id,
+        no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+    )
+    if forward_anchor is not None:
+        anchor_index, checkpoint, anchor_authority = forward_anchor
+        for row in checkpoint.model_states:
+            preceding = before.get(row.model_instance_id)
+            if preceding is not None:
+                _validate_row_against_authority(
+                    row=row,
+                    authority=preceding,
+                    context="preceding",
+                )
+        before.update(anchor_authority)
+        replay_start_index = anchor_index + 1
+    later_without_initial = _physical_authority_by_model(
+        event_records[replay_start_index:],
+        model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
+        starting_wounds_by_model_id=starting_wounds_by_model_id,
+        destruction_by_id=destruction_by_id,
+        departure_by_id=departure_by_id,
+        no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+    )
+    for model_instance_id, current_authority in current.items():
+        prior = before.get(model_instance_id)
+        if (
+            prior is not None
+            and prior.presence is not None
+            and prior.wounds_remaining is not None
+            and (prior.presence != "battlefield" or prior.pose is not None)
+        ):
+            continue
+        if model_instance_id in later_without_initial:
+            raise GameLifecycleError(
+                "Physical event-bound history lacks an exact pre-mutation anchor."
+            )
+        before[model_instance_id] = current_authority
+    later = _physical_authority_by_model(
+        event_records[replay_start_index:],
+        initial=before,
+        model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
+        starting_wounds_by_model_id=starting_wounds_by_model_id,
+        destruction_by_id=destruction_by_id,
+        departure_by_id=departure_by_id,
+        no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+    )
+    for model_instance_id, authority in later.items():
+        terminal_authority = current.get(model_instance_id)
+        if terminal_authority is None:
+            raise GameLifecycleError("Physical event-bound model inventory drifted.")
+        _validate_authority_against_current(
+            model_instance_id=model_instance_id,
+            authority=authority,
+            current=terminal_authority,
+        )
+
+    rows: list[PhysicalModelAuthority] = []
+    for model_instance_id, authority in sorted(before.items()):
+        if authority.presence is None or authority.wounds_remaining is None:
+            raise GameLifecycleError("Physical event-bound authority is incomplete.")
+        if authority.presence == "battlefield" and authority.pose is None:
+            raise GameLifecycleError(
+                "Physical event-bound battlefield model lacks exact pose authority."
+            )
+        rows.append(
+            PhysicalModelAuthority(
+                model_instance_id=model_instance_id,
+                presence=authority.presence,
+                pose=authority.pose,
+                wounds_remaining=authority.wounds_remaining,
+            )
+        )
+    return tuple(rows)
+
+
+def _forward_scoring_commit_anchor_or_none(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    event_index: int,
+    expected_game_id: str,
+    expected_battlefield_id: str,
+    allowed_model_ids: frozenset[str],
+    initial_model_ids: frozenset[str],
+    model_ids_by_rules_unit_id: dict[str, tuple[str, ...]],
+    starting_wounds_by_model_id: dict[str, int],
+    destruction_by_id: dict[str, PrimaryUnitDestructionState],
+    departure_by_id: dict[str, PrimaryBattlefieldDepartureState],
+    no_trigger_destroyed_departure_ids: frozenset[str],
+) -> (
+    tuple[
+        int,
+        PrimaryMissionBoundaryCheckpoint,
+        dict[str, _PhysicalAuthority],
+    ]
+    | None
+):
+    """Return the first exact scoring checkpoint before any later physical mutation."""
+
+    for anchor_index, event in enumerate(
+        event_records[event_index:],
+        start=event_index,
+    ):
+        if _physical_authority_by_model(
+            (event,),
+            model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
+            starting_wounds_by_model_id=starting_wounds_by_model_id,
+            destruction_by_id=destruction_by_id,
+            departure_by_id=departure_by_id,
+            no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        ):
+            return None
+        if event.event_type != PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
+            continue
+        checkpoint = _authenticated_scoring_commit_checkpoint(
+            state=state,
+            event_records=event_records,
+            anchor_index=anchor_index,
+        )
+        authority = _checkpoint_authority(
+            checkpoint=checkpoint,
+            expected_game_id=expected_game_id,
+            expected_battlefield_id=expected_battlefield_id,
+            allowed_model_ids=allowed_model_ids,
+            required_model_ids=initial_model_ids,
+        )
+        if frozenset(authority) != allowed_model_ids:
+            raise GameLifecycleError("Primary scoring-commit physical anchor inventory drifted.")
+        return anchor_index, checkpoint, authority
+    return None
+
+
+def _authenticated_scoring_commit_checkpoint(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    anchor_index: int,
+) -> PrimaryMissionBoundaryCheckpoint:
+    event = event_records[anchor_index]
+    if event.event_id != f"event-{anchor_index + 1:06d}":
+        raise GameLifecycleError("Primary scoring-commit physical anchor event order drifted.")
+    if not isinstance(event.payload, dict):
+        raise GameLifecycleError("Primary scoring-commit physical anchor payload is invalid.")
+    raw_record_id = event.payload.get("objective_control_record_id")
+    raw_boundary_kind = event.payload.get("scoring_boundary_kind")
+    if type(raw_record_id) is not str or not raw_record_id:
+        raise GameLifecycleError(
+            "Primary scoring-commit physical anchor record identity is invalid."
+        )
+    if raw_boundary_kind not in {
+        PrimaryScoringBoundaryKind.ORDINARY.value,
+        PrimaryScoringBoundaryKind.END_OF_BATTLE.value,
+    }:
+        raise GameLifecycleError("Primary scoring-commit physical anchor boundary kind is invalid.")
+    boundary_kind = PrimaryScoringBoundaryKind(raw_boundary_kind)
+    bound_index, checkpoint = primary_scoring_commit_checkpoint_from_events(
+        event_records=event_records,
+        objective_control_record_id=raw_record_id,
+        scoring_boundary_kind=boundary_kind.value,
+    )
+    if bound_index != anchor_index:
+        raise GameLifecycleError("Primary scoring-commit physical anchor occurrence drifted.")
+    records = tuple(
+        record for record in state.objective_control_records if record.record_id == raw_record_id
+    )
+    if len(records) != 1:
+        raise GameLifecycleError(
+            "Primary scoring-commit physical anchor Objective Control record drifted."
+        )
+    record = records[0]
+    evidences = tuple(
+        evidence
+        for evidence in state.primary_scoring_state_evidence_records
+        if evidence.objective_control_record_id == raw_record_id
+        and evidence.scoring_boundary_kind is boundary_kind
+    )
+    lifecycles = tuple(
+        lifecycle
+        for lifecycle in state.primary_scoring_boundary_lifecycles
+        if lifecycle.objective_control_record_id == raw_record_id
+        and lifecycle.scoring_boundary_kind is boundary_kind
+    )
+    if len(evidences) != 1 or len(lifecycles) != 1:
+        raise GameLifecycleError(
+            "Primary scoring-commit physical anchor retained authority drifted."
+        )
+    evidence = evidences[0]
+    lifecycle = lifecycles[0]
+    if (
+        lifecycle.status is not PrimaryScoringBoundaryStatus.RESOLVED
+        or lifecycle.scoring_commit_checkpoint_id != checkpoint.checkpoint_id
+        or lifecycle.scoring_commit_checkpoint_hash != checkpoint.checkpoint_hash
+        or evidence.scoring_commit_checkpoint_id != checkpoint.checkpoint_id
+        or evidence.scoring_commit_checkpoint_hash != checkpoint.checkpoint_hash
+        or evidence.objective_control_record_hash != objective_control_record_hash(record)
+    ):
+        raise GameLifecycleError("Primary scoring-commit physical anchor hash binding drifted.")
+    if (
+        checkpoint.boundary_kind != PRIMARY_SCORING_COMMIT_BOUNDARY_KIND
+        or checkpoint.game_id != record.game_id
+        or checkpoint.player_id != record.active_player_id
+        or checkpoint.active_player_id != record.active_player_id
+        or checkpoint.battle_round != record.battle_round
+        or checkpoint.phase != record.phase
+        or checkpoint.battlefield_id != record.battlefield_id
+        or evidence.game_id != record.game_id
+        or evidence.active_player_id != record.active_player_id
+        or evidence.battle_round != record.battle_round
+        or evidence.phase != record.phase
+        or evidence.battlefield_id != record.battlefield_id
+    ):
+        raise GameLifecycleError("Primary scoring-commit physical anchor context drifted.")
+    return checkpoint
 
 
 def primary_mission_model_placements_from_checkpoint(
@@ -145,22 +501,20 @@ def validate_primary_mission_boundary_physical_authority(
     checkpoint_index: int,
     checkpoint: PrimaryMissionBoundaryCheckpoint,
 ) -> None:
+    validate_direct_mortal_wound_application_event_authority(
+        state=state,
+        event_records=event_records,
+    )
     _validate_model_restoration_event_decision_authority(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
     )
-    for event_index, event in enumerate(event_records):
-        if event.event_type != "movement_activation_completed":
-            continue
-        if not isinstance(event.payload, dict):
-            raise GameLifecycleError("Primary mission movement event payload is invalid.")
-        validate_primary_mission_movement_event_decision_authority(
-            event_records=event_records,
-            decision_records=decision_records,
-            mutation_index=event_index,
-            payload=event.payload,
-        )
+    _validate_physical_transition_decision_authority(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     current = _current_authority_by_model(state=state)
     current_model_ids = frozenset(current)
     initial_model_ids = _initial_model_ids(state=state)
@@ -257,11 +611,14 @@ def _physical_authority_by_model(
 ) -> dict[str, _PhysicalAuthority]:
     authority = {} if initial is None else dict(initial)
     for event in event_records:
+        for damage in direct_mortal_wound_damage_applications_from_event(event):
+            _apply_damage_application(authority=authority, damage=damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
         if transition is not None:
             _apply_transition(
                 authority=authority,
                 transition=transition,
+                starting_wounds_by_model_id=starting_wounds_by_model_id,
                 preserve_destroyed_wounds_for_model_ids=(
                     _desperate_escape_transition_model_ids(
                         event=event,
@@ -277,9 +634,17 @@ def _physical_authority_by_model(
         if event.event_type == "attack_sequence_step":
             _apply_damage_step(authority=authority, event=event)
         elif event.event_type == "healing_step_resolved":
-            _apply_healing_step(authority=authority, event=event)
+            _apply_healing_step(
+                authority=authority,
+                event=event,
+                starting_wounds_by_model_id=starting_wounds_by_model_id,
+            )
         elif event.event_type == "model_destroyed":
             _apply_model_destroyed(authority=authority, event=event)
+        elif event.event_type == "fight_on_death_model_awaiting_attack":
+            _apply_fight_on_death_awaiting(authority=authority, event=event)
+        elif event.event_type == "fight_on_death_models_removed":
+            _apply_fight_on_death_removed(authority=authority, event=event)
         elif event.event_type == "primary_battlefield_departure_recorded":
             _apply_departure(
                 authority=authority,
@@ -462,6 +827,7 @@ def _apply_transition(
     *,
     authority: dict[str, _PhysicalAuthority],
     transition: BattlefieldTransitionBatch,
+    starting_wounds_by_model_id: dict[str, int] | None = None,
     preserve_destroyed_wounds_for_model_ids: frozenset[str] = frozenset(),
 ) -> None:
     for placement in transition.placements:
@@ -471,7 +837,14 @@ def _apply_transition(
         authority[placement.model_instance_id] = _PhysicalAuthority(
             presence="battlefield",
             pose=placement.pose,
-            wounds_remaining=None if prior is None else prior.wounds_remaining,
+            wounds_remaining=(
+                _starting_wounds_for_initial_placement(
+                    model_instance_id=placement.model_instance_id,
+                    starting_wounds_by_model_id=starting_wounds_by_model_id,
+                )
+                if prior is None
+                else prior.wounds_remaining
+            ),
         )
     for displacement in transition.displacements:
         prior = authority.get(displacement.model_instance_id)
@@ -503,6 +876,19 @@ def _apply_transition(
             removal_kind=removal.removal_kind,
             preserve_wounds_on_destroyed=preserve_destroyed_wounds,
         )
+
+
+def _starting_wounds_for_initial_placement(
+    *,
+    model_instance_id: str,
+    starting_wounds_by_model_id: dict[str, int] | None,
+) -> int | None:
+    if starting_wounds_by_model_id is None:
+        return None
+    wounds = starting_wounds_by_model_id.get(model_instance_id)
+    if wounds is None:
+        raise GameLifecycleError("Physical placement model lacks starting-wounds authority.")
+    return wounds
 
 
 def _desperate_escape_transition_model_ids(
@@ -557,7 +943,20 @@ def _apply_damage_step(
     if not isinstance(raw_damage, dict):
         raise GameLifecycleError("Primary mission damage authority payload is invalid.")
     damage = DamageApplication.from_payload(cast(DamageApplicationPayload, raw_damage))
+    _apply_damage_application(authority=authority, damage=damage)
+
+
+def _apply_damage_application(
+    *,
+    authority: dict[str, _PhysicalAuthority],
+    damage: DamageApplication,
+) -> None:
     prior = authority.get(damage.model_instance_id)
+    if prior is not None and (
+        prior.wounds_remaining == damage.final_wounds_remaining
+        and prior.presence == ("destroyed" if damage.destroyed else "battlefield")
+    ):
+        return
     if prior is not None and (
         (
             prior.wounds_remaining is not None
@@ -577,7 +976,14 @@ def _apply_healing_step(
     *,
     authority: dict[str, _PhysicalAuthority],
     event: EventRecord,
+    starting_wounds_by_model_id: dict[str, int] | None,
 ) -> None:
+    from warhammer40k_core.engine.healing import (
+        HealingStep,
+        HealingStepKind,
+        HealingStepPayload,
+    )
+
     if not isinstance(event.payload, dict):
         raise GameLifecycleError("Primary mission healing-step payload is invalid.")
     raw_step = event.payload.get("step")
@@ -593,7 +999,11 @@ def _apply_healing_step(
     ):
         raise GameLifecycleError("Primary mission healing history is discontinuous.")
     if step.transition_batch is not None:
-        _apply_transition(authority=authority, transition=step.transition_batch)
+        _apply_transition(
+            authority=authority,
+            transition=step.transition_batch,
+            starting_wounds_by_model_id=starting_wounds_by_model_id,
+        )
     if step.model_instance_id is None or step.final_wounds_remaining is None:
         return
     updated = authority.get(step.model_instance_id)
@@ -976,7 +1386,40 @@ def _presence_for_removal(removal_kind: BattlefieldRemovalKind) -> str:
     }[removal_kind]
 
 
+def _validate_physical_transition_decision_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
+    for event_index, event in enumerate(event_records):
+        if event.event_type not in {
+            "movement_activation_completed",
+            "charge_move_completed",
+        }:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Physical movement event payload is invalid.")
+        if event.event_type == "movement_activation_completed":
+            validate_primary_mission_movement_event_decision_authority(
+                event_records=event_records,
+                decision_records=decision_records,
+                mutation_index=event_index,
+                payload=event.payload,
+            )
+            continue
+        validate_charge_move_completed_event_authority(
+            event_records=event_records,
+            decision_records=decision_records,
+            event_index=event_index,
+            payload=event.payload,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        )
+
+
 __all__ = (
+    "PhysicalModelAuthority",
+    "physical_model_authority_before_event",
     "primary_mission_boundary_physical_event_model_ids",
     "primary_mission_model_placements_from_checkpoint",
     "validate_primary_mission_boundary_physical_authority",

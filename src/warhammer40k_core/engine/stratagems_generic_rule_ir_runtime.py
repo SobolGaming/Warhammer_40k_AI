@@ -2,22 +2,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.battle_shock import (
-    BattleShockResult,
-    BattleShockTestReason,
-    BattleShockTestRequest,
+from warhammer40k_core.engine.battle_shock import BattleShockTestReason
+from warhammer40k_core.engine.battle_shock_hooks import (
+    battle_shock_modifier_applications_from_modifiers,
 )
-from warhammer40k_core.engine.battlefield_state import (
-    PlacementError,
-)
-from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
-    BATTLE_SHOCK_TEST_ROLL_TYPE,
-    selected_target_test_roll_modifiers,
+from warhammer40k_core.engine.battle_shock_resolution import BattleShockPassedStatePolicy
+from warhammer40k_core.engine.battle_shock_test_service import (
+    STRATAGEM_BATTLE_SHOCK_SOURCE_KIND,
+    BattleShockTestRuntime,
+    resolve_battle_shock_test,
 )
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -60,8 +57,7 @@ from warhammer40k_core.engine.stratagems_model import (
 from warhammer40k_core.engine.stratagems_targeting import (
     destroyed_target_unit_ids_from_context,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -156,6 +152,7 @@ def resolve_generic_rule_ir_context_battle_shock(
     context: StratagemEligibilityContext,
     use_record: StratagemUseRecord,
     effect_payload: dict[str, JsonValue],
+    battle_shock_runtime: BattleShockTestRuntime | None,
 ) -> None:
     required_source_keyword = _optional_rule_effect_string_parameter(
         effect_payload,
@@ -183,6 +180,7 @@ def resolve_generic_rule_ir_context_battle_shock(
         use_record=use_record,
         effect_payload=effect_payload,
         target_unit_id=target_unit_id,
+        battle_shock_runtime=battle_shock_runtime,
     )
 
 
@@ -193,6 +191,7 @@ def resolve_generic_rule_ir_selected_battle_shock(
     context: StratagemEligibilityContext,
     use_record: StratagemUseRecord,
     effect_payload: dict[str, JsonValue],
+    battle_shock_runtime: BattleShockTestRuntime | None,
 ) -> None:
     _resolve_battle_shock_test(
         state=state,
@@ -207,6 +206,7 @@ def resolve_generic_rule_ir_selected_battle_shock(
                 "effect_selection_kind",
             ),
         ),
+        battle_shock_runtime=battle_shock_runtime,
     )
 
 
@@ -696,74 +696,43 @@ def _resolve_battle_shock_test(
     use_record: StratagemUseRecord,
     effect_payload: dict[str, JsonValue],
     target_unit_id: str,
+    battle_shock_runtime: BattleShockTestRuntime | None,
 ) -> None:
-    target_owner = _unit_owner_player_id(state=state, unit_instance_id=target_unit_id)
-    target_unit = unit_by_id(state=state, unit_instance_id=target_unit_id)
-    current_model_ids = _current_battlefield_model_ids(state=state, unit=target_unit)
-    request = BattleShockTestRequest.for_unit(
-        request_id=f"{use_record.use_id}:battle-shock:{target_unit_id}",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id=target_owner,
-        unit_instance_id=target_unit_id,
+    if type(battle_shock_runtime) is not BattleShockTestRuntime:
+        raise GameLifecycleError("Generic Battle-shock requires loaded runtime authority.")
+    target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+    canonical_target_id = target_rules_unit.unit_instance_id
+    generic_modifiers = _generic_battle_shock_modifiers(
+        context=context,
+        use_record=use_record,
+        effect_payload=effect_payload,
+        target_unit_id=canonical_target_id,
+    )
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise GameLifecycleError("Generic Battle-shock requires an active player.")
+    resolve_battle_shock_test(
+        runtime=battle_shock_runtime,
+        state=state,
+        decisions=decisions,
+        request_id=f"{use_record.use_id}:battle-shock:{canonical_target_id}",
+        target_unit_instance_id=canonical_target_id,
         reason=BattleShockTestReason.FORCED_BY_STRATAGEM,
-        leadership_target=_best_current_model_characteristic(
-            target_unit,
-            current_model_ids=current_model_ids,
-            characteristic=Characteristic.LEADERSHIP,
-        ),
-        below_half_strength_context=BelowHalfStrengthContext.from_unit(
-            player_id=target_owner,
-            unit=target_unit,
-            starting_strength=state.starting_strength_record_for_unit(target_unit_id),
-            current_model_ids=current_model_ids,
-        ),
-    )
-    decisions.event_log.append(
-        "battle_shock_test_requested",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": use_record.phase.value,
-            "battle_shock_test_request": validate_json_value(request.to_payload()),
-            "source_stratagem_use": use_record.to_payload(),
+        active_player_id=active_player_id,
+        phase=BattlePhase(use_record.phase.value),
+        phase_start_battle_shocked_unit_ids=tuple(sorted(state.battle_shocked_unit_ids)),
+        passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
+        source_kind=STRATAGEM_BATTLE_SHOCK_SOURCE_KIND,
+        source_payload={
+            "source_stratagem_use": validate_json_value(use_record.to_payload()),
             "generic_rule_effect": validate_json_value(effect_payload),
         },
-    )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    roll_state = manager.roll(request.spec)
-    result = BattleShockResult.from_roll_state(
-        result_id=f"{request.request_id}:result",
-        request=request,
-        roll_state=roll_state,
-        modifiers=(
-            *_generic_battle_shock_modifiers(
-                context=context,
-                use_record=use_record,
-                effect_payload=effect_payload,
-                target_unit_id=target_unit_id,
-            ),
-            *selected_target_test_roll_modifiers(
-                state=state,
-                unit_instance_id=target_unit_id,
-                roll_type=BATTLE_SHOCK_TEST_ROLL_TYPE,
-            ),
+        resolved_event_types=("battle_shock_test_resolved",),
+        pending_phase_body_status="stratagem_battle_shock_reroll_pending",
+        additional_modifier_applications=battle_shock_modifier_applications_from_modifiers(
+            provider_id=use_record.handler_id,
+            modifiers=generic_modifiers,
         ),
-    )
-    state.record_battle_shock_result(result)
-    decisions.event_log.append(
-        "battle_shock_test_resolved",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": use_record.phase.value,
-            "battle_shock_result": validate_json_value(result.to_payload()),
-            "auto_passed": False,
-            "source_stratagem_use": use_record.to_payload(),
-            "generic_rule_effect": validate_json_value(effect_payload),
-        },
     )
 
 
@@ -917,51 +886,6 @@ def _trigger_payload_identifier_list(
     if not identifiers:
         raise GameLifecycleError("Generic Stratagem trigger payload list must not be empty.")
     return tuple(sorted(identifiers))
-
-
-def _current_battlefield_model_ids(*, state: GameState, unit: UnitInstance) -> tuple[str, ...]:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Generic Battle-shock requires battlefield state.")
-    try:
-        placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Generic Battle-shock target unit is not placed.") from exc
-    unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
-    current_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        model = unit_model_by_id.get(model_placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError("Battlefield placement contains unknown model.")
-        if model.is_alive:
-            current_ids.append(model.model_instance_id)
-    if not current_ids:
-        raise GameLifecycleError("Generic Battle-shock target unit has no current models.")
-    return tuple(sorted(current_ids))
-
-
-def _best_current_model_characteristic(
-    unit: UnitInstance,
-    *,
-    current_model_ids: tuple[str, ...],
-    characteristic: Characteristic,
-) -> int:
-    model_ids = set(current_model_ids)
-    values = tuple(
-        _model_characteristic(model, characteristic=characteristic)
-        for model in unit.own_models
-        if model.model_instance_id in model_ids
-    )
-    if not values:
-        raise GameLifecycleError("Generic Battle-shock found no current characteristic.")
-    return min(values)
-
-
-def _model_characteristic(model: ModelInstance, *, characteristic: Characteristic) -> int:
-    for candidate in model.characteristics:
-        if candidate.characteristic is characteristic:
-            return candidate.final
-    raise GameLifecycleError("Generic Battle-shock target model is missing characteristic.")
 
 
 def _opposing_player_id(*, state: GameState, player_id: str) -> str:

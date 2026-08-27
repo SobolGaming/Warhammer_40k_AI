@@ -11,9 +11,14 @@ from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
+    BattleShockModifierApplicationAuthorityContext,
     BattleShockModifierContext,
+    HistoricalBattleShockContribution,
 )
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
@@ -255,6 +260,12 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=FECULENT_DESPAIR_HOOK_ID,
                 source_id=POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,
                 modifier_handler=feculent_despair_battle_shock_modifiers,
+                modifier_application_validator=(
+                    validate_feculent_despair_battle_shock_modifier_application
+                ),
+                historical_contribution_handler=(
+                    historical_feculent_despair_battle_shock_contribution
+                ),
             ),
         ),
     )
@@ -405,6 +416,63 @@ def feculent_despair_battle_shock_modifiers(
         )
         for source_player_id in source_player_ids
     )
+
+
+def historical_feculent_despair_battle_shock_contribution(
+    context: HistoricalBattleShockAuthorityContext,
+) -> HistoricalBattleShockContribution:
+    if type(context) is not HistoricalBattleShockAuthorityContext:
+        raise GameLifecycleError("Feculent Despair historical authority requires context.")
+    target = context.rules_unit(context.request.unit_instance_id)
+    target_models = context.geometry_models(target.unit_instance_id)
+    source_player_ids: set[str] = set()
+    for army in context.armies:
+        if (
+            army.detachment_selection.faction_id != CHAOS_DAEMONS_FACTION_ID
+            or army.player_id == target.owner_player_id
+        ):
+            continue
+        if any(
+            source.base_distance_to(target_model) <= 6.0
+            for unit in army.units
+            if _unit_has_datasheet_ability(unit, POXBRINGER_FECULENT_DESPAIR_ABILITY_ID)
+            for source in context.component_geometry_models(unit.unit_instance_id)
+            for target_model in target_models
+        ):
+            source_player_ids.add(army.player_id)
+    return HistoricalBattleShockContribution(
+        modifiers=tuple(
+            RollModifier(
+                modifier_id=(
+                    f"{FECULENT_DESPAIR_HOOK_ID}:{context.request.request_id}:{player_id}"
+                ),
+                source_id=POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,
+                operand=-1,
+            )
+            for player_id in sorted(source_player_ids)
+        )
+    )
+
+
+def validate_feculent_despair_battle_shock_modifier_application(
+    context: BattleShockModifierApplicationAuthorityContext,
+) -> None:
+    if type(context) is not BattleShockModifierApplicationAuthorityContext:
+        raise GameLifecycleError("Feculent Despair modifier authority requires context.")
+    application = context.application
+    if (
+        application.hook_id != FECULENT_DESPAIR_HOOK_ID
+        or application.source_id != POXBRINGER_FECULENT_DESPAIR_ABILITY_ID
+    ):
+        raise GameLifecycleError("Feculent Despair Battle-shock modifier source drifted.")
+    prefix = f"{FECULENT_DESPAIR_HOOK_ID}:{context.request.request_id}:"
+    for modifier in application.modifiers:
+        if (
+            modifier.operand != -1
+            or not modifier.modifier_id.startswith(prefix)
+            or not modifier.modifier_id.removeprefix(prefix)
+        ):
+            raise GameLifecycleError("Feculent Despair Battle-shock modifier operand drifted.")
 
 
 def infected_outbreak_sticky_objective_states(

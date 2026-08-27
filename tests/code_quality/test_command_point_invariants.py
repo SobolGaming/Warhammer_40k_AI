@@ -6,8 +6,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 COMMAND_POINT_OWNER = ENGINE_ROOT / "command_points.py"
+CORE_CP_HISTORY_AUTHORITY_OWNER = ENGINE_ROOT / "command_core_cp_history.py"
 GAME_STATE_OWNER = ENGINE_ROOT / "game_state.py"
 COMMAND_PHASE_OWNER = ENGINE_ROOT / "phases" / "command.py"
+COMMAND_PHASE_START_AUTHORITY_OWNER = ENGINE_ROOT / "command_phase_start_authority.py"
 APPROVED_EXPLICIT_CAP_EXEMPTION_CALLERS = {
     ENGINE_ROOT / "faction_content" / "warhammer_40000_11th" / "imperial_knights" / "army_rule.py",
 }
@@ -16,9 +18,9 @@ COMMAND_PHASE_START_REGISTRY_RECEIVER_NAMES = {
     "command_phase_start_hook_registry",
 }
 COMMAND_PHASE_START_PRE_CP_METHODS = {
-    "resolve",
-    "resolve_effects",
-    "next_request_for",
+    "resolve_with_provider_dispositions",
+    "resolve_effects_with_provider_dispositions",
+    "next_request_with_provider",
 }
 
 
@@ -106,7 +108,11 @@ def test_ability_paths_cannot_opt_out_of_the_non_core_cp_cap() -> None:
 
 def test_only_the_command_phase_owner_can_issue_core_cp() -> None:
     offenders: list[str] = []
-    allowed_paths = {COMMAND_POINT_OWNER, COMMAND_PHASE_OWNER}
+    allowed_paths = {
+        COMMAND_POINT_OWNER,
+        COMMAND_PHASE_OWNER,
+        CORE_CP_HISTORY_AUTHORITY_OWNER,
+    }
     for path in sorted(ENGINE_ROOT.rglob("*.py")):
         if path in allowed_paths:
             continue
@@ -144,7 +150,6 @@ def test_command_phase_start_registry_routes_through_one_pre_cp_boundary() -> No
         COMMAND_PHASE_OWNER.read_text(encoding="utf-8"),
         filename=COMMAND_PHASE_OWNER.as_posix(),
     )
-    functions = tuple(node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef))
     command_handler_classes = tuple(
         node
         for node in tree.body
@@ -164,8 +169,8 @@ def test_command_phase_start_registry_routes_through_one_pre_cp_boundary() -> No
         for node in ast.walk(begin_phase)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     )
-    assert begin_phase_direct_calls.count("_resolve_command_phase_start_boundary") == 1
-    assert "_resolve_gain_core_command_points_step" not in begin_phase_direct_calls
+    assert begin_phase_direct_calls.count("resolve_command_phase_start_boundary") == 1
+    assert begin_phase_direct_calls.count("_resolve_gain_core_command_points_step") == 1
     assert "_request_command_phase_start_faction_rule_if_available" not in (
         begin_phase_direct_calls
     )
@@ -173,11 +178,6 @@ def test_command_phase_start_registry_routes_through_one_pre_cp_boundary() -> No
     registry_call_owners: dict[str, list[str]] = {
         method: [] for method in COMMAND_PHASE_START_PRE_CP_METHODS
     }
-    named_call_owners: dict[str, list[str]] = {
-        "_request_command_phase_start_faction_rule_if_available": [],
-        "_resolve_gain_core_command_points_step": [],
-    }
-
     for path in sorted(ENGINE_ROOT.rglob("*.py")):
         engine_tree = ast.parse(path.read_text(encoding="utf-8"), filename=path.as_posix())
         visitor = _CommandPhaseStartRegistryCallVisitor(
@@ -187,32 +187,26 @@ def test_command_phase_start_registry_routes_through_one_pre_cp_boundary() -> No
         for method, owners in visitor.owners_by_method.items():
             registry_call_owners[method].extend(owners)
 
-    for function in functions:
-        for node in ast.walk(function):
-            if not isinstance(node, ast.Call):
-                continue
-            if isinstance(node.func, ast.Name) and node.func.id in named_call_owners:
-                named_call_owners[node.func.id].append(function.name)
-
-    command_owner = COMMAND_PHASE_OWNER.relative_to(ROOT).as_posix()
+    authority_owner = COMMAND_PHASE_START_AUTHORITY_OWNER.relative_to(ROOT).as_posix()
     assert registry_call_owners == {
-        "resolve": [f"{command_owner}:_resolve_command_phase_start_boundary"],
-        "resolve_effects": [f"{command_owner}:_resolve_command_phase_start_boundary"],
-        "next_request_for": [
-            f"{command_owner}:_request_command_phase_start_faction_rule_if_available"
+        "resolve_with_provider_dispositions": [
+            f"{authority_owner}:resolve_command_phase_start_boundary"
         ],
-    }
-    assert named_call_owners == {
-        "_request_command_phase_start_faction_rule_if_available": [
-            "_resolve_command_phase_start_boundary"
+        "resolve_effects_with_provider_dispositions": [
+            f"{authority_owner}:resolve_command_phase_start_boundary"
         ],
-        "_resolve_gain_core_command_points_step": ["_resolve_command_phase_start_boundary"],
+        "next_request_with_provider": [f"{authority_owner}:resolve_command_phase_start_boundary"],
     }
 
+    authority_tree = ast.parse(
+        COMMAND_PHASE_START_AUTHORITY_OWNER.read_text(encoding="utf-8"),
+        filename=COMMAND_PHASE_START_AUTHORITY_OWNER.as_posix(),
+    )
     boundary_functions = tuple(
         function
-        for function in functions
-        if function.name == "_resolve_command_phase_start_boundary"
+        for function in ast.walk(authority_tree)
+        if isinstance(function, ast.FunctionDef)
+        and function.name == "resolve_command_phase_start_boundary"
     )
     assert len(boundary_functions) == 1
     ordered_lines: dict[str, int] = {}
@@ -222,27 +216,32 @@ def test_command_phase_start_registry_routes_through_one_pre_cp_boundary() -> No
         if (
             isinstance(node.func, ast.Attribute)
             and _receiver_identifies_command_phase_start_registry(node.func.value)
-            and node.func.attr in {"resolve", "resolve_effects"}
+            and node.func.attr in COMMAND_PHASE_START_PRE_CP_METHODS
         ):
             ordered_lines[node.func.attr] = node.lineno
-        if isinstance(node.func, ast.Name) and node.func.id in {
-            "_request_command_phase_start_faction_rule_if_available",
-            "_resolve_gain_core_command_points_step",
-        }:
-            ordered_lines[node.func.id] = node.lineno
 
     assert set(ordered_lines) == {
-        "resolve",
-        "resolve_effects",
-        "_request_command_phase_start_faction_rule_if_available",
-        "_resolve_gain_core_command_points_step",
+        "resolve_with_provider_dispositions",
+        "resolve_effects_with_provider_dispositions",
+        "next_request_with_provider",
     }
-    assert ordered_lines["resolve"] < ordered_lines["resolve_effects"]
     assert (
-        ordered_lines["resolve_effects"]
-        < ordered_lines["_request_command_phase_start_faction_rule_if_available"]
+        ordered_lines["resolve_with_provider_dispositions"]
+        < ordered_lines["resolve_effects_with_provider_dispositions"]
     )
     assert (
-        ordered_lines["_request_command_phase_start_faction_rule_if_available"]
-        < (ordered_lines["_resolve_gain_core_command_points_step"])
+        ordered_lines["resolve_effects_with_provider_dispositions"]
+        < ordered_lines["next_request_with_provider"]
+    )
+    begin_call_lines = {
+        node.func.id: node.lineno
+        for node in ast.walk(begin_phase)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id
+        in {"resolve_command_phase_start_boundary", "_resolve_gain_core_command_points_step"}
+    }
+    assert (
+        begin_call_lines["resolve_command_phase_start_boundary"]
+        < begin_call_lines["_resolve_gain_core_command_points_step"]
     )

@@ -56,6 +56,12 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookRegistry,
 )
 from warhammer40k_core.engine.charge_effects import charge_after_advance_allowed_by_effects
+from warhammer40k_core.engine.charge_move_event_schema import (
+    CHARGE_MOVE_COMPLETED_OPTIONAL_PAYLOAD_KEYS,
+    CHARGE_MOVE_COMPLETED_PAYLOAD_KEYS,
+    CHARGE_MOVE_COMPLETED_STATUS,
+    CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
+)
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
@@ -157,10 +163,10 @@ if TYPE_CHECKING:
 CHARGE_MOVE_ACTION = "charge_move"
 FIGHTS_FIRST_CHARGE_EFFECT_KIND = "charge_grants_fights_first"
 CHARGE_AFTER_FALL_BACK_EFFECT_KIND = "charge_after_fall_back_allowed"
-_CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = "charge_move_proposal_required"
+_CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS
 _CHARGE_MOVE_INVALID_STATUS = "charge_move_invalid"
 _CHARGE_MOVE_DECLINED_STATUS = "charge_move_declined"
-_CHARGE_MOVE_COMPLETED_STATUS = "charge_move_completed"
+_CHARGE_MOVE_COMPLETED_STATUS = CHARGE_MOVE_COMPLETED_STATUS
 
 
 def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
@@ -3360,6 +3366,13 @@ def _charge_move_completed_payload(
     }
     if persisting_effect is not None:
         payload["persisting_effect"] = validate_json_value(persisting_effect.to_payload())
+    expected_keys: frozenset[str] = CHARGE_MOVE_COMPLETED_PAYLOAD_KEYS | (
+        CHARGE_MOVE_COMPLETED_OPTIONAL_PAYLOAD_KEYS
+        if persisting_effect is not None
+        else frozenset[str]()
+    )
+    if frozenset(payload) != expected_keys:
+        raise GameLifecycleError("charge_move_completed payload shape drifted.")
     return _validate_json_object("charge_move_completed payload", payload)
 
 

@@ -75,15 +75,15 @@ def catalog_forced_desperate_escape_sources_for_unit(
             )
             if not current_model_ids:
                 continue
-            for record in _matching_desperate_escape_records(
+            for record in matching_desperate_escape_records(
                 index=index,
                 unit=source_unit,
                 current_model_instance_ids=current_model_ids,
             ):
-                force_clause = _force_desperate_escape_clause(record)
+                force_clause = force_desperate_escape_clause(record)
                 if force_clause is None:
                     continue
-                if not _falling_back_unit_allowed(clause=force_clause, unit=target_unit):
+                if not falling_back_unit_allowed(clause=force_clause, unit=target_unit):
                     continue
                 if not _target_within_source_engagement(
                     state=state,
@@ -97,7 +97,7 @@ def catalog_forced_desperate_escape_sources_for_unit(
                         record=record,
                         source_unit=source_unit,
                         fall_back_unit_instance_id=requested_unit_id,
-                        battle_shocked_modifier=_battle_shocked_modifier_for_record(
+                        battle_shocked_modifier=battle_shocked_modifier_for_record(
                             record=record,
                             target_unit_instance_id=requested_unit_id,
                             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
@@ -107,7 +107,7 @@ def catalog_forced_desperate_escape_sources_for_unit(
     return tuple(sorted(sources, key=lambda source: str(source["effect_id"])))
 
 
-def _matching_desperate_escape_records(
+def matching_desperate_escape_records(
     *,
     index: AbilityCatalogIndex,
     unit: UnitInstance,
@@ -126,7 +126,7 @@ def _matching_desperate_escape_records(
             current_model_instance_ids=current_model_instance_ids,
         ):
             continue
-        if _force_desperate_escape_clause(record) is not None:
+        if force_desperate_escape_clause(record) is not None:
             records.append(record)
     return tuple(sorted(records, key=lambda item: item.record_id))
 
@@ -142,7 +142,7 @@ def _records_for_timing(
     return tuple(sorted(records_by_id.values(), key=lambda record: record.record_id))
 
 
-def _force_desperate_escape_clause(record: AbilityCatalogRecord) -> RuleClause | None:
+def force_desperate_escape_clause(record: AbilityCatalogRecord) -> RuleClause | None:
     matches: list[RuleClause] = []
     for clause in catalog_rule_clauses_from_record(record):
         if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.UNIT_SELECTED:
@@ -164,7 +164,7 @@ def _force_desperate_escape_clause(record: AbilityCatalogRecord) -> RuleClause |
     return matches[0] if matches else None
 
 
-def _falling_back_unit_allowed(*, clause: RuleClause, unit: UnitInstance) -> bool:
+def falling_back_unit_allowed(*, clause: RuleClause, unit: UnitInstance) -> bool:
     from warhammer40k_core.engine.rule_target_resolution import canonical_keyword
 
     unit_keywords = {
@@ -230,7 +230,7 @@ def _target_within_source_engagement(
     )
 
 
-def _battle_shocked_modifier_for_record(
+def battle_shocked_modifier_for_record(
     *,
     record: AbilityCatalogRecord,
     target_unit_instance_id: str,

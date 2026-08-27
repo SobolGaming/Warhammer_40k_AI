@@ -14,6 +14,7 @@ from tests.phase17n_primary_mission_helpers import (
 
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
+from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -1261,7 +1262,8 @@ def _destroy_component_for_scoring(
     removed_model_ids = tuple(
         model_placement.model_instance_id for model_placement in placement.model_placements
     )
-    state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
+    for model_instance_id in removed_model_ids:
+        destroy_model_by_rule(state=state, model_instance_id=model_instance_id)
     departures = record_primary_destroyed_model_departures(
         state=state,
         destroyed_model_instance_ids=removed_model_ids,

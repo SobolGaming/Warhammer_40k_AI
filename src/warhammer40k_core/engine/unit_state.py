@@ -318,6 +318,10 @@ class BelowHalfStrengthContext:
             return remaining < (starting / 2)
         return self.current_model_count < (self.starting_model_count / 2)
 
+    @property
+    def is_at_or_below_half_strength(self) -> bool:
+        return self.is_at_half_strength or self.is_below_half_strength
+
     def to_payload(self) -> BelowHalfStrengthContextPayload:
         return {
             "player_id": self.player_id,

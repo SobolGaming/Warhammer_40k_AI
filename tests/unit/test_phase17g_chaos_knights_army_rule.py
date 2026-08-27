@@ -8,8 +8,10 @@ import pytest
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     center_marker_definition,
+    default_unit_selection,
     remove_first_models,
     unit_by_id,
+    unit_selection,
     with_model_offsets,
 )
 
@@ -20,6 +22,7 @@ from warhammer40k_core.core.weapon_profiles import (
     RangeProfile,
     WeaponProfile,
 )
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
@@ -28,9 +31,17 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartResultContext,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockForcedTestApplication,
     BattleShockForcedTestContext,
     BattleShockHookRegistry,
     BattleShockOutcomeContext,
+)
+from warhammer40k_core.engine.command_battle_shock_candidates import (
+    CommandBattleShockCandidate,
+    CommandBattleShockCandidatePayload,
+)
+from warhammer40k_core.engine.command_battle_shock_forced_provider_authority import (
+    validate_command_forced_test_applications,
 )
 from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -42,6 +53,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -624,6 +636,154 @@ def test_dismay_forces_below_starting_enemy_battle_shock_test() -> None:
     assert request_payload["reason"] == "below_starting_strength_forced"
 
 
+@pytest.mark.parametrize("tamper", ["deletion", "insertion", "hook", "source"])
+def test_command_restore_rejects_harbingers_forced_application_drift(tamper: str) -> None:
+    state = battle_state(
+        game_id=f"phase17g-chaos-knights-forced-authority-{tamper}",
+        player_b_units=(
+            default_unit_selection("near-unit"),
+            default_unit_selection("far-unit"),
+        ),
+    )
+    _mark_player_as_chaos_knights(state, player_id="player-a")
+    decisions = DecisionController()
+    battle_round_hooks = _battle_round_start_hooks()
+    selection_request = battle_round_hooks.next_request_for(
+        BattleRoundStartRequestContext(state=state, decisions=decisions)
+    )
+    if selection_request is None:
+        raise AssertionError("expected Harbingers selection request")
+    queued = decisions.request_decision(selection_request)
+    selection_result = DecisionResult.for_request(
+        result_id=f"phase17g-chaos-knights-select-dismay-{tamper}",
+        request=queued,
+        selected_option_id="chaos_knights:harbingers_of_dread:dismay",
+    )
+    decisions.submit_result(selection_result)
+    assert battle_round_hooks.apply_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=queued,
+            result=selection_result,
+        )
+    )
+    state.active_player_id = "player-b"
+    state.command_step_state = None
+    target_unit_id = "army-beta:near-unit"
+    remove_first_models(state, unit_instance_id=target_unit_id, count=1)
+    _place_units_near_center(
+        state,
+        source_unit_id="army-alpha:intercessor-unit-1",
+        target_unit_id=target_unit_id,
+    )
+    assert state.battlefield_state is not None
+    marker = center_marker_definition(state)
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id("army-beta:far-unit"),
+            marker,
+            offsets=((20.0, 0.0), (20.4, 0.0), (20.8, 0.0), (21.2, 0.0), (21.6, 0.0)),
+        )
+    )
+    CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=_battle_shock_hooks(),
+    ).begin_phase(state=state, decisions=decisions)
+    snapshot_index, snapshot = next(
+        (index, event)
+        for index, event in enumerate(decisions.event_log.records)
+        if event.event_type == "battle_shock_step_snapshot_created"
+    )
+    assert isinstance(snapshot.payload, dict)
+    raw_candidates = snapshot.payload["battle_shock_candidate_inventory"]
+    assert isinstance(raw_candidates, list)
+    candidates = tuple(
+        CommandBattleShockCandidate.from_payload(
+            cast(CommandBattleShockCandidatePayload, candidate)
+        )
+        for candidate in raw_candidates
+        if isinstance(candidate, dict)
+    )
+    ability_indexes = {
+        "player-a": AbilityCatalogIndex.from_records(()),
+        "player-b": AbilityCatalogIndex.from_records(()),
+    }
+    validate_command_forced_test_applications(
+        state=state,
+        event_records=tuple(decisions.event_log.records),
+        decision_records=decisions.records,
+        snapshot_index=snapshot_index,
+        battle_round=1,
+        active_player_id="player-b",
+        candidates=candidates,
+        battle_shock_hook_registry=_battle_shock_hooks(),
+        ability_indexes_by_player_id=ability_indexes,
+    )
+    forced_index = next(
+        index for index, candidate in enumerate(candidates) if candidate.forced_test_applications
+    )
+    forced_candidate = candidates[forced_index]
+    application = forced_candidate.forced_test_applications[0]
+    if tamper == "deletion":
+        replacement = replace(
+            forced_candidate,
+            forced_below_starting_strength=False,
+            forced_test_applications=(),
+        )
+    elif tamper in {"hook", "source"}:
+        replacement = replace(
+            forced_candidate,
+            forced_test_applications=(
+                BattleShockForcedTestApplication(
+                    hook_id=f"{application.hook_id}:forged"
+                    if tamper == "hook"
+                    else application.hook_id,
+                    source_id=f"{application.source_id}:forged"
+                    if tamper == "source"
+                    else application.source_id,
+                    unit_instance_ids=(forced_candidate.unit_instance_id,),
+                ),
+            ),
+        )
+    else:
+        unforced_index = next(
+            index
+            for index, candidate in enumerate(candidates)
+            if not candidate.forced_test_applications
+        )
+        forced_index = unforced_index
+        unforced = candidates[unforced_index]
+        replacement = replace(
+            unforced,
+            forced_below_starting_strength=True,
+            forced_test_applications=(
+                BattleShockForcedTestApplication(
+                    hook_id=application.hook_id,
+                    source_id=application.source_id,
+                    unit_instance_ids=(unforced.unit_instance_id,),
+                ),
+            ),
+        )
+    tampered = tuple(
+        replacement if index == forced_index else candidate
+        for index, candidate in enumerate(candidates)
+    )
+
+    with pytest.raises(GameLifecycleError, match="forced-test applications drifted"):
+        validate_command_forced_test_applications(
+            state=state,
+            event_records=tuple(decisions.event_log.records),
+            decision_records=decisions.records,
+            snapshot_index=snapshot_index,
+            battle_round=1,
+            active_player_id="player-b",
+            candidates=tampered,
+            battle_shock_hook_registry=_battle_shock_hooks(),
+            ability_indexes_by_player_id=ability_indexes,
+        )
+
+
 def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
     state = battle_state(game_id="phase17g-chaos-knights-delirium")
     _mark_player_as_chaos_knights(state, player_id="player-a")
@@ -662,6 +822,149 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
+
+
+def test_harbingers_uses_attached_rules_unit_identity_for_forced_test_and_outcome() -> None:
+    state = battle_state(
+        game_id="phase17g-chaos-knights-attached-battle-shock",
+        player_b_units=(
+            default_unit_selection("bodyguard-unit"),
+            unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        player_b_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    _mark_player_as_chaos_knights(state, player_id="player-a")
+    _record_harbingers_selection(
+        state,
+        player_id="player-a",
+        selected=(
+            army_rule.DreadAbility.DISMAY,
+            army_rule.DreadAbility.DELIRIUM,
+        ),
+    )
+    state.active_player_id = "player-b"
+    state.command_step_state = None
+    target_army = state.army_definition_for_player("player-b")
+    assert target_army is not None
+    formation = target_army.attached_units[0]
+    attached_id = formation.attached_unit_instance_id
+    bodyguard_id = formation.bodyguard_unit_instance_id
+    leader_id = formation.leader_unit_instance_ids[0]
+    remove_first_models(state, unit_instance_id=bodyguard_id, count=4)
+    _replace_unit_leadership(state, unit_instance_id=bodyguard_id, leadership=13)
+    _replace_unit_leadership(state, unit_instance_id=leader_id, leadership=13)
+    _place_units_near_center(
+        state,
+        source_unit_id="army-alpha:intercessor-unit-1",
+        target_unit_id=bodyguard_id,
+    )
+    starting_wounds = sum(
+        model.wounds_remaining
+        for unit_id in (bodyguard_id, leader_id)
+        for model in unit_by_id(state, unit_id).own_models
+    )
+    decisions = DecisionController()
+
+    completed = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=_battle_shock_hooks(),
+    ).begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    requested = _event_payload(decisions, "battle_shock_test_requested")
+    request_payload = cast(dict[str, JsonValue], requested["battle_shock_test_request"])
+    assert request_payload["unit_instance_id"] == attached_id
+    assert request_payload["reason"] == "below_starting_strength_forced"
+    delirium = _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_applied")
+    assert delirium["target_unit_instance_id"] == attached_id
+    application = cast(dict[str, JsonValue], delirium["mortal_wound_application"])
+    assert application["target_unit_instance_id"] == attached_id
+    final_wounds = sum(
+        model.wounds_remaining
+        for unit_id in (bodyguard_id, leader_id)
+        for model in unit_by_id(state, unit_id).own_models
+    )
+    assert final_wounds < starting_wounds
+
+
+def test_harbingers_source_geometry_does_not_expand_to_attached_bodyguards() -> None:
+    source_bodyguard_id = "army-alpha:dread-bodyguard"
+    source_leader_id = "army-alpha:dread-leader"
+    target_unit_id = "army-beta:intercessor-unit-3"
+    state = battle_state(
+        game_id="phase17g-chaos-knights-attached-source-geometry",
+        player_a_units=(
+            default_unit_selection("dread-bodyguard"),
+            unit_selection(
+                unit_selection_id="dread-leader",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        player_a_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="dread-leader",
+                bodyguard_unit_selection_id="dread-bodyguard",
+            ),
+        ),
+    )
+    _mark_player_faction_only_as_chaos_knights(state, player_id="player-a")
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replace(unit, faction_keywords=(army_rule.CHAOS_KNIGHTS_FACTION_KEYWORD,))
+                if unit.unit_instance_id == source_leader_id
+                else unit
+                for unit in army.units
+            ),
+        )
+        for army in state.army_definitions
+    ]
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    marker = center_marker_definition(state)
+    battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id(source_leader_id),
+            marker,
+            offsets=((-15.0, 0.0),),
+        )
+    )
+    battlefield_state = battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id(source_bodyguard_id),
+            marker,
+            offsets=((0.0, 0.0), (0.4, 0.0), (0.8, 0.0), (1.2, 0.0), (1.6, 0.0)),
+        )
+    )
+    battlefield_state = battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id(target_unit_id),
+            marker,
+            offsets=((3.0, 0.0), (3.4, 0.0), (3.8, 0.0), (4.2, 0.0), (4.6, 0.0)),
+        )
+    )
+    state.battlefield_state = battlefield_state
+    dread_army = state.army_definition_for_player("player-a")
+    assert dread_army is not None
+
+    assert not army_rule._unit_within_dread_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        dread_army=dread_army,
+        target_unit_instance_id=target_unit_id,
+    )
 
 
 def test_delirium_reports_unsupported_when_mortal_wound_fnp_requires_choice() -> None:

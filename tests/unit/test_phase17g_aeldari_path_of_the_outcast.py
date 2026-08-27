@@ -19,6 +19,8 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.battle_shock_test_service import BattleShockTestRuntime
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
@@ -787,15 +789,77 @@ def test_eldritch_suppression_forces_battle_shock_with_destroyed_model_modifier(
     replay_payload = _json_object(result.replay_payload)
     assert replay_payload["enemy_unit_instance_id"] == _ENEMY_UNIT_ID
     assert replay_payload["destroyed_model_modifier_applied"] is True
-    assert replay_payload["selected_target_modifier_ids"] == []
-    assert replay_payload["selected_target_modifier_source_ids"] == []
+    application_payload = _only_event_payload(
+        context.decisions,
+        "battle_shock_modifier_applications_recorded",
+    )
+    applications = cast(
+        list[JsonValue],
+        application_payload["battle_shock_modifier_applications"],
+    )
+    assert len(applications) == 1
+    application = _json_object(applications[0])
+    assert application["hook_id"] == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+    modifiers = application["modifiers"]
+    assert isinstance(modifiers, list)
+    assert modifiers == [
+        {
+            "modifier_id": "use:eldritch:eldritch-suppression:-1",
+            "source_id": application["source_id"],
+            "operation": "add",
+            "operand": -1,
+            "priority": 0,
+        }
+    ]
     assert any(
         record.event_type == "battle_shock_test_resolved"
         for record in context.decisions.event_log.records
     )
 
 
-def test_eldritch_suppression_reports_selected_target_modifier_separately() -> None:
+def test_eldritch_suppression_targets_one_canonical_attached_rules_unit() -> None:
+    state, _army, _rangers, _shroud_runners, enemy = _path_state()
+    attached_id = _attach_path_enemy_target(state=state, bodyguard=enemy, leader_leadership=3)
+    context = _stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.ELDRITCH_SUPPRESSION_STRATAGEM_ID,
+        handler_id=stratagems.ELDRITCH_SUPPRESSION_HANDLER_ID,
+        use_id="use:eldritch:attached-target",
+        destroyed_hit_enemy=False,
+    )
+
+    result = stratagems.apply_eldritch_suppression(context)
+
+    assert result.status is StratagemHandlerExecutionStatus.APPLIED
+    replay_payload = _json_object(result.replay_payload)
+    assert replay_payload["enemy_unit_instance_id"] == attached_id
+    requested_events = tuple(
+        event
+        for event in context.decisions.event_log.records
+        if event.event_type == "battle_shock_test_requested"
+    )
+    resolved_events = tuple(
+        event
+        for event in context.decisions.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+    )
+    assert len(requested_events) == 1
+    assert len(resolved_events) == 1
+    requested = _json_object(requested_events[0].payload)
+    request = _json_object(requested["battle_shock_test_request"])
+    strength = _json_object(request["below_half_strength_context"])
+    assert request["unit_instance_id"] == attached_id
+    assert request["player_id"] == "player-b"
+    assert request["leadership_target"] == 3
+    assert strength["unit_instance_id"] == attached_id
+    assert strength["starting_model_count"] == 2
+    assert strength["current_model_count"] == 2
+    resolved = _json_object(resolved_events[0].payload)
+    battle_shock_result = _json_object(resolved["battle_shock_result"])
+    assert battle_shock_result["request"] == request
+
+
+def test_eldritch_suppression_records_loaded_and_source_modifier_applications() -> None:
     state, _army, _rangers, _shroud_runners, _enemy = _path_state()
     effect = PersistingEffect(
         effect_id="eldritch-selected-target-modifier",
@@ -844,8 +908,25 @@ def test_eldritch_suppression_reports_selected_target_modifier_separately() -> N
     assert result.status is StratagemHandlerExecutionStatus.APPLIED
     replay_payload = _json_object(result.replay_payload)
     assert replay_payload["destroyed_model_modifier_applied"] is False
-    assert replay_payload["selected_target_modifier_ids"] == [f"{effect.effect_id}:battle_shock"]
-    assert replay_payload["selected_target_modifier_source_ids"] == [effect.source_rule_id]
+    application_payload = _only_event_payload(
+        context.decisions,
+        "battle_shock_modifier_applications_recorded",
+    )
+    assert application_payload["battle_shock_modifier_applications"] == [
+        {
+            "hook_id": "catalog-ir:selected-target-test-roll-modifier",
+            "source_id": effect.source_rule_id,
+            "modifiers": [
+                {
+                    "modifier_id": f"{effect.effect_id}:battle_shock",
+                    "source_id": effect.source_rule_id,
+                    "operation": "add",
+                    "operand": -1,
+                    "priority": 0,
+                }
+            ],
+        }
+    ]
     assert json.loads(json.dumps(result.to_payload(), sort_keys=True)) == result.to_payload()
 
 
@@ -1388,6 +1469,85 @@ def _path_state(
     return state, army, rangers, shroud_runners, enemy
 
 
+def _attach_path_enemy_target(
+    *,
+    state: GameState,
+    bodyguard: UnitInstance,
+    leader_leadership: int,
+) -> str:
+    leader = _unit(
+        unit_instance_id="army-b:target-leader",
+        datasheet_id="enemy-target-leader",
+        name="Enemy Target Leader",
+        keywords=("CHARACTER", "INFANTRY"),
+        faction_keywords=("OPFOR",),
+        leadership=leader_leadership,
+    )
+    attached_id = "attached-unit:army-b:target"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="test:path-outcast:attached-target",
+        attachment_source_ids=("test:path-outcast:attached-target:eligibility",),
+    )
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id == "player-b":
+            updated_armies.append(
+                replace(
+                    army,
+                    units=(bodyguard, leader),
+                    attached_units=(formation,),
+                )
+            )
+        else:
+            updated_armies.append(army)
+    state.army_definitions = updated_armies
+    state.starting_strength_records = sorted(
+        (
+            *(
+                record
+                for record in state.starting_strength_records
+                if record.unit_instance_id != bodyguard.unit_instance_id
+            ),
+            StartingStrengthRecord(
+                player_id="player-b",
+                unit_instance_id=attached_id,
+                starting_model_count=2,
+                single_model_starting_wounds=None,
+                source_id=formation.source_id,
+            ),
+        ),
+        key=lambda record: record.unit_instance_id,
+    )
+    battlefield = _battlefield_state(state)
+    state.battlefield_state = replace(
+        battlefield,
+        placed_armies=tuple(
+            replace(
+                placed_army,
+                unit_placements=(
+                    *placed_army.unit_placements,
+                    _unit_placement(
+                        "army-b",
+                        "player-b",
+                        leader,
+                        x=12.5,
+                    ),
+                ),
+            )
+            if placed_army.player_id == "player-b"
+            else placed_army
+            for placed_army in battlefield.placed_armies
+        ),
+    )
+    return attached_id
+
+
 def _path_runtime_bundle(state: GameState) -> RuntimeContentBundle:
     armies = tuple(state.army_definitions)
     return RuntimeContentBundle.from_contributions(
@@ -1596,6 +1756,12 @@ def _stratagem_handler_context(
 ) -> StratagemHandlerContext:
     ruleset = RulesetDescriptor.warhammer_40000_eleventh()
     definition = _stratagem_definition(stratagem_id)
+    if handler_id not in {
+        stratagems.ELDRITCH_SUPPRESSION_HANDLER_ID,
+        stratagems.CASTING_BACK_THE_VEIL_HANDLER_ID,
+        stratagems.NOMADS_OF_THE_HIDDEN_WAY_HANDLER_ID,
+    }:
+        raise AssertionError("Path fixture handler is unsupported.")
     target_binding = StratagemTargetBinding(
         target_kind=StratagemTargetKind.FRIENDLY_UNIT,
         target_player_id="player-a",
@@ -1631,7 +1797,7 @@ def _stratagem_handler_context(
         affected_unit_instance_ids=tuple(sorted((_RANGERS_UNIT_ID, _ENEMY_UNIT_ID))),
         command_point_cost=1,
         command_point_transaction_id=f"{use_id}:cp",
-        handler_id=handler_id,
+        handler_id=definition.handler_id,
         effect_selection={
             "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
             HIT_ENEMY_UNIT_CONTEXT_KEY: _ENEMY_UNIT_ID,
@@ -1648,6 +1814,9 @@ def _stratagem_handler_context(
         use_record=use_record,
         ruleset_descriptor=ruleset,
         army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        battle_shock_runtime=BattleShockTestRuntime.from_runtime_content_bundle(
+            _path_runtime_bundle(state)
+        ),
     )
 
 
@@ -1710,6 +1879,17 @@ def _test_persisting_effect_grant(
 def _json_object(value: object) -> dict[str, object]:
     assert isinstance(value, dict)
     return cast(dict[str, object], value)
+
+
+def _only_event_payload(
+    decisions: DecisionController,
+    event_type: str,
+) -> dict[str, object]:
+    matches = tuple(
+        record for record in decisions.event_log.records if record.event_type == event_type
+    )
+    assert len(matches) == 1
+    return _json_object(matches[0].payload)
 
 
 def _stratagem_id_from_option_payload(payload: dict[str, object]) -> str:

@@ -181,7 +181,7 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
         ): 1,
         (
             "src/warhammer40k_core/engine/physical_engagement.py",
-            "_geometry_models_are_physically_engaged",
+            "geometry_models_are_physically_engaged",
         ): 1,
         (
             "src/warhammer40k_core/engine/prebattle.py",
@@ -589,7 +589,7 @@ def test_physical_engagement_has_one_symmetric_geometry_owner_for_consumers() ->
     assert {
         "physical_geometry_models_for_rules_unit",
         "scenario_physical_enemy_rules_unit_ids",
-        "_geometry_models_are_physically_engaged",
+        "geometry_models_are_physically_engaged",
     }.issubset(physical_engagement_calls)
 
     proximity = _function_node(

@@ -41,7 +41,13 @@ def selected_target_test_roll_modifiers(
     modifiers = tuple(
         modifier
         for effect in state.persisting_effects_for_unit(target_id)
-        if (modifier := _modifier_from_effect(effect=effect, roll_type=roll_type)) is not None
+        if (
+            modifier := selected_target_test_roll_modifier_from_effect(
+                effect=effect,
+                roll_type=roll_type,
+            )
+        )
+        is not None
     )
     modifier_ids = tuple(modifier.modifier_id for modifier in modifiers)
     if len(modifier_ids) != len(set(modifier_ids)):
@@ -49,7 +55,7 @@ def selected_target_test_roll_modifiers(
     return tuple(sorted(modifiers, key=lambda modifier: modifier.modifier_id))
 
 
-def _modifier_from_effect(
+def selected_target_test_roll_modifier_from_effect(
     *,
     effect: PersistingEffect,
     roll_type: str,

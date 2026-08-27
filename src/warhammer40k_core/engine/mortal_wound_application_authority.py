@@ -26,7 +26,10 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
+    from warhammer40k_core.engine.damage_allocation import (
+        DamageApplication,
+        MortalWoundApplicationProgress,
+    )
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
         MortalWoundDestructionEvidence,
@@ -470,6 +473,149 @@ def validate_mortal_wound_application_authority_closure(
             raise GameLifecycleError(
                 "Mortal-wound application terminal lacks exactly one start authority."
             )
+
+
+def validate_direct_mortal_wound_application_event_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+) -> None:
+    """Validate direct mortal-wound progress snapshots and completed packets."""
+
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+        MortalWoundDestructionFinalizationKind,
+        mortal_wound_destruction_finalization_kind_from_event,
+    )
+
+    inventory = mortal_wound_application_authority_inventory(
+        event_records=event_records,
+        game_id=state.game_id,
+    )
+    event_indexes = {event.event_id: index for index, event in enumerate(event_records)}
+    if len(event_indexes) != len(event_records):
+        raise GameLifecycleError("Mortal-wound application authority history is duplicated.")
+    for event in event_records:
+        progress = _direct_mortal_wound_progress_from_event(event)
+        if progress is None:
+            continue
+        validate_pending_mortal_wound_application_authority(
+            state=state,
+            event_records=event_records,
+            progress=progress,
+            request_event=event,
+            inventory=inventory,
+        )
+    claimed_application_ids: set[str] = set()
+    for event in event_records:
+        if event.event_type != MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
+            continue
+        if mortal_wound_destruction_finalization_kind_from_event(event) is not (
+            MortalWoundDestructionFinalizationKind.APPLICATION_PACKET
+        ):
+            continue
+        matches = tuple(
+            (started_event, authority)
+            for started_event, authority in inventory.values()
+            if _ordinary_completion_matches(authority=authority, event=event)
+        )
+        if len(matches) != 1:
+            raise GameLifecycleError(
+                "Mortal-wound application terminal lacks exactly one start authority."
+            )
+        started_event, authority = matches[0]
+        if authority.application_id in claimed_application_ids:
+            raise GameLifecycleError("Mortal-wound application was completed twice.")
+        claimed_application_ids.add(authority.application_id)
+        authority.validate_for_state(state)
+        if event_indexes[started_event.event_id] >= event_indexes[event.event_id]:
+            raise GameLifecycleError(
+                "Mortal-wound application completion must follow its start authority."
+            )
+        _validate_completed_logical_death_order(
+            state=state,
+            authority=authority,
+            started_event=started_event,
+            completion_event=event,
+            event_records=event_records,
+        )
+        _validate_ordinary_completion_payload(
+            state=state,
+            authority=authority,
+            event=event,
+            event_records=event_records,
+        )
+
+
+def direct_mortal_wound_damage_applications_from_event(
+    event: EventRecord,
+) -> tuple[DamageApplication, ...]:
+    """Return cumulative direct mortal-wound damage retained by a canonical event."""
+
+    progress = _direct_mortal_wound_progress_from_event(event)
+    if progress is not None:
+        return progress.applications
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplication,
+        MortalWoundApplicationPayload,
+    )
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+        MortalWoundDestructionFinalizationKind,
+        mortal_wound_destruction_finalization_kind_from_event,
+    )
+
+    if event.event_type != MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
+        return ()
+    if mortal_wound_destruction_finalization_kind_from_event(event) is not (
+        MortalWoundDestructionFinalizationKind.APPLICATION_PACKET
+    ):
+        return ()
+    payload = event.payload
+    raw_application = payload.get("application") if isinstance(payload, dict) else None
+    if not isinstance(raw_application, dict):
+        raise GameLifecycleError("Direct mortal-wound terminal application is invalid.")
+    application = MortalWoundApplication.from_payload(
+        cast(MortalWoundApplicationPayload, raw_application)
+    )
+    destroyed_model_ids = {
+        damage.model_instance_id for damage in application.applications if damage.destroyed
+    }
+    return tuple(
+        damage
+        for damage in application.applications
+        if damage.model_instance_id not in destroyed_model_ids
+    )
+
+
+def _direct_mortal_wound_progress_from_event(
+    event: EventRecord,
+) -> MortalWoundApplicationProgress | None:
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplicationProgress,
+        is_mortal_wound_feel_no_pain_request,
+    )
+    from warhammer40k_core.engine.decision_request import (
+        DecisionError,
+        DecisionRequest,
+        DecisionRequestPayload,
+    )
+
+    if event.event_type != "decision_requested" or not isinstance(event.payload, dict):
+        return None
+    try:
+        request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
+    except (DecisionError, KeyError, TypeError) as exc:
+        raise GameLifecycleError("Direct mortal-wound request event is invalid.") from exc
+    if not is_mortal_wound_feel_no_pain_request(request):
+        return None
+    request_payload = request.payload
+    if not isinstance(request_payload, dict):
+        raise GameLifecycleError("Direct mortal-wound request payload is invalid.")
+    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
+        request_payload.get("lost_wound_context")
+    )
+    return progress if progress.destruction_evidence is not None else None
 
 
 def mortal_wound_application_authority_from_event(
@@ -1194,9 +1340,11 @@ __all__ = (
     "MortalWoundApplicationAuthority",
     "MortalWoundApplicationAuthorityPayload",
     "append_direct_mortal_wound_application_started",
+    "direct_mortal_wound_damage_applications_from_event",
     "ensure_started",
     "mortal_wound_application_authority_from_event",
     "mortal_wound_application_authority_inventory",
+    "validate_direct_mortal_wound_application_event_authority",
     "validate_mortal_wound_application_authority_closure",
     "validate_pending_mortal_wound_application_authority",
 )

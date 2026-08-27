@@ -6,6 +6,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.build_core_command_phase_source import (
+    CoreCommandPhaseSourceBuildError,
+    build_core_command_phase_source_payload,
+)
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -1345,25 +1349,29 @@ def test_p15d_core_stratagem_app_source_rejects_unknown_evidence_id_as_typed_err
         )
 
 
-def test_p08a_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None:
+def test_p08ab_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None:
     raw = _core_command_phase_source_artifact_path().read_bytes()
     artifact_payload = _core_command_phase_source_payload()
     source_document = cast(dict[str, object], artifact_payload["source_document"])
+    search_index_payload = cast(dict[str, object], artifact_payload["search_index_observation"])
     source_package = core_command_phase_2026_08.source_package()
+    search_index_observation = core_command_phase_2026_08.search_index_observation()
     rules = core_command_phase_2026_08.source_rule_records()
     rules_by_id = {rule.rule_id: rule for rule in rules}
 
     assert hashlib.sha256(raw).hexdigest() == (core_command_phase_2026_08.EXPECTED_ARTIFACT_SHA256)
     assert core_command_phase_2026_08.PACKAGE_HASH == (
-        "b29a141391d20acc559e9a19dc08fba5c126d29f451726ea81262e4f8591d4e4"
+        "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127"
     )
     assert [(rule.section_id, rule.display_order, rule.section_heading) for rule in rules] == [
         ("08.01", 1, "START OF COMMAND PHASE"),
         ("08.02", 2, "GAIN CORE CP"),
+        ("08.03", 3, "BATTLE-SHOCK"),
     ]
     assert core_command_phase_2026_08.RULE_SOURCE_IDS == {
         "start-of-command-phase": ("gw-11e-core-rules:command-phase:start-of-command-phase"),
         "gain-core-cp": "gw-11e-core-rules:command-phase:gain-core-cp",
+        "battle-shock": "gw-11e-core-rules:command-phase:battle-shock",
     }
     assert rules_by_id["start-of-command-phase"].source_id == (
         core_command_phase_2026_08.START_OF_COMMAND_PHASE_SOURCE_ID
@@ -1371,11 +1379,28 @@ def test_p08a_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None
     assert rules_by_id["gain-core-cp"].source_id == (
         core_command_phase_2026_08.GAIN_CORE_CP_SOURCE_ID
     )
+    assert rules_by_id["battle-shock"].source_id == (
+        core_command_phase_2026_08.BATTLE_SHOCK_SOURCE_ID
+    )
+    assert rules_by_id["battle-shock"].runtime_consumer_ids == (
+        "warhammer40k_core.engine.phases.command:_resolve_battle_shock_step",
+        "warhammer40k_core.engine.battle_shock:collect_battle_shock_test_requests",
+        "warhammer40k_core.engine.battle_shock_resolution:"
+        "record_battle_shock_result_and_outcome_events",
+    )
     assert rules_by_id["start-of-command-phase"].official_pdf_source_text == (
         "Rules that are triggered at the start of the Command phase are resolved now."
     )
     assert rules_by_id["gain-core-cp"].official_pdf_source_text == (
         "Both players gain 1 Command Point (CP)."
+    )
+    assert rules_by_id["battle-shock"].official_pdf_source_text == (
+        "The active player must now make one battle-shock roll (01.07) for each unit in their "
+        "army that fulfils one or both of the following conditions:\n"
+        "- That unit is currently battle-shocked.\n"
+        "- That unit is at, or below, half-strength.\n"
+        "If a unit was battle-shocked at the start of this step and its battle-shock roll during "
+        "this step succeeds, it is no longer battle-shocked."
     )
     assert all(
         hashlib.sha256(rule.source_text.encode()).hexdigest()
@@ -1407,21 +1432,55 @@ def test_p08a_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None
     assert source_document["category_body_capture_status"] == (
         "review_audit_without_retained_page_body"
     )
-    assert source_document["search_index_context_observed_at"] == ("2026-08-26T14:49:10-04:00")
-    assert source_document["search_index_context_scope"] == (
-        "secondary_context_only_not_rule_evidence"
-    )
-    assert all(
-        record.source_url != "https://www.40k.app/rules"
-        and record.observed_at != "2026-08-26T14:49:10-04:00"
-        for record in core_command_phase_2026_08.source_evidence_records()
+    assert source_document["review_audit_source_observation_sha256"] == (
+        "0920fa00c1f4ecbc9e46795c1d72695872b61e7577eeaa693c57eb12c26c871e"
     )
     assert source_document["exact_text_source_scope"] == (
-        "retained_official_pdf_sections_08.01_and_08.02"
+        "retained_official_pdf_sections_08.01_through_08.03"
+    )
+    assert search_index_payload["source_url"] == "https://www.40k.app/rules"
+    assert search_index_payload["observed_at"] == "2026-08-26T14:49:10-04:00"
+    assert search_index_payload["observation_scope"] == ("command_phase_five_heading_sequence_only")
+    assert search_index_observation.normalized_observed_text == (
+        "START OF COMMAND PHASE\n"
+        "GAIN CORE CP\n"
+        "BATTLE-SHOCK\n"
+        "COMMAND ABILITIES\n"
+        "END OF COMMAND PHASE"
+    )
+    assert [
+        (heading.display_order, heading.normalized_heading)
+        for heading in search_index_observation.headings
+    ] == [
+        (1, "START OF COMMAND PHASE"),
+        (2, "GAIN CORE CP"),
+        (3, "BATTLE-SHOCK"),
+        (4, "COMMAND ABILITIES"),
+        (5, "END OF COMMAND PHASE"),
+    ]
+    assert all(
+        hashlib.sha256(heading.normalized_heading.encode()).hexdigest()
+        == heading.transcription_sha256
+        for heading in search_index_observation.headings
+    )
+    assert search_index_observation.sequence_transcription_sha256 == (
+        core_command_phase_2026_08.EXPECTED_SEARCH_INDEX_SEQUENCE_TRANSCRIPTION_SHA256
+    )
+    assert search_index_observation.source_observation_sha256 == (
+        core_command_phase_2026_08.EXPECTED_SEARCH_INDEX_SOURCE_OBSERVATION_SHA256
     )
 
     review_context, source_observation_by_row_id = _core_rules_review_audit_context()
     assert review_context["observed_at"] == "2026-08-25T00:00:00-04:00"
+    assert (
+        source_observation_by_row_id["category:08"]
+        == (source_document["review_audit_source_observation_sha256"])
+    )
+    expected_semantic_status = {
+        "start-of-command-phase": "executable_engine_runtime",
+        "gain-core-cp": "executable_engine_runtime",
+        "battle-shock": "partial_engine_runtime",
+    }
     for rule in rules:
         evidence = source_package.source_evidence_catalog.records_for_source_id(rule.source_id)
         project_review = next(
@@ -1432,19 +1491,26 @@ def test_p08a_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None
         mirror = next(record for record in evidence if record.evidence_kind == "third_party_mirror")
         assert project_review.source_url is project_review.observed_at is None
         assert project_review.verification_status == "unverified"
-        assert mirror.source_url == "https://www.40k.app/rules/08-command-phase"
-        assert mirror.observed_at == "2026-08-25T00:00:00-04:00"
-        assert mirror.source_title == "40k.app Core Rules - Command Phase"
-        assert mirror.review_audit_row_id == "category:08"
+        assert mirror.source_url == search_index_observation.source_url
+        assert mirror.observed_at == search_index_observation.observed_at
+        assert mirror.source_title == (
+            "40k.app Core Rules search-index Command-phase heading sequence"
+        )
+        assert mirror.review_audit_id == search_index_observation.observation_id
+        assert mirror.review_audit_row_id == search_index_observation.observation_row_id
         assert (
             mirror.review_audit_source_observation_sha256
-            == (source_observation_by_row_id["category:08"])
+            == search_index_observation.source_observation_sha256
+        )
+        assert (
+            mirror.review_audit_source_observation_sha256
+            != (source_observation_by_row_id["category:08"])
         )
         assert mirror.observation_sha256 == rule.source_observation_sha256
         assert all(
             record.transcription_sha256 == rule.transcription_sha256
             and record.load_support_status == "loaded"
-            and record.semantic_execution_status == "executable_engine_runtime"
+            and record.semantic_execution_status == expected_semantic_status[rule.rule_id]
             and record.runtime_consumer_ids == rule.runtime_consumer_ids
             and RuleEvidenceRecord.from_payload(record.to_payload()) == record
             for record in evidence
@@ -1470,11 +1536,15 @@ def test_p08a_command_phase_source_is_ordered_hash_pinned_and_truthful() -> None
         ("rule", "display_order", 2),
         ("rule", "official_pdf_source_text", "stale PDF text"),
         ("document", "category_body_capture_status", "captured"),
-        ("mirror", "source_url", "https://www.40k.app/rules"),
+        ("mirror", "source_url", "https://www.40k.app/rules/08-command-phase"),
+        ("search", "source_url", "https://www.40k.app/rules/08-command-phase"),
+        ("search", "observed_at", "2026-08-26T14:50:10-04:00"),
+        ("search_heading", "normalized_heading", "GAIN CORE CP FIRST"),
+        ("search_heading", "display_order", 2),
         ("rule", "semantic_execution_status", "partial_engine_runtime"),
     ],
 )
-def test_p08a_command_phase_source_rejects_identity_provenance_and_status_drift(
+def test_p08ab_command_phase_source_rejects_identity_provenance_and_status_drift(
     target: str,
     field_name: str,
     replacement: object,
@@ -1487,12 +1557,19 @@ def test_p08a_command_phase_source_rejects_identity_provenance_and_status_drift(
     elif target == "document":
         source_document = cast(dict[str, object], payload["source_document"])
         source_document[field_name] = replacement
+    elif target == "search":
+        search_index = cast(dict[str, object], payload["search_index_observation"])
+        search_index[field_name] = replacement
+    elif target == "search_heading":
+        search_index = cast(dict[str, object], payload["search_index_observation"])
+        headings = cast(list[dict[str, object]], search_index["headings"])
+        headings[0][field_name] = replacement
     else:
         mirror = next(
             record
             for record in evidence
             if record["evidence_id"]
-            == "40k-app-command-phase-audit-2026-08-25:start-of-command-phase"
+            == "40k-app-command-phase-search-index-2026-08-26:start-of-command-phase"
         )
         mirror[field_name] = replacement
 
@@ -1513,7 +1590,7 @@ def test_p08a_command_phase_source_rejects_identity_provenance_and_status_drift(
         "extra_evidence",
     ],
 )
-def test_p08a_command_phase_source_rejects_inventory_drift(mutation: str) -> None:
+def test_p08ab_command_phase_source_rejects_inventory_drift(mutation: str) -> None:
     payload = _core_command_phase_source_payload()
     rules = cast(list[dict[str, object]], payload["rules"])
     evidence = cast(list[dict[str, object]], payload["evidence_records"])
@@ -1542,7 +1619,7 @@ def test_p08a_command_phase_source_rejects_inventory_drift(mutation: str) -> Non
     "malformation",
     ["malformed_json", "unknown_field"],
 )
-def test_p08a_command_phase_source_rejects_malformed_or_unknown_fields(
+def test_p08ab_command_phase_source_rejects_malformed_or_unknown_fields(
     malformation: str,
 ) -> None:
     if malformation == "malformed_json":
@@ -1557,6 +1634,127 @@ def test_p08a_command_phase_source_rejects_malformed_or_unknown_fields(
         match="artifact is invalid",
     ):
         core_command_phase_2026_08.core_command_phase_source_artifact_from_json_bytes(raw)
+
+
+def test_p08ab_search_index_fingerprint_covers_url_timestamp_scope_text_and_order() -> None:
+    observation = cast(
+        dict[str, object],
+        _core_command_phase_source_payload()["search_index_observation"],
+    )
+
+    def fingerprint(payload: dict[str, object]) -> str:
+        canonical = cast(dict[str, object], json.loads(json.dumps(payload)))
+        canonical["source_observation_sha256"] = ""
+        encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
+        return hashlib.sha256(encoded).hexdigest()
+
+    expected = cast(str, observation["source_observation_sha256"])
+    assert fingerprint(observation) == expected
+    for field_name, replacement in (
+        ("source_url", "https://www.40k.app/rules/08-command-phase"),
+        ("observed_at", "2026-08-26T14:50:10-04:00"),
+        ("observation_scope", "category_locator_only"),
+        ("normalized_observed_text", "GAIN CORE CP\nSTART OF COMMAND PHASE"),
+    ):
+        mutated = cast(dict[str, object], json.loads(json.dumps(observation)))
+        mutated[field_name] = replacement
+        assert fingerprint(mutated) != expected
+
+    reordered = cast(dict[str, object], json.loads(json.dumps(observation)))
+    headings = cast(list[dict[str, object]], reordered["headings"])
+    headings[0], headings[1] = headings[1], headings[0]
+    assert fingerprint(reordered) != expected
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "reordered_heading_sequence",
+        "category_url_substitution",
+        "category_scope_substitution",
+    ],
+)
+def test_p08ab_builder_rejects_reviewed_search_observation_identity_drift(
+    mutation: str,
+) -> None:
+    payload = _core_command_phase_source_payload()
+    source_document = cast(dict[str, object], payload["source_document"])
+    search_index = cast(dict[str, object], payload["search_index_observation"])
+    headings = cast(list[dict[str, object]], search_index["headings"])
+    if mutation == "reordered_heading_sequence":
+        headings[0], headings[1] = headings[1], headings[0]
+    elif mutation == "category_url_substitution":
+        search_index["source_url"] = source_document["authoritative_category_url"]
+    else:
+        search_index["observation_scope"] = source_document["authoritative_category_scope"]
+
+    with pytest.raises(
+        CoreCommandPhaseSourceBuildError,
+        match="reviewed semantic identity",
+    ):
+        build_core_command_phase_source_payload(payload)
+
+
+def test_p08ab_builder_rejects_rehashed_category_audit_substitution_for_search_link() -> None:
+    payload = _core_command_phase_source_payload()
+    source_document = cast(dict[str, object], payload["source_document"])
+    search_index = cast(dict[str, object], payload["search_index_observation"])
+    rules = cast(list[dict[str, object]], payload["rules"])
+    evidence = cast(list[dict[str, object]], payload["evidence_records"])
+    search_index.update(
+        {
+            "observation_id": source_document["review_audit_id"],
+            "observation_row_id": source_document["review_audit_row_id"],
+            "source_url": source_document["authoritative_category_url"],
+            "observed_at": source_document["authoritative_category_observed_at"],
+            "observation_scope": source_document["authoritative_category_scope"],
+            "source_observation_sha256": source_document["review_audit_source_observation_sha256"],
+        }
+    )
+    rules_by_source_id = {cast(str, rule["source_id"]): rule for rule in rules}
+    for record in evidence:
+        if record["evidence_kind"] != "third_party_mirror":
+            continue
+        record.update(
+            {
+                "review_audit_id": source_document["review_audit_id"],
+                "review_audit_row_id": source_document["review_audit_row_id"],
+                "review_audit_source_observation_sha256": source_document[
+                    "review_audit_source_observation_sha256"
+                ],
+                "source_url": source_document["authoritative_category_url"],
+                "observed_at": source_document["authoritative_category_observed_at"],
+            }
+        )
+        record["observation_sha256"] = _command_phase_evidence_observation_sha256(record)
+        rules_by_source_id[cast(str, record["rule_source_id"])]["source_observation_sha256"] = (
+            record["observation_sha256"]
+        )
+    payload["package_hash"] = ""
+    payload["package_hash"] = _canonical_payload_sha256(payload)
+
+    assert search_index["observation_id"] == "40k-app-core-rules-2026-08-25"
+    assert search_index["observation_row_id"] == "category:08"
+    assert search_index["source_observation_sha256"] == (
+        "0920fa00c1f4ecbc9e46795c1d72695872b61e7577eeaa693c57eb12c26c871e"
+    )
+    assert all(
+        rule["source_observation_sha256"]
+        == next(
+            record["observation_sha256"]
+            for record in evidence
+            if record["evidence_kind"] == "third_party_mirror"
+            and record["rule_source_id"] == rule["source_id"]
+        )
+        for rule in rules
+    )
+    assert payload["package_hash"] == _canonical_payload_sha256({**payload, "package_hash": ""})
+
+    with pytest.raises(
+        CoreCommandPhaseSourceBuildError,
+        match="reviewed semantic identity",
+    ):
+        build_core_command_phase_source_payload(payload)
 
 
 def test_p08a_command_phase_source_rejects_raw_byte_drift() -> None:
@@ -1664,6 +1862,21 @@ def _core_command_phase_source_payload() -> dict[str, object]:
         dict[str, object],
         json.loads(_core_command_phase_source_artifact_path().read_text()),
     )
+
+
+def _canonical_payload_sha256(payload: object) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
+def _command_phase_evidence_observation_sha256(record: dict[str, object]) -> str:
+    observation = dict(record)
+    observation["observation_sha256"] = ""
+    observation["load_support_status"] = "not_loaded"
+    observation["semantic_execution_status"] = "not_certified"
+    observation["runtime_consumer_ids"] = []
+    return _canonical_payload_sha256(observation)
 
 
 def _core_rules_review_audit_context() -> tuple[dict[str, str], dict[str, str]]:

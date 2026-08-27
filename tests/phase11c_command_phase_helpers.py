@@ -151,11 +151,15 @@ def battle_state(
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_a_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    player_b_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> GameState:
     config = phase11c_config(
         game_id=game_id,
         player_a_units=player_a_units,
         player_b_units=player_b_units,
+        player_a_attachment_declarations=player_a_attachment_declarations,
+        player_b_attachment_declarations=player_b_attachment_declarations,
     )
     state = GameState.from_config(config)
     for army in mustered_armies(config):
@@ -218,6 +222,8 @@ def phase11c_config(
     game_id: str = "phase11c-game",
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_a_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    player_b_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
@@ -235,6 +241,7 @@ def phase11c_config(
                     if player_a_units is None
                     else player_a_units
                 ),
+                attachment_declarations=player_a_attachment_declarations,
             ),
             army_muster_request(
                 catalog=catalog,
@@ -245,6 +252,7 @@ def phase11c_config(
                     if player_b_units is None
                     else player_b_units
                 ),
+                attachment_declarations=player_b_attachment_declarations,
             ),
         ),
         player_ids=("player-a", "player-b"),

@@ -16,13 +16,25 @@ from warhammer40k_core.rules.source_evidence import (
     SemanticExecutionStatus,
 )
 
-ARTIFACT_SCHEMA: Final = "core-v2-command-phase-source-v1"
+ARTIFACT_SCHEMA: Final = "core-v2-command-phase-source-v2"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-command-phase"
-EXPECTED_SOURCE_VERSION: Final = "40k-app-category-audited-2026-08-25"
+EXPECTED_SOURCE_VERSION: Final = "40k-app-search-index-observed-2026-08-26"
 EXPECTED_CATEGORY_URL: Final = "https://www.40k.app/rules/08-command-phase"
 EXPECTED_CATEGORY_OBSERVED_AT: Final = "2026-08-25T00:00:00-04:00"
-EXPECTED_SEARCH_INDEX_CONTEXT_URL: Final = "https://www.40k.app/rules"
-EXPECTED_SEARCH_INDEX_CONTEXT_OBSERVED_AT: Final = "2026-08-26T14:49:10-04:00"
+EXPECTED_SEARCH_INDEX_URL: Final = "https://www.40k.app/rules"
+EXPECTED_SEARCH_INDEX_OBSERVED_AT: Final = "2026-08-26T14:49:10-04:00"
+EXPECTED_SEARCH_INDEX_OBSERVATION_ID: Final = "40k-app-command-phase-search-index-2026-08-26"
+EXPECTED_SEARCH_INDEX_OBSERVATION_ROW_ID: Final = "heading-sequence:command-phase"
+EXPECTED_SEARCH_INDEX_OBSERVATION_SCOPE: Final = "command_phase_five_heading_sequence_only"
+EXPECTED_SEARCH_INDEX_NORMALIZED_TEXT: Final = (
+    "START OF COMMAND PHASE\nGAIN CORE CP\nBATTLE-SHOCK\nCOMMAND ABILITIES\nEND OF COMMAND PHASE"
+)
+EXPECTED_SEARCH_INDEX_SEQUENCE_TRANSCRIPTION_SHA256: Final = (
+    "3ab49c279f743d16d6a122b6b3d3ea42736bd64acf2009b61e5b946f45a03a4c"
+)
+EXPECTED_SEARCH_INDEX_SOURCE_OBSERVATION_SHA256: Final = (
+    "e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab"
+)
 EXPECTED_REVIEW_AUDIT_ID: Final = "40k-app-core-rules-2026-08-25"
 EXPECTED_CATEGORY_AUDIT_FINGERPRINT: Final = (
     "0920fa00c1f4ecbc9e46795c1d72695872b61e7577eeaa693c57eb12c26c871e"
@@ -37,8 +49,23 @@ EXPECTED_OFFICIAL_PDF_PATH: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "d1e61f74c91fa73cda51a470b570c6cf8e14ffa67b6d46cd6b6fe405cb3e7709"
-EXPECTED_PACKAGE_HASH: Final = "b29a141391d20acc559e9a19dc08fba5c126d29f451726ea81262e4f8591d4e4"
+EXPECTED_ARTIFACT_SHA256: Final = "78b2264047e263ab5537c71c7d1be681874bdda31191816b6b297eb9a39425e6"
+EXPECTED_PACKAGE_HASH: Final = "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127"
+
+EXPECTED_SEARCH_INDEX_HEADINGS: Final = (
+    ("start-of-command-phase", 1, "START OF COMMAND PHASE"),
+    ("gain-core-cp", 2, "GAIN CORE CP"),
+    ("battle-shock", 3, "BATTLE-SHOCK"),
+    ("command-abilities", 4, "COMMAND ABILITIES"),
+    ("end-of-command-phase", 5, "END OF COMMAND PHASE"),
+)
+EXPECTED_SEARCH_INDEX_HEADING_SHA256_BY_HEADING_ID: Final = {
+    "start-of-command-phase": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+    "gain-core-cp": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+    "battle-shock": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+    "command-abilities": "f4ea3d1b71326aa37f7fa0d10387f5d36584781ec17cc6bbd8ccb431626265f2",
+    "end-of-command-phase": "2783396269169e5333be1049e5cb0ca511b6601ecf3d650668316155988dca01",
+}
 
 EXPECTED_RULE_IDENTITY: Final = {
     "start-of-command-phase": (
@@ -47,7 +74,11 @@ EXPECTED_RULE_IDENTITY: Final = {
         "START OF COMMAND PHASE",
         "gw-11e-core-rules:command-phase:start-of-command-phase",
         "Rules that are triggered at the start of the Command phase are resolved now.",
-        ("warhammer40k_core.engine.phases.command:_resolve_command_phase_start_boundary"),
+        (
+            "warhammer40k_core.engine.command_phase_start_authority:"
+            "resolve_command_phase_start_boundary",
+        ),
+        "executable_engine_runtime",
     ),
     "gain-core-cp": (
         "08.02",
@@ -55,20 +86,50 @@ EXPECTED_RULE_IDENTITY: Final = {
         "GAIN CORE CP",
         "gw-11e-core-rules:command-phase:gain-core-cp",
         "Both players gain 1 Command Point (CP).",
-        ("warhammer40k_core.engine.phases.command:_resolve_gain_core_command_points_step"),
+        ("warhammer40k_core.engine.phases.command:_resolve_gain_core_command_points_step",),
+        "executable_engine_runtime",
+    ),
+    "battle-shock": (
+        "08.03",
+        3,
+        "BATTLE-SHOCK",
+        "gw-11e-core-rules:command-phase:battle-shock",
+        (
+            "The active player must now make one battle-shock roll (01.07) for each unit in their "
+            "army that fulfils one or both of the following conditions:\n"
+            "- That unit is currently battle-shocked.\n"
+            "- That unit is at, or below, half-strength.\n"
+            "If a unit was battle-shocked at the start of this step and its battle-shock roll "
+            "during this step succeeds, it is no longer battle-shocked."
+        ),
+        (
+            "warhammer40k_core.engine.phases.command:_resolve_battle_shock_step",
+            "warhammer40k_core.engine.battle_shock:collect_battle_shock_test_requests",
+            "warhammer40k_core.engine.battle_shock_resolution:"
+            "record_battle_shock_result_and_outcome_events",
+        ),
+        "partial_engine_runtime",
     ),
 }
 EXPECTED_TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
     "start-of-command-phase": ("c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33"),
     "gain-core-cp": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+    "battle-shock": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
 }
 EXPECTED_OFFICIAL_PDF_TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
     "start-of-command-phase": ("539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31"),
     "gain-core-cp": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0",
+    "battle-shock": "f674a5dd207cb868ab364152a82090c61c1191479531c92464c99fe5318ef958",
 }
 EXPECTED_SOURCE_OBSERVATION_SHA256_BY_RULE_ID: Final = {
-    "start-of-command-phase": ("9b60e2a9afadea0cf9418cc38175079ebd510e42362bb92c527eaa9c6d4aa18b"),
-    "gain-core-cp": "8b7093cccc1d0bbeba477a60449243535b5832eabda56c3a4102acf092956a48",
+    "start-of-command-phase": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76",
+    "gain-core-cp": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a",
+    "battle-shock": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78",
+}
+EXPECTED_PROJECT_REVIEW_EVIDENCE_ID_BY_RULE_ID: Final = {
+    "start-of-command-phase": "core-v2-p08a-source-review:start-of-command-phase",
+    "gain-core-cp": "core-v2-p08a-source-review:gain-core-cp",
+    "battle-shock": "core-v2-p08b-source-review:battle-shock",
 }
 
 
@@ -90,13 +151,41 @@ class CoreCommandPhaseSourceDocumentArtifact(
     review_audit_id: str
     review_audit_row_id: str
     review_audit_source_observation_sha256: str
-    search_index_context_url: str
-    search_index_context_observed_at: str
-    search_index_context_scope: str
     official_pdf_source_id: str
     official_pdf_path: str
     official_pdf_sha256: str
     exact_text_source_scope: str
+
+
+class CoreCommandPhaseSearchIndexHeadingArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    heading_id: str
+    display_order: int
+    normalized_heading: str
+    transcription_sha256: str
+
+
+class CoreCommandPhaseSearchIndexObservationArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    observation_id: str
+    observation_row_id: str
+    provider_name: str
+    source_platform: str
+    source_url: str
+    observed_at: str
+    observation_scope: str
+    project_authority_policy_id: str
+    provider_non_affiliation_recorded: bool
+    headings: tuple[CoreCommandPhaseSearchIndexHeadingArtifact, ...]
+    normalized_observed_text: str
+    sequence_transcription_sha256: str
+    source_observation_sha256: str
 
 
 class CoreCommandPhaseSourceRuleArtifact(
@@ -190,6 +279,7 @@ class CoreCommandPhaseSourcePackageArtifact(
     source_package_id: str
     source_version: str
     source_document: CoreCommandPhaseSourceDocumentArtifact
+    search_index_observation: CoreCommandPhaseSearchIndexObservationArtifact
     rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...]
     evidence_records: tuple[CoreCommandPhaseEvidenceArtifact, ...]
     package_hash: str
@@ -208,7 +298,12 @@ class CoreCommandPhaseSourcePackageArtifact(
             )
         _validate_source_document(self.source_document)
         _validate_rules(self.rules)
-        _validate_evidence(self.evidence_records, rules=self.rules)
+        _validate_search_index_observation(self.search_index_observation, rules=self.rules)
+        _validate_evidence(
+            self.evidence_records,
+            rules=self.rules,
+            search_index_observation=self.search_index_observation,
+        )
         _validate_sha256("package_hash", self.package_hash)
         if self.package_hash != core_command_phase_source_package_hash(self):
             raise CoreCommandPhaseSourceArtifactError("Command-phase source package hash is stale.")
@@ -244,6 +339,19 @@ def core_command_phase_source_package_hash(
     return hashlib.sha256(encoded).hexdigest()
 
 
+def core_command_phase_search_index_source_observation_sha256(
+    observation: CoreCommandPhaseSearchIndexObservationArtifact,
+) -> str:
+    payload = msgspec.to_builtins(observation)
+    if type(payload) is not dict:
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase search-index observation payload is invalid."
+        )
+    payload["source_observation_sha256"] = ""
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def _validate_source_document(source: CoreCommandPhaseSourceDocumentArtifact) -> None:
     if (
         source.document_id,
@@ -255,15 +363,12 @@ def _validate_source_document(source: CoreCommandPhaseSourceDocumentArtifact) ->
         source.review_audit_id,
         source.review_audit_row_id,
         source.review_audit_source_observation_sha256,
-        source.search_index_context_url,
-        source.search_index_context_observed_at,
-        source.search_index_context_scope,
         source.official_pdf_source_id,
         source.official_pdf_path,
         source.official_pdf_sha256,
         source.exact_text_source_scope,
     ) != (
-        "warhammer-40000-command-phase-audited-2026-08-25",
+        "warhammer-40000-command-phase-observed-2026-08-26",
         "Warhammer 40,000 Core Rules - Command Phase",
         EXPECTED_CATEGORY_URL,
         EXPECTED_CATEGORY_OBSERVED_AT,
@@ -272,16 +377,100 @@ def _validate_source_document(source: CoreCommandPhaseSourceDocumentArtifact) ->
         EXPECTED_REVIEW_AUDIT_ID,
         "category:08",
         EXPECTED_CATEGORY_AUDIT_FINGERPRINT,
-        EXPECTED_SEARCH_INDEX_CONTEXT_URL,
-        EXPECTED_SEARCH_INDEX_CONTEXT_OBSERVED_AT,
-        "secondary_context_only_not_rule_evidence",
         EXPECTED_OFFICIAL_PDF_SOURCE_ID,
         EXPECTED_OFFICIAL_PDF_PATH,
         EXPECTED_OFFICIAL_PDF_SHA256,
-        "retained_official_pdf_sections_08.01_and_08.02",
+        "retained_official_pdf_sections_08.01_through_08.03",
     ):
         raise CoreCommandPhaseSourceArtifactError(
             "Command-phase source-document provenance drifted."
+        )
+
+
+def _validate_search_index_observation(
+    observation: CoreCommandPhaseSearchIndexObservationArtifact,
+    *,
+    rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...],
+) -> None:
+    if (
+        observation.observation_id,
+        observation.observation_row_id,
+        observation.provider_name,
+        observation.source_platform,
+        observation.source_url,
+        observation.observed_at,
+        observation.observation_scope,
+        observation.project_authority_policy_id,
+        observation.provider_non_affiliation_recorded,
+    ) != (
+        EXPECTED_SEARCH_INDEX_OBSERVATION_ID,
+        EXPECTED_SEARCH_INDEX_OBSERVATION_ROW_ID,
+        "40k.app",
+        "Web",
+        EXPECTED_SEARCH_INDEX_URL,
+        EXPECTED_SEARCH_INDEX_OBSERVED_AT,
+        EXPECTED_SEARCH_INDEX_OBSERVATION_SCOPE,
+        PROJECT_AUTHORITY_POLICY_ID,
+        True,
+    ):
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase search-index observation provenance drifted."
+        )
+    observed_headings = tuple(
+        (heading.heading_id, heading.display_order, heading.normalized_heading)
+        for heading in observation.headings
+    )
+    if observed_headings != EXPECTED_SEARCH_INDEX_HEADINGS:
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase search-index heading sequence drifted."
+        )
+    if (
+        observation.normalized_observed_text
+        != "\n".join(heading.normalized_heading for heading in observation.headings)
+        or observation.normalized_observed_text != EXPECTED_SEARCH_INDEX_NORMALIZED_TEXT
+    ):
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase search-index normalized text drifted."
+        )
+    for heading in observation.headings:
+        _validate_sha256("heading transcription_sha256", heading.transcription_sha256)
+        if (
+            hashlib.sha256(heading.normalized_heading.encode()).hexdigest()
+            != heading.transcription_sha256
+            or heading.transcription_sha256
+            != EXPECTED_SEARCH_INDEX_HEADING_SHA256_BY_HEADING_ID[heading.heading_id]
+        ):
+            raise CoreCommandPhaseSourceArtifactError(
+                "Command-phase search-index heading transcription drifted."
+            )
+    _validate_sha256(
+        "sequence_transcription_sha256",
+        observation.sequence_transcription_sha256,
+    )
+    if (
+        hashlib.sha256(observation.normalized_observed_text.encode()).hexdigest()
+        != observation.sequence_transcription_sha256
+        or observation.sequence_transcription_sha256
+        != EXPECTED_SEARCH_INDEX_SEQUENCE_TRANSCRIPTION_SHA256
+    ):
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase search-index sequence transcription drifted."
+        )
+    _validate_sha256("source_observation_sha256", observation.source_observation_sha256)
+    if (
+        observation.source_observation_sha256
+        != core_command_phase_search_index_source_observation_sha256(observation)
+        or observation.source_observation_sha256 != EXPECTED_SEARCH_INDEX_SOURCE_OBSERVATION_SHA256
+    ):
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase search-index source observation drifted."
+        )
+    if (
+        tuple((rule.rule_id, rule.display_order, rule.section_heading) for rule in rules)
+        != EXPECTED_SEARCH_INDEX_HEADINGS[: len(rules)]
+    ):
+        raise CoreCommandPhaseSourceArtifactError(
+            "Command-phase source rows drifted from the observed heading sequence."
         )
 
 
@@ -299,7 +488,8 @@ def _validate_rules(rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...]) -> No
             expected_heading,
             expected_source_id,
             expected_pdf_text,
-            expected_runtime_consumer_id,
+            expected_runtime_consumer_ids,
+            expected_semantic_execution_status,
         ) = EXPECTED_RULE_IDENTITY[rule.rule_id]
         if (
             rule.section_id,
@@ -350,12 +540,12 @@ def _validate_rules(rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...]) -> No
         if (
             rule.evidence_ids
             != (
-                f"core-v2-p08a-source-review:{rule.rule_id}",
-                f"40k-app-command-phase-audit-2026-08-25:{rule.rule_id}",
+                EXPECTED_PROJECT_REVIEW_EVIDENCE_ID_BY_RULE_ID[rule.rule_id],
+                f"40k-app-command-phase-search-index-2026-08-26:{rule.rule_id}",
             )
             or rule.load_support_status != "loaded"
-            or rule.semantic_execution_status != "executable_engine_runtime"
-            or rule.runtime_consumer_ids != (expected_runtime_consumer_id,)
+            or rule.semantic_execution_status != expected_semantic_execution_status
+            or rule.runtime_consumer_ids != expected_runtime_consumer_ids
         ):
             raise CoreCommandPhaseSourceArtifactError(
                 "Command-phase source evidence linkage or support status drifted."
@@ -366,6 +556,7 @@ def _validate_evidence(
     evidence_records: tuple[CoreCommandPhaseEvidenceArtifact, ...],
     *,
     rules: tuple[CoreCommandPhaseSourceRuleArtifact, ...],
+    search_index_observation: CoreCommandPhaseSearchIndexObservationArtifact,
 ) -> None:
     evidence_by_id = {record.evidence_id: record for record in evidence_records}
     expected_ids = tuple(evidence_id for rule in rules for evidence_id in rule.evidence_ids)
@@ -424,19 +615,19 @@ def _validate_evidence(
             "third_party_mirror",
             "project_authoritative_app_mirror",
             PROJECT_AUTHORITY_POLICY_ID,
-            EXPECTED_REVIEW_AUDIT_ID,
-            "category:08",
-            EXPECTED_CATEGORY_AUDIT_FINGERPRINT,
+            search_index_observation.observation_id,
+            search_index_observation.observation_row_id,
+            search_index_observation.source_observation_sha256,
             "40k.app",
-            "40k.app Core Rules - Command Phase",
+            "40k.app Core Rules search-index Command-phase heading sequence",
             "Web",
-            EXPECTED_CATEGORY_URL,
-            EXPECTED_CATEGORY_OBSERVED_AT,
+            search_index_observation.source_url,
+            search_index_observation.observed_at,
             "authoritative_app_mirror",
             True,
         ):
             raise CoreCommandPhaseSourceArtifactError(
-                "Command-phase audited-category mirror provenance drifted."
+                "Command-phase search-index mirror provenance drifted."
             )
         if any(
             (
@@ -462,7 +653,7 @@ def _validate_evidence(
             )
         if mirror.observation_sha256 != rule.source_observation_sha256:
             raise CoreCommandPhaseSourceArtifactError(
-                "Command-phase audited-category observation linkage drifted."
+                "Command-phase search-index observation linkage drifted."
             )
 
 
@@ -484,8 +675,14 @@ __all__ = (
     "EXPECTED_CATEGORY_URL",
     "EXPECTED_OFFICIAL_PDF_SHA256",
     "EXPECTED_PACKAGE_HASH",
+    "EXPECTED_SEARCH_INDEX_OBSERVED_AT",
+    "EXPECTED_SEARCH_INDEX_SEQUENCE_TRANSCRIPTION_SHA256",
+    "EXPECTED_SEARCH_INDEX_SOURCE_OBSERVATION_SHA256",
+    "EXPECTED_SEARCH_INDEX_URL",
+    "CoreCommandPhaseSearchIndexObservationArtifact",
     "CoreCommandPhaseSourceArtifactError",
     "CoreCommandPhaseSourcePackageArtifact",
     "CoreCommandPhaseSourceRuleArtifact",
+    "core_command_phase_search_index_source_observation_sha256",
     "core_command_phase_source_artifact_from_json_bytes",
 )

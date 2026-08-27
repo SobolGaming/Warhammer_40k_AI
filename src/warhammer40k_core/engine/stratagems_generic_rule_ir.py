@@ -31,6 +31,7 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
 # fmt: off
 if TYPE_CHECKING:
     from warhammer40k_core.core.modifiers import RollModifier
+    from warhammer40k_core.engine.battle_shock_test_service import BattleShockTestRuntime
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.rule_execution import RuleExecutionResult
     from warhammer40k_core.engine.triggered_movement import TriggeredMovementKind
@@ -68,6 +69,7 @@ def _apply_generic_rule_ir_stratagem_handler(
     use_record: StratagemUseRecord,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    battle_shock_runtime: BattleShockTestRuntime | None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
 ) -> None:
     from warhammer40k_core.engine.rule_execution import (
@@ -125,6 +127,7 @@ def _apply_generic_rule_ir_stratagem_handler(
         use_record=use_record,
         rule_result=rule_result,
         ruleset_descriptor=ruleset_descriptor,
+        battle_shock_runtime=battle_shock_runtime,
     )
     if _rule_execution_result_grants_triggered_normal_move(rule_result.effect_payloads):
         _request_generic_triggered_normal_move(
@@ -264,6 +267,7 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
     use_record: StratagemUseRecord,
     rule_result: RuleExecutionResult,
     ruleset_descriptor: RulesetDescriptor,
+    battle_shock_runtime: BattleShockTestRuntime | None,
 ) -> None:
     rule_result_payload = validate_json_value(rule_result.to_payload())
     for effect_payload in rule_result.effect_payloads:
@@ -341,6 +345,7 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                         context=context,
                         use_record=use_record,
                         effect_payload=effect_payload,
+                        battle_shock_runtime=battle_shock_runtime,
                     )
                 else:
                     resolve_generic_rule_ir_context_battle_shock(
@@ -349,6 +354,7 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                         context=context,
                         use_record=use_record,
                         effect_payload=effect_payload,
+                        battle_shock_runtime=battle_shock_runtime,
                     )
             elif status == "sticky_objective_control":
                 _persisted.record_generic_sticky_objective_control_state(

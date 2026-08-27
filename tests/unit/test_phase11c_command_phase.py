@@ -9,8 +9,14 @@ from tests.deployment_submission_helpers import submit_all_deployments_if_pendin
 from tests.phase17n_secondary_mission_helpers import (
     drain_pending_secondary_mission_setup_for_command_handler,
 )
-from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.setup_completion_helpers import (
+    ensure_army_mustered_events_for_fixture,
+    record_completed_command_occurrences_for_fixture,
+    record_current_battlefield_placements_for_fixture,
+)
 
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -45,6 +51,11 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
     BattleShockRerollPermissionContext,
+    HistoricalBattleShockContribution,
+)
+from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
+    record_battle_shock_result_and_outcome_events,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
@@ -66,11 +77,19 @@ from warhammer40k_core.engine.command_points import (
 from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle import (
+    RuntimeContentBundle,
+    RuntimeContentContribution,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.grey_knights import (
     army_rule as grey_knights_army_rule,
 )
@@ -81,7 +100,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
@@ -123,15 +142,26 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
     primary_reserve_entry_provider_from_accepted_ability_decision,
 )
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveOrigin,
     StrategicReserveDeclaration,
 )
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_is_battle_shocked,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SetupFlow
-from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemCatalogIndex,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
     DisembarkModeKind,
@@ -210,6 +240,151 @@ def test_command_step_grants_both_players_cp_once_before_tactical_draw() -> None
     assert state.command_point_total("player-b") == 2
 
 
+def test_restore_requires_command_step_anchor_after_core_cp_gain() -> None:
+    decisions = DecisionController()
+    state = _battle_state(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        player_b_secondary=SecondaryMissionMode.FIXED,
+        decisions=decisions,
+    )
+    handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
+
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+
+    assert _decision_request(waiting).decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE
+    command_state = _command_step_state(state)
+    assert command_state.command_points_granted
+    assert command_state.current_step is CommandPhaseStep.COMMAND
+    assert not any(
+        event.event_type == "battle_shock_step_snapshot_created"
+        for event in decisions.event_log.records
+    )
+    lifecycle = GameLifecycle(state=state, decision_controller=decisions)
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+
+    forged_payload = json.loads(json.dumps(lifecycle.to_payload()))
+    forged_payload["decisions"]["event_log"] = [
+        event
+        for event in forged_payload["decisions"]["event_log"]
+        if event["event_type"] != "command_step_started"
+    ]
+    for index, event in enumerate(forged_payload["decisions"]["event_log"], start=1):
+        event["event_id"] = f"event-{index:06d}"
+
+    with pytest.raises(GameLifecycleError, match="lacks its start anchor"):
+        GameLifecycle.from_payload(forged_payload)
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "missing_gain_event",
+        "duplicate_gain_event",
+        "missing_ledger_transaction",
+        "duplicate_ledger_transaction",
+        "reordered_anchor_gains",
+    ],
+)
+def test_restore_requires_exact_core_cp_gain_event_and_ledger_inventory(
+    tamper_kind: str,
+) -> None:
+    decisions = DecisionController()
+    state = _battle_state(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        decisions=decisions,
+    )
+    waiting = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(())
+    ).begin_phase(state=state, decisions=decisions)
+    assert _decision_request(waiting).decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE
+    baseline = GameLifecycle(state=state, decision_controller=decisions).to_payload()
+    assert GameLifecycle.from_payload(baseline).to_payload() == baseline
+
+    forged = cast(dict[str, Any], json.loads(json.dumps(baseline)))
+    events = cast(list[dict[str, Any]], forged["decisions"]["event_log"])
+    anchor_index = next(
+        index for index, event in enumerate(events) if event["event_type"] == "command_step_started"
+    )
+    if tamper_kind == "missing_gain_event":
+        events.pop(anchor_index - 1)
+    elif tamper_kind == "duplicate_gain_event":
+        duplicate = json.loads(json.dumps(events[anchor_index - 1]))
+        events.insert(anchor_index, duplicate)
+    elif tamper_kind == "reordered_anchor_gains":
+        events[anchor_index]["payload"]["command_point_gains"].reverse()
+    else:
+        ledger = next(
+            value
+            for value in forged["state"]["command_point_ledgers"]
+            if value["player_id"] == "player-a"
+        )
+        if tamper_kind == "missing_ledger_transaction":
+            removed = ledger["transactions"].pop()
+            ledger["command_points"] -= removed["amount"]
+        else:
+            duplicate = json.loads(json.dumps(ledger["transactions"][0]))
+            duplicate["transaction_id"] = "command-point:player-a:round-01:999999"
+            ledger["transactions"].append(duplicate)
+            ledger["command_points"] += duplicate["amount"]
+    for index, event in enumerate(events, start=1):
+        event["event_id"] = f"event-{index:06d}"
+
+    with pytest.raises(GameLifecycleError, match=r"Command step|Core CP"):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, forged))
+
+
+def test_restore_rejects_coordinated_deletion_of_complete_command_occurrence() -> None:
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions)
+    handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
+    handler.begin_phase(state=state, decisions=decisions)
+    state.command_step_state = None
+    state.active_player_id = "player-b"
+    handler.begin_phase(state=state, decisions=decisions)
+    baseline = GameLifecycle(state=state, decision_controller=decisions).to_payload()
+    assert GameLifecycle.from_payload(baseline).to_payload() == baseline
+
+    forged = json.loads(json.dumps(baseline))
+    source_id = (
+        "gw-11e-core-command-phase-2026-08:app-core-rules:08.01.02-gain-core-cp:"
+        "round-01:active-player-a"
+    )
+    forged["decisions"]["event_log"] = [
+        event
+        for event in forged["decisions"]["event_log"]
+        if not (
+            event["payload"].get("source_id") == source_id
+            or (
+                event["event_type"]
+                in {
+                    "command_step_started",
+                    "battle_shock_step_snapshot_created",
+                    "battle_shock_step_completed",
+                }
+                and event["payload"].get("battle_round") == 1
+                and event["payload"].get("active_player_id") == "player-a"
+            )
+        )
+    ]
+    for ledger in forged["state"]["command_point_ledgers"]:
+        removed = [
+            transaction
+            for transaction in ledger["transactions"]
+            if transaction["source_id"] == source_id
+        ]
+        ledger["transactions"] = [
+            transaction
+            for transaction in ledger["transactions"]
+            if transaction["source_id"] != source_id
+        ]
+        ledger["command_points"] -= sum(transaction["amount"] for transaction in removed)
+    for index, event in enumerate(forged["decisions"]["event_log"], start=1):
+        event["event_id"] = f"event-{index:06d}"
+
+    with pytest.raises(GameLifecycleError, match="occurrence inventory"):
+        GameLifecycle.from_payload(forged)
+
+
 def test_non_command_cp_gain_cap_is_enforced_per_battle_round() -> None:
     state = _battle_state()
 
@@ -257,10 +432,205 @@ def test_below_half_strength_unit_emits_battle_shock_test_request() -> None:
 
     assert len(requests) == 1
     request = requests[0]
-    assert request.reason is BattleShockTestReason.BELOW_HALF_STRENGTH
+    assert request.reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED
     assert request.leadership_target == 6
     assert request.below_half_strength_context.current_model_count == 2
     assert request.below_half_strength_context.is_below_half_strength
+
+
+def test_currently_shocked_unit_requires_one_command_test_even_above_or_below_half() -> None:
+    state = _battle_state()
+    unit_id = "army-alpha:intercessor-unit-1"
+    _record_unit_battle_shocked(state, unit_instance_id=unit_id)
+
+    above_half_requests = _active_battle_shock_requests(state)
+
+    assert len(above_half_requests) == 1
+    assert above_half_requests[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED
+    assert not above_half_requests[0].below_half_strength_context.is_at_or_below_half_strength
+
+    _remove_first_models(state, unit_instance_id=unit_id, count=3)
+    dual_predicate_requests = _active_battle_shock_requests(state)
+
+    assert len(dual_predicate_requests) == 1
+    assert dual_predicate_requests[0].unit_instance_id == unit_id
+    assert dual_predicate_requests[0].below_half_strength_context.is_below_half_strength
+
+
+def test_exactly_half_strength_requires_command_test_for_multi_and_single_model_units() -> None:
+    multi = _battle_state(
+        player_a_units=(
+            _unit_selection(
+                unit_selection_id="four-model-unit",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_id="core-intercessor-like",
+                model_count=10,
+            ),
+        )
+    )
+    _remove_first_models(multi, unit_instance_id="army-alpha:four-model-unit", count=5)
+    multi_request = _active_battle_shock_requests(multi)[0]
+
+    single = _battle_state(
+        player_a_units=(
+            _unit_selection(
+                unit_selection_id="monster-unit",
+                datasheet_id="core-vehicle-monster",
+                model_profile_id="core-vehicle-monster",
+                model_count=1,
+            ),
+        )
+    )
+    _set_single_model_wounds(single, unit_instance_id="army-alpha:monster-unit", wounds=6)
+    single_request = _active_battle_shock_requests(single)[0]
+
+    assert multi_request.below_half_strength_context.is_at_half_strength
+    assert multi_request.below_half_strength_context.is_at_or_below_half_strength
+    assert single_request.below_half_strength_context.is_at_half_strength
+    assert single_request.below_half_strength_context.is_at_or_below_half_strength
+
+
+def test_command_success_clears_step_start_shock_but_failure_and_forced_success_preserve() -> None:
+    unit_id = "army-alpha:intercessor-unit-1"
+
+    passed_state = _battle_state()
+    _record_unit_battle_shocked(passed_state, unit_instance_id=unit_id)
+    passed_request = _active_battle_shock_requests(passed_state)[0]
+    passed_payload = _record_fixed_battle_shock_resolution(
+        state=passed_state,
+        request=passed_request,
+        values=(6, 6),
+        phase=BattlePhase.COMMAND,
+        phase_start_battle_shocked_unit_ids=(unit_id,),
+        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
+    )
+
+    assert passed_state.battle_shocked_unit_ids == []
+    assert passed_payload["state_update"] == "cleared_battle_shocked"
+    assert passed_payload["cleared_battle_shocked_unit_ids"] == [unit_id]
+
+    failed_state = _battle_state()
+    original_failed_state = _record_unit_battle_shocked(
+        failed_state,
+        unit_instance_id=unit_id,
+    )
+    failed_request = _active_battle_shock_requests(failed_state)[0]
+    failed_payload = _record_fixed_battle_shock_resolution(
+        state=failed_state,
+        request=failed_request,
+        values=(1, 1),
+        phase=BattlePhase.COMMAND,
+        phase_start_battle_shocked_unit_ids=(unit_id,),
+        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
+    )
+
+    assert failed_state.battle_shocked_unit_states == [original_failed_state]
+    assert failed_payload["state_update"] == "already_battle_shocked"
+    assert failed_payload["cleared_battle_shocked_unit_ids"] == []
+
+    forced_state = _battle_state()
+    original_forced_state = _record_unit_battle_shocked(
+        forced_state,
+        unit_instance_id=unit_id,
+    )
+    forced_request = _active_battle_shock_requests(forced_state)[0]
+    forced_payload = _record_fixed_battle_shock_resolution(
+        state=forced_state,
+        request=forced_request,
+        values=(6, 6),
+        phase=BattlePhase.SHOOTING,
+        phase_start_battle_shocked_unit_ids=(),
+        passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
+    )
+
+    assert forced_state.battle_shocked_unit_states == [original_forced_state]
+    assert forced_payload["state_update"] == "not_required"
+    assert forced_payload["cleared_battle_shocked_unit_ids"] == []
+
+
+def test_attached_rules_unit_uses_one_canonical_required_test_and_clear_identity() -> None:
+    attached_id = "attached-unit:army-alpha:bodyguard-unit"
+    state = _battle_state(
+        player_a_units=(
+            _default_unit_selection("bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        player_a_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=rules_unit,
+        starting_strength=state.starting_strength_record_for_unit(attached_id),
+        current_model_ids=tuple(model.model_instance_id for model in rules_unit.own_models),
+    )
+    failed_request = BattleShockTestRequest.for_unit(
+        request_id="phase11c-attached-failed-test",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=attached_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=6,
+        below_half_strength_context=context,
+    )
+    failed = BattleShockResult.from_roll_state(
+        result_id="phase11c-attached-failed-result",
+        request=failed_request,
+        roll_state=DiceRollManager("phase11c-attached-fail").roll_fixed(
+            failed_request.spec,
+            [1, 1],
+        ),
+    )
+    state.record_battle_shock_result(failed)
+    canonical_start_ids = tuple(
+        rules_unit.unit_instance_id
+        for rules_unit in placed_alive_rules_unit_views(state=state)
+        if rules_unit.owner_player_id == "player-a"
+        and rules_unit_is_battle_shocked(
+            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
+    )
+    required = _active_battle_shock_requests(
+        state,
+        battle_shocked_unit_ids=canonical_start_ids,
+    )
+
+    assert canonical_start_ids == (attached_id,)
+    assert len(required) == 1
+    assert required[0].unit_instance_id == attached_id
+
+    resolved = _record_fixed_battle_shock_resolution(
+        state=state,
+        request=required[0],
+        values=(6, 6),
+        phase=BattlePhase.COMMAND,
+        phase_start_battle_shocked_unit_ids=canonical_start_ids,
+        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
+    )
+
+    assert state.battle_shocked_unit_ids == []
+    assert resolved["cleared_battle_shocked_unit_ids"] == [attached_id]
+
+
+def test_off_battlefield_shocked_unit_remains_outside_command_candidate_scope() -> None:
+    state = _battle_state()
+    unit_id = "army-alpha:intercessor-unit-1"
+    _record_unit_battle_shocked(state, unit_instance_id=unit_id)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(unit_id)
+
+    assert _active_battle_shock_requests(state) == ()
 
 
 def test_command_phase_resolves_non_reroll_battle_shock_dice_without_decision_pause() -> None:
@@ -320,6 +690,12 @@ def test_command_phase_battle_shock_reroll_permission_pauses_and_resumes() -> No
     assert state.command_step_state is not None
     assert not state.command_step_state.battle_shock_step_resolved
     assert state.command_step_state.completed_battle_shock_test_request_ids == ()
+    assert len(state.command_step_state.battle_shock_required_test_requests) == 1
+    restored_state = GameState.from_payload(_game_state_payload_copy(state))
+    assert (
+        _command_step_state(restored_state).battle_shock_required_test_requests
+        == state.command_step_state.battle_shock_required_test_requests
+    )
     reroll_request_payload = cast(dict[str, Any], reroll_request.payload)
     reroll_context = cast(dict[str, Any], reroll_request_payload["battle_shock_context"])
     battle_shock_request_payload = cast(
@@ -327,6 +703,7 @@ def test_command_phase_battle_shock_reroll_permission_pauses_and_resumes() -> No
         reroll_context["battle_shock_test_request"],
     )
     battle_shock_request_id = cast(str, battle_shock_request_payload["request_id"])
+    assert reroll_context["passed_state_policy"] == "clear_if_step_start_shocked"
 
     _submit_direct_decision(
         decisions=decisions,
@@ -351,6 +728,309 @@ def test_command_phase_battle_shock_reroll_permission_pauses_and_resumes() -> No
     assert "dice_reroll_declined" in event_types
     assert "battle_shock_test_resolved" in event_types
     assert event_types.count("battle_shock_test_requested") == 1
+    completed_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "battle_shock_step_completed"
+    )
+    assert isinstance(completed_event.payload, dict)
+    assert completed_event.payload["battle_shock_test_count"] == 1
+    assert len(cast(list[Any], completed_event.payload["battle_shock_results"])) == 1
+
+
+def test_command_reroll_round_trip_preserves_full_candidate_and_result_prefixes() -> None:
+    game_id = "phase11c-command-reroll-round-trip"
+    unit_selections = (
+        _default_unit_selection("intercessor-unit-1"),
+        _default_unit_selection("intercessor-unit-2"),
+    )
+    config = _config(game_id=game_id, player_a_units=unit_selections)
+    decisions = DecisionController()
+    state = _battle_state(
+        game_id=game_id,
+        player_a_units=unit_selections,
+        decisions=decisions,
+    )
+    for unit_id in (
+        "army-alpha:intercessor-unit-1",
+        "army-alpha:intercessor-unit-2",
+    ):
+        _remove_first_models(state, unit_instance_id=unit_id, count=3)
+
+    def reroll_permission(
+        context: BattleShockRerollPermissionContext,
+    ) -> RerollPermission | None:
+        return RerollPermission(
+            source_id="phase11c:source:command-battle-shock-reroll",
+            timing_window="battle_shock_test",
+            owning_player_id=context.request.player_id,
+            eligible_roll_type=context.request.spec.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+
+    binding = BattleShockHookBinding(
+        hook_id="phase11c:hook:command-battle-shock-reroll",
+        source_id="phase11c:source:command-battle-shock-reroll",
+        reroll_permission_handler=reroll_permission,
+        historical_contribution_handler=lambda context: HistoricalBattleShockContribution(
+            reroll_permission=RerollPermission(
+                source_id="phase11c:source:command-battle-shock-reroll",
+                timing_window="battle_shock_test",
+                owning_player_id=context.request.player_id,
+                eligible_roll_type=context.request.spec.roll_type,
+                component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+            )
+        ),
+    )
+    armies = tuple(state.army_definitions)
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=armies,
+            catalog=config.army_catalog,
+        ),
+        armies=armies,
+        catalog=config.army_catalog,
+        contributions=(
+            RuntimeContentContribution(
+                contribution_id="phase11c:contribution:command-battle-shock-reroll",
+                battle_shock_hook_bindings=(binding,),
+            ),
+        ),
+    )
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": decisions.to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        },
+        runtime_content_bundle=bundle,
+    )
+
+    first_status = lifecycle.advance_until_decision_or_terminal()
+    first_request = _decision_request(first_status)
+    if first_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        first_status = lifecycle.submit_decision(
+            DecisionResult(
+                result_id="phase11c-command-reroll-decline-stratagem",
+                request_id=first_request.request_id,
+                decision_type=first_request.decision_type,
+                actor_id=first_request.actor_id,
+                selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+                payload=stratagem_decline_payload(),
+            )
+        )
+        first_request = _decision_request(first_status)
+    assert first_request.decision_type == DICE_REROLL_DECISION_TYPE
+    second_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase11c-command-reroll-first-declined",
+            request=first_request,
+            selected_option_id="decline",
+        )
+    )
+    second_request = _decision_request(second_status)
+    assert second_request.decision_type == DICE_REROLL_DECISION_TYPE
+    second_context = cast(
+        dict[str, Any],
+        cast(dict[str, Any], second_request.payload)["battle_shock_context"],
+    )
+    assert second_context["additional_modifier_applications"] == []
+    assert lifecycle.state is not None
+    command_state = _command_step_state(lifecycle.state)
+    assert len(command_state.battle_shock_candidate_inventory) == 2
+    assert len(command_state.completed_battle_shock_test_request_ids) == 1
+    candidate_prefix = tuple(command_state.battle_shock_candidate_inventory)
+    completed_id_prefix = tuple(command_state.completed_battle_shock_test_request_ids)
+    result_prefix = tuple(
+        event.payload
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+    )
+    assert len(result_prefix) == 1
+
+    payload = json.loads(json.dumps(lifecycle.to_payload()))
+    restored = GameLifecycle.from_payload(payload, runtime_content_bundle=bundle)
+    assert restored.state is not None
+    restored_state = _command_step_state(restored.state)
+    assert restored_state.battle_shock_candidate_inventory == candidate_prefix
+    assert restored_state.completed_battle_shock_test_request_ids == completed_id_prefix
+    assert (
+        tuple(
+            event.payload
+            for event in restored.decision_controller.event_log.records
+            if event.event_type == "battle_shock_test_resolved"
+        )
+        == result_prefix
+    )
+    assert _decision_request(restored.advance_until_decision_or_terminal()) == second_request
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "missing_anchor",
+        "missing_snapshot",
+        "missing_request",
+        "missing_dice",
+        "missing_result",
+        "missing_completion",
+        "drifted_snapshot_predicate",
+        "drifted_result_state_update",
+        "drifted_completion_results",
+    ],
+)
+def test_post_command_restore_rejects_battle_shock_history_tamper(
+    tamper_kind: str,
+) -> None:
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions)
+    _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
+    completed = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(())
+    ).begin_phase(state=state, decisions=decisions)
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    phase_end_record = state.determine_current_phase_end_objective_control(
+        runtime_modifier_registry=None,
+    )
+    decisions.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.COMMAND.value,
+            "record_ids": [phase_end_record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
+    )
+    state.advance_to_next_battle_phase(event_log=decisions.event_log)
+    lifecycle = GameLifecycle(state=state, decision_controller=decisions)
+    baseline = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(baseline).to_payload() == baseline
+
+    forged = cast(dict[str, Any], json.loads(json.dumps(baseline)))
+    forged_decisions = cast(dict[str, Any], forged["decisions"])
+    events = cast(list[dict[str, Any]], forged_decisions["event_log"])
+    event_type_by_tamper = {
+        "missing_anchor": "command_step_started",
+        "missing_snapshot": "battle_shock_step_snapshot_created",
+        "missing_request": "battle_shock_test_requested",
+        "missing_dice": "dice_rolled",
+        "missing_result": "battle_shock_test_resolved",
+        "missing_completion": "battle_shock_step_completed",
+    }
+    deleted_event_type = event_type_by_tamper.get(tamper_kind)
+    if deleted_event_type is not None:
+        matching_indices = [
+            index for index, event in enumerate(events) if event["event_type"] == deleted_event_type
+        ]
+        assert matching_indices
+        events.pop(matching_indices[-1])
+        for index, event in enumerate(events, start=1):
+            event["event_id"] = f"event-{index:06d}"
+    elif tamper_kind == "drifted_result_state_update":
+        result_event = next(
+            event for event in events if event["event_type"] == "battle_shock_test_resolved"
+        )
+        result_event["payload"]["state_update"] = "forged_update"
+    elif tamper_kind == "drifted_snapshot_predicate":
+        request_payloads: list[dict[str, Any]] = []
+        for event in events:
+            event_payload = cast(dict[str, Any], event["payload"])
+            if event["event_type"] == "battle_shock_step_snapshot_created":
+                request_payloads.extend(event_payload["battle_shock_required_test_requests"])
+            if "battle_shock_test_request" in event_payload:
+                request_payloads.append(event_payload["battle_shock_test_request"])
+            if "battle_shock_result" in event_payload:
+                request_payloads.append(event_payload["battle_shock_result"]["request"])
+            if event["event_type"] == "battle_shock_step_completed":
+                request_payloads.extend(
+                    result_payload["request"]
+                    for result_payload in event_payload["battle_shock_results"]
+                )
+        assert request_payloads
+        for request_payload in request_payloads:
+            context = request_payload["below_half_strength_context"]
+            context["current_model_count"] = 3
+            context["is_below_starting_strength"] = True
+            context["is_at_half_strength"] = False
+            context["is_below_half_strength"] = False
+    else:
+        completion_event = next(
+            event for event in events if event["event_type"] == "battle_shock_step_completed"
+        )
+        completion_event["payload"]["battle_shock_results"] = []
+
+    with pytest.raises(GameLifecycleError, match=r"Command|Battle-shock"):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, forged))
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    ["add", "delete", "source", "models", "round", "mutation_token"],
+)
+def test_restore_rejects_battle_shock_state_inventory_tamper(tamper_kind: str) -> None:
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions, game_id="phase11c-history-fail-13")
+    unit_id = "army-alpha:intercessor-unit-1"
+    _remove_first_models(state, unit_instance_id=unit_id, count=3)
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+    )
+    completed = handler.begin_phase(state=state, decisions=decisions)
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert state.battle_shocked_unit_ids == [unit_id]
+    lifecycle = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _command_phase_handler=handler,
+    )
+    baseline = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(baseline).to_payload() == baseline
+
+    forged = cast(dict[str, Any], json.loads(json.dumps(baseline)))
+    forged_state = cast(dict[str, Any], forged["state"])
+    shocked_states = cast(list[dict[str, Any]], forged_state["battle_shocked_unit_states"])
+    assert len(shocked_states) == 1
+    if tamper_kind == "add":
+        forged_unit_id = "army-beta:intercessor-unit-3"
+        forged_state["battle_shocked_unit_ids"].append(forged_unit_id)
+        forged_state["battle_shocked_unit_ids"].sort()
+        forged_unit = _unit_by_id(state, forged_unit_id)
+        shocked_states.append(
+            {
+                "player_id": "player-b",
+                "unit_instance_id": forged_unit_id,
+                "model_instance_ids": list(forged_unit.own_model_ids()),
+                "source_result_id": "forged:no-result",
+                "battle_round_started": 1,
+            }
+        )
+        shocked_states.sort(key=lambda value: value["unit_instance_id"])
+    elif tamper_kind == "delete":
+        forged_state["battle_shocked_unit_ids"] = []
+        forged_state["battle_shocked_unit_states"] = []
+    elif tamper_kind == "source":
+        shocked_states[0]["source_result_id"] = "forged:no-result"
+    elif tamper_kind == "models":
+        shocked_states[0]["model_instance_ids"] = list(
+            reversed(shocked_states[0]["model_instance_ids"])
+        )
+    elif tamper_kind == "round":
+        shocked_states[0]["battle_round_started"] = 2
+    else:
+        result_event = next(
+            event
+            for event in forged["decisions"]["event_log"]
+            if event["event_type"] == "battle_shock_test_resolved"
+        )
+        result_event["payload"]["state_update"] = "already_battle_shocked"
+
+    with pytest.raises(GameLifecycleError, match="Battle-shock"):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, forged))
 
 
 def test_battle_shock_reroll_payload_helpers_fail_fast_on_contract_drift() -> None:
@@ -504,8 +1184,8 @@ def test_below_starting_strength_forced_test_suppresses_duplicate_below_half() -
         BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED
     ]
     assert [request.reason for request in duplicated] == [
-        BattleShockTestReason.BELOW_HALF_STRENGTH,
         BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
+        BattleShockTestReason.COMMAND_PHASE_REQUIRED,
     ]
 
 
@@ -536,7 +1216,7 @@ def test_failed_battle_shock_persists_and_sets_effective_oc_to_zero() -> None:
 
     assert not failed.passed
     assert "army-alpha:intercessor-unit-1" in state.battle_shocked_unit_ids
-    assert state.battle_shocked_unit_states[0].expires_at_battle_round == 2
+    assert state.battle_shocked_unit_states[0].battle_round_started == 1
     assert result.controlled_by_player_id == "player-b"
     assert {
         contribution.model_instance_id: contribution.effective_objective_control
@@ -1218,7 +1898,7 @@ def test_authenticated_reposition_preserves_disembark_history_and_effects() -> N
         )
         == disembarked
     )
-    assert state.persisting_effects_for_unit(unit_id) == (effect,)
+    assert effect in state.persisting_effects_for_unit(unit_id)
     reserve_state = state.reserve_state_for_unit(unit_id)
     assert reserve_state is not None
     assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
@@ -1389,6 +2069,25 @@ def test_attached_unit_split_recovers_original_starting_strength_records() -> No
             ),
         )
     )
+    unit_by_id = {
+        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
+    }
+    state.starting_attached_unit_records = [
+        StartingAttachedUnitRecord(
+            player_id="player-a",
+            attached_unit_instance_id=attached_id,
+            bodyguard_unit_instance_id=bodyguard_id,
+            leader_unit_instance_ids=(leader_id,),
+            support_unit_instance_ids=(),
+            component_unit_instance_ids=(leader_id, bodyguard_id),
+            starting_model_instance_ids_by_component=(
+                (leader_id, unit_by_id[leader_id].own_model_ids()),
+                (bodyguard_id, unit_by_id[bodyguard_id].own_model_ids()),
+            ),
+            starting_model_count=6,
+            source_id="attached-unit-join:captain-intercessors",
+        )
+    ]
 
     recovered = state.recover_starting_strength_after_attached_unit_split(
         player_id="player-a",
@@ -1491,13 +2190,337 @@ def test_mustered_attached_unit_uses_attached_starting_strength_until_split() ->
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
 
+def test_attached_unit_split_rejects_omitted_living_component() -> None:
+    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+    events = EventLog()
+
+    with pytest.raises(GameLifecycleError, match="exact alive components"):
+        state.recover_starting_strength_after_attached_unit_split(
+            player_id="player-a",
+            attached_unit_instance_id=attached_id,
+            surviving_unit_instance_ids=(leader_id,),
+            event_log=events,
+        )
+
+    assert events.records == ()
+    assert state.army_definitions[0].attached_units
+    assert any(model.is_alive for model in _unit_by_id(state, bodyguard_id).own_models)
+
+
+def test_attached_unit_split_rejects_destroyed_component_as_survivor() -> None:
+    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+    for model in _unit_by_id(state, bodyguard_id).own_models:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=attached_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+
+    with pytest.raises(GameLifecycleError, match="exact alive components"):
+        state.recover_starting_strength_after_attached_unit_split(
+            player_id="player-a",
+            attached_unit_instance_id=attached_id,
+            surviving_unit_instance_ids=(bodyguard_id, leader_id),
+            event_log=EventLog(),
+        )
+
+
+def test_battle_shock_result_rejects_attached_component_target_identity() -> None:
+    state, _attached_id, bodyguard_id, _leader_id = _attached_battle_state_for_split()
+    bodyguard = _unit_by_id(state, bodyguard_id)
+    context = BelowHalfStrengthContext.from_unit(
+        player_id="player-a",
+        unit=bodyguard,
+        starting_strength=StartingStrengthRecord.from_unit(
+            player_id="player-a",
+            unit=bodyguard,
+        ),
+        current_model_ids=bodyguard.own_model_ids(),
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="phase11c-component-battle-shock",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=bodyguard_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=6,
+        below_half_strength_context=context,
+    )
+    failed = BattleShockResult.from_roll_state(
+        result_id="phase11c-component-battle-shock:result",
+        request=request,
+        roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
+    )
+
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=bodyguard_id)
+    with pytest.raises(GameLifecycleError, match="canonical rules-unit ID"):
+        BattleShockedUnitState.from_rules_unit(result=failed, rules_unit=rules_unit)
+
+    with pytest.raises(GameLifecycleError, match="canonical rules-unit"):
+        state.record_battle_shock_result(failed)
+
+    assert state.battle_shocked_unit_ids == []
+
+
+@pytest.mark.parametrize("passed", [False, True])
+def test_attached_root_battle_shock_result_reconciles_split_before_resolution(
+    passed: bool,
+) -> None:
+    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=rules_unit,
+        starting_strength=state.starting_strength_record_for_unit(attached_id),
+        current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id=f"phase11c-split-before-result:{passed}",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=attached_id,
+        reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
+        leadership_target=6,
+        below_half_strength_context=context,
+    )
+    if passed:
+        prior_failed = BattleShockResult.from_roll_state(
+            result_id="phase11c-split-before-result:prior-failed",
+            request=request,
+            roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
+        )
+        state.record_battle_shock_result(prior_failed)
+    decisions = DecisionController()
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = manager.roll_fixed(request.spec, [3, 3] if passed else [1, 1])
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(leader_id, bodyguard_id),
+        event_log=decisions.event_log,
+    )
+    record_battle_shock_result_and_outcome_events(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        request=request,
+        roll_state=roll_state,
+        active_player_id="player-a",
+        phase=BattlePhase.COMMAND,
+        auto_passed=False,
+        phase_start_battle_shocked_unit_ids=((attached_id,) if passed else ()),
+        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
+        base_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": BattlePhase.COMMAND.value,
+            "source_kind": "command_battle_shock",
+        },
+        resolved_event_types=("battle_shock_test_resolved",),
+    )
+
+    expected_ids = () if passed else tuple(sorted((bodyguard_id, leader_id)))
+    assert tuple(state.battle_shocked_unit_ids) == expected_ids
+    assert (
+        tuple(shocked_state.unit_instance_id for shocked_state in state.battle_shocked_unit_states)
+        == expected_ids
+    )
+
+
+def test_attached_root_failure_records_descendant_missing_from_partial_shock_state() -> None:
+    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+    attached = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    attached_context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=attached,
+        starting_strength=state.starting_strength_record_for_unit(attached_id),
+        current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
+    )
+    attached_request = BattleShockTestRequest.for_unit(
+        request_id="phase11c-partial-successors:attached",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=attached_id,
+        reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
+        leadership_target=6,
+        below_half_strength_context=attached_context,
+    )
+    decisions = DecisionController()
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(leader_id, bodyguard_id),
+        event_log=decisions.event_log,
+    )
+    leader = _unit_by_id(state, leader_id)
+    leader_context = BelowHalfStrengthContext.from_unit(
+        player_id="player-a",
+        unit=leader,
+        starting_strength=state.starting_strength_record_for_unit(leader_id),
+        current_model_ids=leader.own_model_ids(),
+    )
+    leader_request = BattleShockTestRequest.for_unit(
+        request_id="phase11c-partial-successors:leader",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=leader_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=6,
+        below_half_strength_context=leader_context,
+    )
+    leader_failed = BattleShockResult.from_roll_state(
+        result_id="phase11c-partial-successors:leader:result",
+        request=leader_request,
+        roll_state=DiceRollManager(state.game_id).roll_fixed(leader_request.spec, [1, 1]),
+    )
+    state.record_battle_shock_result(leader_failed)
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    resolved = record_battle_shock_result_and_outcome_events(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        request=attached_request,
+        roll_state=manager.roll_fixed(attached_request.spec, [1, 1]),
+        active_player_id="player-a",
+        phase=BattlePhase.COMMAND,
+        auto_passed=False,
+        phase_start_battle_shocked_unit_ids=(),
+        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
+        base_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": BattlePhase.COMMAND.value,
+            "source_kind": "command_battle_shock",
+        },
+        resolved_event_types=("battle_shock_test_resolved",),
+    )
+
+    assert isinstance(resolved, dict)
+    assert resolved["state_update"] == "recorded_missing_battle_shocked_descendants"
+    assert tuple(state.battle_shocked_unit_ids) == tuple(sorted((bodyguard_id, leader_id)))
+    assert {
+        shocked_state.unit_instance_id: shocked_state.source_result_id
+        for shocked_state in state.battle_shocked_unit_states
+    } == {
+        bodyguard_id: "phase11c-partial-successors:attached:result",
+        leader_id: "phase11c-partial-successors:leader:result",
+    }
+
+
+def test_attached_split_and_battle_shock_transfer_events_are_public_to_both_viewers() -> None:
+    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=rules_unit,
+        starting_strength=state.starting_strength_record_for_unit(attached_id),
+        current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="phase11c-public-split-events",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=attached_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=6,
+        below_half_strength_context=context,
+    )
+    failed = BattleShockResult.from_roll_state(
+        result_id="phase11c-public-split-events:result",
+        request=request,
+        roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
+    )
+    state.record_battle_shock_result(failed)
+    decisions = DecisionController()
+    cursor = EventStreamCursor(len(decisions.event_log.records))
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(leader_id, bodyguard_id),
+        event_log=decisions.event_log,
+    )
+    session = LocalGameSession(lifecycle=GameLifecycle(state=state, decision_controller=decisions))
+    player_a = session.events_since(cursor, viewer_player_id="player-a")
+    player_b = session.events_since(cursor, viewer_player_id="player-b")
+    public_types = {
+        "attached_rules_unit_split_reconciled",
+        "battle_shock_state_transferred_after_attached_unit_split",
+    }
+    player_a_events = tuple(
+        event for event in player_a["events"] if event["event_type"] in public_types
+    )
+    player_b_events = tuple(
+        event for event in player_b["events"] if event["event_type"] in public_types
+    )
+
+    assert tuple(event["event_type"] for event in player_a_events) == (
+        "attached_rules_unit_split_reconciled",
+        "battle_shock_state_transferred_after_attached_unit_split",
+    )
+    assert player_a_events == player_b_events
+    public_json = json.dumps(player_a_events, sort_keys=True).lower()
+    assert "reserve" not in public_json
+    assert "embark" not in public_json
+
+
+def test_command_battle_shock_public_event_chain_is_identical_for_both_viewers() -> None:
+    decisions = DecisionController()
+    state = _battle_state(
+        game_id="phase11c-public-command-battle-shock-chain",
+        decisions=decisions,
+    )
+    _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
+    cursor = EventStreamCursor(len(decisions.event_log.records))
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+    )
+
+    status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    session = LocalGameSession(lifecycle=GameLifecycle(state=state, decision_controller=decisions))
+    player_a = session.events_since(cursor, viewer_player_id="player-a")
+    player_b = session.events_since(cursor, viewer_player_id="player-b")
+    chain_types = {
+        "battle_shock_step_snapshot_created",
+        "battle_shock_modifier_applications_recorded",
+        "battle_shock_test_resolved",
+        "battle_shock_step_completed",
+    }
+    player_a_events = tuple(
+        event for event in player_a["events"] if event["event_type"] in chain_types
+    )
+    player_b_events = tuple(
+        event for event in player_b["events"] if event["event_type"] in chain_types
+    )
+
+    assert tuple(event["event_type"] for event in player_a_events) == (
+        "battle_shock_step_snapshot_created",
+        "battle_shock_modifier_applications_recorded",
+        "battle_shock_test_resolved",
+        "battle_shock_step_completed",
+    )
+    assert player_a_events == player_b_events
+
+
 def test_attached_unit_split_recovery_rejects_invalid_survivors() -> None:
-    state = _battle_state()
+    state, attached_id, _bodyguard_id, _leader_id = _attached_battle_state_for_split()
     with pytest.raises(GameLifecycleError, match="must not include attached_unit_instance_id"):
         state.recover_starting_strength_after_attached_unit_split(
             player_id="player-a",
-            attached_unit_instance_id="army-alpha:intercessor-unit-1",
-            surviving_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+            attached_unit_instance_id=attached_id,
+            surviving_unit_instance_ids=(attached_id,),
             event_log=EventLog(),
         )
     payload_before_missing_attached = state.to_payload()
@@ -1509,17 +2532,17 @@ def test_attached_unit_split_recovery_rejects_invalid_survivors() -> None:
             event_log=EventLog(),
         )
     assert state.to_payload() == payload_before_missing_attached
-    with pytest.raises(GameLifecycleError, match="survivor unit is unknown"):
+    with pytest.raises(GameLifecycleError, match="exact alive components"):
         state.recover_starting_strength_after_attached_unit_split(
             player_id="player-a",
-            attached_unit_instance_id="army-alpha:intercessor-unit-1",
+            attached_unit_instance_id=attached_id,
             surviving_unit_instance_ids=("missing-unit",),
             event_log=EventLog(),
         )
-    with pytest.raises(GameLifecycleError, match="survivor player_id drift"):
+    with pytest.raises(GameLifecycleError, match="exact alive components"):
         state.recover_starting_strength_after_attached_unit_split(
             player_id="player-a",
-            attached_unit_instance_id="army-alpha:intercessor-unit-1",
+            attached_unit_instance_id=attached_id,
             surviving_unit_instance_ids=("army-beta:intercessor-unit-3",),
             event_log=EventLog(),
         )
@@ -1554,9 +2577,7 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
     command_state = CommandStepState.start(
         battle_round=1,
         active_player_id="player-a",
-    ).with_command_phase_start_synchronous_hooks_resolved(
-        cleared_battle_shocked_unit_ids=("unit-cleared-before-command-start",),
-    )
+    ).with_command_phase_start_synchronous_hooks_resolved()
     assert not command_state.command_phase_start_boundary_resolved
     command_state = command_state.with_command_phase_start_boundary_resolved()
     command_state = command_state.with_command_points_granted()
@@ -1593,9 +2614,7 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
     synchronous_only_state = CommandStepState.start(
         battle_round=1,
         active_player_id="player-a",
-    ).with_command_phase_start_synchronous_hooks_resolved(
-        cleared_battle_shocked_unit_ids=(),
-    )
+    ).with_command_phase_start_synchronous_hooks_resolved()
     with pytest.raises(GameLifecycleError, match="before the Command-start boundary resolves"):
         synchronous_only_state.with_command_points_granted()
     with pytest.raises(GameLifecycleError, match="already resolved"):
@@ -1604,11 +2623,7 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
         CommandStepState.start(
             battle_round=1,
             active_player_id="player-a",
-        ).with_command_phase_start_synchronous_hooks_resolved(
-            cleared_battle_shocked_unit_ids=(),
-        ).with_command_phase_start_synchronous_hooks_resolved(
-            cleared_battle_shocked_unit_ids=(),
-        )
+        ).with_command_phase_start_synchronous_hooks_resolved().with_command_phase_start_synchronous_hooks_resolved()
     with pytest.raises(GameLifecycleError, match="before the Command-start boundary resolves"):
         CommandStepState(
             battle_round=1,
@@ -1627,6 +2642,10 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
             active_player_id="player-a",
             battle_shock_step_resolved=True,
         )
+    forged_pre_step_payload = command_state.to_payload()
+    forged_pre_step_payload["completed_battle_shock_test_request_ids"] = ["forged-future-request"]
+    with pytest.raises(GameLifecycleError, match="snapshot or progress before its step"):
+        CommandStepState.from_payload(forged_pre_step_payload)
     with pytest.raises(GameLifecycleError, match="command_points must match transactions"):
         CommandPointLedger(
             player_id="player-a",
@@ -2162,18 +3181,6 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             model_instance_ids=(),
             source_result_id=failed.result_id,
             battle_round_started=1,
-            expires_at_player_command_phase_start="player-a",
-            expires_at_battle_round=2,
-        )
-    with pytest.raises(GameLifecycleError, match="expiry must be a future round"):
-        BattleShockedUnitState(
-            player_id="player-a",
-            unit_instance_id=unit.unit_instance_id,
-            model_instance_ids=(unit.own_model_ids()[0],),
-            source_result_id=failed.result_id,
-            battle_round_started=1,
-            expires_at_player_command_phase_start="player-a",
-            expires_at_battle_round=1,
         )
 
     with pytest.raises(GameLifecycleError, match="allow_battle_shocked must be bool"):
@@ -2228,6 +3235,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             army=cast(Any, object()),
             battlefield_state=state.battlefield_state,
             starting_strength_records=tuple(state.starting_strength_records),
+            battle_shocked_unit_ids=(),
         )
     with pytest.raises(GameLifecycleError, match="army player drift"):
         collect_battle_shock_test_requests(
@@ -2237,6 +3245,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             army=army,
             battlefield_state=state.battlefield_state,
             starting_strength_records=tuple(state.starting_strength_records),
+            battle_shocked_unit_ids=(),
         )
     with pytest.raises(GameLifecycleError, match="require BattlefieldRuntimeState"):
         collect_battle_shock_test_requests(
@@ -2246,6 +3255,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             army=army,
             battlefield_state=cast(Any, object()),
             starting_strength_records=tuple(state.starting_strength_records),
+            battle_shocked_unit_ids=(),
         )
     with pytest.raises(GameLifecycleError, match="missing StartingStrengthRecord"):
         collect_battle_shock_test_requests(
@@ -2255,6 +3265,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             army=army,
             battlefield_state=state.battlefield_state,
             starting_strength_records=(),
+            battle_shocked_unit_ids=(),
         )
     with pytest.raises(GameLifecycleError, match="allow_duplicate_below_half_tests must be a bool"):
         collect_battle_shock_test_requests(
@@ -2264,6 +3275,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             army=army,
             battlefield_state=state.battlefield_state,
             starting_strength_records=tuple(state.starting_strength_records),
+            battle_shocked_unit_ids=(),
             allow_duplicate_below_half_tests=cast(Any, "no"),
         )
     with pytest.raises(GameLifecycleError, match="forced_below_starting_strength_unit_ids"):
@@ -2274,6 +3286,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             army=army,
             battlefield_state=state.battlefield_state,
             starting_strength_records=tuple(state.starting_strength_records),
+            battle_shocked_unit_ids=(),
             forced_below_starting_strength_unit_ids=cast(Any, [unit.unit_instance_id]),
         )
 
@@ -2311,6 +3324,7 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
 def _active_battle_shock_requests(
     state: GameState,
     *,
+    battle_shocked_unit_ids: tuple[str, ...] | None = None,
     forced_below_starting_strength_unit_ids: tuple[str, ...] = (),
     allow_duplicate_below_half_tests: bool = False,
 ) -> tuple[BattleShockTestRequest, ...]:
@@ -2325,9 +3339,68 @@ def _active_battle_shock_requests(
         army=army,
         battlefield_state=state.battlefield_state,
         starting_strength_records=tuple(state.starting_strength_records),
+        battle_shocked_unit_ids=(
+            tuple(state.battle_shocked_unit_ids)
+            if battle_shocked_unit_ids is None
+            else battle_shocked_unit_ids
+        ),
         forced_below_starting_strength_unit_ids=forced_below_starting_strength_unit_ids,
         allow_duplicate_below_half_tests=allow_duplicate_below_half_tests,
     )
+
+
+def _record_unit_battle_shocked(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+) -> BattleShockedUnitState:
+    unit = _unit_by_id(state, unit_instance_id)
+    request = _battle_shock_request_for_unit(state, unit)
+    failed = BattleShockResult.from_roll_state(
+        result_id=f"phase11c-existing-shock:{unit_instance_id}",
+        request=request,
+        roll_state=DiceRollManager("phase11c-existing-shock").roll_fixed(
+            request.spec,
+            [1, 1],
+        ),
+    )
+    state.record_battle_shock_result(failed)
+    return state.battle_shocked_unit_states[-1]
+
+
+def _record_fixed_battle_shock_resolution(
+    *,
+    state: GameState,
+    request: BattleShockTestRequest,
+    values: tuple[int, ...],
+    phase: BattlePhase,
+    phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    passed_state_policy: BattleShockPassedStatePolicy,
+) -> dict[str, Any]:
+    decisions = DecisionController()
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    resolved = record_battle_shock_result_and_outcome_events(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        request=request,
+        roll_state=manager.roll_fixed(request.spec, list(values)),
+        active_player_id="player-a",
+        phase=phase,
+        auto_passed=False,
+        phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        passed_state_policy=passed_state_policy,
+        base_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-a",
+            "phase": phase.value,
+        },
+        resolved_event_types=("phase11c_battle_shock_resolved",),
+    )
+    assert isinstance(resolved, dict)
+    return cast(dict[str, Any], resolved)
 
 
 def _battle_shock_request_for_unit(
@@ -2510,7 +3583,7 @@ def _gate_of_infinity_pending_decision() -> tuple[
         army,
         detachment_selection=DetachmentSelection(
             faction_id=grey_knights_army_rule.GREY_KNIGHTS_FACTION_ID,
-            detachment_ids=("phase17g-grey-knights-test-detachment",),
+            detachment_ids=("warpbane-task-force",),
         ),
         units=(unit, transport),
     )
@@ -2539,10 +3612,22 @@ def _gate_of_infinity_pending_decision() -> tuple[
             armies=(army, enemy_army),
         ).battlefield_state
     )
+    state.record_secondary_mission_choice(
+        _secondary_choice(player_id="player-a", mode=SecondaryMissionMode.FIXED)
+    )
+    state.record_secondary_mission_choice(
+        _secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
+    )
+    decisions = DecisionController()
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=config,
+    )
     registry = TurnEndHookRegistry.from_bindings(
         grey_knights_army_rule.runtime_contribution().turn_end_hook_bindings
     )
-    decisions = DecisionController()
     request = registry.next_request_for(
         TurnEndRequestContext(
             state=state,
@@ -2605,11 +3690,18 @@ def _is_center_objective_id(objective_id: str) -> bool:
 
 def _battle_state(
     *,
+    game_id: str = "phase11c-game",
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_a_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    decisions: DecisionController | None = None,
 ) -> GameState:
-    config = _config(player_a_units=player_a_units)
+    config = _config(
+        game_id=game_id,
+        player_a_units=player_a_units,
+        player_a_attachment_declarations=player_a_attachment_declarations,
+    )
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
         state.record_army_definition(army)
@@ -2624,9 +3716,33 @@ def _battle_state(
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    decisions = DecisionController()
-    _complete_setup_through_gate(state=state, decisions=decisions, config=config)
+    resolved_decisions = DecisionController() if decisions is None else decisions
+    _complete_setup_through_gate(state=state, decisions=resolved_decisions, config=config)
     return state
+
+
+def _attached_battle_state_for_split() -> tuple[GameState, str, str, str]:
+    bodyguard_id = "army-alpha:bodyguard-unit"
+    leader_id = "army-alpha:leader-unit"
+    attached_id = "attached-unit:army-alpha:bodyguard-unit"
+    state = _battle_state(
+        player_a_units=(
+            _default_unit_selection("bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        player_a_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    return state, attached_id, bodyguard_id, leader_id
 
 
 def _complete_setup_through_gate(
@@ -2639,11 +3755,12 @@ def _complete_setup_through_gate(
     final_setup_step = state.setup_sequence[-1]
     while state.current_setup_step is not final_setup_step:
         state.complete_current_setup_step()
-    SetupCompletionGate().complete_setup_and_enter_battle(
+    battle_start = SetupCompletionGate().complete_setup_and_enter_battle(
         state=state,
         decisions=decisions,
         config=config,
     )
+    decisions.event_log.append("battle_started", battle_start.to_payload())
 
 
 def _setup_state_at_declare_battle_formations(config: GameConfig) -> GameState:
@@ -2666,10 +3783,15 @@ def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondar
     )
 
 
-def _config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = None) -> GameConfig:
+def _config(
+    *,
+    game_id: str = "phase11c-game",
+    player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_a_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
-        game_id="phase11c-game",
+        game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=_ruleset(),
         army_catalog=catalog,
@@ -2683,6 +3805,7 @@ def _config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = None) ->
                     if player_a_units is None
                     else player_a_units
                 ),
+                attachment_declarations=player_a_attachment_declarations,
             ),
             _army_muster_request(
                 catalog=catalog,

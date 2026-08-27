@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -20,6 +20,9 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationHookBinding,
     BattleFormationRequestContext,
     BattleFormationResultContext,
+)
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import CommandPhaseStartHookBinding
 from warhammer40k_core.engine.command_points import (
@@ -42,11 +45,17 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventResult,
     RuntimeContentEventSubscription,
 )
-from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.faction_rule_states import (
+    FactionRuleState,
+    FactionRuleStatePayload,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedEffectGrant,
     FightUnitSelectedHookBinding,
+)
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
 )
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -299,6 +308,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=f"{HOOK_ID}:legacy:leadership",
                 source_id=SOURCE_RULE_ID,
                 handler=code_chivalric_legacy_leadership_modifier,
+                historical_leadership_handler=historical_code_chivalric_leadership,
             ),
         ),
     )
@@ -606,6 +616,48 @@ def code_chivalric_legacy_leadership_modifier(
     ):
         return context.current_value
     return max(1, context.current_value - 1)
+
+
+def historical_code_chivalric_leadership(
+    context: HistoricalBattleShockAuthorityContext,
+    current: int,
+) -> int:
+    if type(context) is not HistoricalBattleShockAuthorityContext:
+        raise GameLifecycleError("Code Chivalric historical authority requires context.")
+    target = context.rules_unit(context.request.unit_instance_id)
+    if not any(_unit_has_code_chivalric(component.unit) for component in target.components):
+        return current
+    selected: dict[str, CodeChivalricQuality] = {}
+    for event_index, event in enumerate(context.event_records[: context.boundary_event_index]):
+        if event.event_type != CODE_CHIVALRIC_SELECTED_EVENT:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Code Chivalric historical event is invalid.")
+        raw_state = event.payload.get("faction_rule_state")
+        if not isinstance(raw_state, dict):
+            raise GameLifecycleError("Code Chivalric historical state is missing.")
+        row = FactionRuleState.from_payload(cast(FactionRuleStatePayload, raw_state))
+        if (
+            row.state_kind != CODE_CHIVALRIC_STATE_KIND
+            or row.source_rule_id != SOURCE_RULE_ID
+            or row.player_id in selected
+        ):
+            raise GameLifecycleError("Code Chivalric historical state drifted.")
+        validate_mutation_decision_closure(
+            event_records=context.event_records,
+            decision_records=context.decision_records,
+            mutation_index=event_index,
+            request_id=row.request_id,
+            result_id=row.result_id,
+        )
+        selected[row.player_id] = _quality_from_token(
+            _payload_string(_payload_object(row.payload), key="selected_quality_id")
+        )
+    return (
+        max(1, current - 1)
+        if selected.get(target.owner_player_id) is CodeChivalricQuality.LEGACY_UNSULLIED
+        else current
+    )
 
 
 def code_chivalric_martial_valour_shooting_grants(

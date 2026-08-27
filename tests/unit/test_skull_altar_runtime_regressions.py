@@ -33,6 +33,8 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.battle_shock import (
+    BattleShockResult,
+    BattleShockResultPayload,
     BattleShockTestReason,
     BattleShockTestRequest,
 )
@@ -40,6 +42,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
     BattleShockRerollPermissionContext,
+)
+from warhammer40k_core.engine.battle_shock_source_family_authority import (
+    validate_battle_shock_source_family_authority,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -74,6 +79,9 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.starting_attached_units import (
+    StartingAttachedUnitRecord,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
@@ -84,7 +92,10 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     apply_unit_move_completed_battle_shock_reroll_decision,
     resolve_unit_move_completed_battle_shock_hooks,
 )
-from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.engine.unit_state import (
+    BelowHalfStrengthContext,
+    StartingStrengthRecord,
+)
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -240,6 +251,90 @@ def test_post_shoot_forced_battle_shock_reroll_pauses_and_resumes() -> None:
         CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT
     )
 
+    events = decisions.event_log.records
+    request_index, request_event = next(
+        (index, event)
+        for index, event in enumerate(events)
+        if event.event_type == "battle_shock_test_requested"
+        and isinstance(event.payload, dict)
+        and event.payload.get("source_kind") == "catalog_selected_target_effect"
+    )
+    resolved_index, resolved_event = next(
+        (index, event)
+        for index, event in enumerate(events)
+        if index > request_index
+        and event.event_type == "battle_shock_test_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("source_kind") == "catalog_selected_target_effect"
+    )
+    request_context = cast(dict[str, JsonValue], request_event.payload)
+    request_base = {
+        key: value for key, value in request_context.items() if key != "battle_shock_test_request"
+    }
+    resolved_payload = cast(dict[str, JsonValue], resolved_event.payload)
+    resolved_result = BattleShockResult.from_payload(
+        cast(BattleShockResultPayload, resolved_payload["battle_shock_result"])
+    )
+    validate_battle_shock_source_family_authority(
+        event_records=events,
+        decision_records=decisions.records,
+        resolved_index=resolved_index,
+        request_payload=cast(
+            dict[str, JsonValue],
+            request_context["battle_shock_test_request"],
+        ),
+        request_context=request_context,
+        request_base=request_base,
+        result=resolved_result,
+    )
+    selected_payload = cast(
+        dict[str, JsonValue],
+        request_base["selected_target_payload"],
+    )
+    effect_records = cast(list[JsonValue], selected_payload["generic_rule_effect_records"])
+    assert len(effect_records) == 1
+    coordinated_inventory_tampers: tuple[dict[str, JsonValue], ...] = (
+        cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    **request_base,
+                    "selected_target_remaining_effect_records_after_battle_shock": [
+                        effect_records[0]
+                    ],
+                }
+            ),
+        ),
+        cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    **request_base,
+                    "selected_target_recorded_effects_before_battle_shock": [
+                        {"forged_effect": True}
+                    ],
+                }
+            ),
+        ),
+    )
+    for tampered_base in coordinated_inventory_tampers:
+        with pytest.raises(GameLifecycleError, match=r"Selected-target .* drifted"):
+            validate_battle_shock_source_family_authority(
+                event_records=events,
+                decision_records=decisions.records,
+                resolved_index=resolved_index,
+                request_payload=cast(
+                    dict[str, JsonValue],
+                    request_context["battle_shock_test_request"],
+                ),
+                request_context={
+                    **tampered_base,
+                    "battle_shock_test_request": request_context["battle_shock_test_request"],
+                },
+                request_base=tampered_base,
+                result=resolved_result,
+            )
+
 
 def test_battle_shock_resolution_result_rejects_invalid_shapes() -> None:
     with pytest.raises(GameLifecycleError, match="resolved or pending"):
@@ -341,8 +436,15 @@ def test_battle_shock_resolution_resolves_without_reroll_permission() -> None:
         active_player_id="player-a",
         phase=BattlePhase.SHOOTING,
         phase_start_battle_shocked_unit_ids=(),
+        passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
         source_kind="test-source",
-        base_payload={"source_id": "test:no-reroll-resolution"},
+        base_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "source_id": "test:no-reroll-resolution",
+        },
         resolved_event_types=("test_battle_shock_resolved",),
         pending_phase_body_status="test_pending",
     )
@@ -367,6 +469,7 @@ def test_battle_shock_resolution_resolve_validates_runtime_inputs() -> None:
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
             phase_start_battle_shocked_unit_ids=(),
+            passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
             source_kind="test-source",
             base_payload={},
             resolved_event_types=("test_battle_shock_resolved",),
@@ -384,6 +487,7 @@ def test_battle_shock_resolution_resolve_validates_runtime_inputs() -> None:
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
             phase_start_battle_shocked_unit_ids=(),
+            passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
             source_kind="test-source",
             base_payload={},
             resolved_event_types=("test_battle_shock_resolved",),
@@ -401,6 +505,7 @@ def test_battle_shock_resolution_resolve_validates_runtime_inputs() -> None:
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
             phase_start_battle_shocked_unit_ids=(),
+            passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
             source_kind="test-source",
             base_payload={},
             resolved_event_types=("test_battle_shock_resolved",),
@@ -418,6 +523,7 @@ def test_battle_shock_resolution_resolve_validates_runtime_inputs() -> None:
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
             phase_start_battle_shocked_unit_ids=(),
+            passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
             source_kind="test-source",
             base_payload={},
             resolved_event_types=("test_battle_shock_resolved",),
@@ -435,6 +541,7 @@ def test_battle_shock_resolution_resolve_validates_runtime_inputs() -> None:
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
             phase_start_battle_shocked_unit_ids=(),
+            passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
             source_kind="test-source",
             base_payload={},
             resolved_event_types=("test_battle_shock_resolved",),
@@ -452,6 +559,7 @@ def test_battle_shock_resolution_resolve_validates_runtime_inputs() -> None:
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
             phase_start_battle_shocked_unit_ids=(),
+            passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
             source_kind="test-source",
             base_payload={},
             resolved_event_types=("test_battle_shock_resolved",),
@@ -481,6 +589,9 @@ def test_battle_shock_reroll_resolution_apply_validates_runtime_inputs() -> None
             result=result,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             expected_source_kind="test-source",
+            expected_passed_state_policy=(
+                battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE
+            ),
         )
 
     with pytest.raises(GameLifecycleError, match="DecisionController"):
@@ -490,6 +601,9 @@ def test_battle_shock_reroll_resolution_apply_validates_runtime_inputs() -> None
             result=result,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             expected_source_kind="test-source",
+            expected_passed_state_policy=(
+                battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE
+            ),
         )
 
     with pytest.raises(GameLifecycleError, match="DecisionResult"):
@@ -499,6 +613,9 @@ def test_battle_shock_reroll_resolution_apply_validates_runtime_inputs() -> None
             result=cast(DecisionResult, object()),
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             expected_source_kind="test-source",
+            expected_passed_state_policy=(
+                battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE
+            ),
         )
 
     with pytest.raises(GameLifecycleError, match="Battle-shock hooks"):
@@ -508,6 +625,9 @@ def test_battle_shock_reroll_resolution_apply_validates_runtime_inputs() -> None
             result=result,
             battle_shock_hooks=cast(BattleShockHookRegistry, object()),
             expected_source_kind="test-source",
+            expected_passed_state_policy=(
+                battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE
+            ),
         )
 
     setup_state = _basic_battle_shock_resolution_inputs()[0]
@@ -519,6 +639,9 @@ def test_battle_shock_reroll_resolution_apply_validates_runtime_inputs() -> None
             result=result,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             expected_source_kind="test-source",
+            expected_passed_state_policy=(
+                battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE
+            ),
         )
 
     phase_less_state = _basic_battle_shock_resolution_inputs()[0]
@@ -530,6 +653,9 @@ def test_battle_shock_reroll_resolution_apply_validates_runtime_inputs() -> None
             result=result,
             battle_shock_hooks=BattleShockHookRegistry.empty(),
             expected_source_kind="test-source",
+            expected_passed_state_policy=(
+                battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE
+            ),
         )
 
 
@@ -618,7 +744,14 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
         phase=BattlePhase.SHOOTING,
         auto_passed=False,
         phase_start_battle_shocked_unit_ids=(),
-        base_payload={"source_id": "test:failed-battle-shock-recorded"},
+        passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
+        base_payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "source_id": "test:failed-battle-shock-recorded",
+        },
         resolved_event_types=("test_battle_shock_resolved",),
     )
 
@@ -645,6 +778,12 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
         unit=target_unit,
         request_id="request:failed-battle-shock-already-shocked",
     )
+    already_shocked_state.replace_battle_shock_state(
+        (
+            list(state.battle_shocked_unit_ids),
+            list(state.battle_shocked_unit_states),
+        )
+    )
     already_payload = battle_shock_resolution.record_battle_shock_result_and_outcome_events(
         state=already_shocked_state,
         decisions=DecisionController(),
@@ -660,13 +799,20 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
         phase=BattlePhase.SHOOTING,
         auto_passed=False,
         phase_start_battle_shocked_unit_ids=(target_unit.unit_instance_id,),
-        base_payload={"source_id": "test:failed-battle-shock-already-shocked"},
+        passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
+        base_payload={
+            "game_id": already_shocked_state.game_id,
+            "battle_round": already_shocked_state.battle_round,
+            "active_player_id": already_shocked_state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "source_id": "test:failed-battle-shock-already-shocked",
+        },
         resolved_event_types=("test_battle_shock_resolved",),
     )
 
     already_resolved_payload = cast(dict[str, JsonValue], already_payload)
     assert already_resolved_payload["state_update"] == "already_battle_shocked"
-    assert target_unit.unit_instance_id not in already_shocked_state.battle_shocked_unit_ids
+    assert target_unit.unit_instance_id in already_shocked_state.battle_shocked_unit_ids
 
 
 def test_fortification_cover_keyword_ignores_destroyed_blocker_model() -> None:
@@ -1209,6 +1355,8 @@ def _state_with_battlefield(
     battlefield: BattlefieldRuntimeState,
     active_player_id: str,
     phase: BattlePhase,
+    starting_strength_records: tuple[StartingStrengthRecord, ...] = (),
+    starting_attached_unit_records: tuple[StartingAttachedUnitRecord, ...] = (),
 ) -> GameState:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     phases = tuple(descriptor.battle_phase_sequence.phases)
@@ -1226,6 +1374,8 @@ def _state_with_battlefield(
         turn_order=tuple(army.player_id for army in armies),
         tactical_secondary_draw_count=2,
         army_definitions=list(armies),
+        starting_strength_records=list(starting_strength_records),
+        starting_attached_unit_records=list(starting_attached_unit_records),
         battlefield_state=battlefield,
     )
 

@@ -245,6 +245,7 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
         army=army,
         battlefield_state=alive_bearer_battlefield,
         starting_strength_records=starting_strength,
+        battle_shocked_unit_ids=(),
     )
     alive_bearer_requests_with_index = collect_battle_shock_test_requests(
         game_id="phase17k-game",
@@ -253,6 +254,7 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
         army=army,
         battlefield_state=alive_bearer_battlefield,
         starting_strength_records=starting_strength,
+        battle_shocked_unit_ids=(),
         ability_index=player_index,
     )
     destroyed_bearer_requests_with_index = collect_battle_shock_test_requests(
@@ -262,6 +264,7 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
         army=army,
         battlefield_state=destroyed_bearer_battlefield,
         starting_strength_records=starting_strength,
+        battle_shocked_unit_ids=(),
         ability_index=player_index,
     )
 

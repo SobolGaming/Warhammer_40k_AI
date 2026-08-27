@@ -20,6 +20,7 @@ from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, Objective
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
+from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
@@ -775,6 +776,7 @@ def _started_surveil_attached_split(
         battlefield_depth_inches=setup.battlefield_depth_inches,
         terrain_features=setup.terrain_features,
     )
+    _bind_force_dispositions(state)
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.active_player_id = "player-a"
@@ -1027,7 +1029,8 @@ def _destroy_component_for_scoring(
     removed_model_ids = tuple(
         model_placement.model_instance_id for model_placement in placement.model_placements
     )
-    state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
+    for model_instance_id in removed_model_ids:
+        destroy_model_by_rule(state=state, model_instance_id=model_instance_id)
     departures = record_primary_destroyed_model_departures(
         state=state,
         destroyed_model_instance_ids=removed_model_ids,

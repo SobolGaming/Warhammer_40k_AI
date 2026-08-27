@@ -23,26 +23,46 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.command_phase_start_authority import (
+    COMMAND_START_BOUNDARY_COMPLETED_EVENT,
+    COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
+    resolve_command_phase_start_boundary,
+    validate_command_phase_start_restore_authority,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartContext,
+    CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
 )
+from warhammer40k_core.engine.command_points import CommandStepState
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.leagues_of_votann import (
     army_rule,
 )
 from warhammer40k_core.engine.faction_resources import FactionResourceStatus
-from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
+    RuntimeModifierRegistry,
     WoundRollModifierContext,
 )
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
@@ -208,6 +228,214 @@ def test_command_phase_handler_with_bundle_hook_transitions_to_fortify_takeover(
         for index, event_type in enumerate(event_types)
         if event_type == "command_points_gained"
     ) < event_types.index("command_step_started")
+
+
+@pytest.mark.parametrize(
+    "deleted_event_type",
+    [
+        COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
+        "leagues_of_votann_prioritised_efficiency_resolved",
+    ],
+)
+def test_command_start_restore_requires_votann_provider_output(
+    deleted_event_type: str,
+) -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    bundle = build_runtime_content_bundle(_votann_runtime_config())
+    decisions = DecisionController()
+    completed = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        command_phase_start_hooks=bundle.command_phase_start_hook_registry,
+    ).begin_phase(state=state, decisions=decisions)
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    validate_command_phase_start_restore_authority(
+        state=state,
+        decisions=decisions,
+        registry=bundle.command_phase_start_hook_registry,
+    )
+
+    forged_decisions_payload = json.loads(json.dumps(decisions.to_payload(), sort_keys=True))
+    forged_events = forged_decisions_payload["event_log"]
+    forged_events[:] = [
+        event for event in forged_events if event["event_type"] != deleted_event_type
+    ]
+    for event_index, event in enumerate(forged_events, start=1):
+        event["event_id"] = f"event-{event_index:06d}"
+    with pytest.raises(GameLifecycleError, match="Command-start"):
+        validate_command_phase_start_restore_authority(
+            state=state,
+            decisions=DecisionController.from_payload(forged_decisions_payload),
+            registry=bundle.command_phase_start_hook_registry,
+        )
+
+
+def test_command_start_transient_boundary_rejects_injected_pending_request() -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+        )
+    )
+    bundle = build_runtime_content_bundle(_votann_runtime_config())
+    decisions = DecisionController()
+    assert (
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=decisions,
+            command_phase_start_hooks=bundle.command_phase_start_hook_registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+        is None
+    )
+    command_state = state.command_step_state
+    assert command_state is not None
+    assert command_state.command_phase_start_boundary_resolved
+    assert not command_state.command_points_granted
+    assert decisions.event_log.records[-1].event_type == COMMAND_START_BOUNDARY_COMPLETED_EVENT
+    validate_command_phase_start_restore_authority(
+        state=state,
+        decisions=decisions,
+        registry=bundle.command_phase_start_hook_registry,
+    )
+    forged_request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type="phase17g_votann_forged_post_boundary_request",
+        actor_id="player-a",
+        payload=validate_json_value({"game_id": state.game_id}),
+        options=(
+            DecisionOption(
+                option_id="phase17g:votann:forged",
+                label="Forged",
+                payload=validate_json_value({"game_id": state.game_id}),
+            ),
+        ),
+    )
+    decisions.request_decision(forged_request)
+
+    with pytest.raises(GameLifecycleError, match="before Core CP"):
+        validate_command_phase_start_restore_authority(
+            state=state,
+            decisions=decisions,
+            registry=bundle.command_phase_start_hook_registry,
+        )
+
+
+def test_command_start_restore_rejects_pending_before_synchronous_progress() -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+        )
+    )
+    bundle = build_runtime_content_bundle(_votann_runtime_config())
+    decisions = DecisionController()
+    decisions.request_decision(
+        DecisionRequest(
+            request_id=state.next_decision_request_id(),
+            decision_type="phase17g_votann_forged_pre_synchronous_request",
+            actor_id="player-a",
+            payload=validate_json_value({"game_id": state.game_id}),
+            options=(
+                DecisionOption(
+                    option_id="phase17g:votann:forged-pre-synchronous",
+                    label="Forged",
+                    payload=validate_json_value({"game_id": state.game_id}),
+                ),
+            ),
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="before synchronous progress"):
+        validate_command_phase_start_restore_authority(
+            state=state,
+            decisions=decisions,
+            registry=bundle.command_phase_start_hook_registry,
+        )
+
+
+def test_command_start_synchronous_provider_cannot_enqueue_then_pop_request() -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+        )
+    )
+    decisions = DecisionController()
+
+    def enqueue_then_pop(context: CommandPhaseStartContext) -> None:
+        context.decisions.request_decision(
+            DecisionRequest(
+                request_id=context.state.next_decision_request_id(),
+                decision_type="phase17g_votann_orphaned_command_start_request",
+                actor_id=context.active_player_id,
+                payload=validate_json_value({"game_id": context.state.game_id}),
+                options=(
+                    DecisionOption(
+                        option_id="phase17g:votann:orphaned",
+                        label="Orphaned",
+                        payload=validate_json_value({"game_id": context.state.game_id}),
+                    ),
+                ),
+            )
+        )
+        context.decisions.queue.pop_next()
+
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        (
+            CommandPhaseStartHookBinding(
+                hook_id="phase17g:votann:orphaned-command-start",
+                source_id="phase17g:votann:orphaned-command-start-source",
+                handler=enqueue_then_pop,
+            ),
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="orphaned decision request"):
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=decisions,
+            command_phase_start_hooks=registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+
+
+def test_command_start_restore_allows_real_post_boundary_tactical_request() -> None:
+    state = battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    _mark_player_as_votann(state, player_id="player-a")
+    bundle = build_runtime_content_bundle(_votann_runtime_config())
+    decisions = DecisionController()
+    waiting = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        command_phase_start_hooks=bundle.command_phase_start_hook_registry,
+    ).begin_phase(state=state, decisions=decisions)
+
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert waiting.stage is GameLifecycleStage.BATTLE
+    command_state = state.command_step_state
+    assert command_state is not None
+    assert command_state.command_phase_start_boundary_resolved
+    assert command_state.command_points_granted
+    assert decisions.queue.pending_requests == (waiting.decision_request,)
+    validate_command_phase_start_restore_authority(
+        state=state,
+        decisions=decisions,
+        registry=bundle.command_phase_start_hook_registry,
+    )
 
 
 def test_non_votann_detachment_with_votann_keyword_unit_does_not_gain_yield_points() -> None:

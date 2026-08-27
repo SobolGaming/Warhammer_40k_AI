@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from enum import StrEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -12,6 +12,9 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationHookBinding,
     BattleFormationRequestContext,
     BattleFormationResultContext,
+)
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -29,7 +32,13 @@ from warhammer40k_core.engine.faction_content.common import (
 from warhammer40k_core.engine.faction_content.common import (
     payload_string as _payload_string,
 )
-from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.faction_rule_states import (
+    FactionRuleState,
+    FactionRuleStatePayload,
+)
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import rules_unit_owner_player_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -91,11 +100,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=f"{HOOK_ID}:toughness",
                 source_id=SOURCE_RULE_ID,
                 handler=nurgles_gift_toughness_modifier,
+                historical_leadership_handler=_historical_identity_leadership,
             ),
             UnitCharacteristicModifierBinding(
                 modifier_id=f"{HOOK_ID}:leadership",
                 source_id=SOURCE_RULE_ID,
                 handler=nurgles_gift_leadership_modifier,
+                historical_leadership_handler=historical_nurgles_gift_leadership,
             ),
         ),
         hit_roll_modifier_bindings=(
@@ -380,6 +391,66 @@ def nurgles_gift_leadership_modifier(context: UnitCharacteristicModifierContext)
         unit_instance_id=context.unit_instance_id,
         base_leadership=context.current_value,
     )
+
+
+def historical_nurgles_gift_leadership(
+    context: HistoricalBattleShockAuthorityContext,
+    current: int,
+) -> int:
+    if type(context) is not HistoricalBattleShockAuthorityContext:
+        raise GameLifecycleError("Nurgle's Gift historical authority requires context.")
+    selected: dict[str, NurglesGiftPlague] = {}
+    for event_index, event in enumerate(context.event_records[: context.boundary_event_index]):
+        if event.event_type != "death_guard_nurgles_gift_plague_selected":
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Nurgle's Gift historical event is invalid.")
+        raw_state = event.payload.get("faction_rule_state")
+        if not isinstance(raw_state, dict):
+            raise GameLifecycleError("Nurgle's Gift historical state is missing.")
+        row = FactionRuleState.from_payload(cast(FactionRuleStatePayload, raw_state))
+        if (
+            row.state_kind != NURGLES_GIFT_STATE_KIND
+            or row.source_rule_id != SOURCE_RULE_ID
+            or row.player_id in selected
+        ):
+            raise GameLifecycleError("Nurgle's Gift historical state drifted.")
+        validate_mutation_decision_closure(
+            event_records=context.event_records,
+            decision_records=context.decision_records,
+            mutation_index=event_index,
+            request_id=row.request_id,
+            result_id=row.result_id,
+        )
+        selected[row.player_id] = _plague_from_token(
+            _payload_string(_payload_object(row.payload), key="plague_id")
+        )
+    target = context.rules_unit(context.request.unit_instance_id)
+    target_models = context.geometry_models(target.unit_instance_id)
+    for army in context.armies:
+        if (
+            army.player_id == target.owner_player_id
+            or selected.get(army.player_id) is not NurglesGiftPlague.SCABROUS_SOULROT
+            or army.detachment_selection.faction_id != DEATH_GUARD_FACTION_ID
+        ):
+            continue
+        if any(
+            source.base_distance_to(target_model)
+            <= contagion_range_inches(battle_round=context.request.battle_round)
+            for unit in army.units
+            if _unit_has_faction_keyword(unit, DEATH_GUARD_FACTION_KEYWORD)
+            for source in context.component_geometry_models(unit.unit_instance_id)
+            for target_model in target_models
+        ):
+            return current + 1
+    return current
+
+
+def _historical_identity_leadership(
+    _context: HistoricalBattleShockAuthorityContext,
+    current: int,
+) -> int:
+    return current
 
 
 def nurgles_gift_modified_objective_control(

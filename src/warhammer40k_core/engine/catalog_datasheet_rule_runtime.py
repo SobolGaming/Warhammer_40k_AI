@@ -29,6 +29,9 @@ from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierContext,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
+)
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     CatalogAnyPhaseOncePerBattleRuntime,
 )
@@ -220,6 +223,7 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=source.binding_id,
                 source_id=source.rule_ir.source_id,
                 handler=self._unit_characteristic_handler(source),
+                historical_leadership_handler=_historical_identity_leadership,
             )
             for source in self._sources(clause_is_passive_characteristic_modifier)
             if _source_characteristic(source) is Characteristic.TOUGHNESS
@@ -229,6 +233,12 @@ class CatalogDatasheetRuleRuntime:
                 modifier_id=f"{source.binding_id}:conditional-characteristic",
                 source_id=source.rule_ir.source_id,
                 handler=self._conditional_proximity_characteristic_handler(source, descriptor),
+                historical_leadership_handler=(
+                    self._historical_conditional_proximity_leadership_handler(
+                        source,
+                        descriptor,
+                    )
+                ),
             )
             for source, descriptor in self._described_sources(
                 conditional_proximity_effects_descriptor_for_clause
@@ -719,6 +729,39 @@ class CatalogDatasheetRuleRuntime:
             ):
                 return context.current_value
             return descriptor.characteristic_value
+
+        return handler
+
+    def _historical_conditional_proximity_leadership_handler(
+        self,
+        source: _CatalogClauseSource,
+        descriptor: CatalogConditionalProximityEffectsDescriptor,
+    ) -> Callable[[HistoricalBattleShockAuthorityContext, int], int]:
+        def handler(context: HistoricalBattleShockAuthorityContext, current: int) -> int:
+            if type(context) is not HistoricalBattleShockAuthorityContext:
+                raise GameLifecycleError("Catalog historical Leadership modifier requires context.")
+            if descriptor.characteristic is not Characteristic.LEADERSHIP:
+                return current
+            target = context.rules_unit(context.request.unit_instance_id)
+            if (
+                source.unit.unit_instance_id not in target.component_unit_instance_ids
+                or not context.component_placed_alive_model_ids(source.unit.unit_instance_id)
+            ):
+                return current
+            source_models = context.component_geometry_models(source.unit.unit_instance_id)
+            for candidate in context.all_rules_units():
+                if candidate.owner_player_id != source.player_id:
+                    continue
+                keywords = frozenset((*candidate.keywords, *candidate.faction_keywords))
+                if not frozenset(descriptor.required_keyword_sequence).issubset(keywords):
+                    continue
+                if any(
+                    first.base_distance_to(second) <= descriptor.distance_inches
+                    for first in source_models
+                    for second in context.geometry_models(candidate.unit_instance_id)
+                ):
+                    return descriptor.characteristic_value
+            return current
 
         return handler
 
@@ -1415,6 +1458,12 @@ def _positive_float_parameter(parameters: Mapping[str, object], key: str) -> flo
     if numeric <= 0:
         raise GameLifecycleError(f"Catalog datasheet {key} must be positive numeric.")
     return numeric
+
+
+def _historical_identity_leadership(
+    _context: HistoricalBattleShockAuthorityContext, current: int
+) -> int:
+    return current
 
 
 def _validate_indexes(value: object) -> Mapping[str, AbilityCatalogIndex]:

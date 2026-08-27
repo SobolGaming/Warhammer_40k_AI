@@ -59,7 +59,7 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),
     "core_command_phase_2026_08": (
-        "project_reviewed_transcription_with_audited_category_mirror_and_official_pdf_text"
+        "project_reviewed_transcription_with_authoritative_search_index_sequence_and_official_pdf_text"
     ),
     "event_companion_2026_06_artifacts": "official_event_source",
     "event_companion_layouts_2026_06": "official_event_source",
@@ -343,7 +343,8 @@ def test_core_rules_app_mirror_sources_use_project_authority_not_official_captur
     )
     assert (
         _EDITION_SOURCE_PACKAGE_CLASSIFICATION["core_command_phase_2026_08"]
-        == "project_reviewed_transcription_with_audited_category_mirror_and_official_pdf_text"
+        == "project_reviewed_transcription_with_authoritative_search_index_sequence_"
+        "and_official_pdf_text"
     )
     assert (
         _EDITION_SOURCE_PACKAGE_CLASSIFICATION["july_rules_updates_2026_07"]
