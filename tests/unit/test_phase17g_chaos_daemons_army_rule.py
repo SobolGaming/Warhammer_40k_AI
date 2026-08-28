@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -68,7 +69,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     army_rule,
@@ -1243,6 +1244,92 @@ def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> 
     replay_payload = session.lifecycle.decision_controller.to_payload()
     assert DecisionController.from_payload(replay_payload).to_payload() == replay_payload
     assert "<" not in json.dumps(replay_payload, sort_keys=True)
+
+
+def test_daemonic_manifestation_effect_kind_drift_rejects_before_lifecycle_mutation() -> None:
+    session, state, destroyed_model_ids, _return_placements, request = (
+        _july_manifestation_revival_session()
+    )
+    lifecycle = session.lifecycle
+    bundle = _runtime_content_bundle(lifecycle)
+    decisions = lifecycle.decision_controller
+    request_payload = cast(dict[str, object], deepcopy(request.payload))
+    effect_payload = cast(dict[str, object], request_payload["effect"])
+    source_context = cast(dict[str, object], effect_payload["source_context"])
+    source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-effect"
+    forged_options = tuple(
+        replace(
+            option,
+            payload=validate_json_value(
+                {
+                    **cast(dict[str, JsonValue], deepcopy(option.payload)),
+                    "source_context": {
+                        **cast(
+                            dict[str, JsonValue],
+                            deepcopy(cast(dict[str, JsonValue], option.payload)["source_context"]),
+                        ),
+                        "effect_kind": "phase17g:forged-daemonic-manifestation-effect",
+                    },
+                }
+            ),
+        )
+        for option in request.options
+    )
+    forged_request = replace(
+        request,
+        payload=validate_json_value(request_payload),
+        options=forged_options,
+    )
+    decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
+
+    original_request_payload = request.to_payload()
+    forged_request_payload = forged_request.to_payload()
+    changed_request_event = False
+    drifted_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type == "decision_requested" and event.payload == original_request_payload:
+            drifted_events.append(
+                replace(event, payload=validate_json_value(forged_request_payload))
+            )
+            changed_request_event = True
+            continue
+        drifted_events.append(event)
+    assert changed_request_event
+    decisions.event_log.replace_records(tuple(drifted_events))
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+    selected_model_id = destroyed_model_ids[-1]
+    result = DecisionResult.for_request(
+        result_id="phase17g-daemonic-manifestation-effect-kind-drift:select",
+        request=forged_request,
+        selected_option_id=_healing_option_id_for_model(forged_request, selected_model_id),
+    )
+    before_state = state.to_payload()
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+    before_dice_events = sum(event.event_type == "dice_rolled" for event in before_events)
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        lifecycle.submit_decision(result)
+
+    assert state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert (
+        sum(event.event_type == "dice_rolled" for event in decisions.event_log.records)
+        == before_dice_events
+    )
+    assert all(
+        _model_by_id(state, model_instance_id).wounds_remaining == 0
+        for model_instance_id in destroyed_model_ids
+    )
 
 
 def test_staged_july_daemonic_manifestation_can_finish_before_first_revival() -> None:

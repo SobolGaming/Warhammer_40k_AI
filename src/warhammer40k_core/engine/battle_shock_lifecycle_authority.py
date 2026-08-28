@@ -221,12 +221,24 @@ def validate_pending_outcome_request(
     provider_source_ids = (
         runtime_content_bundle.battle_shock_hook_registry.pending_outcome_authority_source_ids()
     )
-    continuation_binding = (
-        runtime_content_bundle.mortal_wound_feel_no_pain_hook_registry.binding_for_request(
-            request,
-            required_source_ids=provider_source_ids,
+    fnp_source_rule_id = (
+        runtime_content_bundle.mortal_wound_feel_no_pain_hook_registry.source_rule_id_for_request(
+            request
         )
     )
+    from warhammer40k_core.engine.healing_decision_dispatch import (
+        healing_source_rule_id_for_request,
+    )
+
+    healing_source_rule_id = healing_source_rule_id_for_request(request)
+    source_rule_ids = tuple(
+        source_rule_id
+        for source_rule_id in (fnp_source_rule_id, healing_source_rule_id)
+        if source_rule_id is not None
+    )
+    if len(source_rule_ids) > 1:
+        raise GameLifecycleError("Battle-shock outcome continuation source family is ambiguous.")
+    continuation_source_rule_id = source_rule_ids[0] if source_rule_ids else None
     claim = runtime_content_bundle.battle_shock_hook_registry.pending_outcome_authority_for(
         BattleShockPendingOutcomeAuthorityContext(
             state=state,
@@ -234,14 +246,14 @@ def validate_pending_outcome_request(
             request=request,
         )
     )
-    if (
-        continuation_binding is not None
-        and continuation_binding.source_id in provider_source_ids
-        and claim is None
-    ):
+    if continuation_source_rule_id in provider_source_ids and claim is None:
         raise GameLifecycleError(
             "Loaded Battle-shock outcome continuation lacks pending provider authority."
         )
+    runtime_content_bundle.mortal_wound_feel_no_pain_hook_registry.binding_for_request(
+        request,
+        required_source_ids=provider_source_ids,
+    )
 
 
 def validate_restore(

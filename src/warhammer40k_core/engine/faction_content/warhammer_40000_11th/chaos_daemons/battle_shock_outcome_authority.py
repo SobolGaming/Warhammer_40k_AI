@@ -94,9 +94,15 @@ def validate_july_daemonic_manifestation_pending_outcome(
     if effect is None:
         return None
     source_context = _object(effect.source_context, "source context")
-    if source_context.get("effect_kind") != _EFFECT_KIND:
+    source_identifies_provider = effect.source_rule_id == source_rule_id
+    kind_identifies_provider = source_context.get("effect_kind") == _EFFECT_KIND
+    if not source_identifies_provider and not kind_identifies_provider:
         return None
-    if effect.source_rule_id != source_rule_id or source_context.get("hook_id") != hook_id:
+    if (
+        not source_identifies_provider
+        or not kind_identifies_provider
+        or source_context.get("hook_id") != hook_id
+    ):
         raise GameLifecycleError("Daemonic Manifestation outcome provider identity drifted.")
     if frozenset(source_context) != _SOURCE_CONTEXT_KEYS:
         raise GameLifecycleError("Daemonic Manifestation outcome source context drifted.")

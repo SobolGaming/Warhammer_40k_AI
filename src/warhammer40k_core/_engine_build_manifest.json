@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8fd77bdf6b2e780a08f58e5b232bc81123cc1c2e24726530a55b543268ec2bc6",
-  "fingerprint": "8fd77bdf6b2e780a08f58e5b232bc81123cc1c2e24726530a55b543268ec2bc6",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cfd2cab604fc7abf2d543d8a4d5816cbf692f43a329e8909a6a517209ad27f28",
+  "fingerprint": "cfd2cab604fc7abf2d543d8a4d5816cbf692f43a329e8909a6a517209ad27f28",
   "resource_count": 2453,
   "resources": [
     {
@@ -765,9 +765,9 @@
       "sha256": "283438ec09eab4e3ad29b410e06b7d148138dc56dfcea2fe237a436d0c0c2f1d"
     },
     {
-      "byte_length": 9568,
+      "byte_length": 10184,
       "path": "warhammer40k_core/engine/battle_shock_lifecycle_authority.py",
-      "sha256": "e8ad4c95ec42e5b40bc71238d648a6c9a300001070aca8d4b5e4f59249973c65"
+      "sha256": "ba618f05070f7c148af9e8dd58ef1917667add3c99edbddab9a94cbd955b92e5"
     },
     {
       "byte_length": 9317,
@@ -3495,9 +3495,9 @@
       "sha256": "344ee57a3d64b50946f26aa3978c7be4844c865aab123b41643a35ad8f63581e"
     },
     {
-      "byte_length": 23198,
+      "byte_length": 23421,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
-      "sha256": "c0aaee62cda7cf9ce9bab8e890e114c01110240fa0843fb7f7a01f72bc070871"
+      "sha256": "8bb4a0604e8e5568a5361ea6aa3c6189c46876f26c397bca0982bf2e16fafd6c"
     },
     {
       "byte_length": 61675,
@@ -3770,9 +3770,9 @@
       "sha256": "0b7e93f78c42c212d36cb6864dd9dbd5326c6ed35b32249ae7bb2996928ba072"
     },
     {
-      "byte_length": 23470,
+      "byte_length": 23722,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/battle_shock_outcome_authority.py",
-      "sha256": "2589506cf48da546cbcb0521cde02ad882e6deaf836a237bbebc98ddbbd5abe0"
+      "sha256": "3f622b0e76bf6b625e2e0289e7165c6df7dfc212a00cc9f9f9fbe34d0b8a88c3"
     },
     {
       "byte_length": 172,
@@ -9330,9 +9330,9 @@
       "sha256": "2c578a73c96d0b07099dad8a6708c43235edc267deedf1c1aafa66e5d1859768"
     },
     {
-      "byte_length": 3239,
+      "byte_length": 3904,
       "path": "warhammer40k_core/engine/healing_decision_dispatch.py",
-      "sha256": "7fe19069831dc383975078969385a46d647b775da0ff1cbe3096df3aa081513c"
+      "sha256": "e31334eedf49c7ecf43b477178a68e4f59ab8ae441ec6663adf30a208ae00d2c"
     },
     {
       "byte_length": 4757,
@@ -9535,9 +9535,9 @@
       "sha256": "9f8f95751952a51429c914ff35e817a86689b24e32cd7635386e0caa4e91c156"
     },
     {
-      "byte_length": 10520,
+      "byte_length": 11091,
       "path": "warhammer40k_core/engine/mortal_wound_feel_no_pain_hooks.py",
-      "sha256": "09864129e85547a53d472ac83e50b7e60833fd234d426db47864bf5d3913a40b"
+      "sha256": "a669fa20537c9100e3c7d89a4a7152da5802f8e3055a3d5770b0fd3d66f2aad5"
     },
     {
       "byte_length": 16903,

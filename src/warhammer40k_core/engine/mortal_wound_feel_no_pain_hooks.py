@@ -138,22 +138,33 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
         *,
         required_source_ids: frozenset[str],
     ) -> MortalWoundFeelNoPainContinuationHookBinding | None:
-        if not is_mortal_wound_feel_no_pain_request(request):
+        source_rule_id = self.source_rule_id_for_request(request)
+        if source_rule_id is None:
             return None
         source_context = mortal_wound_feel_no_pain_source_context(request)
         binding = self.binding_for_source_context(source_context)
-        if binding is None:
-            return None
-        if binding.source_id in required_source_ids:
-            request_payload = cast(dict[str, JsonValue], request.payload)
-            progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-                request_payload["lost_wound_context"]
-            )
-            if progress.source_rule_id != binding.source_id:
-                raise GameLifecycleError(
-                    "Mortal wound FNP continuation source rule identity drifted."
-                )
+        source_identifies_provider = source_rule_id in required_source_ids
+        binding_identifies_provider = (
+            binding is not None and binding.source_id in required_source_ids
+        )
+        if source_identifies_provider and (binding is None or binding.source_id != source_rule_id):
+            raise GameLifecycleError("Mortal wound FNP continuation provider identity drifted.")
+        if (
+            binding is not None
+            and binding_identifies_provider
+            and binding.source_id != source_rule_id
+        ):
+            raise GameLifecycleError("Mortal wound FNP continuation provider identity drifted.")
         return binding
+
+    def source_rule_id_for_request(self, request: DecisionRequest) -> str | None:
+        if not is_mortal_wound_feel_no_pain_request(request):
+            return None
+        request_payload = cast(dict[str, JsonValue], request.payload)
+        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
+            request_payload["lost_wound_context"]
+        )
+        return progress.source_rule_id
 
     def apply_decision(
         self,

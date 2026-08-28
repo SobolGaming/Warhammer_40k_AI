@@ -79,10 +79,6 @@ def validate_delirium_pending_outcome_authority(
     if not is_mortal_wound_feel_no_pain_request(context.request):
         return None
     source_context = mortal_wound_feel_no_pain_source_context(context.request)
-    if not isinstance(source_context, dict) or source_context.get("source_kind") != (
-        DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND
-    ):
-        return None
     request_payload = _payload_object(context.request.payload)
     progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
         request_payload.get("lost_wound_context")
@@ -91,8 +87,15 @@ def validate_delirium_pending_outcome_authority(
         army_rule,
     )
 
-    if progress.source_rule_id != army_rule.SOURCE_RULE_ID:
+    source_identifies_provider = progress.source_rule_id == army_rule.SOURCE_RULE_ID
+    kind_identifies_provider = isinstance(source_context, dict) and source_context.get(
+        "source_kind"
+    ) == (DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND)
+    if not source_identifies_provider and not kind_identifies_provider:
+        return None
+    if not source_identifies_provider or not kind_identifies_provider:
         raise GameLifecycleError("Delirium pending outcome provider identity drifted.")
+    source_context = cast(dict[str, JsonValue], source_context)
     if context.state.current_battle_phase is not delirium_phase(
         delirium_source_context(source_context)["phase"]
     ) or context.state.battle_round != _payload_object(
