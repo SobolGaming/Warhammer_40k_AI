@@ -551,7 +551,7 @@ def _harbingers_forced_target_ids(
         army_rule as chaos_knights,
     )
 
-    active_by_player = _historical_harbingers_abilities(
+    active_by_player = historical_harbingers_abilities(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
@@ -606,7 +606,7 @@ def _harbingers_forced_target_ids(
     return tuple(sorted(forced_ids))
 
 
-def _historical_harbingers_abilities(
+def historical_harbingers_abilities(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],

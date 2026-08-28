@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import replace
 from typing import Any, cast
 
@@ -25,6 +26,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine import (
+    battle_shock_resolution,
+)
+from warhammer40k_core.engine import (
     command_battle_shock_forced_provider_authority as forced_provider_authority,
 )
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -34,6 +38,10 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartHookRegistry,
     BattleRoundStartRequestContext,
     BattleRoundStartResultContext,
+)
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockTestReason,
+    BattleShockTestRequest,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockForcedTestApplication,
@@ -51,7 +59,10 @@ from warhammer40k_core.engine.command_battle_shock_forced_provider_authority imp
     validate_command_forced_test_applications,
 )
 from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
-from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_controller import (
+    DecisionController,
+    DecisionControllerPayload,
+)
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -73,6 +84,7 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -81,6 +93,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -216,7 +229,7 @@ def test_harbingers_roll_selection_records_engine_owned_dice() -> None:
     assert all(type(value) is int and 1 <= value <= 6 for value in dice_values)
     assert set(selected_ids) <= {ability.value for ability in army_rule.ROLLABLE_DREAD_ABILITIES}
     assert len(set(selected_ids)) == len(selected_ids)
-    historical = forced_provider_authority._historical_harbingers_abilities(  # pyright: ignore[reportPrivateUsage]
+    historical = forced_provider_authority.historical_harbingers_abilities(
         state=state,
         event_records=tuple(decisions.event_log.records),
         decision_records=decisions.records,
@@ -1051,10 +1064,12 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
     state = battle_state()
     state.game_id = "phase17g-chaos-knights-delirium-fnp"
     _mark_player_as_chaos_knights(state, player_id="player-a")
-    _record_harbingers_selection(
+    decisions = DecisionController()
+    _record_real_harbingers_selection(
         state,
+        decisions=decisions,
         player_id="player-a",
-        selected=(army_rule.DreadAbility.DELIRIUM,),
+        selected=army_rule.DreadAbility.DELIRIUM,
     )
     state.active_player_id = "player-b"
     state.command_step_state = None
@@ -1074,7 +1089,6 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
         decline_allowed=True,
     )
     starting_wounds = sum(model.wounds_remaining for model in target_unit.own_models)
-    decisions = DecisionController()
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_battle_shock_hooks(),
@@ -1140,6 +1154,205 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
+
+
+def test_delirium_applies_immediate_damage_in_non_command_phase() -> None:
+    state, decisions, target_unit_id = _delirium_outcome_fixture(
+        game_id="phase17g-chaos-knights-delirium-shooting-immediate",
+        phase=BattlePhase.SHOOTING,
+        with_feel_no_pain=False,
+    )
+    starting_wounds = sum(
+        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
+    )
+
+    _resolve_failed_delirium_battle_shock(
+        state=state,
+        decisions=decisions,
+        target_unit_id=target_unit_id,
+        phase=BattlePhase.SHOOTING,
+    )
+
+    applied = _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_applied")
+    assert applied["phase"] == BattlePhase.SHOOTING.value
+    assert not decisions.queue.pending_requests
+    assert (
+        sum(model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models)
+        < starting_wounds
+    )
+
+
+def test_delirium_non_command_fnp_round_trips_and_resumes_from_retained_phase() -> None:
+    state, decisions, target_unit_id = _delirium_outcome_fixture(
+        game_id="phase17g-chaos-knights-delirium-shooting-fnp",
+        phase=BattlePhase.SHOOTING,
+        with_feel_no_pain=True,
+    )
+    _resolve_failed_delirium_battle_shock(
+        state=state,
+        decisions=decisions,
+        target_unit_id=target_unit_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    restored_state = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+    )
+    restored_decisions = DecisionController.from_payload(
+        json.loads(json.dumps(decisions.to_payload()))
+    )
+    request = restored_decisions.queue.peek_next()
+    authority = _battle_shock_hooks().pending_outcome_authority_for(
+        BattleShockPendingOutcomeAuthorityContext(
+            state=restored_state,
+            decisions=restored_decisions,
+            request=request,
+        )
+    )
+    assert authority is not None
+    assert authority.result.request.unit_instance_id == target_unit_id
+    registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        army_rule.runtime_contribution().mortal_wound_feel_no_pain_hook_bindings
+    )
+    while restored_decisions.queue.pending_requests:
+        request = restored_decisions.queue.peek_next()
+        request_payload = cast(dict[str, JsonValue], request.payload)
+        lost_wound_context = cast(dict[str, JsonValue], request_payload["lost_wound_context"])
+        result = DecisionResult.for_request(
+            result_id=f"phase17g-delirium-shooting-fnp:{request.request_id}",
+            request=request,
+            selected_option_id="decline",
+        )
+        restored_decisions.submit_result(result)
+        continuation = registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=restored_state,
+                decisions=restored_decisions,
+                request=request,
+                result=result,
+                source_context=lost_wound_context["source_context"],
+                dice_manager=DiceRollManager(
+                    restored_state.game_id,
+                    event_log=restored_decisions.event_log,
+                ),
+                runtime_modifier_registry=_runtime_modifier_registry(),
+                battle_shock_hooks=_battle_shock_hooks(),
+                ability_indexes_by_player_id={},
+            )
+        )
+        if continuation is not None:
+            assert isinstance(continuation.payload, dict)
+            assert continuation.payload["phase"] == BattlePhase.SHOOTING.value
+    applied = _event_payload(
+        restored_decisions,
+        "chaos_knights_delirium_mortal_wounds_applied",
+    )
+    assert applied["phase"] == BattlePhase.SHOOTING.value
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "wound_count",
+        "d3_payload",
+        "missing_d3",
+        "duplicate_d3",
+        "wrong_chaos_knights_player",
+        "inactive_delirium",
+        "target_not_below_half",
+        "target_out_of_aura",
+    ],
+)
+def test_delirium_pending_authority_rejects_source_and_predicate_tamper(
+    tamper_kind: str,
+) -> None:
+    state, decisions, target_unit_id = _delirium_outcome_fixture(
+        game_id=f"phase17g-chaos-knights-delirium-tamper:{tamper_kind}",
+        phase=BattlePhase.SHOOTING,
+        with_feel_no_pain=True,
+    )
+    _resolve_failed_delirium_battle_shock(
+        state=state,
+        decisions=decisions,
+        target_unit_id=target_unit_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    forged_state = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+    )
+    decisions_payload = cast(dict[str, Any], deepcopy(decisions.to_payload()))
+    pending_payload = cast(
+        dict[str, Any],
+        cast(list[dict[str, Any]], decisions_payload["queue"]["pending_requests"])[0]["payload"],
+    )
+    lost_wound_context = cast(dict[str, Any], pending_payload["lost_wound_context"])
+    source_context = cast(dict[str, Any], lost_wound_context["source_context"])
+    resolution_payload = cast(dict[str, Any], source_context["resolution_payload"])
+    if tamper_kind == "wound_count":
+        lost_wound_context["mortal_wounds"] = int(lost_wound_context["mortal_wounds"]) + 1
+        lost_wound_context["remaining_mortal_wounds"] = (
+            int(lost_wound_context["remaining_mortal_wounds"]) + 1
+        )
+    elif tamper_kind == "d3_payload":
+        d3_payload = cast(dict[str, Any], resolution_payload["d3_result"])
+        source_roll = cast(dict[str, Any], d3_payload["source_d6_result"])
+        replacement = 1 if source_roll["values"] != [1] else 6
+        source_roll["values"] = [replacement]
+        source_roll["total"] = replacement
+        d3_payload["value"] = (replacement + 1) // 2
+    elif tamper_kind in {"missing_d3", "duplicate_d3"}:
+        events = cast(list[dict[str, Any]], decisions_payload["event_log"])
+        d3_index = next(
+            index
+            for index, event in enumerate(events)
+            if event["event_type"] == "dice_rolled"
+            and cast(dict[str, Any], event["payload"])["spec"]["roll_type"]
+            == army_rule.HARBINGERS_DELIRIUM_D3_ROLL_TYPE
+        )
+        if tamper_kind == "missing_d3":
+            events.pop(d3_index)
+        else:
+            events.insert(d3_index + 1, deepcopy(events[d3_index]))
+        for index, event in enumerate(events, start=1):
+            event["event_id"] = f"event-{index:06d}"
+    elif tamper_kind == "wrong_chaos_knights_player":
+        resolution_payload["player_id"] = "player-b"
+    elif tamper_kind == "inactive_delirium":
+        selection_event = next(
+            event
+            for event in cast(list[dict[str, Any]], decisions_payload["event_log"])
+            if event["event_type"] == "chaos_knights_harbingers_of_dread_selected"
+        )
+        selection_event["event_type"] = "unrelated_harbingers_event"
+    elif tamper_kind == "target_not_below_half":
+        target_record = next(
+            record
+            for record in forged_state.starting_strength_records
+            if record.unit_instance_id == target_unit_id
+        )
+        alive_count = sum(
+            model.is_alive for model in unit_by_id(forged_state, target_unit_id).own_models
+        )
+        forged_state.starting_strength_records = [
+            replace(target_record, starting_model_count=alive_count)
+            if record == target_record
+            else record
+            for record in forged_state.starting_strength_records
+        ]
+    else:
+        _place_source_outside_dread_aura(forged_state)
+    forged_decisions = DecisionController.from_payload(
+        cast(DecisionControllerPayload, decisions_payload)
+    )
+    forged_request = forged_decisions.queue.peek_next()
+
+    with pytest.raises(GameLifecycleError):
+        _battle_shock_hooks().pending_outcome_authority_for(
+            BattleShockPendingOutcomeAuthorityContext(
+                state=forged_state,
+                decisions=forged_decisions,
+                request=forged_request,
+            )
+        )
 
 
 def test_deathly_terror_and_despair_worsen_enemy_leadership_in_aura() -> None:
@@ -1347,6 +1560,143 @@ def _harbingers_selection_request_for_test() -> tuple[
     if request is None:
         raise AssertionError("expected Harbingers selection request")
     return state, decisions, request
+
+
+def _record_real_harbingers_selection(
+    state: GameState,
+    *,
+    decisions: DecisionController,
+    player_id: str,
+    selected: army_rule.DreadAbility,
+) -> None:
+    registry = _battle_round_start_hooks()
+    request = registry.next_request_for(
+        BattleRoundStartRequestContext(state=state, decisions=decisions)
+    )
+    if request is None or request.actor_id != player_id:
+        raise AssertionError("expected Harbingers selection request")
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id=f"phase17g-real-harbingers:{state.game_id}:{selected.value}",
+        request=request,
+        selected_option_id=f"chaos_knights:harbingers_of_dread:{selected.value}",
+    )
+    decisions.submit_result(result)
+    assert registry.apply_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+
+def _delirium_outcome_fixture(
+    *,
+    game_id: str,
+    phase: BattlePhase,
+    with_feel_no_pain: bool,
+) -> tuple[GameState, DecisionController, str]:
+    state = battle_state(game_id=game_id)
+    _mark_player_as_chaos_knights(state, player_id="player-a")
+    decisions = DecisionController()
+    _record_real_harbingers_selection(
+        state,
+        decisions=decisions,
+        player_id="player-a",
+        selected=army_rule.DreadAbility.DELIRIUM,
+    )
+    state.active_player_id = "player-b"
+    state.command_step_state = None
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    target_unit_id = "army-beta:intercessor-unit-3"
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    _place_units_near_center(
+        state,
+        source_unit_id="army-alpha:intercessor-unit-1",
+        target_unit_id=target_unit_id,
+    )
+    if with_feel_no_pain:
+        target = unit_by_id(state, target_unit_id)
+        model = next(model for model in target.own_models if model.is_alive)
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=model.model_instance_id,
+            sources=(FeelNoPainSource(source_id=f"{game_id}:fnp", threshold=5),),
+            decline_allowed=True,
+        )
+    return state, decisions, target_unit_id
+
+
+def _resolve_failed_delirium_battle_shock(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    target_unit_id: str,
+    phase: BattlePhase,
+) -> None:
+    target = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+    request = BattleShockTestRequest.for_unit(
+        request_id=f"{state.game_id}:battle-shock",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=target.owner_player_id,
+        unit_instance_id=target.unit_instance_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=13,
+        below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
+            rules_unit=target,
+            starting_strength=state.starting_strength_record_for_unit(target.unit_instance_id),
+            current_model_ids=tuple(model.model_instance_id for model in target.alive_models()),
+        ),
+    )
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise AssertionError("Delirium outcome fixture requires an active player")
+    base_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": active_player_id,
+        "phase": phase.value,
+        "source_kind": "phase17g_delirium_non_command_test",
+    }
+    decisions.event_log.append(
+        "battle_shock_test_requested",
+        {
+            **base_payload,
+            "battle_shock_test_request": request.to_payload(),
+        },
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    resolved = battle_shock_resolution.resolve_battle_shock_test_with_optional_reroll(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=_battle_shock_hooks(),
+        request=request,
+        roll_state=manager.roll_fixed(request.spec, (1, 1)),
+        active_player_id=active_player_id,
+        phase=phase,
+        phase_start_battle_shocked_unit_ids=(),
+        passed_state_policy=battle_shock_resolution.BattleShockPassedStatePolicy.PRESERVE,
+        source_kind="phase17g_delirium_non_command_test",
+        base_payload=base_payload,
+        resolved_event_types=("battle_shock_test_resolved",),
+        pending_phase_body_status="phase17g_delirium_battle_shock_pending",
+    )
+    assert resolved.resolved_payload is not None
+
+
+def _place_source_outside_dread_aura(state: GameState) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("Delirium aura fixture requires battlefield state")
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    source = state.battlefield_state.unit_placement_by_id(source_unit_id)
+    marker = center_marker_definition(state)
+    offsets = tuple((-20.0 - index, 0.0) for index in range(len(source.model_placements)))
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(source, marker, offsets=offsets)
+    )
 
 
 def _mark_player_as_chaos_knights(state: GameState, *, player_id: str) -> None:

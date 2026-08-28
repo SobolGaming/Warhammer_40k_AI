@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9747c5b695ccdce6d5e67299843b1d9564a6147b6703bfd6e8af2b391ce0f428",
-  "fingerprint": "9747c5b695ccdce6d5e67299843b1d9564a6147b6703bfd6e8af2b391ce0f428",
-  "resource_count": 2452,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f744d98f95991f442e96fc8ce60fd3662be1585368f96873a2010ec2a2d4b55e",
+  "fingerprint": "f744d98f95991f442e96fc8ce60fd3662be1585368f96873a2010ec2a2d4b55e",
+  "resource_count": 2453,
   "resources": [
     {
       "byte_length": 113,
@@ -1285,14 +1285,14 @@
       "sha256": "f8d7798a0675fdfbaadb8898d5f5a6f4c0dbf9b3e48cb1813d00678daa505eba"
     },
     {
-      "byte_length": 21623,
+      "byte_length": 21951,
       "path": "warhammer40k_core/engine/command_battle_shock_candidates.py",
-      "sha256": "c2f5e8c7ddb623030b4ef53de227ee8241d3fddbae6e96fb71618362e2efca29"
+      "sha256": "e903304d7e3e6349ec1c3645aef4c08bb34192669ef2ed6865b95ec04e795162"
     },
     {
-      "byte_length": 43495,
+      "byte_length": 43493,
       "path": "warhammer40k_core/engine/command_battle_shock_forced_provider_authority.py",
-      "sha256": "69124848f6a834457a55ba229549d60e9404cecb064e49648ffea160c71d1dc7"
+      "sha256": "c2b844ce71d71ee812baab8a3059dfe01810fec939e66d7c5d304552ca1cd6e8"
     },
     {
       "byte_length": 56862,
@@ -1300,9 +1300,9 @@
       "sha256": "7910f9811aa5a031259860bbb18d0c9e19b50be1cdc20ea2270950c1741df075"
     },
     {
-      "byte_length": 15946,
+      "byte_length": 20596,
       "path": "warhammer40k_core/engine/command_battle_shock_history_helpers.py",
-      "sha256": "b8995dee9af6d13a2008dac1c537f80fa9ac9f199ed0b60103521f84011757e8"
+      "sha256": "6053ac605bbb5accbe103f0318c4f445d8704ca0900851a4819a4f8b15a331f5"
     },
     {
       "byte_length": 13564,
@@ -3765,9 +3765,14 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 52808,
+      "byte_length": 49285,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/army_rule.py",
-      "sha256": "6794bd5b607046e78a9f7b667002266eb926a67c33feca6f53703ab3e780d5d1"
+      "sha256": "3710e57af9160a450b0a6b24c88366e96b08464ded9248b5c7ebf821465b12d0"
+    },
+    {
+      "byte_length": 13096,
+      "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/battle_shock_outcome_authority.py",
+      "sha256": "ba5937992a47be45a34ffcedfc2633b5a8a78dbd288070363b904ddfa939e902"
     },
     {
       "byte_length": 172,

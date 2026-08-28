@@ -1651,6 +1651,147 @@ def test_ten_command_battle_shock_candidates_use_bounded_select_next_requests() 
     assert first_decisions.to_payload() == second_decisions.to_payload()
 
 
+def test_restore_rejects_two_candidate_selections_before_first_test_resolves() -> None:
+    selections = tuple(
+        _default_unit_selection(f"intercessor-unit-{index}") for index in range(1, 4)
+    )
+    decisions = DecisionController()
+    state = _battle_state(
+        game_id="phase11c-command-premature-second-selection",
+        player_a_units=selections,
+        decisions=decisions,
+    )
+    for selection in selections:
+        _remove_first_models(
+            state,
+            unit_instance_id=f"army-alpha:{selection.unit_selection_id}",
+            count=3,
+        )
+    status = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(())
+    ).begin_phase(state=state, decisions=decisions)
+    first_request = _decision_request(status)
+    first_result = DecisionResult.for_request(
+        result_id="phase11c-premature-selection:first",
+        request=first_request,
+        selected_option_id=first_request.options[0].option_id,
+    )
+    first_record = decisions.submit_result(first_result)
+    first_selection = sequencing_module.apply_select_next_sequencing_participant_from_request(
+        request=first_record.request,
+        result=first_record.result,
+    )
+    decisions.event_log.append(
+        "sequencing_next_participant_selected",
+        first_selection.to_payload(),
+    )
+    assert (
+        command_phase_module._resolve_command_battle_shock_candidate_order(
+            state=state,
+            decisions=decisions,
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="lacks its in-flight test authority"):
+        command_history._validate_pending_candidate_order_restore_authority(
+            state=state,
+            pending_decision_requests=(),
+        )
+    first_payload = cast(dict[str, Any], first_request.payload)
+    conflict = sequencing_module.SequencingConflictContext.from_payload(
+        first_payload["sequencing_conflict"]
+    )
+    participants = tuple(
+        sequencing_module.SequencingParticipant.from_payload(payload)
+        for payload in first_payload["participants"]
+    )
+    remaining = tuple(
+        participant
+        for participant in participants
+        if participant.participant_id != first_selection.selected_participant_id
+    )
+    second_request = sequencing_module.create_select_next_sequencing_participant_request(
+        request_id=state.next_decision_request_id(),
+        context=conflict,
+        previously_selected_participant_ids=(first_selection.selected_participant_id,),
+        remaining_participants=remaining,
+    )
+    decisions.request_decision(second_request)
+    second_result = DecisionResult.for_request(
+        result_id="phase11c-premature-selection:second",
+        request=second_request,
+        selected_option_id=second_request.options[0].option_id,
+    )
+    second_record = decisions.submit_result(second_result)
+    second_selection = sequencing_module.apply_select_next_sequencing_participant_from_request(
+        request=second_record.request,
+        result=second_record.result,
+    )
+    decisions.event_log.append(
+        "sequencing_next_participant_selected",
+        second_selection.to_payload(),
+    )
+    command_state = _command_step_state(state)
+    selected_unit_ids = tuple(
+        selection.selected_participant_id.removeprefix("command-battle-shock-test:")
+        for selection in (first_selection, second_selection)
+    )
+    candidates = {
+        candidate.unit_instance_id: candidate
+        for candidate in command_state.battle_shock_candidate_inventory
+    }
+    first_candidate = candidates[selected_unit_ids[0]]
+    second_candidate = candidates[selected_unit_ids[1]]
+    assert first_candidate.test_reason is not None
+    assert second_candidate.test_reason is not None
+    first_test_request_id = command_candidates.command_battle_shock_request_id(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        unit_instance_id=selected_unit_ids[0],
+        reason=first_candidate.test_reason,
+    )
+    second_test_request = BattleShockTestRequest.for_unit(
+        request_id=command_candidates.command_battle_shock_request_id(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            unit_instance_id=selected_unit_ids[1],
+            reason=second_candidate.test_reason,
+        ),
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-a",
+        unit_instance_id=selected_unit_ids[1],
+        reason=second_candidate.test_reason,
+        leadership_target=6,
+        below_half_strength_context=second_candidate.below_half_strength_context,
+    )
+    forged_command_state = replace(command_state)
+    object.__setattr__(
+        forged_command_state,
+        "battle_shock_candidate_order_unit_ids",
+        selected_unit_ids,
+    )
+    object.__setattr__(
+        forged_command_state,
+        "completed_battle_shock_test_request_ids",
+        (first_test_request_id,),
+    )
+    object.__setattr__(
+        forged_command_state,
+        "battle_shock_in_flight_test_request",
+        second_test_request,
+    )
+    state.command_step_state = forged_command_state
+
+    with pytest.raises(GameLifecycleError, match="preceding test resolved"):
+        command_history.validate_restore(
+            state,
+            decisions.event_log.records,
+            decisions.records,
+            (),
+        )
+
+
 def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> None:
     game_id = "phase11c-command-live-battle-shock-materialization"
     first_unit_id = "army-alpha:intercessor-unit-1"
@@ -2091,7 +2232,7 @@ def test_command_battle_shock_progress_requires_exact_live_request_prefix() -> N
             "battle_shock_step_resolved": False,
             "phase_start_unit_ids": (second_unit_id,),
             "candidate_inventory": inventory,
-            "candidate_order_unit_ids": order,
+            "candidate_order_unit_ids": (first_unit_id,),
             "in_flight_test_request": in_flight,
             "completed_test_request_ids": (),
             "battle_round": 1,
@@ -2101,8 +2242,9 @@ def test_command_battle_shock_progress_requires_exact_live_request_prefix() -> N
         command_candidates.validate_command_battle_shock_step_progress(**values)
 
     validate()
-    validate(candidate_order_unit_ids=(first_unit_id,))
+    validate(candidate_order_unit_ids=(), in_flight_test_request=None)
     validate(
+        candidate_order_unit_ids=order,
         in_flight_test_request=None,
         completed_test_request_ids=(first_request_id, second_request_id),
         battle_shock_step_resolved=True,
@@ -2131,10 +2273,14 @@ def test_command_battle_shock_progress_requires_exact_live_request_prefix() -> N
         },
         {"candidate_order_unit_ids": ()},
         {
+            "candidate_order_unit_ids": order,
+        },
+        {
             "in_flight_test_request": None,
             "completed_test_request_ids": (second_request_id,),
         },
         {
+            "candidate_order_unit_ids": order,
             "completed_test_request_ids": (first_request_id, second_request_id),
         },
         {

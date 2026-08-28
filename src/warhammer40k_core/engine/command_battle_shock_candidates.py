@@ -277,6 +277,12 @@ def validate_command_battle_shock_step_progress(
         raise GameLifecycleError(
             "CommandStepState cannot progress before Battle-shock candidate order resolves."
         )
+    completed_count = len(completed_test_request_ids)
+    if len(candidate_order_unit_ids) not in {completed_count, completed_count + 1}:
+        raise GameLifecycleError(
+            "CommandStepState Battle-shock candidate sequencing order may contain only the "
+            "completed prefix and one selected in-flight candidate."
+        )
     candidate_by_id = {candidate.unit_instance_id: candidate for candidate in required_candidates}
     required_request_ids = tuple(
         command_battle_shock_request_id(
@@ -292,7 +298,7 @@ def validate_command_battle_shock_step_progress(
             "CommandStepState completed Battle-shock requests must be an exact prefix."
         )
     if in_flight_test_request is not None:
-        if len(completed_test_request_ids) >= len(candidate_order_unit_ids):
+        if completed_count >= len(candidate_order_unit_ids):
             raise GameLifecycleError("CommandStepState Battle-shock in-flight request is excess.")
         next_unit_id = candidate_order_unit_ids[len(completed_test_request_ids)]
         next_candidate = candidate_by_id[next_unit_id]

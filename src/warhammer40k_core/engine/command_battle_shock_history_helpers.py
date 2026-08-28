@@ -13,6 +13,9 @@ from warhammer40k_core.engine.command_points import CommandStepState
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
@@ -158,18 +161,65 @@ def validate_historical_candidate_order(
     selected_participant_ids: list[str] = []
     remaining_participant_ids = list(participant_by_id)
     context: SequencingConflictContext | None = None
+    previous_selection_event_index = snapshot_index
     for event_index, sequencing_decision in matching_events:
         if not snapshot_index < event_index < completion_index:
             raise GameLifecycleError("Historical Battle-shock sequencing escaped its step.")
-        records = tuple(
-            record
-            for record in decision_records
-            if record.request.request_id == sequencing_decision.request_id
-            and record.result.result_id == sequencing_decision.result_id
+        try:
+            record = validate_mutation_decision_closure(
+                event_records=event_records,
+                decision_records=decision_records,
+                mutation_index=event_index,
+                request_id=sequencing_decision.request_id,
+                result_id=sequencing_decision.result_id,
+            )
+        except GameLifecycleError as exc:
+            raise GameLifecycleError(
+                "Historical Battle-shock sequencing lacks a decision record."
+            ) from exc
+        request_event_indices = tuple(
+            index
+            for index, event in enumerate(event_records[:event_index])
+            if event.event_type == "decision_requested"
+            and event.payload == record.request.to_payload()
         )
-        if len(records) != 1:
-            raise GameLifecycleError("Historical Battle-shock sequencing lacks a decision record.")
-        record = records[0]
+        if len(request_event_indices) != 1:
+            raise GameLifecycleError("Historical Battle-shock sequencing lacks a request event.")
+        request_event_index = request_event_indices[0]
+        if selected_participant_ids:
+            previous_unit_id = unit_id_by_participant[selected_participant_ids[-1]]
+            previous_candidate = candidate_by_id(candidates, previous_unit_id)
+            previous_reason = previous_candidate.test_reason
+            if previous_reason is None:
+                raise GameLifecycleError(
+                    "Historical Battle-shock preceding candidate is not eligible."
+                )
+            previous_request_id = command_battle_shock_request_id(
+                battle_round=battle_round,
+                active_player_id=active_player_id,
+                unit_instance_id=previous_unit_id,
+                reason=previous_reason,
+            )
+            resolved_indices = tuple(
+                index
+                for index, event in enumerate(
+                    event_records[previous_selection_event_index + 1 : request_event_index],
+                    start=previous_selection_event_index + 1,
+                )
+                if event.event_type == "battle_shock_test_resolved"
+                and raw_result_request_id(event.payload) == previous_request_id
+            )
+            if len(resolved_indices) != 1:
+                raise GameLifecycleError(
+                    "Historical Battle-shock sequencing advanced before the preceding test "
+                    "resolved."
+                )
+            _validate_intervening_decisions_closed(
+                event_records=event_records,
+                decision_records=decision_records,
+                start_index=resolved_indices[0] + 1,
+                end_index=request_event_index,
+            )
         context = validate_historical_sequencing_request(
             state=state,
             request=record.request,
@@ -194,6 +244,7 @@ def validate_historical_candidate_order(
             raise GameLifecycleError("Historical Battle-shock sequencing decision drifted.")
         selected_participant_ids.append(sequencing_decision.selected_participant_id)
         remaining_participant_ids.remove(sequencing_decision.selected_participant_id)
+        previous_selection_event_index = event_index
     if context is None and matching_events:
         raise GameLifecycleError("Historical Battle-shock sequencing context is missing.")
     reconstructed_order = tuple(
@@ -313,6 +364,12 @@ def validate_pending_order_restore_authority(
     )
     completed_count = len(command_state.completed_battle_shock_test_request_ids)
     selected_unit_ids = command_state.battle_shock_candidate_order_unit_ids
+    if len(selected_unit_ids) == completed_count + 1 and (
+        command_state.battle_shock_in_flight_test_request is None
+    ):
+        raise GameLifecycleError(
+            "Command Battle-shock selected candidate lacks its in-flight test authority."
+        )
     remaining_candidates = tuple(
         candidate for candidate in candidates if candidate.unit_instance_id not in selected_unit_ids
     )
@@ -337,6 +394,59 @@ def validate_pending_order_restore_authority(
             f"command-battle-shock-test:{unit_id}" for unit_id in selected_unit_ids
         ),
     )
+
+
+def _validate_intervening_decisions_closed(
+    *,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    start_index: int,
+    end_index: int,
+) -> None:
+    for request_index, event in enumerate(
+        event_records[start_index:end_index],
+        start=start_index,
+    ):
+        if event.event_type != "decision_requested":
+            continue
+        matches = tuple(
+            record for record in decision_records if event.payload == record.request.to_payload()
+        )
+        if len(matches) != 1:
+            raise GameLifecycleError(
+                "Historical Battle-shock sequencing advanced with an unauthorised pending decision."
+            )
+        recorded_indices = tuple(
+            index
+            for index, recorded in enumerate(
+                event_records[request_index + 1 : end_index],
+                start=request_index + 1,
+            )
+            if recorded.event_type == "decision_recorded"
+            and recorded.payload == matches[0].to_payload()
+        )
+        if len(recorded_indices) != 1:
+            raise GameLifecycleError(
+                "Historical Battle-shock sequencing advanced before a nested decision closed."
+            )
+        next_request_index = next(
+            (
+                index
+                for index, later in enumerate(
+                    event_records[recorded_indices[0] + 1 : end_index],
+                    start=recorded_indices[0] + 1,
+                )
+                if later.event_type == "decision_requested"
+            ),
+            end_index,
+        )
+        if not any(
+            mutation.event_type not in {"decision_requested", "decision_recorded"}
+            for mutation in event_records[recorded_indices[0] + 1 : next_request_index]
+        ):
+            raise GameLifecycleError(
+                "Historical Battle-shock sequencing advanced before a nested mutation closed."
+            )
 
 
 def sequencing_request_conflict_id(request: DecisionRequest) -> str | None:
