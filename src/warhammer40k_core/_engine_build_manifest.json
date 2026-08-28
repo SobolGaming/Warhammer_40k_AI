@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5553748a86d32e7672b17fcdedf3d07e9aedc9f8a05a96de58a128fcd986495b",
-  "fingerprint": "5553748a86d32e7672b17fcdedf3d07e9aedc9f8a05a96de58a128fcd986495b",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9747c5b695ccdce6d5e67299843b1d9564a6147b6703bfd6e8af2b391ce0f428",
+  "fingerprint": "9747c5b695ccdce6d5e67299843b1d9564a6147b6703bfd6e8af2b391ce0f428",
   "resource_count": 2452,
   "resources": [
     {
@@ -1285,9 +1285,9 @@
       "sha256": "f8d7798a0675fdfbaadb8898d5f5a6f4c0dbf9b3e48cb1813d00678daa505eba"
     },
     {
-      "byte_length": 21431,
+      "byte_length": 21623,
       "path": "warhammer40k_core/engine/command_battle_shock_candidates.py",
-      "sha256": "b29e76f44700661e991772dff8350ee2a342a90bb8af769109e0512d05fa904d"
+      "sha256": "c2f5e8c7ddb623030b4ef53de227ee8241d3fddbae6e96fb71618362e2efca29"
     },
     {
       "byte_length": 43495,
@@ -1300,14 +1300,14 @@
       "sha256": "7910f9811aa5a031259860bbb18d0c9e19b50be1cdc20ea2270950c1741df075"
     },
     {
-      "byte_length": 13103,
+      "byte_length": 15946,
       "path": "warhammer40k_core/engine/command_battle_shock_history_helpers.py",
-      "sha256": "c0a1cacb231094f59b63bd79db4d4107c9f91716502e3f9a9cd037e9c1d175fe"
+      "sha256": "b8995dee9af6d13a2008dac1c537f80fa9ac9f199ed0b60103521f84011757e8"
     },
     {
-      "byte_length": 10556,
+      "byte_length": 13564,
       "path": "warhammer40k_core/engine/command_battle_shock_phase_authority.py",
-      "sha256": "9071d02ff776ce6e0b0297d434be5013ce4ffcfc639db888e51c1f7dd0168248"
+      "sha256": "a773785d03a2174ff06725b747a809724136d742357cc4170034ee31d90ee6fc"
     },
     {
       "byte_length": 13327,
@@ -1345,9 +1345,9 @@
       "sha256": "8676164786b4a0c47983fa16d82b548f3fe22c27b361d30cf5589742ec4b118d"
     },
     {
-      "byte_length": 64602,
+      "byte_length": 64840,
       "path": "warhammer40k_core/engine/command_points.py",
-      "sha256": "27e7ed20f72270b50291ef1c3b1fbbb794476912e1de7c7f4dda202688a740a1"
+      "sha256": "b0c021ddaf6b96f29a263cece5fff9495b2880f4f91f67980639302e25f6c2f3"
     },
     {
       "byte_length": 281,
@@ -3765,9 +3765,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 44871,
+      "byte_length": 52808,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_knights/army_rule.py",
-      "sha256": "6a0c78b6233115f4fba1b7924afe3dae6f73a68584faca077d2eaa428d7acd57"
+      "sha256": "6794bd5b607046e78a9f7b667002266eb926a67c33feca6f53703ab3e780d5d1"
     },
     {
       "byte_length": 172,
@@ -9350,9 +9350,9 @@
       "sha256": "c99ebc4ef765137b1be0abb3666f6881eaf2be68cdb22d54f202b96f85e68fc4"
     },
     {
-      "byte_length": 171563,
+      "byte_length": 171452,
       "path": "warhammer40k_core/engine/lifecycle.py",
-      "sha256": "a551a0137cdb74fd26ed21d3a7b1b94510054046c07b8df47771d214772b3d69"
+      "sha256": "df6db60f48ca7081a1049878837b9868736bce6c8c0b1d4b3935caa87456dce9"
     },
     {
       "byte_length": 2130,
@@ -9645,9 +9645,9 @@
       "sha256": "9090677872cf4ea63f5daf9492516125198b5525ce4c39fc790332c30fc1aa9d"
     },
     {
-      "byte_length": 60335,
+      "byte_length": 60659,
       "path": "warhammer40k_core/engine/phases/command.py",
-      "sha256": "3c126596509b7fa365f2f6802144bdf81524aacea3c9b2e09db8134d518195ae"
+      "sha256": "d1ac51c9ec14252ed6c3adcc1296f188e918943544003946414fa066a50c8cf6"
     },
     {
       "byte_length": 16681,
@@ -10565,9 +10565,9 @@
       "sha256": "7a1629516b1a65ea9337b4c4df73aaf4393629a7886f5f5329ed820b7e6eef3f"
     },
     {
-      "byte_length": 26206,
+      "byte_length": 37709,
       "path": "warhammer40k_core/engine/sequencing.py",
-      "sha256": "f0d9536e38246b77ccfcb61fb357bc83c02ef49907eb79f0189cb292781db940"
+      "sha256": "f1420243a3e842b69f01e86347dbe18d197b38598bffc514f4ddc59e6a1181ed"
     },
     {
       "byte_length": 52896,

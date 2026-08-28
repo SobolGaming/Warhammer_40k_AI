@@ -1230,6 +1230,96 @@ def test_off_battlefield_shocked_unit_returns_typed_command_unsupported() -> Non
     assert command_state.battle_shock_in_flight_test_request is None
 
 
+def test_completed_rerolled_battle_shock_target_destruction_does_not_block_reentry() -> None:
+    game_id = "phase11c-command-rerolled-self-destruction"
+    unit_id = "army-alpha:intercessor-unit-1"
+    state = _battle_state(game_id=game_id)
+    _remove_first_models(state, unit_instance_id=unit_id, count=3)
+    decisions = DecisionController()
+    modifier = RollModifier(
+        modifier_id="phase11c:command-self-destruction:modifier",
+        source_id="phase11c:command-self-destruction:source",
+        operand=-3,
+    )
+
+    def destroy_failed_target(context: BattleShockOutcomeContext) -> None:
+        if context.result.passed:
+            raise AssertionError("forced modifier must make the rerolled test fail")
+        unit = _unit_by_id(context.state, context.result.request.unit_instance_id)
+        for model in unit.own_models:
+            if not model.is_alive:
+                continue
+            apply_damage_to_model(
+                state=context.state,
+                target_unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                damage=model.wounds_remaining,
+                damage_kind=DamageKind.NORMAL,
+            )
+
+    def reroll_permission(
+        context: BattleShockRerollPermissionContext,
+    ) -> RerollPermission | None:
+        return RerollPermission(
+            source_id="phase11c:command-self-destruction:reroll",
+            timing_window="battle_shock_test",
+            owning_player_id=context.request.player_id,
+            eligible_roll_type=context.request.spec.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+
+    hooks = BattleShockHookRegistry.from_bindings(
+        (
+            BattleShockHookBinding(
+                hook_id="phase11c:command-self-destruction:hook",
+                source_id="phase11c:command-self-destruction:source",
+                modifier_handler=lambda _context: (modifier,),
+                reroll_permission_handler=reroll_permission,
+                outcome_handler=destroy_failed_target,
+                historical_contribution_handler=lambda _context: HistoricalBattleShockContribution(
+                    modifiers=(modifier,),
+                    reroll_permission=RerollPermission(
+                        source_id="phase11c:command-self-destruction:reroll",
+                        timing_window="battle_shock_test",
+                        owning_player_id="player-a",
+                        eligible_roll_type="battle_shock_roll",
+                        component_selection_policy=(RerollComponentSelectionPolicy.WHOLE_ROLL),
+                    ),
+                ),
+            ),
+        )
+    )
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=hooks,
+    )
+
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+    reroll_request = _decision_request(waiting)
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    reroll_result = DecisionResult.for_request(
+        result_id="phase11c:command-self-destruction:reroll-result",
+        request=reroll_request,
+        selected_option_id="reroll:0,1",
+    )
+    decisions.submit_result(reroll_result)
+    battle_shock_rerolls.apply_battle_shock_reroll_decision(
+        state=state,
+        result=reroll_result,
+        decisions=decisions,
+        battle_shock_hooks=hooks,
+    )
+    command_state = _command_step_state(state)
+    assert len(command_state.completed_battle_shock_test_request_ids) == 1
+    assert not command_state.battle_shock_step_resolved
+    assert not any(model.is_alive for model in _unit_by_id(state, unit_id).own_models)
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert _command_step_state(state).battle_shock_step_resolved
+
+
 def test_command_phase_resolves_non_reroll_battle_shock_dice_without_decision_pause() -> None:
     state = _battle_state()
     decisions = DecisionController()
@@ -1424,10 +1514,7 @@ def test_command_reroll_round_trip_preserves_full_candidate_and_result_prefixes(
         DecisionResult.for_request(
             result_id="phase11c-command-battle-shock-order",
             request=first_request,
-            selected_option_id=(
-                "order:command-battle-shock-test:army-alpha:intercessor-unit-1,"
-                "command-battle-shock-test:army-alpha:intercessor-unit-2"
-            ),
+            selected_option_id=("next:command-battle-shock-test:army-alpha:intercessor-unit-1"),
         )
     )
     first_request = _decision_request(first_status)
@@ -1479,6 +1566,89 @@ def test_command_reroll_round_trip_preserves_full_candidate_and_result_prefixes(
         == result_prefix
     )
     assert _decision_request(restored.advance_until_decision_or_terminal()) == second_request
+
+
+def test_ten_command_battle_shock_candidates_use_bounded_select_next_requests() -> None:
+    game_id = "phase11c-command-bounded-select-next"
+    unit_selections = tuple(
+        _default_unit_selection(f"intercessor-unit-{index:02d}") for index in range(1, 11)
+    )
+    decisions = DecisionController()
+    state = _battle_state(
+        game_id=game_id,
+        player_a_units=unit_selections,
+        decisions=decisions,
+    )
+    for selection in unit_selections:
+        _remove_first_models(
+            state,
+            unit_instance_id=f"army-alpha:{selection.unit_selection_id}",
+            count=3,
+        )
+    initial_state_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload())),
+    )
+    initial_decisions_payload = json.loads(json.dumps(decisions.to_payload()))
+
+    def resolve_all() -> tuple[GameState, DecisionController]:
+        restored_state = GameState.from_payload(initial_state_payload)
+        restored_decisions = DecisionController.from_payload(initial_decisions_payload)
+        handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
+        status = handler.begin_phase(state=restored_state, decisions=restored_decisions)
+        request = _decision_request(status)
+        option_counts: list[int] = []
+        selection_index = 0
+        while request.decision_type == SEQUENCING_DECISION_TYPE:
+            option_counts.append(len(request.options))
+            assert len(request.options) <= 10
+            assert request.payload == json.loads(json.dumps(request.payload))
+            restored_state = GameState.from_payload(
+                cast(
+                    GameStatePayload,
+                    json.loads(json.dumps(restored_state.to_payload())),
+                )
+            )
+            restored_decisions = DecisionController.from_payload(
+                json.loads(json.dumps(restored_decisions.to_payload()))
+            )
+            assert restored_decisions.queue.pending_requests == (request,)
+            if not request.options:
+                raise AssertionError("bounded sequencing request requires options")
+            result = DecisionResult.for_request(
+                result_id=f"phase11c-bounded-selection-{selection_index:02d}",
+                request=request,
+                selected_option_id=request.options[0].option_id,
+            )
+            record = restored_decisions.submit_result(result)
+            selection = sequencing_module.apply_select_next_sequencing_participant_from_request(
+                request=record.request,
+                result=record.result,
+            )
+            restored_decisions.event_log.append(
+                "sequencing_next_participant_selected",
+                selection.to_payload(),
+            )
+            status = handler.begin_phase(
+                state=restored_state,
+                decisions=restored_decisions,
+            )
+            selection_index += 1
+            command_state = _command_step_state(restored_state)
+            if command_state.battle_shock_step_resolved:
+                break
+            request = _decision_request(status)
+        assert option_counts == list(range(10, 1, -1))
+        command_state = _command_step_state(restored_state)
+        assert command_state.battle_shock_step_resolved
+        assert len(command_state.battle_shock_candidate_order_unit_ids) == 10
+        assert len(command_state.completed_battle_shock_test_request_ids) == 10
+        return restored_state, restored_decisions
+
+    first_state, first_decisions = resolve_all()
+    second_state, second_decisions = resolve_all()
+    assert first_state.to_payload() == second_state.to_payload()
+    assert first_decisions.to_payload() == second_decisions.to_payload()
 
 
 def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> None:
@@ -1612,10 +1782,7 @@ def test_later_command_battle_shock_request_recomputes_after_prior_outcome() -> 
         DecisionResult.for_request(
             result_id="phase11c-live-materialization-order",
             request=request,
-            selected_option_id=(
-                f"order:command-battle-shock-test:{first_unit_id},"
-                f"command-battle-shock-test:{second_unit_id}"
-            ),
+            selected_option_id=f"next:command-battle-shock-test:{first_unit_id}",
         )
     )
 
@@ -1934,6 +2101,7 @@ def test_command_battle_shock_progress_requires_exact_live_request_prefix() -> N
         command_candidates.validate_command_battle_shock_step_progress(**values)
 
     validate()
+    validate(candidate_order_unit_ids=(first_unit_id,))
     validate(
         in_flight_test_request=None,
         completed_test_request_ids=(first_request_id, second_request_id),
@@ -1955,7 +2123,6 @@ def test_command_battle_shock_progress_requires_exact_live_request_prefix() -> N
             "candidate_order_unit_ids": (),
             "in_flight_test_request": None,
         },
-        {"candidate_order_unit_ids": (first_unit_id,)},
         {
             "candidate_inventory": (first_candidate,),
             "candidate_order_unit_ids": (),
@@ -10126,7 +10293,7 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
         )
 
     malformed_event = DecisionController.from_payload(sequencing_decisions.to_payload())
-    malformed_event.event_log.append("sequencing_order_resolved", None)
+    malformed_event.event_log.append("sequencing_next_participant_selected", None)
     with pytest.raises(GameLifecycleError, match="payload is malformed"):
         command_phase_module._resolve_command_battle_shock_candidate_order(
             state=sequencing_state,
@@ -10139,14 +10306,16 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
         selected_option_id=sequencing_request.options[0].option_id,
     )
     sequencing_record = sequencing_decisions.submit_result(sequencing_result)
-    sequencing = sequencing_module.apply_sequencing_decision_from_request(
+    sequencing = sequencing_module.apply_select_next_sequencing_participant_from_request(
         request=sequencing_record.request,
         result=sequencing_record.result,
     )
-    sequencing_decisions.event_log.append("sequencing_order_resolved", sequencing.to_payload())
+    sequencing_decisions.event_log.append(
+        "sequencing_next_participant_selected", sequencing.to_payload()
+    )
     duplicated = DecisionController.from_payload(sequencing_decisions.to_payload())
-    duplicated.event_log.append("sequencing_order_resolved", sequencing.to_payload())
-    with pytest.raises(GameLifecycleError, match="decision is duplicated"):
+    duplicated.event_log.append("sequencing_next_participant_selected", sequencing.to_payload())
+    with pytest.raises(GameLifecycleError, match="selection prefix drifted"):
         command_phase_module._resolve_command_battle_shock_candidate_order(
             state=sequencing_state,
             decisions=duplicated,
@@ -10164,7 +10333,7 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
     sequencing_event_index = next(
         index
         for index, event in enumerate(sequencing_events)
-        if event.event_type == "sequencing_order_resolved"
+        if event.event_type == "sequencing_next_participant_selected"
     )
     snapshot_index = next(
         index
@@ -10177,9 +10346,13 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
         for candidate in sequencing_command_state.battle_shock_candidate_inventory
         if candidate.test_reason is not None
     )
-    ordered_unit_ids = tuple(
-        participant_id.removeprefix("command-battle-shock-test:")
-        for participant_id in sequencing.ordered_participant_ids
+    ordered_unit_ids = (
+        sequencing.selected_participant_id.removeprefix("command-battle-shock-test:"),
+        next(
+            participant_id.removeprefix("command-battle-shock-test:")
+            for participant_id in sequencing.remaining_participant_ids
+            if participant_id != sequencing.selected_participant_id
+        ),
     )
     command_history._validate_historical_candidate_order(
         state=sequencing_state,
@@ -10203,7 +10376,7 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
     with pytest.raises(GameLifecycleError, match="sequencing payload is malformed"):
         command_history._validate_historical_candidate_order(
             state=sequencing_state,
-            event_records=(EventRecord("malformed", "sequencing_order_resolved", None),),
+            event_records=(EventRecord("malformed", "sequencing_next_participant_selected", None),),
             decision_records=(),
             snapshot_index=-1,
             completion_index=1,
@@ -10212,7 +10385,7 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
             candidates=sequencing_candidates,
             ordered_unit_ids=ordered_unit_ids,
         )
-    with pytest.raises(GameLifecycleError, match="sequencing authority is ambiguous"):
+    with pytest.raises(GameLifecycleError, match="sequencing order drifted"):
         command_history._validate_historical_candidate_order(
             state=sequencing_state,
             event_records=(),

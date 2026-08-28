@@ -497,7 +497,12 @@ class CommandStepState:
     def with_battle_shock_candidate_order(self, unit_instance_ids: tuple[str, ...]) -> Self:
         if self.current_step is not CommandPhaseStep.BATTLE_SHOCK:
             raise GameLifecycleError("Battle-shock candidate order requires Battle-shock step.")
-        if self.battle_shock_candidate_order_unit_ids:
+        current = self.battle_shock_candidate_order_unit_ids
+        if current and (
+            unit_instance_ids[: len(current)] != current
+            or len(unit_instance_ids) != len(current) + 1
+            or len(self.completed_battle_shock_test_request_ids) != len(current)
+        ):
             raise GameLifecycleError("Battle-shock candidate order was already resolved.")
         return type(self)(
             battle_round=self.battle_round,

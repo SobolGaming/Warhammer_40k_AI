@@ -110,7 +110,7 @@ from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
-    apply_sequencing_decision_from_request,
+    sequencing_decision_event_from_request,
 )
 from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
@@ -1723,13 +1723,13 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
         selected_option_id=sequencing_request.options[0].option_id,
     )
     sequencing_record = decisions.submit_result(sequencing_result)
-    sequencing_decision = apply_sequencing_decision_from_request(
+    sequencing_event_type, sequencing_event_payload = sequencing_decision_event_from_request(
         request=sequencing_record.request,
         result=sequencing_record.result,
     )
     decisions.event_log.append(
-        "sequencing_order_resolved",
-        sequencing_decision.to_payload(),
+        sequencing_event_type,
+        sequencing_event_payload,
     )
 
     completed = handler.begin_phase(state=state, decisions=decisions)

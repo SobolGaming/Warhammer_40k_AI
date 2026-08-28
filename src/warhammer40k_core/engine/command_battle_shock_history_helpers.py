@@ -18,11 +18,12 @@ from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     SequencingConflictContext,
     SequencingConflictContextPayload,
-    SequencingDecision,
-    SequencingDecisionPayload,
+    SequencingNextParticipantDecision,
+    SequencingNextParticipantDecisionPayload,
     SequencingParticipant,
-    apply_sequencing_decision_from_request,
-    create_sequencing_decision_request,
+    apply_select_next_sequencing_participant_from_request,
+    create_select_next_sequencing_participant_request,
+    is_select_next_sequencing_participant_request,
 )
 
 if TYPE_CHECKING:
@@ -119,9 +120,9 @@ def validate_historical_candidate_order(
     conflict_id = (
         f"command-battle-shock-order:{state.game_id}:round-{battle_round:02d}:{active_player_id}"
     )
-    matching_events: list[tuple[int, SequencingDecision]] = []
+    matching_events: list[tuple[int, SequencingNextParticipantDecision]] = []
     for event_index, event in enumerate(event_records):
-        if event.event_type != "sequencing_order_resolved":
+        if event.event_type != "sequencing_next_participant_selected":
             continue
         if not isinstance(event.payload, dict):
             raise GameLifecycleError("Historical Battle-shock sequencing payload is malformed.")
@@ -130,7 +131,9 @@ def validate_historical_candidate_order(
         matching_events.append(
             (
                 event_index,
-                SequencingDecision.from_payload(cast(SequencingDecisionPayload, event.payload)),
+                SequencingNextParticipantDecision.from_payload(
+                    cast(SequencingNextParticipantDecisionPayload, event.payload)
+                ),
             )
         )
     expected_unit_ids = {candidate.unit_instance_id for candidate in candidates}
@@ -139,48 +142,74 @@ def validate_historical_candidate_order(
         if matching_events or ordered_unit_ids != expected_trivial_order:
             raise GameLifecycleError("Historical Battle-shock trivial order drifted.")
         return
-    if len(matching_events) != 1:
-        raise GameLifecycleError("Historical Battle-shock sequencing authority is ambiguous.")
-    event_index, sequencing_decision = matching_events[0]
-    if not snapshot_index < event_index < completion_index:
-        raise GameLifecycleError("Historical Battle-shock sequencing escaped its step.")
-    records = tuple(
-        record
-        for record in decision_records
-        if record.request.request_id == sequencing_decision.request_id
-        and record.result.result_id == sequencing_decision.result_id
-    )
-    if len(records) != 1:
-        raise GameLifecycleError("Historical Battle-shock sequencing lacks a decision record.")
-    record = records[0]
-    validate_historical_sequencing_request(
-        state=state,
-        request=record.request,
-        battle_round=battle_round,
-        active_player_id=active_player_id,
-        candidates=candidates,
-    )
-    if (
-        apply_sequencing_decision_from_request(
-            request=record.request,
-            result=record.result,
+    participant_by_id = {
+        f"command-battle-shock-test:{candidate.unit_instance_id}": SequencingParticipant(
+            participant_id=f"command-battle-shock-test:{candidate.unit_instance_id}",
+            player_id=active_player_id,
+            source_rule_id="gw-11e-core-rules:command-phase:battle-shock",
+            payload=validate_json_value(candidate.to_payload()),
         )
-        != sequencing_decision
-    ):
-        raise GameLifecycleError("Historical Battle-shock sequencing decision drifted.")
+        for candidate in candidates
+    }
     unit_id_by_participant = {
         f"command-battle-shock-test:{candidate.unit_instance_id}": candidate.unit_instance_id
         for candidate in candidates
     }
-    if (
-        tuple(
-            unit_id_by_participant.get(participant_id, "")
-            for participant_id in sequencing_decision.ordered_participant_ids
+    selected_participant_ids: list[str] = []
+    remaining_participant_ids = list(participant_by_id)
+    context: SequencingConflictContext | None = None
+    for event_index, sequencing_decision in matching_events:
+        if not snapshot_index < event_index < completion_index:
+            raise GameLifecycleError("Historical Battle-shock sequencing escaped its step.")
+        records = tuple(
+            record
+            for record in decision_records
+            if record.request.request_id == sequencing_decision.request_id
+            and record.result.result_id == sequencing_decision.result_id
         )
-        != ordered_unit_ids
-        or set(ordered_unit_ids) != expected_unit_ids
+        if len(records) != 1:
+            raise GameLifecycleError("Historical Battle-shock sequencing lacks a decision record.")
+        record = records[0]
+        context = validate_historical_sequencing_request(
+            state=state,
+            request=record.request,
+            battle_round=battle_round,
+            active_player_id=active_player_id,
+            candidates=tuple(
+                candidate_by_id(candidates, unit_id_by_participant[participant_id])
+                for participant_id in remaining_participant_ids
+            ),
+            previously_selected_participant_ids=tuple(selected_participant_ids),
+        )
+        if (
+            sequencing_decision.previously_selected_participant_ids
+            != tuple(selected_participant_ids)
+            or sequencing_decision.remaining_participant_ids != tuple(remaining_participant_ids)
+            or apply_select_next_sequencing_participant_from_request(
+                request=record.request,
+                result=record.result,
+            )
+            != sequencing_decision
+        ):
+            raise GameLifecycleError("Historical Battle-shock sequencing decision drifted.")
+        selected_participant_ids.append(sequencing_decision.selected_participant_id)
+        remaining_participant_ids.remove(sequencing_decision.selected_participant_id)
+    if context is None and matching_events:
+        raise GameLifecycleError("Historical Battle-shock sequencing context is missing.")
+    reconstructed_order = tuple(
+        unit_id_by_participant[participant_id] for participant_id in selected_participant_ids
+    )
+    if len(remaining_participant_ids) == 1 and len(ordered_unit_ids) > len(reconstructed_order):
+        reconstructed_order = (
+            *reconstructed_order,
+            unit_id_by_participant[remaining_participant_ids[0]],
+        )
+    if reconstructed_order != ordered_unit_ids or not set(ordered_unit_ids).issubset(
+        expected_unit_ids
     ):
         raise GameLifecycleError("Historical Battle-shock sequencing order drifted.")
+    if set(ordered_unit_ids) == expected_unit_ids and len(matching_events) != len(candidates) - 1:
+        raise GameLifecycleError("Historical Battle-shock sequencing selection count drifted.")
 
 
 def validate_historical_sequencing_request(
@@ -190,8 +219,13 @@ def validate_historical_sequencing_request(
     battle_round: int,
     active_player_id: str,
     candidates: tuple[CommandBattleShockCandidate, ...],
-) -> None:
-    if request.decision_type != SEQUENCING_DECISION_TYPE or request.actor_id != active_player_id:
+    previously_selected_participant_ids: tuple[str, ...] = (),
+) -> SequencingConflictContext:
+    if (
+        request.decision_type != SEQUENCING_DECISION_TYPE
+        or request.actor_id != active_player_id
+        or not is_select_next_sequencing_participant_request(request)
+    ):
         raise GameLifecycleError("Historical Battle-shock sequencing request drifted.")
     conflict_id = (
         f"command-battle-shock-order:{state.game_id}:round-{battle_round:02d}:{active_player_id}"
@@ -239,13 +273,15 @@ def validate_historical_sequencing_request(
         raise GameLifecycleError(
             "Historical Battle-shock sequencing context is incomplete."
         ) from exc
-    expected_request = create_sequencing_decision_request(
+    expected_request = create_select_next_sequencing_participant_request(
         request_id=request.request_id,
         context=context,
-        participants=participants,
+        previously_selected_participant_ids=previously_selected_participant_ids,
+        remaining_participants=participants,
     )
     if request != expected_request:
         raise GameLifecycleError("Historical Battle-shock sequencing request payload drifted.")
+    return context
 
 
 def validate_pending_order_restore_authority(
@@ -275,7 +311,17 @@ def validate_pending_order_restore_authority(
         if request.decision_type == SEQUENCING_DECISION_TYPE
         and sequencing_request_conflict_id(request) == conflict_id
     )
-    if command_state.battle_shock_candidate_order_unit_ids or len(candidates) < 2:
+    completed_count = len(command_state.completed_battle_shock_test_request_ids)
+    selected_unit_ids = command_state.battle_shock_candidate_order_unit_ids
+    remaining_candidates = tuple(
+        candidate for candidate in candidates if candidate.unit_instance_id not in selected_unit_ids
+    )
+    expects_selection = (
+        len(candidates) >= 2
+        and completed_count == len(selected_unit_ids)
+        and len(remaining_candidates) > 1
+    )
+    if not expects_selection:
         if matching:
             raise GameLifecycleError("Command Battle-shock has an excess sequencing request.")
         return
@@ -286,7 +332,10 @@ def validate_pending_order_restore_authority(
         request=matching[0],
         battle_round=command_state.battle_round,
         active_player_id=command_state.active_player_id,
-        candidates=candidates,
+        candidates=remaining_candidates,
+        previously_selected_participant_ids=tuple(
+            f"command-battle-shock-test:{unit_id}" for unit_id in selected_unit_ids
+        ),
     )
 
 

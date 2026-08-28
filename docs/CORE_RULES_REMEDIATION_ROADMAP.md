@@ -457,7 +457,7 @@ Owning state/validation/mutation/event/replay path: `BattleRoundFlow` generic `S
 one-time synchronous/effect/finite-choice progress → engine-owned Core CP transactions → two
 `command_points_gained` events → `command_step_started` → scoring/Command work → one-time 08.03
 canonical-rules-unit eligibility snapshot → typed eligible-off-battlefield unsupported boundary or
-generic sequencing choice → one live in-flight Battle-shock request/result and optional-reroll path →
+bounded select-next sequencing choice → one live in-flight Battle-shock request/result and optional-reroll path →
 success-only clearing of carried phase-start Battle-shock → exact
 `battle_shock_modifier_applications_recorded` producer/source/operand authority → universal
 `attached_rules_unit_split_reconciled` lineage authority whenever an Attached Unit splits → exact
@@ -470,8 +470,10 @@ Decision and viewer-visibility impact: The existing
 `select_faction_rule_command_phase_start_option` decision type, option IDs, payload shapes,
 stale/drift validation, queue behavior, record shapes, and public viewer visibility remain
 unchanged. Multiple required Battle-shock tests reuse the public generic
-`resolve_sequencing_order` decision with deterministic candidate IDs; no test request is
-materialized before that order is selected. Battle-shock rerolls retain decision type
+`resolve_sequencing_order` decision with deterministic candidate IDs and one option per remaining
+candidate; each selected test and its outcome finish before the next selection is requested, and
+the final sole candidate is automatic. No future test request is materialized before its candidate
+is selected. Battle-shock rerolls retain decision type
 `select_dice_reroll` and their option IDs, but
 their adapter-visible `battle_shock_context` now requires `passed_state_policy`: `preserve` for
 non-Command forced-test success and `clear_if_step_start_shocked` for 08.03 success. The lifecycle

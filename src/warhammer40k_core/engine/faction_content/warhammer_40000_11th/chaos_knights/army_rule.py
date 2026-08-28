@@ -14,6 +14,7 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartRequestContext,
     BattleRoundStartResultContext,
 )
+from warhammer40k_core.engine.battle_shock import BattleShockResult, BattleShockResultPayload
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
 )
@@ -21,8 +22,19 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockForcedTestContext,
     BattleShockHookBinding,
     BattleShockOutcomeContext,
+    BattleShockPendingOutcomeAuthority,
+    BattleShockPendingOutcomeAuthorityContext,
 )
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
+    resolve_mortal_wound_feel_no_pain_decision,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -44,10 +56,20 @@ from warhammer40k_core.engine.faction_rule_states import (
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookBinding,
+)
 from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    SetupStep,
+)
 from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_component_unit,
     placed_alive_geometry_models_for_rules_unit,
@@ -87,6 +109,8 @@ HARBINGERS_SELECTION_KIND = "select_chaos_knights_harbingers_of_dread"
 HARBINGERS_EFFECT_KIND = "chaos_knights_harbingers_of_dread"
 HARBINGERS_DREAD_ROLL_TYPE = "chaos_knights_harbingers_of_dread"
 HARBINGERS_DELIRIUM_D3_ROLL_TYPE = "chaos_knights_delirium_mortal_wounds_d3"
+DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND = "chaos_knights_delirium_mortal_wounds"
+DELIRIUM_MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:delirium:mortal-wound-fnp"
 ROLL_SELECTION_OPTION_ID = "chaos_knights:harbingers_of_dread:roll"
 DREAD_SELECTION_BATTLE_ROUNDS = frozenset({1, 3, 5})
 DREAD_AURA_RANGE_INCHES = 9.0
@@ -210,6 +234,15 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=SOURCE_RULE_ID,
                 forced_test_handler=harbingers_forced_battle_shock_unit_ids,
                 outcome_handler=resolve_harbingers_battle_shock_outcome,
+                pending_outcome_authority_validator=(validate_delirium_pending_outcome_authority),
+            ),
+        ),
+        mortal_wound_feel_no_pain_hook_bindings=(
+            MortalWoundFeelNoPainContinuationHookBinding(
+                hook_id=DELIRIUM_MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                source_kind=DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
+                handler=apply_delirium_mortal_wound_feel_no_pain_decision,
             ),
         ),
         unit_characteristic_modifier_bindings=(
@@ -685,34 +718,25 @@ def _apply_delirium_mortal_wounds(
         roll_type=HARBINGERS_DELIRIUM_D3_ROLL_TYPE,
         actor_id=target_rules_unit.unit_instance_id,
     )
-    if _rules_unit_has_feel_no_pain_choice(context.state, target_rules_unit):
-        context.decisions.event_log.append(
-            "chaos_knights_delirium_unsupported",
-            validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "phase": context.phase.value,
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "battle_shock_result_id": context.result.result_id,
-                    "player_id": chaos_knights_player_id,
-                    "target_unit_instance_id": target_rules_unit.unit_instance_id,
-                    "unsupported_reason": "mortal_wound_feel_no_pain_requires_decision",
-                    "d3_result": d3_result.to_payload(),
-                }
-            ),
-        )
-        return
+    resolution_payload = {
+        "game_id": context.state.game_id,
+        "battle_round": context.state.battle_round,
+        "phase": context.phase.value,
+        "source_rule_id": SOURCE_RULE_ID,
+        "battle_shock_result_id": context.result.result_id,
+        "player_id": chaos_knights_player_id,
+        "target_unit_instance_id": target_rules_unit.unit_instance_id,
+        "d3_result": validate_json_value(d3_result.to_payload()),
+    }
     source_context = validate_json_value(
         {
+            "source_kind": DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
+            "phase": context.phase.value,
             "battle_shock_result": context.result.to_payload(),
-            "d3_result": d3_result.to_payload(),
-            "target_unit_instance_id": target_rules_unit.unit_instance_id,
+            "resolution_payload": resolution_payload,
         }
     )
-    application = apply_mortal_wounds_to_unit(
-        state=context.state,
-        decisions=context.decisions,
+    progress = MortalWoundApplicationProgress.start(
         application_id=(
             f"{context.result.result_id}:delirium:{target_rules_unit.unit_instance_id}"
         ),
@@ -728,27 +752,198 @@ def _apply_delirium_mortal_wounds(
             source_step="delirium_mortal_wounds",
         ),
         target_unit_instance_id=target_rules_unit.unit_instance_id,
+        defender_player_id=context.result.request.player_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
+    )
+    routed = continue_mortal_wound_application(
+        state=context.state,
+        decisions=context.decisions,
+        request_id=context.state.next_decision_request_id(),
+        progress=progress,
         dice_manager=context.dice_manager,
-        defender_player_id=context.result.request.player_id,
     )
-    context.decisions.event_log.append(
-        "chaos_knights_delirium_mortal_wounds_applied",
-        validate_json_value(
-            {
-                "game_id": context.state.game_id,
-                "battle_round": context.state.battle_round,
-                "phase": context.phase.value,
+    _resolve_routed_delirium_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        feel_no_pain_result_id=None,
+    )
+
+
+def apply_delirium_mortal_wound_feel_no_pain_decision(
+    context: MortalWoundFeelNoPainContinuationContext,
+) -> LifecycleStatus | None:
+    if type(context) is not MortalWoundFeelNoPainContinuationContext:
+        raise GameLifecycleError("Delirium FNP continuation requires context.")
+    routed = resolve_mortal_wound_feel_no_pain_decision(
+        state=context.state,
+        decisions=context.decisions,
+        request=context.request,
+        result=context.result,
+        next_request_id=context.state.next_decision_request_id(),
+        dice_manager=context.dice_manager,
+    )
+    return _resolve_routed_delirium_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        feel_no_pain_result_id=context.result.result_id,
+    )
+
+
+def _resolve_routed_delirium_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    routed_request: DecisionRequest | None,
+    routed_application: MortalWoundApplication | None,
+    routed_progress: MortalWoundApplicationProgress,
+    feel_no_pain_result_id: str | None,
+) -> LifecycleStatus | None:
+    source_context = _delirium_source_context(routed_progress.source_context)
+    resolution_payload = _payload_object(source_context["resolution_payload"])
+    if routed_request is not None:
+        decisions.request_decision(routed_request)
+        decisions.event_log.append(
+            "chaos_knights_delirium_mortal_wounds_pending",
+            validate_json_value(
+                {
+                    **resolution_payload,
+                    "feel_no_pain_request_id": routed_request.request_id,
+                    "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed_request,
+            payload={
+                "phase": BattlePhase.COMMAND.value,
+                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                 "source_rule_id": SOURCE_RULE_ID,
-                "battle_shock_result_id": context.result.result_id,
-                "player_id": chaos_knights_player_id,
-                "target_unit_instance_id": target_rules_unit.unit_instance_id,
-                "d3_result": d3_result.to_payload(),
-                "mortal_wound_application": application.to_payload(),
-            }
-        ),
+                "source_kind": DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
+                "target_unit_instance_id": routed_progress.target_unit_instance_id,
+                "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+            },
+        )
+    if routed_application is None:
+        raise GameLifecycleError("Delirium mortal wound routing did not complete.")
+    applied_payload: dict[str, JsonValue] = {
+        **resolution_payload,
+        "mortal_wound_application": validate_json_value(routed_application.to_payload()),
+    }
+    if feel_no_pain_result_id is not None:
+        applied_payload["feel_no_pain_result_id"] = feel_no_pain_result_id
+    decisions.event_log.append(
+        "chaos_knights_delirium_mortal_wounds_applied",
+        validate_json_value(applied_payload),
     )
+    return None
+
+
+def validate_delirium_pending_outcome_authority(
+    context: BattleShockPendingOutcomeAuthorityContext,
+) -> BattleShockPendingOutcomeAuthority | None:
+    if type(context) is not BattleShockPendingOutcomeAuthorityContext:
+        raise GameLifecycleError("Delirium pending outcome authority requires context.")
+    if not is_mortal_wound_feel_no_pain_request(context.request):
+        return None
+    source_context = mortal_wound_feel_no_pain_source_context(context.request)
+    if not isinstance(source_context, dict) or source_context.get("source_kind") != (
+        DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND
+    ):
+        return None
+    parsed = _delirium_source_context(source_context)
+    result_payload = parsed["battle_shock_result"]
+    if not isinstance(result_payload, dict):
+        raise GameLifecycleError("Delirium pending outcome lacks Battle-shock result.")
+    result = BattleShockResult.from_payload(cast(BattleShockResultPayload, result_payload))
+    resolution_payload = _payload_object(parsed["resolution_payload"])
+    if (
+        result.passed
+        or resolution_payload.get("game_id") != context.state.game_id
+        or resolution_payload.get("battle_round") != context.state.battle_round
+        or resolution_payload.get("phase") != BattlePhase.COMMAND.value
+        or resolution_payload.get("source_rule_id") != SOURCE_RULE_ID
+        or resolution_payload.get("battle_shock_result_id") != result.result_id
+        or resolution_payload.get("target_unit_instance_id") != result.request.unit_instance_id
+    ):
+        raise GameLifecycleError("Delirium pending outcome source authority drifted.")
+    request_payload = _payload_object(context.request.payload)
+    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
+        request_payload.get("lost_wound_context")
+    )
+    if (
+        progress.application_id != f"{result.result_id}:delirium:{result.request.unit_instance_id}"
+        or progress.source_rule_id != SOURCE_RULE_ID
+        or progress.source_context != source_context
+        or progress.target_unit_instance_id != result.request.unit_instance_id
+        or progress.defender_player_id != result.request.player_id
+    ):
+        raise GameLifecycleError("Delirium pending mortal wound progress drifted.")
+    matches = tuple(
+        index
+        for index, event in enumerate(context.decisions.event_log.records)
+        if event.event_type == "battle_shock_test_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("battle_shock_result") == result.to_payload()
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("Delirium pending Battle-shock result authority drifted.")
+    if context.decisions.queue.pending_requests.count(context.request) != 1:
+        raise GameLifecycleError("Delirium pending outcome request is not queued.")
+    request_event_indices = tuple(
+        index
+        for index, event in enumerate(context.decisions.event_log.records)
+        if event.event_type == "decision_requested"
+        and event.payload == context.request.to_payload()
+    )
+    if len(request_event_indices) != 1 or request_event_indices[0] <= matches[0]:
+        raise GameLifecycleError("Delirium pending request event authority drifted.")
+    return BattleShockPendingOutcomeAuthority(
+        result=result,
+        resolved_event_index=matches[0],
+    )
+
+
+def _delirium_source_context(value: JsonValue) -> dict[str, JsonValue]:
+    payload = _payload_object(value)
+    if (
+        frozenset(payload)
+        != frozenset(
+            {
+                "source_kind",
+                "phase",
+                "battle_shock_result",
+                "resolution_payload",
+            }
+        )
+        or payload.get("source_kind") != DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND
+        or payload.get("phase") != BattlePhase.COMMAND.value
+        or not isinstance(payload.get("battle_shock_result"), dict)
+        or not isinstance(payload.get("resolution_payload"), dict)
+    ):
+        raise GameLifecycleError("Delirium mortal wound source context drifted.")
+    resolution_payload = _payload_object(payload["resolution_payload"])
+    if frozenset(resolution_payload) != frozenset(
+        {
+            "game_id",
+            "battle_round",
+            "phase",
+            "source_rule_id",
+            "battle_shock_result_id",
+            "player_id",
+            "target_unit_instance_id",
+            "d3_result",
+        }
+    ):
+        raise GameLifecycleError("Delirium mortal wound resolution payload drifted.")
+    return payload
 
 
 def _selection_common_payload(
@@ -1054,18 +1249,6 @@ def _roll_d3(
         )
     )
     return D3RollResult.from_source_d6_result(roll_state.original_result)
-
-
-def _rules_unit_has_feel_no_pain_choice(
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> bool:
-    return any(
-        state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id)
-        or state.feel_no_pain_decline_allowed_for_model(model_instance_id=model.model_instance_id)
-        for model in rules_unit.own_models
-        if model.is_alive
-    )
 
 
 def _eligible_harbingers_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:

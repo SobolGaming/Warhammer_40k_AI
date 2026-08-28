@@ -1317,15 +1317,6 @@ def _resolve_battle_shock_step(
         state=state,
         event_records=decisions.event_log.records,
     )
-    unsupported = _unsupported_command_battle_shock_candidate_status(state=state)
-    if unsupported is not None:
-        return unsupported
-    sequencing_status = _resolve_command_battle_shock_candidate_order(
-        state=state,
-        decisions=decisions,
-    )
-    if sequencing_status is not None:
-        return sequencing_status
     command_state = _command_step_state(state)
     phase_start_battle_shocked_unit_ids = command_state.battle_shock_phase_start_unit_ids
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
@@ -1339,9 +1330,21 @@ def _resolve_battle_shock_step(
         for candidate in command_state.battle_shock_candidate_inventory
         if candidate.test_reason is not None
     }
-    while len(command_state.completed_battle_shock_test_request_ids) < len(
-        command_state.battle_shock_candidate_order_unit_ids
-    ):
+    while len(command_state.completed_battle_shock_test_request_ids) < len(candidates_by_id):
+        unsupported = _unsupported_command_battle_shock_candidate_status(state=state)
+        if unsupported is not None:
+            return unsupported
+        sequencing_status = _resolve_command_battle_shock_candidate_order(
+            state=state,
+            decisions=decisions,
+        )
+        if sequencing_status is not None:
+            return sequencing_status
+        command_state = _command_step_state(state)
+        if len(command_state.completed_battle_shock_test_request_ids) >= len(
+            command_state.battle_shock_candidate_order_unit_ids
+        ):
+            raise GameLifecycleError("Battle-shock next candidate was not selected.")
         candidate_unit_id = command_state.battle_shock_candidate_order_unit_ids[
             len(command_state.completed_battle_shock_test_request_ids)
         ]
@@ -1459,6 +1462,7 @@ def _resolve_battle_shock_step(
                     "pending_request_id": pending_request.request_id,
                 },
             )
+    command_state = _command_step_state(state)
     completed_results = ordered_completed_command_battle_shock_results(
         state=state,
         event_records=decisions.event_log.records,

@@ -315,7 +315,8 @@ from warhammer40k_core.engine.runtime_rule_ir_authority import (
 )
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
-    apply_sequencing_decision_from_request,
+    sequencing_decision_event_from_request,
+    validate_sequencing_result_from_request,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
@@ -2668,11 +2669,7 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
-        result.validate_for_request(request)
-        apply_sequencing_decision_from_request(
-            request=request,
-            result=result,
-        )
+        validate_sequencing_result_from_request(request=request, result=result)
         return None
 
     def _apply_sequencing_decision(
@@ -2680,14 +2677,11 @@ class GameLifecycle:
         record: DecisionRecord,
         result: DecisionResult,
     ) -> LifecycleStatus:
-        sequencing_decision = apply_sequencing_decision_from_request(
+        event_type, payload = sequencing_decision_event_from_request(
             request=record.request,
             result=result,
         )
-        self.decision_controller.event_log.append(
-            "sequencing_order_resolved",
-            sequencing_decision.to_payload(),
-        )
+        self.decision_controller.event_log.append(event_type, payload)
         return self.advance_until_decision_or_terminal()
 
     def pending_decision_request(self) -> DecisionRequest | None:

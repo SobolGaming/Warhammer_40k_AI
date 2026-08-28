@@ -40,6 +40,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockForcedTestContext,
     BattleShockHookRegistry,
     BattleShockOutcomeContext,
+    BattleShockPendingOutcomeAuthorityContext,
 )
 from warhammer40k_core.engine.command_battle_shock_candidates import (
     CommandBattleShockCandidate,
@@ -53,6 +54,7 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights import (
     army_rule,
@@ -60,6 +62,10 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookRegistry,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -1041,7 +1047,7 @@ def test_harbingers_source_geometry_does_not_expand_to_attached_bodyguards() -> 
     )
 
 
-def test_delirium_reports_unsupported_when_mortal_wound_fnp_requires_choice() -> None:
+def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> None:
     state = battle_state()
     state.game_id = "phase17g-chaos-knights-delirium-fnp"
     _mark_player_as_chaos_knights(state, player_id="player-a")
@@ -1074,17 +1080,66 @@ def test_delirium_reports_unsupported_when_mortal_wound_fnp_requires_choice() ->
         battle_shock_hooks=_battle_shock_hooks(),
     )
 
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = waiting.decision_request
+    assert request is not None
+    hooks = _battle_shock_hooks()
+    pending_authority = hooks.pending_outcome_authority_for(
+        BattleShockPendingOutcomeAuthorityContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+        )
+    )
+    assert pending_authority is not None
+    assert pending_authority.result.result_id == cast(
+        str,
+        _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_pending")[
+            "battle_shock_result_id"
+        ],
+    )
+    contribution = army_rule.runtime_contribution()
+    registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        contribution.mortal_wound_feel_no_pain_hook_bindings
+    )
+    while request is not None:
+        request_payload = cast(dict[str, JsonValue], request.payload)
+        lost_wound_context = cast(
+            dict[str, JsonValue],
+            request_payload["lost_wound_context"],
+        )
+        result = DecisionResult.for_request(
+            result_id=f"phase17g-chaos-knights-delirium-fnp-{request.request_id}",
+            request=request,
+            selected_option_id="decline",
+        )
+        decisions.submit_result(result)
+        continuation = registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                source_context=lost_wound_context["source_context"],
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=_runtime_modifier_registry(),
+                battle_shock_hooks=hooks,
+                ability_indexes_by_player_id={},
+            )
+        )
+        request = None if continuation is None else continuation.decision_request
     completed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
-    unsupported_payload = _event_payload(decisions, "chaos_knights_delirium_unsupported")
-    assert (
-        unsupported_payload["unsupported_reason"] == "mortal_wound_feel_no_pain_requires_decision"
-    )
+    applied_payload = _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_applied")
+    assert applied_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+    assert applied_payload["feel_no_pain_result_id"] is not None
     final_wounds = sum(
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
-    assert final_wounds == starting_wounds
+    assert final_wounds < starting_wounds
 
 
 def test_deathly_terror_and_despair_worsen_enemy_leadership_in_aura() -> None:
@@ -1241,6 +1296,7 @@ def test_chaos_knights_army_rule_uses_phase17f_execution_source_id() -> None:
     assert contribution.contribution_id == record.handler_id
     assert contribution.battle_round_start_hook_bindings[0].source_id == record.execution_id
     assert contribution.battle_shock_hook_bindings[0].source_id == record.execution_id
+    assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].source_id == record.execution_id
     assert contribution.unit_characteristic_modifier_bindings[0].source_id == record.execution_id
     assert contribution.hit_roll_modifier_bindings[0].source_id == record.execution_id
     assert contribution.wound_roll_modifier_bindings[0].source_id == record.execution_id

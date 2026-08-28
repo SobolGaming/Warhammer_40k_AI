@@ -480,6 +480,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread` | Harbingers of Dread |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock` | Harbingers of Dread - Battle-shock |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll` | Harbingers of Dread - Darkness |
+| `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:delirium:mortal-wound-fnp` | Harbingers of Dread |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll` | Harbingers of Dread - Doom |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership` | Harbingers of Dread - Deathly Terror and Despair |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed` | Dark Pacts |

@@ -260,11 +260,12 @@ def validate_command_battle_shock_step_progress(
     )
     required_unit_ids = {candidate.unit_instance_id for candidate in required_candidates}
     if candidate_order_unit_ids:
-        if set(candidate_order_unit_ids) != required_unit_ids or len(
+        if not set(candidate_order_unit_ids).issubset(required_unit_ids) or len(
             candidate_order_unit_ids
-        ) != len(required_unit_ids):
+        ) != len(set(candidate_order_unit_ids)):
             raise GameLifecycleError(
-                "CommandStepState Battle-shock candidate order must contain every required unit."
+                "CommandStepState Battle-shock candidate order must be a unique required-unit "
+                "prefix."
             )
     elif len(required_candidates) == 1:
         raise GameLifecycleError(
@@ -302,7 +303,11 @@ def validate_command_battle_shock_step_progress(
             or in_flight_test_request.reason is not next_candidate.test_reason
         ):
             raise GameLifecycleError("CommandStepState Battle-shock in-flight request drifted.")
-    if battle_shock_step_resolved and completed_test_request_ids != required_request_ids:
+    if battle_shock_step_resolved and (
+        set(candidate_order_unit_ids) != required_unit_ids
+        or len(candidate_order_unit_ids) != len(required_unit_ids)
+        or completed_test_request_ids != required_request_ids
+    ):
         raise GameLifecycleError(
             "CommandStepState cannot resolve before all required Battle-shock tests."
         )

@@ -54,7 +54,12 @@ from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
 )
-from warhammer40k_core.engine.decision_request import DecisionOption
+from warhammer40k_core.engine.decision_request import (
+    DecisionError,
+    DecisionOption,
+    DecisionRequest,
+    DecisionRequestPayload,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
@@ -149,8 +154,12 @@ from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     SequencingConflictContext,
     SequencingDecision,
+    SequencingNextParticipantDecision,
+    SequencingNextParticipantDecisionPayload,
     SequencingParticipant,
+    apply_select_next_sequencing_participant_from_request,
     apply_sequencing_decision,
+    create_select_next_sequencing_participant_request,
     create_sequencing_decision_request,
     request_sequencing_decision,
 )
@@ -569,6 +578,86 @@ def test_lifecycle_submit_decision_resolves_sequencing_decision() -> None:
     assert lifecycle.decision_controller.records[-1].request.decision_type == (
         SEQUENCING_DECISION_TYPE
     )
+
+
+def test_lifecycle_submit_decision_resolves_bounded_select_next_sequencing() -> None:
+    lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
+    state = lifecycle.state
+    assert state is not None
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    context = SequencingConflictContext(
+        conflict_id="phase12a-lifecycle-bounded-sequencing-conflict",
+        game_id=state.game_id,
+        timing_window=_timing_window(
+            state=state,
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+            phase=BattlePhase.MOVEMENT,
+            window_id="phase12a-lifecycle-bounded-sequencing-window",
+        ),
+        player_ids=state.player_ids,
+        active_player_id=state.active_player_id,
+    )
+    participants = (
+        *_sequencing_participants(),
+        SequencingParticipant(
+            participant_id="rule-gamma",
+            player_id="player-a",
+            source_rule_id="rule-gamma",
+        ),
+    )
+    request = create_select_next_sequencing_participant_request(
+        request_id=state.next_decision_request_id(),
+        context=context,
+        previously_selected_participant_ids=(),
+        remaining_participants=participants,
+    )
+    lifecycle.decision_controller.request_decision(request)
+    assert len(request.options) == len(participants)
+    assert (
+        DecisionRequest.from_payload(
+            cast(DecisionRequestPayload, json.loads(json.dumps(request.to_payload())))
+        )
+        == request
+    )
+
+    invalid = DecisionResult(
+        result_id="phase12a-lifecycle-bounded-invalid",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id="next:missing-participant",
+        payload={"selected_participant_id": "missing-participant"},
+    )
+    with pytest.raises(DecisionError, match="not in the finite action space"):
+        lifecycle.submit_decision(invalid)
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert lifecycle.decision_controller.records == ()
+
+    result = DecisionResult.for_request(
+        result_id="phase12a-lifecycle-bounded-result",
+        request=request,
+        selected_option_id="next:rule-beta",
+    )
+    status = lifecycle.submit_decision(result)
+    payload = _last_event_payload(
+        lifecycle.decision_controller,
+        "sequencing_next_participant_selected",
+    )
+    decision = SequencingNextParticipantDecision.from_payload(
+        cast(SequencingNextParticipantDecisionPayload, payload)
+    )
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert decision == apply_select_next_sequencing_participant_from_request(
+        request=request,
+        result=result,
+    )
+    assert decision.selected_participant_id == "rule-beta"
+    assert decision.remaining_participant_ids == ("rule-alpha", "rule-beta", "rule-gamma")
+    restored = GameLifecycle.from_payload(
+        cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+    )
+    assert restored.to_payload() == lifecycle.to_payload()
 
 
 def test_roll_off_decides_simultaneous_start_or_end_battle_round_rules() -> None:
