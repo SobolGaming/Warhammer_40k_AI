@@ -259,17 +259,12 @@ def validate_command_battle_shock_step_progress(
         candidate for candidate in candidate_inventory if candidate.test_reason is not None
     )
     required_unit_ids = {candidate.unit_instance_id for candidate in required_candidates}
-    if candidate_order_unit_ids:
-        if not set(candidate_order_unit_ids).issubset(required_unit_ids) or len(
-            candidate_order_unit_ids
-        ) != len(set(candidate_order_unit_ids)):
-            raise GameLifecycleError(
-                "CommandStepState Battle-shock candidate order must be a unique required-unit "
-                "prefix."
-            )
-    elif len(required_candidates) == 1:
+    if candidate_order_unit_ids and (
+        not set(candidate_order_unit_ids).issubset(required_unit_ids)
+        or len(candidate_order_unit_ids) != len(set(candidate_order_unit_ids))
+    ):
         raise GameLifecycleError(
-            "CommandStepState must fix the trivial Battle-shock candidate order."
+            "CommandStepState Battle-shock candidate order must be a unique required-unit prefix."
         )
     if (completed_test_request_ids or in_flight_test_request is not None) and not (
         candidate_order_unit_ids

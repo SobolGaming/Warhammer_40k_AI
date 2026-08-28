@@ -468,12 +468,6 @@ class CommandStepState:
             and candidates != self.battle_shock_candidate_inventory
         ):
             raise GameLifecycleError("Battle-shock candidate inventory drifted.")
-        required_unit_ids = tuple(
-            candidate.unit_instance_id
-            for candidate in candidates
-            if candidate.test_reason is not None
-        )
-        candidate_order = required_unit_ids if len(required_unit_ids) <= 1 else ()
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
@@ -489,7 +483,7 @@ class CommandStepState:
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=phase_start_ids,
             battle_shock_candidate_inventory=candidates,
-            battle_shock_candidate_order_unit_ids=candidate_order,
+            battle_shock_candidate_order_unit_ids=(),
             battle_shock_in_flight_test_request=None,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )

@@ -43,6 +43,10 @@ type BattleShockPendingOutcomeAuthorityValidator = Callable[
     ["BattleShockPendingOutcomeAuthorityContext"],
     "BattleShockPendingOutcomeAuthority | None",
 ]
+type BattleShockCompletedOutcomeAuthorityValidator = Callable[
+    ["BattleShockCompletedOutcomeAuthorityContext"],
+    None,
+]
 type BattleShockForcedTestHandler = Callable[
     ["BattleShockForcedTestContext"],
     tuple[str, ...],
@@ -464,6 +468,24 @@ class BattleShockPendingOutcomeAuthority:
 
 
 @dataclass(frozen=True, slots=True)
+class BattleShockCompletedOutcomeAuthorityContext:
+    """Loaded-provider context for authenticating completed outcome history."""
+
+    state: GameState
+    decisions: DecisionController
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Completed Battle-shock outcome authority requires GameState.")
+        if type(self.decisions) is not DecisionController:
+            raise GameLifecycleError(
+                "Completed Battle-shock outcome authority requires DecisionController."
+            )
+
+
+@dataclass(frozen=True, slots=True)
 class BattleShockHookBinding:
     hook_id: str
     source_id: str
@@ -475,6 +497,9 @@ class BattleShockHookBinding:
     reroll_permission_handler: BattleShockRerollPermissionHandler | None = None
     outcome_handler: BattleShockOutcomeHandler | None = None
     pending_outcome_authority_validator: BattleShockPendingOutcomeAuthorityValidator | None = None
+    completed_outcome_authority_validator: BattleShockCompletedOutcomeAuthorityValidator | None = (
+        None
+    )
     historical_contribution_handler: HistoricalBattleShockContributionHandler | None = None
 
     def __post_init__(self) -> None:
@@ -533,6 +558,16 @@ class BattleShockHookBinding:
         if self.pending_outcome_authority_validator is not None and self.outcome_handler is None:
             raise GameLifecycleError(
                 "BattleShockHookBinding pending outcome authority requires an outcome handler."
+            )
+        if self.completed_outcome_authority_validator is not None and not callable(
+            self.completed_outcome_authority_validator
+        ):
+            raise GameLifecycleError(
+                "BattleShockHookBinding completed outcome authority validator must be callable."
+            )
+        if self.completed_outcome_authority_validator is not None and self.outcome_handler is None:
+            raise GameLifecycleError(
+                "BattleShockHookBinding completed outcome authority requires an outcome handler."
             )
         if self.historical_contribution_handler is not None and not callable(
             self.historical_contribution_handler
@@ -772,6 +807,33 @@ class BattleShockHookRegistry:
                 "Pending Battle-shock outcome request has multiple loaded authorities."
             )
         return None if not claims else claims[0]
+
+    def validate_completed_outcome_authority(
+        self,
+        context: BattleShockCompletedOutcomeAuthorityContext,
+    ) -> None:
+        """Run every loaded provider's read-only completed-outcome validator."""
+
+        if type(context) is not BattleShockCompletedOutcomeAuthorityContext:
+            raise GameLifecycleError("Completed Battle-shock outcome hooks require context.")
+        for binding in self.bindings:
+            validator = binding.completed_outcome_authority_validator
+            if validator is None:
+                continue
+            before_state = context.state.to_payload()
+            before_queue = context.decisions.queue.pending_requests
+            before_records = context.decisions.records
+            before_events = context.decisions.event_log.records
+            validator(context)
+            if (
+                context.state.to_payload() != before_state
+                or context.decisions.queue.pending_requests != before_queue
+                or context.decisions.records != before_records
+                or context.decisions.event_log.records != before_events
+            ):
+                raise GameLifecycleError(
+                    "Completed Battle-shock outcome authority validation mutated runtime state."
+                )
 
 
 def _validate_hook_bindings(value: object) -> tuple[BattleShockHookBinding, ...]:

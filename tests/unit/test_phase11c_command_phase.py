@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import replace
 from typing import Any, cast
 
@@ -135,7 +136,12 @@ from warhammer40k_core.engine.command_points import (
     command_point_gain_status_from_token,
     command_point_source_kind_from_token,
 )
-from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+from warhammer40k_core.engine.damage_allocation import (
+    DamageKind,
+    MortalWoundApplicationProgress,
+    apply_damage_to_model,
+    continue_mortal_wound_application,
+)
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -145,6 +151,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
@@ -180,6 +187,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -1202,17 +1212,57 @@ def test_attached_rules_unit_uses_one_canonical_required_test_and_clear_identity
     assert resolved["cleared_battle_shocked_unit_ids"] == [attached_id]
 
 
-def test_off_battlefield_shocked_unit_returns_typed_command_unsupported() -> None:
-    state = _battle_state()
-    decisions = DecisionController()
-    unit_id = "army-alpha:intercessor-unit-1"
-    _record_unit_battle_shocked(state, unit_instance_id=unit_id)
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.without_unit_placement(unit_id)
+def test_off_battlefield_singleton_returns_restorable_typed_command_unsupported() -> None:
+    state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
+    prewound = continue_mortal_wound_application(
+        state=state,
+        decisions=decisions,
+        request_id="phase11c-off-battlefield-restore:prewound-request",
+        progress=MortalWoundApplicationProgress.start(
+            application_id="phase11c-off-battlefield-restore:prewound",
+            source_rule_id="phase11c:test:off-battlefield-prewound",
+            source_context={"source_kind": "phase11c_off_battlefield_fixture"},
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+                state=state,
+                destroying_player_id="player-b",
+                source_rules_unit_instance_id=None,
+                source_model_instance_id=None,
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=BattlePhase.FIGHT,
+                source_step="phase11c_off_battlefield_fixture",
+            ),
+            target_unit_instance_id=unit.unit_instance_id,
+            defender_player_id="player-a",
+            mortal_wounds=sum(model.wounds_remaining for model in unit.own_models[:3]),
+            spill_over=True,
+        ),
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+    )
+    assert prewound.request is None
+    assert prewound.application is not None
+    result, _provider = _accept_gate_of_infinity_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        unit=unit,
+        result_id="phase11c-off-battlefield-restore:gate",
+    )
+    assert registry.apply_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+    state.active_player_id = "player-a"
+    state.battle_round = 2
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+    state.command_step_state = None
+    unit_id = unit.unit_instance_id
 
-    status = CommandPhaseHandler(
-        stratagem_index=StratagemCatalogIndex.from_records(())
-    ).begin_phase(state=state, decisions=decisions)
+    handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
+    status = handler.begin_phase(state=state, decisions=decisions)
 
     assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
     assert status.payload == {
@@ -1220,14 +1270,33 @@ def test_off_battlefield_shocked_unit_returns_typed_command_unsupported() -> Non
         "section_id": "08.03",
         "unit_instance_id": unit_id,
         "component_unit_instance_ids": [unit_id],
-        "candidate_reasons": ["currently_battle_shocked"],
+        "candidate_reasons": ["at_or_below_half_strength"],
         "unsupported_scope": "off_battlefield_battle_shock_test",
     }
     command_state = _command_step_state(state)
     assert command_state.current_step is CommandPhaseStep.BATTLE_SHOCK
     assert not command_state.battle_shock_step_resolved
-    assert command_state.battle_shock_required_unit_ids == (unit_id,)
+    assert command_state.battle_shock_required_unit_ids == ()
     assert command_state.battle_shock_in_flight_test_request is None
+    lifecycle = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _command_phase_handler=handler,
+    )
+    restored = GameLifecycle.from_payload(
+        cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+    )
+    before_reentry = restored.to_payload()
+
+    assert restored.state is not None
+    reentered = handler.begin_phase(
+        state=restored.state,
+        decisions=restored.decision_controller,
+    )
+
+    assert reentered.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert reentered.payload == status.payload
+    assert restored.to_payload() == before_reentry
 
 
 def test_completed_rerolled_battle_shock_target_destruction_does_not_block_reentry() -> None:
@@ -2264,12 +2333,6 @@ def test_command_battle_shock_progress_requires_exact_live_request_prefix() -> N
             "candidate_inventory": inventory,
             "candidate_order_unit_ids": (),
             "in_flight_test_request": None,
-        },
-        {
-            "candidate_inventory": (first_candidate,),
-            "candidate_order_unit_ids": (),
-            "in_flight_test_request": None,
-            "phase_start_unit_ids": (),
         },
         {"candidate_order_unit_ids": ()},
         {
@@ -7845,8 +7908,11 @@ def test_battle_shock_reroll_applier_rejects_wrong_lifecycle_window() -> None:
 
 
 def test_command_battle_shock_pending_reroll_context_drift_is_rejected() -> None:
-    state = _battle_state(game_id="phase11c-command-reroll-context-drift")
     decisions = DecisionController()
+    state = _battle_state(
+        game_id="phase11c-command-reroll-context-drift",
+        decisions=decisions,
+    )
     unit_id = "army-alpha:intercessor-unit-1"
     _remove_first_models(state, unit_instance_id=unit_id, count=3)
 
@@ -8078,6 +8144,74 @@ def test_command_battle_shock_pending_reroll_context_drift_is_rejected() -> None
         runtime_content_bundle=runtime_bundle,
     )
     assert authority.test_request == in_flight
+    lifecycle_payload = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _config=config,
+        _runtime_content_bundle=runtime_bundle,
+    ).to_payload()
+    GameLifecycle.from_payload(
+        cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle_payload))),
+        runtime_content_bundle=runtime_bundle,
+    )
+    for tamper_kind in (
+        "leadership",
+        "dice_expression",
+        "strength_context",
+        "in_flight_without_request_event",
+        "request_event_without_roll_or_pending_reroll",
+    ):
+        forged_lifecycle = cast(dict[str, Any], deepcopy(lifecycle_payload))
+        forged_state = cast(dict[str, Any], forged_lifecycle["state"])
+        forged_command = cast(dict[str, Any], forged_state["command_step_state"])
+        forged_in_flight = cast(
+            dict[str, Any],
+            forged_command["battle_shock_in_flight_test_request"],
+        )
+        if tamper_kind == "leadership":
+            forged_in_flight["leadership_target"] = int(forged_in_flight["leadership_target"]) + 1
+        elif tamper_kind == "dice_expression":
+            expression = cast(
+                dict[str, Any],
+                cast(dict[str, Any], forged_in_flight["spec"])["expression"],
+            )
+            expression["quantity"] = 3
+        elif tamper_kind == "strength_context":
+            strength = cast(dict[str, Any], forged_in_flight["below_half_strength_context"])
+            strength["starting_model_count"] = int(strength["starting_model_count"]) + 1
+        else:
+            forged_decisions = cast(dict[str, Any], forged_lifecycle["decisions"])
+            forged_queue = cast(dict[str, Any], forged_decisions["queue"])
+            forged_queue["pending_requests"] = []
+            events = cast(list[dict[str, Any]], forged_decisions["event_log"])
+            filtered = [
+                event
+                for event in events
+                if not (
+                    event["event_type"] == "dice_rolled"
+                    or (
+                        event["event_type"] == "decision_requested"
+                        and isinstance(event["payload"], dict)
+                        and cast(dict[str, Any], event["payload"]).get("request_id")
+                        == request.request_id
+                    )
+                    or (
+                        tamper_kind == "in_flight_without_request_event"
+                        and event["event_type"] == "battle_shock_test_requested"
+                        and isinstance(event["payload"], dict)
+                        and cast(dict[str, Any], event["payload"]).get("battle_shock_test_request")
+                        == in_flight.to_payload()
+                    )
+                )
+            ]
+            for index, event in enumerate(filtered, start=1):
+                event["event_id"] = f"event-{index:06d}"
+            forged_decisions["event_log"] = filtered
+        with pytest.raises(GameLifecycleError, match="Battle-shock"):
+            GameLifecycle.from_payload(
+                cast(GameLifecyclePayload, forged_lifecycle),
+                runtime_content_bundle=runtime_bundle,
+            )
 
     request_event_index = next(
         index
@@ -8210,7 +8344,7 @@ def test_command_battle_shock_pending_reroll_context_drift_is_rejected() -> None
         )
     state.command_step_state = original_command_state
 
-    with pytest.raises(GameLifecycleError, match="in-progress test requires pending reroll"):
+    with pytest.raises(GameLifecycleError, match="in-flight test requires pending reroll"):
         command_history._validate_pending_reroll_restore_authority(
             state=state,
             event_records=decisions.event_log.records,
@@ -9978,12 +10112,15 @@ def test_command_point_and_step_state_validation_is_fail_fast() -> None:
         battle_step.enter_battle_shock_step(candidate_inventory=())
     with pytest.raises(GameLifecycleError, match="candidate order requires Battle-shock step"):
         command_state.with_battle_shock_candidate_order((unit_id,))
+    ordered_battle_step = battle_step.with_battle_shock_candidate_order((unit_id,))
     with pytest.raises(GameLifecycleError, match="candidate order was already resolved"):
-        battle_step.with_battle_shock_candidate_order((unit_id,))
+        ordered_battle_step.with_battle_shock_candidate_order((unit_id,))
     with pytest.raises(GameLifecycleError, match="in-flight test requires Battle-shock step"):
         command_state.with_in_flight_battle_shock_test_request(request)
 
-    in_flight = battle_step.with_in_flight_battle_shock_test_request(request)
+    with pytest.raises(GameLifecycleError, match="candidate order resolves"):
+        battle_step.with_in_flight_battle_shock_test_request(request)
+    in_flight = ordered_battle_step.with_in_flight_battle_shock_test_request(request)
     with pytest.raises(GameLifecycleError, match="already in flight"):
         in_flight.with_in_flight_battle_shock_test_request(request)
     with pytest.raises(GameLifecycleError, match="completion requires Battle-shock step"):
@@ -10383,13 +10520,17 @@ def test_command_phase_section_eight_private_boundaries_fail_closed() -> None:
             candidate_inventory=inventory,
         )
     )
-    object.__setattr__(battle_step, "battle_shock_candidate_order_unit_ids", ())
     one_candidate_state.command_step_state = battle_step
-    with pytest.raises(GameLifecycleError, match="trivial candidate order"):
+    assert (
         command_phase_module._resolve_command_battle_shock_candidate_order(
             state=one_candidate_state,
             decisions=DecisionController(),
         )
+        is None
+    )
+    assert _command_step_state(one_candidate_state).battle_shock_candidate_order_unit_ids == (
+        unit_id,
+    )
 
     two_unit_selections = (
         _default_unit_selection("intercessor-unit-1"),

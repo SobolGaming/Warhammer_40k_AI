@@ -57,7 +57,6 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     unit_move_completed_battle_shock_effect_key,
     unit_move_completed_battle_shock_request_id,
 )
-from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -252,12 +251,7 @@ def _validate_historical_request_semantics(
             phase_start_battle_shocked_unit_ids=(phase_start_battle_shocked_unit_ids),
             placed_model_ids=placed_model_ids,
         )
-    starting_strength = historical.starting_strength(rules_unit.unit_instance_id)
-    expected_strength_context = BelowHalfStrengthContext.from_rules_unit(
-        rules_unit=rules_unit,
-        starting_strength=starting_strength,
-        current_model_ids=placed_model_ids,
-    )
+    expected_strength_context = historical.below_half_strength_context(rules_unit.unit_instance_id)
     if request.below_half_strength_context != expected_strength_context:
         raise GameLifecycleError("Battle-shock historical request strength context drifted.")
     ability_index = runtime_content_bundle.ability_indexes_by_player_id.get(request.player_id)

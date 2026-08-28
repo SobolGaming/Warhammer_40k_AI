@@ -238,6 +238,9 @@ def runtime_contribution() -> RuntimeContentContribution:
                 pending_outcome_authority_validator=(
                     battle_shock_outcome_authority.validate_delirium_pending_outcome_authority
                 ),
+                completed_outcome_authority_validator=(
+                    battle_shock_outcome_authority.validate_delirium_completed_outcome_authority
+                ),
             ),
         ),
         mortal_wound_feel_no_pain_hook_bindings=(

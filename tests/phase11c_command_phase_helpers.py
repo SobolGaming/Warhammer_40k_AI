@@ -153,6 +153,7 @@ def battle_state(
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
     player_a_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     player_b_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    decisions: DecisionController | None = None,
 ) -> GameState:
     config = phase11c_config(
         game_id=game_id,
@@ -175,8 +176,8 @@ def battle_state(
     state.record_secondary_mission_choice(
         secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    decisions = DecisionController()
-    complete_setup_through_gate(state=state, decisions=decisions, config=config)
+    resolved_decisions = DecisionController() if decisions is None else decisions
+    complete_setup_through_gate(state=state, decisions=resolved_decisions, config=config)
     return state
 
 

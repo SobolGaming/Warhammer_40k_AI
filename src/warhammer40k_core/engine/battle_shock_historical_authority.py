@@ -24,7 +24,7 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -184,6 +184,30 @@ class HistoricalBattleShockAuthorityContext:
                 for row in self.physical_models
                 if row.model_instance_id in allowed and row.presence == "battlefield"
             )
+        )
+
+    def below_half_strength_context(self, unit_instance_id: str) -> BelowHalfStrengthContext:
+        rules_unit = self.rules_unit(unit_instance_id)
+        starting_strength = self.starting_strength(rules_unit.unit_instance_id)
+        current_model_ids = self.placed_alive_model_ids(rules_unit.unit_instance_id)
+        single_model_wounds_remaining = None
+        if starting_strength.starting_model_count == 1:
+            model_ids = {model.model_instance_id for model in rules_unit.own_models}
+            matching_rows = tuple(
+                row for row in self.physical_models if row.model_instance_id in model_ids
+            )
+            if len(model_ids) != 1 or len(matching_rows) != 1:
+                raise GameLifecycleError(
+                    "Historical Battle-shock single-model wound authority is ambiguous."
+                )
+            single_model_wounds_remaining = matching_rows[0].wounds_remaining
+        return BelowHalfStrengthContext(
+            player_id=rules_unit.owner_player_id,
+            unit_instance_id=rules_unit.unit_instance_id,
+            starting_model_count=starting_strength.starting_model_count,
+            current_model_count=len(current_model_ids),
+            single_model_starting_wounds=starting_strength.single_model_starting_wounds,
+            single_model_wounds_remaining=single_model_wounds_remaining,
         )
 
     def geometry_models(self, unit_instance_id: str) -> tuple[GeometryModel, ...]:

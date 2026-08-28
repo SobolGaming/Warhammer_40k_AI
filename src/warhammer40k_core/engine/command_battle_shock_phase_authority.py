@@ -106,8 +106,13 @@ def resolve_candidate_order(
     if not candidates:
         return None
     if len(candidates) == 1:
-        if command_state.battle_shock_candidate_order_unit_ids != (candidates[0].unit_instance_id,):
-            raise GameLifecycleError("Battle-shock trivial candidate order was not fixed at entry.")
+        expected_order = (candidates[0].unit_instance_id,)
+        if not command_state.battle_shock_candidate_order_unit_ids:
+            state.replace_command_step_state(
+                command_state.with_battle_shock_candidate_order(expected_order)
+            )
+        elif command_state.battle_shock_candidate_order_unit_ids != expected_order:
+            raise GameLifecycleError("Battle-shock trivial candidate order drifted.")
         return None
     context = _command_battle_shock_sequencing_context(state=state)
     all_participants = _command_battle_shock_sequencing_participants(

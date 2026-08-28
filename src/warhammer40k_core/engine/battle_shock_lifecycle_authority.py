@@ -173,18 +173,58 @@ def validate_loaded(
     )
 
     for pending_request in decisions.queue.pending_requests:
-        if not (
+        if (
             isinstance(pending_request.payload, dict)
             and "battle_shock_context" in pending_request.payload
         ):
-            continue
-        validate_live_pending_battle_shock_reroll_authority(
+            validate_live_pending_battle_shock_reroll_authority(
+                state=state,
+                event_records=decisions.event_log.records,
+                decision_records=decisions.records,
+                pending_request=pending_request,
+                runtime_content_bundle=runtime_content_bundle,
+            )
+        validate_pending_outcome_request(
             state=state,
-            event_records=decisions.event_log.records,
-            decision_records=decisions.records,
-            pending_request=pending_request,
+            decisions=decisions,
+            request=pending_request,
             runtime_content_bundle=runtime_content_bundle,
         )
+    from warhammer40k_core.engine.battle_shock_hooks import (
+        BattleShockCompletedOutcomeAuthorityContext,
+    )
+
+    runtime_content_bundle.battle_shock_hook_registry.validate_completed_outcome_authority(
+        BattleShockCompletedOutcomeAuthorityContext(
+            state=state,
+            decisions=decisions,
+        )
+    )
+
+
+def validate_pending_outcome_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    runtime_content_bundle: RuntimeContentBundle | None,
+) -> None:
+    """Require any loaded Battle-shock outcome provider to authenticate its request."""
+
+    if runtime_content_bundle is None:
+        return
+
+    from warhammer40k_core.engine.battle_shock_hooks import (
+        BattleShockPendingOutcomeAuthorityContext,
+    )
+
+    runtime_content_bundle.battle_shock_hook_registry.pending_outcome_authority_for(
+        BattleShockPendingOutcomeAuthorityContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+        )
+    )
 
 
 def validate_restore(
@@ -206,5 +246,6 @@ __all__ = (
     "invalid_live_pending",
     "requires_command_prevalidation",
     "validate_loaded",
+    "validate_pending_outcome_request",
     "validate_restore",
 )

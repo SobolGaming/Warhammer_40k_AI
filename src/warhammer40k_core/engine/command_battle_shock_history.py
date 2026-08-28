@@ -768,11 +768,9 @@ def _validate_pending_reroll_restore_authority(
         and event.payload == expected_test_event
     )
     if not pending_rerolls:
-        if in_progress_test_events:
-            raise GameLifecycleError(
-                "Command Battle-shock in-progress test requires pending reroll authority."
-            )
-        return
+        raise GameLifecycleError(
+            "Command Battle-shock in-flight test requires pending reroll authority."
+        )
     pending_request = pending_rerolls[0]
     if not in_progress_test_events:
         raise GameLifecycleError("Command Battle-shock pending reroll state drift.")
@@ -1039,8 +1037,6 @@ def _validate_historical_snapshot_completion_pairs(
                     candidates=required_candidates,
                     ordered_unit_ids=(command_state.battle_shock_candidate_order_unit_ids),
                 )
-            elif len(required_candidates) == 1:
-                raise GameLifecycleError("Open Command Battle-shock trivial order drifted.")
             continue
         if completion is None:
             raise GameLifecycleError("Historical Command Battle-shock completion is missing.")
