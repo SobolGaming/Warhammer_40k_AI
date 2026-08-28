@@ -90,24 +90,50 @@ def validate_july_daemonic_manifestation_pending_outcome(
 
     if type(context) is not BattleShockPendingOutcomeAuthorityContext:
         raise GameLifecycleError("Daemonic Manifestation outcome authority requires context.")
+    events = context.decisions.event_log.records
+    marker_identifies_provider = any(
+        event.event_type == _PENDING_EVENT_TYPE
+        and isinstance(event.payload, dict)
+        and event.payload.get("decision_request_id") == context.request.request_id
+        for event in events
+    )
     effect = _effect_from_supported_request(context.request)
     if effect is None:
+        if marker_identifies_provider:
+            raise GameLifecycleError("Daemonic Manifestation outcome provider identity drifted.")
         return None
-    source_context = _object(effect.source_context, "source context")
+    source_context = effect.source_context if isinstance(effect.source_context, dict) else None
     source_identifies_provider = effect.source_rule_id == source_rule_id
-    kind_identifies_provider = source_context.get("effect_kind") == _EFFECT_KIND
-    if not source_identifies_provider and not kind_identifies_provider:
+    kind_identifies_provider = (
+        source_context is not None and source_context.get("effect_kind") == _EFFECT_KIND
+    )
+    hook_identifies_provider = (
+        source_context is not None and source_context.get("hook_id") == hook_id
+    )
+    effect_id_identifies_provider = effect.effect_id.startswith(
+        f"{hook_id}:daemonic-manifestation-battleline:"
+    )
+    if not any(
+        (
+            source_identifies_provider,
+            kind_identifies_provider,
+            hook_identifies_provider,
+            effect_id_identifies_provider,
+            marker_identifies_provider,
+        )
+    ):
         return None
     if (
         not source_identifies_provider
         or not kind_identifies_provider
-        or source_context.get("hook_id") != hook_id
+        or not hook_identifies_provider
+        or not effect_id_identifies_provider
+        or source_context is None
     ):
         raise GameLifecycleError("Daemonic Manifestation outcome provider identity drifted.")
     if frozenset(source_context) != _SOURCE_CONTEXT_KEYS:
         raise GameLifecycleError("Daemonic Manifestation outcome source context drifted.")
 
-    events = context.decisions.event_log.records
     request_event_index = _exact_request_event_index(events=events, request=context.request)
     result_id = _identifier(source_context.get("battle_shock_result_id"), "result ID")
     resolved_matches = tuple(

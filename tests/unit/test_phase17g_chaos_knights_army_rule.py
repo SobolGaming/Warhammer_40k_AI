@@ -1586,6 +1586,93 @@ def test_delirium_source_kind_drift_rejects_before_lifecycle_mutation() -> None:
     )
 
 
+def test_delirium_dual_identity_drift_keeps_provider_ownership() -> None:
+    lifecycle, bundle = _command_delirium_lifecycle_fixture(
+        game_id="phase17g-chaos-knights-delirium-dual-identity-drift",
+        with_feel_no_pain=True,
+    )
+    decisions = lifecycle.decision_controller
+    request = decisions.queue.peek_next()
+    request_payload = cast(dict[str, Any], deepcopy(request.payload))
+    lost_wound_context = cast(dict[str, Any], request_payload["lost_wound_context"])
+    application_id = cast(str, lost_wound_context["application_id"])
+    lost_wound_context["source_rule_id"] = "phase17g:forged-delirium-source"
+    source_context = cast(dict[str, Any], lost_wound_context["source_context"])
+    source_context["source_kind"] = "phase17g:forged-delirium-source-kind"
+    forged_request = replace(request, payload=validate_json_value(request_payload))
+    decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
+
+    original_request_payload = request.to_payload()
+    forged_request_payload = forged_request.to_payload()
+    changed_request_event = False
+    changed_application_root = False
+    drifted_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type == "decision_requested" and event.payload == original_request_payload:
+            drifted_events.append(
+                replace(event, payload=validate_json_value(forged_request_payload))
+            )
+            changed_request_event = True
+            continue
+        if (
+            event.event_type == "mortal_wound_application_started"
+            and isinstance(event.payload, dict)
+            and event.payload.get("application_id") == application_id
+        ):
+            root_source_context = cast(dict[str, Any], deepcopy(event.payload["source_context"]))
+            root_source_context["source_kind"] = "phase17g:forged-delirium-source-kind"
+            drifted_events.append(
+                replace(
+                    event,
+                    payload={
+                        **event.payload,
+                        "source_rule_id": "phase17g:forged-delirium-source",
+                        "source_context": validate_json_value(root_source_context),
+                    },
+                )
+            )
+            changed_application_root = True
+            continue
+        drifted_events.append(event)
+    assert changed_request_event
+    assert changed_application_root
+    decisions.event_log.replace_records(tuple(drifted_events))
+
+    pending_marker = _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_pending")
+    assert pending_marker["source_rule_id"] == army_rule.SOURCE_RULE_ID
+    assert pending_marker["feel_no_pain_request_id"] == request.request_id
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+    result = DecisionResult.for_request(
+        result_id="phase17g-chaos-knights-delirium-dual-identity-drift:decline",
+        request=forged_request,
+        selected_option_id="decline",
+    )
+    assert lifecycle.state is not None
+    before_state = lifecycle.state.to_payload()
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+    before_dice_events = sum(event.event_type == "dice_rolled" for event in before_events)
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        lifecycle.submit_decision(result)
+
+    assert lifecycle.state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert (
+        sum(event.event_type == "dice_rolled" for event in decisions.event_log.records)
+        == before_dice_events
+    )
+
+
 def test_delirium_loaded_continuation_requires_pending_provider_claim() -> None:
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
         game_id="phase17g-chaos-knights-delirium-missing-provider-claim",

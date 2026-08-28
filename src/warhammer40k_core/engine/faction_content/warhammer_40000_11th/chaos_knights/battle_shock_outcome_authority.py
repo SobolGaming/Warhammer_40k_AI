@@ -76,7 +76,16 @@ def validate_delirium_pending_outcome_authority(
 
     if type(context) is not BattleShockPendingOutcomeAuthorityContext:
         raise GameLifecycleError("Delirium pending outcome authority requires context.")
+    events = context.decisions.event_log.records
+    marker_identifies_provider = any(
+        event.event_type == "chaos_knights_delirium_mortal_wounds_pending"
+        and isinstance(event.payload, dict)
+        and event.payload.get("feel_no_pain_request_id") == context.request.request_id
+        for event in events
+    )
     if not is_mortal_wound_feel_no_pain_request(context.request):
+        if marker_identifies_provider:
+            raise GameLifecycleError("Delirium pending outcome provider identity drifted.")
         return None
     source_context = mortal_wound_feel_no_pain_source_context(context.request)
     request_payload = _payload_object(context.request.payload)
@@ -91,7 +100,23 @@ def validate_delirium_pending_outcome_authority(
     kind_identifies_provider = isinstance(source_context, dict) and source_context.get(
         "source_kind"
     ) == (DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND)
-    if not source_identifies_provider and not kind_identifies_provider:
+    resolution_payload = (
+        source_context.get("resolution_payload") if isinstance(source_context, dict) else None
+    )
+    resolution_identifies_provider = (
+        isinstance(resolution_payload, dict)
+        and resolution_payload.get("source_rule_id") == army_rule.SOURCE_RULE_ID
+    )
+    application_identifies_provider = ":delirium:" in progress.application_id
+    if not any(
+        (
+            source_identifies_provider,
+            kind_identifies_provider,
+            resolution_identifies_provider,
+            application_identifies_provider,
+            marker_identifies_provider,
+        )
+    ):
         return None
     if not source_identifies_provider or not kind_identifies_provider:
         raise GameLifecycleError("Delirium pending outcome provider identity drifted.")
@@ -102,7 +127,6 @@ def validate_delirium_pending_outcome_authority(
         delirium_source_context(source_context)["resolution_payload"]
     ).get("battle_round"):
         raise GameLifecycleError("Delirium pending outcome live phase drifted.")
-    events = context.decisions.event_log.records
     if context.decisions.queue.pending_requests.count(context.request) != 1:
         raise GameLifecycleError("Delirium pending outcome request is not queued.")
     request_event_indices = tuple(
