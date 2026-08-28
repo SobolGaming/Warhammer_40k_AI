@@ -560,7 +560,10 @@ def _harbingers_forced_target_ids(
     candidate_models = {
         candidate.unit_instance_id: _geometry_models(
             state=state,
-            model_ids=candidate.placed_alive_model_instance_ids,
+            model_ids=_model_ids_for_component_unit_ids(
+                state=state,
+                component_unit_instance_ids=candidate.component_unit_instance_ids,
+            ),
             physical_rows=physical_rows,
         )
         for candidate in candidates
@@ -957,6 +960,25 @@ def _models_by_id(state: GameState) -> dict[str, ModelInstance]:
     ):
         raise GameLifecycleError("Command forced-test model identity is duplicated.")
     return models
+
+
+def _model_ids_for_component_unit_ids(
+    *,
+    state: GameState,
+    component_unit_instance_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    units_by_id = {
+        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
+    }
+    if any(unit_id not in units_by_id for unit_id in component_unit_instance_ids):
+        raise GameLifecycleError("Command forced-test component identity authority drifted.")
+    return tuple(
+        sorted(
+            model.model_instance_id
+            for unit_id in component_unit_instance_ids
+            for model in units_by_id[unit_id].own_models
+        )
+    )
 
 
 def _physical_by_id(

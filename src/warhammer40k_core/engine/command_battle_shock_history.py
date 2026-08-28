@@ -22,7 +22,22 @@ from warhammer40k_core.engine.battle_shock_state_history import (
 from warhammer40k_core.engine.command_battle_shock_candidates import (
     CommandBattleShockCandidate,
     CommandBattleShockCandidatePayload,
+    command_battle_shock_request_id,
     validate_command_battle_shock_candidate_inventory,
+)
+from warhammer40k_core.engine.command_battle_shock_history_helpers import (
+    candidate_by_id,
+    ordered_candidates_by_request_id,
+    payload_int,
+    payload_object,
+    payload_string,
+    raw_result_request_id,
+    sequencing_request_conflict_id,
+    validate_historical_candidate_order,
+    validate_historical_request_context,
+    validate_historical_sequencing_request,
+    validate_pending_order_restore_authority,
+    validate_request_against_candidate,
 )
 from warhammer40k_core.engine.command_battle_shock_runtime_authority import (
     validate_historical_command_candidate_inventory,
@@ -52,6 +67,24 @@ from warhammer40k_core.engine.rules_units import (
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
+_candidate_by_id = candidate_by_id
+_ordered_candidates_by_request_id = ordered_candidates_by_request_id
+_payload_int = payload_int
+_payload_object = payload_object
+_payload_string = payload_string
+_raw_result_request_id = raw_result_request_id
+_sequencing_request_conflict_id = sequencing_request_conflict_id
+_validate_historical_candidate_order = validate_historical_candidate_order
+_validate_historical_request_context = validate_historical_request_context
+_validate_historical_sequencing_request = validate_historical_sequencing_request
+_validate_pending_candidate_order_restore_authority = validate_pending_order_restore_authority
+_validate_request_against_candidate = validate_request_against_candidate
+
+__all__ = (
+    "_sequencing_request_conflict_id",
+    "_validate_historical_sequencing_request",
+)
+
 COMMAND_BATTLE_SHOCK_RESOLVED_EVENT_TYPE = "battle_shock_test_resolved"
 COMMAND_BATTLE_SHOCK_SNAPSHOT_EVENT_TYPE = "battle_shock_step_snapshot_created"
 COMMAND_BATTLE_SHOCK_COMPLETED_EVENT_TYPE = "battle_shock_step_completed"
@@ -64,7 +97,6 @@ _COMMAND_SNAPSHOT_PAYLOAD_KEYS = frozenset(
         "phase",
         "battle_shock_phase_start_unit_ids",
         "battle_shock_candidate_inventory",
-        "battle_shock_required_test_requests",
     }
 )
 _COMMAND_STEP_ANCHOR_PAYLOAD_KEYS = frozenset(
@@ -114,9 +146,9 @@ def requires_command_prevalidation(*, state: GameState, request: DecisionRequest
         return False
     context = cast(dict[str, JsonValue], payload["battle_shock_context"])
     retained_request = context.get("battle_shock_test_request")
-    return context.get("source_kind") == COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND or any(
-        retained_request == required.to_payload()
-        for required in state.command_step_state.battle_shock_required_test_requests
+    in_flight = state.command_step_state.battle_shock_in_flight_test_request
+    return context.get("source_kind") == COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND or (
+        in_flight is not None and retained_request == in_flight.to_payload()
     )
 
 
@@ -135,27 +167,31 @@ def validate_command_battle_shock_state_snapshot(*, state: GameState) -> None:
         if record.player_id == command_state.active_player_id
     }
     allowed_canonical_ids = current_canonical_ids | historical_canonical_ids
-    phase_start_ids = set(command_state.battle_shock_phase_start_unit_ids)
-    for request in command_state.battle_shock_required_test_requests:
+    request = command_state.battle_shock_in_flight_test_request
+    if request is not None:
         if request.game_id != state.game_id:
-            raise GameLifecycleError("Command Battle-shock required test game_id drift.")
+            raise GameLifecycleError("Command Battle-shock in-flight test game_id drift.")
         if request.reason not in {
             BattleShockTestReason.COMMAND_PHASE_REQUIRED,
             BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
         }:
-            raise GameLifecycleError("Command Battle-shock required test reason drift.")
-        expected_request_id = (
-            f"battle-shock:{command_state.battle_round:02d}:"
-            f"{command_state.active_player_id}:{request.unit_instance_id}:"
-            f"{request.reason.value}"
+            raise GameLifecycleError("Command Battle-shock in-flight test reason drift.")
+        expected_request_id = command_battle_shock_request_id(
+            battle_round=command_state.battle_round,
+            active_player_id=command_state.active_player_id,
+            unit_instance_id=request.unit_instance_id,
+            reason=request.reason,
         )
         if request.request_id != expected_request_id:
-            raise GameLifecycleError("Command Battle-shock required test request_id drift.")
+            raise GameLifecycleError("Command Battle-shock in-flight test request_id drift.")
         if request.unit_instance_id not in allowed_canonical_ids:
-            raise GameLifecycleError("Command Battle-shock required test unit is not canonical.")
-        _validate_required_test_predicate(
+            raise GameLifecycleError("Command Battle-shock in-flight test unit is not canonical.")
+        _validate_request_against_candidate(
             request=request,
-            phase_start_battle_shocked_unit_ids=phase_start_ids,
+            candidate=_candidate_by_id(
+                command_state.battle_shock_candidate_inventory,
+                request.unit_instance_id,
+            ),
         )
     if not set(command_state.battle_shock_phase_start_unit_ids) <= allowed_canonical_ids:
         raise GameLifecycleError("Command Battle-shock phase-start unit is not canonical.")
@@ -239,10 +275,6 @@ def _command_battle_shock_snapshot_payload(*, state: GameState) -> dict[str, Jso
                     candidate.to_payload()
                     for candidate in command_state.battle_shock_candidate_inventory
                 ],
-                "battle_shock_required_test_requests": [
-                    request.to_payload()
-                    for request in command_state.battle_shock_required_test_requests
-                ],
             }
         ),
     )
@@ -269,17 +301,14 @@ def ordered_completed_command_battle_shock_results(
     game_id = state.game_id
     battle_round = state.battle_round
     active_player_id = command_state.active_player_id
-    required_test_requests = command_state.battle_shock_required_test_requests
     completed_test_request_ids = command_state.completed_battle_shock_test_request_ids
-    required_by_id = {request.request_id: request for request in required_test_requests}
-    if len(required_by_id) != len(required_test_requests):
-        raise GameLifecycleError("Command Battle-shock history required requests must be unique.")
+    candidates_by_request_id = _ordered_candidates_by_request_id(command_state)
     if len(set(completed_test_request_ids)) != len(completed_test_request_ids):
         raise GameLifecycleError(
             "Command Battle-shock history completed request IDs must be unique."
         )
     completed_ids = set(completed_test_request_ids)
-    if not completed_ids <= set(required_by_id):
+    if not completed_ids <= set(candidates_by_request_id):
         raise GameLifecycleError("Command Battle-shock history completed request is not required.")
 
     result_by_request_id: dict[
@@ -300,7 +329,7 @@ def ordered_completed_command_battle_shock_results(
         if not isinstance(raw_request_payload, dict):
             continue
         raw_request_id = raw_request_payload.get("request_id")
-        if type(raw_request_id) is not str or raw_request_id not in required_by_id:
+        if type(raw_request_id) is not str or raw_request_id not in candidates_by_request_id:
             continue
         if _payload_string(payload, "phase") != BattlePhase.COMMAND.value:
             raise GameLifecycleError("Command Battle-shock resolved event phase drift.")
@@ -333,9 +362,10 @@ def ordered_completed_command_battle_shock_results(
                 "Command Battle-shock resolved event result payload shape drift."
             )
         request_id = result.request.request_id
-        required_request = required_by_id[request_id]
-        if result.request != required_request:
-            raise GameLifecycleError("Command Battle-shock resolved event request snapshot drift.")
+        _validate_request_against_candidate(
+            request=result.request,
+            candidate=candidates_by_request_id[request_id],
+        )
         if request_id not in completed_ids:
             raise GameLifecycleError(
                 "Command Battle-shock resolved event request is not completed."
@@ -357,9 +387,7 @@ def ordered_completed_command_battle_shock_results(
             "Command Battle-shock resolved events must equal the completed request prefix."
         )
     ordered_rows = tuple(
-        result_by_request_id[request.request_id]
-        for request in required_test_requests
-        if request.request_id in completed_ids
+        result_by_request_id[request_id] for request_id in completed_test_request_ids
     )
     _validate_ordered_result_event_prefix(
         state=state,
@@ -718,12 +746,11 @@ def _validate_pending_reroll_restore_authority(
         return
     if len(pending_rerolls) > 1:
         raise GameLifecycleError("Command Battle-shock pending reroll is ambiguous.")
-    completed_count = len(command_state.completed_battle_shock_test_request_ids)
-    if completed_count >= len(command_state.battle_shock_required_test_requests):
+    in_flight_request = command_state.battle_shock_in_flight_test_request
+    if in_flight_request is None:
         if pending_rerolls:
-            raise GameLifecycleError("Command Battle-shock pending reroll has no required test.")
+            raise GameLifecycleError("Command Battle-shock pending reroll has no in-flight test.")
         return
-    required_request = command_state.battle_shock_required_test_requests[completed_count]
     expected_test_event = validate_json_value(
         {
             "game_id": state.game_id,
@@ -731,7 +758,7 @@ def _validate_pending_reroll_restore_authority(
             "active_player_id": command_state.active_player_id,
             "phase": BattlePhase.COMMAND.value,
             "source_kind": COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
-            "battle_shock_test_request": required_request.to_payload(),
+            "battle_shock_test_request": in_flight_request.to_payload(),
         }
     )
     in_progress_test_events = tuple(
@@ -759,7 +786,7 @@ def _validate_pending_reroll_restore_authority(
         cast(DiceRollStatePayload, _payload_object(context.get("battle_shock_roll_state")))
     )
     if (
-        test_request != required_request
+        test_request != in_flight_request
         or initial_roll != DiceRollState.from_result(initial_roll.original_result)
         or initial_roll.original_result.spec != test_request.spec
     ):
@@ -842,7 +869,7 @@ def _validate_historical_snapshot_completion_pairs(
         tuple[
             int,
             dict[str, JsonValue],
-            tuple[BattleShockTestRequest, ...],
+            tuple[CommandBattleShockCandidate, ...],
             tuple[str, ...],
         ],
     ] = {}
@@ -892,18 +919,6 @@ def _validate_historical_snapshot_completion_pairs(
             phase_start_ids = tuple(cast(list[str], raw_phase_start_ids))
             if phase_start_ids != tuple(sorted(set(phase_start_ids))):
                 raise GameLifecycleError("Historical phase-start unit IDs are not deterministic.")
-            raw_requests = payload["battle_shock_required_test_requests"]
-            if not isinstance(raw_requests, list) or any(
-                not isinstance(request_payload, dict) for request_payload in raw_requests
-            ):
-                raise GameLifecycleError("Historical required test snapshot drift.")
-            requests = tuple(
-                BattleShockTestRequest.from_payload(
-                    cast(BattleShockTestRequestPayload, request_payload)
-                )
-                for request_payload in raw_requests
-                if isinstance(request_payload, dict)
-            )
             raw_candidates = payload["battle_shock_candidate_inventory"]
             if not isinstance(raw_candidates, list) or any(
                 not isinstance(candidate_payload, dict) for candidate_payload in raw_candidates
@@ -918,43 +933,16 @@ def _validate_historical_snapshot_completion_pairs(
             )
             if raw_candidates != [candidate.to_payload() for candidate in candidates]:
                 raise GameLifecycleError("Historical Command candidate payload drift.")
-            expected_requests = tuple(
-                sorted(
-                    requests,
-                    key=lambda request: (request.unit_instance_id, request.reason.value),
-                )
-            )
-            unique_unit_ids = {row.unit_instance_id for row in requests}
-            if requests != expected_requests or len(unique_unit_ids) != len(requests):
-                raise GameLifecycleError("Historical required tests are not deterministic.")
-            for request in requests:
-                expected_request_id = (
-                    f"battle-shock:{key[0]:02d}:{key[1]}:{request.unit_instance_id}:"
-                    f"{request.reason.value}"
-                )
-                if (
-                    request.game_id != state.game_id
-                    or request.battle_round != key[0]
-                    or request.player_id != key[1]
-                    or request.request_id != expected_request_id
-                    or request.reason
-                    not in {
-                        BattleShockTestReason.COMMAND_PHASE_REQUIRED,
-                        BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
-                    }
-                ):
-                    raise GameLifecycleError("Historical required test context drift.")
-                _validate_required_test_predicate(
-                    request=request,
-                    phase_start_battle_shocked_unit_ids=set(phase_start_ids),
-                )
-            if not set(phase_start_ids) <= {request.unit_instance_id for request in requests}:
+            if not set(phase_start_ids) <= {
+                candidate.unit_instance_id
+                for candidate in candidates
+                if candidate.test_reason is not None
+            }:
                 raise GameLifecycleError("Historical phase-start unit lacks required test.")
             validate_command_battle_shock_candidate_inventory(
                 candidates,
                 active_player_id=key[1],
                 phase_start_battle_shocked_unit_ids=phase_start_ids,
-                required_test_requests=requests,
             )
             validate_historical_command_candidate_inventory(
                 state=state,
@@ -966,7 +954,7 @@ def _validate_historical_snapshot_completion_pairs(
                 phase_start_battle_shocked_unit_ids=phase_start_ids,
                 candidates=candidates,
             )
-            snapshots[key] = (event_index, payload, requests, phase_start_ids)
+            snapshots[key] = (event_index, payload, candidates, phase_start_ids)
             continue
         if event.event_type == COMMAND_BATTLE_SHOCK_COMPLETED_EVENT_TYPE:
             payload = _payload_object(event.payload)
@@ -1021,7 +1009,7 @@ def _validate_historical_snapshot_completion_pairs(
             if pre_snapshot_open_key == key:
                 continue
             raise GameLifecycleError("Command step lacks Battle-shock snapshot authority.")
-        snapshot_index, _snapshot_payload, requests, phase_start_ids = snapshot
+        snapshot_index, _snapshot_payload, candidates, phase_start_ids = snapshot
         if snapshot_index <= anchor_index:
             raise GameLifecycleError("Command Battle-shock snapshot precedes Command step anchor.")
         next_anchor_index = next(
@@ -1034,18 +1022,31 @@ def _validate_historical_snapshot_completion_pairs(
         if open_key == key:
             if completion is not None:
                 raise GameLifecycleError("Open Command Battle-shock history has completion event.")
+            if command_state is None:
+                raise GameLifecycleError("Open Command Battle-shock history lacks command state.")
+            required_candidates = tuple(
+                candidate for candidate in candidates if candidate.test_reason is not None
+            )
+            if command_state.battle_shock_candidate_order_unit_ids:
+                _validate_historical_candidate_order(
+                    state=state,
+                    event_records=event_records,
+                    decision_records=decision_records,
+                    snapshot_index=snapshot_index,
+                    completion_index=next_anchor_index,
+                    battle_round=key[0],
+                    active_player_id=key[1],
+                    candidates=required_candidates,
+                    ordered_unit_ids=(command_state.battle_shock_candidate_order_unit_ids),
+                )
+            elif len(required_candidates) == 1:
+                raise GameLifecycleError("Open Command Battle-shock trivial order drifted.")
             continue
         if completion is None:
             raise GameLifecycleError("Historical Command Battle-shock completion is missing.")
         completion_index, completion_payload = completion
         if completion_index <= snapshot_index or completion_index >= next_anchor_index:
             raise GameLifecycleError("Historical Command Battle-shock completion order drift.")
-        required_ids = tuple(request.request_id for request in requests)
-        raw_completed_ids = completion_payload["completed_battle_shock_test_request_ids"]
-        if raw_completed_ids != list(required_ids):
-            raise GameLifecycleError("Historical completed request IDs drift.")
-        if completion_payload["battle_shock_test_count"] != len(requests):
-            raise GameLifecycleError("Historical Battle-shock test count drift.")
         raw_results = completion_payload["battle_shock_results"]
         if not isinstance(raw_results, list) or any(
             not isinstance(result_payload, dict) for result_payload in raw_results
@@ -1058,8 +1059,46 @@ def _validate_historical_snapshot_completion_pairs(
         )
         if raw_results != [validate_json_value(result.to_payload()) for result in results]:
             raise GameLifecycleError("Historical Battle-shock completion result shape drift.")
-        if tuple(result.request for result in results) != requests:
-            raise GameLifecycleError("Historical Battle-shock result request order drift.")
+        required_candidates = tuple(
+            candidate for candidate in candidates if candidate.test_reason is not None
+        )
+        if len(results) != len(required_candidates):
+            raise GameLifecycleError("Historical Battle-shock result inventory drift.")
+        _candidate_by_id = {
+            candidate.unit_instance_id: candidate for candidate in required_candidates
+        }
+        if len(_candidate_by_id) != len(required_candidates):
+            raise GameLifecycleError("Historical Battle-shock candidates are duplicated.")
+        result_unit_ids = tuple(result.request.unit_instance_id for result in results)
+        if set(result_unit_ids) != set(_candidate_by_id) or len(set(result_unit_ids)) != len(
+            result_unit_ids
+        ):
+            raise GameLifecycleError("Historical Battle-shock result candidate order drift.")
+        for result in results:
+            _validate_historical_request_context(
+                state=state,
+                request=result.request,
+                battle_round=key[0],
+                active_player_id=key[1],
+                candidate=_candidate_by_id[result.request.unit_instance_id],
+            )
+        _validate_historical_candidate_order(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            snapshot_index=snapshot_index,
+            completion_index=completion_index,
+            battle_round=key[0],
+            active_player_id=key[1],
+            candidates=required_candidates,
+            ordered_unit_ids=result_unit_ids,
+        )
+        required_ids = tuple(result.request.request_id for result in results)
+        raw_completed_ids = completion_payload["completed_battle_shock_test_request_ids"]
+        if raw_completed_ids != list(required_ids):
+            raise GameLifecycleError("Historical completed request IDs drift.")
+        if completion_payload["battle_shock_test_count"] != len(required_candidates):
+            raise GameLifecycleError("Historical Battle-shock test count drift.")
         relevant_resolved = tuple(
             (event_index, _payload_object(event.payload))
             for event_index, event in enumerate(event_records)
@@ -1119,29 +1158,6 @@ def _validate_historical_snapshot_completion_pairs(
         )
 
 
-def _validate_required_test_predicate(
-    *,
-    request: BattleShockTestRequest,
-    phase_start_battle_shocked_unit_ids: set[str],
-) -> None:
-    if request.reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED:
-        if (
-            request.unit_instance_id not in phase_start_battle_shocked_unit_ids
-            and not request.below_half_strength_context.is_at_or_below_half_strength
-        ):
-            raise GameLifecycleError(
-                "Command Battle-shock required test lacks a step-start predicate."
-            )
-        return
-    if (
-        request.reason is BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED
-        and not request.below_half_strength_context.is_below_starting_strength
-    ):
-        raise GameLifecycleError(
-            "Command Battle-shock forced test lacks a below-starting predicate."
-        )
-
-
 def validate_restore(
     state: GameState,
     event_records: tuple[EventRecord, ...],
@@ -1165,6 +1181,10 @@ def validate_restore(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
+    )
+    _validate_pending_candidate_order_restore_authority(
+        state=state,
+        pending_decision_requests=pending_decision_requests,
     )
     try:
         _validate_pending_reroll_restore_authority(
@@ -1220,7 +1240,7 @@ def validate_command_battle_shock_completion_authority(
                 "battle_round": state.battle_round,
                 "active_player_id": command_state.active_player_id,
                 "phase": BattlePhase.COMMAND.value,
-                "battle_shock_test_count": len(command_state.battle_shock_required_test_requests),
+                "battle_shock_test_count": len(command_state.battle_shock_candidate_order_unit_ids),
                 "battle_shock_results": [result.to_payload() for result in results],
                 "completed_battle_shock_test_request_ids": list(
                     command_state.completed_battle_shock_test_request_ids
@@ -1250,36 +1270,3 @@ def validate_command_battle_shock_completion_authority(
         raise GameLifecycleError(
             "Unresolved Command Battle-shock step cannot have a completion event."
         )
-
-
-def _payload_object(value: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(value, dict):
-        raise GameLifecycleError("Command Battle-shock resolved event payload must be an object.")
-    return value
-
-
-def _raw_result_request_id(value: JsonValue) -> str | None:
-    if not isinstance(value, dict):
-        return None
-    result = value.get("battle_shock_result")
-    if not isinstance(result, dict):
-        return None
-    request = result.get("request")
-    if not isinstance(request, dict):
-        return None
-    request_id = request.get("request_id")
-    return request_id if type(request_id) is str else None
-
-
-def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str or not value.strip():
-        raise GameLifecycleError(f"Command Battle-shock resolved event {key} must be a string.")
-    return value
-
-
-def _payload_int(payload: dict[str, JsonValue], key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Command Battle-shock resolved event {key} must be an integer.")
-    return value

@@ -441,8 +441,8 @@ def _validate_command_candidate_model_authority(
     )
     if (
         len(matching) != 1
-        or matching[0].placed_alive_model_instance_ids != placed_model_ids
-        or matching[0].below_half_strength_context != request.below_half_strength_context
+        or matching[0].test_reason is not request.reason
+        or request.below_half_strength_context.current_model_count != len(placed_model_ids)
         or payload.get("battle_shock_phase_start_unit_ids")
         != list(phase_start_battle_shocked_unit_ids)
     ):

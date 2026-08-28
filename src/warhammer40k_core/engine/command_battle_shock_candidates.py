@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -14,8 +15,8 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
-    placed_alive_rules_unit_views,
     rules_unit_is_battle_shocked,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
@@ -28,59 +29,86 @@ if TYPE_CHECKING:
 
 class CommandBattleShockCandidatePayload(TypedDict):
     unit_instance_id: str
-    placed_alive_model_instance_ids: list[str]
+    component_unit_instance_ids: list[str]
     is_battle_shocked: bool
-    forced_below_starting_strength: bool
+    eligibility_reasons: list[str]
     forced_test_applications: list[BattleShockForcedTestApplicationPayload]
     below_half_strength_context: BelowHalfStrengthContextPayload
 
 
+class CommandBattleShockEligibilityReason(StrEnum):
+    CURRENTLY_BATTLE_SHOCKED = "currently_battle_shocked"
+    AT_OR_BELOW_HALF_STRENGTH = "at_or_below_half_strength"
+    BELOW_STARTING_STRENGTH_FORCED = "below_starting_strength_forced"
+
+
+_ELIGIBILITY_REASON_ORDER = {
+    reason: index for index, reason in enumerate(CommandBattleShockEligibilityReason)
+}
+
+
 @dataclass(frozen=True, slots=True)
 class CommandBattleShockCandidate:
-    """Immutable step-start predicate inventory for one placed, living rules unit."""
+    """Immutable step-start eligibility inventory for one living rules unit."""
 
     unit_instance_id: str
-    placed_alive_model_instance_ids: tuple[str, ...]
+    component_unit_instance_ids: tuple[str, ...]
     is_battle_shocked: bool
-    forced_below_starting_strength: bool
     below_half_strength_context: BelowHalfStrengthContext
+    eligibility_reasons: tuple[CommandBattleShockEligibilityReason, ...] = ()
     forced_test_applications: tuple[BattleShockForcedTestApplication, ...] = ()
 
     def __post_init__(self) -> None:
         unit_id = _validate_identifier("Command Battle-shock candidate unit", self.unit_instance_id)
-        model_ids = _validate_identifier_tuple(
-            "Command Battle-shock candidate placed models",
-            self.placed_alive_model_instance_ids,
+        component_ids = _validate_identifier_tuple(
+            "Command Battle-shock candidate component units",
+            self.component_unit_instance_ids,
         )
-        if not model_ids or model_ids != tuple(sorted(model_ids)):
+        if not component_ids or component_ids != tuple(sorted(component_ids)):
             raise GameLifecycleError(
-                "Command Battle-shock candidate placed models must be non-empty and sorted."
+                "Command Battle-shock candidate component units must be non-empty and sorted."
             )
         if type(self.is_battle_shocked) is not bool:
             raise GameLifecycleError("Command Battle-shock candidate shocked flag must be bool.")
-        if type(self.forced_below_starting_strength) is not bool:
-            raise GameLifecycleError("Command Battle-shock candidate forced flag must be bool.")
+        reasons = _validate_eligibility_reasons(self.eligibility_reasons)
         applications = _validate_candidate_forced_test_applications(
             self.forced_test_applications,
             unit_instance_id=unit_id,
         )
-        if self.forced_below_starting_strength != bool(applications):
-            raise GameLifecycleError("Command Battle-shock candidate forced authority drifted.")
         context = self.below_half_strength_context
         if type(context) is not BelowHalfStrengthContext:
             raise GameLifecycleError("Command Battle-shock candidate requires strength context.")
-        if context.unit_instance_id != unit_id or context.current_model_count != len(model_ids):
+        if context.unit_instance_id != unit_id or context.current_model_count < 1:
             raise GameLifecycleError("Command Battle-shock candidate strength context drifted.")
+        expected_reasons = _candidate_eligibility_reasons(
+            is_battle_shocked=self.is_battle_shocked,
+            context=context,
+            forced_test_applications=applications,
+        )
+        if reasons != expected_reasons:
+            raise GameLifecycleError("Command Battle-shock candidate eligibility drifted.")
         object.__setattr__(self, "unit_instance_id", unit_id)
-        object.__setattr__(self, "placed_alive_model_instance_ids", model_ids)
+        object.__setattr__(self, "component_unit_instance_ids", component_ids)
+        object.__setattr__(self, "eligibility_reasons", reasons)
         object.__setattr__(self, "forced_test_applications", applications)
+
+    @property
+    def test_reason(self) -> BattleShockTestReason | None:
+        if (
+            CommandBattleShockEligibilityReason.BELOW_STARTING_STRENGTH_FORCED
+            in self.eligibility_reasons
+        ):
+            return BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED
+        if self.eligibility_reasons:
+            return BattleShockTestReason.COMMAND_PHASE_REQUIRED
+        return None
 
     def to_payload(self) -> CommandBattleShockCandidatePayload:
         return {
             "unit_instance_id": self.unit_instance_id,
-            "placed_alive_model_instance_ids": list(self.placed_alive_model_instance_ids),
+            "component_unit_instance_ids": list(self.component_unit_instance_ids),
             "is_battle_shocked": self.is_battle_shocked,
-            "forced_below_starting_strength": self.forced_below_starting_strength,
+            "eligibility_reasons": [reason.value for reason in self.eligibility_reasons],
             "forced_test_applications": [
                 application.to_payload() for application in self.forced_test_applications
             ],
@@ -91,11 +119,14 @@ class CommandBattleShockCandidate:
     def from_payload(cls, payload: CommandBattleShockCandidatePayload) -> Self:
         candidate = cls(
             unit_instance_id=payload["unit_instance_id"],
-            placed_alive_model_instance_ids=tuple(payload["placed_alive_model_instance_ids"]),
+            component_unit_instance_ids=tuple(payload["component_unit_instance_ids"]),
             is_battle_shocked=payload["is_battle_shocked"],
-            forced_below_starting_strength=payload["forced_below_starting_strength"],
             below_half_strength_context=BelowHalfStrengthContext.from_payload(
                 payload["below_half_strength_context"]
+            ),
+            eligibility_reasons=tuple(
+                command_battle_shock_eligibility_reason_from_token(reason)
+                for reason in payload["eligibility_reasons"]
             ),
             forced_test_applications=tuple(
                 BattleShockForcedTestApplication.from_payload(application)
@@ -112,7 +143,7 @@ def command_battle_shock_candidate_inventory(
     active_player_id: str,
     forced_test_applications: tuple[BattleShockForcedTestApplication, ...],
 ) -> tuple[CommandBattleShockCandidate, ...]:
-    """Capture every placed, living active-player rules unit at step entry."""
+    """Capture every living active-player canonical rules unit at step entry."""
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -123,40 +154,35 @@ def command_battle_shock_candidate_inventory(
     applications = _validate_forced_test_applications(forced_test_applications)
     forced_by_unit_id = _forced_test_applications_by_unit_id(applications)
     forced_ids = set(forced_by_unit_id)
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Command Battle-shock candidates require battlefield state.")
-    placed_ids = set(battlefield.placed_model_ids())
     candidates: list[CommandBattleShockCandidate] = []
-    for rules_unit in placed_alive_rules_unit_views(state=state):
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
         if rules_unit.owner_player_id != player_id:
             continue
-        model_ids = tuple(
-            sorted(
-                model.model_instance_id
-                for model in rules_unit.alive_models()
-                if model.model_instance_id in placed_ids
-            )
-        )
+        model_ids = tuple(sorted(model.model_instance_id for model in rules_unit.alive_models()))
+        if not model_ids:
+            continue
         context = BelowHalfStrengthContext.from_rules_unit(
             rules_unit=rules_unit,
             starting_strength=state.starting_strength_record_for_unit(rules_unit.unit_instance_id),
             current_model_ids=model_ids,
         )
+        applications_for_unit = forced_by_unit_id.get(rules_unit.unit_instance_id, ())
+        is_battle_shocked = rules_unit_is_battle_shocked(
+            state=state,
+            unit_instance_id=rules_unit.unit_instance_id,
+        )
         candidates.append(
             CommandBattleShockCandidate(
                 unit_instance_id=rules_unit.unit_instance_id,
-                placed_alive_model_instance_ids=model_ids,
-                is_battle_shocked=rules_unit_is_battle_shocked(
-                    state=state,
-                    unit_instance_id=rules_unit.unit_instance_id,
-                ),
-                forced_below_starting_strength=rules_unit.unit_instance_id in forced_ids,
+                component_unit_instance_ids=tuple(sorted(rules_unit.component_unit_instance_ids)),
+                is_battle_shocked=is_battle_shocked,
                 below_half_strength_context=context,
-                forced_test_applications=forced_by_unit_id.get(
-                    rules_unit.unit_instance_id,
-                    (),
+                eligibility_reasons=_candidate_eligibility_reasons(
+                    is_battle_shocked=is_battle_shocked,
+                    context=context,
+                    forced_test_applications=applications_for_unit,
                 ),
+                forced_test_applications=applications_for_unit,
             )
         )
     inventory = tuple(sorted(candidates, key=lambda candidate: candidate.unit_instance_id))
@@ -170,7 +196,6 @@ def validate_command_battle_shock_candidate_inventory(
     *,
     active_player_id: str,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
-    required_test_requests: tuple[BattleShockTestRequest, ...],
 ) -> tuple[CommandBattleShockCandidate, ...]:
     if type(values) is not tuple or any(
         type(value) is not CommandBattleShockCandidate for value in cast(tuple[object, ...], values)
@@ -192,25 +217,6 @@ def validate_command_battle_shock_candidate_inventory(
     )
     if phase_start_battle_shocked_unit_ids != shocked_ids:
         raise GameLifecycleError("Command Battle-shock phase-start inventory drifted.")
-    expected: dict[str, tuple[BattleShockTestReason, BelowHalfStrengthContext]] = {}
-    for candidate in candidates:
-        context = candidate.below_half_strength_context
-        if candidate.forced_below_starting_strength and context.is_below_starting_strength:
-            expected[candidate.unit_instance_id] = (
-                BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
-                context,
-            )
-        elif candidate.is_battle_shocked or context.is_at_or_below_half_strength:
-            expected[candidate.unit_instance_id] = (
-                BattleShockTestReason.COMMAND_PHASE_REQUIRED,
-                context,
-            )
-    actual = {
-        request.unit_instance_id: (request.reason, request.below_half_strength_context)
-        for request in required_test_requests
-    }
-    if actual != expected:
-        raise GameLifecycleError("Command Battle-shock required tests omit candidate authority.")
     return candidates
 
 
@@ -221,8 +227,11 @@ def validate_command_battle_shock_step_progress(
     battle_shock_step_resolved: bool,
     phase_start_unit_ids: tuple[str, ...],
     candidate_inventory: tuple[CommandBattleShockCandidate, ...],
-    required_test_requests: tuple[BattleShockTestRequest, ...],
+    candidate_order_unit_ids: tuple[str, ...],
+    in_flight_test_request: BattleShockTestRequest | None,
     completed_test_request_ids: tuple[str, ...],
+    battle_round: int,
+    active_player_id: str,
 ) -> None:
     """Validate the immutable Command Battle-shock snapshot and completion prefix."""
 
@@ -238,22 +247,135 @@ def validate_command_battle_shock_step_progress(
         if (
             phase_start_unit_ids
             or candidate_inventory
-            or required_test_requests
+            or candidate_order_unit_ids
+            or in_flight_test_request is not None
             or completed_test_request_ids
         ):
             raise GameLifecycleError(
                 "CommandStepState cannot retain Battle-shock snapshot or progress before its step."
             )
         return
-    required_request_ids = tuple(request.request_id for request in required_test_requests)
+    required_candidates = tuple(
+        candidate for candidate in candidate_inventory if candidate.test_reason is not None
+    )
+    required_unit_ids = {candidate.unit_instance_id for candidate in required_candidates}
+    if candidate_order_unit_ids:
+        if set(candidate_order_unit_ids) != required_unit_ids or len(
+            candidate_order_unit_ids
+        ) != len(required_unit_ids):
+            raise GameLifecycleError(
+                "CommandStepState Battle-shock candidate order must contain every required unit."
+            )
+    elif len(required_candidates) == 1:
+        raise GameLifecycleError(
+            "CommandStepState must fix the trivial Battle-shock candidate order."
+        )
+    if (completed_test_request_ids or in_flight_test_request is not None) and not (
+        candidate_order_unit_ids
+    ):
+        raise GameLifecycleError(
+            "CommandStepState cannot progress before Battle-shock candidate order resolves."
+        )
+    candidate_by_id = {candidate.unit_instance_id: candidate for candidate in required_candidates}
+    required_request_ids = tuple(
+        command_battle_shock_request_id(
+            battle_round=battle_round,
+            active_player_id=active_player_id,
+            unit_instance_id=unit_id,
+            reason=cast(BattleShockTestReason, candidate_by_id[unit_id].test_reason),
+        )
+        for unit_id in candidate_order_unit_ids
+    )
     if completed_test_request_ids != required_request_ids[: len(completed_test_request_ids)]:
         raise GameLifecycleError(
             "CommandStepState completed Battle-shock requests must be an exact prefix."
         )
+    if in_flight_test_request is not None:
+        if len(completed_test_request_ids) >= len(candidate_order_unit_ids):
+            raise GameLifecycleError("CommandStepState Battle-shock in-flight request is excess.")
+        next_unit_id = candidate_order_unit_ids[len(completed_test_request_ids)]
+        next_candidate = candidate_by_id[next_unit_id]
+        if (
+            in_flight_test_request.request_id
+            != required_request_ids[len(completed_test_request_ids)]
+            or in_flight_test_request.unit_instance_id != next_unit_id
+            or in_flight_test_request.reason is not next_candidate.test_reason
+        ):
+            raise GameLifecycleError("CommandStepState Battle-shock in-flight request drifted.")
     if battle_shock_step_resolved and completed_test_request_ids != required_request_ids:
         raise GameLifecycleError(
             "CommandStepState cannot resolve before all required Battle-shock tests."
         )
+    if battle_shock_step_resolved and in_flight_test_request is not None:
+        raise GameLifecycleError("CommandStepState resolved with an in-flight Battle-shock test.")
+
+
+def command_battle_shock_request_id(
+    *,
+    battle_round: int,
+    active_player_id: str,
+    unit_instance_id: str,
+    reason: BattleShockTestReason,
+) -> str:
+    if type(battle_round) is not int or battle_round < 1:
+        raise GameLifecycleError("Command Battle-shock request battle round is invalid.")
+    player_id = _validate_identifier("active_player_id", active_player_id)
+    unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    if type(reason) is not BattleShockTestReason:
+        raise GameLifecycleError("Command Battle-shock request reason is invalid.")
+    return f"battle-shock:{battle_round:02d}:{player_id}:{unit_id}:{reason.value}"
+
+
+def command_battle_shock_eligibility_reason_from_token(
+    token: object,
+) -> CommandBattleShockEligibilityReason:
+    if type(token) is CommandBattleShockEligibilityReason:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("Command Battle-shock eligibility reason must be a string.")
+    try:
+        return CommandBattleShockEligibilityReason(token)
+    except ValueError as exc:
+        raise GameLifecycleError(
+            f"Unsupported Command Battle-shock eligibility reason: {token}."
+        ) from exc
+
+
+def _validate_eligibility_reasons(
+    values: object,
+) -> tuple[CommandBattleShockEligibilityReason, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Command Battle-shock eligibility reasons must be a tuple.")
+    reasons = tuple(
+        command_battle_shock_eligibility_reason_from_token(value)
+        for value in cast(tuple[object, ...], values)
+    )
+    expected = tuple(sorted(set(reasons), key=_ELIGIBILITY_REASON_ORDER.__getitem__))
+    if reasons != expected:
+        raise GameLifecycleError(
+            "Command Battle-shock eligibility reasons must be deterministic and unique."
+        )
+    return reasons
+
+
+def _candidate_eligibility_reasons(
+    *,
+    is_battle_shocked: bool,
+    context: BelowHalfStrengthContext,
+    forced_test_applications: tuple[BattleShockForcedTestApplication, ...],
+) -> tuple[CommandBattleShockEligibilityReason, ...]:
+    reasons: list[CommandBattleShockEligibilityReason] = []
+    if is_battle_shocked:
+        reasons.append(CommandBattleShockEligibilityReason.CURRENTLY_BATTLE_SHOCKED)
+    if context.is_at_or_below_half_strength:
+        reasons.append(CommandBattleShockEligibilityReason.AT_OR_BELOW_HALF_STRENGTH)
+    if forced_test_applications:
+        if not context.is_below_starting_strength:
+            raise GameLifecycleError(
+                "Command Battle-shock forced candidate is not below Starting Strength."
+            )
+        reasons.append(CommandBattleShockEligibilityReason.BELOW_STARTING_STRENGTH_FORCED)
+    return tuple(reasons)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -353,7 +475,10 @@ def _validate_candidate_forced_test_applications(
 __all__ = (
     "CommandBattleShockCandidate",
     "CommandBattleShockCandidatePayload",
+    "CommandBattleShockEligibilityReason",
     "command_battle_shock_candidate_inventory",
+    "command_battle_shock_eligibility_reason_from_token",
+    "command_battle_shock_request_id",
     "forced_test_applications_from_candidate_inventory",
     "forced_test_unit_ids",
     "validate_command_battle_shock_candidate_inventory",

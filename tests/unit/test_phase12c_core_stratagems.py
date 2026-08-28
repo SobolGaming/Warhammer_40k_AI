@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tests.setup_completion_helpers import (
@@ -14,9 +14,11 @@ from tools.generate_ability_support_matrix import (
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine import battle_shock_event_authority
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogRecord,
@@ -32,6 +34,8 @@ from warhammer40k_core.engine.attack_sequence import (
     attack_sequence_wound_roll_spec,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.battle_shock import BattleShockResult
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockModifierApplication
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     ModelPlacement,
@@ -166,6 +170,7 @@ from warhammer40k_core.engine.stratagems import (
     FALL_BACK_UNIT_CONTEXT_KEY,
     FIRE_OVERWATCH_TARGET_POLICY_ID,
     FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
     HIT_TARGET_UNIT_CONTEXT_KEY,
@@ -4396,6 +4401,148 @@ def test_stratagem_battle_shock_reroll_restores_and_resumes_shooting_reaction() 
         reroll_context["battle_shock_test_request"],
     )
     assert resolved_request["request_id"] == reroll_test_request["request_id"]
+
+    result = BattleShockResult.from_payload(cast(Any, resolved_result))
+    request_base: dict[str, JsonValue] = {
+        key: value
+        for key, value in resolved_payload.items()
+        if key
+        not in {
+            "battle_shock_result",
+            "auto_passed",
+            "state_update",
+            "cleared_battle_shocked_unit_ids",
+        }
+    }
+    use = battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+        request_base=request_base,
+        result=result,
+        runtime_content_bundle=bundle,
+    )
+    assert use.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+    with pytest.raises(GameLifecycleError, match="lacks a loaded player index"):
+        battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+            request_base=request_base,
+            result=result,
+            runtime_content_bundle=replace(bundle, stratagem_indexes_by_player_id={}),
+        )
+    drifted_use_payload = cast(
+        dict[str, JsonValue],
+        validate_json_value(use.to_payload()),
+    )
+    drifted_request_base = cast(
+        dict[str, JsonValue],
+        validate_json_value(
+            {
+                **request_base,
+                "source_stratagem_use": {
+                    **drifted_use_payload,
+                    "source_id": f"{use.source_id}:drift",
+                },
+            }
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="catalog authority drifted"):
+        battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+            request_base=drifted_request_base,
+            result=result,
+            runtime_content_bundle=bundle,
+        )
+    with pytest.raises(GameLifecycleError, match="request identity drifted"):
+        battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+            request_base=request_base,
+            result=replace(
+                result,
+                request=replace(result.request, request_id=f"{result.request.request_id}:drift"),
+            ),
+            runtime_content_bundle=bundle,
+        )
+    modifier_source_id = use.source_id
+    modifier = RollModifier(
+        modifier_id=f"{use.use_id}:battle-shock-modifier",
+        source_id=modifier_source_id,
+        operand=-1,
+    )
+    application = BattleShockModifierApplication(
+        hook_id=use.handler_id,
+        source_id=modifier_source_id,
+        modifiers=(modifier,),
+    )
+    with pytest.raises(GameLifecycleError, match="generic Stratagem modifier source drifted"):
+        battle_shock_event_authority._validate_stratagem_modifier_application(  # pyright: ignore[reportPrivateUsage]
+            event_records=restored.decision_controller.event_log.records,
+            decision_records=restored.decision_controller.records,
+            request_base=request_base,
+            result=result,
+            application=application,
+            runtime_content_bundle=bundle,
+        )
+
+    generic_modifier_effect = cast(
+        dict[str, JsonValue],
+        validate_json_value(
+            {
+                "source_id": modifier_source_id,
+                "effect": {
+                    "parameters": [
+                        {"key": "modifier_if_destroyed_target", "value": -1},
+                        {
+                            "key": "modifier_source_suffix",
+                            "value": "battle-shock-modifier",
+                        },
+                    ]
+                },
+            }
+        ),
+    )
+    modifier_base: dict[str, JsonValue] = {
+        **request_base,
+        "generic_rule_effect": generic_modifier_effect,
+    }
+    battle_shock_event_authority._validate_stratagem_modifier_application(  # pyright: ignore[reportPrivateUsage]
+        event_records=restored.decision_controller.event_log.records,
+        decision_records=restored.decision_controller.records,
+        request_base=modifier_base,
+        result=result,
+        application=application,
+        runtime_content_bundle=bundle,
+    )
+    invalid_applications = (
+        replace(application, hook_id="wrong-provider"),
+        BattleShockModifierApplication(
+            hook_id=use.handler_id,
+            source_id="wrong-source",
+            modifiers=(
+                replace(
+                    modifier,
+                    modifier_id="wrong-source:modifier",
+                    source_id="wrong-source",
+                ),
+            ),
+        ),
+        BattleShockModifierApplication(
+            hook_id=use.handler_id,
+            source_id=modifier_source_id,
+            modifiers=(
+                modifier,
+                replace(modifier, modifier_id=f"{modifier.modifier_id}:duplicate"),
+            ),
+        ),
+        replace(
+            application,
+            modifiers=(replace(modifier, operand=-2),),
+        ),
+    )
+    for invalid_application in invalid_applications:
+        with pytest.raises(GameLifecycleError, match="Stratagem modifier"):
+            battle_shock_event_authority._validate_stratagem_modifier_application(  # pyright: ignore[reportPrivateUsage]
+                event_records=restored.decision_controller.event_log.records,
+                decision_records=restored.decision_controller.records,
+                request_base=modifier_base,
+                result=result,
+                application=invalid_application,
+                runtime_content_bundle=bundle,
+            )
 
 
 def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -> None:

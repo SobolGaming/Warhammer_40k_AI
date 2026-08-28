@@ -127,7 +127,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-one-0009"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-authenticated-001-003-0001"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-authenticated-001-003-0002"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"

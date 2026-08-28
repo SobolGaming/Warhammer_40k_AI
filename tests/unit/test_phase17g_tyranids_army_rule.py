@@ -4,9 +4,10 @@ import hashlib
 import json
 from collections.abc import Callable
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
+from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
 from tests.phase11c_command_phase_helpers import (
     battle_shock_request_for_unit,
     battle_state,
@@ -910,6 +911,28 @@ def test_synapse_battle_shock_uses_three_d6_in_command_phase() -> None:
     assert battle_shock_request["reason"] == BattleShockTestReason.COMMAND_PHASE_REQUIRED.value
     assert expression["quantity"] == 3
     assert expression["sides"] == 6
+
+
+def test_synapse_historical_contribution_recomputes_from_authenticated_geometry() -> None:
+    lifecycle = _battle_ready_lifecycle(
+        game_id="phase17g-tyranids-historical-synapse",
+        active_player_id="player-a",
+        authenticate_reposition=True,
+    )
+    state = _require_state(lifecycle)
+    context = historical_battle_shock_context_for_unit(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id=TYRANIDS_GAUNTS_UNIT_ID,
+        active_player_id="player-a",
+    )
+
+    contribution = army_rule.historical_synapse_battle_shock_contribution(context)
+
+    assert contribution.dice_expression == DiceExpression(quantity=3, sides=6)
+    assert contribution.modifiers == ()
+    with pytest.raises(GameLifecycleError, match="historical authority requires"):
+        army_rule.historical_synapse_battle_shock_contribution(cast(Any, object()))
 
 
 def test_synapse_melee_strength_modifier_uses_live_range() -> None:
@@ -1849,6 +1872,7 @@ def _battle_ready_lifecycle(
     enemy_unit_count: int = 1,
     enemy_battle_shock_reroll: bool = False,
     enemy_chaos_daemons: bool = False,
+    authenticate_reposition: bool = False,
 ) -> GameLifecycle:
     other_player_id = "player-b" if active_player_id == "player-a" else "player-a"
     config = replace(
@@ -1872,12 +1896,15 @@ def _battle_ready_lifecycle(
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
+    if authenticate_reposition:
+        _place_units_near_center(state)
     _complete_setup_through_gate(
         state=state,
         decisions=lifecycle.decision_controller,
         config=config,
     )
-    _place_units_near_center(state)
+    if not authenticate_reposition:
+        _place_units_near_center(state)
     assert state.active_player_id == active_player_id
     _runtime_content_bundle(lifecycle)
     return lifecycle

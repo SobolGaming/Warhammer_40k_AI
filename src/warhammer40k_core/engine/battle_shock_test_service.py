@@ -104,51 +104,39 @@ class BattleShockTestExecution:
             raise GameLifecycleError("Battle-shock execution requires a typed resolution.")
 
 
-def resolve_battle_shock_test(
+def materialize_battle_shock_test_request(
     *,
     runtime: BattleShockTestRuntime,
     state: GameState,
-    decisions: DecisionController,
     request_id: str,
     target_unit_instance_id: str,
     reason: BattleShockTestReason,
     active_player_id: str,
     phase: BattlePhase,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
-    passed_state_policy: BattleShockPassedStatePolicy,
-    source_kind: str,
-    source_payload: dict[str, JsonValue],
-    resolved_event_types: tuple[str, ...],
-    pending_phase_body_status: str,
-    additional_modifier_applications: tuple[BattleShockModifierApplication, ...] = (),
-) -> BattleShockTestExecution:
+) -> BattleShockTestRequest:
+    """Materialize one test from current authoritative state immediately before its roll."""
     from warhammer40k_core.engine.game_state import GameState
 
     if type(runtime) is not BattleShockTestRuntime:
         raise GameLifecycleError("Battle-shock test requires BattleShockTestRuntime.")
     if type(state) is not GameState:
         raise GameLifecycleError("Battle-shock test requires GameState.")
-    if type(decisions) is not DecisionController:
-        raise GameLifecycleError("Battle-shock test requires DecisionController.")
     requested_id = _validate_identifier("request_id", request_id)
     target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
     active_player = _validate_identifier("active_player_id", active_player_id)
-    source = _validate_identifier("source_kind", source_kind)
     if type(reason) is not BattleShockTestReason:
         raise GameLifecycleError("Battle-shock test reason is invalid.")
     if type(phase) is not BattlePhase or state.current_battle_phase is not phase:
         raise GameLifecycleError("Battle-shock test phase does not match live state.")
     if state.active_player_id != active_player:
         raise GameLifecycleError("Battle-shock test active player does not match live state.")
-    if type(source_payload) is not dict:
-        raise GameLifecycleError("Battle-shock source payload must be an object.")
-    conflicting_keys = _RESERVED_SOURCE_PAYLOAD_KEYS.intersection(source_payload)
-    if conflicting_keys:
-        raise GameLifecycleError("Battle-shock source payload contains reserved fields.")
-    source_context = cast(dict[str, JsonValue], validate_json_value(source_payload))
     target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_id)
     canonical_target_id = target_rules_unit.unit_instance_id
-    current_model_ids = tuple(
+    alive_model_ids = tuple(
+        sorted(model.model_instance_id for model in target_rules_unit.alive_models())
+    )
+    placed_model_ids = tuple(
         sorted(
             model.model_id
             for model in placed_alive_geometry_models_for_rules_unit(
@@ -157,8 +145,10 @@ def resolve_battle_shock_test(
             )
         )
     )
-    if not current_model_ids:
-        raise GameLifecycleError("Battle-shock target has no placed alive models.")
+    if not alive_model_ids or placed_model_ids != alive_model_ids:
+        raise GameLifecycleError(
+            "Battle-shock target does not have every alive model on the battlefield."
+        )
     player_id = target_rules_unit.owner_player_id
     ability_index = runtime.ability_indexes_by_player_id.get(player_id)
     if ability_index is None:
@@ -181,7 +171,7 @@ def resolve_battle_shock_test(
             phase_start_battle_shocked_unit_ids=phase_start_ids,
         )
     )
-    request = BattleShockTestRequest.for_unit(
+    return BattleShockTestRequest.for_unit(
         request_id=requested_id,
         game_id=state.game_id,
         battle_round=state.battle_round,
@@ -190,7 +180,7 @@ def resolve_battle_shock_test(
         reason=reason,
         leadership_target=battle_shock_leadership_target_for_rules_unit(
             target_rules_unit,
-            current_model_ids=current_model_ids,
+            current_model_ids=alive_model_ids,
             ability_index=ability_index,
             state=state,
             runtime_modifier_registry=runtime.runtime_modifier_registry,
@@ -198,9 +188,53 @@ def resolve_battle_shock_test(
         below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
             rules_unit=target_rules_unit,
             starting_strength=state.starting_strength_record_for_unit(canonical_target_id),
-            current_model_ids=current_model_ids,
+            current_model_ids=alive_model_ids,
         ),
         dice_expression=dice_expression,
+    )
+
+
+def resolve_battle_shock_test(
+    *,
+    runtime: BattleShockTestRuntime,
+    state: GameState,
+    decisions: DecisionController,
+    request_id: str,
+    target_unit_instance_id: str,
+    reason: BattleShockTestReason,
+    active_player_id: str,
+    phase: BattlePhase,
+    phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    passed_state_policy: BattleShockPassedStatePolicy,
+    source_kind: str,
+    source_payload: dict[str, JsonValue],
+    resolved_event_types: tuple[str, ...],
+    pending_phase_body_status: str,
+    additional_modifier_applications: tuple[BattleShockModifierApplication, ...] = (),
+) -> BattleShockTestExecution:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Battle-shock test requires DecisionController.")
+    active_player = _validate_identifier("active_player_id", active_player_id)
+    source = _validate_identifier("source_kind", source_kind)
+    if type(source_payload) is not dict:
+        raise GameLifecycleError("Battle-shock source payload must be an object.")
+    conflicting_keys = _RESERVED_SOURCE_PAYLOAD_KEYS.intersection(source_payload)
+    if conflicting_keys:
+        raise GameLifecycleError("Battle-shock source payload contains reserved fields.")
+    source_context = cast(dict[str, JsonValue], validate_json_value(source_payload))
+    phase_start_ids = _validate_identifier_tuple(
+        "phase_start_battle_shocked_unit_ids",
+        phase_start_battle_shocked_unit_ids,
+    )
+    request = materialize_battle_shock_test_request(
+        runtime=runtime,
+        state=state,
+        request_id=request_id,
+        target_unit_instance_id=target_unit_instance_id,
+        reason=reason,
+        active_player_id=active_player,
+        phase=phase,
+        phase_start_battle_shocked_unit_ids=phase_start_ids,
     )
     base_payload = cast(
         dict[str, JsonValue],
@@ -290,5 +324,6 @@ __all__ = (
     "BattleShockTestRuntime",
     "apply_stratagem_battle_shock_reroll_decision",
     "is_stratagem_battle_shock_reroll_request",
+    "materialize_battle_shock_test_request",
     "resolve_battle_shock_test",
 )

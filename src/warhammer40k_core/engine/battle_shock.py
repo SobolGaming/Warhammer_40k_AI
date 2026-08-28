@@ -559,22 +559,33 @@ def collect_battle_shock_test_requests(
 
     requests: list[BattleShockTestRequest] = []
     for rules_unit in rules_unit_views_from_armies(armies=(army,)):
-        current_model_ids = _current_battlefield_model_ids_for_rules_unit(
+        alive_model_ids = tuple(
+            sorted(model.model_instance_id for model in rules_unit.alive_models())
+        )
+        if not alive_model_ids:
+            continue
+        placed_model_ids = _current_battlefield_model_ids_for_rules_unit(
             rules_unit=rules_unit,
             battlefield_state=battlefield_state,
         )
-        if not current_model_ids:
-            continue
         record = records.get(rules_unit.unit_instance_id)
         if record is None:
             raise GameLifecycleError("Battle-shock request missing StartingStrengthRecord.")
         context = BelowHalfStrengthContext.from_rules_unit(
             rules_unit=rules_unit,
             starting_strength=record,
-            current_model_ids=current_model_ids,
+            current_model_ids=alive_model_ids,
         )
+        is_forced = rules_unit.unit_instance_id in forced_ids and context.is_below_starting_strength
+        is_core_required = (
+            rules_unit.unit_instance_id in shocked_ids or context.is_at_or_below_half_strength
+        )
+        if (is_forced or is_core_required) and placed_model_ids != alive_model_ids:
+            raise GameLifecycleError(
+                "Battle-shock test for an eligible off-battlefield rules unit is unsupported."
+            )
         forced_test_added = False
-        if rules_unit.unit_instance_id in forced_ids and context.is_below_starting_strength:
+        if is_forced:
             requests.append(
                 _battle_shock_request_for_rules_unit_context(
                     game_id=requested_game_id,
@@ -582,7 +593,7 @@ def collect_battle_shock_test_requests(
                     player_id=requested_player_id,
                     rules_unit=rules_unit,
                     context=context,
-                    current_model_ids=current_model_ids,
+                    current_model_ids=alive_model_ids,
                     reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
                     ability_index=catalog_ability_index,
                     state=state,
@@ -591,9 +602,7 @@ def collect_battle_shock_test_requests(
                 )
             )
             forced_test_added = True
-        if (
-            rules_unit.unit_instance_id in shocked_ids or context.is_at_or_below_half_strength
-        ) and (allow_duplicate_below_half_tests or not forced_test_added):
+        if is_core_required and (allow_duplicate_below_half_tests or not forced_test_added):
             requests.append(
                 _battle_shock_request_for_rules_unit_context(
                     game_id=requested_game_id,
@@ -601,7 +610,7 @@ def collect_battle_shock_test_requests(
                     player_id=requested_player_id,
                     rules_unit=rules_unit,
                     context=context,
-                    current_model_ids=current_model_ids,
+                    current_model_ids=alive_model_ids,
                     reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
                     ability_index=catalog_ability_index,
                     state=state,

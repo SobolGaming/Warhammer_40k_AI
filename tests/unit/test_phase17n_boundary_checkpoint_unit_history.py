@@ -38,6 +38,11 @@ from warhammer40k_core.engine.battle_shock_resolution import (
     BattleShockPassedStatePolicy,
     record_battle_shock_result_and_outcome_events,
 )
+from warhammer40k_core.engine.command_battle_shock_candidates import (
+    CommandBattleShockCandidate,
+    CommandBattleShockEligibilityReason,
+)
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -196,9 +201,28 @@ def _split_before_attached_root_failure_checkpoint() -> tuple[
         game_id="phase17n-attached-split-before-failed-result"
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+    bodyguard = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == _HISTORY_UNIT_ID
+    )
+    for model in bodyguard.own_models[:3]:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
     attached = rules_unit_view_by_id(
         state=state,
         unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+    )
+    strength_context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=attached,
+        starting_strength=state.starting_strength_record_for_unit(_ATTACHED_HISTORY_UNIT_ID),
+        current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
     )
     request = BattleShockTestRequest.for_unit(
         request_id="phase17n-attached-split-before-failed-result:request",
@@ -208,11 +232,7 @@ def _split_before_attached_root_failure_checkpoint() -> tuple[
         unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
         reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
         leadership_target=6,
-        below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
-            rules_unit=attached,
-            starting_strength=state.starting_strength_record_for_unit(_ATTACHED_HISTORY_UNIT_ID),
-            current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
-        ),
+        below_half_strength_context=strength_context,
     )
     decisions = DecisionController()
     base_payload: dict[str, JsonValue] = {
@@ -225,8 +245,22 @@ def _split_before_attached_root_failure_checkpoint() -> tuple[
     decisions.event_log.append(
         "battle_shock_step_snapshot_created",
         {
-            **base_payload,
-            "battle_shock_required_test_requests": [request.to_payload()],
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-b",
+            "phase": BattlePhase.COMMAND.value,
+            "battle_shock_phase_start_unit_ids": [],
+            "battle_shock_candidate_inventory": [
+                CommandBattleShockCandidate(
+                    unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+                    component_unit_instance_ids=tuple(sorted(attached.component_unit_instance_ids)),
+                    is_battle_shocked=False,
+                    below_half_strength_context=strength_context,
+                    eligibility_reasons=(
+                        CommandBattleShockEligibilityReason.AT_OR_BELOW_HALF_STRENGTH,
+                    ),
+                ).to_payload()
+            ],
         },
     )
     decisions.event_log.append(
@@ -455,7 +489,7 @@ def _pending_action_opportunity_after_failed_battle_shock() -> tuple[
     DecisionController,
 ]:
     state, _config = _phase17n_two_unit_state(
-        game_id="phase17n-boundary-battle-shock-history",
+        game_id="phase17n-boundary-battle-shock-history-2",
         single_model_history_unit=True,
     )
     _place_action_units_at_central_objective(state)

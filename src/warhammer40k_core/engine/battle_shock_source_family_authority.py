@@ -11,6 +11,10 @@ from warhammer40k_core.engine.battle_shock_resolution_authority import (
     BattleShockResolutionAuthority,
     PendingBattleShockRerollAuthority,
 )
+from warhammer40k_core.engine.command_battle_shock_candidates import (
+    CommandBattleShockCandidate,
+    CommandBattleShockCandidatePayload,
+)
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_rule_states import (
@@ -994,17 +998,54 @@ def _matching_command_snapshots(
             payload, dict
         ):
             continue
-        required = payload.get("battle_shock_required_test_requests")
+        candidates = payload.get("battle_shock_candidate_inventory")
         if (
             payload.get("game_id") == request_base.get("game_id")
             and payload.get("battle_round") == request_base.get("battle_round")
             and payload.get("active_player_id") == request_base.get("active_player_id")
             and payload.get("phase") == request_base.get("phase")
-            and isinstance(required, list)
-            and request_payload in required
+            and _command_candidate_inventory_matches_request(
+                candidates,
+                request_payload=request_payload,
+            )
         ):
             matching += 1
     return matching
+
+
+def _command_candidate_inventory_matches_request(
+    value: JsonValue,
+    *,
+    request_payload: dict[str, JsonValue],
+) -> bool:
+    if not isinstance(value, list):
+        return False
+    requested_unit_id = request_payload.get("unit_instance_id")
+    requested_reason = request_payload.get("reason")
+    if type(requested_unit_id) is not str or type(requested_reason) is not str:
+        return False
+    matches = 0
+    for raw_candidate in value:
+        if not isinstance(raw_candidate, dict):
+            raise GameLifecycleError("Battle-shock Command candidate payload is malformed.")
+        try:
+            candidate = CommandBattleShockCandidate.from_payload(
+                cast(CommandBattleShockCandidatePayload, raw_candidate)
+            )
+        except KeyError as exc:
+            raise GameLifecycleError(
+                "Battle-shock Command candidate payload is incomplete."
+            ) from exc
+        reason = candidate.test_reason
+        if (
+            candidate.unit_instance_id == requested_unit_id
+            and reason is not None
+            and reason.value == requested_reason
+        ):
+            matches += 1
+    if matches > 1:
+        raise GameLifecycleError("Battle-shock Command candidate identity is duplicated.")
+    return matches == 1
 
 
 def _validate_source_decision_ids(

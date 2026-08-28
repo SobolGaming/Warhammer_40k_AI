@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
+from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     center_marker_definition,
@@ -14,6 +15,7 @@ from tests.phase11c_command_phase_helpers import (
     unit_selection,
     with_model_offsets,
 )
+from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.weapon_profiles import (
@@ -21,6 +23,9 @@ from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
     RangeProfile,
     WeaponProfile,
+)
+from warhammer40k_core.engine import (
+    command_battle_shock_forced_provider_authority as forced_provider_authority,
 )
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -39,6 +44,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 from warhammer40k_core.engine.command_battle_shock_candidates import (
     CommandBattleShockCandidate,
     CommandBattleShockCandidatePayload,
+    CommandBattleShockEligibilityReason,
 )
 from warhammer40k_core.engine.command_battle_shock_forced_provider_authority import (
     validate_command_forced_test_applications,
@@ -124,6 +130,50 @@ def test_harbingers_selection_records_persistent_dread_state() -> None:
     assert restored.to_payload() == state.to_payload()
 
 
+def test_harbingers_historical_leadership_recomputes_from_event_bound_aura() -> None:
+    state = battle_state(game_id="phase17g-chaos-knights-historical-harbingers")
+    _mark_player_as_chaos_knights(state, player_id="player-a")
+    decisions = DecisionController()
+    registry = _battle_round_start_hooks()
+    request = registry.next_request_for(
+        BattleRoundStartRequestContext(state=state, decisions=decisions)
+    )
+    if request is None:
+        raise AssertionError("expected Harbingers selection request")
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase17g-chaos-knights-historical-despair",
+        request=request,
+        selected_option_id="chaos_knights:harbingers_of_dread:despair",
+    )
+    decisions.submit_result(result)
+    assert registry.apply_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+    _place_units_near_center(
+        state,
+        source_unit_id="army-alpha:intercessor-unit-1",
+        target_unit_id="army-beta:intercessor-unit-3",
+    )
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    assert state.active_player_id is not None
+    context = historical_battle_shock_context_for_unit(
+        state=state,
+        decisions=decisions,
+        unit_instance_id="army-beta:intercessor-unit-3",
+        active_player_id=state.active_player_id,
+    )
+
+    assert army_rule.historical_harbingers_leadership(context, 7) == 9
+    with pytest.raises(GameLifecycleError, match="historical authority requires"):
+        army_rule.historical_harbingers_leadership(cast(Any, object()), 7)
+
+
 def test_harbingers_roll_selection_records_engine_owned_dice() -> None:
     state = battle_state()
     state.game_id = "phase17g-chaos-knights-roll-selection"
@@ -135,12 +185,14 @@ def test_harbingers_roll_selection_records_engine_owned_dice() -> None:
     )
     if request is None:
         raise AssertionError("expected Harbingers selection request")
+    decisions.request_decision(request)
 
     result = DecisionResult.for_request(
         result_id="phase17g-chaos-knights-roll",
         request=request,
         selected_option_id=army_rule.ROLL_SELECTION_OPTION_ID,
     )
+    decisions.submit_result(result)
     assert registry.apply_result(
         BattleRoundStartResultContext(
             state=state,
@@ -158,6 +210,16 @@ def test_harbingers_roll_selection_records_engine_owned_dice() -> None:
     assert all(type(value) is int and 1 <= value <= 6 for value in dice_values)
     assert set(selected_ids) <= {ability.value for ability in army_rule.ROLLABLE_DREAD_ABILITIES}
     assert len(set(selected_ids)) == len(selected_ids)
+    historical = forced_provider_authority._historical_harbingers_abilities(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        event_records=tuple(decisions.event_log.records),
+        decision_records=decisions.records,
+        snapshot_index=len(decisions.event_log.records),
+    )
+    assert historical["player-a"] == army_rule.active_dread_abilities_for_player(
+        state,
+        player_id="player-a",
+    )
 
 
 def test_harbingers_rejects_stale_selection_after_active_dread_drift() -> None:
@@ -728,7 +790,11 @@ def test_command_restore_rejects_harbingers_forced_application_drift(tamper: str
     if tamper == "deletion":
         replacement = replace(
             forced_candidate,
-            forced_below_starting_strength=False,
+            eligibility_reasons=tuple(
+                reason
+                for reason in forced_candidate.eligibility_reasons
+                if reason is not CommandBattleShockEligibilityReason.BELOW_STARTING_STRENGTH_FORCED
+            ),
             forced_test_applications=(),
         )
     elif tamper in {"hook", "source"}:
@@ -754,9 +820,17 @@ def test_command_restore_rejects_harbingers_forced_application_drift(tamper: str
         )
         forced_index = unforced_index
         unforced = candidates[unforced_index]
+        forged_context = replace(
+            unforced.below_half_strength_context,
+            current_model_count=unforced.below_half_strength_context.starting_model_count - 1,
+        )
         replacement = replace(
             unforced,
-            forced_below_starting_strength=True,
+            below_half_strength_context=forged_context,
+            eligibility_reasons=(
+                *unforced.eligibility_reasons,
+                CommandBattleShockEligibilityReason.BELOW_STARTING_STRENGTH_FORCED,
+            ),
             forced_test_applications=(
                 BattleShockForcedTestApplication(
                     hook_id=application.hook_id,

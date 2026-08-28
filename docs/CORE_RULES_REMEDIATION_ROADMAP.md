@@ -366,10 +366,11 @@ operative 08.01, 08.02, and 08.03 statements. With those evidence roles kept dis
 Violated invariants: Every rule triggered at the start of the Command phase, including every
 engine-owned player choice, must resolve at one deterministic, resumable boundary before Gain Core
 CP. Battle-shock must not be cleared merely because the active player's Command phase began. On the
-first entry to the 08.03 Battle-shock step, the engine must snapshot each active-player,
-on-battlefield attached rules unit that is currently Battle-shocked or at/below Half-strength,
-resolve exactly one required test for every snapshot member, and clear carried phase-start
-Battle-shock only when that required test succeeds.
+first entry to the 08.03 Battle-shock step, the engine must snapshot the eligibility of every living
+active-player canonical rules unit. It must resolve exactly one required test for every eligible
+on-battlefield member, report eligible off-battlefield members as typed unsupported without
+completing the step, and clear carried phase-start Battle-shock only when that required test
+succeeds.
 
 How it was done before this combined remediation: `BattleRoundFlow` dispatched the generic
 `START_PHASE` window before entering `CommandPhaseHandler`, but the handler granted Core CP and
@@ -387,15 +388,22 @@ decision remains pending, return without granting Core CP. After each accepted
 completion. Final boundary completion grants each player 1CP exactly once and then emits
 `command_step_started`; scoring and other Command-step work follow without clearing Battle-shock.
 
-When the lifecycle first enters 08.03, snapshot canonical attached rules-unit identities for the
-active player's units that have at least one alive model on the battlefield and are either currently
-Battle-shocked or at/below Half-strength. Persist that ordered snapshot and completed-request
-progress across reroll decisions, serialization, replay, and lifecycle re-entry. A rules unit that
-satisfies both predicates appears once and receives exactly one required test. A successful required
-test clears Battle-shock when that snapshot member carried it into the step; a failed test preserves
-or applies Battle-shock through the ordinary engine-owned outcome path. Later re-entry cannot add,
-remove, or repeat snapshot members. P01 remains responsible for extending the same predicate to
-embarked and Strategic Reserve rules units with no placed model.
+When the lifecycle first enters 08.03, snapshot every living active-player canonical attached
+rules-unit identity together with its eligibility reasons and step-start strength context. Do not
+snapshot future dice, Leadership, model placement, modifiers, or test requests. An eligible unit
+with no alive placed model produces a typed `off_battlefield_battle_shock_test` unsupported result
+containing the 08.03 source ID, canonical rules-unit ID, component IDs, and eligibility reasons; the
+step remains unresolved. P01 remains responsible for implementing those off-battlefield tests.
+
+For eligible on-battlefield units, use the existing generic sequencing decision when more than one
+test is required. Materialize and persist only the current in-flight request, using the candidate's
+actual eligibility reason and live dice, Leadership, model, placement, and modifier state. After
+that test and all of its nested outcome continuations finish, record its completion and materialize
+the next request from current authoritative state. Persist the candidate order, single in-flight
+request, and completed prefix across reroll decisions, serialization, replay, and lifecycle re-entry.
+A rules unit satisfying both predicates appears once and receives exactly one required test. A
+successful required test clears Battle-shock when that candidate carried it into the step; a failed
+test preserves or applies Battle-shock through the ordinary engine-owned outcome path.
 
 Specific authoritative 40k.app rule/statement and source ID: The authoritative August 26 `/rules`
 observation pins the complete normalized Command-phase heading order: Start of Command Phase, Gain
@@ -423,29 +431,33 @@ observation hashes are `9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d233
 `8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127`, its canonical
 artifact-byte SHA-256 is `78b2264047e263ab5537c71c7d1be681874bdda31191816b6b297eb9a39425e6`,
 and the final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:38f6d2103c82edfb26363d0b073fda0739bac8c26a38c5b72690915f4989e932`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:f529cb38565ef94f103e10500ca3a863ce50e50965c4d3c46f79e6ff1d3e45ac`.
 
 Load and execution support: The final source package must record all three implemented rows as
 `loaded` only after each row is linked to the authoritative `/rules` observation and the separate
 official-PDF operative statement. Rows 08.01 and 08.02 are `executable_engine_runtime`; 08.03 is
-truthfully `partial_engine_runtime` because this combined PR covers the active player's
-on-battlefield attached rules units while P01 retains the off-battlefield extension. The runtime
-consumer mapping covers the Command-start boundary, Core CP transaction, Battle-shock
-snapshot/collection, and successful phase-start recovery path.
+truthfully `partial_engine_runtime`: every living active-player canonical rules unit is included in
+the eligibility snapshot, but eligible off-battlefield tests stop with a typed unsupported result
+until P01 supplies their execution semantics. The runtime consumer mapping covers the Command-start
+boundary, Core CP transaction, eligibility snapshot, live one-at-a-time request materialization,
+and successful phase-start recovery path.
 
 Scope and explicit exclusions: This combined section covers the Command-phase timing owner,
 resumable Command-start progress, one-time Core CP gain, preservation of phase-start Battle-shock,
-the active-player on-battlefield attached-rules-unit snapshot, required-test completion progress,
-success-only recovery, deterministic events/replay/projections, exact 08.01-08.03 source evidence,
-static ownership audits, generated build identity/contracts, and timing documentation. It does not
-extend collection to embarked or Strategic Reserve units; that off-battlefield work remains P01. It
-adds no faction content, option family, proposal kind, movement, geometry, or adapter-owned mutation.
+the active-player canonical-rules-unit eligibility snapshot, typed eligible-off-battlefield
+unsupported boundary, deterministic multi-test sequencing, live single-request materialization,
+required-test completion progress, success-only recovery, deterministic events/replay/projections,
+exact 08.01-08.03 source evidence, static ownership audits, generated build identity/contracts, and
+timing documentation. It does not implement Battle-shock testing while embarked or in Strategic
+Reserves; that execution work remains P01. It adds no faction content, proposal kind, movement,
+geometry, or adapter-owned mutation.
 
 Owning state/validation/mutation/event/replay path: `BattleRoundFlow` generic `START_PHASE` dispatch
 → `CommandPhaseHandler` canonical Command-start boundary with Battle-shock preserved → serialized
 one-time synchronous/effect/finite-choice progress → engine-owned Core CP transactions → two
 `command_points_gained` events → `command_step_started` → scoring/Command work → one-time 08.03
-attached-rules-unit snapshot → shared Battle-shock request/result and optional-reroll path →
+canonical-rules-unit eligibility snapshot → typed eligible-off-battlefield unsupported boundary or
+generic sequencing choice → one live in-flight Battle-shock request/result and optional-reroll path →
 success-only clearing of carried phase-start Battle-shock → exact
 `battle_shock_modifier_applications_recorded` producer/source/operand authority → universal
 `attached_rules_unit_split_reconciled` lineage authority whenever an Attached Unit splits → exact
@@ -457,7 +469,10 @@ the predicate, constructs the snapshot, rolls the test, or mutates Battle-shock 
 Decision and viewer-visibility impact: The existing
 `select_faction_rule_command_phase_start_option` decision type, option IDs, payload shapes,
 stale/drift validation, queue behavior, record shapes, and public viewer visibility remain
-unchanged. Battle-shock rerolls retain decision type `select_dice_reroll` and their option IDs, but
+unchanged. Multiple required Battle-shock tests reuse the public generic
+`resolve_sequencing_order` decision with deterministic candidate IDs; no test request is
+materialized before that order is selected. Battle-shock rerolls retain decision type
+`select_dice_reroll` and their option IDs, but
 their adapter-visible `battle_shock_context` now requires `passed_state_policy`: `preserve` for
 non-Command forced-test success and `clear_if_step_start_shocked` for 08.03 success. The lifecycle
 validates that field and the exact source, request, roll, phase-start IDs, base payload, resolved
@@ -480,11 +495,14 @@ No hidden-information type or redaction set is added.
 Regression scenarios and same-bug-class search: Required coverage includes synchronous, effect, and
 finite Command-start work before CP; nested decision pause/resume without duplicated work; a
 currently Battle-shocked unit remaining shocked through Command start and scoring; above-half,
-below-half, and dual-reason snapshot membership; exact-once attached-rules-unit testing; success-only
-recovery; failure persistence; optional reroll pause/round-trip; snapshot drift rejection; destroyed
+below-half, and dual-reason snapshot membership; eligible off-battlefield typed unsupported payload
+and unresolved step; exact-once attached-rules-unit testing; success-only recovery; failure
+persistence; optional reroll pause/round-trip; snapshot drift rejection; destroyed
 or detached component handling through canonical rules-unit identity; an outcome-enqueued nested
 decision preempting the next required test while retaining the exact completed prefix; event
-ordering; post-Command history validation; authentic clear-before-split and split-before-clear
+ordering; generic multi-test sequencing before dice materialization; live recomputation of a later
+request after an earlier outcome removes a modifier source; actual forced-reason propagation into
+dice hooks; post-Command history validation; authentic clear-before-split and split-before-clear
 lineage histories; split-transfer deletion, partial-successor, and payload-tamper rejection;
 required-test predicate tamper; loaded modifier producer/source/operand tamper; exact
 move-completed trigger and source-binding tamper; attached producer paths for move hooks, generic

@@ -605,7 +605,6 @@ def _has_command_required_clear_authority(
     resolved_index: int,
     result: BattleShockResult,
 ) -> bool:
-    request_payload = result.request.to_payload()
     matching = 0
     for event in event_records[:resolved_index]:
         if event.event_type != "battle_shock_step_snapshot_created":
@@ -620,11 +619,18 @@ def _has_command_required_clear_authority(
             or payload.get("phase") != BattlePhase.COMMAND.value
         ):
             continue
-        required = payload.get("battle_shock_required_test_requests")
+        candidates = payload.get("battle_shock_candidate_inventory")
         phase_start_ids = payload.get("battle_shock_phase_start_unit_ids")
-        if not isinstance(required, list) or not isinstance(phase_start_ids, list):
+        if not isinstance(candidates, list) or not isinstance(phase_start_ids, list):
             raise GameLifecycleError("Battle-shock Command snapshot clear authority is invalid.")
-        if request_payload in required and result.request.unit_instance_id in phase_start_ids:
+        matching_candidates = tuple(
+            candidate
+            for candidate in candidates
+            if isinstance(candidate, dict)
+            and candidate.get("unit_instance_id") == result.request.unit_instance_id
+            and candidate.get("is_battle_shocked") is True
+        )
+        if len(matching_candidates) == 1 and result.request.unit_instance_id in phase_start_ids:
             matching += 1
     return matching == 1
 

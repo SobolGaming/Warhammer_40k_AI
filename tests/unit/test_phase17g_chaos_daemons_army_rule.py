@@ -108,6 +108,10 @@ from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    apply_sequencing_decision_from_request,
+)
 from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
@@ -1710,6 +1714,24 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+    sequencing_request = _required_decision_request(waiting)
+    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
+    sequencing_result = DecisionResult.for_request(
+        result_id="phase17g-shadow-command-battle-shock-order",
+        request=sequencing_request,
+        selected_option_id=sequencing_request.options[0].option_id,
+    )
+    sequencing_record = decisions.submit_result(sequencing_result)
+    sequencing_decision = apply_sequencing_decision_from_request(
+        request=sequencing_record.request,
+        result=sequencing_record.result,
+    )
+    decisions.event_log.append(
+        "sequencing_order_resolved",
+        sequencing_decision.to_payload(),
+    )
+
     completed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
@@ -2742,7 +2764,7 @@ def _july_manifestation_revival_session() -> tuple[
 ]:
     config = replace(
         _chaos_daemons_lifecycle_config(battleline=True),
-        game_id="phase17g-config-canonical-seed-1",
+        game_id="phase17g-config-canonical-seed-2",
     )
     session = LocalGameSession()
     session.start(config)

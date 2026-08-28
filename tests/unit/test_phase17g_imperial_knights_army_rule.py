@@ -3,14 +3,17 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
+from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     battle_state_with_center_objective_positions,
+    complete_setup_through_gate,
     default_unit_selection,
     phase11c_config,
+    secondary_choice,
     setup_state_at_declare_battle_formations,
     unit_by_id,
 )
@@ -64,11 +67,17 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedHookBinding,
     FightUnitSelectedHookRegistry,
 )
-from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.return_on_death import (
     RETURN_ON_DEATH_PENDING_CREATED_EVENT_TYPE,
     SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
@@ -152,6 +161,63 @@ def test_code_chivalric_setup_selection_records_replay_safe_oath() -> None:
         cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
     )
     assert restored.to_payload() == state.to_payload()
+
+
+def test_code_chivalric_historical_leadership_replays_event_bound_quality() -> None:
+    config = phase11c_config(game_id="phase17g-imperial-knights-historical-code")
+    state = setup_state_at_declare_battle_formations(config)
+    _mark_player_as_imperial_knights(state, player_id="player-a")
+    _mark_enemy_unit_as_character(state, player_id="player-b")
+    decisions = DecisionController()
+    request = army_rule.code_chivalric_oath_request(
+        BattleFormationRequestContext(state=state, decisions=decisions, config=config)
+    )
+    if request is None:
+        raise AssertionError("expected Code Chivalric oath request")
+    decisions.request_decision(request)
+    option = _oath_option(
+        request,
+        deed=army_rule.CodeChivalricDeed.LAY_LOW_THE_TYRANT,
+        quality=army_rule.CodeChivalricQuality.LEGACY_UNSULLIED,
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17g-imperial-knights-historical-oath",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    decisions.submit_result(result)
+    assert army_rule.apply_code_chivalric_oath_result(
+        BattleFormationResultContext(
+            state=state,
+            decisions=decisions,
+            config=config,
+            request=request,
+            result=result,
+        )
+    )
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-imperial-knights-historical-battlefield",
+        armies=tuple(state.army_definitions),
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    state.record_secondary_mission_choice(
+        secondary_choice(player_id="player-a", mode=SecondaryMissionMode.FIXED)
+    )
+    state.record_secondary_mission_choice(
+        secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
+    )
+    complete_setup_through_gate(state=state, decisions=decisions, config=config)
+    assert state.active_player_id is not None
+    context = historical_battle_shock_context_for_unit(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
+        active_player_id=state.active_player_id,
+    )
+
+    assert army_rule.historical_code_chivalric_leadership(context, 7) == 6
+    with pytest.raises(GameLifecycleError, match="historical authority requires"):
+        army_rule.historical_code_chivalric_leadership(cast(Any, object()), 7)
 
 
 def test_code_chivalric_random_oath_rolls_engine_dice_and_rewards_three_cp() -> None:

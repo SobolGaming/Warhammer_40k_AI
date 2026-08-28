@@ -9,6 +9,7 @@ from warhammer40k_core.engine.battle_shock_state_history import (
 from warhammer40k_core.engine.command_battle_shock_candidates import (
     CommandBattleShockCandidate,
     CommandBattleShockCandidatePayload,
+    CommandBattleShockEligibilityReason,
     forced_test_applications_from_candidate_inventory,
 )
 from warhammer40k_core.engine.command_battle_shock_forced_provider_authority import (
@@ -137,16 +138,20 @@ def _historical_command_candidate_inventory(
             state=state,
             unit_instance_id=unit_instance_id,
             owner_player_id=owner_player_id,
+            component_unit_instance_ids=component_unit_instance_ids,
             all_model_instance_ids=model_instance_ids,
             physical_by_model_id=physical_by_model_id,
             is_battle_shocked=unit_instance_id in shocked_ids,
             forced_applications=applications_by_unit_id.get(unit_instance_id, ()),
         )
-        for unit_instance_id, owner_player_id, model_instance_ids in identity_rows
+        for (
+            unit_instance_id,
+            owner_player_id,
+            component_unit_instance_ids,
+            model_instance_ids,
+        ) in identity_rows
         if owner_player_id == active_player_id
-        and any(
-            _is_placed_alive(physical_by_model_id.get(model_id)) for model_id in model_instance_ids
-        )
+        and any(_is_alive(physical_by_model_id.get(model_id)) for model_id in model_instance_ids)
     )
     expected_forced_ids = set(applications_by_unit_id)
     if expected_forced_ids - {candidate.unit_instance_id for candidate in candidates}:
@@ -158,7 +163,7 @@ def _historical_rules_unit_identity_rows(
     *,
     state: GameState,
     active_attached_ids: set[str],
-) -> tuple[tuple[str, str, tuple[str, ...]], ...]:
+) -> tuple[tuple[str, str, tuple[str, ...], tuple[str, ...]], ...]:
     physical = {
         unit.unit_instance_id: (
             army.player_id,
@@ -168,7 +173,7 @@ def _historical_rules_unit_identity_rows(
         for unit in army.units
     }
     grouped_component_ids: set[str] = set()
-    rows: list[tuple[str, str, tuple[str, ...]]] = []
+    rows: list[tuple[str, str, tuple[str, ...], tuple[str, ...]]] = []
     for record in state.starting_attached_unit_records:
         if record.attached_unit_instance_id not in active_attached_ids:
             continue
@@ -178,9 +183,16 @@ def _historical_rules_unit_identity_rows(
             for component_id in record.component_unit_instance_ids
             for model_id in physical[component_id][1]
         )
-        rows.append((record.attached_unit_instance_id, record.player_id, model_ids))
+        rows.append(
+            (
+                record.attached_unit_instance_id,
+                record.player_id,
+                tuple(sorted(record.component_unit_instance_ids)),
+                model_ids,
+            )
+        )
     rows.extend(
-        (unit_id, owner_id, model_ids)
+        (unit_id, owner_id, (unit_id,), model_ids)
         for unit_id, (owner_id, model_ids) in physical.items()
         if unit_id not in grouped_component_ids
     )
@@ -192,17 +204,18 @@ def _candidate_from_historical_rows(
     state: GameState,
     unit_instance_id: str,
     owner_player_id: str,
+    component_unit_instance_ids: tuple[str, ...],
     all_model_instance_ids: tuple[str, ...],
     physical_by_model_id: dict[str, PhysicalModelAuthority],
     is_battle_shocked: bool,
     forced_applications: tuple[BattleShockForcedTestApplication, ...],
 ) -> CommandBattleShockCandidate:
     applications = forced_applications
-    placed_alive_model_ids = tuple(
+    alive_model_ids = tuple(
         sorted(
             model_id
             for model_id in all_model_instance_ids
-            if _is_placed_alive(physical_by_model_id.get(model_id))
+            if _is_alive(physical_by_model_id.get(model_id))
         )
     )
     starting_model_count, single_model_starting_wounds = _starting_strength(
@@ -213,20 +226,28 @@ def _candidate_from_historical_rows(
     if starting_model_count == 1:
         row = physical_by_model_id[all_model_instance_ids[0]]
         single_model_wounds_remaining = row.wounds_remaining
+    context = BelowHalfStrengthContext(
+        player_id=owner_player_id,
+        unit_instance_id=unit_instance_id,
+        starting_model_count=starting_model_count,
+        current_model_count=len(alive_model_ids),
+        single_model_starting_wounds=single_model_starting_wounds,
+        single_model_wounds_remaining=single_model_wounds_remaining,
+    )
+    reasons: list[CommandBattleShockEligibilityReason] = []
+    if is_battle_shocked:
+        reasons.append(CommandBattleShockEligibilityReason.CURRENTLY_BATTLE_SHOCKED)
+    if context.is_at_or_below_half_strength:
+        reasons.append(CommandBattleShockEligibilityReason.AT_OR_BELOW_HALF_STRENGTH)
+    if applications:
+        reasons.append(CommandBattleShockEligibilityReason.BELOW_STARTING_STRENGTH_FORCED)
     return CommandBattleShockCandidate(
         unit_instance_id=unit_instance_id,
-        placed_alive_model_instance_ids=placed_alive_model_ids,
+        component_unit_instance_ids=tuple(sorted(component_unit_instance_ids)),
         is_battle_shocked=is_battle_shocked,
-        forced_below_starting_strength=bool(applications),
         forced_test_applications=applications,
-        below_half_strength_context=BelowHalfStrengthContext(
-            player_id=owner_player_id,
-            unit_instance_id=unit_instance_id,
-            starting_model_count=starting_model_count,
-            current_model_count=len(placed_alive_model_ids),
-            single_model_starting_wounds=single_model_starting_wounds,
-            single_model_wounds_remaining=single_model_wounds_remaining,
-        ),
+        below_half_strength_context=context,
+        eligibility_reasons=tuple(reasons),
     )
 
 
@@ -264,8 +285,8 @@ def _forced_applications_by_unit_id(
     return {unit_id: tuple(rows) for unit_id, rows in grouped.items()}
 
 
-def _is_placed_alive(row: PhysicalModelAuthority | None) -> bool:
-    return row is not None and row.presence == "battlefield" and row.wounds_remaining > 0
+def _is_alive(row: PhysicalModelAuthority | None) -> bool:
+    return row is not None and row.presence != "destroyed" and row.wounds_remaining > 0
 
 
 def _candidates(value: JsonValue) -> tuple[CommandBattleShockCandidate, ...]:

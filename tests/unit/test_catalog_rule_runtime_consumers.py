@@ -44,6 +44,9 @@ from warhammer40k_core.engine import catalog_rule_consumption as rule_consumptio
 from warhammer40k_core.engine import (
     catalog_unit_move_completed_battle_shock_runtime as unit_move_battle_shock_runtime,
 )
+from warhammer40k_core.engine import (
+    command_battle_shock_forced_provider_authority as forced_provider_authority,
+)
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -235,6 +238,7 @@ from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support i
 )
 from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionOption,
@@ -246,7 +250,11 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -315,6 +323,9 @@ from warhammer40k_core.engine.phases.movement_reactions import (
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
     record_primary_mission_boundary_checkpoint,
+)
+from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
+    PhysicalModelAuthority,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserve_arrival_hooks import (
@@ -902,6 +913,23 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
     assert runtime.reroll_permission(replace(context, phase=BattlePhase.MOVEMENT)) == permission
     with pytest.raises(GameLifecycleError, match="requires context"):
         runtime.reroll_permission(cast(Any, object()))
+    drifted_owner_request = replace(request)
+    object.__setattr__(drifted_owner_request, "player_id", enemy_army.player_id)
+    with pytest.raises(GameLifecycleError, match="target owner drift"):
+        runtime.reroll_permission(
+            replace(
+                context,
+                request=drifted_owner_request,
+            )
+        )
+    assert battle_shock_runtime._units_within_distance(  # pyright: ignore[reportPrivateUsage]
+        context=context,
+        first_unit=source_unit,
+        first_model_ids=source_unit.own_model_ids(),
+        second_unit=target_unit,
+        second_model_ids=target_unit.own_model_ids(),
+        distance_inches=6.0,
+    )
 
     bindings = catalog_battle_shock_hook_bindings(
         ability_indexes_by_player_id={
@@ -940,6 +968,34 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
             second_unit=target_unit,
             second_model_ids=target_unit.own_model_ids(),
             distance_inches=6.0,
+        )
+    with pytest.raises(GameLifecycleError, match="requires battlefield state"):
+        battle_shock_runtime._unit_within_distance_of_rules_unit(  # pyright: ignore[reportPrivateUsage]
+            context=replace(
+                context,
+                state=_state_without_battlefield(
+                    active_player_id=army.player_id,
+                    phase=BattlePhase.COMMAND,
+                ),
+            ),
+            source_unit=source_unit,
+            source_model_ids=source_unit.own_model_ids(),
+            target_rules_unit=target_rules_unit,
+            target_model_ids=tuple(
+                model.model_instance_id for model in target_rules_unit.alive_models()
+            ),
+            distance_inches=6.0,
+        )
+    with pytest.raises(GameLifecycleError, match="requires battlefield state"):
+        battle_shock_runtime._placed_alive_model_ids_for_rules_unit(  # pyright: ignore[reportPrivateUsage]
+            context=replace(
+                context,
+                state=_state_without_battlefield(
+                    active_player_id=army.player_id,
+                    phase=BattlePhase.COMMAND,
+                ),
+            ),
+            rules_unit=target_rules_unit,
         )
     with pytest.raises(GameLifecycleError, match="placement evidence drifted"):
         battle_shock_runtime._geometry_models_for_unit_ids(  # pyright: ignore[reportPrivateUsage]
@@ -1090,6 +1146,73 @@ def test_catalog_battle_shock_runtime_helpers_fail_fast_on_contract_drift() -> N
             source_army,
             unit_instance_id=target_army.units[0].unit_instance_id,
         )
+
+    with pytest.raises(GameLifecycleError, match="modifiers require context"):
+        battle_shock_runtime.catalog_selected_target_battle_shock_modifiers(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="forced tests require context"):
+        battle_shock_runtime.catalog_forced_battle_shock_unit_ids(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="heal requires outcome context"):
+        battle_shock_runtime.resolve_catalog_battle_shock_failed_heal(cast(Any, object()))
+
+    def persisted_effect(*, effect_payload: Any) -> PersistingEffect:
+        return PersistingEffect(
+            effect_id="test:catalog-battle-shock:generic-effect",
+            source_rule_id="test:catalog-battle-shock:generic-rule",
+            owner_player_id=source_army.player_id,
+            target_unit_instance_ids=(target_army.units[0].unit_instance_id,),
+            started_battle_round=1,
+            started_phase=BattlePhaseKind.COMMAND,
+            expiration=EffectExpiration.end_of_battle(),
+            effect_payload=effect_payload,
+        )
+
+    assert (
+        battle_shock_runtime._generic_rule_effect_or_none(  # pyright: ignore[reportPrivateUsage]
+            persisted_effect(effect_payload=None)
+        )
+        is None
+    )
+    assert (
+        battle_shock_runtime._generic_rule_effect_or_none(  # pyright: ignore[reportPrivateUsage]
+            persisted_effect(effect_payload={"effect_kind": "other"})
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="missing effect"):
+        battle_shock_runtime._generic_rule_effect_or_none(  # pyright: ignore[reportPrivateUsage]
+            persisted_effect(effect_payload={"effect_kind": GENERIC_RULE_EFFECT_KIND})
+        )
+    with pytest.raises(GameLifecycleError, match="payload is invalid"):
+        battle_shock_runtime._generic_rule_effect_or_none(  # pyright: ignore[reportPrivateUsage]
+            persisted_effect(
+                effect_payload={
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "effect": {
+                        "kind": "unsupported",
+                        "source_span": _span().to_payload(),
+                        "parameters": [],
+                    },
+                }
+            )
+        )
+
+    invalid_source_payloads: tuple[tuple[JsonValue, str], ...] = (
+        (None, "generic effect payload"),
+        ({}, "generic context payload"),
+        ({"context": {}}, "source unit context"),
+    )
+    for payload, message in invalid_source_payloads:
+        with pytest.raises(GameLifecycleError, match=message):
+            battle_shock_runtime._generic_effect_source_unit_id(  # pyright: ignore[reportPrivateUsage]
+                persisted_effect(effect_payload=payload)
+            )
+    source_payload = {"context": {"source_unit_instance_id": source_army.units[0].unit_instance_id}}
+    assert (
+        battle_shock_runtime._generic_effect_source_unit_id(  # pyright: ignore[reportPrivateUsage]
+            persisted_effect(effect_payload=source_payload)
+        )
+        == source_army.units[0].unit_instance_id
+    )
 
 
 def test_catalog_battle_shock_reroll_clause_helpers_are_strict() -> None:
@@ -4457,6 +4580,107 @@ def test_catalog_unit_move_completed_battle_shock_binding_targets_engaged_enemie
     assert replay_payload["source_model_instance_id"] == source_unit.own_models[0].model_instance_id
     assert replay_payload["target_unit_instance_id"] == target_unit.unit_instance_id
     assert replay_payload["movement_action"] == "charge_move"
+    runtime = unit_move_battle_shock_runtime.CatalogUnitMoveCompletedBattleShockRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=(source_army, target_army),
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        runtime.effect_handler(cast(Any, object()))
+    assert runtime.effect_handler(replace(context, completed_phase=BattlePhase.MOVEMENT)) == ()
+    assert runtime.effect_handler(replace(context, movement_action="normal_move")) == ()
+    with pytest.raises(GameLifecycleError, match="source owner drifted"):
+        unit_move_battle_shock_runtime._available_catalog_unit_move_completed_battle_shock_effects(  # pyright: ignore[reportPrivateUsage]
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            context=replace(context, triggering_player_id=target_army.player_id),
+        )
+    with pytest.raises(GameLifecycleError, match="index is missing player"):
+        unit_move_battle_shock_runtime._available_catalog_unit_move_completed_battle_shock_effects(  # pyright: ignore[reportPrivateUsage]
+            ability_indexes_by_player_id={},
+            context=context,
+        )
+    battlefield_state = state.battlefield_state
+    state.battlefield_state = None
+    assert (
+        unit_move_battle_shock_runtime._available_catalog_unit_move_completed_battle_shock_effects(  # pyright: ignore[reportPrivateUsage]
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            context=context,
+        )
+        == ()
+    )
+    assert (
+        unit_move_battle_shock_runtime._placed_alive_model_instance_ids_for_rules_unit(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            rules_unit_instance_id=source_unit.unit_instance_id,
+        )
+        == ()
+    )
+    state.battlefield_state = battlefield_state
+
+    (clause,) = catalog_rule_clauses_from_record(record)
+    effect_call: dict[str, Any] = {
+        "trigger_event_id": trigger.event_id,
+        "triggering_player_id": source_army.player_id,
+        "movement_action": "charge_move",
+        "record": record,
+        "source_unit": source_unit,
+        "source_model_instance_id": source_unit.own_models[0].model_instance_id,
+        "source_rules_unit_instance_id": source_unit.unit_instance_id,
+        "target_candidates": ((target_unit.unit_instance_id, target_army.player_id),),
+        "clause": clause,
+    }
+    with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
+        unit_move_battle_shock_runtime._effects_from_clause(  # pyright: ignore[reportPrivateUsage]
+            **{**effect_call, "source_unit": object()}  # pyright: ignore[reportArgumentType]
+        )
+    with pytest.raises(GameLifecycleError, match="targets must be a tuple"):
+        unit_move_battle_shock_runtime._effects_from_clause(  # pyright: ignore[reportPrivateUsage]
+            **{**effect_call, "target_candidates": []}  # pyright: ignore[reportArgumentType]
+        )
+    with pytest.raises(GameLifecycleError, match="requires a clause"):
+        unit_move_battle_shock_runtime._effects_from_clause(  # pyright: ignore[reportPrivateUsage]
+            **{**effect_call, "clause": object()}  # pyright: ignore[reportArgumentType]
+        )
+    assert (
+        unit_move_battle_shock_runtime._effects_from_clause(  # pyright: ignore[reportPrivateUsage]
+            **{  # pyright: ignore[reportArgumentType]
+                **effect_call,
+                "clause": replace(clause, trigger=None),
+            }
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        unit_move_battle_shock_runtime._effect_payload(  # pyright: ignore[reportPrivateUsage]
+            trigger_event_id=trigger.event_id,
+            triggering_player_id=source_army.player_id,
+            movement_action="charge_move",
+            record=record,
+            source_unit=source_unit,
+            source_model_instance_id=source_unit.own_models[0].model_instance_id,
+            source_rules_unit_instance_id=source_unit.unit_instance_id,
+            clause=clause,
+            effect_index=-1,
+            target_unit_instance_id=target_unit.unit_instance_id,
+            target_player_id=target_army.player_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires ruleset"):
+        unit_move_battle_shock_runtime._target_candidates(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            ruleset_descriptor=cast(Any, object()),
+            source_rules_unit_instance_id=source_unit.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        unit_move_battle_shock_runtime._source_model_instance_id_for_record(  # pyright: ignore[reportPrivateUsage]
+            record=cast(Any, object()),
+            source_unit=source_unit,
+            current_model_instance_ids=source_unit.own_model_ids(),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a current model"):
+        unit_move_battle_shock_runtime._source_model_instance_id_for_record(  # pyright: ignore[reportPrivateUsage]
+            record=record,
+            source_unit=source_unit,
+            current_model_instance_ids=(),
+        )
     effect_key = unit_move_completed_battle_shock_effect_key(effect)
     request_id = unit_move_completed_battle_shock_request_id(
         battle_round=state.battle_round,
@@ -8837,6 +9061,217 @@ def test_catalog_rule_effect_consumers_classify_supported_and_fail_closed_shapes
     ):
         with pytest.raises(GameLifecycleError, match=expected):
             catalog_rule_ir_consumer_ids_for_effect(malformed_effect)
+
+
+def test_command_forced_provider_rejects_unrederivable_selected_target_effect() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=10.0,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=30.0,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id=target_army.player_id,
+        phase=BattlePhase.COMMAND,
+    )
+    clause = _effect_clause(
+        clause_id="test:command-forced-provider:effect",
+        duration=_duration("battle_round"),
+        effect_kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+        force_battle_shock_below_starting_strength=True,
+        rules_context="battle_shock",
+        status="battle_shock_forced_below_starting_strength",
+    )
+    source_id = "test:command-forced-provider"
+    catalog_record = _ability_record(
+        record_id="record:test:command-forced-provider",
+        rule_ir=_rule_ir(source_id=source_id, clauses=(clause,)),
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        datasheet_id=source_unit.datasheet_id,
+    )
+    catalog_record_id = catalog_record.record_id
+    selection_clause_id = "test:command-forced-provider:selection"
+    transformed = effect_with_selected_target(
+        clause.effects[0],
+        selected_target_unit_instance_id=target_unit.unit_instance_id,
+    )
+    effect_record: dict[str, JsonValue] = {
+        "immediate_effect_kind": None,
+        "effect_payload": {
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "effect": validate_json_value(transformed.to_payload()),
+        },
+        "source_rule_id": source_id,
+        "owner_player_id": source_army.player_id,
+        "target_unit_instance_ids": [target_unit.unit_instance_id],
+        "started_battle_round": state.battle_round,
+        "started_phase": BattlePhaseKind.COMMAND.value,
+        "expiration": validate_json_value(
+            EffectExpiration.end_battle_round(battle_round=state.battle_round).to_payload()
+        ),
+        "effect_clause_id": clause.clause_id,
+        "effect_index": 0,
+        "catalog_record_id": catalog_record_id,
+        "source_unit_instance_id": source_unit.unit_instance_id,
+        "selection_clause_id": selection_clause_id,
+        "selected_target_unit_instance_id": target_unit.unit_instance_id,
+    }
+    option = DecisionOption(
+        option_id="test:command-forced-provider:select",
+        label="Select target",
+        payload={"generic_rule_effect_records": [effect_record]},
+    )
+    request = DecisionRequest(
+        request_id="request:test:command-forced-provider",
+        decision_type="test:command-forced-provider",
+        actor_id=source_army.player_id,
+        payload={"selection_clause_id": selection_clause_id},
+        options=(option,),
+    )
+    result = DecisionResult.for_request(
+        result_id="result:test:command-forced-provider",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    decision_record = DecisionRecord(
+        record_id="decision-record:test:command-forced-provider",
+        request=request,
+        result=result,
+    )
+    event = EventRecord(
+        event_id="event:test:command-forced-provider",
+        event_type="catalog_selected_target_effect_selected",
+        payload={
+            "player_id": source_army.player_id,
+            "request_id": request.request_id,
+            "result_id": result.result_id,
+            "selected_option_id": option.option_id,
+            "catalog_record_id": catalog_record_id,
+            "source_rule_id": source_id,
+            "source_unit_instance_id": source_unit.unit_instance_id,
+            "source_model_instance_id": source_unit.own_models[0].model_instance_id,
+            "selection_clause_id": selection_clause_id,
+            "target_unit_instance_id": target_unit.unit_instance_id,
+        },
+    )
+    physical_rows = tuple(
+        PhysicalModelAuthority(
+            model_instance_id=model.model_instance_id,
+            presence="battlefield",
+            pose=battlefield.model_placement_by_id(model.model_instance_id).pose,
+            wounds_remaining=model.wounds_remaining,
+        )
+        for army in (source_army, target_army)
+        for unit in army.units
+        for model in unit.own_models
+    )
+    indexes = {
+        source_army.player_id: AbilityCatalogIndex.from_records((catalog_record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+
+    with pytest.raises(GameLifecycleError, match="effect clause is unsupported"):
+        forced_provider_authority._catalog_forced_effect_from_record(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            event=event,
+            decision_record=decision_record,
+            effect_index=0,
+            effect_record=effect_record,
+            ability_indexes_by_player_id=indexes,
+            physical_rows=physical_rows,
+        )
+    with pytest.raises(GameLifecycleError, match="effect clause is unsupported"):
+        forced_provider_authority._expected_catalog_forced_effects(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            event=event,
+            record=decision_record,
+            ability_indexes_by_player_id=indexes,
+            physical_rows=physical_rows,
+        )
+    assert (
+        forced_provider_authority._catalog_forced_target_ids(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            event_records=(),
+            decision_records=(),
+            snapshot_index=0,
+            battle_round=state.battle_round,
+            active_player_id=target_army.player_id,
+            candidates=(),
+            physical_rows=physical_rows,
+            ability_indexes_by_player_id=indexes,
+        )
+        == ()
+    )
+
+    invalid_overrides: tuple[dict[str, JsonValue], ...] = (
+        {"immediate_effect_kind": "immediate"},
+        {"effect_payload": None},
+        {"effect_payload": {"effect_kind": GENERIC_RULE_EFFECT_KIND}},
+    )
+    for overrides in invalid_overrides:
+        assert (
+            forced_provider_authority._catalog_forced_effect_from_record(  # pyright: ignore[reportPrivateUsage]
+                state=state,
+                event=event,
+                decision_record=decision_record,
+                effect_index=0,
+                effect_record={**effect_record, **overrides},
+                ability_indexes_by_player_id=indexes,
+                physical_rows=physical_rows,
+            )
+            is None
+        )
+
+    invalid_cases = (
+        (
+            {**effect_record, "source_rule_id": "drifted-source"},
+            event,
+            indexes,
+            "loaded source record drifted",
+        ),
+        (
+            effect_record,
+            replace(
+                event,
+                payload={
+                    **cast(dict[str, JsonValue], event.payload),
+                    "source_model_instance_id": "missing-model",
+                },
+            ),
+            indexes,
+            "source model authority drifted",
+        ),
+        (
+            {**effect_record, "effect_clause_id": "missing-clause"},
+            event,
+            indexes,
+            "effect clause authority drifted",
+        ),
+        (
+            {**effect_record, "effect_index": 1},
+            event,
+            indexes,
+            "effect index authority drifted",
+        ),
+    )
+    for invalid_record, invalid_event, invalid_indexes, message in invalid_cases:
+        with pytest.raises(GameLifecycleError, match=message):
+            forced_provider_authority._catalog_forced_effect_from_record(  # pyright: ignore[reportPrivateUsage]
+                state=state,
+                event=invalid_event,
+                decision_record=decision_record,
+                effect_index=0,
+                effect_record=invalid_record,
+                ability_indexes_by_player_id=invalid_indexes,
+                physical_rows=physical_rows,
+            )
 
 
 def _command_point_record(

@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
+from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -556,6 +557,41 @@ def test_voice_of_command_modifiers_cover_all_orders() -> None:
         )
         == 3
     )
+
+
+def test_voice_of_command_historical_leadership_replays_live_order_boundary() -> None:
+    lifecycle = _battle_ready_lifecycle(orders_per_battle_round=1)
+    _issue_order(
+        lifecycle,
+        order=army_rule.VoiceOfCommandOrder.DUTY_AND_HONOUR,
+        target_rules_unit_id=INFANTRY_UNIT_ID,
+        result_id="phase17g-astra-historical-duty-and-honour",
+    )
+    state = _require_state(lifecycle)
+    context = historical_battle_shock_context_for_unit(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id=INFANTRY_UNIT_ID,
+        active_player_id="player-a",
+    )
+
+    assert army_rule.historical_voice_of_command_leadership(context, 7) == 6
+    assert (
+        army_rule.historical_voice_of_command_leadership(
+            replace(context, battle_shocked_unit_ids=(INFANTRY_UNIT_ID,)),
+            7,
+        )
+        == 7
+    )
+    enemy_context = historical_battle_shock_context_for_unit(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id=ENEMY_UNIT_ID,
+        active_player_id="player-a",
+    )
+    assert army_rule.historical_voice_of_command_leadership(enemy_context, 7) == 7
+    with pytest.raises(GameLifecycleError, match="historical authority requires context"):
+        army_rule.historical_voice_of_command_leadership(cast(Any, object()), 7)
 
 
 def test_voice_of_command_filters_battle_shocked_targets_and_wrong_keywords() -> None:

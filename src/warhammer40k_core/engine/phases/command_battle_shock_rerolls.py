@@ -188,11 +188,8 @@ def validate_command_battle_shock_reroll_context(
             ),
         )
     )
-    completed_count = len(command_state.completed_battle_shock_test_request_ids)
-    if completed_count >= len(command_state.battle_shock_required_test_requests):
-        raise GameLifecycleError("Battle-shock reroll has no next required test.")
-    if battle_shock_request != command_state.battle_shock_required_test_requests[completed_count]:
-        raise GameLifecycleError("Battle-shock reroll request is not the next required test.")
+    if battle_shock_request != command_state.battle_shock_in_flight_test_request:
+        raise GameLifecycleError("Battle-shock reroll request is not the in-flight test.")
     if request.actor_id != battle_shock_request.player_id:
         raise GameLifecycleError("Battle-shock reroll request actor drift.")
     initial_roll_state = DiceRollState.from_payload(
