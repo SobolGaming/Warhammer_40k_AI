@@ -5,6 +5,11 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.damage_allocation import (
+    MortalWoundApplicationProgress,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -115,8 +120,40 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
         return self.bindings
 
     def handles_source_context(self, source_context: JsonValue) -> bool:
+        return self.binding_for_source_context(source_context) is not None
+
+    def binding_for_source_context(
+        self,
+        source_context: JsonValue,
+    ) -> MortalWoundFeelNoPainContinuationHookBinding | None:
         source_kind = _source_kind_from_context(source_context)
-        return any(binding.source_kind == source_kind for binding in self.bindings)
+        return next(
+            (binding for binding in self.bindings if binding.source_kind == source_kind),
+            None,
+        )
+
+    def binding_for_request(
+        self,
+        request: DecisionRequest,
+        *,
+        required_source_ids: frozenset[str],
+    ) -> MortalWoundFeelNoPainContinuationHookBinding | None:
+        if not is_mortal_wound_feel_no_pain_request(request):
+            return None
+        source_context = mortal_wound_feel_no_pain_source_context(request)
+        binding = self.binding_for_source_context(source_context)
+        if binding is None:
+            return None
+        if binding.source_id in required_source_ids:
+            request_payload = cast(dict[str, JsonValue], request.payload)
+            progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
+                request_payload["lost_wound_context"]
+            )
+            if progress.source_rule_id != binding.source_id:
+                raise GameLifecycleError(
+                    "Mortal wound FNP continuation source rule identity drifted."
+                )
+        return binding
 
     def apply_decision(
         self,
@@ -124,17 +161,32 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
     ) -> LifecycleStatus | None:
         if type(context) is not MortalWoundFeelNoPainContinuationContext:
             raise GameLifecycleError("Mortal wound FNP continuation requires context.")
-        source_kind = _source_kind_from_context(context.source_context)
-        for binding in self.bindings:
-            if binding.source_kind != source_kind:
-                continue
-            status = binding.handler(context)
-            if status is not None and type(status) is not LifecycleStatus:
-                raise GameLifecycleError(
-                    "Mortal wound FNP continuation handlers must return status or None."
+        binding = self.binding_for_source_context(context.source_context)
+        if binding is None:
+            raise GameLifecycleError("Mortal wound FNP continuation source kind is not registered.")
+        required_source_ids: frozenset[str]
+        if context.battle_shock_hooks is None:
+            required_source_ids = frozenset()
+        else:
+            required_source_ids = context.battle_shock_hooks.pending_outcome_authority_source_ids()
+        if binding.source_id in required_source_ids:
+            request_source_context = mortal_wound_feel_no_pain_source_context(context.request)
+            if context.source_context != request_source_context:
+                raise GameLifecycleError("Mortal wound FNP continuation source context drifted.")
+            if (
+                self.binding_for_request(
+                    context.request,
+                    required_source_ids=required_source_ids,
                 )
-            return status
-        raise GameLifecycleError("Mortal wound FNP continuation source kind is not registered.")
+                != binding
+            ):
+                raise GameLifecycleError("Mortal wound FNP continuation request binding drifted.")
+        status = binding.handler(context)
+        if status is not None and type(status) is not LifecycleStatus:
+            raise GameLifecycleError(
+                "Mortal wound FNP continuation handlers must return status or None."
+            )
+        return status
 
 
 def _validate_ability_indexes(

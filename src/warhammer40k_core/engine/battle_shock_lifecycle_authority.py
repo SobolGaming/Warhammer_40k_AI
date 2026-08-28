@@ -218,13 +218,30 @@ def validate_pending_outcome_request(
         BattleShockPendingOutcomeAuthorityContext,
     )
 
-    runtime_content_bundle.battle_shock_hook_registry.pending_outcome_authority_for(
+    provider_source_ids = (
+        runtime_content_bundle.battle_shock_hook_registry.pending_outcome_authority_source_ids()
+    )
+    continuation_binding = (
+        runtime_content_bundle.mortal_wound_feel_no_pain_hook_registry.binding_for_request(
+            request,
+            required_source_ids=provider_source_ids,
+        )
+    )
+    claim = runtime_content_bundle.battle_shock_hook_registry.pending_outcome_authority_for(
         BattleShockPendingOutcomeAuthorityContext(
             state=state,
             decisions=decisions,
             request=request,
         )
     )
+    if (
+        continuation_binding is not None
+        and continuation_binding.source_id in provider_source_ids
+        and claim is None
+    ):
+        raise GameLifecycleError(
+            "Loaded Battle-shock outcome continuation lacks pending provider authority."
+        )
 
 
 def validate_restore(

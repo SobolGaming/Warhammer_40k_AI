@@ -808,6 +808,13 @@ class BattleShockHookRegistry:
             )
         return None if not claims else claims[0]
 
+    def pending_outcome_authority_source_ids(self) -> frozenset[str]:
+        return frozenset(
+            binding.source_id
+            for binding in self.bindings
+            if binding.pending_outcome_authority_validator is not None
+        )
+
     def validate_completed_outcome_authority(
         self,
         context: BattleShockCompletedOutcomeAuthorityContext,
