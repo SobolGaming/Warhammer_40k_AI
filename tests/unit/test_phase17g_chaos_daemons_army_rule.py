@@ -1428,7 +1428,14 @@ def test_daemonic_manifestation_dual_identity_drift_keeps_provider_ownership() -
     )
 
 
-def test_daemonic_manifestation_placement_identity_drift_follows_selection_lineage() -> None:
+@pytest.mark.parametrize(
+    "erase_selection_lineage",
+    [False, True],
+    ids=("selection-lineage-preserved", "selection-lineage-erased"),
+)
+def test_daemonic_manifestation_placement_identity_drift_retains_provider_ownership(
+    erase_selection_lineage: bool,
+) -> None:
     session, state, destroyed_model_ids, return_placements, selection_request = (
         _july_manifestation_revival_session()
     )
@@ -1473,9 +1480,16 @@ def test_daemonic_manifestation_placement_identity_drift_follows_selection_linea
     source_context = cast(dict[str, object], effect_payload["source_context"])
     source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-kind"
     source_context["hook_id"] = "phase17g:forged-daemonic-manifestation-hook"
+    if erase_selection_lineage:
+        placement_payload["source_selection_request_id"] = None
+        placement_payload["source_selection_result_id"] = None
     forged_request = replace(
         placement_request,
         payload=validate_json_value(placement_payload),
+    )
+    assert forged_request.request_id == placement_request.request_id
+    assert forged_request.request_id.startswith(
+        f"{army_rule.JULY_HOOK_ID}:daemonic-manifestation-battleline:"
     )
     decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
 
@@ -1493,8 +1507,10 @@ def test_daemonic_manifestation_placement_identity_drift_follows_selection_linea
         drifted_events.append(event)
     assert changed_request_event
     decisions.event_log.replace_records(tuple(drifted_events))
-    assert placement_payload["source_selection_request_id"] == selection_request_id
-    assert placement_payload["source_selection_result_id"] == selection_result_id
+    expected_selection_request_id = None if erase_selection_lineage else selection_request_id
+    expected_selection_result_id = None if erase_selection_lineage else selection_result_id
+    assert placement_payload["source_selection_request_id"] == expected_selection_request_id
+    assert placement_payload["source_selection_result_id"] == expected_selection_result_id
 
     with pytest.raises(GameLifecycleError, match="provider identity drifted"):
         GameLifecycle.from_payload(

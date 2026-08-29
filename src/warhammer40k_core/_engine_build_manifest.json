@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0d0a4e9e2c0ce8cc46cecfb3d9132e7fa41ae09db7fbca716fd0bdc7869a4b80",
-  "fingerprint": "0d0a4e9e2c0ce8cc46cecfb3d9132e7fa41ae09db7fbca716fd0bdc7869a4b80",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:32d942ec5542938b7f6310e727f3172209fa42c7d2dc196321cf580ca5f3d8a8",
+  "fingerprint": "32d942ec5542938b7f6310e727f3172209fa42c7d2dc196321cf580ca5f3d8a8",
   "resource_count": 2453,
   "resources": [
     {
@@ -3495,9 +3495,9 @@
       "sha256": "344ee57a3d64b50946f26aa3978c7be4844c865aab123b41643a35ad8f63581e"
     },
     {
-      "byte_length": 26549,
+      "byte_length": 26753,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
-      "sha256": "579ca30a1bc5702c921affc76370bcbf255c5c41c50d00e704a8eb5008b63cf8"
+      "sha256": "48b3182343846365e67f2432496c6af90c925b7c2e69c48f36831a087ef198eb"
     },
     {
       "byte_length": 61675,

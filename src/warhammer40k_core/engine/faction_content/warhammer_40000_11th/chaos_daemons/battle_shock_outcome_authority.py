@@ -110,8 +110,10 @@ def validate_july_daemonic_manifestation_pending_outcome(
     hook_identifies_provider = (
         source_context is not None and source_context.get("hook_id") == hook_id
     )
-    effect_id_identifies_provider = effect.effect_id.startswith(
-        f"{hook_id}:daemonic-manifestation-battleline:"
+    provider_effect_id_prefix = f"{hook_id}:daemonic-manifestation-battleline:"
+    effect_id_identifies_provider = effect.effect_id.startswith(provider_effect_id_prefix)
+    request_id_identifies_provider = context.request.request_id.startswith(
+        provider_effect_id_prefix
     )
     lineage_identifies_provider = _placement_lineage_identifies_provider(
         context=context,
@@ -124,6 +126,7 @@ def validate_july_daemonic_manifestation_pending_outcome(
             kind_identifies_provider,
             hook_identifies_provider,
             effect_id_identifies_provider,
+            request_id_identifies_provider,
             marker_identifies_provider,
             lineage_identifies_provider,
         )
