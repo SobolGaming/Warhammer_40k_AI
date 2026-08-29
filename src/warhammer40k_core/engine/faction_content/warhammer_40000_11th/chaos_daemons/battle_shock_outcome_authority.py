@@ -23,6 +23,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     parse_battle_shock_resolution_authority,
 )
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import (
     DecisionOption,
     DecisionRequest,
@@ -33,7 +34,9 @@ from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_
 from warhammer40k_core.engine.healing import (
     SELECT_HEALING_MODEL_DECISION_TYPE,
     HealingEffect,
+    HealingStep,
     HealingStepKind,
+    HealingStepPayload,
     healing_effect_from_request,
 )
 from warhammer40k_core.engine.healing_revival import (
@@ -44,7 +47,10 @@ from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    current_rules_unit_views_for_identity,
+)
 
 _EFFECT_KIND = "daemonic_manifestation_battleline_revival"
 _PENDING_EVENT_TYPE = "chaos_daemons_daemonic_manifestation_revival_pending"
@@ -432,17 +438,20 @@ def _placement_producer_identifies_provider(
         model_id = _identifier(selected_payload.get("model_instance_id"), "revival model ID")
         if producer.result.payload != selected.payload:
             raise GameLifecycleError("Daemonic Manifestation revival selection drifted.")
-        target = rules_unit_view_by_id(
-            state=context.state,
-            unit_instance_id=root_effect.target_unit_instance_id,
-        )
-        component_id = target.component_unit_id_for_model(model_id)
         if producer_index + 1 == len(events):
             raise GameLifecycleError("Daemonic Manifestation placement chronology drifted.")
         child_event = events[producer_index + 1]
         if child_event.event_type == "healing_step_resolved":
-            if context.state.transport_cargo_state_for_embarked_unit(component_id) is None:
-                raise GameLifecycleError("Daemonic Manifestation placement chronology drifted.")
+            _validate_completed_selection_step(
+                events=events,
+                decision_records=context.decisions.records,
+                event_index=producer_index + 1,
+                event=child_event,
+                effect=root_effect,
+                model_id=model_id,
+                request_id=producer.request.request_id,
+                result_id=producer.result.result_id,
+            )
             continue
         if child_event.event_type != "decision_requested" or not isinstance(
             child_event.payload, dict
@@ -462,29 +471,48 @@ def _placement_producer_identifies_provider(
         if completed_matches:
             if len(completed_matches) != 1 or pending_matches:
                 raise GameLifecycleError("Daemonic Manifestation pending descendant drifted.")
+            component_id = _historical_component_unit_id_for_model(
+                context=context,
+                target_unit_instance_id=root_effect.target_unit_instance_id,
+                model_id=model_id,
+            )
+            expected_request = _expected_placement_request(
+                effect=root_effect,
+                producer=producer,
+                model_id=model_id,
+                component_id=component_id,
+            )
+            if child_request != expected_request:
+                raise GameLifecycleError(
+                    "Daemonic Manifestation outcome provider identity drifted."
+                )
+            _validate_completed_placement_step(
+                events=events,
+                decision_records=context.decisions.records,
+                effect=root_effect,
+                model_id=model_id,
+                child_request=child_request,
+                result_id=completed_matches[0].result.result_id,
+            )
             continue
         if len(pending_matches) != 1:
             raise GameLifecycleError("Daemonic Manifestation pending descendant drifted.")
-        expected_request = DecisionRequest(
-            request_id=(
-                f"{root_effect.effect_id}:healing-step-"
-                f"{root_effect.next_step_index():03d}:placement"
-            ),
-            decision_type=SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
-            actor_id=root_effect.selection_actor_player_id,
-            payload=validate_json_value(
-                {
-                    "submission_kind": SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
-                    "proposal_kind": "healing_revival_placement",
-                    "effect": root_effect.to_payload(),
-                    "step_index": root_effect.next_step_index(),
-                    "model_instance_id": model_id,
-                    "component_unit_instance_id": component_id,
-                    "source_selection_request_id": producer.request.request_id,
-                    "source_selection_result_id": producer.result.result_id,
-                }
-            ),
-            options=(parameterized_decision_option(),),
+        relevant_descendants = tuple(
+            view
+            for view in current_rules_unit_views_for_identity(
+                state=context.state,
+                unit_instance_id=root_effect.target_unit_instance_id,
+            )
+            if any(model.model_instance_id == model_id for model in view.own_models)
+        )
+        if len(relevant_descendants) != 1:
+            raise GameLifecycleError("Daemonic Manifestation placement descendant is ambiguous.")
+        component_id = relevant_descendants[0].component_unit_id_for_model(model_id)
+        expected_request = _expected_placement_request(
+            effect=root_effect,
+            producer=producer,
+            model_id=model_id,
+            component_id=component_id,
         )
         if child_request != expected_request:
             raise GameLifecycleError("Daemonic Manifestation outcome provider identity drifted.")
@@ -493,6 +521,156 @@ def _placement_producer_identifies_provider(
     if claims > 1:
         raise GameLifecycleError("Daemonic Manifestation pending descendant is ambiguous.")
     return claims == 1
+
+
+def _historical_component_unit_id_for_model(
+    *,
+    context: BattleShockPendingOutcomeAuthorityContext,
+    target_unit_instance_id: str,
+    model_id: str,
+) -> str:
+    attached_matches = tuple(
+        record
+        for record in context.state.starting_attached_unit_records
+        if record.attached_unit_instance_id == target_unit_instance_id
+    )
+    if attached_matches:
+        if len(attached_matches) != 1:
+            raise GameLifecycleError(
+                "Daemonic Manifestation historical target identity is ambiguous."
+            )
+        component_matches = tuple(
+            component_id
+            for component_id, model_ids in attached_matches[
+                0
+            ].starting_model_instance_ids_by_component
+            if model_id in model_ids
+        )
+        if len(component_matches) != 1:
+            raise GameLifecycleError(
+                "Daemonic Manifestation historical model identity is ambiguous."
+            )
+        return component_matches[0]
+    component_id = context.state.unit_instance_id_for_model(model_id)
+    if component_id != target_unit_instance_id:
+        raise GameLifecycleError("Daemonic Manifestation historical target identity drifted.")
+    return component_id
+
+
+def _expected_placement_request(
+    *,
+    effect: HealingEffect,
+    producer: DecisionRecord,
+    model_id: str,
+    component_id: str,
+) -> DecisionRequest:
+    return DecisionRequest(
+        request_id=(f"{effect.effect_id}:healing-step-{effect.next_step_index():03d}:placement"),
+        decision_type=SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+        actor_id=effect.selection_actor_player_id,
+        payload=validate_json_value(
+            {
+                "submission_kind": SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+                "proposal_kind": "healing_revival_placement",
+                "effect": effect.to_payload(),
+                "step_index": effect.next_step_index(),
+                "model_instance_id": model_id,
+                "component_unit_instance_id": component_id,
+                "source_selection_request_id": producer.request.request_id,
+                "source_selection_result_id": producer.result.result_id,
+            }
+        ),
+        options=(parameterized_decision_option(),),
+    )
+
+
+def _validate_completed_selection_step(
+    *,
+    events: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    event_index: int,
+    event: EventRecord,
+    effect: HealingEffect,
+    model_id: str,
+    request_id: str,
+    result_id: str,
+) -> None:
+    step = _healing_step_from_event(event=event, effect=effect)
+    if (
+        step.step_index != effect.next_step_index()
+        or step.step_kind
+        not in {
+            HealingStepKind.REVIVE_MODEL_EMBARKED,
+            HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY,
+        }
+        or step.model_instance_id != model_id
+        or step.request_id != request_id
+        or step.result_id != result_id
+    ):
+        raise GameLifecycleError("Daemonic Manifestation healing step drifted.")
+    validate_mutation_decision_closure(
+        event_records=events,
+        decision_records=decision_records,
+        mutation_index=event_index,
+        request_id=request_id,
+        result_id=result_id,
+    )
+
+
+def _validate_completed_placement_step(
+    *,
+    events: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    effect: HealingEffect,
+    model_id: str,
+    child_request: DecisionRequest,
+    result_id: str,
+) -> None:
+    matches: list[tuple[int, HealingStep]] = []
+    for event_index, event in enumerate(events):
+        if event.event_type != "healing_step_resolved" or not isinstance(event.payload, dict):
+            continue
+        if event.payload.get("effect_id") != effect.effect_id:
+            continue
+        step = _healing_step_from_event(event=event, effect=effect)
+        if step.request_id == child_request.request_id and step.result_id == result_id:
+            matches.append((event_index, step))
+    if len(matches) != 1:
+        raise GameLifecycleError("Daemonic Manifestation placement chronology drifted.")
+    event_index, step = matches[0]
+    if (
+        step.step_index != effect.next_step_index()
+        or step.step_kind is not HealingStepKind.REVIVE_MODEL
+        or step.model_instance_id != model_id
+        or step.transition_batch is None
+    ):
+        raise GameLifecycleError("Daemonic Manifestation healing step drifted.")
+    validate_mutation_decision_closure(
+        event_records=events,
+        decision_records=decision_records,
+        mutation_index=event_index,
+        request_id=child_request.request_id,
+        result_id=result_id,
+    )
+
+
+def _healing_step_from_event(*, event: EventRecord, effect: HealingEffect) -> HealingStep:
+    payload = _object(event.payload, "healing step event")
+    raw_step = _object(payload.get("step"), "healing step")
+    step = HealingStep.from_payload(cast(HealingStepPayload, raw_step))
+    expected_payload = validate_json_value(
+        {
+            "effect_id": effect.effect_id,
+            "target_unit_instance_id": effect.target_unit_instance_id,
+            "amount": effect.amount,
+            "source_rule_id": effect.source_rule_id,
+            "source_context": effect.source_context,
+            "step": step.to_payload(),
+        }
+    )
+    if event.payload != expected_payload:
+        raise GameLifecycleError("Daemonic Manifestation healing step drifted.")
+    return step
 
 
 def _exact_manifestation_d3(

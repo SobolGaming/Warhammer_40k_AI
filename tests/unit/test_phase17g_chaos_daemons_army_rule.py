@@ -68,6 +68,10 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -88,7 +92,11 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
-from warhammer40k_core.engine.healing import SELECT_HEALING_MODEL_DECISION_TYPE
+from warhammer40k_core.engine.healing import (
+    SELECT_HEALING_MODEL_DECISION_TYPE,
+    HealingEffect,
+    resolve_healing_until_blocked,
+)
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
 )
@@ -106,7 +114,14 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
+from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_historical_events import (
+    record_primary_battlefield_departure_event,
+)
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_destroyed_model_departures,
+)
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.sequencing import (
@@ -1924,6 +1939,212 @@ def test_staged_july_daemonic_manifestation_uses_attached_rules_unit_models() ->
     assert effect["target_unit_instance_id"] == formation.attached_unit_instance_id
     source_context = cast(dict[str, JsonValue], effect["source_context"])
     assert source_context["eligible_revival_model_ids"] == sorted(bodyguard_destroyed_ids)
+
+
+def test_completed_attached_manifestation_survives_split_with_later_healing() -> None:
+    config = replace(
+        _chaos_daemons_lifecycle_config(attached=True),
+        game_id="phase17g-attached-manifestation-historical-split",
+    )
+    session = LocalGameSession()
+    session.start(config)
+    lifecycle = session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    for army in _mustered_armies(config):
+        state.record_army_definition(army)
+    daemon_army = state.army_definition_for_player("player-a")
+    assert daemon_army is not None
+    formation = daemon_army.attached_units[0]
+    bodyguard = unit_by_id(state, formation.bodyguard_unit_instance_id)
+    leader = unit_by_id(state, formation.leader_unit_instance_ids[0])
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-chaos-daemons-battlefield",
+        armies=tuple(state.army_definitions),
+    )
+    leader_placement = scenario.battlefield_state.unit_placement_by_id(leader.unit_instance_id)
+    leader_model_placement = leader_placement.model_placements[0]
+    battlefield = scenario.battlefield_state.with_unit_placement(
+        replace(
+            leader_placement,
+            model_placements=(
+                replace(
+                    leader_model_placement,
+                    pose=Pose.at(
+                        x=12.0,
+                        y=8.0,
+                        z=leader_model_placement.pose.position.z,
+                    ),
+                ),
+            ),
+        )
+    )
+    state.record_battlefield_state(battlefield)
+    starting_placements = {
+        placement.model_instance_id: placement
+        for placement in battlefield.unit_placement_by_id(
+            bodyguard.unit_instance_id
+        ).model_placements
+    }
+    destroyed_model_ids = tuple(starting_placements)[:3]
+    state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
+    state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
+    complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
+    destruction_attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-b",
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=None,
+        source_model_instance_id=None,
+    )
+    for index, model_instance_id in enumerate(destroyed_model_ids, start=1):
+        destroyed_event = lifecycle.decision_controller.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.COMMAND.value,
+                **destruction_attribution.to_payload(),
+                "target_unit_instance_id": formation.attached_unit_instance_id,
+                "model_instance_id": model_instance_id,
+                "damage_kind": "normal",
+                "damage_event_id": f"phase17g:historical-split:damage:{index}",
+                "destroyed_model_rules_triggered": True,
+            },
+        )
+        remove_first_models(state, unit_instance_id=bodyguard.unit_instance_id, count=1)
+        departures = record_primary_destroyed_model_departures(
+            state=state,
+            destroyed_model_instance_ids=(model_instance_id,),
+            source_id=(f"core-rules:primary-unit-destruction-tracking:{destroyed_event.event_id}"),
+            occurrence_id=destroyed_event.event_id,
+        )
+        for departure in departures:
+            record_primary_battlefield_departure_event(
+                event_log=lifecycle.decision_controller.event_log,
+                departure=departure,
+            )
+    candidate = july_2026_candidate.runtime_contribution()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
+            candidate.battle_shock_hook_bindings
+        ),
+    )
+    manifestation_request = _required_decision_request(
+        handler.begin_phase(state=state, decisions=lifecycle.decision_controller)
+    )
+    selected_model_id = destroyed_model_ids[-1]
+    survivor_anchor = starting_placements[tuple(starting_placements)[3]].pose.position
+    return_placement = starting_placements[selected_model_id].with_pose(
+        Pose.at(
+            x=survivor_anchor.x + 2.0,
+            y=survivor_anchor.y + 2.0,
+            z=survivor_anchor.z,
+        )
+    )
+    placement_request = _required_decision_request(
+        session.submit_option(
+            request_id=manifestation_request.request_id,
+            option_id=_healing_option_id_for_model(
+                manifestation_request,
+                selected_model_id,
+            ),
+            result_id="phase17g-attached-manifestation-historical-split:selection",
+        )
+    )
+    placement_payload = _healing_revival_payload(
+        request=placement_request,
+        placement=return_placement,
+    )
+    finish_request = _required_decision_request(
+        session.submit_parameterized_payload(
+            request_id=placement_request.request_id,
+            payload=placement_payload,
+            result_id="phase17g-attached-manifestation-historical-split:placement",
+        )
+    )
+    completed = session.submit_option(
+        request_id=finish_request.request_id,
+        option_id=_healing_finish_option_id(finish_request),
+        result_id="phase17g-attached-manifestation-historical-split:finish",
+    )
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    movement_request = lifecycle.decision_controller.queue.peek_next()
+    assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=formation.attached_unit_instance_id,
+        surviving_unit_instance_ids=tuple(sorted(formation.component_unit_instance_ids)),
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    current_army = state.army_definition_for_player("player-a")
+    assert current_army is not None
+    assert current_army.attached_units == ()
+
+    remaining_destroyed_model_id = destroyed_model_ids[0]
+    current_bodyguard = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    unrelated_effect = HealingEffect(
+        effect_id="phase17g:unrelated-healing-after-attached-split",
+        target_unit_instance_id=bodyguard.unit_instance_id,
+        amount=1,
+        opposing_player_id="player-b",
+        selection_actor_player_id="player-a",
+        source_rule_id="phase17g:unrelated-healing-source",
+        source_context=validate_json_value(
+            {
+                "eligible_revival_model_ids": [remaining_destroyed_model_id],
+                "revive_destroyed_models_only": True,
+                "revive_model_full_health": True,
+                "allow_revival_finish": True,
+            }
+        ),
+        phase_start_model_ids=tuple(
+            model.model_instance_id for model in current_bodyguard.alive_models()
+        ),
+    )
+    _pending_effect, later_request = resolve_healing_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        effect=unrelated_effect,
+    )
+    assert later_request is not None
+
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+    )
+    restored_movement_request = restored.decision_controller.queue.peek_next()
+    assert restored_movement_request == movement_request
+    movement_status = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g:movement-before-unrelated-healing",
+            request=restored_movement_request,
+            selected_option_id=restored_movement_request.options[0].option_id,
+        )
+    )
+    restored_request = _required_decision_request(movement_status)
+    assert restored_request == later_request
+    restored_status = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g:unrelated-healing-after-attached-split:finish",
+            request=restored_request,
+            selected_option_id=_healing_finish_option_id(restored_request),
+        )
+    )
+    assert restored_status.status_kind is not LifecycleStatusKind.INVALID
+    assert all(
+        request.request_id != later_request.request_id
+        for request in restored.decision_controller.queue.pending_requests
+    )
 
 
 def test_default_june_daemonic_manifestation_battleline_branch_remains_unsupported() -> None:
