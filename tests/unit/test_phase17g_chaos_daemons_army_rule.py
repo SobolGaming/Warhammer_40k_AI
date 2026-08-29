@@ -1429,12 +1429,17 @@ def test_daemonic_manifestation_dual_identity_drift_keeps_provider_ownership() -
 
 
 @pytest.mark.parametrize(
-    "erase_selection_lineage",
-    [False, True],
-    ids=("selection-lineage-preserved", "selection-lineage-erased"),
+    ("erase_selection_lineage", "rewrite_request_id"),
+    [(False, False), (True, False), (True, True)],
+    ids=(
+        "selection-lineage-preserved",
+        "selection-lineage-erased",
+        "request-id-and-selection-lineage-erased",
+    ),
 )
 def test_daemonic_manifestation_placement_identity_drift_retains_provider_ownership(
     erase_selection_lineage: bool,
+    rewrite_request_id: bool,
 ) -> None:
     session, state, destroyed_model_ids, return_placements, selection_request = (
         _july_manifestation_revival_session()
@@ -1475,7 +1480,8 @@ def test_daemonic_manifestation_placement_identity_drift_retains_provider_owners
     assert pending_marker["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
 
     effect_payload = cast(dict[str, object], placement_payload["effect"])
-    effect_payload["effect_id"] = "phase17g:forged-daemonic-manifestation-effect"
+    forged_effect_id = "phase17g:forged-daemonic-manifestation-effect"
+    effect_payload["effect_id"] = forged_effect_id
     effect_payload["source_rule_id"] = "phase17g:forged-daemonic-manifestation-source"
     source_context = cast(dict[str, object], effect_payload["source_context"])
     source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-kind"
@@ -1485,11 +1491,20 @@ def test_daemonic_manifestation_placement_identity_drift_retains_provider_owners
         placement_payload["source_selection_result_id"] = None
     forged_request = replace(
         placement_request,
+        request_id=(
+            f"{forged_effect_id}:healing-step-"
+            f"{cast(int, placement_payload['step_index']):03d}:placement"
+            if rewrite_request_id
+            else placement_request.request_id
+        ),
         payload=validate_json_value(placement_payload),
     )
-    assert forged_request.request_id == placement_request.request_id
-    assert forged_request.request_id.startswith(
-        f"{army_rule.JULY_HOOK_ID}:daemonic-manifestation-battleline:"
+    assert (forged_request.request_id == placement_request.request_id) is not rewrite_request_id
+    assert (
+        forged_request.request_id.startswith(
+            f"{army_rule.JULY_HOOK_ID}:daemonic-manifestation-battleline:"
+        )
+        is not rewrite_request_id
     )
     decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
 
@@ -1534,8 +1549,12 @@ def test_daemonic_manifestation_placement_identity_drift_retains_provider_owners
     before_records = decisions.records
     before_events = decisions.event_log.records
 
-    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
-        lifecycle.submit_decision(result)
+    if rewrite_request_id:
+        with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+            lifecycle.submit_decision(result)
+    else:
+        invalid_status = lifecycle.submit_decision(result)
+        assert invalid_status.status_kind is LifecycleStatusKind.INVALID
 
     assert state.to_payload() == before_state
     assert decisions.queue.pending_requests == before_queue

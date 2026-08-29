@@ -260,6 +260,11 @@ def _validated_healing_revival_submission(
         raise GameLifecycleError("Healing revival requires a RulesetDescriptor.")
     payload = _healing_revival_request_payload(request)
     effect = HealingEffect.from_payload(payload["effect"])
+    expected_request_id = (
+        f"{effect.effect_id}:healing-step-{effect.next_step_index():03d}:placement"
+    )
+    if request.request_id != expected_request_id:
+        raise GameLifecycleError("Healing revival request ID drift.")
     result.validate_for_request(request)
     model_instance_id = payload["model_instance_id"]
     if model_instance_id not in healing_revival_candidate_model_ids(state=state, effect=effect):

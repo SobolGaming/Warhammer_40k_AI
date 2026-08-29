@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:32d942ec5542938b7f6310e727f3172209fa42c7d2dc196321cf580ca5f3d8a8",
-  "fingerprint": "32d942ec5542938b7f6310e727f3172209fa42c7d2dc196321cf580ca5f3d8a8",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d87da402cce230294cec6c1260237a67252575a69dd88673fd40dba30157261f",
+  "fingerprint": "d87da402cce230294cec6c1260237a67252575a69dd88673fd40dba30157261f",
   "resource_count": 2453,
   "resources": [
     {
@@ -3495,9 +3495,9 @@
       "sha256": "344ee57a3d64b50946f26aa3978c7be4844c865aab123b41643a35ad8f63581e"
     },
     {
-      "byte_length": 26753,
+      "byte_length": 34355,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
-      "sha256": "48b3182343846365e67f2432496c6af90c925b7c2e69c48f36831a087ef198eb"
+      "sha256": "e3a2f4e2002b00b9ff562e4d7f8aaf88a1263b3d884b4ae4d2c9b613474f8577"
     },
     {
       "byte_length": 61675,
@@ -9340,9 +9340,9 @@
       "sha256": "b2dde875ddb8cda55b3807af841b4d3d8c65332ae2c63cb2c72afb949495a14c"
     },
     {
-      "byte_length": 27476,
+      "byte_length": 27714,
       "path": "warhammer40k_core/engine/healing_revival.py",
-      "sha256": "fcd6c7177168be95bfa38c701fc67a98da3614babba6f9301106e60bed4adeea"
+      "sha256": "4074da9ce30c6e6a76b6f35c771c4bd2bf5f585e6460c0f49e3e121c670aefca"
     },
     {
       "byte_length": 3685,
