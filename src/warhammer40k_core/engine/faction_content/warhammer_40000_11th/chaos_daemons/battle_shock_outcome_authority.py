@@ -113,6 +113,11 @@ def validate_july_daemonic_manifestation_pending_outcome(
     effect_id_identifies_provider = effect.effect_id.startswith(
         f"{hook_id}:daemonic-manifestation-battleline:"
     )
+    lineage_identifies_provider = _placement_lineage_identifies_provider(
+        context=context,
+        hook_id=hook_id,
+        source_rule_id=source_rule_id,
+    )
     if not any(
         (
             source_identifies_provider,
@@ -120,6 +125,7 @@ def validate_july_daemonic_manifestation_pending_outcome(
             hook_identifies_provider,
             effect_id_identifies_provider,
             marker_identifies_provider,
+            lineage_identifies_provider,
         )
     ):
         return None
@@ -278,6 +284,53 @@ def _effect_from_supported_request(request: DecisionRequest) -> HealingEffect | 
     if request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE:
         return healing_effect_from_revival_request(request=request)
     return None
+
+
+def _placement_lineage_identifies_provider(
+    *,
+    context: BattleShockPendingOutcomeAuthorityContext,
+    hook_id: str,
+    source_rule_id: str,
+) -> bool:
+    request = context.request
+    if request.decision_type != SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE:
+        return False
+    if not isinstance(request.payload, dict):
+        return False
+    selection_request_id = request.payload.get("source_selection_request_id")
+    selection_result_id = request.payload.get("source_selection_result_id")
+    if type(selection_request_id) is not str or type(selection_result_id) is not str:
+        return False
+    marker_identifies_provider = any(
+        event.event_type == _PENDING_EVENT_TYPE
+        and isinstance(event.payload, dict)
+        and event.payload.get("decision_request_id") == selection_request_id
+        for event in context.decisions.event_log.records
+    )
+    matches = tuple(
+        record
+        for record in context.decisions.records
+        if record.request.request_id == selection_request_id
+        and record.result.request_id == selection_request_id
+        and record.result.result_id == selection_result_id
+    )
+    if len(matches) != 1:
+        return marker_identifies_provider
+    root_request = matches[0].request
+    if root_request.decision_type != SELECT_HEALING_MODEL_DECISION_TYPE:
+        return marker_identifies_provider
+    root_effect = healing_effect_from_request(request=root_request)
+    root_context = (
+        root_effect.source_context if isinstance(root_effect.source_context, dict) else None
+    )
+    return marker_identifies_provider or any(
+        (
+            root_effect.source_rule_id == source_rule_id,
+            root_context is not None and root_context.get("effect_kind") == _EFFECT_KIND,
+            root_context is not None and root_context.get("hook_id") == hook_id,
+            root_effect.effect_id.startswith(f"{hook_id}:daemonic-manifestation-battleline:"),
+        )
+    )
 
 
 def _exact_manifestation_d3(
@@ -537,7 +590,7 @@ def _validate_exact_pending_request(
         payload=validate_json_value(
             {
                 "submission_kind": SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
-                "proposal_kind": "healing_revival",
+                "proposal_kind": "healing_revival_placement",
                 "effect": effect.to_payload(),
                 "step_index": effect.next_step_index(),
                 "model_instance_id": model_id,

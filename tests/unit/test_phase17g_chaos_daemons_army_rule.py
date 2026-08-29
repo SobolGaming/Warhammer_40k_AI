@@ -1428,6 +1428,108 @@ def test_daemonic_manifestation_dual_identity_drift_keeps_provider_ownership() -
     )
 
 
+def test_daemonic_manifestation_placement_identity_drift_follows_selection_lineage() -> None:
+    session, state, destroyed_model_ids, return_placements, selection_request = (
+        _july_manifestation_revival_session()
+    )
+    lifecycle = session.lifecycle
+    bundle = _runtime_content_bundle(lifecycle)
+    selected_model_id = destroyed_model_ids[-1]
+    placement_status = session.submit_option(
+        request_id=selection_request.request_id,
+        option_id=_healing_option_id_for_model(selection_request, selected_model_id),
+        result_id="phase17g-daemonic-manifestation-lineage-drift:selection",
+    )
+    placement_request = _required_decision_request(placement_status)
+    assert placement_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    assert restored.decision_controller.queue.peek_next() == placement_request
+
+    decisions = lifecycle.decision_controller
+    placement_payload = cast(dict[str, object], deepcopy(placement_request.payload))
+    selection_request_id = cast(str, placement_payload["source_selection_request_id"])
+    selection_result_id = cast(str, placement_payload["source_selection_result_id"])
+    selection_records = tuple(
+        record
+        for record in decisions.records
+        if record.request.request_id == selection_request_id
+        and record.result.result_id == selection_result_id
+    )
+    assert len(selection_records) == 1
+    assert selection_records[0].request == selection_request
+    pending_marker = _event_payload(
+        decisions,
+        "chaos_daemons_daemonic_manifestation_revival_pending",
+    )
+    assert pending_marker["decision_request_id"] == selection_request_id
+    assert pending_marker["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
+
+    effect_payload = cast(dict[str, object], placement_payload["effect"])
+    effect_payload["effect_id"] = "phase17g:forged-daemonic-manifestation-effect"
+    effect_payload["source_rule_id"] = "phase17g:forged-daemonic-manifestation-source"
+    source_context = cast(dict[str, object], effect_payload["source_context"])
+    source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-kind"
+    source_context["hook_id"] = "phase17g:forged-daemonic-manifestation-hook"
+    forged_request = replace(
+        placement_request,
+        payload=validate_json_value(placement_payload),
+    )
+    decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
+
+    original_request_payload = placement_request.to_payload()
+    forged_request_payload = forged_request.to_payload()
+    changed_request_event = False
+    drifted_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type == "decision_requested" and event.payload == original_request_payload:
+            drifted_events.append(
+                replace(event, payload=validate_json_value(forged_request_payload))
+            )
+            changed_request_event = True
+            continue
+        drifted_events.append(event)
+    assert changed_request_event
+    decisions.event_log.replace_records(tuple(drifted_events))
+    assert placement_payload["source_selection_request_id"] == selection_request_id
+    assert placement_payload["source_selection_result_id"] == selection_result_id
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+    result = DecisionResult(
+        result_id="phase17g-daemonic-manifestation-lineage-drift:placement",
+        request_id=forged_request.request_id,
+        decision_type=forged_request.decision_type,
+        actor_id=forged_request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=_healing_revival_payload(
+            request=forged_request,
+            placement=return_placements[selected_model_id],
+        ),
+    )
+    before_state = state.to_payload()
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        lifecycle.submit_decision(result)
+
+    assert state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert _model_by_id(state, selected_model_id).wounds_remaining == 0
+    assert state.battlefield_state is not None
+    assert selected_model_id not in state.battlefield_state.placed_model_ids()
+
+
 def test_staged_july_daemonic_manifestation_can_finish_before_first_revival() -> None:
     session, state, destroyed_model_ids, _return_placements, request = (
         _july_manifestation_revival_session()
