@@ -424,6 +424,7 @@ def _phase_state_consistency_payload(
                 battle_round=state.battle_round,
                 active_player_id="player-a",
                 selected_unit_ids=(alpha_unit_id,),
+                moved_unit_ids=(alpha_unit_id,),
             )
         )
     elif phase is BattlePhase.SHOOTING:
@@ -1380,6 +1381,7 @@ def test_lifecycle_restore_rejects_corrupt_movement_phase_authority(
         movement_payload["battle_round"] = 2
     elif corruption == "selected_enemy":
         movement_payload["selected_unit_ids"] = [beta_unit_id]
+        movement_payload["moved_unit_ids"] = [beta_unit_id]
 
     with pytest.raises(GameLifecycleError, match=expected_message):
         GameLifecycle.from_payload(payload)

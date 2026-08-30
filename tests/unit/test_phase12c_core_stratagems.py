@@ -124,7 +124,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
@@ -4651,7 +4651,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
         == "rapid-ingress-end-movement-round-02-player-player-b-resume"
     )
     declined_request = _decision_request(declined)
-    assert declined_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    assert declined_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert not _has_event(restored.decision_controller, "rapid_ingress_resolved")
 
 
@@ -6690,8 +6690,6 @@ def _battle_lifecycle(
                     )
                 )
                 continue
-            elif request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
-                selected_option_id = "complete_reinforcements"
             else:
                 raise AssertionError(
                     "Round-advance fixture encountered an unexpected decision type: "

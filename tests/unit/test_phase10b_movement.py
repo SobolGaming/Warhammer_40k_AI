@@ -84,6 +84,9 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_movement_phase_2026_08,
+)
 
 
 def test_lifecycle_enters_movement_with_real_handler_and_placed_unit_options() -> None:
@@ -93,6 +96,9 @@ def test_lifecycle_enters_movement_with_real_handler_and_placed_unit_options() -
     request = _decision_request(status)
     assert request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert request.actor_id == "player-a"
+    assert cast(dict[str, object], request.payload)["source_rule_id"] == (
+        core_movement_phase_2026_08.MOVE_UNITS_STEP_SOURCE_ID
+    )
     assert lifecycle.state is not None
     assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
     assert lifecycle.state.battlefield_state is not None
@@ -142,6 +148,7 @@ def test_movement_unit_selection_records_activation_state_and_replay_payloads() 
         "phase": BattlePhase.MOVEMENT.value,
         "active_player_id": "player-a",
         "unit_instance_id": "army-alpha:intercessor-unit-1",
+        "source_rule_id": core_movement_phase_2026_08.MOVE_UNITS_STEP_SOURCE_ID,
     }
     assert lifecycle.state is not None
     assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
@@ -170,6 +177,8 @@ def test_movement_unit_selection_records_activation_state_and_replay_payloads() 
             "active_player_id": "player-a",
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": "army-alpha:intercessor-unit-1",
+            "unit_location": "battlefield",
+            "source_rule_id": core_movement_phase_2026_08.MOVE_UNITS_STEP_SOURCE_ID,
             "request_id": request.request_id,
             "result_id": "phase10b-result-000003",
             "phase_body_status": "unit_selected",
@@ -347,8 +356,7 @@ def test_selected_units_are_excluded_from_legal_movement_unit_set() -> None:
     assert lifecycle.state is not None
     movement_state = lifecycle.state.movement_phase_state
     assert movement_state is not None
-    scenario = _scenario_from_state(lifecycle.state)
-    assert movement_state.legal_unit_ids(scenario) == ("army-alpha:intercessor-unit-2",)
+    assert movement_state.legal_unit_ids(lifecycle.state) == ("army-alpha:intercessor-unit-2",)
 
 
 def test_movement_phase_requires_complete_placement_before_unit_selection() -> None:

@@ -260,13 +260,6 @@
         "submission_kind": "finite"
       },
       {
-        "decision_type": "select_disembark_unit",
-        "interaction_kinds": [
-          "entity_selection"
-        ],
-        "submission_kind": "finite"
-      },
-      {
         "decision_type": "select_embark_transport",
         "interaction_kinds": [
           "entity_selection"
@@ -415,13 +408,6 @@
       },
       {
         "decision_type": "select_redeploy_unit",
-        "interaction_kinds": [
-          "entity_selection"
-        ],
-        "submission_kind": "finite"
-      },
-      {
-        "decision_type": "select_reinforcement_unit",
         "interaction_kinds": [
           "entity_selection"
         ],
@@ -961,13 +947,13 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "11.0.0",
+        "contract_version": "11.1.0",
         "identity_hash": "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d",
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "65e3ba5621d98bfa9e0e58949c57bb13eec7c4a0fa8ee83840f6aa05d29c20c9",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1b809c7a4c1490fe74686917805124262b4964eeafbb10e0a4e28ba455b3bf1"
+        "identity_hash": "59063b24765653bdcc55e044f4a4e4d8f8fd2a32e181ca8214a4b5e75378bb8e",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1fd70b76de22cc41b11fb23106b7de2ca3ed831d25a6637703654af93e2f9ff0"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -2872,13 +2858,6 @@
       "submission_kind": "finite"
     },
     {
-      "decision_type": "select_disembark_unit",
-      "interaction_kinds": [
-        "entity_selection"
-      ],
-      "submission_kind": "finite"
-    },
-    {
       "decision_type": "select_embark_transport",
       "interaction_kinds": [
         "entity_selection"
@@ -3027,13 +3006,6 @@
     },
     {
       "decision_type": "select_redeploy_unit",
-      "interaction_kinds": [
-        "entity_selection"
-      ],
-      "submission_kind": "finite"
-    },
-    {
-      "decision_type": "select_reinforcement_unit",
       "interaction_kinds": [
         "entity_selection"
       ],

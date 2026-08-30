@@ -958,7 +958,7 @@ def _lifecycle_for_fixture(fixture: _RuntimeFixture) -> GameLifecycle:
     fixture.state.movement_phase_state = MovementPhaseState(
         battle_round=1,
         active_player_id="player-a",
-        reinforcements_completed=True,
+        move_units_completed=True,
         selected_unit_ids=tuple(unit.unit_instance_id for unit in fixture.armies[0].units),
         moved_unit_ids=tuple(unit.unit_instance_id for unit in fixture.armies[0].units),
     )

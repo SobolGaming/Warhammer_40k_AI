@@ -24,12 +24,12 @@ from warhammer40k_core.engine.phases.movement_geometry import *
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mission_setup import MissionSetup
-    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_REINFORCEMENT_UNIT_DECISION_TYPE, SELECT_DISEMBARK_UNIT_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, COMPLETE_REINFORCEMENTS_OPTION_ID, COMPLETE_DISEMBARKS_OPTION_ID, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
+    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
     from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
-    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _begin_reinforcements_step, _complete_reinforcements_step
+    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_end_opponent_movement_reaction_if_available, _request_end_movement_active_player_stratagem_if_available, _request_rapid_ingress_reaction_if_available, _request_fire_overwatch_reaction_if_available, _request_selected_to_move_stratagem_if_available, _request_selected_to_fall_back_stratagem_if_available, _request_friendly_unit_fell_back_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _request_movement_end_surge_if_available, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
-    from warhammer40k_core.engine.phases.movement_reinforcements import _reinforcement_unit_options, _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _apply_reinforcement_unit_selection_decision, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
-    from warhammer40k_core.engine.phases.movement_transports import _request_pre_move_disembark_if_available, _request_post_normal_move_disembark_if_available, _pre_move_disembark_entries, _post_normal_move_disembark_entries, _disembark_unit_selection_options, _apply_disembark_unit_selection_decision, _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission
+    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
@@ -70,6 +70,8 @@ __all__ = (
     "_movement_mode_from_payload",
     "_movement_mode_from_proposal_submission",
     "_movement_modes_for_action_options",
+    "_movement_unit_candidate",
+    "_movement_unit_candidates",
     "_movement_unit_options",
     "_normal_move_invalid_message",
     "_objective_markers_for_state",
@@ -286,25 +288,153 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     return battlefield_scenario_for_state(state=state)
 
 
+@dataclass(frozen=True, slots=True)
+class _MovementUnitCandidate:
+    unit_instance_id: str
+    label: str
+    location: MovementUnitLocationKind
+    model_instance_ids: tuple[str, ...]
+    transport_unit_instance_id: str | None = None
+    reserve_state: ReserveState | None = None
+
+
+def _movement_unit_candidates(
+    *,
+    state: GameState,
+    movement_state: MovementPhaseState,
+    include_selected: bool = False,
+) -> tuple[_MovementUnitCandidate, ...]:
+    scenario = _battlefield_scenario(state)
+    try:
+        scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
+    except PlacementError as exc:
+        raise GameLifecycleError("Movement phase requires complete placed armies.") from exc
+
+    unarrived_reserves = state.unarrived_reserve_states_for_player(movement_state.active_player_id)
+    candidates_by_id: dict[str, _MovementUnitCandidate] = {}
+
+    for reserve_state in unarrived_reserves:
+        rules_unit = rules_unit_view_from_armies(
+            armies=tuple(state.army_definitions),
+            unit_instance_id=reserve_state.unit_instance_id,
+        )
+        alive_model_ids = tuple(
+            sorted(model.model_instance_id for model in rules_unit.alive_models())
+        )
+        if not alive_model_ids:
+            continue
+        candidates_by_id[reserve_state.unit_instance_id] = _MovementUnitCandidate(
+            unit_instance_id=reserve_state.unit_instance_id,
+            label=rules_unit_display_name(rules_unit),
+            location=MovementUnitLocationKind.STRATEGIC_RESERVES,
+            model_instance_ids=alive_model_ids,
+            reserve_state=reserve_state,
+        )
+
+    embarked_transport_by_unit_id: dict[str, str] = {}
+    for cargo_state in state.transport_cargo_states:
+        if cargo_state.player_id != movement_state.active_player_id:
+            continue
+        for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
+            previous_transport_id = embarked_transport_by_unit_id.get(embarked_unit_id)
+            if (
+                previous_transport_id is not None
+                and previous_transport_id != cargo_state.transport_unit_instance_id
+            ):
+                raise GameLifecycleError("Unit has ambiguous embarked Transport state.")
+            embarked_transport_by_unit_id[embarked_unit_id] = cargo_state.transport_unit_instance_id
+    for reserve_state in unarrived_reserves:
+        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
+            previous_transport_id = embarked_transport_by_unit_id.get(embarked_unit_id)
+            if previous_transport_id is not None and previous_transport_id != (
+                reserve_state.unit_instance_id
+            ):
+                raise GameLifecycleError("Unit embarked Transport identity drift.")
+            embarked_transport_by_unit_id[embarked_unit_id] = reserve_state.unit_instance_id
+    for embarked_unit_id, transport_unit_id in embarked_transport_by_unit_id.items():
+        if embarked_unit_id in candidates_by_id:
+            raise GameLifecycleError("Unit cannot be both embarked and directly in Reserves.")
+        unit = _unit_instance_by_id(state=state, unit_instance_id=embarked_unit_id)
+        alive_model_ids = tuple(
+            sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+        )
+        if not alive_model_ids:
+            continue
+        candidates_by_id[embarked_unit_id] = _MovementUnitCandidate(
+            unit_instance_id=embarked_unit_id,
+            label=unit.name,
+            location=MovementUnitLocationKind.EMBARKED,
+            model_instance_ids=alive_model_ids,
+            transport_unit_instance_id=transport_unit_id,
+        )
+
+    placed_army = scenario.battlefield_state.placed_army_for_player_or_none(
+        movement_state.active_player_id
+    )
+    if placed_army is not None:
+        for placement in placed_army.unit_placements:
+            if placement.unit_instance_id in candidates_by_id:
+                raise GameLifecycleError("Unit has multiple movement locations.")
+            unit = scenario.unit_instance_for_placement(placement)
+            candidates_by_id[placement.unit_instance_id] = _MovementUnitCandidate(
+                unit_instance_id=placement.unit_instance_id,
+                label=unit.name,
+                location=MovementUnitLocationKind.BATTLEFIELD,
+                model_instance_ids=tuple(
+                    sorted(
+                        model_placement.model_instance_id
+                        for model_placement in placement.model_placements
+                    )
+                ),
+            )
+
+    selected = set(movement_state.selected_unit_ids)
+    return tuple(
+        candidate
+        for unit_id, candidate in sorted(candidates_by_id.items())
+        if include_selected or unit_id not in selected
+    )
+
+
+def _movement_unit_candidate(
+    *,
+    state: GameState,
+    movement_state: MovementPhaseState,
+    unit_instance_id: str,
+) -> _MovementUnitCandidate:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    matching = tuple(
+        candidate
+        for candidate in _movement_unit_candidates(
+            state=state,
+            movement_state=movement_state,
+            include_selected=True,
+        )
+        if candidate.unit_instance_id == requested_unit_id
+    )
+    if len(matching) != 1:
+        raise GameLifecycleError("Movement unit selection is not currently legal.")
+    return matching[0]
+
+
 def _movement_unit_options(
     *,
-    scenario: BattlefieldScenario,
-    unit_ids: tuple[str, ...],
+    candidates: tuple[_MovementUnitCandidate, ...],
 ) -> tuple[DecisionOption, ...]:
     options: list[DecisionOption] = []
-    for unit_id in unit_ids:
-        unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_id)
-        unit = scenario.unit_instance_for_placement(unit_placement)
+    for candidate in candidates:
+        payload: dict[str, JsonValue] = {
+            "unit_instance_id": candidate.unit_instance_id,
+            "model_instance_ids": list(candidate.model_instance_ids),
+            "unit_location": candidate.location.value,
+        }
+        if candidate.transport_unit_instance_id is not None:
+            payload["transport_unit_instance_id"] = candidate.transport_unit_instance_id
         options.append(
             DecisionOption(
-                option_id=unit.unit_instance_id,
-                label=unit.name,
-                payload={
-                    "unit_instance_id": unit.unit_instance_id,
-                    "model_instance_ids": [
-                        placement.model_instance_id for placement in unit_placement.model_placements
-                    ],
-                },
+                option_id=candidate.unit_instance_id,
+                label=candidate.label,
+                payload=payload,
             )
         )
     return tuple(options)

@@ -15,7 +15,7 @@ from warhammer40k_core.adapters.command_protocol import (
     SessionCommandProtocolError,
 )
 from warhammer40k_core.adapters.external_contract import (
-    EXTERNAL_CONTRACT_VERSION,
+    SESSION_PERSISTENCE_CONTRACT_VERSION,
     SESSION_PERSISTENCE_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.server_sync import validate_cursor_position
@@ -72,7 +72,7 @@ def server_persistence_payload(
         "schema_version": SESSION_PERSISTENCE_SCHEMA_VERSION,
         "engine_version": ENGINE_VERSION,
         "engine_build_id": ENGINE_BUILD_ID,
-        "external_contract_version": EXTERNAL_CONTRACT_VERSION,
+        "external_contract_version": SESSION_PERSISTENCE_CONTRACT_VERSION,
         "authorization_bindings": principal_registry.binding_payload(),
         "cursor_codec": cursor_codec.to_persistence_payload(),
         "event_retention_limit": retention,
@@ -177,7 +177,7 @@ def _validate_runtime_versions(payload: dict[str, JsonValue]) -> None:
         "schema_version": SESSION_PERSISTENCE_SCHEMA_VERSION,
         "engine_version": ENGINE_VERSION,
         "engine_build_id": ENGINE_BUILD_ID,
-        "external_contract_version": EXTERNAL_CONTRACT_VERSION,
+        "external_contract_version": SESSION_PERSISTENCE_CONTRACT_VERSION,
     }
     if any(payload[name] != value for name, value in expected.items()):
         raise SessionRecoveryError("Persisted server runtime identity drifted.")

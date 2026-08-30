@@ -14933,7 +14933,8 @@
             "army-alpha:intercessor-unit-1:core-intercessor-like:004",
             "army-alpha:intercessor-unit-1:core-intercessor-like:005"
           ],
-          "unit_instance_id": "army-alpha:intercessor-unit-1"
+          "unit_instance_id": "army-alpha:intercessor-unit-1",
+          "unit_location": "battlefield"
         }
       }
     ],
@@ -14941,7 +14942,8 @@
       "active_player_id": "player-a",
       "battle_round": 1,
       "game_id": "ui-contract-post-deployment",
-      "phase": "movement"
+      "phase": "movement",
+      "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
     },
     "request_id": "decision-request-000007",
     "schema_version": "decision-request-view-v5-phase17n-step4"
@@ -15002,7 +15004,7 @@
     }
   ],
   "projection_schema": "game-view-v11-phase17n-step4",
-  "projection_state_hash": "a218708834cdc1f4cf6003a1f22ab29e416dc7b64ac49cecc4333a1b785f9f0f",
+  "projection_state_hash": "ef6dfd794bcde01dc3e4d87166a892e4243f41ae18c87b8cc6cb2ed828a6a58e",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

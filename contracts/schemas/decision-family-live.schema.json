@@ -106,7 +106,12 @@
                         "type": "array",
                         "uniqueItems": true
                       },
-                      "unit_instance_id": {"$ref": "#/$defs/identifier"}
+                      "transport_unit_instance_id": {"$ref": "#/$defs/identifier"},
+                      "unit_instance_id": {"$ref": "#/$defs/identifier"},
+                      "unit_location": {
+                        "enum": ["battlefield", "embarked", "strategic_reserves"],
+                        "type": "string"
+                      }
                     },
                     "required": ["unit_instance_id", "model_instance_ids"],
                     "type": "object"
@@ -129,7 +134,8 @@
         "active_player_id": {"$ref": "#/$defs/identifier"},
         "battle_round": {"minimum": 1, "type": "integer"},
         "game_id": {"$ref": "#/$defs/identifier"},
-        "phase": {"const": "movement"}
+        "phase": {"const": "movement"},
+        "source_rule_id": {"$ref": "#/$defs/identifier"}
       },
       "required": ["game_id", "battle_round", "phase", "active_player_id"],
       "type": "object"
@@ -145,7 +151,9 @@
               "items": {
                 "oneOf": [
                   {"$ref": "#/$defs/moving_action_option"},
-                  {"$ref": "#/$defs/remain_stationary_option"}
+                  {"$ref": "#/$defs/remain_stationary_option"},
+                  {"$ref": "#/$defs/disembark_option"},
+                  {"$ref": "#/$defs/ingress_option"}
                 ]
               },
               "minItems": 1,
@@ -163,6 +171,7 @@
         "battle_round": {"minimum": 1, "type": "integer"},
         "game_id": {"$ref": "#/$defs/identifier"},
         "phase": {"const": "movement"},
+        "source_rule_id": {"$ref": "#/$defs/identifier"},
         "unit_instance_id": {"$ref": "#/$defs/identifier"}
       },
       "required": [
@@ -208,6 +217,10 @@
             "movement_inches": {"const": 0},
             "movement_phase_action": {"const": "remain_stationary"},
             "unit_instance_id": {"$ref": "#/$defs/identifier"},
+            "unit_location": {
+              "enum": ["embarked", "strategic_reserves"],
+              "type": "string"
+            },
             "witness": {"type": "null"}
           },
           "required": [
@@ -216,6 +229,62 @@
             "movement_inches",
             "model_movements",
             "witness"
+          ],
+          "type": "object"
+        }
+      },
+      "required": ["option_id", "label", "payload"],
+      "type": "object"
+    },
+    "disembark_option": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {"$ref": "#/$defs/identifier"},
+        "option_id": {"const": "disembark"},
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "disembark_mode": {"$ref": "#/$defs/identifier"},
+            "movement_phase_action": {"const": "disembark"},
+            "transport_movement_status": {"$ref": "#/$defs/identifier"},
+            "transport_unit_instance_id": {"$ref": "#/$defs/identifier"},
+            "unit_instance_id": {"$ref": "#/$defs/identifier"},
+            "unit_location": {"const": "embarked"}
+          },
+          "required": [
+            "movement_phase_action",
+            "unit_instance_id",
+            "unit_location",
+            "transport_unit_instance_id",
+            "disembark_mode",
+            "transport_movement_status"
+          ],
+          "type": "object"
+        }
+      },
+      "required": ["option_id", "label", "payload"],
+      "type": "object"
+    },
+    "ingress_option": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {"$ref": "#/$defs/identifier"},
+        "option_id": {"const": "ingress"},
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "movement_phase_action": {"const": "ingress"},
+            "reserve_kind": {"$ref": "#/$defs/identifier"},
+            "reserve_origin": {"$ref": "#/$defs/identifier"},
+            "unit_instance_id": {"$ref": "#/$defs/identifier"},
+            "unit_location": {"const": "strategic_reserves"}
+          },
+          "required": [
+            "movement_phase_action",
+            "unit_instance_id",
+            "unit_location",
+            "reserve_kind",
+            "reserve_origin"
           ],
           "type": "object"
         }

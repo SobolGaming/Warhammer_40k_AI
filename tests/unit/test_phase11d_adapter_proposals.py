@@ -72,10 +72,8 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
-    SELECT_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     FallBackModeKind,
     MovementPhaseActionKind,
     MovementPhaseHandler,
@@ -774,7 +772,7 @@ def test_valid_reserve_placement_proposal_emits_placement_records() -> None:
             state=state,
             decisions=decisions,
             request=selection_request,
-            option_id=reserve_state.unit_instance_id,
+            option_id=MovementPhaseActionKind.INGRESS.value,
             result_id="phase11d-select-reserve",
         )
     )
@@ -908,7 +906,7 @@ def test_invalid_placement_proposal_returns_invalid_without_mutation() -> None:
             state=state,
             decisions=decisions,
             request=selection_request,
-            option_id=reserve_state.unit_instance_id,
+            option_id=MovementPhaseActionKind.INGRESS.value,
             result_id="phase11d-select-invalid-reserve",
         )
     )
@@ -959,7 +957,7 @@ def test_malformed_placement_proposal_payload_returns_typed_invalid_without_muta
             state=state,
             decisions=decisions,
             request=selection_request,
-            option_id=reserve_state.unit_instance_id,
+            option_id=MovementPhaseActionKind.INGRESS.value,
             result_id="phase11d-select-malformed-reserve",
         )
     )
@@ -1001,7 +999,7 @@ def test_placement_proposal_drift_rejections_keep_pending_request_and_records_cl
             state=state,
             decisions=decisions,
             request=selection_request,
-            option_id=reserve_state.unit_instance_id,
+            option_id=MovementPhaseActionKind.INGRESS.value,
             result_id="phase11d-select-drift-reserve",
         )
     )
@@ -1067,7 +1065,7 @@ def test_source_geometry_drift_rejects_pending_shared_placement_before_queue_pop
             state=state,
             decisions=decisions,
             request=selection_request,
-            option_id=reserve_state.unit_instance_id,
+            option_id=MovementPhaseActionKind.INGRESS.value,
             result_id="phase18j-select-source-drift-reserve",
         )
     )
@@ -1115,16 +1113,12 @@ def test_transport_cargo_drift_rejects_pending_disembark_before_queue_pop() -> N
         parameterized_proposals=True,
     )
     decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=disembark_request,
-            option_id=passenger.unit_instance_id,
-            result_id="phase18j-select-cargo-drift-disembark",
-        )
+    placement_request = _enter_disembark_placement_choice(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        passenger=passenger,
+        result_id_prefix="phase18j-select-cargo-drift-disembark",
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
     cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
@@ -1176,17 +1170,12 @@ def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> N
         parameterized_proposals=True,
     )
     decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=disembark_request,
-            option_id=passenger.unit_instance_id,
-            result_id="phase11d-select-disembark",
-        )
+    placement_request = _enter_disembark_placement_choice(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        passenger=passenger,
+        result_id_prefix="phase11d-select-disembark",
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
     assert proposal.context is not None
@@ -1227,16 +1216,12 @@ def test_disembark_placement_wrong_mode_keeps_pending_request_clean() -> None:
         parameterized_proposals=True,
     )
     decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=disembark_request,
-            option_id=passenger.unit_instance_id,
-            result_id="phase14h-select-disembark-mode-drift",
-        )
+    placement_request = _enter_disembark_placement_choice(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        passenger=passenger,
+        result_id_prefix="phase14h-select-disembark-mode-drift",
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
     before_record_count = len(decisions.records)
@@ -1279,16 +1264,12 @@ def test_disembark_placement_allowed_mode_context_is_fail_fast() -> None:
         parameterized_proposals=True,
     )
     decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=disembark_request,
-            option_id=passenger.unit_instance_id,
-            result_id="phase14h-select-disembark-allowed-mode-contract",
-        )
+    placement_request = _enter_disembark_placement_choice(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        passenger=passenger,
+        result_id_prefix="phase14h-select-disembark-allowed-mode-contract",
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
     assert proposal.context is not None
@@ -1338,16 +1319,12 @@ def test_disembark_placement_missing_required_field_keeps_pending_request_clean(
         parameterized_proposals=True,
     )
     decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=disembark_request,
-            option_id=passenger.unit_instance_id,
-            result_id="phase11d-select-disembark-missing-field",
-        )
+    placement_request = _enter_disembark_placement_choice(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        passenger=passenger,
+        result_id_prefix="phase11d-select-disembark-missing-field",
     )
     proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
     before_record_count = len(decisions.records)
@@ -2085,10 +2062,67 @@ def _enter_reinforcements_choice(
     decisions = DecisionController()
     status = handler.begin_phase(state=state, decisions=decisions)
     request = _decision_request(status)
-    assert request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    assert request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    reserve_unit_ids = {
+        reserve_state.unit_instance_id
+        for reserve_state in state.unarrived_reserve_states_for_player("player-a")
+    }
+    selectable_reserve_ids = tuple(
+        option.option_id for option in request.options if option.option_id in reserve_unit_ids
+    )
+    if len(selectable_reserve_ids) != 1:
+        raise AssertionError("reserve choice fixture requires exactly one reserve unit")
+    assert (
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=request,
+            option_id=selectable_reserve_ids[0],
+            result_id="phase11d-select-reserve-unit",
+        )
+        is None
+    )
+    request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert state.movement_phase_state is not None
     assert state.movement_phase_state.step is MovementPhaseStepKind.MOVE_UNITS
     return handler, decisions, request
+
+
+def _enter_disembark_placement_choice(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    passenger: UnitInstance,
+    result_id_prefix: str,
+) -> DecisionRequest:
+    unit_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert unit_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert (
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=unit_request,
+            option_id=passenger.unit_instance_id,
+            result_id=f"{result_id_prefix}-unit",
+        )
+        is None
+    )
+    action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    return _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=action_request,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            result_id=f"{result_id_prefix}-action",
+        )
+    )
 
 
 def _reserve_placement(

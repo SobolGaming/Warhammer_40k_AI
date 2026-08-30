@@ -300,16 +300,6 @@
     },
     {
       "coverage_status": "envelope_only",
-      "decision_type": "select_disembark_unit",
-      "example_path": null,
-      "interaction_kinds": [
-        "entity_selection"
-      ],
-      "registry_scope": "registered",
-      "submission_kind": "finite"
-    },
-    {
-      "coverage_status": "envelope_only",
       "decision_type": "select_embark_transport",
       "example_path": null,
       "interaction_kinds": [
@@ -521,16 +511,6 @@
     {
       "coverage_status": "envelope_only",
       "decision_type": "select_redeploy_unit",
-      "example_path": null,
-      "interaction_kinds": [
-        "entity_selection"
-      ],
-      "registry_scope": "registered",
-      "submission_kind": "finite"
-    },
-    {
-      "coverage_status": "envelope_only",
-      "decision_type": "select_reinforcement_unit",
       "example_path": null,
       "interaction_kinds": [
         "entity_selection"
@@ -801,9 +781,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 80,
+  "known_external_token_count": 78,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 78,
+  "registered_decision_type_count": 76,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",

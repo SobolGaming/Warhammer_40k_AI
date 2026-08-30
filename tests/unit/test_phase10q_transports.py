@@ -77,9 +77,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
-    COMPLETE_DISEMBARKS_OPTION_ID,
     DECLINE_EMBARK_OPTION_ID,
-    SELECT_DISEMBARK_UNIT_DECISION_TYPE,
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
@@ -296,7 +294,7 @@ def test_embark_validates_distance_for_every_attached_rules_unit_model() -> None
     }
 
 
-def test_embarked_units_are_unavailable_for_movement_selection() -> None:
+def test_embarked_units_are_available_for_unified_movement_selection() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     cargo_state = _cargo_state(
         transport=transport,
@@ -323,15 +321,14 @@ def test_embarked_units_are_unavailable_for_movement_selection() -> None:
     assert status.decision_request is not None
     assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert {option.option_id for option in status.decision_request.options} == {
-        transport.unit_instance_id
+        passenger.unit_instance_id,
+        transport.unit_instance_id,
     }
-    assert passenger.unit_instance_id not in state.movement_phase_state.legal_unit_ids(
-        BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=state.battlefield_state,
-        ),
-        accounted_unplaced_model_ids=state.unavailable_model_ids(),
-    )
+    passenger_option = status.decision_request.option_by_id(passenger.unit_instance_id)
+    passenger_option_payload = cast(dict[str, JsonValue], passenger_option.payload)
+    assert passenger_option_payload["unit_location"] == "embarked"
+    assert passenger_option_payload["transport_unit_instance_id"] == (transport.unit_instance_id)
+    assert passenger.unit_instance_id in state.movement_phase_state.legal_unit_ids(state)
 
 
 def test_lifecycle_replay_accepts_embarked_models_accounted_by_transport_cargo_state() -> None:
@@ -1239,23 +1236,43 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
 
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
-    disembark_payload = cast(dict[str, object], disembark_request.payload)
-    assert disembark_payload["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
-    selected_payload = cast(
+    unit_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert unit_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    passenger_payload = cast(
         dict[str, object],
-        disembark_request.option_by_id(passenger.unit_instance_id).payload,
+        unit_request.option_by_id(passenger.unit_instance_id).payload,
     )
-    assert selected_payload["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
+    assert passenger_payload == {
+        "unit_instance_id": passenger.unit_instance_id,
+        "model_instance_ids": [model.model_instance_id for model in passenger.own_models],
+        "unit_location": "embarked",
+        "transport_unit_instance_id": transport.unit_instance_id,
+    }
+    assert (
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=unit_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase09a-select-embarked-unit",
+        )
+        is None
+    )
+    action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert {option.option_id for option in action_request.options} == {
+        MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        MovementPhaseActionKind.DISEMBARK.value,
+    }
     placement_request = _decision_request(
         _submit_handler_decision(
             handler,
             state=state,
             decisions=decisions,
-            request=disembark_request,
-            option_id=passenger.unit_instance_id,
-            result_id="phase10q-select-disembark",
+            request=action_request,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            result_id="phase10q-select-disembark-move",
         )
     )
     assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
@@ -1286,19 +1303,14 @@ def test_started_embarked_unit_disembarks_through_movement_decision_lifecycle() 
     assert disembarked_state is not None
     assert disembarked_state.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK
 
-    movement_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    selection_status = _submit_handler_decision(
-        handler,
-        state=state,
-        decisions=decisions,
-        request=movement_request,
-        option_id=passenger.unit_instance_id,
-        result_id="phase10q-select-disembarked-move",
-    )
-    assert selection_status is None
     action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert MovementPhaseActionKind.REMAIN_STATIONARY.value not in {
         option.option_id for option in action_request.options
+    }
+    assert {option.option_id for option in action_request.options} == {
+        MovementPhaseActionKind.NORMAL_MOVE.value,
+        MovementPhaseActionKind.ADVANCE.value,
     }
 
     payload: GameLifecyclePayload = {
@@ -1335,16 +1347,22 @@ def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence()
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
 
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    disembark_payload = cast(dict[str, object], disembark_request.payload)
-    assert disembark_payload["disembark_mode"] == DisembarkModeKind.TACTICAL_DISEMBARK.value
+    handler, decisions, disembark_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+    disembark_option = disembark_request.option_by_id(MovementPhaseActionKind.DISEMBARK.value)
+    disembark_option_payload = cast(dict[str, JsonValue], disembark_option.payload)
+    assert disembark_option_payload["disembark_mode"] == (
+        DisembarkModeKind.TACTICAL_DISEMBARK.value
+    )
     placement_request = _decision_request(
         _submit_handler_decision(
             handler,
             state=state,
             decisions=decisions,
             request=disembark_request,
-            option_id=passenger.unit_instance_id,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
             result_id="phase14h-select-combat-disembark-fallback",
         )
     )
@@ -1416,16 +1434,17 @@ def test_movement_phase_combat_disembark_rejects_when_tactical_placement_is_lega
         battle_round=1,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
-    decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    handler, decisions, disembark_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    )
     placement_request = _decision_request(
         _submit_handler_decision(
             handler,
             state=state,
             decisions=decisions,
             request=disembark_request,
-            option_id=passenger.unit_instance_id,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
             result_id="phase14h-select-combat-disembark-reject",
         )
     )
@@ -1475,16 +1494,17 @@ def test_movement_phase_combat_disembark_rejects_invalid_combat_placement() -> N
         battle_round=1,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
-    decisions = DecisionController()
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    handler, decisions, disembark_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    )
     placement_request = _decision_request(
         _submit_handler_decision(
             handler,
             state=state,
             decisions=decisions,
             request=disembark_request,
-            option_id=passenger.unit_instance_id,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
             result_id="phase14h-select-combat-disembark-invalid-placement",
         )
     )
@@ -1542,8 +1562,10 @@ def test_disembark_selection_does_not_depend_on_engine_built_placement() -> None
         battle_round=1,
         active_player_id="player-a",
     )
-    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
-    decisions = DecisionController()
+    handler, decisions, disembark_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=passenger.unit_instance_id,
+    )
 
     blocked_scenario = BattlefieldScenario(
         armies=tuple(state.army_definitions),
@@ -1576,9 +1598,10 @@ def test_disembark_selection_does_not_depend_on_engine_built_placement() -> None
     )
     assert not blocked_resolution.is_valid
 
-    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
-    assert passenger.unit_instance_id in {option.option_id for option in disembark_request.options}
+    assert disembark_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert MovementPhaseActionKind.DISEMBARK.value in {
+        option.option_id for option in disembark_request.options
+    }
 
     placement_request = _decision_request(
         _submit_handler_decision(
@@ -1586,7 +1609,7 @@ def test_disembark_selection_does_not_depend_on_engine_built_placement() -> None
             state=state,
             decisions=decisions,
             request=disembark_request,
-            option_id=passenger.unit_instance_id,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
             result_id="phase10q-select-placement-agnostic-disembark",
         )
     )
@@ -1638,20 +1661,21 @@ def test_transport_normal_move_emits_post_move_disembark_decision_after_pre_move
 
     assert handler is not None
     assert decisions is not None
-    assert post_move_disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
-    post_move_payload = cast(dict[str, object], post_move_disembark_request.payload)
-    assert post_move_payload["transport_movement_status"] == (
+    assert post_move_disembark_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    post_move_option = post_move_disembark_request.option_by_id(
+        MovementPhaseActionKind.DISEMBARK.value
+    )
+    post_move_option_payload = cast(dict[str, JsonValue], post_move_option.payload)
+    assert post_move_option_payload["transport_movement_status"] == (
         TransportMovementStatus.NORMAL_MOVE.value
     )
-    assert post_move_payload["disembark_mode"] == DisembarkModeKind.RAPID_DISEMBARK.value
-    assert post_move_payload["transport_unit_instance_id"] == transport.unit_instance_id
+    assert post_move_option_payload["disembark_mode"] == (DisembarkModeKind.RAPID_DISEMBARK.value)
+    assert post_move_option_payload["transport_unit_instance_id"] == transport.unit_instance_id
     assert {option.option_id for option in post_move_disembark_request.options} == {
-        COMPLETE_DISEMBARKS_OPTION_ID,
-        passenger.unit_instance_id,
+        MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        MovementPhaseActionKind.DISEMBARK.value,
     }
     assert state.movement_phase_state is not None
-    assert state.movement_phase_state.declined_disembark_unit_ids == (passenger.unit_instance_id,)
-    assert state.movement_phase_state.declined_post_normal_move_disembark_unit_ids == ()
     assert state.movement_phase_state.moved_unit_ids == (transport.unit_instance_id,)
 
 
@@ -1683,7 +1707,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
             state=state,
             decisions=decisions,
             request=post_move_disembark_request,
-            option_id=passenger.unit_instance_id,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
             result_id="phase10q-select-post-normal-disembark",
         )
     )
@@ -1725,14 +1749,7 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
         transport.unit_instance_id,
         passenger.unit_instance_id,
     )
-    scenario_after = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    assert passenger.unit_instance_id not in state.movement_phase_state.legal_unit_ids(
-        scenario_after,
-        accounted_unplaced_model_ids=state.unavailable_model_ids(),
-    )
+    assert passenger.unit_instance_id not in state.movement_phase_state.legal_unit_ids(state)
 
     payload: GameLifecyclePayload = {
         "config": None,
@@ -3895,17 +3912,6 @@ def _movement_action_request_for_unit(
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    if selection_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE:
-        decline_status = _submit_handler_decision(
-            handler,
-            state=state,
-            decisions=decisions,
-            request=selection_request,
-            option_id=COMPLETE_DISEMBARKS_OPTION_ID,
-            result_id=f"{unit_instance_id}:decline-pre-move-disembark",
-        )
-        assert decline_status is None
-        selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     selection_status = _submit_handler_decision(
         handler,
@@ -3933,22 +3939,6 @@ def _rapid_disembark_request_after_transport_normal_move(
     )
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     decisions = DecisionController()
-    pre_move_disembark_request = _decision_request(
-        handler.begin_phase(state=state, decisions=decisions)
-    )
-    assert pre_move_disembark_request.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE
-    assert passenger.unit_instance_id in {
-        option.option_id for option in pre_move_disembark_request.options
-    }
-    pre_move_decline_status = _submit_handler_decision(
-        handler,
-        state=state,
-        decisions=decisions,
-        request=pre_move_disembark_request,
-        option_id=COMPLETE_DISEMBARKS_OPTION_ID,
-        result_id="phase10q-decline-pre-move-disembark",
-    )
-    assert pre_move_decline_status is None
     movement_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
     assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     transport_selection_status = _submit_handler_decision(
@@ -3980,7 +3970,27 @@ def _rapid_disembark_request_after_transport_normal_move(
         transport=transport,
         result_id="phase10q-transport-normal-move-proposal",
     )
-    return handler, decisions, _decision_request(post_move_disembark_status)
+    assert post_move_disembark_status is None
+    passenger_selection_request = _decision_request(
+        handler.begin_phase(state=state, decisions=decisions)
+    )
+    assert passenger_selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert (
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=passenger_selection_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase10q-select-passenger-after-transport",
+        )
+        is None
+    )
+    return (
+        handler,
+        decisions,
+        _decision_request(handler.begin_phase(state=state, decisions=decisions)),
+    )
 
 
 def _submit_handler_decision(

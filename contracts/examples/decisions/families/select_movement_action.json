@@ -83,6 +83,7 @@
     "battle_round": 1,
     "game_id": "phase18d-decision-family-contract",
     "phase": "movement",
+    "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step",
     "unit_instance_id": "army-alpha:intercessor-unit-1"
   },
   "request_id": "decision-request-000008",

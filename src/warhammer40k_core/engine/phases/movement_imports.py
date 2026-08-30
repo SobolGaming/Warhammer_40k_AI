@@ -189,7 +189,12 @@ from warhammer40k_core.engine.reserves import (
     resolve_reserve_arrival,
 )
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_display_name,
+    rules_unit_view_from_armies,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     AdvanceRollModifierContext,
     MovementBudgetModifierContext,
@@ -292,6 +297,9 @@ from warhammer40k_core.geometry.pathing import (
 from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
 from warhammer40k_core.geometry.volume import Model
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_movement_phase_2026_08,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -427,7 +435,9 @@ __all__ = (
     "ReserveState",
     "RulesUnitPlacement",
     "RulesUnitView",
+    "rules_unit_display_name",
     "rules_unit_view_from_armies",
+    "rules_unit_views_from_armies",
     "RollModifier",
     "RollModifierPayload",
     "RulesetDescriptor",
@@ -502,6 +512,7 @@ __all__ = (
     "movement_bonus_inches_from_effects",
     "movement_keywords_granted_by_effects",
     "movement_mode_from_token",
+    "core_movement_phase_2026_08",
     "objective_marker_endpoint_placement_violation",
     "parameterized_decision_option",
     "replace",

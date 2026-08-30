@@ -992,6 +992,7 @@ Objects:
 Invariants:
 
 - Movement phase has a Move Units step; reserve arrivals are resolved as move types such as Ingress Move selected inside that step;
+- one deterministic unit-selection loop enumerates every unselected battlefield, embarked, and Strategic Reserve rules unit, and each selected unit receives its legal Move Units action space before another unit is selected;
 - `REINFORCEMENTS` is not a separate 11th Edition phase step and remains only a retired migration term;
 - reserve placement uses placement records, not displacement records;
 - all Reserves units not set up on the battlefield when the battle ends count as destroyed;

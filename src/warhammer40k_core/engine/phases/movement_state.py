@@ -11,11 +11,11 @@ from warhammer40k_core.engine.phases.movement_model import *
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mission_setup import MissionSetup
-    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_REINFORCEMENT_UNIT_DECISION_TYPE, SELECT_DISEMBARK_UNIT_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, COMPLETE_REINFORCEMENTS_OPTION_ID, COMPLETE_DISEMBARKS_OPTION_ID, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
-    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _begin_reinforcements_step, _complete_reinforcements_step
+    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
+    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_end_opponent_movement_reaction_if_available, _request_end_movement_active_player_stratagem_if_available, _request_rapid_ingress_reaction_if_available, _request_fire_overwatch_reaction_if_available, _request_selected_to_move_stratagem_if_available, _request_selected_to_fall_back_stratagem_if_available, _request_friendly_unit_fell_back_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _request_movement_end_surge_if_available, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
-    from warhammer40k_core.engine.phases.movement_reinforcements import _reinforcement_unit_options, _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _apply_reinforcement_unit_selection_decision, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
-    from warhammer40k_core.engine.phases.movement_transports import _request_pre_move_disembark_if_available, _request_post_normal_move_disembark_if_available, _pre_move_disembark_entries, _post_normal_move_disembark_entries, _disembark_unit_selection_options, _apply_disembark_unit_selection_decision, _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission
+    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
@@ -40,9 +40,7 @@ class MovementPhaseState:
     battle_round: int
     active_player_id: str
     step: MovementPhaseStepKind = MovementPhaseStepKind.MOVE_UNITS
-    reinforcements_completed: bool = False
-    declined_disembark_unit_ids: tuple[str, ...] = ()
-    declined_post_normal_move_disembark_unit_ids: tuple[str, ...] = ()
+    move_units_completed: bool = False
     selected_unit_ids: tuple[str, ...] = ()
     moved_unit_ids: tuple[str, ...] = ()
     movement_distance_records: tuple[MovementDistanceRecord, ...] = ()
@@ -63,26 +61,10 @@ class MovementPhaseState:
         object.__setattr__(self, "step", movement_phase_step_kind_from_token(self.step))
         object.__setattr__(
             self,
-            "reinforcements_completed",
+            "move_units_completed",
             _validate_bool(
-                "MovementPhaseState reinforcements_completed",
-                self.reinforcements_completed,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "declined_disembark_unit_ids",
-            _validate_identifier_tuple(
-                "MovementPhaseState declined_disembark_unit_ids",
-                self.declined_disembark_unit_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "declined_post_normal_move_disembark_unit_ids",
-            _validate_identifier_tuple(
-                "MovementPhaseState declined_post_normal_move_disembark_unit_ids",
-                self.declined_post_normal_move_disembark_unit_ids,
+                "MovementPhaseState move_units_completed",
+                self.move_units_completed,
             ),
         )
         object.__setattr__(
@@ -114,6 +96,10 @@ class MovementPhaseState:
                 raise GameLifecycleError(
                     "MovementPhaseState moved_unit_ids must be in selected_unit_ids."
                 )
+        if self.active_selection is None and self.selected_unit_ids != self.moved_unit_ids:
+            raise GameLifecycleError(
+                "MovementPhaseState selected units require an active selection or completion."
+            )
         for record in self.movement_distance_records:
             if record.unit_instance_id not in self.moved_unit_ids:
                 raise GameLifecycleError(
@@ -166,17 +152,20 @@ class MovementPhaseState:
 
     def legal_unit_ids(
         self,
-        scenario: BattlefieldScenario,
-        *,
-        accounted_unplaced_model_ids: tuple[str, ...] = (),
+        state: GameState,
     ) -> tuple[str, ...]:
+        from warhammer40k_core.engine.phases.movement_validation import (
+            _movement_unit_candidates,
+        )
+
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
             return ()
-        return _remaining_move_units_unit_ids(
-            scenario=scenario,
-            active_player_id=self.active_player_id,
-            selected_unit_ids=self.selected_unit_ids,
-            accounted_unplaced_model_ids=accounted_unplaced_model_ids,
+        return tuple(
+            candidate.unit_instance_id
+            for candidate in _movement_unit_candidates(
+                state=state,
+                movement_state=self,
+            )
         )
 
     def with_unit_selection(self, selection: MovementUnitSelection) -> Self:
@@ -196,11 +185,7 @@ class MovementPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            move_units_completed=self.move_units_completed,
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
@@ -227,11 +212,7 @@ class MovementPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            move_units_completed=self.move_units_completed,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
@@ -246,95 +227,11 @@ class MovementPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            move_units_completed=self.move_units_completed,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
             active_selection=self.active_selection,
-            pending_action=None,
-        )
-
-    def with_disembark_declined(self, unit_instance_ids: tuple[str, ...]) -> Self:
-        declined_ids = _validate_identifier_tuple("unit_instance_ids", unit_instance_ids)
-        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
-            raise GameLifecycleError("Disembark decline requires Move Units step.")
-        if self.active_selection is not None:
-            raise GameLifecycleError("Disembark decline requires no active_selection.")
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=tuple(
-                sorted((*self.declined_disembark_unit_ids, *declined_ids))
-            ),
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
-            selected_unit_ids=self.selected_unit_ids,
-            moved_unit_ids=self.moved_unit_ids,
-            movement_distance_records=self.movement_distance_records,
-            active_selection=None,
-            pending_action=None,
-        )
-
-    def with_post_normal_move_disembark_declined(
-        self,
-        unit_instance_ids: tuple[str, ...],
-    ) -> Self:
-        declined_ids = _validate_identifier_tuple("unit_instance_ids", unit_instance_ids)
-        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
-            raise GameLifecycleError("Post-move Disembark decline requires Move Units step.")
-        if self.active_selection is not None:
-            raise GameLifecycleError("Post-move Disembark decline requires no active_selection.")
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=tuple(
-                sorted((*self.declined_post_normal_move_disembark_unit_ids, *declined_ids))
-            ),
-            selected_unit_ids=self.selected_unit_ids,
-            moved_unit_ids=self.moved_unit_ids,
-            movement_distance_records=self.movement_distance_records,
-            active_selection=None,
-            pending_action=None,
-        )
-
-    def with_post_normal_move_disembark_counted_as_moved(
-        self,
-        unit_instance_id: str,
-    ) -> Self:
-        moved_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
-            raise GameLifecycleError(
-                "Post-move Disembark movement record requires Move Units step."
-            )
-        if self.active_selection is not None:
-            raise GameLifecycleError(
-                "Post-move Disembark movement record requires no active_selection."
-            )
-        if moved_unit_id in self.selected_unit_ids or moved_unit_id in self.moved_unit_ids:
-            raise GameLifecycleError("Post-move Disembark unit already has movement state.")
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
-            selected_unit_ids=(*self.selected_unit_ids, moved_unit_id),
-            moved_unit_ids=(*self.moved_unit_ids, moved_unit_id),
-            movement_distance_records=self.movement_distance_records,
-            active_selection=None,
             pending_action=None,
         )
 
@@ -370,11 +267,7 @@ class MovementPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            move_units_completed=self.move_units_completed,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=(*self.moved_unit_ids, completed_unit_id),
             movement_distance_records=(
@@ -395,34 +288,6 @@ class MovementPhaseState:
             return self
         raise GameLifecycleError("MovementPhaseState has no secondary movement phase step.")
 
-    def with_reinforcement_arrival(self, unit_instance_id: str) -> Self:
-        arrived_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        if self.step is not MovementPhaseStepKind.MOVE_UNITS:
-            raise GameLifecycleError("Reinforcement arrival requires Move Units step.")
-        if self.reinforcements_completed:
-            raise GameLifecycleError("Reinforcement arrival requires incomplete Move Units.")
-        selected = self.selected_unit_ids
-        moved = self.moved_unit_ids
-        if arrived_unit_id not in selected:
-            selected = (*selected, arrived_unit_id)
-        if arrived_unit_id not in moved:
-            moved = (*moved, arrived_unit_id)
-        return type(self)(
-            battle_round=self.battle_round,
-            active_player_id=self.active_player_id,
-            step=self.step,
-            reinforcements_completed=self.reinforcements_completed,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
-            selected_unit_ids=selected,
-            moved_unit_ids=moved,
-            movement_distance_records=self.movement_distance_records,
-            active_selection=None,
-            pending_action=None,
-        )
-
     def with_end_movement_ingress_arrival(self, unit_instance_id: str) -> Self:
         arrived_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
@@ -439,11 +304,7 @@ class MovementPhaseState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             step=self.step,
-            reinforcements_completed=True,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            move_units_completed=True,
             selected_unit_ids=selected,
             moved_unit_ids=moved,
             movement_distance_records=self.movement_distance_records,
@@ -451,20 +312,16 @@ class MovementPhaseState:
             pending_action=None,
         )
 
-    def with_reinforcements_completed(self) -> Self:
+    def with_move_units_completed(self) -> Self:
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
-            raise GameLifecycleError("Completing reserve arrivals requires Move Units step.")
+            raise GameLifecycleError("Completing Move Units requires Move Units step.")
         if self.active_selection is not None:
-            raise GameLifecycleError("Completing reserve arrivals requires no active_selection.")
+            raise GameLifecycleError("Completing Move Units requires no active_selection.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             step=self.step,
-            reinforcements_completed=True,
-            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
-            declined_post_normal_move_disembark_unit_ids=(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            move_units_completed=True,
             selected_unit_ids=self.selected_unit_ids,
             moved_unit_ids=self.moved_unit_ids,
             movement_distance_records=self.movement_distance_records,
@@ -477,11 +334,7 @@ class MovementPhaseState:
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
             "step": self.step.value,
-            "reinforcements_completed": self.reinforcements_completed,
-            "declined_disembark_unit_ids": list(self.declined_disembark_unit_ids),
-            "declined_post_normal_move_disembark_unit_ids": list(
-                self.declined_post_normal_move_disembark_unit_ids
-            ),
+            "move_units_completed": self.move_units_completed,
             "selected_unit_ids": list(self.selected_unit_ids),
             "moved_unit_ids": list(self.moved_unit_ids),
             "movement_distance_records": [
@@ -503,11 +356,7 @@ class MovementPhaseState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             step=movement_phase_step_kind_from_token(payload["step"]),
-            reinforcements_completed=payload["reinforcements_completed"],
-            declined_disembark_unit_ids=tuple(payload["declined_disembark_unit_ids"]),
-            declined_post_normal_move_disembark_unit_ids=tuple(
-                payload["declined_post_normal_move_disembark_unit_ids"]
-            ),
+            move_units_completed=payload["move_units_completed"],
             selected_unit_ids=tuple(payload["selected_unit_ids"]),
             moved_unit_ids=tuple(payload["moved_unit_ids"]),
             movement_distance_records=tuple(

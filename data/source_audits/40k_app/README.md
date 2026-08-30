@@ -69,5 +69,19 @@ The loader's reviewed byte, package, search-index sequence observation, per-head
 official-PDF text transcription, source identity, ordered-row, support-status, and runtime-consumer
 pins must be updated together. The builder is offline and never queries the live provider.
 
+P09A's exact 09.02 Move Units sequence lives in
+`core_movement_phase_2026_08/artifacts/package.json`. The artifact pins the reviewed URL,
+observation timestamp, complete Select Unit location set, complete move-type list, transcription
+hash, evidence observation hashes, execution status, and runtime consumers. The older category-09
+audit row remains locator metadata and does not authenticate this exact excerpt. After an
+intentional reviewed edit, refresh its derived hashes offline with:
+
+```text
+uv run python tools/build_core_movement_phase_source.py
+uv run python tools/build_core_movement_phase_source.py --check
+```
+
+The typed loader's reviewed artifact-byte pin must be updated in the same change.
+
 The current scope is exactly the 25 core-rules categories. Factions, faction detachments, and
 faction datasheet content is explicitly excluded.

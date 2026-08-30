@@ -72,10 +72,8 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.phases.movement import (
-    COMPLETE_REINFORCEMENTS_OPTION_ID,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
@@ -184,21 +182,60 @@ def test_movement_phase_requests_reserve_arrivals_inside_move_units() -> None:
     )
 
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    payload = cast(dict[str, object], status.payload)
-    assert payload["step"] == MovementPhaseStepKind.MOVE_UNITS.value
-    assert payload["phase_body_status"] == "move_units_waiting_for_arrival_choice"
-    assert payload["unarrived_reserve_count"] == 1
     assert status.decision_request is not None
-    assert status.decision_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
-    request_payload = cast(dict[str, object], status.decision_request.payload)
-    assert request_payload["step"] == MovementPhaseStepKind.MOVE_UNITS.value
+    assert status.decision_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert {option.option_id for option in status.decision_request.options} == {
-        COMPLETE_REINFORCEMENTS_OPTION_ID,
         reserve_state.unit_instance_id,
     }
+    reserve_option = status.decision_request.option_by_id(reserve_state.unit_instance_id)
+    reserve_option_payload = cast(dict[str, JsonValue], reserve_option.payload)
+    assert reserve_option_payload["unit_location"] == "strategic_reserves"
     assert state.movement_phase_state is not None
     assert state.movement_phase_state.step is MovementPhaseStepKind.MOVE_UNITS
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
+
+
+def test_move_units_selection_interleaves_battlefield_and_strategic_reserve_units() -> None:
+    state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve()
+    state.battle_round = 3
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=3,
+        active_player_id="player-a",
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
+    decisions = DecisionController()
+
+    selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+
+    assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    option_payloads = {
+        option.option_id: cast(dict[str, object], option.payload)
+        for option in selection_request.options
+    }
+    assert set(option_payloads) == {
+        "army-alpha:intercessor-unit-2",
+        reserve_state.unit_instance_id,
+    }
+    assert option_payloads["army-alpha:intercessor-unit-2"]["unit_location"] == "battlefield"
+    assert option_payloads[reserve_state.unit_instance_id]["unit_location"] == "strategic_reserves"
+
+    assert (
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=reserve_state.unit_instance_id,
+            result_id="phase09a-select-reserve-before-battlefield",
+        )
+        is None
+    )
+    action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert {option.option_id for option in action_request.options} == {
+        MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        MovementPhaseActionKind.INGRESS.value,
+    }
 
 
 def test_reinforcements_valid_strategic_reserves_arrival_mutates_state_atomically() -> None:
@@ -212,7 +249,7 @@ def test_reinforcements_valid_strategic_reserves_arrival_mutates_state_atomicall
         state=state,
         decisions=decisions,
         request=selection_request,
-        option_id=reserve_state.unit_instance_id,
+        option_id=MovementPhaseActionKind.INGRESS.value,
         result_id="phase10p-select-strategic",
     )
     placement_request = _decision_request(placement_status)
@@ -444,8 +481,8 @@ def test_aircraft_edge_departure_arrives_next_turn_and_round_trips() -> None:
     handler = MovementPhaseHandler(ruleset_descriptor=_ruleset())
     _set_movement_ready_for_reinforcements(state=state, battle_round=2)
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    assert selection_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
-    placement_request = _decision_request(
+    assert selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert (
         _submit_handler_decision(
             handler=handler,
             state=state,
@@ -453,6 +490,18 @@ def test_aircraft_edge_departure_arrives_next_turn_and_round_trips() -> None:
             request=selection_request,
             option_id=aircraft.unit_instance_id,
             result_id="phase10p-aircraft-arrival-select",
+        )
+        is None
+    )
+    ingress_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=ingress_request,
+            option_id=MovementPhaseActionKind.INGRESS.value,
+            result_id="phase10p-aircraft-arrival-ingress",
         )
     )
     diameter_mm = aircraft.own_models[0].base_size.diameter_mm
@@ -1149,7 +1198,7 @@ def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() ->
         state=state,
         decisions=decisions,
         request=selection_request,
-        option_id=deep_strike_state.unit_instance_id,
+        option_id=MovementPhaseActionKind.INGRESS.value,
         result_id="phase10p-select-deep-strike",
     )
     placement_request = _decision_request(placement_status)
@@ -1196,7 +1245,7 @@ def test_reinforcements_invalid_arrival_does_not_mutate_state() -> None:
         state=state,
         decisions=decisions,
         request=selection_request,
-        option_id=reserve_state.unit_instance_id,
+        option_id=MovementPhaseActionKind.INGRESS.value,
         result_id="phase10p-select-invalid",
     )
     placement_request = _decision_request(placement_status)
@@ -1242,10 +1291,22 @@ def test_reinforcements_completion_choice_leaves_reserve_unarrived_and_advances_
         state=state,
         decisions=decisions,
         request=selection_request,
-        option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
-        result_id="phase10p-complete-reinforcements",
+        option_id=reserve_state.unit_instance_id,
+        result_id="phase10p-select-reserve-to-remain",
     )
     assert decision_status is None
+    action_request = _decision_request(flow.advance(state=state, decisions=decisions))
+    assert (
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=action_request,
+            option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
+            result_id="phase10p-reserve-remains-stationary",
+        )
+        is None
+    )
     advanced_status = flow.advance(state=state, decisions=decisions)
 
     assert advanced_status.status_kind is LifecycleStatusKind.ADVANCED
@@ -3289,7 +3350,7 @@ def _declared_reserve_arrival_lifecycle() -> GameLifecycle:
     )
     handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor)
     selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
-    placement_request = _decision_request(
+    assert (
         _submit_handler_decision(
             handler=handler,
             state=state,
@@ -3297,6 +3358,18 @@ def _declared_reserve_arrival_lifecycle() -> GameLifecycle:
             request=selection_request,
             option_id=reserve_unit_id,
             result_id="phase10p-declared-arrival-select",
+        )
+        is None
+    )
+    ingress_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=ingress_request,
+            option_id=MovementPhaseActionKind.INGRESS.value,
+            result_id="phase10p-declared-arrival-ingress",
         )
     )
     reserve_unit = armies[0].unit_by_id(reserve_unit_id)
@@ -3356,8 +3429,34 @@ def _enter_reinforcements_choice(
     _set_movement_ready_for_reinforcements(state=state, battle_round=battle_round)
     handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor or _ruleset())
     decisions = DecisionController()
-    status = handler.begin_phase(state=state, decisions=decisions)
-    return handler, decisions, _decision_request(status)
+    selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    reserve_unit_ids = {
+        reserve_state.unit_instance_id
+        for reserve_state in state.unarrived_reserve_states_for_player("player-a")
+    }
+    selectable_reserve_ids = tuple(
+        option.option_id
+        for option in selection_request.options
+        if option.option_id in reserve_unit_ids
+    )
+    if len(selectable_reserve_ids) != 1:
+        raise AssertionError("reserve choice fixture requires exactly one reserve unit")
+    assert (
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=selectable_reserve_ids[0],
+            result_id="phase10p-select-reserve-unit",
+        )
+        is None
+    )
+    return (
+        handler,
+        decisions,
+        _decision_request(handler.begin_phase(state=state, decisions=decisions)),
+    )
 
 
 def _submit_handler_decision(

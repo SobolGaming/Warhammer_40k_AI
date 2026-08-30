@@ -1045,7 +1045,7 @@ def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> Non
 
 class _DirectEngagementRangeCallVisitor(ast.NodeVisitor):
     def __init__(self, *, path: Path) -> None:
-        self._relative_path = str(path.relative_to(ROOT))
+        self._relative_path = path.relative_to(ROOT).as_posix()
         self._function_names: list[str] = []
         self.calls: Counter[tuple[str, str]] = Counter()
 

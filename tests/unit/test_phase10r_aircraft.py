@@ -67,7 +67,6 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvanceRollRequest,
     AdvanceRollResult,
     FallBackModeKind,
@@ -1156,7 +1155,7 @@ def test_aircraft_transition_reserve_state_is_required_next_controller_turn_only
         )
     )
 
-    assert reinforcement_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    assert reinforcement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert {option.option_id for option in reinforcement_request.options} == {
         aircraft.unit_instance_id
     }

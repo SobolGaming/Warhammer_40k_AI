@@ -57,6 +57,27 @@ def test_registered_decision_families_have_exact_interaction_metadata_coverage()
     )
 
 
+def test_p09a_split_movement_selection_surfaces_are_fully_retired() -> None:
+    retired_tokens = (
+        "complete_disembarks",
+        "complete_reinforcements",
+        "select_disembark_unit",
+        "select_reinforcement_unit",
+    )
+    registered_types = {
+        contract.decision_type for contract in GameLifecycle().decision_dispatch_contracts
+    }
+    assert registered_types.isdisjoint(retired_tokens)
+    assert set(registered_interaction_decision_types()).isdisjoint(retired_tokens)
+
+    engine_root = ROOT / "src" / "warhammer40k_core" / "engine"
+    engine_source = "\n".join(
+        path.read_text(encoding="utf-8") for path in sorted(engine_root.rglob("*.py"))
+    )
+    for retired_token in retired_tokens:
+        assert retired_token not in engine_source
+
+
 def test_conformance_variant_renderer_unions_match_every_published_inventory() -> None:
     contracts_by_type = {
         contract.decision_type: contract for contract in GameLifecycle().decision_dispatch_contracts
