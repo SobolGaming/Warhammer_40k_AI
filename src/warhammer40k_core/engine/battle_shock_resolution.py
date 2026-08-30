@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
@@ -12,6 +13,8 @@ from warhammer40k_core.engine.battle_shock import (
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
+    BattleShockModifierApplication,
+    BattleShockModifierApplicationPayload,
     BattleShockModifierContext,
     BattleShockOutcomeContext,
     BattleShockRerollPermissionContext,
@@ -27,12 +30,23 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_canonical_identity,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 BATTLE_SHOCK_REROLL_CONTEXT_KEY = "battle_shock_context"
 BATTLE_SHOCK_REROLL_SOURCE_KIND_KEY = "source_kind"
+PASSED_STATE_POLICY_CONTEXT_KEY = "passed_state_policy"
+BATTLE_SHOCK_MODIFIER_APPLICATION_EVENT = "battle_shock_modifier_applications_recorded"
+ADDITIONAL_MODIFIER_APPLICATIONS_CONTEXT_KEY = "additional_modifier_applications"
+
+
+class BattleShockPassedStatePolicy(StrEnum):
+    PRESERVE = "preserve"
+    CLEAR_IF_STEP_START_SHOCKED = "clear_if_step_start_shocked"
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,10 +80,12 @@ def resolve_battle_shock_test_with_optional_reroll(
     active_player_id: str,
     phase: BattlePhase,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    passed_state_policy: BattleShockPassedStatePolicy,
     source_kind: str,
     base_payload: dict[str, JsonValue],
     resolved_event_types: tuple[str, ...],
     pending_phase_body_status: str,
+    additional_modifier_applications: tuple[BattleShockModifierApplication, ...] = (),
 ) -> BattleShockResolutionResult:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -92,9 +108,11 @@ def resolve_battle_shock_test_with_optional_reroll(
         "phase_start_battle_shocked_unit_ids",
         phase_start_battle_shocked_unit_ids,
     )
+    pass_policy = _passed_state_policy_from_token(passed_state_policy)
     payload = _validate_json_object("base_payload", base_payload)
     event_types = _validate_identifier_tuple("resolved_event_types", resolved_event_types)
     phase_body_status = _validate_identifier("pending_phase_body_status", pending_phase_body_status)
+    additional_applications = _validate_modifier_applications(additional_modifier_applications)
     permission = battle_shock_hooks.reroll_permission_for(
         BattleShockRerollPermissionContext(
             state=state,
@@ -116,8 +134,10 @@ def resolve_battle_shock_test_with_optional_reroll(
             phase=requested_phase,
             auto_passed=False,
             phase_start_battle_shocked_unit_ids=phase_start_ids,
+            passed_state_policy=pass_policy,
             base_payload=payload,
             resolved_event_types=event_types,
+            additional_modifier_applications=additional_applications,
         )
         return BattleShockResolutionResult(
             resolved_payload=cast(dict[str, JsonValue], resolved_payload),
@@ -138,8 +158,13 @@ def resolve_battle_shock_test_with_optional_reroll(
                 "battle_shock_test_request": validate_json_value(request.to_payload()),
                 "battle_shock_roll_state": validate_json_value(roll_state.to_payload()),
                 "phase_start_battle_shocked_unit_ids": list(phase_start_ids),
+                PASSED_STATE_POLICY_CONTEXT_KEY: pass_policy.value,
                 "base_payload": validate_json_value(payload),
                 "resolved_event_types": list(event_types),
+                ADDITIONAL_MODIFIER_APPLICATIONS_CONTEXT_KEY: [
+                    validate_json_value(application.to_payload())
+                    for application in additional_applications
+                ],
             }
         },
     )
@@ -172,6 +197,7 @@ def apply_battle_shock_reroll_resolution_decision(
     result: DecisionResult,
     battle_shock_hooks: BattleShockHookRegistry,
     expected_source_kind: str,
+    expected_passed_state_policy: BattleShockPassedStatePolicy,
 ) -> dict[str, JsonValue]:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -189,6 +215,7 @@ def apply_battle_shock_reroll_resolution_decision(
     if type(phase) is not BattlePhase:
         raise GameLifecycleError("Battle-shock reroll requires the current battle phase.")
     source = _validate_identifier("expected_source_kind", expected_source_kind)
+    expected_pass_policy = _passed_state_policy_from_token(expected_passed_state_policy)
     record = decisions.record_for_result(result)
     request_payload = _payload_object(record.request.payload, context="Decision payload")
     context_payload = _payload_object(
@@ -210,6 +237,11 @@ def apply_battle_shock_reroll_resolution_decision(
         context_payload,
         key="phase_start_battle_shocked_unit_ids",
     )
+    pass_policy = _passed_state_policy_from_token(
+        _payload_string(context_payload, key=PASSED_STATE_POLICY_CONTEXT_KEY)
+    )
+    if pass_policy is not expected_pass_policy:
+        raise GameLifecycleError("Battle-shock reroll passed-state policy drift.")
     battle_shock_request = BattleShockTestRequest.from_payload(
         cast(
             BattleShockTestRequestPayload,
@@ -232,6 +264,10 @@ def apply_battle_shock_reroll_resolution_decision(
     )
     base_payload = _payload_json_object(context_payload, key="base_payload")
     resolved_event_types = _payload_string_tuple(context_payload, key="resolved_event_types")
+    additional_modifier_applications = _payload_modifier_applications(
+        context_payload,
+        key=ADDITIONAL_MODIFIER_APPLICATIONS_CONTEXT_KEY,
+    )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     rerolled_state = manager.resolve_reroll(
         initial_roll_state,
@@ -250,8 +286,10 @@ def apply_battle_shock_reroll_resolution_decision(
         phase=phase,
         auto_passed=False,
         phase_start_battle_shocked_unit_ids=phase_start_ids,
+        passed_state_policy=pass_policy,
         base_payload=base_payload,
         resolved_event_types=resolved_event_types,
+        additional_modifier_applications=additional_modifier_applications,
     )
     return cast(dict[str, JsonValue], resolved_payload)
 
@@ -268,8 +306,10 @@ def record_battle_shock_result_and_outcome_events(
     phase: BattlePhase,
     auto_passed: bool,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    passed_state_policy: BattleShockPassedStatePolicy,
     base_payload: dict[str, JsonValue],
     resolved_event_types: tuple[str, ...],
+    additional_modifier_applications: tuple[BattleShockModifierApplication, ...] = (),
 ) -> JsonValue:
     requested_phase = _battle_phase_from_token(phase)
     active_player = _validate_identifier("active_player_id", active_player_id)
@@ -277,40 +317,106 @@ def record_battle_shock_result_and_outcome_events(
         "phase_start_battle_shocked_unit_ids",
         phase_start_battle_shocked_unit_ids,
     )
-    event_types = _validate_identifier_tuple("resolved_event_types", resolved_event_types)
-    payload = _validate_json_object("base_payload", base_payload)
+    modifier_context = BattleShockModifierContext(
+        state=state,
+        request=request,
+        active_player_id=active_player,
+        phase=requested_phase,
+        phase_start_battle_shocked_unit_ids=phase_start_ids,
+    )
+    modifier_applications = _validate_modifier_applications(
+        tuple(
+            sorted(
+                (
+                    *battle_shock_hooks.modifier_applications_for(modifier_context),
+                    *_validate_modifier_applications(additional_modifier_applications),
+                ),
+                key=lambda application: (application.hook_id, application.source_id),
+            )
+        )
+    )
     result = BattleShockResult.from_roll_state(
         result_id=f"{request.request_id}:result",
         request=request,
         roll_state=roll_state,
-        modifiers=battle_shock_hooks.modifiers_for(
-            BattleShockModifierContext(
-                state=state,
-                request=request,
-                active_player_id=active_player,
-                phase=requested_phase,
-                phase_start_battle_shocked_unit_ids=phase_start_ids,
-            )
+        modifiers=tuple(
+            modifier for application in modifier_applications for modifier in application.modifiers
         ),
     )
-    state_update = "not_required"
-    if not result.passed:
-        if request.unit_instance_id in phase_start_ids:
-            state_update = "already_battle_shocked"
-        else:
-            state.record_battle_shock_result(result)
-            state_update = "recorded_battle_shocked"
-    result_payload = validate_json_value(result.to_payload())
-    resolved_payload = validate_json_value(
-        {
-            **payload,
-            "battle_shock_result": result_payload,
-            "auto_passed": auto_passed,
-            "state_update": state_update,
-        }
+    return record_precomputed_battle_shock_result_and_outcome_events(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=battle_shock_hooks,
+        result=result,
+        active_player_id=active_player,
+        phase=requested_phase,
+        auto_passed=auto_passed,
+        phase_start_battle_shocked_unit_ids=phase_start_ids,
+        passed_state_policy=passed_state_policy,
+        base_payload=base_payload,
+        resolved_event_types=resolved_event_types,
+        modifier_applications=modifier_applications,
     )
-    for event_type in event_types:
-        decisions.event_log.append(event_type, resolved_payload)
+
+
+def record_precomputed_battle_shock_result_and_outcome_events(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    battle_shock_hooks: BattleShockHookRegistry,
+    result: BattleShockResult,
+    active_player_id: str,
+    phase: BattlePhase,
+    auto_passed: bool,
+    phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    passed_state_policy: BattleShockPassedStatePolicy,
+    base_payload: dict[str, JsonValue],
+    resolved_event_types: tuple[str, ...],
+    modifier_applications: tuple[BattleShockModifierApplication, ...] | None = None,
+) -> JsonValue:
+    if type(manager) is not DiceRollManager:
+        raise GameLifecycleError("Precomputed Battle-shock resolution requires dice manager.")
+    if type(battle_shock_hooks) is not BattleShockHookRegistry:
+        raise GameLifecycleError("Precomputed Battle-shock resolution requires hooks.")
+    requested_phase = _battle_phase_from_token(phase)
+    active_player = _validate_identifier("active_player_id", active_player_id)
+    phase_start_ids = _validate_identifier_tuple(
+        "phase_start_battle_shocked_unit_ids",
+        phase_start_battle_shocked_unit_ids,
+    )
+    modifier_context = BattleShockModifierContext(
+        state=state,
+        request=result.request,
+        active_player_id=active_player,
+        phase=requested_phase,
+        phase_start_battle_shocked_unit_ids=phase_start_ids,
+    )
+    applications = (
+        battle_shock_hooks.modifier_applications_for(modifier_context)
+        if modifier_applications is None
+        else _validate_modifier_applications(modifier_applications)
+    )
+    flattened = tuple(
+        modifier for application in applications for modifier in application.modifiers
+    )
+    if tuple(sorted(flattened, key=lambda modifier: modifier.modifier_id)) != (
+        result.modified_roll.modifiers
+    ):
+        raise GameLifecycleError("Precomputed Battle-shock modifier authority drifted.")
+    resolved_payload = record_precomputed_battle_shock_result_events(
+        state=state,
+        decisions=decisions,
+        result=result,
+        phase=requested_phase,
+        auto_passed=auto_passed,
+        phase_start_battle_shocked_unit_ids=phase_start_ids,
+        passed_state_policy=passed_state_policy,
+        base_payload=base_payload,
+        resolved_event_types=resolved_event_types,
+        modifier_applications=applications,
+    )
     battle_shock_hooks.resolve_outcomes(
         BattleShockOutcomeContext(
             state=state,
@@ -324,6 +430,169 @@ def record_battle_shock_result_and_outcome_events(
         )
     )
     return resolved_payload
+
+
+def record_precomputed_battle_shock_result_events(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: BattleShockResult,
+    phase: BattlePhase,
+    auto_passed: bool,
+    phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    passed_state_policy: BattleShockPassedStatePolicy,
+    base_payload: dict[str, JsonValue],
+    resolved_event_types: tuple[str, ...],
+    modifier_applications: tuple[BattleShockModifierApplication, ...],
+) -> JsonValue:
+    """Apply and audit an already-computed result without dispatching outcome hooks."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Precomputed Battle-shock resolution requires GameState.")
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Precomputed Battle-shock resolution requires decisions.")
+    if type(result) is not BattleShockResult:
+        raise GameLifecycleError("Precomputed Battle-shock resolution requires result.")
+    requested_phase = _battle_phase_from_token(phase)
+    phase_start_ids = _validate_identifier_tuple(
+        "phase_start_battle_shocked_unit_ids",
+        phase_start_battle_shocked_unit_ids,
+    )
+    pass_policy = _passed_state_policy_from_token(passed_state_policy)
+    if type(auto_passed) is not bool:
+        raise GameLifecycleError("Precomputed Battle-shock auto_passed must be a boolean.")
+    if (
+        pass_policy is BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED
+        and requested_phase is not BattlePhase.COMMAND
+    ):
+        raise GameLifecycleError(
+            "Step-start Battle-shock clearing is only valid in the Command phase."
+        )
+    event_types = _validate_identifier_tuple("resolved_event_types", resolved_event_types)
+    applications = _validate_modifier_applications(modifier_applications)
+    flattened = tuple(
+        modifier for application in applications for modifier in application.modifiers
+    )
+    if tuple(sorted(flattened, key=lambda modifier: modifier.modifier_id)) != (
+        result.modified_roll.modifiers
+    ):
+        raise GameLifecycleError("Battle-shock result modifiers lack exact application authority.")
+    payload = _validate_json_object("base_payload", base_payload)
+    _validate_precomputed_result_context(
+        state=state,
+        result=result,
+        phase=requested_phase,
+        base_payload=payload,
+    )
+    decisions.event_log.append(
+        BATTLE_SHOCK_MODIFIER_APPLICATION_EVENT,
+        {
+            **payload,
+            "battle_shock_test_request": result.request.to_payload(),
+            "phase_start_battle_shocked_unit_ids": list(phase_start_ids),
+            "battle_shock_modifier_applications": [
+                application.to_payload() for application in applications
+            ],
+        },
+    )
+    state_update = "not_required"
+    cleared_battle_shocked_unit_ids: tuple[str, ...] = ()
+    if result.passed:
+        if (
+            pass_policy is BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED
+            and result.request.unit_instance_id in phase_start_ids
+        ):
+            from warhammer40k_core.engine.battle_shock_state import (
+                clear_battle_shock_for_rules_unit,
+            )
+
+            cleared_battle_shocked_unit_ids = clear_battle_shock_for_rules_unit(
+                state=state,
+                unit_instance_id=result.request.unit_instance_id,
+            )
+            state_update = "cleared_battle_shocked"
+    else:
+        from warhammer40k_core.engine.battle_shock_state import (
+            apply_battle_shock_result_state,
+        )
+
+        state_update = apply_battle_shock_result_state(state=state, result=result)
+    result_payload = validate_json_value(result.to_payload())
+    resolved_payload = validate_json_value(
+        {
+            **payload,
+            "battle_shock_result": result_payload,
+            "auto_passed": auto_passed,
+            "state_update": state_update,
+            "cleared_battle_shocked_unit_ids": list(cleared_battle_shocked_unit_ids),
+        }
+    )
+    for event_type in event_types:
+        decisions.event_log.append(event_type, resolved_payload)
+    return resolved_payload
+
+
+def _validate_precomputed_result_context(
+    *,
+    state: GameState,
+    result: BattleShockResult,
+    phase: BattlePhase,
+    base_payload: dict[str, JsonValue],
+) -> None:
+    if result.request.game_id != state.game_id:
+        raise GameLifecycleError("Precomputed Battle-shock result game_id drift.")
+    if result.request.battle_round != state.battle_round:
+        raise GameLifecycleError("Precomputed Battle-shock result battle_round drift.")
+    if result.request.player_id not in state.player_ids:
+        raise GameLifecycleError("Precomputed Battle-shock result player_id is unknown.")
+    rules_units = current_rules_unit_views_for_canonical_identity(
+        state=state,
+        unit_instance_id=result.request.unit_instance_id,
+    )
+    if {rules_unit.owner_player_id for rules_unit in rules_units} != {result.request.player_id}:
+        raise GameLifecycleError("Precomputed Battle-shock result unit owner drift.")
+    if base_payload.get("game_id") != state.game_id:
+        raise GameLifecycleError("Precomputed Battle-shock base game_id drift.")
+    if base_payload.get("battle_round") != state.battle_round:
+        raise GameLifecycleError("Precomputed Battle-shock base battle_round drift.")
+    if base_payload.get("phase") != phase.value:
+        raise GameLifecycleError("Precomputed Battle-shock base phase drift.")
+
+
+def _validate_modifier_applications(
+    values: object,
+) -> tuple[BattleShockModifierApplication, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Battle-shock modifier applications must be a typed tuple.")
+    raw_values = cast(tuple[object, ...], values)
+    if any(type(value) is not BattleShockModifierApplication for value in raw_values):
+        raise GameLifecycleError("Battle-shock modifier applications must be a typed tuple.")
+    applications = cast(tuple[BattleShockModifierApplication, ...], values)
+    if applications != tuple(
+        sorted(applications, key=lambda value: (value.hook_id, value.source_id))
+    ):
+        raise GameLifecycleError("Battle-shock modifier applications must be sorted.")
+    application_ids = tuple((value.hook_id, value.source_id) for value in applications)
+    modifier_ids = tuple(
+        modifier.modifier_id for value in applications for modifier in value.modifiers
+    )
+    if len(set(application_ids)) != len(application_ids) or len(set(modifier_ids)) != len(
+        modifier_ids
+    ):
+        raise GameLifecycleError("Battle-shock modifier application identities are duplicated.")
+    return applications
+
+
+def _passed_state_policy_from_token(value: object) -> BattleShockPassedStatePolicy:
+    if type(value) is BattleShockPassedStatePolicy:
+        return value
+    if type(value) is not str:
+        raise GameLifecycleError("Battle-shock passed-state policy must be a string.")
+    try:
+        return BattleShockPassedStatePolicy(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Battle-shock passed-state policy is unsupported.") from exc
 
 
 def is_battle_shock_reroll_request(
@@ -379,6 +648,27 @@ def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[s
     if not isinstance(value, list):
         raise GameLifecycleError(f"Decision payload key must be a list: {key}.")
     return _validate_identifier_tuple(key, tuple(value))
+
+
+def _payload_modifier_applications(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> tuple[BattleShockModifierApplication, ...]:
+    if key not in payload:
+        raise GameLifecycleError(f"Decision payload missing required key: {key}.")
+    value = payload[key]
+    if not isinstance(value, list) or any(not isinstance(item, dict) for item in value):
+        raise GameLifecycleError(f"Decision payload key must be an object list: {key}.")
+    return _validate_modifier_applications(
+        tuple(
+            BattleShockModifierApplication.from_payload(
+                cast(BattleShockModifierApplicationPayload, item)
+            )
+            for item in value
+            if isinstance(item, dict)
+        )
+    )
 
 
 def _active_player_id(state: GameState) -> str:

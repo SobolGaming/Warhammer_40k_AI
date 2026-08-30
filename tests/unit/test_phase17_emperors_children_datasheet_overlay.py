@@ -14,6 +14,7 @@ from tests.movement_submission_helpers import (
     submit_action_and_movement_proposal,
 )
 from tests.setup_completion_helpers import (
+    record_current_battlefield_placements_for_fixture,
     record_existing_primary_turn_start_evidence_events_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
 )
@@ -79,6 +80,7 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestRequest,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.battle_shock_state import clear_battle_shock_for_rules_unit
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
@@ -110,7 +112,9 @@ from warhammer40k_core.engine.catalog_once_per_battle_runtime import (
     CatalogOncePerBattleRuntime,
 )
 from warhammer40k_core.engine.catalog_poisoned_status_runtime import (
+    CATALOG_POISONED_COMMAND_PENDING_EVENT,
     CATALOG_POISONED_COMMAND_RESOLVED_EVENT,
+    CATALOG_POISONED_COMMAND_ROLLED_EVENT,
     catalog_poisoned_command_start_bindings,
 )
 from warhammer40k_core.engine.catalog_poisoned_status_support import (
@@ -163,7 +167,11 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
 from warhammer40k_core.engine.catalog_sticky_objective_support import (
     CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
 )
+from warhammer40k_core.engine.command_phase_start_authority import (
+    COMMAND_START_EFFECT_PAUSED_EVENT,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
+    SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartEffectContext,
     CommandPhaseStartHookRegistry,
     CommandPhaseStartRequestContext,
@@ -184,7 +192,11 @@ from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
 )
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+    parameterized_decision_option,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.deployment_ability_queries import rules_unit_has_infiltrators
 from warhammer40k_core.engine.destruction_provenance import (
@@ -196,7 +208,7 @@ from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
 )
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.catalog_runtime_hooks import (
     phase_end_objective_control_hook_bindings,
 )
@@ -251,10 +263,12 @@ from warhammer40k_core.engine.objective_control import (
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
@@ -266,6 +280,7 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_destruction_evidence import (
     destruction_source_objective_proximity_witness,
@@ -305,6 +320,7 @@ from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemCatalogIndex,
     stratagem_decline_payload,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -887,6 +903,7 @@ def test_post_shoot_pending_decision_after_target_set_change_replays() -> None:
         source_attached_id,
     ) = _configured_kakophonist_multi_target_fixture()
     decisions = DecisionController()
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_existing_primary_turn_start_evidence_events_for_fixture(
         state,
         decisions=decisions,
@@ -1434,6 +1451,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
     assert len(target_noise_marines.own_models) == 1
     assert target_noise_marines.own_models[0].wounds_remaining == 1
     decisions = DecisionController()
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_existing_primary_turn_start_evidence_events_for_fixture(
         state,
         decisions=decisions,
@@ -1446,6 +1464,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
         source_rules_unit_id=source_attached_id,
         targets=((target_noise_marines, target_attached_id),),
         sequence_suffix="attached-split-replay",
+        authenticated_history=True,
     )
 
     assert runtime.post_shoot_hit_target_request(context) is not None
@@ -1584,6 +1603,7 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
             ),
         )
     decisions = DecisionController()
+    record_current_battlefield_placements_for_fixture(state, decisions=decisions)
     record_existing_primary_turn_start_evidence_events_for_fixture(
         state,
         decisions=decisions,
@@ -1596,6 +1616,7 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
         source_rules_unit_id=source_attached_id,
         targets=((target_bodyguard, target_attached_id),),
         sequence_suffix=f"leader-support-replay-{use_feel_no_pain}",
+        authenticated_history=True,
     )
 
     assert runtime.post_shoot_hit_target_request(context) is not None
@@ -2126,7 +2147,10 @@ def test_attached_battle_shock_state_transfers_to_split_survivor() -> None:
         ).to_payload()
         == state.to_payload()
     )
-    assert state.clear_battle_shock_for_player("player-b") == (target_lord.unit_instance_id,)
+    assert clear_battle_shock_for_rules_unit(
+        state=state,
+        unit_instance_id=target_lord.unit_instance_id,
+    ) == (target_lord.unit_instance_id,)
 
 
 def test_lord_kakophonist_doom_siren_resolves_stale_attached_target_to_survivor() -> None:
@@ -5038,7 +5062,7 @@ def test_fulgrim_daemon_primarch_modes_use_one_replay_safe_command_decision(
     armies, state, indexes, fulgrim, enemy = _fulgrim_runtime_fixture(
         phase=BattlePhase.COMMAND,
         active_player_id="player-b",
-        game_id="fulgrim-command-test-2",
+        game_id="fulgrim-command-denial-2",
     )
     runtime = CatalogSelectableAbilityModeRuntime(indexes, armies)
     decisions = DecisionController()
@@ -5140,7 +5164,7 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     armies, state, indexes, fulgrim, enemy = _fulgrim_runtime_fixture(
         phase=BattlePhase.SHOOTING,
         active_player_id="player-a",
-        game_id="fulgrim-runtime-test",
+        game_id="fulgrim-runtime-poison-v2-001",
     )
     decisions = DecisionController()
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
@@ -5172,20 +5196,28 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     assert {effect.target_unit_instance_ids for effect in state.persisting_effects} == {
         (enemy.unit_instance_id,)
     }
+    poison_effect_ids = sorted(effect.effect_id for effect in state.persisting_effects)
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
     poison_registry = CommandPhaseStartHookRegistry.from_bindings(
         catalog_poisoned_command_start_bindings(ability_indexes_by_player_id=indexes)
     )
-    assert (
-        poison_registry.resolve_effects(
-            CommandPhaseStartEffectContext(
-                state=state,
-                decisions=decisions,
-                active_player_id="player-a",
-            )
-        )
-        is None
+    completed = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        command_phase_start_hooks=poison_registry,
+    ).begin_phase(state=state, decisions=decisions)
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    event_types = tuple(record.event_type for record in decisions.event_log.records)
+    assert event_types.index(CATALOG_POISONED_COMMAND_RESOLVED_EVENT) < event_types.index(
+        "command_points_gained"
     )
     resolved_events = tuple(
         record
@@ -5194,12 +5226,183 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     )
     assert len(resolved_events) == 1
     resolved_payload = cast(dict[str, Any], resolved_events[0].payload)
-    assert resolved_payload["poison_effect_ids"] == sorted(
-        effect.effect_id for effect in state.persisting_effects
-    )
+    assert resolved_payload["poison_effect_ids"] == poison_effect_ids
     assert resolved_payload["mortal_wounds"] == 3
     updated_enemy = _unit_from_state(state, enemy.unit_instance_id)
     assert updated_enemy.own_models[0].wounds_remaining == 9
+
+
+def test_fulgrim_poisoned_command_fnp_pause_round_trips_and_resumes_once() -> None:
+    session, fulgrim, enemy = _fulgrim_opponent_turn_fight_session(
+        game_id="p08a-poison-fnp-command-start-v2-003"
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    catalog = session.lifecycle.config.army_catalog
+    armies = tuple(state.army_definitions)
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(
+            records,
+            army=army,
+            catalog=catalog,
+        )
+        for army in armies
+    }
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    _select_poisoned_target(
+        phase=BattlePhase.FIGHT,
+        runtime=runtime,
+        state=state,
+        decisions=session.lifecycle.decision_controller,
+        indexes=indexes,
+        fulgrim=fulgrim,
+        enemy=enemy,
+        profile=_weapon_profile(_FULGRIM_ID, "Daemonic blades - strike"),
+        sequence_suffix="command-fnp-boundary",
+    )
+    enemy_model_id = enemy.own_models[0].model_instance_id
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=enemy_model_id,
+        sources=(
+            FeelNoPainSource(source_id="poison-command-fnp-a", threshold=5),
+            FeelNoPainSource(source_id="poison-command-fnp-b", threshold=6),
+        ),
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+
+    pending_status = session.advance_until_decision_or_terminal()
+    pending_request = _decision_request(pending_status)
+    assert is_mortal_wound_feel_no_pain_request(pending_request)
+    assert state.command_step_state is not None
+    assert state.command_step_state.command_phase_start_synchronous_hooks_resolved
+    assert not state.command_step_state.command_phase_start_boundary_resolved
+    assert not state.command_step_state.command_points_granted
+    assert tuple(state.command_point_total(player_id) for player_id in state.player_ids) == (0, 0)
+
+    pending_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    forged_without_effect_pause = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(pending_payload, sort_keys=True)),
+    )
+    forged_events = forged_without_effect_pause["decisions"]["event_log"]
+    forged_events[:] = [
+        event for event in forged_events if event["event_type"] != COMMAND_START_EFFECT_PAUSED_EVENT
+    ]
+    for event_index, event in enumerate(forged_events, start=1):
+        event["event_id"] = f"event-{event_index:06d}"
+    with pytest.raises(
+        GameLifecycleError,
+        match=(
+            r"(?:Command-start (?:provider progress|nested pending request)|"
+            r"Pending Command-start provider occurrence)"
+        ),
+    ):
+        GameLifecycle.from_payload(forged_without_effect_pause)
+
+    restored = GameLifecycle.from_payload(pending_payload)
+    assert restored.to_payload() == pending_payload
+    session = LocalGameSession(lifecycle=restored)
+
+    rolled_event = next(
+        record
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == CATALOG_POISONED_COMMAND_ROLLED_EVENT
+    )
+    rolled_payload = cast(dict[str, Any], rolled_event.payload)
+    mortal_wounds = cast(int, rolled_payload["mortal_wounds"])
+    resumed_status = pending_status
+    for wound_index in range(mortal_wounds):
+        fnp_request = pending_request if wound_index == 0 else _decision_request(resumed_status)
+        assert is_mortal_wound_feel_no_pain_request(fnp_request)
+        resumed_status = session.submit_option(
+            request_id=fnp_request.request_id,
+            option_id="poison-command-fnp-a",
+            result_id=f"fulgrim-command-poison-fnp-result-{wound_index + 1:02d}",
+        )
+        state = session.lifecycle.state
+        assert state is not None
+        assert state.command_step_state is not None
+        assert not state.command_step_state.command_phase_start_boundary_resolved
+        assert not state.command_step_state.command_points_granted
+        assert tuple(state.command_point_total(player_id) for player_id in state.player_ids) == (
+            0,
+            0,
+        )
+
+    mode_request = _decision_request(resumed_status)
+    assert mode_request.decision_type == (
+        SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE
+    )
+
+    completed_status = session.submit_option(
+        request_id=mode_request.request_id,
+        option_id=mode_request.options[0].option_id,
+        result_id="fulgrim-command-mode-after-poison-fnp",
+    )
+    assert completed_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    state = session.lifecycle.state
+    assert state is not None
+    assert tuple(state.command_point_total(player_id) for player_id in state.player_ids) == (1, 1)
+
+    event_types = tuple(
+        record.event_type for record in session.lifecycle.decision_controller.event_log.records
+    )
+    assert event_types.count(CATALOG_POISONED_COMMAND_ROLLED_EVENT) == 1
+    assert event_types.count(CATALOG_POISONED_COMMAND_PENDING_EVENT) == 1
+    assert event_types.count(CATALOG_POISONED_COMMAND_RESOLVED_EVENT) == 1
+    assert event_types.count("command_points_gained") == 2
+    assert event_types.count("command_step_started") == 1
+    rolled_index = event_types.index(CATALOG_POISONED_COMMAND_ROLLED_EVENT)
+    pending_index = event_types.index(CATALOG_POISONED_COMMAND_PENDING_EVENT)
+    resolved_index = event_types.index(CATALOG_POISONED_COMMAND_RESOLVED_EVENT)
+    cp_gain_indexes = tuple(
+        index
+        for index, event_type in enumerate(event_types)
+        if event_type == "command_points_gained"
+    )
+    assert (
+        rolled_index
+        < pending_index
+        < resolved_index
+        < cp_gain_indexes[0]
+        < cp_gain_indexes[1]
+        < event_types.index("command_step_started")
+    )
+    enemy_wounds_after_resolution = (
+        _unit_from_state(
+            state,
+            enemy.unit_instance_id,
+        )
+        .own_models[0]
+        .wounds_remaining
+    )
+
+    unchanged_counts = {
+        event_type: event_types.count(event_type)
+        for event_type in (
+            CATALOG_POISONED_COMMAND_ROLLED_EVENT,
+            CATALOG_POISONED_COMMAND_PENDING_EVENT,
+            CATALOG_POISONED_COMMAND_RESOLVED_EVENT,
+            "command_points_gained",
+            "command_step_started",
+        )
+    }
+    reentered_status = session.advance_until_decision_or_terminal()
+    assert _decision_request(reentered_status) == _decision_request(completed_status)
+    reentered_event_types = tuple(
+        record.event_type for record in session.lifecycle.decision_controller.event_log.records
+    )
+    assert {
+        event_type: reentered_event_types.count(event_type) for event_type in unchanged_counts
+    } == unchanged_counts
+    assert (
+        _unit_from_state(state, enemy.unit_instance_id).own_models[0].wounds_remaining
+        == enemy_wounds_after_resolution
+    )
 
 
 def test_fulgrim_opponent_turn_fight_poison_uses_lifecycle_dispatch_and_replays() -> None:
@@ -6482,22 +6685,37 @@ def _kakophonist_post_shoot_context(
     source_rules_unit_id: str,
     targets: tuple[tuple[UnitInstance, str | None], ...],
     sequence_suffix: str,
+    authenticated_history: bool = False,
 ) -> AttackSequenceCompletedContext:
+    attack_pools = tuple(
+        _attack_pool(
+            source_noise_marines,
+            target,
+            _weapon_profile("000004088", "Sonic blaster"),
+            target_unit_instance_id=target_rules_unit_id,
+        )
+        for target, target_rules_unit_id in targets
+    )
+    declaration_result_id = f"kakophonist-declaration-{sequence_suffix}"
     sequence = AttackSequence(
-        sequence_id=f"kakophonist-noise-marines-{sequence_suffix}",
+        sequence_id=(
+            f"attack-sequence:{declaration_result_id}"
+            if authenticated_history
+            else f"kakophonist-noise-marines-{sequence_suffix}"
+        ),
         attacker_player_id="player-a",
         attacking_unit_instance_id=source_rules_unit_id,
         source_phase=BattlePhase.SHOOTING,
-        attack_pools=tuple(
-            _attack_pool(
-                source_noise_marines,
-                target,
-                _weapon_profile("000004088", "Sonic blaster"),
-                target_unit_instance_id=target_rules_unit_id,
-            )
-            for target, target_rules_unit_id in targets
-        ),
+        attack_pools=attack_pools,
+        pool_index=(len(attack_pools) if authenticated_history else 0),
     )
+    if authenticated_history:
+        _record_authenticated_shooting_declaration(
+            state=state,
+            decisions=decisions,
+            sequence=sequence,
+            result_id=declaration_result_id,
+        )
     for pool_index in range(len(sequence.attack_pools)):
         decisions.event_log.append(
             "attack_sequence_step",
@@ -6508,6 +6726,16 @@ def _kakophonist_post_shoot_context(
                 "payload": {"successful": True},
             },
         )
+    completion_event_id = f"kakophonist-completed-{sequence_suffix}"
+    if authenticated_history:
+        completion_event_id = decisions.event_log.append(
+            "attack_sequence_completed",
+            {
+                "sequence_id": sequence.sequence_id,
+                "attacker_player_id": sequence.attacker_player_id,
+                "attacking_unit_instance_id": sequence.attacking_unit_instance_id,
+            },
+        ).event_id
     return AttackSequenceCompletedContext(
         state=state,
         decisions=decisions,
@@ -6515,7 +6743,100 @@ def _kakophonist_post_shoot_context(
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         source_phase=BattlePhase.SHOOTING,
         attack_sequence=sequence,
-        attack_sequence_completed_event_id=f"kakophonist-completed-{sequence_suffix}",
+        attack_sequence_completed_event_id=completion_event_id,
+    )
+
+
+def _record_authenticated_shooting_declaration(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+    result_id: str,
+) -> None:
+    request_id = f"kakophonist-declaration-request:{result_id}"
+    visibility_cache_key = f"kakophonist-visibility:{result_id}"
+    source_request_id = f"kakophonist-unit-selection-request:{result_id}"
+    source_result_id = f"kakophonist-unit-selection-result:{result_id}"
+    proposal_request = {
+        "request_id": request_id,
+        "active_player_id": sequence.attacker_player_id,
+        "battle_round": state.battle_round,
+        "unit_instance_id": sequence.attacking_unit_instance_id,
+        "source_decision_request_id": source_request_id,
+        "source_decision_result_id": source_result_id,
+        "visibility_cache_key": visibility_cache_key,
+        "proposal_kind": "shooting_declaration",
+    }
+    request = DecisionRequest(
+        request_id=request_id,
+        decision_type=SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+        actor_id=sequence.attacker_player_id,
+        payload=validate_json_value(
+            {
+                "proposal_request": proposal_request,
+                "request_context": {},
+                "nested_interaction_requests": [],
+            }
+        ),
+        options=(parameterized_decision_option(),),
+    )
+    decisions.request_decision(request)
+    proposal = ShootingDeclarationProposal(
+        proposal_request_id=request_id,
+        proposal_kind="shooting_declaration",
+        player_id=sequence.attacker_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=sequence.attacking_unit_instance_id,
+        source_decision_request_id=source_request_id,
+        source_decision_result_id=source_result_id,
+        declarations=tuple(
+            WeaponDeclaration(
+                weapon_instance_id=pool.weapon_instance_id,
+                attacker_model_instance_id=pool.attacker_model_instance_id,
+                wargear_id=pool.wargear_id,
+                weapon_profile_id=pool.weapon_profile_id,
+                target_unit_instance_id=pool.target_unit_instance_id,
+                shooting_type=pool.shooting_type,
+                selected_weapon_ability_ids=pool.selected_weapon_ability_ids,
+                firing_deck_source_unit_instance_id=(pool.firing_deck_source_unit_instance_id),
+                firing_deck_source_model_instance_id=(pool.firing_deck_source_model_instance_id),
+            )
+            for pool in sequence.attack_pools
+        ),
+        visibility_cache_key=visibility_cache_key,
+    )
+    decisions.submit_result(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    )
+    decisions.event_log.append(
+        "shooting_declaration_accepted",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": sequence.attacker_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "unit_instance_id": sequence.attacking_unit_instance_id,
+            "request_id": request.request_id,
+            "result_id": result_id,
+            "proposal_request_id": request.request_id,
+            "visibility_cache_key": visibility_cache_key,
+            "attack_pools": [pool.to_payload() for pool in sequence.attack_pools],
+            "ineligible_unit_instance_ids": [],
+        },
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id=sequence.attacker_player_id,
+        shot_unit_ids=(sequence.attacking_unit_instance_id,),
+        attack_pools=sequence.attack_pools,
     )
 
 

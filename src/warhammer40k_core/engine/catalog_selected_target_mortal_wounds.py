@@ -270,16 +270,20 @@ def apply_catalog_selected_target_mortal_wound_feel_no_pain_decision(
         source_context,
         mortal_application=routed.application.to_payload(),
     )
-    context.decisions.event_log.append(
-        CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_RESOLVED_EVENT,
+    resolved_event_payload = cast(
+        dict[str, JsonValue],
         validate_json_value(
             {**resolved_payload, "feel_no_pain_result_id": context.result.result_id}
         ),
     )
+    context.decisions.event_log.append(
+        CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_RESOLVED_EVENT,
+        resolved_event_payload,
+    )
     return _continue_selected_target_effects(
         context=context,
         source_context=source_context,
-        resolved_mortal_wound_payload=resolved_payload,
+        resolved_mortal_wound_payload=resolved_event_payload,
     )
 
 

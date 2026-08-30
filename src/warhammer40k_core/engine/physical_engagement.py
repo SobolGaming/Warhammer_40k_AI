@@ -85,7 +85,7 @@ def scenario_physically_engaged_enemy_rules_unit_ids(
                 scenario=scenario,
                 unit_instance_id=source_id,
             )
-            if _geometry_models_are_physically_engaged(
+            if geometry_models_are_physically_engaged(
                 first_models=source_models,
                 second_models=physical_geometry_models_for_rules_unit(
                     scenario=scenario,
@@ -145,7 +145,7 @@ def scenario_rules_units_are_physically_engaged(
     )
     if first.owner_player_id == second.owner_player_id:
         return False
-    return _geometry_models_are_physically_engaged(
+    return geometry_models_are_physically_engaged(
         first_models=physical_geometry_models_for_rules_unit(
             scenario=scenario,
             unit_instance_id=first.unit_instance_id,
@@ -231,7 +231,7 @@ def physical_geometry_models_for_rules_unit(
     return tuple(sorted(geometry_models, key=lambda model: model.model_id))
 
 
-def _geometry_models_are_physically_engaged(
+def geometry_models_are_physically_engaged(
     *,
     first_models: tuple[GeometryModel, ...],
     second_models: tuple[GeometryModel, ...],
@@ -273,6 +273,7 @@ __all__ = (
     "current_closest_physical_enemy_distance_inches",
     "current_physically_engaged_enemy_rules_unit_ids",
     "current_rules_unit_is_physically_engaged",
+    "geometry_models_are_physically_engaged",
     "physical_geometry_models_for_rules_unit",
     "scenario_closest_physical_enemy_distance_inches",
     "scenario_physical_enemy_rules_unit_ids",

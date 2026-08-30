@@ -82,6 +82,7 @@ from warhammer40k_core.engine.command_points import (
     CommandPointSourceKind,
     initial_command_point_ledgers,
 )
+from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -4220,6 +4221,13 @@ def _battle_state_with_attached_leader_support() -> GameState:
 
 def _bodyguard_destroyed_split_state() -> GameState:
     state = _battle_state_with_attached_leader_support()
+    bodyguard = _unit_by_id(state, "army-alpha:bodyguard-unit")
+    for model_instance_id in bodyguard.own_model_ids():
+        destroy_model_by_rule(
+            state=state,
+            model_instance_id=model_instance_id,
+            remove_from_battlefield=False,
+        )
     state.recover_starting_strength_after_attached_unit_split(
         player_id="player-a",
         attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",

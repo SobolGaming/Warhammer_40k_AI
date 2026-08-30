@@ -12,6 +12,7 @@ from warhammer40k_core.engine.stratagems_requests import *
 
 # fmt: off
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.faction_content.stratagem_handlers import StratagemHandlerRegistry
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.stratagems_model import STRATAGEM_DECISION_TYPE, STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE, STRATAGEM_PROPOSAL_PAYLOAD_KIND, DECLINE_STRATAGEM_WINDOW_OPTION_ID, DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND, STRATAGEM_WINDOW_DECLINED_EVENT_TYPE, UNSUPPORTED_STRATAGEM_HANDLER_PREFIX, CORE_COMMAND_REROLL_HANDLER_ID, CORE_INSANE_BRAVERY_HANDLER_ID, CORE_RAPID_INGRESS_HANDLER_ID, CORE_NEW_ORDERS_HANDLER_ID, CORE_FIRE_OVERWATCH_HANDLER_ID, CORE_GO_TO_GROUND_HANDLER_ID, CORE_EXPLOSIVES_HANDLER_ID, CORE_SMOKESCREEN_HANDLER_ID, CORE_HEROIC_INTERVENTION_HANDLER_ID, CORE_COUNTEROFFENSIVE_HANDLER_ID, CORE_CRUSHING_IMPACT_HANDLER_ID, CORE_EPIC_CHALLENGE_HANDLER_ID, GENERIC_INGRESS_MOVE_HANDLER_ID, GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID, GENERIC_RULE_IR_STRATAGEM_HANDLER_ID, COMMAND_REROLL_DICE_CONTEXT_KEY, COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY, INSANE_BRAVERY_TARGET_POLICY_ID, RAPID_INGRESS_TARGET_POLICY_ID, STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID, NEW_ORDERS_TARGET_POLICY_ID, FIRE_OVERWATCH_TARGET_POLICY_ID, GO_TO_GROUND_TARGET_POLICY_ID, SELECTED_TARGET_CONTROLLED_OBJECTIVE_INFANTRY_TARGET_POLICY_ID, EXPLOSIVES_TARGET_POLICY_ID, SMOKESCREEN_TARGET_POLICY_ID, HEROIC_INTERVENTION_TARGET_POLICY_ID, COUNTEROFFENSIVE_TARGET_POLICY_ID, CRUSHING_IMPACT_TARGET_POLICY_ID, EPIC_CHALLENGE_TARGET_POLICY_ID, SELECTED_TO_MOVE_TARGET_POLICY_ID, JUST_FELL_BACK_UNIT_TARGET_POLICY_ID, JUST_SHOT_UNIT_TARGET_POLICY_ID, ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID, EXPLOSIVES_TARGET_CONTEXT_KEY, CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY, CRUSHING_IMPACT_MODEL_CONTEXT_KEY, EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY, HEROIC_INTERVENTION_MODE_CONTEXT_KEY, HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND, HEROIC_INTERVENTION_MODE_INTO_THE_FRAY, SELECTED_TARGET_UNIT_CONTEXT_KEY, SELECTED_TO_MOVE_UNIT_CONTEXT_KEY, JUST_FELL_BACK_UNIT_CONTEXT_KEY, JUST_SHOT_UNIT_CONTEXT_KEY, HIT_TARGET_UNIT_CONTEXT_KEY, DESTROYED_TARGET_UNIT_CONTEXT_KEY, DESTROYED_ENEMY_UNIT_CONTEXT_KEY, HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND, HIT_ENEMY_UNIT_CONTEXT_KEY, ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND, ENGAGED_ENEMY_UNIT_CONTEXT_KEY, ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY, FALL_BACK_UNIT_CONTEXT_KEY, FALL_BACK_MODE_CONTEXT_KEY, FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND, FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY, FIRE_OVERWATCH_MAX_RANGE_INCHES, HEROIC_INTERVENTION_TARGET_RANGE_INCHES, HEROIC_INTERVENTION_INTO_THE_FRAY_TARGET_RANGE_INCHES, CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT, StratagemAvailabilityKind, StratagemCategory, StratagemTargetKind, StratagemUseRecordPayload, StratagemTimingDescriptorPayload, StratagemRestrictionPolicyPayload, StratagemTargetSpecPayload, StratagemDefinitionPayload, StratagemCatalogRecordPayload, StratagemEligibilityContextPayload, StratagemTargetBindingPayload, StratagemTargetProposalPayload, StratagemTimingDescriptor, StratagemRestrictionPolicy, StratagemTargetSpec, StratagemDefinition, StratagemCatalogRecord, StratagemCatalogIndex, StratagemEligibilityContext, StratagemTargetBinding, StratagemTargetProposal, StratagemUseRequest, StratagemUseRecord
@@ -88,6 +89,7 @@ def apply_stratagem_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    runtime_content_bundle: RuntimeContentBundle | None = None,
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
@@ -109,6 +111,7 @@ def apply_stratagem_decision(
         effect_selection=effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        runtime_content_bundle=runtime_content_bundle,
         stratagem_handler_registry=stratagem_handler_registry,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
@@ -127,11 +130,27 @@ def _apply_stratagem_use(
     effect_selection: JsonValue,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    runtime_content_bundle: RuntimeContentBundle | None,
     stratagem_handler_registry: StratagemHandlerRegistry | None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
     resolve_unaffordable_cost_increase_as_used: bool = False,
 ) -> StratagemUseRecord:
+    battle_shock_runtime = None
+    if runtime_content_bundle is not None:
+        from warhammer40k_core.engine.battle_shock_test_service import (
+            BattleShockTestRuntime,
+        )
+        from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+
+        if type(runtime_content_bundle) is not RuntimeContentBundle:
+            raise GameLifecycleError("Stratagem application runtime bundle is invalid.")
+        if stratagem_handler_registry is not None:
+            raise GameLifecycleError("Stratagem application runtime authority is ambiguous.")
+        stratagem_handler_registry = runtime_content_bundle.stratagem_handler_registry
+        battle_shock_runtime = BattleShockTestRuntime.from_runtime_content_bundle(
+            runtime_content_bundle
+        )
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
         raise GameLifecycleError("Unsupported stratagem handler cannot be applied.")
@@ -260,6 +279,7 @@ def _apply_stratagem_use(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
+        battle_shock_runtime=battle_shock_runtime,
     )
     spend_result: CommandPointSpendResult | None = None
     transaction_id: str | None = None
@@ -296,6 +316,7 @@ def _apply_stratagem_use(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
+        battle_shock_runtime=battle_shock_runtime,
         shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
     )
     return use_record
@@ -353,6 +374,7 @@ def apply_stratagem_target_proposal(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    runtime_content_bundle: RuntimeContentBundle | None = None,
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
     shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
@@ -379,6 +401,7 @@ def apply_stratagem_target_proposal(
         effect_selection=proposal.effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        runtime_content_bundle=runtime_content_bundle,
         stratagem_handler_registry=stratagem_handler_registry,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
         shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,

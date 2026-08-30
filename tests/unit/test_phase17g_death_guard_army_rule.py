@@ -3,14 +3,20 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
+from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
 from tests.phase11c_command_phase_helpers import (
     battle_state_with_center_objective_positions,
+    center_marker_definition,
+    complete_setup_through_gate,
     default_unit_selection,
     remove_first_models,
+    secondary_choice,
+    setup_state_at_declare_battle_formations,
     unit_by_id,
+    with_model_offsets,
 )
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
@@ -59,7 +65,12 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard i
     army_rule,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
-from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -79,6 +90,7 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.phases.movement import resolve_normal_move
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
     HitRollModifierContext,
@@ -197,6 +209,76 @@ def test_lifecycle_requests_death_guard_plague_selection_and_records_state() -> 
         cast(GameStatePayload, json.loads(json.dumps(lifecycle.state.to_payload())))
     )
     assert restored.to_payload() == lifecycle.state.to_payload()
+
+
+def test_nurgles_gift_historical_leadership_recomputes_from_event_bound_contagion() -> None:
+    config = _death_guard_config()
+    state = setup_state_at_declare_battle_formations(config)
+    decisions = DecisionController()
+    request = army_rule.plague_selection_request(
+        BattleFormationRequestContext(state=state, decisions=decisions, config=config)
+    )
+    if request is None:
+        raise AssertionError("expected Nurgle's Gift selection request")
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase17g-death-guard-historical-scabrous-soulrot",
+        request=request,
+        selected_option_id=(
+            f"death_guard:nurgles_gift:{army_rule.NurglesGiftPlague.SCABROUS_SOULROT.value}"
+        ),
+    )
+    decisions.submit_result(result)
+    assert army_rule.apply_plague_selection_result(
+        BattleFormationResultContext(
+            state=state,
+            decisions=decisions,
+            config=config,
+            request=request,
+            result=result,
+        )
+    )
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-death-guard-historical-battlefield",
+        armies=tuple(state.army_definitions),
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    marker = center_marker_definition(state)
+    assert state.battlefield_state is not None
+    source = state.battlefield_state.unit_placement_by_id("army-alpha:plague-marine")
+    target = state.battlefield_state.unit_placement_by_id("army-beta:enemy-unit")
+    battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            source,
+            marker,
+            offsets=((0.0, -3.0), (0.0, -1.5), (0.0, 0.0), (0.0, 1.5), (0.0, 3.0)),
+        )
+    )
+    state.battlefield_state = battlefield_state.with_unit_placement(
+        with_model_offsets(
+            target,
+            marker,
+            offsets=((2.0, -3.0), (2.0, -1.5), (2.0, 0.0), (2.0, 1.5), (2.0, 3.0)),
+        )
+    )
+    state.record_secondary_mission_choice(
+        secondary_choice(player_id="player-a", mode=SecondaryMissionMode.FIXED)
+    )
+    state.record_secondary_mission_choice(
+        secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
+    )
+    complete_setup_through_gate(state=state, decisions=decisions, config=config)
+    assert state.active_player_id is not None
+    context = historical_battle_shock_context_for_unit(
+        state=state,
+        decisions=decisions,
+        unit_instance_id="army-beta:enemy-unit",
+        active_player_id=state.active_player_id,
+    )
+
+    assert army_rule.historical_nurgles_gift_leadership(context, 7) == 8
+    with pytest.raises(GameLifecycleError, match="historical authority requires"):
+        army_rule.historical_nurgles_gift_leadership(cast(Any, object()), 7)
 
 
 def test_lifecycle_rejects_death_guard_plague_selection_drift_before_mutation() -> None:
@@ -1242,13 +1324,14 @@ def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
         army=enemy_army,
         battlefield_state=state.battlefield_state,
         starting_strength_records=tuple(state.starting_strength_records),
+        battle_shocked_unit_ids=(),
         state=state,
         ability_index=AbilityCatalogIndex.from_records(()),
         runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
     )
 
     assert len(requests) == 1
-    assert requests[0].reason is BattleShockTestReason.BELOW_HALF_STRENGTH
+    assert requests[0].reason is BattleShockTestReason.COMMAND_PHASE_REQUIRED
     assert requests[0].leadership_target == (
         enemy_model.characteristic(Characteristic.LEADERSHIP).final + 1
     )

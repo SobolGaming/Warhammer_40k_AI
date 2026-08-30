@@ -64,6 +64,18 @@ class SequencingDecisionPayload(TypedDict):
     roll_off_result: RollOffResultPayload | None
 
 
+class SequencingNextParticipantDecisionPayload(TypedDict):
+    decision_id: str
+    conflict_id: str
+    deciding_player_id: str
+    previously_selected_participant_ids: list[str]
+    remaining_participant_ids: list[str]
+    selected_participant_id: str
+    request_id: str
+    result_id: str
+    timing_window: TimingWindowPayload
+
+
 _ROLL_OFF_TIMING_KINDS = frozenset(
     (
         TimingTriggerKind.BEFORE_BATTLE,
@@ -273,6 +285,107 @@ class SequencingDecision:
 
 
 @dataclass(frozen=True, slots=True)
+class SequencingNextParticipantDecision:
+    decision_id: str
+    conflict_id: str
+    deciding_player_id: str
+    previously_selected_participant_ids: tuple[str, ...]
+    remaining_participant_ids: tuple[str, ...]
+    selected_participant_id: str
+    request_id: str
+    result_id: str
+    timing_window: TimingWindow
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "decision_id",
+            _validate_identifier("Sequencing next decision_id", self.decision_id),
+        )
+        object.__setattr__(
+            self,
+            "conflict_id",
+            _validate_identifier("Sequencing next conflict_id", self.conflict_id),
+        )
+        object.__setattr__(
+            self,
+            "deciding_player_id",
+            _validate_identifier(
+                "Sequencing next deciding_player_id",
+                self.deciding_player_id,
+            ),
+        )
+        previous = _validate_identifier_tuple(
+            "Sequencing previously selected participant IDs",
+            self.previously_selected_participant_ids,
+            min_length=0,
+            sort_values=False,
+        )
+        remaining = _validate_identifier_tuple(
+            "Sequencing remaining participant IDs",
+            self.remaining_participant_ids,
+            min_length=2,
+            sort_values=True,
+        )
+        selected = _validate_identifier(
+            "Sequencing selected participant ID",
+            self.selected_participant_id,
+        )
+        if set(previous).intersection(remaining):
+            raise GameLifecycleError(
+                "Sequencing previously selected and remaining participants overlap."
+            )
+        if selected not in remaining:
+            raise GameLifecycleError("Sequencing selected participant is not remaining.")
+        object.__setattr__(self, "previously_selected_participant_ids", previous)
+        object.__setattr__(self, "remaining_participant_ids", remaining)
+        object.__setattr__(self, "selected_participant_id", selected)
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("Sequencing next request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("Sequencing next result_id", self.result_id),
+        )
+        if type(self.timing_window) is not TimingWindow:
+            raise GameLifecycleError(
+                "Sequencing next participant decision timing_window must be a TimingWindow."
+            )
+
+    def to_payload(self) -> SequencingNextParticipantDecisionPayload:
+        return {
+            "decision_id": self.decision_id,
+            "conflict_id": self.conflict_id,
+            "deciding_player_id": self.deciding_player_id,
+            "previously_selected_participant_ids": list(self.previously_selected_participant_ids),
+            "remaining_participant_ids": list(self.remaining_participant_ids),
+            "selected_participant_id": self.selected_participant_id,
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+            "timing_window": self.timing_window.to_payload(),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SequencingNextParticipantDecisionPayload) -> Self:
+        return cls(
+            decision_id=payload["decision_id"],
+            conflict_id=payload["conflict_id"],
+            deciding_player_id=payload["deciding_player_id"],
+            previously_selected_participant_ids=tuple(
+                payload["previously_selected_participant_ids"]
+            ),
+            remaining_participant_ids=tuple(payload["remaining_participant_ids"]),
+            selected_participant_id=payload["selected_participant_id"],
+            request_id=payload["request_id"],
+            result_id=payload["result_id"],
+            timing_window=TimingWindow.from_payload(payload["timing_window"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SequencingRollOffRewind:
     decisions: DecisionController
     removed_events: tuple[EventRecord, ...]
@@ -298,6 +411,173 @@ def create_sequencing_decision_request(
         participants=participant_values,
         roll_off_result=roll_off_result,
     )
+
+
+def create_select_next_sequencing_participant_request(
+    *,
+    request_id: str,
+    context: SequencingConflictContext,
+    previously_selected_participant_ids: tuple[str, ...],
+    remaining_participants: tuple[SequencingParticipant, ...],
+) -> DecisionRequest:
+    """Create a linear-size request selecting only the next participant."""
+
+    request_identifier = _validate_identifier("request_id", request_id)
+    if context.requires_roll_off():
+        raise GameLifecycleError(
+            "Select-next sequencing supports only active-player during-battle conflicts."
+        )
+    previous = _validate_identifier_tuple(
+        "previously_selected_participant_ids",
+        previously_selected_participant_ids,
+        min_length=0,
+        sort_values=False,
+    )
+    participants = _validate_participants(
+        remaining_participants,
+        player_ids=context.player_ids,
+    )
+    participant_ids = tuple(participant.participant_id for participant in participants)
+    if set(previous).intersection(participant_ids):
+        raise GameLifecycleError(
+            "Select-next sequencing previous and remaining participants overlap."
+        )
+    deciding_player_id = _require_active_player(context)
+    return DecisionRequest(
+        request_id=request_identifier,
+        decision_type=SEQUENCING_DECISION_TYPE,
+        actor_id=deciding_player_id,
+        payload=validate_json_value(
+            {
+                "sequencing_model": "select_next_participant",
+                "sequencing_conflict": context.to_payload(),
+                "previously_selected_participant_ids": list(previous),
+                "participants": [participant.to_payload() for participant in participants],
+                "requires_roll_off": False,
+                "roll_off_result": None,
+            }
+        ),
+        options=tuple(
+            DecisionOption(
+                option_id=f"next:{participant.participant_id}",
+                label=participant.participant_id,
+                payload=validate_json_value(
+                    {
+                        "sequencing_conflict_id": context.conflict_id,
+                        "deciding_player_id": deciding_player_id,
+                        "previously_selected_participant_ids": list(previous),
+                        "remaining_participant_ids": list(participant_ids),
+                        "selected_participant_id": participant.participant_id,
+                        "timing_window": context.timing_window.to_payload(),
+                    }
+                ),
+            )
+            for participant in participants
+        ),
+    )
+
+
+def is_select_next_sequencing_participant_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Select-next sequencing check requires a DecisionRequest.")
+    return (
+        request.decision_type == SEQUENCING_DECISION_TYPE
+        and isinstance(request.payload, dict)
+        and request.payload.get("sequencing_model") == "select_next_participant"
+    )
+
+
+def apply_select_next_sequencing_participant_from_request(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> SequencingNextParticipantDecision:
+    if not is_select_next_sequencing_participant_request(request):
+        raise GameLifecycleError("Sequencing request is not a select-next request.")
+    payload = cast(dict[str, JsonValue], request.payload)
+    context_payload = payload.get("sequencing_conflict")
+    participant_payloads = payload.get("participants")
+    previous_values = payload.get("previously_selected_participant_ids")
+    if not isinstance(context_payload, dict):
+        raise GameLifecycleError("Select-next sequencing requires a conflict context.")
+    if not isinstance(participant_payloads, list):
+        raise GameLifecycleError("Select-next sequencing requires remaining participants.")
+    if not isinstance(previous_values, list):
+        raise GameLifecycleError("Select-next sequencing requires the selected prefix.")
+    context = SequencingConflictContext.from_payload(
+        cast(SequencingConflictContextPayload, context_payload)
+    )
+    participants = tuple(
+        SequencingParticipant.from_payload(cast(SequencingParticipantPayload, value))
+        for value in participant_payloads
+        if isinstance(value, dict)
+    )
+    if len(participants) != len(participant_payloads):
+        raise GameLifecycleError("Select-next sequencing participants must be objects.")
+    previous = tuple(
+        _validate_identifier("previously_selected_participant_id", value)
+        for value in previous_values
+    )
+    expected = create_select_next_sequencing_participant_request(
+        request_id=request.request_id,
+        context=context,
+        previously_selected_participant_ids=previous,
+        remaining_participants=participants,
+    )
+    if request != expected:
+        raise GameLifecycleError("Select-next sequencing request authority drifted.")
+    result.validate_for_request(request)
+    result_payload = result.payload
+    if not isinstance(result_payload, dict):
+        raise GameLifecycleError("Select-next sequencing result payload must be an object.")
+    selected = _validate_identifier(
+        "selected_participant_id",
+        result_payload.get("selected_participant_id"),
+    )
+    participant_ids = tuple(participant.participant_id for participant in participants)
+    return SequencingNextParticipantDecision(
+        decision_id=f"sequencing-next-decision:{context.conflict_id}:{result.result_id}",
+        conflict_id=context.conflict_id,
+        deciding_player_id=_validate_identifier(
+            "deciding_player_id",
+            result_payload.get("deciding_player_id"),
+        ),
+        previously_selected_participant_ids=previous,
+        remaining_participant_ids=participant_ids,
+        selected_participant_id=selected,
+        request_id=request.request_id,
+        result_id=result.result_id,
+        timing_window=context.timing_window,
+    )
+
+
+def validate_sequencing_result_from_request(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> None:
+    if is_select_next_sequencing_participant_request(request):
+        apply_select_next_sequencing_participant_from_request(
+            request=request,
+            result=result,
+        )
+        return
+    apply_sequencing_decision_from_request(request=request, result=result)
+
+
+def sequencing_decision_event_from_request(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> tuple[str, JsonValue]:
+    if is_select_next_sequencing_participant_request(request):
+        selection = apply_select_next_sequencing_participant_from_request(
+            request=request,
+            result=result,
+        )
+        return "sequencing_next_participant_selected", validate_json_value(selection.to_payload())
+    decision = apply_sequencing_decision_from_request(request=request, result=result)
+    return "sequencing_order_resolved", validate_json_value(decision.to_payload())
 
 
 def decision_controller_before_pending_sequencing_roll_off(
@@ -528,6 +808,8 @@ def apply_sequencing_decision_from_request(
 ) -> SequencingDecision:
     if type(request) is not DecisionRequest:
         raise GameLifecycleError("Sequencing request must be a DecisionRequest.")
+    if is_select_next_sequencing_participant_request(request):
+        raise GameLifecycleError("Select-next sequencing requires its bounded applier.")
     payload = request.payload
     if not isinstance(payload, dict):
         raise GameLifecycleError("Sequencing request payload must be an object.")

@@ -4,7 +4,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -20,6 +20,9 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetBinding,
     StratagemUseRecord,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.battle_shock_test_service import BattleShockTestRuntime
 
 UNSUPPORTED_STRATAGEM_HANDLER_PREFIX = "unsupported:"
 
@@ -51,6 +54,7 @@ class StratagemHandlerContext:
     use_record: StratagemUseRecord
     ruleset_descriptor: RulesetDescriptor
     army_catalog: ArmyCatalog
+    battle_shock_runtime: BattleShockTestRuntime | None = None
 
     def __post_init__(self) -> None:
         if type(self.state) is not GameState:
@@ -73,6 +77,13 @@ class StratagemHandlerContext:
             raise GameLifecycleError("Stratagem handler context requires RulesetDescriptor.")
         if type(self.army_catalog) is not ArmyCatalog:
             raise GameLifecycleError("Stratagem handler context requires ArmyCatalog.")
+        if self.battle_shock_runtime is not None:
+            from warhammer40k_core.engine.battle_shock_test_service import (
+                BattleShockTestRuntime,
+            )
+
+            if type(self.battle_shock_runtime) is not BattleShockTestRuntime:
+                raise GameLifecycleError("Stratagem handler Battle-shock runtime is invalid.")
 
 
 @dataclass(frozen=True, slots=True)

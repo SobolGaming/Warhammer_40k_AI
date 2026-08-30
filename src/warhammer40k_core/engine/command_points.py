@@ -4,8 +4,36 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockTestRequest,
+    BattleShockTestRequestPayload,
+)
+from warhammer40k_core.engine.command_battle_shock_candidates import (
+    CommandBattleShockCandidate,
+    CommandBattleShockCandidatePayload,
+    validate_command_battle_shock_candidate_inventory,
+    validate_command_battle_shock_step_progress,
+)
+from warhammer40k_core.engine.command_point_validation import (
+    validate_bool,
+    validate_identifier,
+    validate_identifier_tuple,
+    validate_non_negative_int,
+    validate_non_zero_int,
+    validate_optional_identifier,
+    validate_optional_test_request,
+    validate_positive_int,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
+
+_validate_bool = validate_bool
+_validate_identifier = validate_identifier
+_validate_identifier_tuple = validate_identifier_tuple
+_validate_non_negative_int = validate_non_negative_int
+_validate_non_zero_int = validate_non_zero_int
+_validate_optional_battle_shock_test_request = validate_optional_test_request
+_validate_optional_identifier = validate_optional_identifier
+_validate_positive_int = validate_positive_int
 
 NON_CORE_CP_GAIN_LIMIT_PER_BATTLE_ROUND = 1
 
@@ -41,12 +69,17 @@ class CommandStepStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
     current_step: str
+    command_phase_start_synchronous_hooks_resolved: bool
+    command_phase_start_boundary_resolved: bool
     command_points_granted: bool
     scoring_hooks_resolved: bool
     tactical_secondary_resolved: bool
     tactical_secondary_replacement_resolved: bool
     battle_shock_step_resolved: bool
     battle_shock_phase_start_unit_ids: list[str]
+    battle_shock_candidate_inventory: list[CommandBattleShockCandidatePayload]
+    battle_shock_candidate_order_unit_ids: list[str]
+    battle_shock_in_flight_test_request: BattleShockTestRequestPayload | None
     completed_battle_shock_test_request_ids: list[str]
 
 
@@ -107,12 +140,17 @@ class CommandStepState:
     battle_round: int
     active_player_id: str
     current_step: CommandPhaseStep = CommandPhaseStep.COMMAND
+    command_phase_start_synchronous_hooks_resolved: bool = False
+    command_phase_start_boundary_resolved: bool = False
     command_points_granted: bool = False
     scoring_hooks_resolved: bool = False
     tactical_secondary_resolved: bool = False
     tactical_secondary_replacement_resolved: bool = False
     battle_shock_step_resolved: bool = False
     battle_shock_phase_start_unit_ids: tuple[str, ...] = ()
+    battle_shock_candidate_inventory: tuple[CommandBattleShockCandidate, ...] = ()
+    battle_shock_candidate_order_unit_ids: tuple[str, ...] = ()
+    battle_shock_in_flight_test_request: BattleShockTestRequest | None = None
     completed_battle_shock_test_request_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -127,6 +165,22 @@ class CommandStepState:
             _validate_identifier("CommandStepState active_player_id", self.active_player_id),
         )
         object.__setattr__(self, "current_step", command_phase_step_from_token(self.current_step))
+        object.__setattr__(
+            self,
+            "command_phase_start_synchronous_hooks_resolved",
+            _validate_bool(
+                "CommandStepState command_phase_start_synchronous_hooks_resolved",
+                self.command_phase_start_synchronous_hooks_resolved,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "command_phase_start_boundary_resolved",
+            _validate_bool(
+                "CommandStepState command_phase_start_boundary_resolved",
+                self.command_phase_start_boundary_resolved,
+            ),
+        )
         object.__setattr__(
             self,
             "command_points_granted",
@@ -169,6 +223,38 @@ class CommandStepState:
                 self.battle_shock_phase_start_unit_ids,
             ),
         )
+        if self.battle_shock_phase_start_unit_ids != tuple(
+            sorted(self.battle_shock_phase_start_unit_ids)
+        ):
+            raise GameLifecycleError(
+                "CommandStepState Battle-shock phase-start units must be deterministic."
+            )
+        object.__setattr__(
+            self,
+            "battle_shock_candidate_inventory",
+            validate_command_battle_shock_candidate_inventory(
+                self.battle_shock_candidate_inventory,
+                active_player_id=self.active_player_id,
+                phase_start_battle_shocked_unit_ids=self.battle_shock_phase_start_unit_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_shock_candidate_order_unit_ids",
+            _validate_identifier_tuple(
+                "CommandStepState battle_shock_candidate_order_unit_ids",
+                self.battle_shock_candidate_order_unit_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_shock_in_flight_test_request",
+            _validate_optional_battle_shock_test_request(
+                self.battle_shock_in_flight_test_request,
+                battle_round=self.battle_round,
+                active_player_id=self.active_player_id,
+            ),
+        )
         object.__setattr__(
             self,
             "completed_battle_shock_test_request_ids",
@@ -177,33 +263,109 @@ class CommandStepState:
                 self.completed_battle_shock_test_request_ids,
             ),
         )
-        if self.current_step is CommandPhaseStep.BATTLE_SHOCK and not self.command_points_granted:
-            raise GameLifecycleError(
-                "CommandStepState cannot enter Battle-shock before Command step CP gain."
-            )
+        validate_command_battle_shock_step_progress(
+            battle_shock_step_started=self.current_step is CommandPhaseStep.BATTLE_SHOCK,
+            command_points_granted=self.command_points_granted,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            candidate_inventory=self.battle_shock_candidate_inventory,
+            candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            in_flight_test_request=self.battle_shock_in_flight_test_request,
+            completed_test_request_ids=self.completed_battle_shock_test_request_ids,
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+        )
         if (
-            self.battle_shock_step_resolved
-            and self.current_step is not CommandPhaseStep.BATTLE_SHOCK
+            self.command_phase_start_boundary_resolved
+            and not self.command_phase_start_synchronous_hooks_resolved
         ):
             raise GameLifecycleError(
-                "CommandStepState resolved Battle-shock state must be in Battle-shock step."
+                "CommandStepState cannot resolve the Command-start boundary before synchronous "
+                "hooks resolve."
             )
+        if self.command_points_granted and not self.command_phase_start_boundary_resolved:
+            raise GameLifecycleError(
+                "CommandStepState cannot grant Core CP before the Command-start boundary resolves."
+            )
+
+    @property
+    def battle_shock_required_unit_ids(self) -> tuple[str, ...]:
+        return self.battle_shock_candidate_order_unit_ids
 
     @classmethod
     def start(cls, *, battle_round: int, active_player_id: str) -> Self:
         return cls(battle_round=battle_round, active_player_id=active_player_id)
 
-    def with_command_points_granted(self) -> Self:
+    def with_command_phase_start_synchronous_hooks_resolved(self) -> Self:
+        if self.command_phase_start_synchronous_hooks_resolved:
+            raise GameLifecycleError("Synchronous Command-start hooks were already resolved.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=True,
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_command_phase_start_boundary_resolved(self) -> Self:
+        if not self.command_phase_start_synchronous_hooks_resolved:
+            raise GameLifecycleError(
+                "Command-start boundary cannot resolve before synchronous hooks resolve."
+            )
+        if self.command_phase_start_boundary_resolved:
+            raise GameLifecycleError("Command-start boundary was already resolved.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=True,
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_command_points_granted(self) -> Self:
+        if not self.command_phase_start_boundary_resolved:
+            raise GameLifecycleError(
+                "Core CP cannot be granted before the Command-start boundary resolves."
+            )
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=True,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
@@ -212,12 +374,19 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=True,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
@@ -226,12 +395,19 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.COMMAND,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=True,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
@@ -240,12 +416,19 @@ class CommandStepState:
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=self.current_step,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=True,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
@@ -253,9 +436,16 @@ class CommandStepState:
         self,
         *,
         phase_start_battle_shocked_unit_ids: tuple[str, ...] | None = None,
+        candidate_inventory: tuple[CommandBattleShockCandidate, ...] | None = None,
     ) -> Self:
         if not self.command_points_granted:
             raise GameLifecycleError("Battle-shock step requires Command step CP gain.")
+        if self.current_step is CommandPhaseStep.COMMAND and (
+            phase_start_battle_shocked_unit_ids is None or candidate_inventory is None
+        ):
+            raise GameLifecycleError(
+                "Battle-shock step entry requires an immutable eligibility snapshot."
+            )
         if phase_start_battle_shocked_unit_ids is None:
             phase_start_ids = self.battle_shock_phase_start_unit_ids
         else:
@@ -268,33 +458,122 @@ class CommandStepState:
                 and phase_start_ids != self.battle_shock_phase_start_unit_ids
             ):
                 raise GameLifecycleError("Battle-shock phase-start unit IDs drifted.")
+        candidates = (
+            self.battle_shock_candidate_inventory
+            if candidate_inventory is None
+            else candidate_inventory
+        )
+        if (
+            self.current_step is CommandPhaseStep.BATTLE_SHOCK
+            and candidates != self.battle_shock_candidate_inventory
+        ):
+            raise GameLifecycleError("Battle-shock candidate inventory drifted.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=phase_start_ids,
+            battle_shock_candidate_inventory=candidates,
+            battle_shock_candidate_order_unit_ids=(),
+            battle_shock_in_flight_test_request=None,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
-    def with_completed_battle_shock_test_request(self, request_id: str) -> Self:
-        completed_request_id = _validate_identifier("request_id", request_id)
-        if completed_request_id in self.completed_battle_shock_test_request_ids:
-            raise GameLifecycleError("Battle-shock test request was already completed.")
+    def with_battle_shock_candidate_order(self, unit_instance_ids: tuple[str, ...]) -> Self:
+        if self.current_step is not CommandPhaseStep.BATTLE_SHOCK:
+            raise GameLifecycleError("Battle-shock candidate order requires Battle-shock step.")
+        current = self.battle_shock_candidate_order_unit_ids
+        if current and (
+            unit_instance_ids[: len(current)] != current
+            or len(unit_instance_ids) != len(current) + 1
+            or len(self.completed_battle_shock_test_request_ids) != len(current)
+        ):
+            raise GameLifecycleError("Battle-shock candidate order was already resolved.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
-            current_step=CommandPhaseStep.BATTLE_SHOCK,
+            current_step=self.current_step,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=self.battle_shock_step_resolved,
             battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=unit_instance_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_in_flight_battle_shock_test_request(
+        self,
+        request: BattleShockTestRequest,
+    ) -> Self:
+        if self.current_step is not CommandPhaseStep.BATTLE_SHOCK:
+            raise GameLifecycleError("Battle-shock in-flight test requires Battle-shock step.")
+        if self.battle_shock_in_flight_test_request is not None:
+            raise GameLifecycleError("Battle-shock test is already in flight.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=self.current_step,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=request,
+            completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
+        )
+
+    def with_completed_battle_shock_test_request(self, request_id: str) -> Self:
+        completed_request_id = _validate_identifier("request_id", request_id)
+        if self.current_step is not CommandPhaseStep.BATTLE_SHOCK:
+            raise GameLifecycleError("Battle-shock test completion requires Battle-shock step.")
+        if self.battle_shock_step_resolved:
+            raise GameLifecycleError("Battle-shock step is already resolved.")
+        in_flight = self.battle_shock_in_flight_test_request
+        if in_flight is None or completed_request_id != in_flight.request_id:
+            raise GameLifecycleError("Battle-shock test request is not the in-flight request.")
+        if completed_request_id in self.completed_battle_shock_test_request_ids:
+            raise GameLifecycleError("Battle-shock test request was already completed.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
+            command_points_granted=self.command_points_granted,
+            scoring_hooks_resolved=self.scoring_hooks_resolved,
+            tactical_secondary_resolved=self.tactical_secondary_resolved,
+            tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
+            battle_shock_step_resolved=self.battle_shock_step_resolved,
+            battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=None,
             completed_battle_shock_test_request_ids=(
                 *self.completed_battle_shock_test_request_ids,
                 completed_request_id,
@@ -302,16 +581,27 @@ class CommandStepState:
         )
 
     def with_battle_shock_step_resolved(self) -> Self:
+        if self.current_step is not CommandPhaseStep.BATTLE_SHOCK:
+            raise GameLifecycleError("Battle-shock resolution requires Battle-shock step.")
+        if self.battle_shock_step_resolved:
+            raise GameLifecycleError("Battle-shock step is already resolved.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
             current_step=CommandPhaseStep.BATTLE_SHOCK,
+            command_phase_start_synchronous_hooks_resolved=(
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            command_phase_start_boundary_resolved=self.command_phase_start_boundary_resolved,
             command_points_granted=self.command_points_granted,
             scoring_hooks_resolved=self.scoring_hooks_resolved,
             tactical_secondary_resolved=self.tactical_secondary_resolved,
             tactical_secondary_replacement_resolved=self.tactical_secondary_replacement_resolved,
             battle_shock_step_resolved=True,
             battle_shock_phase_start_unit_ids=self.battle_shock_phase_start_unit_ids,
+            battle_shock_candidate_inventory=self.battle_shock_candidate_inventory,
+            battle_shock_candidate_order_unit_ids=self.battle_shock_candidate_order_unit_ids,
+            battle_shock_in_flight_test_request=self.battle_shock_in_flight_test_request,
             completed_battle_shock_test_request_ids=self.completed_battle_shock_test_request_ids,
         )
 
@@ -320,6 +610,10 @@ class CommandStepState:
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
             "current_step": self.current_step.value,
+            "command_phase_start_synchronous_hooks_resolved": (
+                self.command_phase_start_synchronous_hooks_resolved
+            ),
+            "command_phase_start_boundary_resolved": (self.command_phase_start_boundary_resolved),
             "command_points_granted": self.command_points_granted,
             "scoring_hooks_resolved": self.scoring_hooks_resolved,
             "tactical_secondary_resolved": self.tactical_secondary_resolved,
@@ -328,6 +622,17 @@ class CommandStepState:
             ),
             "battle_shock_step_resolved": self.battle_shock_step_resolved,
             "battle_shock_phase_start_unit_ids": list(self.battle_shock_phase_start_unit_ids),
+            "battle_shock_candidate_inventory": [
+                candidate.to_payload() for candidate in self.battle_shock_candidate_inventory
+            ],
+            "battle_shock_candidate_order_unit_ids": list(
+                self.battle_shock_candidate_order_unit_ids
+            ),
+            "battle_shock_in_flight_test_request": (
+                None
+                if self.battle_shock_in_flight_test_request is None
+                else self.battle_shock_in_flight_test_request.to_payload()
+            ),
             "completed_battle_shock_test_request_ids": list(
                 self.completed_battle_shock_test_request_ids
             ),
@@ -339,6 +644,10 @@ class CommandStepState:
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
             current_step=command_phase_step_from_token(payload["current_step"]),
+            command_phase_start_synchronous_hooks_resolved=payload[
+                "command_phase_start_synchronous_hooks_resolved"
+            ],
+            command_phase_start_boundary_resolved=payload["command_phase_start_boundary_resolved"],
             command_points_granted=payload["command_points_granted"],
             scoring_hooks_resolved=payload["scoring_hooks_resolved"],
             tactical_secondary_resolved=payload["tactical_secondary_resolved"],
@@ -347,6 +656,20 @@ class CommandStepState:
             ],
             battle_shock_step_resolved=payload["battle_shock_step_resolved"],
             battle_shock_phase_start_unit_ids=tuple(payload["battle_shock_phase_start_unit_ids"]),
+            battle_shock_candidate_inventory=tuple(
+                CommandBattleShockCandidate.from_payload(candidate)
+                for candidate in payload["battle_shock_candidate_inventory"]
+            ),
+            battle_shock_candidate_order_unit_ids=tuple(
+                payload["battle_shock_candidate_order_unit_ids"]
+            ),
+            battle_shock_in_flight_test_request=(
+                None
+                if payload["battle_shock_in_flight_test_request"] is None
+                else BattleShockTestRequest.from_payload(
+                    payload["battle_shock_in_flight_test_request"]
+                )
+            ),
             completed_battle_shock_test_request_ids=tuple(
                 payload["completed_battle_shock_test_request_ids"]
             ),
@@ -1152,59 +1475,6 @@ def _validate_transaction_tuple(
         seen.add(value.transaction_id)
         validated.append(value)
     return tuple(validated)
-
-
-_validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
-        identifiers.append(identifier)
-        seen.add(identifier)
-    return tuple(identifiers)
-
-
-def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
-
-
-def _validate_positive_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an integer.")
-    if value < 1:
-        raise GameLifecycleError(f"{field_name} must be at least 1.")
-    return value
-
-
-def _validate_non_zero_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an integer.")
-    if value == 0:
-        raise GameLifecycleError(f"{field_name} must not be zero.")
-    return value
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an integer.")
-    if value < 0:
-        raise GameLifecycleError(f"{field_name} must not be negative.")
-    return value
-
-
-def _validate_bool(field_name: str, value: object) -> bool:
-    if type(value) is not bool:
-        raise GameLifecycleError(f"{field_name} must be a bool.")
-    return value
 
 
 def _source_kind_counts_toward_non_command_gain_cap(source_kind: CommandPointSourceKind) -> bool:

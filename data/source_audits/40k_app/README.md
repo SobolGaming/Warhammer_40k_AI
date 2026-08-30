@@ -46,5 +46,28 @@ The loader's reviewed byte, package, per-row transcription/observation, and numb
 transcription/observation pins must be updated in the same change. The builder is offline and never
 queries the live provider.
 
+P08A and P08B's ordered Command-phase source rows live in the packaged
+`core_command_phase_2026_08/artifacts/package.json` loader boundary. Its retained 2026-08-26
+search-index observation at `https://www.40k.app/rules` is authoritative `RuleEvidence` for the
+exact normalized five-heading sequence from Start of Command Phase through End of Command Phase.
+The artifact pins the actual URL and timestamp, every normalized heading and transcription hash,
+the ordered sequence text and hash, and a source-observation fingerprint whose canonical input
+includes that URL, timestamp, scope, text, and order. The older category-08 audit record remains
+category-locator metadata only; its fingerprint does not certify an exact heading or operative
+statement, and the audit retains no category-page body. Complete 08.01 through 08.03 operative text
+is separately transcribed from the retained official Core Rules PDF. The 08.03 source row remains
+`partial_engine_runtime` only because P01 retains the off-battlefield embarked and Strategic
+Reserve extension; P08B's on-battlefield scope is executable. After an intentional reviewed edit,
+refresh only the derived transcription, observation, and package hashes with:
+
+```text
+uv run python tools/build_core_command_phase_source.py
+uv run python tools/build_core_command_phase_source.py --check
+```
+
+The loader's reviewed byte, package, search-index sequence observation, per-heading transcription,
+official-PDF text transcription, source identity, ordered-row, support-status, and runtime-consumer
+pins must be updated together. The builder is offline and never queries the live provider.
+
 The current scope is exactly the 25 core-rules categories. Factions, faction detachments, and
 faction datasheet content is explicitly excluded.

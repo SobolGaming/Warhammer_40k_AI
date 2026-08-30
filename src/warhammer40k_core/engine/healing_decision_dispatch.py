@@ -29,6 +29,18 @@ HEALING_DECISION_TYPES = frozenset(
 PARAMETERIZED_HEALING_DECISION_TYPES = frozenset((SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,))
 
 
+def healing_source_rule_id_for_request(request: DecisionRequest) -> str | None:
+    """Return stable source ownership for any supported healing continuation."""
+
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Healing continuation source routing requires a request.")
+    if request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
+        return healing_effect_from_request(request=request).source_rule_id
+    if request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE:
+        return healing_effect_from_revival_request(request=request).source_rule_id
+    return None
+
+
 def invalid_healing_decision_status(
     *,
     state: GameState,
@@ -87,5 +99,6 @@ __all__ = (
     "HEALING_DECISION_TYPES",
     "PARAMETERIZED_HEALING_DECISION_TYPES",
     "apply_recorded_healing_decision",
+    "healing_source_rule_id_for_request",
     "invalid_healing_decision_status",
 )

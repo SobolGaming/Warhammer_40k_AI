@@ -30,12 +30,18 @@ from warhammer40k_core.engine.source_backed_rerolls import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.battle_shock_historical_authority import (
+        HistoricalBattleShockAuthorityContext,
+    )
     from warhammer40k_core.engine.game_state import GameState
 
 
 type UnitCharacteristicModifierHandler = Callable[
     ["UnitCharacteristicModifierContext"],
     int,
+]
+type HistoricalLeadershipModifierHandler = Callable[
+    ["HistoricalBattleShockAuthorityContext", int], int
 ]
 type HitRollModifierHandler = Callable[["HitRollModifierContext"], int]
 type WoundRollModifierHandler = Callable[["WoundRollModifierContext"], int]
@@ -569,6 +575,7 @@ class UnitCharacteristicModifierBinding:
     modifier_id: str
     source_id: str
     handler: UnitCharacteristicModifierHandler
+    historical_leadership_handler: HistoricalLeadershipModifierHandler | None = None
 
     def __post_init__(self) -> None:
         _validate_modifier_binding(
@@ -577,6 +584,10 @@ class UnitCharacteristicModifierBinding:
             source_id=self.source_id,
             handler=self.handler,
         )
+        if self.historical_leadership_handler is not None and not callable(
+            self.historical_leadership_handler
+        ):
+            raise GameLifecycleError("Historical Leadership modifier handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)

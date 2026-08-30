@@ -44,6 +44,7 @@ BATTLE_SHOCK_ROLL_TYPE = "battle_shock_roll"
 
 
 class BattleShockTestReason(StrEnum):
+    COMMAND_PHASE_REQUIRED = "command_phase_required"
     BELOW_HALF_STRENGTH = "below_half_strength"
     BELOW_STARTING_STRENGTH_FORCED = "below_starting_strength_forced"
     FORCED_BY_STRATAGEM = "forced_by_stratagem"
@@ -83,8 +84,6 @@ class BattleShockedUnitStatePayload(TypedDict):
     model_instance_ids: list[str]
     source_result_id: str
     battle_round_started: int
-    expires_at_player_command_phase_start: str
-    expires_at_battle_round: int
 
 
 class StratagemTargetPermissionPayload(TypedDict):
@@ -320,8 +319,6 @@ class BattleShockedUnitState:
     model_instance_ids: tuple[str, ...]
     source_result_id: str
     battle_round_started: int
-    expires_at_player_command_phase_start: str
-    expires_at_battle_round: int
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -356,24 +353,6 @@ class BattleShockedUnitState:
                 self.battle_round_started,
             ),
         )
-        object.__setattr__(
-            self,
-            "expires_at_player_command_phase_start",
-            _validate_identifier(
-                "BattleShockedUnitState expires_at_player_command_phase_start",
-                self.expires_at_player_command_phase_start,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "expires_at_battle_round",
-            _validate_positive_int(
-                "BattleShockedUnitState expires_at_battle_round",
-                self.expires_at_battle_round,
-            ),
-        )
-        if self.expires_at_battle_round <= self.battle_round_started:
-            raise GameLifecycleError("BattleShockedUnitState expiry must be a future round.")
 
     @classmethod
     def from_result(
@@ -396,8 +375,6 @@ class BattleShockedUnitState:
             model_instance_ids=tuple(model.model_instance_id for model in unit.own_models),
             source_result_id=result.result_id,
             battle_round_started=result.request.battle_round,
-            expires_at_player_command_phase_start=result.request.player_id,
-            expires_at_battle_round=result.request.battle_round + 1,
         )
 
     @classmethod
@@ -414,26 +391,16 @@ class BattleShockedUnitState:
         if type(rules_unit) is not RulesUnitView:
             raise GameLifecycleError("BattleShockedUnitState requires a RulesUnitView.")
         requested_unit_id = result.request.unit_instance_id
-        if requested_unit_id == rules_unit.unit_instance_id:
-            models = rules_unit.own_models
-        elif requested_unit_id in rules_unit.component_unit_instance_ids:
-            models = next(
-                component.unit.own_models
-                for component in rules_unit.components
-                if component.unit.unit_instance_id == requested_unit_id
-            )
-        else:
-            raise GameLifecycleError("BattleShockedUnitState rules-unit drift.")
+        if requested_unit_id != rules_unit.unit_instance_id:
+            raise GameLifecycleError("BattleShockedUnitState requires the canonical rules-unit ID.")
         if rules_unit.owner_player_id != result.request.player_id:
             raise GameLifecycleError("BattleShockedUnitState rules-unit owner drift.")
         return cls(
             player_id=result.request.player_id,
-            unit_instance_id=requested_unit_id,
-            model_instance_ids=tuple(model.model_instance_id for model in models),
+            unit_instance_id=rules_unit.unit_instance_id,
+            model_instance_ids=tuple(model.model_instance_id for model in rules_unit.own_models),
             source_result_id=result.result_id,
             battle_round_started=result.request.battle_round,
-            expires_at_player_command_phase_start=result.request.player_id,
-            expires_at_battle_round=result.request.battle_round + 1,
         )
 
     def to_payload(self) -> BattleShockedUnitStatePayload:
@@ -443,21 +410,20 @@ class BattleShockedUnitState:
             "model_instance_ids": list(self.model_instance_ids),
             "source_result_id": self.source_result_id,
             "battle_round_started": self.battle_round_started,
-            "expires_at_player_command_phase_start": self.expires_at_player_command_phase_start,
-            "expires_at_battle_round": self.expires_at_battle_round,
         }
 
     @classmethod
     def from_payload(cls, payload: BattleShockedUnitStatePayload) -> Self:
-        return cls(
+        state = cls(
             player_id=payload["player_id"],
             unit_instance_id=payload["unit_instance_id"],
             model_instance_ids=tuple(payload["model_instance_ids"]),
             source_result_id=payload["source_result_id"],
             battle_round_started=payload["battle_round_started"],
-            expires_at_player_command_phase_start=payload["expires_at_player_command_phase_start"],
-            expires_at_battle_round=payload["expires_at_battle_round"],
         )
+        if payload != state.to_payload():
+            raise GameLifecycleError("Battle-shock unit state payload is not canonical.")
+        return state
 
 
 @dataclass(frozen=True, slots=True)
@@ -548,6 +514,7 @@ def collect_battle_shock_test_requests(
     army: ArmyDefinition,
     battlefield_state: BattlefieldRuntimeState,
     starting_strength_records: tuple[StartingStrengthRecord, ...],
+    battle_shocked_unit_ids: tuple[str, ...],
     state: GameState | None = None,
     forced_below_starting_strength_unit_ids: tuple[str, ...] = (),
     allow_duplicate_below_half_tests: bool = False,
@@ -576,6 +543,13 @@ def collect_battle_shock_test_requests(
             min_length=0,
         )
     )
+    shocked_ids = set(
+        _validate_identifier_tuple(
+            "battle_shocked_unit_ids",
+            battle_shocked_unit_ids,
+            min_length=0,
+        )
+    )
     if type(allow_duplicate_below_half_tests) is not bool:
         raise GameLifecycleError("allow_duplicate_below_half_tests must be a bool.")
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
@@ -585,22 +559,33 @@ def collect_battle_shock_test_requests(
 
     requests: list[BattleShockTestRequest] = []
     for rules_unit in rules_unit_views_from_armies(armies=(army,)):
-        current_model_ids = _current_battlefield_model_ids_for_rules_unit(
+        alive_model_ids = tuple(
+            sorted(model.model_instance_id for model in rules_unit.alive_models())
+        )
+        if not alive_model_ids:
+            continue
+        placed_model_ids = _current_battlefield_model_ids_for_rules_unit(
             rules_unit=rules_unit,
             battlefield_state=battlefield_state,
         )
-        if not current_model_ids:
-            continue
         record = records.get(rules_unit.unit_instance_id)
         if record is None:
             raise GameLifecycleError("Battle-shock request missing StartingStrengthRecord.")
         context = BelowHalfStrengthContext.from_rules_unit(
             rules_unit=rules_unit,
             starting_strength=record,
-            current_model_ids=current_model_ids,
+            current_model_ids=alive_model_ids,
         )
+        is_forced = rules_unit.unit_instance_id in forced_ids and context.is_below_starting_strength
+        is_core_required = (
+            rules_unit.unit_instance_id in shocked_ids or context.is_at_or_below_half_strength
+        )
+        if (is_forced or is_core_required) and placed_model_ids != alive_model_ids:
+            raise GameLifecycleError(
+                "Battle-shock test for an eligible off-battlefield rules unit is unsupported."
+            )
         forced_test_added = False
-        if rules_unit.unit_instance_id in forced_ids and context.is_below_starting_strength:
+        if is_forced:
             requests.append(
                 _battle_shock_request_for_rules_unit_context(
                     game_id=requested_game_id,
@@ -608,7 +593,7 @@ def collect_battle_shock_test_requests(
                     player_id=requested_player_id,
                     rules_unit=rules_unit,
                     context=context,
-                    current_model_ids=current_model_ids,
+                    current_model_ids=alive_model_ids,
                     reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
                     ability_index=catalog_ability_index,
                     state=state,
@@ -617,9 +602,7 @@ def collect_battle_shock_test_requests(
                 )
             )
             forced_test_added = True
-        if context.is_below_half_strength and (
-            allow_duplicate_below_half_tests or not forced_test_added
-        ):
+        if is_core_required and (allow_duplicate_below_half_tests or not forced_test_added):
             requests.append(
                 _battle_shock_request_for_rules_unit_context(
                     game_id=requested_game_id,
@@ -627,8 +610,8 @@ def collect_battle_shock_test_requests(
                     player_id=requested_player_id,
                     rules_unit=rules_unit,
                     context=context,
-                    current_model_ids=current_model_ids,
-                    reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+                    current_model_ids=alive_model_ids,
+                    reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
                     ability_index=catalog_ability_index,
                     state=state,
                     runtime_modifier_registry=runtime_modifiers,

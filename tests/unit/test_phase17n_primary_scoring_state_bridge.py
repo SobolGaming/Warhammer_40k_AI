@@ -1765,8 +1765,6 @@ def test_phase17n_step5a_restore_rejects_rehashed_battle_shock_removal() -> None
         model_instance_ids=shocked_unit.own_model_ids(),
         source_result_id="phase17n-step5a-battle-shock-result",
         battle_round_started=state.battle_round,
-        expires_at_player_command_phase_start="player-b",
-        expires_at_battle_round=state.battle_round + 1,
     )
     state.battle_shocked_unit_ids = [shocked_unit.unit_instance_id]
     state.battle_shocked_unit_states = [shocked_state]

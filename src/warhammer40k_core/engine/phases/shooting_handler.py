@@ -875,6 +875,18 @@ class ShootingPhaseHandler:
                     runtime_modifier_registry=self.runtime_modifier_registry,
                     ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 )
+            if is_stratagem_battle_shock_reroll_request(reroll_record.request):
+                apply_stratagem_battle_shock_reroll_decision(
+                    runtime=BattleShockTestRuntime(
+                        ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                        runtime_modifier_registry=self.runtime_modifier_registry,
+                        battle_shock_hook_registry=self.battle_shock_hooks,
+                    ),
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                )
+                return None
             return _apply_shooting_dice_reroll_decision(
                 state=state,
                 result=result,

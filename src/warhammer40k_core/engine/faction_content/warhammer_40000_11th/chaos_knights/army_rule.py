@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Collection
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING, cast
@@ -14,16 +15,22 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartRequestContext,
     BattleRoundStartResultContext,
 )
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockForcedTestContext,
     BattleShockHookBinding,
     BattleShockOutcomeContext,
 )
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
-    geometry_model_for_placement,
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+    resolve_mortal_wound_feel_no_pain_decision,
 )
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -38,11 +45,39 @@ from warhammer40k_core.engine.faction_content.common import (
 from warhammer40k_core.engine.faction_content.common import (
     payload_object as _payload_object,
 )
-from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights import (
+    battle_shock_outcome_authority,
+)
+from warhammer40k_core.engine.faction_rule_states import (
+    FactionRuleState,
+    FactionRuleStatePayload,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
+)
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    SetupStep,
+)
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_component_unit,
+    placed_alive_geometry_models_for_rules_unit,
+)
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    placed_alive_rules_unit_views,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
     HitRollModifierContext,
@@ -61,7 +96,7 @@ if TYPE_CHECKING:
 
 HOOK_ID = "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread"
 CONTRIBUTION_ID = HOOK_ID
-BATTLE_SHOCK_HOOK_ID = f"{HOOK_ID}:battle-shock"
+BATTLE_SHOCK_HOOK_ID: str = f"{HOOK_ID}:battle-shock"
 LEADERSHIP_MODIFIER_ID = f"{HOOK_ID}:leadership"
 DARKNESS_HIT_MODIFIER_ID = f"{HOOK_ID}:darkness:hit-roll"
 DOOM_WOUND_MODIFIER_ID = f"{HOOK_ID}:doom:wound-roll"
@@ -72,7 +107,11 @@ HARBINGERS_STATE_KIND = "chaos_knights_harbingers_of_dread_selection"
 HARBINGERS_SELECTION_KIND = "select_chaos_knights_harbingers_of_dread"
 HARBINGERS_EFFECT_KIND = "chaos_knights_harbingers_of_dread"
 HARBINGERS_DREAD_ROLL_TYPE = "chaos_knights_harbingers_of_dread"
-HARBINGERS_DELIRIUM_D3_ROLL_TYPE = "chaos_knights_delirium_mortal_wounds_d3"
+HARBINGERS_DELIRIUM_D3_ROLL_TYPE = battle_shock_outcome_authority.HARBINGERS_DELIRIUM_D3_ROLL_TYPE
+DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND = (
+    battle_shock_outcome_authority.DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND
+)
+DELIRIUM_MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:delirium:mortal-wound-fnp"
 ROLL_SELECTION_OPTION_ID = "chaos_knights:harbingers_of_dread:roll"
 DREAD_SELECTION_BATTLE_ROUNDS = frozenset({1, 3, 5})
 DREAD_AURA_RANGE_INCHES = 9.0
@@ -196,6 +235,20 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=SOURCE_RULE_ID,
                 forced_test_handler=harbingers_forced_battle_shock_unit_ids,
                 outcome_handler=resolve_harbingers_battle_shock_outcome,
+                pending_outcome_authority_validator=(
+                    battle_shock_outcome_authority.validate_delirium_pending_outcome_authority
+                ),
+                completed_outcome_authority_validator=(
+                    battle_shock_outcome_authority.validate_delirium_completed_outcome_authority
+                ),
+            ),
+        ),
+        mortal_wound_feel_no_pain_hook_bindings=(
+            MortalWoundFeelNoPainContinuationHookBinding(
+                hook_id=DELIRIUM_MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                source_kind=DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
+                handler=apply_delirium_mortal_wound_feel_no_pain_decision,
             ),
         ),
         unit_characteristic_modifier_bindings=(
@@ -203,6 +256,7 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=LEADERSHIP_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=harbingers_leadership_modifier,
+                historical_leadership_handler=historical_harbingers_leadership,
             ),
         ),
         hit_roll_modifier_bindings=(
@@ -468,6 +522,75 @@ def harbingers_leadership_modifier(context: UnitCharacteristicModifierContext) -
     return context.current_value + modifier
 
 
+def historical_harbingers_leadership(
+    context: HistoricalBattleShockAuthorityContext,
+    current: int,
+) -> int:
+    if type(context) is not HistoricalBattleShockAuthorityContext:
+        raise GameLifecycleError("Harbingers historical authority requires context.")
+    target = context.rules_unit(context.request.unit_instance_id)
+    active_by_player: dict[str, set[DreadAbility]] = {
+        army.player_id: {DreadAbility.DEATHLY_TERROR}
+        for army in context.armies
+        if army.detachment_selection.faction_id == CHAOS_KNIGHTS_FACTION_ID
+    }
+    for event_index, event in enumerate(context.event_records[: context.boundary_event_index]):
+        if event.event_type != "chaos_knights_harbingers_of_dread_selected":
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Harbingers historical event payload is invalid.")
+        raw_state = event.payload.get("faction_rule_state")
+        if not isinstance(raw_state, dict):
+            raise GameLifecycleError("Harbingers historical state is missing.")
+        state_row = FactionRuleState.from_payload(cast(FactionRuleStatePayload, raw_state))
+        if (
+            state_row.state_kind != HARBINGERS_STATE_KIND
+            or state_row.source_rule_id != SOURCE_RULE_ID
+            or event.payload.get("battle_round")
+            != _payload_object(state_row.payload).get("battle_round")
+        ):
+            raise GameLifecycleError("Harbingers historical state drifted.")
+        validate_mutation_decision_closure(
+            event_records=context.event_records,
+            decision_records=context.decision_records,
+            mutation_index=event_index,
+            request_id=state_row.request_id,
+            result_id=state_row.result_id,
+        )
+        active = active_by_player.get(state_row.player_id)
+        if active is None:
+            raise GameLifecycleError("Harbingers historical player is not loaded.")
+        payload = _payload_object(state_row.payload)
+        for token in _payload_string_list(payload, key="selected_dread_ability_ids"):
+            ability = _dread_from_token(token)
+            if ability is DreadAbility.DEATHLY_TERROR or ability in active:
+                raise GameLifecycleError("Harbingers historical ability is duplicated.")
+            active.add(ability)
+    modified = current
+    for army in context.armies:
+        active = active_by_player.get(army.player_id)
+        if active is None or army.player_id == target.owner_player_id:
+            continue
+        aura_range = (
+            DREAD_AURA_RANGE_WITH_DOMINION_INCHES
+            if DreadAbility.DOMINION in active
+            else DREAD_AURA_RANGE_INCHES
+        )
+        target_models = context.geometry_models(target.unit_instance_id)
+        applies = any(
+            source_model.base_distance_to(target_model) <= aura_range
+            for unit in army.units
+            if _unit_has_harbingers(unit)
+            for source_model in context.component_geometry_models(unit.unit_instance_id)
+            for target_model in target_models
+        )
+        if applies:
+            modified += 1
+            if DreadAbility.DESPAIR in active:
+                modified += 1
+    return modified
+
+
 def harbingers_darkness_hit_roll_modifier(context: HitRollModifierContext) -> int:
     if type(context) is not HitRollModifierContext:
         raise GameLifecycleError("Harbingers of Dread Darkness hit modifier requires context.")
@@ -538,13 +661,15 @@ def harbingers_forced_battle_shock_unit_ids(
             player_id=chaos_knights_army.player_id,
         ):
             continue
-        for target_unit in active_army.units:
+        for target_rules_unit in placed_alive_rules_unit_views(state=context.state):
+            if target_rules_unit.owner_player_id != active_army.player_id:
+                continue
             if _unit_within_dread_aura(
                 state=context.state,
                 dread_army=chaos_knights_army,
-                target_unit_instance_id=target_unit.unit_instance_id,
+                target_unit_instance_id=target_rules_unit.unit_instance_id,
             ):
-                forced_ids.add(target_unit.unit_instance_id)
+                forced_ids.add(target_rules_unit.unit_instance_id)
     return tuple(sorted(forced_ids))
 
 
@@ -554,7 +679,12 @@ def resolve_harbingers_battle_shock_outcome(context: BattleShockOutcomeContext) 
     result = context.result
     if result.passed:
         return
-    target_unit = _unit_by_id(context.state, result.request.unit_instance_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=result.request.unit_instance_id,
+    )
+    if target_rules_unit.owner_player_id != result.request.player_id:
+        raise GameLifecycleError("Harbingers of Dread Battle-shock target owner drift.")
     for chaos_knights_army in _chaos_knights_armies(context.state):
         if chaos_knights_army.player_id == result.request.player_id:
             continue
@@ -566,19 +696,19 @@ def resolve_harbingers_battle_shock_outcome(context: BattleShockOutcomeContext) 
         if not _unit_is_below_half_strength(
             context.state,
             player_id=result.request.player_id,
-            unit=target_unit,
+            rules_unit=target_rules_unit,
         ):
             continue
         if not _unit_within_dread_aura(
             state=context.state,
             dread_army=chaos_knights_army,
-            target_unit_instance_id=target_unit.unit_instance_id,
+            target_unit_instance_id=target_rules_unit.unit_instance_id,
         ):
             continue
         _apply_delirium_mortal_wounds(
             context=context,
             chaos_knights_player_id=chaos_knights_army.player_id,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
         )
 
 
@@ -586,43 +716,36 @@ def _apply_delirium_mortal_wounds(
     *,
     context: BattleShockOutcomeContext,
     chaos_knights_player_id: str,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
 ) -> None:
     d3_result = _roll_d3(
         context=context,
         reason="Delirium mortal wounds",
         roll_type=HARBINGERS_DELIRIUM_D3_ROLL_TYPE,
-        actor_id=target_unit.unit_instance_id,
+        actor_id=target_rules_unit.unit_instance_id,
     )
-    if _unit_has_feel_no_pain_choice(context.state, target_unit):
-        context.decisions.event_log.append(
-            "chaos_knights_delirium_unsupported",
-            validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "phase": context.phase.value,
-                    "source_rule_id": SOURCE_RULE_ID,
-                    "battle_shock_result_id": context.result.result_id,
-                    "player_id": chaos_knights_player_id,
-                    "target_unit_instance_id": target_unit.unit_instance_id,
-                    "unsupported_reason": "mortal_wound_feel_no_pain_requires_decision",
-                    "d3_result": d3_result.to_payload(),
-                }
-            ),
-        )
-        return
+    resolution_payload = {
+        "game_id": context.state.game_id,
+        "battle_round": context.state.battle_round,
+        "phase": context.phase.value,
+        "source_rule_id": SOURCE_RULE_ID,
+        "battle_shock_result_id": context.result.result_id,
+        "player_id": chaos_knights_player_id,
+        "target_unit_instance_id": target_rules_unit.unit_instance_id,
+        "d3_result": validate_json_value(d3_result.to_payload()),
+    }
     source_context = validate_json_value(
         {
+            "source_kind": DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
+            "phase": context.phase.value,
             "battle_shock_result": context.result.to_payload(),
-            "d3_result": d3_result.to_payload(),
-            "target_unit_instance_id": target_unit.unit_instance_id,
+            "resolution_payload": resolution_payload,
         }
     )
-    application = apply_mortal_wounds_to_unit(
-        state=context.state,
-        decisions=context.decisions,
-        application_id=(f"{context.result.result_id}:delirium:{target_unit.unit_instance_id}"),
+    progress = MortalWoundApplicationProgress.start(
+        application_id=(
+            f"{context.result.result_id}:delirium:{target_rules_unit.unit_instance_id}"
+        ),
         source_rule_id=SOURCE_RULE_ID,
         source_context=source_context,
         destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
@@ -634,27 +757,125 @@ def _apply_delirium_mortal_wounds(
             action_phase=context.phase,
             source_step="delirium_mortal_wounds",
         ),
-        target_unit_instance_id=target_unit.unit_instance_id,
+        target_unit_instance_id=target_rules_unit.unit_instance_id,
+        defender_player_id=context.result.request.player_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
-        dice_manager=context.dice_manager,
-        defender_player_id=context.result.request.player_id,
     )
-    context.decisions.event_log.append(
-        "chaos_knights_delirium_mortal_wounds_applied",
-        validate_json_value(
-            {
-                "game_id": context.state.game_id,
-                "battle_round": context.state.battle_round,
-                "phase": context.phase.value,
+    routed = continue_mortal_wound_application(
+        state=context.state,
+        decisions=context.decisions,
+        request_id=context.state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=context.dice_manager,
+    )
+    _resolve_routed_delirium_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        feel_no_pain_result_id=None,
+    )
+
+
+def apply_delirium_mortal_wound_feel_no_pain_decision(
+    context: MortalWoundFeelNoPainContinuationContext,
+) -> LifecycleStatus | None:
+    if type(context) is not MortalWoundFeelNoPainContinuationContext:
+        raise GameLifecycleError("Delirium FNP continuation requires context.")
+    routed = resolve_mortal_wound_feel_no_pain_decision(
+        state=context.state,
+        decisions=context.decisions,
+        request=context.request,
+        result=context.result,
+        next_request_id=context.state.next_decision_request_id(),
+        dice_manager=context.dice_manager,
+    )
+    return _resolve_routed_delirium_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        feel_no_pain_result_id=context.result.result_id,
+    )
+
+
+def _resolve_routed_delirium_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    routed_request: DecisionRequest | None,
+    routed_application: MortalWoundApplication | None,
+    routed_progress: MortalWoundApplicationProgress,
+    feel_no_pain_result_id: str | None,
+) -> LifecycleStatus | None:
+    source_context = battle_shock_outcome_authority.delirium_source_context(
+        routed_progress.source_context
+    )
+    resolution_payload = _payload_object(source_context["resolution_payload"])
+    phase = battle_shock_outcome_authority.delirium_phase(source_context["phase"])
+    if resolution_payload.get("phase") != phase.value or state.current_battle_phase is not phase:
+        raise GameLifecycleError("Delirium mortal wound phase authority drifted.")
+    if routed_request is not None:
+        decisions.request_decision(routed_request)
+        decisions.event_log.append(
+            "chaos_knights_delirium_mortal_wounds_pending",
+            validate_json_value(
+                {
+                    **resolution_payload,
+                    "feel_no_pain_request_id": routed_request.request_id,
+                    "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed_request,
+            payload={
+                "phase": phase.value,
+                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                 "source_rule_id": SOURCE_RULE_ID,
-                "battle_shock_result_id": context.result.result_id,
-                "player_id": chaos_knights_player_id,
-                "target_unit_instance_id": target_unit.unit_instance_id,
-                "d3_result": d3_result.to_payload(),
-                "mortal_wound_application": application.to_payload(),
-            }
-        ),
+                "source_kind": DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
+                "target_unit_instance_id": routed_progress.target_unit_instance_id,
+                "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+            },
+        )
+    if routed_application is None:
+        raise GameLifecycleError("Delirium mortal wound routing did not complete.")
+    applied_payload: dict[str, JsonValue] = {
+        **resolution_payload,
+        "mortal_wound_application": validate_json_value(routed_application.to_payload()),
+    }
+    if feel_no_pain_result_id is not None:
+        applied_payload["feel_no_pain_result_id"] = feel_no_pain_result_id
+    decisions.event_log.append(
+        "chaos_knights_delirium_mortal_wounds_applied",
+        validate_json_value(applied_payload),
+    )
+    return None
+
+
+def historical_unit_within_dread_aura(
+    context: HistoricalBattleShockAuthorityContext,
+    *,
+    dread_army: ArmyDefinition,
+    target: RulesUnitView,
+    active: Collection[DreadAbility],
+) -> bool:
+    aura_range = (
+        DREAD_AURA_RANGE_WITH_DOMINION_INCHES
+        if DreadAbility.DOMINION in active
+        else DREAD_AURA_RANGE_INCHES
+    )
+    target_models = context.geometry_models(target.unit_instance_id)
+    return any(
+        source_model.base_distance_to(target_model) <= aura_range
+        for unit in dread_army.units
+        if _unit_has_harbingers(unit)
+        for source_model in context.component_geometry_models(unit.unit_instance_id)
+        for target_model in target_models
     )
 
 
@@ -852,9 +1073,9 @@ def _unit_within_dread_aura(
     for source_unit in dread_army.units:
         if not _unit_has_harbingers(source_unit):
             continue
-        for source_model in _unit_geometry_models(
+        for source_model in placed_alive_geometry_models_for_component_unit(
             state=state,
-            unit_instance_id=source_unit.unit_instance_id,
+            component_unit_instance_id=source_unit.unit_instance_id,
         ):
             if any(
                 shapely_backend.base_footprint_distance(
@@ -881,22 +1102,9 @@ def _unit_geometry_models(
     state: GameState,
     unit_instance_id: str,
 ) -> tuple[GeometryModel, ...]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Harbingers of Dread geometry lookup requires battlefield_state.")
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    unit_placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
-    if unit_placement is None:
-        return ()
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in unit_placement.model_placements
-        if scenario.model_instance_for_placement(model_placement).is_alive
+    return placed_alive_geometry_models_for_rules_unit(
+        state=state,
+        unit_instance_id=unit_instance_id,
     )
 
 
@@ -904,18 +1112,20 @@ def _unit_is_below_half_strength(
     state: GameState,
     *,
     player_id: str,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
 ) -> bool:
-    current_model_ids = _current_battlefield_model_ids(state=state, unit=unit)
+    current_model_ids = _current_battlefield_model_ids(
+        state=state,
+        rules_unit=rules_unit,
+    )
     if not current_model_ids:
         return False
-    context = BelowHalfStrengthContext.from_unit(
-        player_id=player_id,
-        unit=unit,
+    context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=rules_unit,
         starting_strength=_starting_strength_record(
             state=state,
             player_id=player_id,
-            unit_instance_id=unit.unit_instance_id,
+            unit_instance_id=rules_unit.unit_instance_id,
         ),
         current_model_ids=current_model_ids,
     )
@@ -925,22 +1135,17 @@ def _unit_is_below_half_strength(
 def _current_battlefield_model_ids(
     *,
     state: GameState,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
 ) -> tuple[str, ...]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Harbingers of Dread strength lookup requires battlefield_state.")
-    placement = state.battlefield_state.unit_placement_or_none(unit.unit_instance_id)
-    if placement is None:
-        return ()
-    unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
-    current_model_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        model = unit_model_by_id.get(model_placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError("Battlefield unit placement contains unknown model.")
-        if model.is_alive:
-            current_model_ids.append(model.model_instance_id)
-    return tuple(sorted(current_model_ids))
+    return tuple(
+        sorted(
+            model.model_id
+            for model in placed_alive_geometry_models_for_rules_unit(
+                state=state,
+                unit_instance_id=rules_unit.unit_instance_id,
+            )
+        )
+    )
 
 
 def _starting_strength_record(
@@ -979,15 +1184,6 @@ def _roll_d3(
     return D3RollResult.from_source_d6_result(roll_state.original_result)
 
 
-def _unit_has_feel_no_pain_choice(state: GameState, unit: UnitInstance) -> bool:
-    return any(
-        state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id)
-        or state.feel_no_pain_decline_allowed_for_model(model_instance_id=model.model_instance_id)
-        for model in unit.own_models
-        if model.is_alive
-    )
-
-
 def _eligible_harbingers_unit_ids_for_army(army: ArmyDefinition) -> tuple[str, ...]:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Harbingers of Dread requires an ArmyDefinition.")
@@ -1000,11 +1196,6 @@ def _unit_has_harbingers(unit: UnitInstance) -> bool:
     if _unit_has_keyword(unit, CHAOS_KNIGHTS_FACTION_KEYWORD):
         return True
     return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
-
-
-def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
-    unit, _army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    return unit
 
 
 def _unit_and_army_by_id(

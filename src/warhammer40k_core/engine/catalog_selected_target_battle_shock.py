@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
 )
 from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
     BattleShockResolutionResult,
     resolve_battle_shock_test_with_optional_reroll,
 )
@@ -198,6 +199,7 @@ def resolve_selected_target_battle_shock_effect(
         active_player_id=active_player_id,
         phase=BattlePhase.SHOOTING,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
         source_kind="catalog_selected_target_effect",
         base_payload=base_payload,
         resolved_event_types=(

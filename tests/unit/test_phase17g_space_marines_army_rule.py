@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import replace
 from typing import TypedDict, cast
 
 import pytest
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -29,6 +32,14 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.command_phase_start_authority import (
+    COMMAND_START_BOUNDARY_COMPLETED_EVENT,
+    COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
+    COMMAND_START_FINITE_REQUESTED_EVENT,
+    COMMAND_START_FINITE_RESULT_EVENT,
+    COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
+    resolve_command_phase_start_boundary,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartContext,
@@ -37,11 +48,12 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
+from warhammer40k_core.engine.command_points import CommandStepState
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines import (
     army_rule,
@@ -59,9 +71,19 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.runtime_modifiers import WoundRollModifierContext
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WoundRollModifierContext,
+)
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
@@ -125,11 +147,13 @@ def _malformed_command_phase_start_result_handler(
 
 def test_lifecycle_requests_oath_target_and_records_effects() -> None:
     lifecycle = _battle_ready_lifecycle()
+    session = LocalGameSession(lifecycle=lifecycle)
+    state = _require_state(lifecycle)
     contribution = army_rule.runtime_contribution()
     assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
     assert not contribution.contribution_id.endswith(":scaffold")
 
-    status = lifecycle.advance_until_decision_or_terminal()
+    status = session.advance_until_decision_or_terminal()
 
     request = status.decision_request
     assert request is not None
@@ -139,16 +163,39 @@ def test_lifecycle_requests_oath_target_and_records_effects() -> None:
         f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
         f"space_marines:oath_of_moment:{ENEMY_OTHER_ID}",
     }
-
-    lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase17g-space-marines-oath-target",
-            request=request,
-            selected_option_id=f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
+    assert state.command_point_total("player-a") == 0
+    assert state.command_point_total("player-b") == 0
+    assert state.command_step_state is not None
+    assert state.command_step_state.command_phase_start_synchronous_hooks_resolved
+    assert not state.command_step_state.command_phase_start_boundary_resolved
+    assert not state.command_step_state.command_points_granted
+    event_types = tuple(
+        record.event_type for record in lifecycle.decision_controller.event_log.records
+    )
+    assert "command_phase_start_faction_rule_requested" in event_types
+    assert "command_points_gained" not in event_types
+    for viewer_player_id in state.player_ids:
+        pending = session.view(viewer_player_id=viewer_player_id)["pending_decision"]
+        assert pending is not None
+        assert pending["decision_type"] == request.decision_type
+    cursors = {
+        viewer_player_id: EventStreamCursor(
+            session.events_since(
+                EventStreamCursor(),
+                viewer_player_id=viewer_player_id,
+            )["next_cursor"]
         )
+        for viewer_player_id in state.player_ids
+    }
+
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
+        result_id="phase17g-space-marines-oath-target",
     )
 
-    state = _require_state(lifecycle)
+    assert state.command_point_total("player-a") == 1
+    assert state.command_point_total("player-b") == 1
     assert (
         army_rule.oath_of_moment_target_unit_id_for_player(
             state,
@@ -177,8 +224,244 @@ def test_lifecycle_requests_oath_target_and_records_effects() -> None:
         )
         is None
     )
+    event_types = tuple(
+        record.event_type for record in lifecycle.decision_controller.event_log.records
+    )
+    assert event_types.index("command_phase_start_faction_rule_requested") < event_types.index(
+        "space_marines_oath_of_moment_target_selected"
+    )
+    assert event_types.index("space_marines_oath_of_moment_target_selected") < event_types.index(
+        "command_points_gained"
+    )
+    assert event_types.count("command_points_gained") == 2
+    assert max(
+        index
+        for index, event_type in enumerate(event_types)
+        if event_type == "command_points_gained"
+    ) < event_types.index("command_step_started")
+    command_step_records = tuple(
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type == "command_step_started"
+    )
+    assert len(command_step_records) == 1
+    command_step_payload = command_step_records[0].payload
+    assert isinstance(command_step_payload, dict)
+    assert "cleared_battle_shocked_unit_ids" not in command_step_payload
+    for viewer_player_id, cursor in cursors.items():
+        visible_event_types = {
+            event["event_type"]
+            for event in session.events_since(
+                cursor,
+                viewer_player_id=viewer_player_id,
+            )["events"]
+        }
+        assert "space_marines_oath_of_moment_target_selected" in visible_event_types
+        assert "command_points_gained" in visible_event_types
+        assert "command_step_started" in visible_event_types
     restored = cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
     assert restored == state.to_payload()
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:phase17g:space-marines:oath-command-start")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "synchronous_event_deleted",
+        "boundary_flag_forged",
+        "finite_request_deleted",
+        "finite_request_hash_drifted",
+        "finite_request_reordered",
+        "synchronous_inventory_deleted",
+        "finite_request_extra_key",
+    ],
+)
+def test_command_start_restore_rejects_pending_authority_tamper(
+    tamper_kind: str,
+) -> None:
+    lifecycle, _request = _pending_oath_command_start_lifecycle()
+    baseline = deepcopy(lifecycle.to_payload())
+    assert GameLifecycle.from_payload(baseline).to_payload() == baseline
+    forged = deepcopy(baseline)
+    events = forged["decisions"]["event_log"]
+    command_state = forged["state"]["command_step_state"]
+    assert command_state is not None
+
+    if tamper_kind == "synchronous_event_deleted":
+        events.pop(_event_payload_index(events, COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT))
+    elif tamper_kind == "boundary_flag_forged":
+        command_state["command_phase_start_boundary_resolved"] = True
+    elif tamper_kind == "finite_request_deleted":
+        events.pop(_event_payload_index(events, COMMAND_START_FINITE_REQUESTED_EVENT))
+    elif tamper_kind == "finite_request_hash_drifted":
+        payload = events[_event_payload_index(events, COMMAND_START_FINITE_REQUESTED_EVENT)][
+            "payload"
+        ]
+        assert isinstance(payload, dict)
+        payload["request_payload_hash"] = "0" * 64
+    elif tamper_kind == "finite_request_reordered":
+        request_index = _event_payload_index(events, COMMAND_START_FINITE_REQUESTED_EVENT)
+        request_event = events.pop(request_index)
+        effect_pass_index = _event_payload_index(
+            events,
+            COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
+        )
+        events.insert(effect_pass_index, request_event)
+    elif tamper_kind == "synchronous_inventory_deleted":
+        payload = events[_event_payload_index(events, COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT)][
+            "payload"
+        ]
+        assert isinstance(payload, dict)
+        del payload["provider_binding_inventory"]
+    else:
+        payload = events[_event_payload_index(events, COMMAND_START_FINITE_REQUESTED_EVENT)][
+            "payload"
+        ]
+        assert isinstance(payload, dict)
+        payload["unexpected_provider_claim"] = True
+    _resequence_event_ids(events)
+
+    with pytest.raises(GameLifecycleError, match="Command-start"):
+        GameLifecycle.from_payload(forged)
+
+
+@pytest.mark.parametrize("drift_kind", ["source", "capability"])
+def test_command_start_restore_rejects_loaded_provider_registry_drift(
+    drift_kind: str,
+) -> None:
+    lifecycle, _request = _pending_oath_command_start_lifecycle()
+    baseline = deepcopy(lifecycle.to_payload())
+    bundle = _runtime_content_bundle(lifecycle)
+    bindings = list(bundle.command_phase_start_hook_registry.all_bindings())
+    binding_index = next(
+        index for index, binding in enumerate(bindings) if binding.hook_id == army_rule.HOOK_ID
+    )
+    original = bindings[binding_index]
+    bindings[binding_index] = (
+        replace(original, source_id=f"{original.source_id}:drifted")
+        if drift_kind == "source"
+        else replace(original, request_handler=None)
+    )
+    drifted_bundle = replace(
+        bundle,
+        command_phase_start_hook_registry=CommandPhaseStartHookRegistry.from_bindings(
+            tuple(bindings)
+        ),
+        hook_bindings_by_event={},
+    )
+
+    with pytest.raises(GameLifecycleError, match="loaded provider registry"):
+        GameLifecycle.from_payload(
+            baseline,
+            runtime_content_bundle=drifted_bundle,
+        )
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "boundary_deleted",
+        "boundary_after_core_cp",
+        "finite_result_deleted",
+        "finite_result_hash_drifted",
+        "finite_result_reordered",
+        "effect_passes_deleted",
+        "extra_effect_pass",
+        "boundary_gap_before_core_cp",
+        "provider_output_deleted",
+        "unrelated_pending_before_boundary",
+        "whole_occurrence_deleted",
+    ],
+)
+def test_command_start_restore_rejects_completed_authority_tamper(
+    tamper_kind: str,
+) -> None:
+    lifecycle = _completed_oath_command_start_lifecycle()
+    baseline = deepcopy(lifecycle.to_payload())
+    assert GameLifecycle.from_payload(baseline).to_payload() == baseline
+    forged = deepcopy(baseline)
+    events = forged["decisions"]["event_log"]
+
+    if tamper_kind == "boundary_deleted":
+        events.pop(_event_payload_index(events, COMMAND_START_BOUNDARY_COMPLETED_EVENT))
+    elif tamper_kind == "boundary_after_core_cp":
+        boundary = events.pop(_event_payload_index(events, COMMAND_START_BOUNDARY_COMPLETED_EVENT))
+        first_gain_index = _event_payload_index(events, "command_points_gained")
+        events.insert(first_gain_index + 1, boundary)
+    elif tamper_kind == "finite_result_deleted":
+        events.pop(_event_payload_index(events, COMMAND_START_FINITE_RESULT_EVENT))
+    elif tamper_kind == "finite_result_hash_drifted":
+        payload = events[_event_payload_index(events, COMMAND_START_FINITE_RESULT_EVENT)]["payload"]
+        assert isinstance(payload, dict)
+        payload["result_payload_hash"] = "f" * 64
+    elif tamper_kind == "finite_result_reordered":
+        result_authority = events.pop(
+            _event_payload_index(events, COMMAND_START_FINITE_RESULT_EVENT)
+        )
+        recorded_index = _event_payload_index(events, "decision_recorded")
+        events.insert(recorded_index, result_authority)
+    elif tamper_kind == "effect_passes_deleted":
+        events[:] = [
+            event
+            for event in events
+            if event["event_type"] != COMMAND_START_EFFECT_PASS_COMPLETED_EVENT
+        ]
+    elif tamper_kind == "extra_effect_pass":
+        pass_indexes = tuple(
+            index
+            for index, event in enumerate(events)
+            if event["event_type"] == COMMAND_START_EFFECT_PASS_COMPLETED_EVENT
+        )
+        duplicate = deepcopy(events[pass_indexes[-1]])
+        duplicate_payload = duplicate["payload"]
+        assert isinstance(duplicate_payload, dict)
+        duplicate_payload["effect_pass_index"] = len(pass_indexes) + 1
+        boundary_index = _event_payload_index(events, COMMAND_START_BOUNDARY_COMPLETED_EVENT)
+        events.insert(boundary_index, duplicate)
+    elif tamper_kind == "boundary_gap_before_core_cp":
+        boundary_index = _event_payload_index(events, COMMAND_START_BOUNDARY_COMPLETED_EVENT)
+        events.insert(
+            boundary_index + 1,
+            {
+                "event_id": "event-forged-gap",
+                "event_type": "forged_command_start_gap",
+                "payload": {"game_id": forged["state"]["game_id"]},
+            },
+        )
+    elif tamper_kind == "provider_output_deleted":
+        events.pop(_event_payload_index(events, "space_marines_oath_of_moment_target_selected"))
+    elif tamper_kind == "unrelated_pending_before_boundary":
+        records = forged["decisions"]["records"]
+        arbitrary_request = deepcopy(records[0]["request"])
+        arbitrary_request["request_id"] = "phase17g:forged:pre-boundary-pending"
+        forged["decisions"]["queue"]["pending_requests"] = [arbitrary_request]
+        boundary_index = _event_payload_index(events, COMMAND_START_BOUNDARY_COMPLETED_EVENT)
+        events.insert(
+            boundary_index,
+            {
+                "event_id": "event-forged-pending",
+                "event_type": "decision_requested",
+                "payload": cast(JsonValue, arbitrary_request),
+            },
+        )
+    else:
+        command_authority_types = {
+            COMMAND_START_BOUNDARY_COMPLETED_EVENT,
+            COMMAND_START_EFFECT_PASS_COMPLETED_EVENT,
+            COMMAND_START_FINITE_REQUESTED_EVENT,
+            COMMAND_START_FINITE_RESULT_EVENT,
+            COMMAND_START_SYNCHRONOUS_COMPLETED_EVENT,
+        }
+        events[:] = [
+            event for event in events if event["event_type"] not in command_authority_types
+        ]
+    _resequence_event_ids(events)
+
+    with pytest.raises(GameLifecycleError, match=r"Command-start|Command step Core CP"):
+        GameLifecycle.from_payload(forged)
 
 
 def test_command_phase_start_hook_registry_routes_requests_and_results() -> None:
@@ -295,11 +578,13 @@ def test_command_phase_start_hook_registry_rejects_ambiguous_hooks() -> None:
                 hook_id="phase17g:command-start:request-a",
                 source_id="phase17g:command-start:source",
                 request_handler=_command_phase_start_test_request,
+                result_handler=lambda _context: False,
             ),
             CommandPhaseStartHookBinding(
                 hook_id="phase17g:command-start:request-b",
                 source_id="phase17g:command-start:source",
                 request_handler=_command_phase_start_test_request,
+                result_handler=lambda _context: False,
             ),
         )
     )
@@ -534,7 +819,8 @@ def test_command_phase_start_hook_contract_rejects_malformed_inputs() -> None:
             ),
         )
     )
-    assert none_request_registry.next_request_for(request_context) is not None
+    with pytest.raises(GameLifecycleError, match="require a result handler"):
+        none_request_registry.next_request_for(request_context)
     malformed_request_registry = CommandPhaseStartHookRegistry.from_bindings(
         (
             CommandPhaseStartHookBinding(
@@ -579,6 +865,160 @@ def test_command_phase_start_hook_contract_rejects_malformed_inputs() -> None:
         )
 
 
+def test_command_start_boundary_rejects_synchronous_provider_queue_mutation() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+        )
+    )
+
+    def enqueue_from_synchronous_handler(context: CommandPhaseStartContext) -> None:
+        context.decisions.request_decision(
+            _command_phase_start_test_request(
+                CommandPhaseStartRequestContext(
+                    state=context.state,
+                    decisions=context.decisions,
+                    active_player_id=context.active_player_id,
+                )
+            )
+        )
+
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        (
+            CommandPhaseStartHookBinding(
+                hook_id="phase17g:command-start:sync-queue-mutation",
+                source_id="phase17g:command-start:sync-queue-source",
+                handler=enqueue_from_synchronous_handler,
+            ),
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="synchronous hooks cannot enqueue decisions"):
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            command_phase_start_hooks=registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+
+
+def test_command_start_boundary_rejects_provider_internal_decision_resolution() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+        )
+    )
+
+    def resolve_internal_decision(context: CommandPhaseStartContext) -> None:
+        request = context.decisions.request_decision(
+            _command_phase_start_test_request(
+                CommandPhaseStartRequestContext(
+                    state=context.state,
+                    decisions=context.decisions,
+                    active_player_id=context.active_player_id,
+                )
+            )
+        )
+        context.decisions.submit_result(
+            DecisionResult.for_request(
+                result_id="phase17g-command-start-internal-result",
+                request=request,
+                selected_option_id="phase17g:command-start:test",
+            )
+        )
+
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        (
+            CommandPhaseStartHookBinding(
+                hook_id="phase17g:command-start:internal-decision",
+                source_id="phase17g:command-start:internal-decision-source",
+                handler=resolve_internal_decision,
+            ),
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="cannot record player decisions"):
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            command_phase_start_hooks=registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+
+
+def test_command_start_boundary_rejects_non_waiting_effect_status() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    state.replace_command_step_state(
+        CommandStepState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+        )
+    )
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        (
+            CommandPhaseStartHookBinding(
+                hook_id="phase17g:command-start:advanced-effect",
+                source_id="phase17g:command-start:advanced-effect-source",
+                effect_handler=lambda _context: LifecycleStatus.advanced(
+                    stage=GameLifecycleStage.BATTLE
+                ),
+            ),
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="must pause with waiting_for_decision"):
+        resolve_command_phase_start_boundary(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            command_phase_start_hooks=registry,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+
+
+def test_command_start_registry_rejects_wrong_finite_type_and_missing_applier() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    context = CommandPhaseStartRequestContext(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        active_player_id="player-a",
+    )
+    wrong_type_registry = CommandPhaseStartHookRegistry.from_bindings(
+        (
+            CommandPhaseStartHookBinding(
+                hook_id="phase17g:command-start:wrong-finite-type",
+                source_id="phase17g:command-start:wrong-finite-source",
+                request_handler=lambda request_context: replace(
+                    _command_phase_start_test_request(request_context),
+                    decision_type="phase17g_wrong_command_start_type",
+                ),
+                result_handler=lambda _context: True,
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="must use the finite decision type"):
+        wrong_type_registry.next_request_for(context)
+
+    missing_applier_registry = CommandPhaseStartHookRegistry.from_bindings(
+        (
+            CommandPhaseStartHookBinding(
+                hook_id="phase17g:command-start:missing-applier",
+                source_id="phase17g:command-start:missing-applier-source",
+                request_handler=_command_phase_start_test_request,
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="require a result handler"):
+        missing_applier_registry.next_request_for(context)
+
+
 def test_oath_target_drift_rejects_before_queue_pop() -> None:
     lifecycle = _battle_ready_lifecycle()
     status = lifecycle.advance_until_decision_or_terminal()
@@ -608,6 +1048,12 @@ def test_oath_target_drift_rejects_before_queue_pop() -> None:
     assert isinstance(rejected.payload, dict)
     assert rejected.payload["invalid_reason"] == "target_unit_missing"
     assert lifecycle.decision_controller.queue.peek_next().request_id == request.request_id
+    assert state.command_point_total("player-a") == 0
+    assert state.command_point_total("player-b") == 0
+    assert not any(
+        record.event_type == "command_points_gained"
+        for record in lifecycle.decision_controller.event_log.records
+    )
 
 
 def test_oath_request_and_result_defensive_paths() -> None:
@@ -1633,6 +2079,49 @@ def _weapon_profile() -> WeaponProfile:
         damage_profile=DamageProfile.fixed(1),
         source_ids=("phase17g:space-marines:test-weapon",),
     )
+
+
+def _pending_oath_command_start_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle = _battle_ready_lifecycle()
+    status = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
+    request = status.decision_request
+    if request is None:
+        raise AssertionError("Oath of Moment command-start request is required")
+    if request.decision_type != SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE:
+        raise AssertionError("Oath of Moment command-start request type drifted")
+    return lifecycle, request
+
+
+def _completed_oath_command_start_lifecycle() -> GameLifecycle:
+    lifecycle, request = _pending_oath_command_start_lifecycle()
+    LocalGameSession(lifecycle=lifecycle).submit_option(
+        request_id=request.request_id,
+        option_id=f"space_marines:oath_of_moment:{ENEMY_TARGET_ID}",
+        result_id="phase17g-space-marines-command-authority-result",
+    )
+    event_types = tuple(
+        event.event_type for event in lifecycle.decision_controller.event_log.records
+    )
+    if COMMAND_START_BOUNDARY_COMPLETED_EVENT not in event_types:
+        raise AssertionError("Oath of Moment Command-start boundary did not complete")
+    return lifecycle
+
+
+def _event_payload_index(
+    events: list[EventRecordPayload],
+    event_type: str,
+) -> int:
+    matches = tuple(
+        index for index, event in enumerate(events) if event["event_type"] == event_type
+    )
+    if not matches:
+        raise AssertionError(f"event type {event_type} is required")
+    return matches[0]
+
+
+def _resequence_event_ids(events: list[EventRecordPayload]) -> None:
+    for index, event in enumerate(events, start=1):
+        event["event_id"] = f"event-{index:06d}"
 
 
 def _require_state(lifecycle: GameLifecycle) -> GameState:

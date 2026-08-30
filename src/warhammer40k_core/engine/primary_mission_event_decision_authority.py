@@ -15,6 +15,9 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayloadPayload,
     MovementProposalRequest,
 )
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.movement_model import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -44,23 +47,13 @@ def validate_primary_mission_mutation_decision_closure(
     request_id: str,
     result_id: str,
 ) -> DecisionRecord:
-    records = _authoritative_decision_records(decision_records)
-    matches = tuple(
-        record
-        for record in records
-        if record.request.request_id == request_id
-        and record.result.request_id == request_id
-        and record.result.result_id == result_id
-    )
-    if len(matches) != 1:
-        raise GameLifecycleError("Primary mission physical mutation decision authority drifted.")
-    record = matches[0]
-    _validate_record_event_closure(
+    return validate_mutation_decision_closure(
         event_records=event_records,
+        decision_records=decision_records,
         mutation_index=mutation_index,
-        record=record,
+        request_id=request_id,
+        result_id=result_id,
     )
-    return record
 
 
 def validate_primary_mission_movement_event_decision_authority(

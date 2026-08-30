@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tests.setup_completion_helpers import (
     enter_battle_for_fixture,
-    record_primary_turn_start_evidence_for_fixture,
 )
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
@@ -15,9 +14,18 @@ from tools.generate_ability_support_matrix import (
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine import battle_shock_event_authority
+from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
+)
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
@@ -25,6 +33,9 @@ from warhammer40k_core.engine.attack_sequence import (
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
 )
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.battle_shock import BattleShockResult
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockModifierApplication
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     ModelPlacement,
@@ -33,13 +44,14 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
-    CommandStepState,
+    CommandPointSpendStatus,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     DamageKind,
     FeelNoPainSource,
     apply_damage_to_model,
+    apply_mortal_wounds_to_unit,
     model_by_id,
 )
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
@@ -51,6 +63,7 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
@@ -61,12 +74,19 @@ from warhammer40k_core.engine.faction_content.stratagem_activation import (
 from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
     combine_stratagem_indexes_with_runtime_overrides,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.path_of_the_outcast import (  # noqa: E501
+    manifest as path_of_the_outcast_manifest,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.path_of_the_outcast import (  # noqa: E501
+    stratagems as path_of_the_outcast_stratagems,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     july_2026_candidate as thousand_sons_july_candidate,
 )
 from warhammer40k_core.engine.fight_on_death import (
     model_is_present_on_battlefield,
     restore_model_awaiting_fight_on_death,
+    restore_selected_model_awaiting_fight_on_death,
 )
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
@@ -74,7 +94,6 @@ from warhammer40k_core.engine.game_state import (
     GameState,
     SecondaryMissionChoice,
     SecondaryMissionMode,
-    TacticalSecondaryDraw,
 )
 from warhammer40k_core.engine.lifecycle import (
     GameLifecycle,
@@ -85,6 +104,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -100,6 +122,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
+from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
     SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
@@ -108,10 +131,12 @@ from warhammer40k_core.engine.phases.movement import (
     FellBackUnitState,
     MovementDiceRecord,
     MovementPhaseActionKind,
-    MovementPhaseState,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_historical_events import (
+    record_new_primary_turn_start_evidence_events,
+)
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     reposition_destruction_policy,
@@ -145,8 +170,10 @@ from warhammer40k_core.engine.stratagems import (
     FALL_BACK_UNIT_CONTEXT_KEY,
     FIRE_OVERWATCH_TARGET_POLICY_ID,
     FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
+    HIT_TARGET_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
     JUST_SHOT_UNIT_CONTEXT_KEY,
@@ -217,6 +244,11 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     july_faction_packs_2026_07,
 )
@@ -482,9 +514,8 @@ def test_command_reroll_allows_eleventh_edition_number_of_attacks_roll_for_actor
 
 
 def test_phase14i_command_reroll_unlisted_roll_classes_are_domain_invalid() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _command_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
     command_reroll = _source_stratagem_record("command-reroll")
 
     for roll_type in (
@@ -519,9 +550,8 @@ def test_phase14i_command_reroll_unlisted_roll_classes_are_domain_invalid() -> N
 
 
 def test_phase14i_command_reroll_unlisted_roll_rejects_without_mutation() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _command_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
     _grant_cp(state, player_id="player-a", amount=1)
     command_reroll = _source_stratagem_record("command-reroll")
     roll_type = "battle_shock_roll"
@@ -888,32 +918,12 @@ def test_command_reroll_source_handler_can_resume_reaction_parent() -> None:
 
 
 def test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _command_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.FIXED,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_battle_shock(state)
-    _grant_cp(state, player_id="player-a", amount=1)
     target_unit_id = "army-alpha:intercessor-unit-1"
     _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
-    proposal_request = StratagemTargetProposal.for_request(
-        context=_context(
-            state=state,
-            player_id="player-a",
-            trigger_kind=TimingTriggerKind.START_PHASE,
-        ),
-        catalog_record=_source_stratagem_record("insane-bravery"),
-    )
-    waiting = request_stratagem_target_proposal(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        proposal_request=proposal_request,
-    )
-    request = _decision_request(waiting)
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
     submitted = _proposal_request_from_decision(request).with_binding(
         StratagemTargetBinding(
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
@@ -949,15 +959,6 @@ def test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock()
 def test_parameterized_stratagem_decline_requires_engine_marked_optional_window() -> None:
     lifecycle = _battle_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.FIXED,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_battle_shock(state)
-    _grant_cp(state, player_id="player-a", amount=1)
-    _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
     proposal_request = StratagemTargetProposal.for_request(
         context=_context(
             state=state,
@@ -966,12 +967,12 @@ def test_parameterized_stratagem_decline_requires_engine_marked_optional_window(
         ),
         catalog_record=_source_stratagem_record("insane-bravery"),
     )
-    waiting = request_stratagem_target_proposal(
+    request = create_stratagem_target_proposal_decision_request(
         state=state,
-        decisions=lifecycle.decision_controller,
         proposal_request=proposal_request,
     )
-    request = _decision_request(waiting)
+    lifecycle.decision_controller.request_decision(request)
+    assert request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
 
     rejected = lifecycle.submit_decision(
         DecisionResult(
@@ -992,9 +993,8 @@ def test_parameterized_stratagem_decline_requires_engine_marked_optional_window(
 
 
 def test_stratagem_decline_helpers_require_decline_results_and_marked_requests() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _command_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
     proposal_request = StratagemTargetProposal.for_request(
         context=_context(
             state=state,
@@ -1138,16 +1138,8 @@ def test_stratagem_decline_helpers_require_decline_results_and_marked_requests()
 
 
 def test_command_phase_progression_offers_insane_bravery_from_index_before_battle_shock() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _command_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.FIXED,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_battle_shock(state)
-    _grant_cp(state, player_id="player-a", amount=1)
     target_unit_id = "army-alpha:intercessor-unit-1"
     _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
 
@@ -1180,16 +1172,8 @@ def test_command_phase_progression_offers_insane_bravery_from_index_before_battl
 
 
 def test_command_phase_progression_declines_parameterized_stratagem_window() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _command_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.FIXED,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_battle_shock(state)
-    _grant_cp(state, player_id="player-a", amount=1)
     _remove_first_models(state, unit_instance_id="army-alpha:intercessor-unit-1", count=3)
 
     request = _decision_request(lifecycle.advance_until_decision_or_terminal())
@@ -1223,42 +1207,14 @@ def test_command_phase_progression_declines_parameterized_stratagem_window() -> 
 
 
 def test_new_orders_finite_source_handler_discards_and_draws_replacement_card() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle, request = _tactical_command_lifecycle_after_draw()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.TACTICAL,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_tactical_secondary(state)
-    _grant_cp(state, player_id="player-a", amount=1)
-    state.record_tactical_secondary_draw(
-        TacticalSecondaryDraw(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            request_id="phase12c-initial-tactical-draw-request",
-            result_id="phase12c-initial-tactical-draw",
-            draw_count=state.tactical_secondary_draw_count,
-        )
-    )
-    initial_cards = state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id="phase12c-initial-tactical-draw",
+    initial_cards = tuple(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a" and card.status.value == "active"
     )
     target_card_id = initial_cards[0].secondary_mission_id
-
-    waiting = request_stratagem_use(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        catalog_records=(_source_stratagem_record("new-orders"),),
-        context=_context(
-            state=state,
-            player_id="player-a",
-            trigger_kind=TimingTriggerKind.START_PHASE,
-        ),
-    )
-    request = _decision_request(waiting)
     selected_option = next(
         option
         for option in request.options
@@ -1296,121 +1252,84 @@ def test_new_orders_finite_source_handler_discards_and_draws_replacement_card() 
     )
 
 
-def test_phase14i_new_orders_rejects_second_use_in_same_game_before_cp_spend() -> None:
-    lifecycle = _battle_lifecycle()
+def test_phase14i_new_orders_is_not_offered_after_first_use_in_same_game() -> None:
+    lifecycle, request = _tactical_command_lifecycle_after_draw()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.TACTICAL,
-        player_b_mode=SecondaryMissionMode.FIXED,
+    selected_option = next(
+        option
+        for option in request.options
+        if option.option_id != DECLINE_STRATAGEM_WINDOW_OPTION_ID
     )
-    record = _source_stratagem_record("new-orders")
-    state.record_stratagem_use(
-        StratagemUseRecord(
-            use_id="phase14i-previous-new-orders-use",
-            player_id="player-a",
-            stratagem_id=record.definition.stratagem_id,
-            source_id=record.definition.source_id,
-            battle_round=1,
-            phase=BattlePhase.COMMAND,
-            active_player_id=state.active_player_id,
-            timing_window_id=None,
-            request_id="phase14i-previous-new-orders-request",
-            result_id="phase14i-previous-new-orders-result",
-            selected_option_id="phase14i-previous-new-orders-option",
-            target_binding=StratagemTargetBinding(
-                target_kind=StratagemTargetKind.TACTICAL_SECONDARY_CARD,
-                target_player_id="player-a",
-                target_secondary_mission_id="phase14i-prior-secondary-card",
-            ),
-            targeted_unit_instance_ids=(),
-            affected_unit_instance_ids=(),
-            command_point_cost=1,
-            command_point_transaction_id="phase14i-previous-new-orders-cp",
-            handler_id=record.definition.handler_id,
-        )
-    )
-    state.battle_round = 2
-    _set_command_step_ready_for_tactical_secondary(state)
-    _grant_cp(state, player_id="player-a", amount=1)
-    state.record_tactical_secondary_draw(
-        TacticalSecondaryDraw(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            request_id="phase14i-second-new-orders-draw-request",
-            result_id="phase14i-second-new-orders-draw",
-            draw_count=state.tactical_secondary_draw_count,
-        )
-    )
-    active_cards = state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id="phase14i-second-new-orders-draw",
-    )
-    context = _context(
-        state=state,
-        player_id="player-a",
-        trigger_kind=TimingTriggerKind.START_PHASE,
-    )
-    request = create_stratagem_use_decision_request(
-        state=state,
-        context=context,
-        options=(
-            _handcrafted_stratagem_option(
-                record=record,
-                context=context,
-                binding=StratagemTargetBinding(
-                    target_kind=StratagemTargetKind.TACTICAL_SECONDARY_CARD,
-                    target_player_id="player-a",
-                    target_secondary_mission_id=active_cards[1].secondary_mission_id,
-                ),
-            ),
-        ),
-    )
-    lifecycle.decision_controller.request_decision(request)
-
-    rejected = lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase14i-new-orders-second-use",
+            result_id="phase14i-first-new-orders-use",
             request=request,
-            selected_option_id=request.options[0].option_id,
+            selected_option_id=selected_option.option_id,
+        )
+    )
+    assert len(state.stratagem_use_records) == 1
+    while state.battle_round == 1:
+        movement_request = _decision_request(status)
+        if movement_request.decision_type == "select_movement_unit":
+            selected_movement_option_id = movement_request.options[0].option_id
+        elif movement_request.decision_type == "select_movement_action":
+            selected_movement_option_id = "remain_stationary"
+        else:
+            raise AssertionError(
+                "New Orders round-advance fixture encountered an unexpected decision type: "
+                f"{movement_request.decision_type}."
+            )
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=(
+                    f"phase14i-new-orders-round-advance:{state.active_player_id}:"
+                    f"{movement_request.decision_type}"
+                ),
+                request=movement_request,
+                selected_option_id=selected_movement_option_id,
+            )
+        )
+    draw_request = _decision_request(status)
+    assert state.battle_round == 2
+    assert state.current_battle_phase is BattlePhase.COMMAND
+    assert draw_request.decision_type == "draw_tactical_secondary_missions"
+    command_points_before_draw = state.command_point_total("player-a")
+
+    follow_up = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase14i-second-round-tactical-draw",
+            request=draw_request,
+            selected_option_id="draw",
         )
     )
 
-    assert rejected.status_kind is LifecycleStatusKind.INVALID
-    assert rejected.payload == {"invalid_reason": "once_per_battle"}
-    assert state.command_point_total("player-a") == 1
+    follow_up_request = _decision_request(follow_up)
+    assert follow_up_request.decision_type != STRATAGEM_DECISION_TYPE
+    assert (
+        stratagem_use_options(
+            state=state,
+            catalog_records=(_source_stratagem_record("new-orders"),),
+            context=_context(
+                state=state,
+                player_id="player-a",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+            ),
+        )
+        == ()
+    )
+    assert state.command_point_total("player-a") == command_points_before_draw
     assert len(state.stratagem_use_records) == 1
-    assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
 
 def test_command_phase_progression_offers_new_orders_from_index() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle, request = _tactical_command_lifecycle_after_draw()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.TACTICAL,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_tactical_secondary(state)
-    _grant_cp(state, player_id="player-a", amount=1)
-    state.record_tactical_secondary_draw(
-        TacticalSecondaryDraw(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            request_id="phase12c-progressed-new-orders-draw-request",
-            result_id="phase12c-progressed-new-orders-draw",
-            draw_count=state.tactical_secondary_draw_count,
-        )
-    )
-    initial_cards = state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id="phase12c-progressed-new-orders-draw",
+    initial_cards = tuple(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == "player-a" and card.status.value == "active"
     )
     target_card_id = initial_cards[0].secondary_mission_id
-
-    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     selected_option = next(
         option
         for option in request.options
@@ -1437,31 +1356,8 @@ def test_command_phase_progression_offers_new_orders_from_index() -> None:
 
 
 def test_command_phase_progression_declines_finite_stratagem_window() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle, request = _tactical_command_lifecycle_after_draw()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.TACTICAL,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_tactical_secondary(state)
-    _grant_cp(state, player_id="player-a", amount=1)
-    state.record_tactical_secondary_draw(
-        TacticalSecondaryDraw(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            request_id="phase12c-decline-new-orders-draw-request",
-            result_id="phase12c-decline-new-orders-draw",
-            draw_count=state.tactical_secondary_draw_count,
-        )
-    )
-    state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id="phase12c-decline-new-orders-draw",
-    )
-
-    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     assert request.decision_type == STRATAGEM_DECISION_TYPE
     assert request.option_by_id(DECLINE_STRATAGEM_WINDOW_OPTION_ID).option_id == (
         DECLINE_STRATAGEM_WINDOW_OPTION_ID
@@ -1488,33 +1384,11 @@ def test_command_phase_progression_declines_finite_stratagem_window() -> None:
 
 
 def test_command_phase_declining_new_orders_does_not_suppress_insane_bravery() -> None:
-    lifecycle = _battle_lifecycle()
-    state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.COMMAND)
-    _record_secondary_choices(
-        state,
-        player_a_mode=SecondaryMissionMode.TACTICAL,
-        player_b_mode=SecondaryMissionMode.FIXED,
-    )
-    _set_command_step_ready_for_tactical_secondary(state)
-    _grant_cp(state, player_id="player-a", amount=1)
-    state.record_tactical_secondary_draw(
-        TacticalSecondaryDraw(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            request_id="phase12c-combined-window-draw-request",
-            result_id="phase12c-combined-window-draw",
-            draw_count=state.tactical_secondary_draw_count,
-        )
-    )
-    state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id="phase12c-combined-window-draw",
-    )
     target_unit_id = "army-alpha:intercessor-unit-1"
-    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
-
-    new_orders_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    lifecycle, new_orders_request = _tactical_command_lifecycle_after_draw(
+        below_half_unit_id=target_unit_id,
+    )
+    state = _state(lifecycle)
     new_orders_payload = cast(dict[str, JsonValue], new_orders_request.payload)
     new_orders_context_payload = cast(
         dict[str, JsonValue],
@@ -1761,10 +1635,9 @@ def test_phase15e_core_stratagem_descriptors_are_supported_and_window_scoped() -
 
 
 def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> None:
-    insufficient_lifecycle = _battle_lifecycle()
+    insufficient_lifecycle = _battle_lifecycle(active_player_id="player-b")
     insufficient_state = _state(insufficient_lifecycle)
     _set_current_battle_phase(insufficient_state, BattlePhase.CHARGE)
-    insufficient_state.active_player_id = "player-b"
     _replace_unit_poses(
         insufficient_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -1800,10 +1673,9 @@ def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> No
     assert insufficient_state.stratagem_use_records == []
     assert insufficient_lifecycle.decision_controller.queue.pending_requests == ()
 
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -1847,7 +1719,7 @@ def test_phase15e_heroic_intervention_into_the_fray_spends_additional_cp() -> No
 def test_phase15e_heroic_intervention_reachable_targets_skip_absent_enemy_geometry(
     enemy_state: str,
 ) -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
@@ -1911,23 +1783,24 @@ def test_phase15e_heroic_intervention_reachable_targets_skip_absent_enemy_geomet
 
 
 def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_first() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        active_player_id="player-b",
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+            ),
+        ),
+        clear_terrain=True,
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
-    _replace_unit_poses(
-        state,
-        unit_instance_id=heroic_unit_id,
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id=enemy_unit_id,
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
-    )
-    _clear_terrain(state)
     assert state.battlefield_state is not None
     before_battlefield = state.battlefield_state.to_payload()
     _grant_cp(state, player_id="player-a", amount=2)
@@ -1986,11 +1859,11 @@ def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_fir
 
 def test_phase15e_heroic_intervention_charge_move_rejects_missing_witness() -> None:
     lifecycle = _battle_lifecycle(
-        replace(_config(), game_id="phase12c-heroic-missing-witness-0000")
+        replace(_config(), game_id="phase12c-heroic-missing-witness-0000"),
+        active_player_id="player-b",
     )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
     _replace_unit_poses(
@@ -2049,10 +1922,9 @@ def test_phase15e_heroic_intervention_charge_move_rejects_missing_witness() -> N
 
 
 def test_phase15e_heroic_intervention_charge_no_move_records_decline() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
     _replace_unit_poses(
@@ -2110,10 +1982,9 @@ def test_phase15e_heroic_intervention_charge_no_move_records_decline() -> None:
 
 
 def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
     _replace_unit_poses(
@@ -2190,10 +2061,9 @@ def test_phase15e_heroic_intervention_charge_rejects_endpoint_only_witness() -> 
 
 
 def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
     _replace_unit_poses(
@@ -2296,10 +2166,9 @@ def test_phase15e_heroic_intervention_reaction_invalid_charge_continues_to_retry
 
 
 def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and_drift() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
-    state.active_player_id = "player-b"
     heroic_unit_id = "army-alpha:intercessor-unit-1"
     enemy_unit_id = "army-beta:enemy-unit"
     _replace_unit_poses(
@@ -2391,10 +2260,9 @@ def test_phase15e_heroic_intervention_charge_prevalidation_rejects_malformed_and
 
 
 def test_phase15e_core_stratagem_effect_selection_rejects_malformed_payloads() -> None:
-    heroic_lifecycle = _battle_lifecycle()
+    heroic_lifecycle = _battle_lifecycle(active_player_id="player-b")
     heroic_state = _state(heroic_lifecycle)
     _set_current_battle_phase(heroic_state, BattlePhase.CHARGE)
-    heroic_state.active_player_id = "player-b"
     _grant_cp(heroic_state, player_id="player-a", amount=2)
     heroic_status = _submit_source_stratagem_target(
         heroic_lifecycle,
@@ -2449,25 +2317,22 @@ def test_phase15e_core_stratagem_effect_selection_rejects_malformed_payloads() -
 
 
 def test_phase15e_core_stratagem_target_policies_reject_invalid_official_contexts() -> None:
-    heroic_vehicle_lifecycle = _battle_lifecycle()
+    heroic_vehicle_lifecycle = _battle_lifecycle(
+        active_player_id="player-b",
+        keyword_replacements=(("army-alpha:intercessor-unit-1", ("Vehicle",)),),
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+            ),
+        ),
+    )
     heroic_vehicle_state = _state(heroic_vehicle_lifecycle)
     _set_current_battle_phase(heroic_vehicle_state, BattlePhase.CHARGE)
-    heroic_vehicle_state.active_player_id = "player-b"
-    _replace_unit_keywords(
-        heroic_vehicle_state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("Vehicle",),
-    )
-    _replace_unit_poses(
-        heroic_vehicle_state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        heroic_vehicle_state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
-    )
     _grant_cp(heroic_vehicle_state, player_id="player-a", amount=1)
     heroic_vehicle = _submit_source_stratagem_target(
         heroic_vehicle_lifecycle,
@@ -2478,20 +2343,21 @@ def test_phase15e_core_stratagem_target_policies_reject_invalid_official_context
         result_id="phase15e-heroic-vehicle",
     )
 
-    heroic_range_lifecycle = _battle_lifecycle()
+    heroic_range_lifecycle = _battle_lifecycle(
+        active_player_id="player-b",
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=50.0) for index in range(5)),
+            ),
+        ),
+    )
     heroic_range_state = _state(heroic_range_lifecycle)
     _set_current_battle_phase(heroic_range_state, BattlePhase.CHARGE)
-    heroic_range_state.active_player_id = "player-b"
-    _replace_unit_poses(
-        heroic_range_state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        heroic_range_state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=50.0) for index in range(5)),
-    )
     _grant_cp(heroic_range_state, player_id="player-a", amount=1)
     heroic_range = _submit_source_stratagem_target(
         heroic_range_lifecycle,
@@ -2626,7 +2492,7 @@ def test_phase15e_core_stratagem_target_policies_reject_invalid_official_context
 
 
 def test_phase15e_counteroffensive_selects_next_fight_activation() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     state.active_player_id = "player-a"
@@ -3000,7 +2866,18 @@ def test_snarling_protector_heroic_exception_uses_canonical_runtime_per_unit() -
 
 
 def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=1.0 + index * 2.0, y=0.0) for index in range(5)),
+            ),
+        ),
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
     state.active_player_id = "player-a"
@@ -3008,16 +2885,6 @@ def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Vehicle", "Monster"),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(x=index * 4.0, y=0.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(Pose.at(x=2.0 + index * 4.0, y=0.0) for index in range(5)),
     )
     source_model_id = _first_model_id(
         state,
@@ -3053,7 +2920,18 @@ def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
 
 
 def test_phase15e_crushing_impact_rejects_retained_destroyed_source_model() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(x=index * 2.0, y=0.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=1.0 + index * 2.0, y=0.0) for index in range(5)),
+            ),
+        ),
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
     state.active_player_id = "player-a"
@@ -3063,32 +2941,44 @@ def test_phase15e_crushing_impact_rejects_retained_destroyed_source_model() -> N
         unit_instance_id=source_unit_id,
         keywords=("Vehicle", "Monster"),
     )
-    _replace_unit_poses(
-        state,
-        unit_instance_id=source_unit_id,
-        poses=tuple(Pose.at(x=index * 4.0, y=0.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(Pose.at(x=2.0 + index * 4.0, y=0.0) for index in range(5)),
-    )
     source_model_id = _first_model_id(state, unit_instance_id=source_unit_id)
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    retained_placement = battlefield.model_placement_by_id(source_model_id)
     source_model = model_by_id(state=state, model_instance_id=source_model_id)
-    apply_damage_to_model(
+    enemy_unit_id = "army-beta:enemy-unit"
+    apply_mortal_wounds_to_unit(
         state=state,
+        decisions=lifecycle.decision_controller,
+        application_id="phase15e-crushing-impact-source-destruction",
+        source_rule_id="phase12c:test:fight-on-death",
+        source_context={"source_kind": "phase15e_crushing_impact_source_test"},
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id="player-b",
+            source_rules_unit_instance_id=enemy_unit_id,
+            source_model_instance_id=_first_model_id(
+                state,
+                unit_instance_id=enemy_unit_id,
+            ),
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.CHARGE,
+            source_step="phase15e_crushing_impact_source_test",
+        ),
         target_unit_instance_id=source_unit_id,
-        model_instance_id=source_model_id,
-        damage=source_model.wounds_remaining,
-        damage_kind=DamageKind.NORMAL,
+        mortal_wounds=source_model.wounds_remaining,
+        spill_over=False,
     )
-    restore_model_awaiting_fight_on_death(
+    destroyed_event = next(
+        event
+        for event in reversed(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "model_destroyed"
+        and isinstance(event.payload, dict)
+        and event.payload.get("model_instance_id") == source_model_id
+    )
+    restore_selected_model_awaiting_fight_on_death(
         state=state,
-        placement=retained_placement,
-        effect_id="phase12c:fight-on-death:crushing-impact-source",
+        decisions=lifecycle.decision_controller,
+        model_destroyed_event_id=destroyed_event.event_id,
+        model_instance_id=source_model_id,
+        source_id="phase12c:fight-on-death:crushing-impact-source",
         source_rule_id="phase12c:test:fight-on-death",
         source_phase=BattlePhase.CHARGE,
     )
@@ -3157,23 +3047,24 @@ def test_phase15e_epic_challenge_registers_selected_character_model_precision() 
 
 
 def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        active_player_id="player-b",
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(
+                    Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+                ),
+            ),
+        ),
+        clear_terrain=True,
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(
-            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
-        ),
-    )
-    _clear_terrain(state)
     _grant_cp(state, player_id="player-a", amount=1)
     record = _source_stratagem_record("fire-overwatch")
     context = _context(
@@ -3249,6 +3140,15 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
         if _state(lifecycle).out_of_phase_shooting_state is None:
             break
         request = _decision_request(status)
+        if request.decision_type == STRATAGEM_DECISION_TYPE:
+            status = lifecycle.submit_decision(
+                DecisionResult.for_request(
+                    result_id=f"phase13d-fire-overwatch-attack-{index}",
+                    request=request,
+                    selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+                )
+            )
+            continue
         assert request.decision_type in {
             SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
             "select_feel_no_pain",
@@ -3276,10 +3176,9 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
 
 
 def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3373,10 +3272,9 @@ def test_phase13d_fire_overwatch_rejects_invalid_declaration_before_queue_pop() 
 
 
 def test_phase13d_fire_overwatch_rejects_unit_more_than_24_before_cp_spend() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3415,25 +3313,22 @@ def test_phase13d_fire_overwatch_rejects_unit_more_than_24_before_cp_spend() -> 
 
 
 def test_phase13d_fire_overwatch_rejects_titanic_selected_unit_before_cp_spend() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        active_player_id="player-b",
+        keyword_replacements=(("army-alpha:intercessor-unit-1", ("TITANIC", "VEHICLE")),),
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+            ),
+        ),
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
-    )
-    _replace_unit_keywords(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("TITANIC", "VEHICLE"),
-    )
     _grant_cp(state, player_id="player-a", amount=1)
     request = _request_fire_overwatch_target_proposal(lifecycle)
     proposal = _proposal_request_from_decision(request).with_binding(
@@ -3461,26 +3356,23 @@ def test_phase13d_fire_overwatch_rejects_titanic_selected_unit_before_cp_spend()
 
 
 def test_phase13d_fire_overwatch_allows_titanic_triggering_enemy_unit() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        active_player_id="player-b",
+        keyword_replacements=(("army-beta:enemy-unit", ("TITANIC", "VEHICLE")),),
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
+            ),
+            (
+                "army-beta:enemy-unit",
+                tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
+            ),
+        ),
+        clear_terrain=True,
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(index * 2.0, y=6.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(Pose.at(x=20.0 + index * 2.0, y=6.0) for index in range(5)),
-    )
-    _replace_unit_keywords(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        keywords=("TITANIC", "VEHICLE"),
-    )
-    _clear_terrain(state)
     _grant_cp(state, player_id="player-a", amount=1)
     request = _request_fire_overwatch_target_proposal(lifecycle)
     proposal = _proposal_request_from_decision(request).with_binding(
@@ -3508,10 +3400,9 @@ def test_phase13d_fire_overwatch_allows_titanic_triggering_enemy_unit() -> None:
 
 
 def test_phase13d_fire_overwatch_rejects_engaged_selected_unit_before_cp_spend() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3551,11 +3442,11 @@ def test_phase13d_fire_overwatch_rejects_engaged_selected_unit_before_cp_spend()
 
 def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> None:
     lifecycle = _battle_lifecycle(
-        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2")),
+        active_player_id="player-b",
     )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3645,10 +3536,9 @@ def test_phase13d_fire_overwatch_declaration_is_bound_to_triggering_enemy() -> N
 
 
 def test_phase13d_fire_overwatch_rejects_fell_back_unit_before_cp_spend() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(active_player_id="player-b")
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3707,11 +3597,11 @@ def test_phase13d_fire_overwatch_rejects_advanced_unit_without_assault_before_cp
         ),
     )
     lifecycle = _battle_lifecycle(
-        config=_config(catalog=_catalog_with_replaced_bolt_profiles((non_assault_profile,)))
+        config=_config(catalog=_catalog_with_replaced_bolt_profiles((non_assault_profile,))),
+        active_player_id="player-b",
     )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3776,11 +3666,11 @@ def test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons() ->
     lifecycle = _battle_lifecycle(
         config=_config(
             catalog=_catalog_with_replaced_bolt_profiles((non_assault_profile, assault_profile))
-        )
+        ),
+        active_player_id="player-b",
     )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.active_player_id = "player-b"
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3833,14 +3723,9 @@ def test_phase13d_fire_overwatch_advanced_unit_exposes_only_assault_weapons() ->
 
 
 def test_phase13d_smokescreen_registers_defensive_effects() -> None:
-    smoke_lifecycle = _battle_lifecycle()
+    smoke_lifecycle = _battle_lifecycle(active_player_id="player-b")
     smoke_state = _state(smoke_lifecycle)
     _set_current_battle_phase(smoke_state, BattlePhase.SHOOTING)
-    smoke_state.active_player_id = "player-b"
-    record_primary_turn_start_evidence_for_fixture(
-        smoke_state,
-        decisions=smoke_lifecycle.decision_controller,
-    )
     _replace_unit_keywords(
         smoke_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3878,10 +3763,9 @@ def test_phase13d_smokescreen_registers_defensive_effects() -> None:
     assert smoke_effect["hit_roll_modifier"] == -1
     assert smoke_expiration["player_id"] == "player-b"
 
-    invalid_lifecycle = _battle_lifecycle()
+    invalid_lifecycle = _battle_lifecycle(active_player_id="player-b")
     invalid_state = _state(invalid_lifecycle)
     _set_current_battle_phase(invalid_state, BattlePhase.SHOOTING)
-    invalid_state.active_player_id = "player-b"
     _grant_cp(invalid_state, player_id="player-a", amount=1)
 
     invalid_status = _submit_source_stratagem_target(
@@ -3901,7 +3785,16 @@ def test_phase13d_smokescreen_registers_defensive_effects() -> None:
 
 
 def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        pose_replacements=(
+            (
+                "army-beta:enemy-unit",
+                tuple(
+                    Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+                ),
+            ),
+        ),
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     state.active_player_id = "player-a"
@@ -3909,13 +3802,6 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Infantry", "Battleline", "Grenades"),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(
-            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
-        ),
     )
     _grant_cp(state, player_id="player-a", amount=1)
 
@@ -3990,7 +3876,16 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
     assert invalid_state.stratagem_use_records == []
     assert invalid_lifecycle.decision_controller.queue.pending_requests == (request,)
 
-    shot_lifecycle = _battle_lifecycle()
+    shot_lifecycle = _battle_lifecycle(
+        pose_replacements=(
+            (
+                "army-beta:enemy-unit",
+                tuple(
+                    Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+                ),
+            ),
+        ),
+    )
     shot_state = _state(shot_lifecycle)
     _set_current_battle_phase(shot_state, BattlePhase.SHOOTING)
     shot_state.active_player_id = "player-a"
@@ -3998,13 +3893,6 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
         shot_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Infantry", "Battleline", "Grenades"),
-    )
-    _replace_unit_poses(
-        shot_state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(
-            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
-        ),
     )
     shot_state.shooting_phase_state = ShootingPhaseState(
         battle_round=shot_state.battle_round,
@@ -4030,7 +3918,16 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
 
 
 def test_phase13d_explosives_enemy_effect_does_not_block_opponent_targeting() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        pose_replacements=(
+            (
+                "army-beta:enemy-unit",
+                tuple(
+                    Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+                ),
+            ),
+        ),
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     state.active_player_id = "player-a"
@@ -4038,13 +3935,6 @@ def test_phase13d_explosives_enemy_effect_does_not_block_opponent_targeting() ->
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Infantry", "Battleline", "Grenades"),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(
-            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
-        ),
     )
     _grant_cp(state, player_id="player-a", amount=1)
     _grant_cp(state, player_id="player-b", amount=1)
@@ -4092,7 +3982,15 @@ def test_phase13d_explosives_enemy_effect_does_not_block_opponent_targeting() ->
 def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> None:
     attached_id = "attached-unit:army-beta:enemy-command-unit"
     lifecycle = _battle_lifecycle(
-        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2")),
+        pose_replacements=(
+            (
+                "army-beta:enemy-unit",
+                tuple(
+                    Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+                ),
+            ),
+        ),
     )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
@@ -4101,13 +3999,6 @@ def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> 
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Infantry", "Battleline", "Grenades"),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(
-            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
-        ),
     )
     _mark_attached_unit_join(
         state,
@@ -4184,31 +4075,31 @@ def test_phase13d_explosives_unknown_enemy_target_rejects_before_queue_pop() -> 
 
 
 def test_phase13d_explosives_mortal_wounds_route_decline_allowed_feel_no_pain() -> None:
-    lifecycle = _battle_lifecycle()
+    target_model_id = "army-beta:enemy-unit:core-intercessor-like:001"
+    lifecycle = _battle_lifecycle(
+        keyword_replacements=(
+            ("army-alpha:intercessor-unit-1", ("Infantry", "Battleline", "Grenades")),
+        ),
+        pose_replacements=(
+            (
+                "army-beta:enemy-unit",
+                tuple(
+                    Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
+                ),
+            ),
+        ),
+        feel_no_pain_source_replacements=(
+            (
+                target_model_id,
+                (FeelNoPainSource(source_id="phase13d-explosives-fnp", threshold=5),),
+                True,
+            ),
+        ),
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     state.active_player_id = "player-a"
-    _replace_unit_keywords(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        keywords=("Infantry", "Battleline", "Grenades"),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:enemy-unit",
-        poses=tuple(
-            Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
-        ),
-    )
-    target_model = model_by_id(
-        state=state,
-        model_instance_id="army-beta:enemy-unit:core-intercessor-like:001",
-    )
-    state.record_model_feel_no_pain_sources(
-        model_instance_id=target_model.model_instance_id,
-        sources=(FeelNoPainSource(source_id="phase13d-explosives-fnp", threshold=5),),
-        decline_allowed=True,
-    )
+    target_model = model_by_id(state=state, model_instance_id=target_model_id)
     _grant_cp(state, player_id="player-a", amount=1)
 
     status = _submit_source_stratagem_target(
@@ -4258,7 +4149,7 @@ def test_phase13d_explosives_mortal_wounds_route_decline_allowed_feel_no_pain() 
 
 
 def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _rapid_ingress_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
         _request_rapid_ingress_placement(lifecycle)
     )
@@ -4308,52 +4199,25 @@ def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle(
 
 
 def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resumes() -> None:
-    lifecycle = _battle_lifecycle()
-    state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.battle_round = 2
-    _grant_cp(state, player_id="player-b", amount=1)
-    reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        lifecycle,
-        player_id="player-b",
-        unit_instance_id="army-beta:enemy-unit",
-    )
-    proposal_request = StratagemTargetProposal.for_request(
-        context=_context(
-            state=state,
-            player_id="player-b",
-            trigger_kind=TimingTriggerKind.END_PHASE,
-        ),
-        catalog_record=_source_stratagem_record("rapid-ingress"),
-    )
-    lifecycle.reaction_queue.emit_decision_request(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        reaction_window=_reaction_window_for_trigger(
-            state,
-            eligible_player_id="player-b",
-            trigger_kind=TimingTriggerKind.END_PHASE,
-            source_rule_id="phase12c-rapid-ingress-reaction",
-            window_id="phase12c-rapid-ingress-window",
-        ),
-        parent_phase=BattlePhase.MOVEMENT,
-        parent_step="end_movement_phase_reactions",
-        resume_token="phase12c_rapid_ingress_resume_token",
-        actor_id="player-b",
-        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-        options=(parameterized_decision_option(),),
-        payload=validate_json_value(
-            {"proposal_request": validate_json_value(proposal_request.to_payload())}
-        ),
+    lifecycle = _rapid_ingress_lifecycle()
+    _state_before_restore, reserve_state, _reserve_unit, _reserve_army, target_request = (
+        _round_two_rapid_ingress_target_request(lifecycle)
     )
     restored_target = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
-    target_request = _decision_request(restored_target.advance_until_decision_or_terminal())
+    restored_target_request = _decision_request(
+        restored_target.advance_until_decision_or_terminal()
+    )
+    assert restored_target_request == target_request
+    resumed_count_before_target = sum(
+        event.event_type == "reaction_parent_resumed"
+        for event in restored_target.decision_controller.event_log.records
+    )
 
     target_status = restored_target.submit_decision(
         _target_proposal_result(
-            request=target_request,
+            request=restored_target_request,
             result_id="phase12c-rapid-ingress-reaction-target",
-            proposal=_proposal_request_from_decision(target_request).with_binding(
+            proposal=_proposal_request_from_decision(restored_target_request).with_binding(
                 StratagemTargetBinding(
                     target_kind=StratagemTargetKind.FRIENDLY_UNIT,
                     target_player_id="player-b",
@@ -4367,7 +4231,13 @@ def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resum
     assert placement_request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
     assert len(restored_target.reaction_queue.frames) == 1
     assert restored_target.reaction_queue.frames[0].request_id == placement_request.request_id
-    assert not _has_event(restored_target.decision_controller, "reaction_parent_resumed")
+    assert (
+        sum(
+            event.event_type == "reaction_parent_resumed"
+            for event in restored_target.decision_controller.event_log.records
+        )
+        == resumed_count_before_target
+    )
     assert _has_event(restored_target.decision_controller, "reaction_window_continued")
 
     restored_placement = GameLifecycle.from_payload(_lifecycle_payload_copy(restored_target))
@@ -4413,33 +4283,273 @@ def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resum
         restored_placement.decision_controller,
         "reaction_parent_resumed",
     )
-    assert resumed_payload["resume_token"] == "phase12c_rapid_ingress_resume_token"
+    assert resumed_payload["resume_token"] == (
+        "rapid-ingress-end-movement-round-02-player-player-b-resume"
+    )
     assert _has_event(restored_placement.decision_controller, "rapid_ingress_resolved")
     arrived_state = restored_state.reserve_state_for_unit(restored_reserve_state.unit_instance_id)
     assert arrived_state is not None
     assert arrived_state.status is ReserveStatus.ARRIVED
 
 
-def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -> None:
-    lifecycle = _battle_lifecycle()
+def test_stratagem_battle_shock_reroll_restores_and_resumes_shooting_reaction() -> None:
+    lifecycle, bundle = _eldritch_suppression_reaction_lifecycle()
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.battle_round = 2
-    _grant_cp(state, player_id="player-b", amount=1)
-    reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        lifecycle,
-        player_id="player-b",
-        unit_instance_id="army-beta:enemy-unit",
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-beta:enemy-unit"
+    record = next(
+        record
+        for record in bundle.stratagem_indexes_by_player_id["player-a"].all_records()
+        if record.definition.stratagem_id
+        == path_of_the_outcast_stratagems.ELDRITCH_SUPPRESSION_STRATAGEM_ID
     )
-    state.movement_phase_state = MovementPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        reinforcements_completed=True,
-        selected_unit_ids=("army-alpha:intercessor-unit-1",),
-        moved_unit_ids=("army-alpha:intercessor-unit-1",),
+    context = _context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: source_unit_id,
+            HIT_TARGET_UNIT_CONTEXT_KEY: [target_unit_id],
+            "attack_sequence_id": "phase12c-eldritch-attack-sequence",
+            "attack_sequence_completed_event_id": "phase12c-eldritch-shot-completed",
+        },
+    )
+    options = stratagem_use_options(
+        state=state,
+        catalog_records=(record,),
+        context=context,
+    )
+    assert len(options) == 1
+    lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=_reaction_window_for_trigger(
+            state,
+            eligible_player_id="player-a",
+            trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            source_rule_id=record.definition.source_id,
+            window_id="phase12c-eldritch-reaction-window",
+            phase=BattlePhase.SHOOTING,
+        ),
+        parent_phase=BattlePhase.SHOOTING,
+        parent_step="friendly_unit_has_shot_reactions",
+        resume_token="phase12c_eldritch_reaction_resume",
+        actor_id="player-a",
+        decision_type=STRATAGEM_DECISION_TYPE,
+        options=options,
+        payload=validate_json_value(
+            {
+                "stratagem_context": validate_json_value(context.to_payload()),
+                "finite": True,
+            }
+        ),
+    )
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    reroll_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-eldritch-target-result",
+            request=request,
+            selected_option_id=options[0].option_id,
+        )
     )
 
-    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    reroll_request = _decision_request(reroll_status)
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert lifecycle.reaction_queue.frames[-1].request_id == reroll_request.request_id
+    restored = GameLifecycle.from_payload(
+        _lifecycle_payload_copy(lifecycle),
+        runtime_content_bundle=bundle,
+    )
+    restored_request = _decision_request(restored.advance_until_decision_or_terminal())
+    assert restored_request.request_id == reroll_request.request_id
+
+    resumed = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-eldritch-reroll-declined",
+            request=restored_request,
+            selected_option_id="decline",
+        )
+    )
+
+    assert resumed.status_kind is not LifecycleStatusKind.INVALID
+    assert restored.reaction_queue.frames == ()
+    continued = tuple(
+        event
+        for event in restored.decision_controller.event_log.records
+        if event.event_type == "reaction_window_continued"
+    )
+    assert len(continued) == 1
+    assert (
+        _last_event_payload(restored.decision_controller, "reaction_parent_resumed")["resume_token"]
+        == "phase12c_eldritch_reaction_resume"
+    )
+    resolved_payload = _last_event_payload(
+        restored.decision_controller,
+        "battle_shock_test_resolved",
+    )
+    assert resolved_payload["source_kind"] == "stratagem_battle_shock"
+    resolved_result = cast(dict[str, JsonValue], resolved_payload["battle_shock_result"])
+    resolved_request = cast(dict[str, JsonValue], resolved_result["request"])
+    reroll_payload = cast(dict[str, JsonValue], reroll_request.payload)
+    reroll_context = cast(
+        dict[str, JsonValue],
+        reroll_payload["battle_shock_context"],
+    )
+    reroll_test_request = cast(
+        dict[str, JsonValue],
+        reroll_context["battle_shock_test_request"],
+    )
+    assert resolved_request["request_id"] == reroll_test_request["request_id"]
+
+    result = BattleShockResult.from_payload(cast(Any, resolved_result))
+    request_base: dict[str, JsonValue] = {
+        key: value
+        for key, value in resolved_payload.items()
+        if key
+        not in {
+            "battle_shock_result",
+            "auto_passed",
+            "state_update",
+            "cleared_battle_shocked_unit_ids",
+        }
+    }
+    use = battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+        request_base=request_base,
+        result=result,
+        runtime_content_bundle=bundle,
+    )
+    assert use.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+    with pytest.raises(GameLifecycleError, match="lacks a loaded player index"):
+        battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+            request_base=request_base,
+            result=result,
+            runtime_content_bundle=replace(bundle, stratagem_indexes_by_player_id={}),
+        )
+    drifted_use_payload = cast(
+        dict[str, JsonValue],
+        validate_json_value(use.to_payload()),
+    )
+    drifted_request_base = cast(
+        dict[str, JsonValue],
+        validate_json_value(
+            {
+                **request_base,
+                "source_stratagem_use": {
+                    **drifted_use_payload,
+                    "source_id": f"{use.source_id}:drift",
+                },
+            }
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="catalog authority drifted"):
+        battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+            request_base=drifted_request_base,
+            result=result,
+            runtime_content_bundle=bundle,
+        )
+    with pytest.raises(GameLifecycleError, match="request identity drifted"):
+        battle_shock_event_authority._validated_stratagem_use_and_provider(  # pyright: ignore[reportPrivateUsage]
+            request_base=request_base,
+            result=replace(
+                result,
+                request=replace(result.request, request_id=f"{result.request.request_id}:drift"),
+            ),
+            runtime_content_bundle=bundle,
+        )
+    modifier_source_id = use.source_id
+    modifier = RollModifier(
+        modifier_id=f"{use.use_id}:battle-shock-modifier",
+        source_id=modifier_source_id,
+        operand=-1,
+    )
+    application = BattleShockModifierApplication(
+        hook_id=use.handler_id,
+        source_id=modifier_source_id,
+        modifiers=(modifier,),
+    )
+    with pytest.raises(GameLifecycleError, match="generic Stratagem modifier source drifted"):
+        battle_shock_event_authority._validate_stratagem_modifier_application(  # pyright: ignore[reportPrivateUsage]
+            event_records=restored.decision_controller.event_log.records,
+            decision_records=restored.decision_controller.records,
+            request_base=request_base,
+            result=result,
+            application=application,
+            runtime_content_bundle=bundle,
+        )
+
+    generic_modifier_effect = cast(
+        dict[str, JsonValue],
+        validate_json_value(
+            {
+                "source_id": modifier_source_id,
+                "effect": {
+                    "parameters": [
+                        {"key": "modifier_if_destroyed_target", "value": -1},
+                        {
+                            "key": "modifier_source_suffix",
+                            "value": "battle-shock-modifier",
+                        },
+                    ]
+                },
+            }
+        ),
+    )
+    modifier_base: dict[str, JsonValue] = {
+        **request_base,
+        "generic_rule_effect": generic_modifier_effect,
+    }
+    battle_shock_event_authority._validate_stratagem_modifier_application(  # pyright: ignore[reportPrivateUsage]
+        event_records=restored.decision_controller.event_log.records,
+        decision_records=restored.decision_controller.records,
+        request_base=modifier_base,
+        result=result,
+        application=application,
+        runtime_content_bundle=bundle,
+    )
+    invalid_applications = (
+        replace(application, hook_id="wrong-provider"),
+        BattleShockModifierApplication(
+            hook_id=use.handler_id,
+            source_id="wrong-source",
+            modifiers=(
+                replace(
+                    modifier,
+                    modifier_id="wrong-source:modifier",
+                    source_id="wrong-source",
+                ),
+            ),
+        ),
+        BattleShockModifierApplication(
+            hook_id=use.handler_id,
+            source_id=modifier_source_id,
+            modifiers=(
+                modifier,
+                replace(modifier, modifier_id=f"{modifier.modifier_id}:duplicate"),
+            ),
+        ),
+        replace(
+            application,
+            modifiers=(replace(modifier, operand=-2),),
+        ),
+    )
+    for invalid_application in invalid_applications:
+        with pytest.raises(GameLifecycleError, match="Stratagem modifier"):
+            battle_shock_event_authority._validate_stratagem_modifier_application(  # pyright: ignore[reportPrivateUsage]
+                event_records=restored.decision_controller.event_log.records,
+                decision_records=restored.decision_controller.records,
+                request_base=modifier_base,
+                result=result,
+                application=invalid_application,
+                runtime_content_bundle=bundle,
+            )
+
+
+def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -> None:
+    lifecycle = _rapid_ingress_lifecycle()
+    _state_before_target, reserve_state, _reserve_unit, _reserve_army, target_request = (
+        _round_two_rapid_ingress_target_request(lifecycle)
+    )
 
     assert target_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
     assert len(lifecycle.reaction_queue.frames) == 1
@@ -4509,25 +4619,10 @@ def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -
 
 
 def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index() -> None:
-    lifecycle = _battle_lifecycle()
-    state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.battle_round = 2
-    _grant_cp(state, player_id="player-b", amount=1)
-    reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        lifecycle,
-        player_id="player-b",
-        unit_instance_id="army-beta:enemy-unit",
+    lifecycle = _rapid_ingress_lifecycle()
+    _state_before_restore, reserve_state, _reserve_unit, _reserve_army, target_request = (
+        _round_two_rapid_ingress_target_request(lifecycle)
     )
-    state.movement_phase_state = MovementPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        reinforcements_completed=True,
-        selected_unit_ids=("army-alpha:intercessor-unit-1",),
-        moved_unit_ids=("army-alpha:intercessor-unit-1",),
-    )
-
-    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     assert target_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
     restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
     restored_request = _decision_request(restored.advance_until_decision_or_terminal())
@@ -4561,7 +4656,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
 
 
 def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _rapid_ingress_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
         _request_rapid_ingress_placement(lifecycle)
     )
@@ -4580,7 +4675,6 @@ def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> N
         placement_kind=BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,
         attempted_placement=invalid_placement,
     )
-
     status = lifecycle.submit_decision(
         DecisionResult(
             result_id="phase12c-rapid-ingress-invalid-placement",
@@ -4611,7 +4705,7 @@ def test_rapid_ingress_invalid_placement_is_typed_invalid_without_arrival() -> N
 
 
 def test_rapid_ingress_reaction_invalid_placement_keeps_parent_blocked_for_retry() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _rapid_ingress_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
         _request_rapid_ingress_reaction_placement(lifecycle)
     )
@@ -4629,6 +4723,10 @@ def test_rapid_ingress_reaction_invalid_placement_keeps_parent_blocked_for_retry
         unit_instance_id=reserve_state.unit_instance_id,
         placement_kind=BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,
         attempted_placement=invalid_placement,
+    )
+    resumed_count_before_invalid = sum(
+        event.event_type == "reaction_parent_resumed"
+        for event in lifecycle.decision_controller.event_log.records
     )
 
     status = lifecycle.submit_decision(
@@ -4648,12 +4746,18 @@ def test_rapid_ingress_reaction_invalid_placement_keeps_parent_blocked_for_retry
     assert status.payload["next_request_id"] == retry_request.request_id
     assert len(lifecycle.reaction_queue.frames) == 1
     assert lifecycle.reaction_queue.frames[0].request_id == retry_request.request_id
-    assert not _has_event(lifecycle.decision_controller, "reaction_parent_resumed")
+    assert (
+        sum(
+            event.event_type == "reaction_parent_resumed"
+            for event in lifecycle.decision_controller.event_log.records
+        )
+        == resumed_count_before_invalid
+    )
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
 
 
 def test_rapid_ingress_stale_placement_proposal_rejects_before_queue_pop() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _rapid_ingress_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
         _request_rapid_ingress_placement(lifecycle)
     )
@@ -4696,7 +4800,7 @@ def test_rapid_ingress_stale_placement_proposal_rejects_before_queue_pop() -> No
 
 
 def test_rapid_ingress_reserve_state_drift_rejects_before_queue_pop() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _rapid_ingress_lifecycle()
     state, reserve_state, reserve_unit, reserve_army, placement_request = (
         _request_rapid_ingress_placement(lifecycle)
     )
@@ -4755,7 +4859,7 @@ def test_rapid_ingress_reserve_state_drift_rejects_before_queue_pop() -> None:
 
 
 def test_rapid_ingress_malformed_placement_payload_rejects_before_queue_pop() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _rapid_ingress_lifecycle()
     state, reserve_state, _reserve_unit, _reserve_army, placement_request = (
         _request_rapid_ingress_placement(lifecycle)
     )
@@ -6324,29 +6428,9 @@ def _move_unit_to_reserves(
 def _request_rapid_ingress_placement(
     lifecycle: GameLifecycle,
 ) -> tuple[GameState, ReserveState, UnitInstance, ArmyDefinition, DecisionRequest]:
-    state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.battle_round = 2
-    _grant_cp(state, player_id="player-b", amount=1)
-    reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
-        lifecycle,
-        player_id="player-b",
-        unit_instance_id="army-beta:enemy-unit",
+    state, reserve_state, reserve_unit, reserve_army, request = (
+        _round_two_rapid_ingress_target_request(lifecycle)
     )
-    proposal_request = StratagemTargetProposal.for_request(
-        context=_context(
-            state=state,
-            player_id="player-b",
-            trigger_kind=TimingTriggerKind.END_PHASE,
-        ),
-        catalog_record=_source_stratagem_record("rapid-ingress"),
-    )
-    waiting = request_stratagem_target_proposal(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        proposal_request=proposal_request,
-    )
-    request = _decision_request(waiting)
     target_status = lifecycle.submit_decision(
         _target_proposal_result(
             request=request,
@@ -6365,47 +6449,51 @@ def _request_rapid_ingress_placement(
     return state, reserve_state, reserve_unit, reserve_army, placement_request
 
 
-def _request_rapid_ingress_reaction_placement(
+def _round_two_rapid_ingress_target_request(
     lifecycle: GameLifecycle,
 ) -> tuple[GameState, ReserveState, UnitInstance, ArmyDefinition, DecisionRequest]:
     state = _state(lifecycle)
-    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
-    state.battle_round = 2
+    assert state.battle_round == 2
+    assert state.active_player_id == "player-a"
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
     _grant_cp(state, player_id="player-b", amount=1)
-    reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
-        lifecycle,
-        player_id="player-b",
-        unit_instance_id="army-beta:enemy-unit",
+    reserve_state = state.reserve_state_for_unit("army-beta:enemy-unit")
+    assert reserve_state is not None
+    assert reserve_state.status is ReserveStatus.IN_RESERVES
+    reserve_army = state.army_definition_for_player("player-b")
+    assert reserve_army is not None
+    reserve_unit = reserve_army.unit_by_id(reserve_state.unit_instance_id)
+    select_unit_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert select_unit_request.decision_type == "select_movement_unit"
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-rapid-ingress-fixture-select-unit",
+            request=select_unit_request,
+            selected_option_id=select_unit_request.options[0].option_id,
+        )
     )
-    proposal_request = StratagemTargetProposal.for_request(
-        context=_context(
-            state=state,
-            player_id="player-b",
-            trigger_kind=TimingTriggerKind.END_PHASE,
-        ),
-        catalog_record=_source_stratagem_record("rapid-ingress"),
+    action_request = _decision_request(action_status)
+    assert action_request.decision_type == "select_movement_action"
+    target_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-rapid-ingress-fixture-remain-stationary",
+            request=action_request,
+            selected_option_id="remain_stationary",
+        )
     )
-    lifecycle.reaction_queue.emit_decision_request(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        reaction_window=_reaction_window_for_trigger(
-            state,
-            eligible_player_id="player-b",
-            trigger_kind=TimingTriggerKind.END_PHASE,
-            source_rule_id="phase12c-rapid-ingress-retry-reaction",
-            window_id="phase12c-rapid-ingress-retry-window",
-        ),
-        parent_phase=BattlePhase.MOVEMENT,
-        parent_step="end_movement_phase_reactions",
-        resume_token="phase12c_rapid_ingress_retry_resume_token",
-        actor_id="player-b",
-        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
-        options=(parameterized_decision_option(),),
-        payload=validate_json_value(
-            {"proposal_request": validate_json_value(proposal_request.to_payload())}
-        ),
+    target_request = _decision_request(target_status)
+    assert target_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert len(lifecycle.reaction_queue.frames) == 1
+    assert lifecycle.reaction_queue.frames[0].request_id == target_request.request_id
+    return state, reserve_state, reserve_unit, reserve_army, target_request
+
+
+def _request_rapid_ingress_reaction_placement(
+    lifecycle: GameLifecycle,
+) -> tuple[GameState, ReserveState, UnitInstance, ArmyDefinition, DecisionRequest]:
+    state, reserve_state, reserve_unit, reserve_army, target_request = (
+        _round_two_rapid_ingress_target_request(lifecycle)
     )
-    target_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     target_status = lifecycle.submit_decision(
         _target_proposal_result(
             request=target_request,
@@ -6489,32 +6577,24 @@ def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondar
     )
 
 
-def _set_command_step_ready_for_battle_shock(state: GameState) -> None:
-    command_state = CommandStepState.start(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-    )
-    state.command_step_state = (
-        command_state.with_command_points_granted()
-        .with_scoring_hooks_resolved()
-        .with_tactical_secondary_resolved()
-    )
-
-
-def _set_command_step_ready_for_tactical_secondary(state: GameState) -> None:
-    command_state = CommandStepState.start(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-    )
-    state.command_step_state = (
-        command_state.with_command_points_granted().with_scoring_hooks_resolved()
-    )
-
-
-def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
+def _unadvanced_battle_lifecycle(
+    config: GameConfig | None = None,
+    *,
+    keyword_replacements: tuple[tuple[str, tuple[str, ...]], ...] = (),
+    pose_replacements: tuple[tuple[str, tuple[Pose, ...]], ...] = (),
+    clear_terrain: bool = False,
+    attached_unit_joins: tuple[tuple[str, str, tuple[str, ...]], ...] = (),
+) -> GameLifecycle:
     config = _config() if config is None else config
     decisions = DecisionController()
-    state = _battle_state(config=config, decisions=decisions)
+    state = _battle_state(
+        config=config,
+        decisions=decisions,
+        keyword_replacements=keyword_replacements,
+        pose_replacements=pose_replacements,
+        clear_terrain=clear_terrain,
+        attached_unit_joins=attached_unit_joins,
+    )
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
@@ -6523,6 +6603,309 @@ def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
             "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         }
+    )
+
+
+def _battle_lifecycle(
+    config: GameConfig | None = None,
+    *,
+    battle_round: int = 1,
+    active_player_id: str = "player-a",
+    reserve_unit: tuple[str, str] | None = None,
+    keyword_replacements: tuple[tuple[str, tuple[str, ...]], ...] = (),
+    pose_replacements: tuple[tuple[str, tuple[Pose, ...]], ...] = (),
+    feel_no_pain_source_replacements: tuple[
+        tuple[str, tuple[FeelNoPainSource, ...], bool], ...
+    ] = (),
+    clear_terrain: bool = False,
+    attached_unit_joins: tuple[tuple[str, str, tuple[str, ...]], ...] = (),
+) -> GameLifecycle:
+    if battle_round < 1:
+        raise AssertionError("Battle lifecycle fixture round must be positive.")
+    lifecycle = _unadvanced_battle_lifecycle(
+        config,
+        pose_replacements=pose_replacements,
+        clear_terrain=clear_terrain,
+        attached_unit_joins=attached_unit_joins,
+    )
+    state = _state(lifecycle)
+    for unit_instance_id, keywords in keyword_replacements:
+        _replace_unit_keywords(
+            state,
+            unit_instance_id=unit_instance_id,
+            keywords=keywords,
+        )
+    for model_instance_id, sources, decline_allowed in feel_no_pain_source_replacements:
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=model_instance_id,
+            sources=sources,
+            decline_allowed=decline_allowed,
+        )
+    _record_default_fixed_secondary_choices_for_missing_players(state)
+    if reserve_unit is not None:
+        reserve_player_id, reserve_unit_instance_id = reserve_unit
+        _move_unit_to_reserves(
+            lifecycle,
+            player_id=reserve_player_id,
+            unit_instance_id=reserve_unit_instance_id,
+        )
+    lifecycle = _complete_current_command_for_fixture(lifecycle)
+    if battle_round == 1 and active_player_id != _state(lifecycle).turn_order[0]:
+        state = _state(lifecycle)
+        if active_player_id not in state.player_ids:
+            raise AssertionError("Battle lifecycle fixture active player is unknown.")
+        while not (
+            state.active_player_id == active_player_id
+            and state.current_battle_phase is BattlePhase.COMMAND
+        ):
+            _advance_battle_phase_for_fixture(lifecycle)
+        lifecycle = _complete_current_command_for_fixture(lifecycle)
+    if battle_round > 1:
+        status = lifecycle.advance_until_decision_or_terminal()
+        while True:
+            state = _state(lifecycle)
+            if (
+                state.battle_round == battle_round
+                and state.active_player_id == state.turn_order[0]
+                and state.current_battle_phase is BattlePhase.MOVEMENT
+            ):
+                break
+            request = _decision_request(status)
+            if request.decision_type == "select_movement_unit":
+                selected_option_id = request.options[0].option_id
+            elif request.decision_type == "select_movement_action":
+                selected_option_id = "remain_stationary"
+            elif request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+                status = lifecycle.submit_decision(
+                    DecisionResult(
+                        result_id=(
+                            f"phase12c-round-advance:{state.battle_round}:"
+                            f"{state.active_player_id}:decline-stratagem"
+                        ),
+                        request_id=request.request_id,
+                        decision_type=request.decision_type,
+                        actor_id=request.actor_id,
+                        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+                        payload=stratagem_decline_payload(),
+                    )
+                )
+                continue
+            elif request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
+                selected_option_id = "complete_reinforcements"
+            else:
+                raise AssertionError(
+                    "Round-advance fixture encountered an unexpected decision type: "
+                    f"{request.decision_type}."
+                )
+            status = lifecycle.submit_decision(
+                DecisionResult.for_request(
+                    result_id=(
+                        f"phase12c-round-advance:{state.battle_round}:"
+                        f"{state.active_player_id}:{request.decision_type}"
+                    ),
+                    request=request,
+                    selected_option_id=selected_option_id,
+                )
+            )
+    state = _state(lifecycle)
+    assert state.battle_round == battle_round
+    assert state.active_player_id == active_player_id
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    return lifecycle
+
+
+def _rapid_ingress_lifecycle() -> GameLifecycle:
+    return _battle_lifecycle(
+        battle_round=2,
+        reserve_unit=("player-b", "army-beta:enemy-unit"),
+    )
+
+
+def _command_lifecycle(
+    *,
+    player_a_mode: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+    player_b_mode: SecondaryMissionMode = SecondaryMissionMode.FIXED,
+) -> GameLifecycle:
+    lifecycle = _unadvanced_battle_lifecycle()
+    _record_secondary_choices(
+        _state(lifecycle),
+        player_a_mode=player_a_mode,
+        player_b_mode=player_b_mode,
+    )
+    return lifecycle
+
+
+def _tactical_command_lifecycle_after_draw(
+    *,
+    below_half_unit_id: str | None = None,
+) -> tuple[GameLifecycle, DecisionRequest]:
+    lifecycle = _command_lifecycle(player_a_mode=SecondaryMissionMode.TACTICAL)
+    state = _state(lifecycle)
+    if below_half_unit_id is not None:
+        _remove_first_models(state, unit_instance_id=below_half_unit_id, count=3)
+    draw_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert draw_request.decision_type == "draw_tactical_secondary_missions"
+    new_orders_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase12c-fixture-tactical-draw",
+            request=draw_request,
+            selected_option_id="draw",
+        )
+    )
+    new_orders_request = _decision_request(new_orders_status)
+    assert new_orders_request.decision_type == STRATAGEM_DECISION_TYPE
+    return lifecycle, new_orders_request
+
+
+def _complete_current_command_for_fixture(lifecycle: GameLifecycle) -> GameLifecycle:
+    state = _state(lifecycle)
+    assert state.current_battle_phase is BattlePhase.COMMAND
+    completed = BattleRoundFlow(
+        phase_handlers={BattlePhase.COMMAND: CommandPhaseHandler()},
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        army_catalog=lifecycle.config.army_catalog,
+    ).advance(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_queue=lifecycle.reaction_queue,
+    )
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert _state(lifecycle).current_battle_phase is BattlePhase.MOVEMENT
+    return lifecycle
+
+
+def _advance_battle_phase_for_fixture(lifecycle: GameLifecycle) -> None:
+    state = _state(lifecycle)
+    objective_state_ids_before = tuple(
+        value.state_id for value in state.primary_objective_turn_start_states
+    )
+    snapshot_ids_before = tuple(
+        value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
+    )
+    state.advance_to_next_battle_phase(event_log=lifecycle.decision_controller.event_log)
+    record_new_primary_turn_start_evidence_events(
+        state=state,
+        event_log=lifecycle.decision_controller.event_log,
+        objective_state_ids_before=objective_state_ids_before,
+        snapshot_ids_before=snapshot_ids_before,
+    )
+
+
+def _eldritch_suppression_reaction_lifecycle() -> tuple[GameLifecycle, RuntimeContentBundle]:
+    config = _config(catalog=_eldritch_suppression_reaction_catalog())
+    command_lifecycle = _battle_lifecycle(config)
+    state = _state(command_lifecycle)
+    state.advance_to_next_battle_phase(
+        event_log=command_lifecycle.decision_controller.event_log,
+    )
+    assert state.current_battle_phase is BattlePhase.SHOOTING
+    decisions = command_lifecycle.decision_controller
+    source_army = state.army_definition_for_player("player-a")
+    target_army = state.army_definition_for_player("player-b")
+    assert source_army is not None
+    assert target_army is not None
+    target_unit = target_army.units[0]
+    armies = (source_army, target_army)
+    reroll_record = _skull_altar_battle_shock_reroll_record(target_unit)
+    eldritch_record = replace(
+        next(
+            record
+            for record in path_of_the_outcast_manifest.runtime_contribution().stratagem_records
+            if record.definition.stratagem_id
+            == path_of_the_outcast_stratagems.ELDRITCH_SUPPRESSION_STRATAGEM_ID
+        ),
+        detachment_id="core-combined-arms",
+    )
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=RuntimeContentActivation.from_armies(
+            armies=armies,
+            catalog=config.army_catalog,
+        ),
+        armies=armies,
+        catalog=config.army_catalog,
+        contributions=(),
+        base_ability_records=(reroll_record,),
+        base_stratagem_records=(
+            *source_backed_detachment_stratagem_activation_records(),
+            eldritch_record,
+        ),
+    )
+    _grant_cp(state, player_id="player-a", amount=1)
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": decisions.to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        },
+        runtime_content_bundle=bundle,
+    )
+    return lifecycle, bundle
+
+
+def _eldritch_suppression_reaction_catalog() -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    unit_datasheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    updated_datasheet = replace(
+        unit_datasheet,
+        keywords=replace(
+            unit_datasheet.keywords,
+            keywords=tuple(sorted((*unit_datasheet.keywords.keywords, "FORTIFICATION", "RANGERS"))),
+            faction_keywords=tuple(
+                sorted(
+                    (
+                        *unit_datasheet.keywords.faction_keywords,
+                        "KHORNE",
+                        "LEGIONES DAEMONICA",
+                    )
+                )
+            ),
+        ),
+    )
+    return replace(
+        catalog,
+        catalog_id="phase12c-eldritch-battle-shock-reaction",
+        source_package_id="data-package:phase12c:eldritch-battle-shock-reaction:2026-08-27",
+        datasheets=tuple(
+            updated_datasheet if datasheet is unit_datasheet else datasheet
+            for datasheet in catalog.datasheets
+        ),
+    )
+
+
+def _skull_altar_battle_shock_reroll_record(
+    source_unit: UnitInstance,
+) -> AbilityCatalogRecord:
+    source_text = RuleSourceText.from_raw(
+        source_id="phase12c:source:skull-altar-battle-shock-reroll",
+        raw_text=(
+            'While a friendly Khorne Legiones Daemonica unit is within 6" of this '
+            "FORTIFICATION, each time you take a Battle-shock test for that unit, you can "
+            "re-roll that test."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    return AbilityCatalogRecord(
+        record_id="phase12c:catalog:skull-altar-battle-shock-reroll",
+        definition=AbilityDefinition(
+            ability_id="phase12c-skull-altar-battle-shock-reroll",
+            name="Shadow of Khorne",
+            source_id=rule_ir.source_id,
+            when_descriptor="Each time the nearby friendly unit takes a Battle-shock test.",
+            effect_descriptor="That unit can re-roll that test.",
+            restrictions_descriptor="Source-backed Skull Altar aura.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=source_unit.datasheet_id,
     )
 
 
@@ -6643,26 +7026,28 @@ def _snarling_protector_heroic_lifecycle(
         beta_datasheet_ids=("000001029", "core-intercessor-like-infantry"),
         catalog=catalog,
     )
-    lifecycle = _battle_lifecycle(config)
+    lifecycle = _battle_lifecycle(
+        config,
+        pose_replacements=(
+            (
+                "army-alpha:intercessor-unit-1",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
+            ),
+            (
+                "army-beta:snarling-maulerfiend",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
+            ),
+            (
+                "army-beta:normal-unit",
+                tuple(Pose.at(x=20.0 + (index * 2.0), y=28.0) for index in range(5)),
+            ),
+        ),
+        clear_terrain=True,
+    )
     state = _state(lifecycle)
+    _grant_cp(state, player_id="player-b", amount=0)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
     state.active_player_id = "player-a"
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=24.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:snarling-maulerfiend",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=20.0) for index in range(5)),
-    )
-    _replace_unit_poses(
-        state,
-        unit_instance_id="army-beta:normal-unit",
-        poses=tuple(Pose.at(x=20.0 + (index * 2.0), y=28.0) for index in range(5)),
-    )
-    _clear_terrain(state)
     if enemy_made_charge_move:
         state.record_persisting_effect(
             PersistingEffect(
@@ -6844,6 +7229,10 @@ def _battle_state(
     config: GameConfig | None = None,
     *,
     decisions: DecisionController | None = None,
+    keyword_replacements: tuple[tuple[str, tuple[str, ...]], ...] = (),
+    pose_replacements: tuple[tuple[str, tuple[Pose, ...]], ...] = (),
+    clear_terrain: bool = False,
+    attached_unit_joins: tuple[tuple[str, str, tuple[str, ...]], ...] = (),
 ) -> GameState:
     resolved_config = _config() if config is None else config
     armies = _mustered_armies(resolved_config)
@@ -6855,6 +7244,27 @@ def _battle_state(
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
+    for unit_instance_id, keywords in keyword_replacements:
+        _replace_unit_keywords(
+            state,
+            unit_instance_id=unit_instance_id,
+            keywords=keywords,
+        )
+    for unit_instance_id, poses in pose_replacements:
+        _replace_unit_poses(
+            state,
+            unit_instance_id=unit_instance_id,
+            poses=poses,
+        )
+    if clear_terrain:
+        _clear_terrain(state)
+    for player_id, attached_unit_instance_id, component_unit_instance_ids in attached_unit_joins:
+        _mark_attached_unit_join(
+            state,
+            player_id=player_id,
+            attached_unit_instance_id=attached_unit_instance_id,
+            component_unit_instance_ids=component_unit_instance_ids,
+        )
     enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
@@ -6998,13 +7408,23 @@ def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:
 
 
 def _grant_cp(state: GameState, *, player_id: str, amount: int) -> None:
-    result = state.gain_command_points(
-        player_id=player_id,
-        amount=amount,
-        source_id=f"phase12c-grant:{player_id}:{amount}",
-        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
-    )
-    assert result.status is CommandPointGainStatus.APPLIED
+    current = state.command_point_total(player_id)
+    if current < amount:
+        gain_result = state.gain_command_points(
+            player_id=player_id,
+            amount=amount - current,
+            source_id=f"phase12c-grant:{player_id}:{amount}",
+            source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+        )
+        assert gain_result.status is CommandPointGainStatus.APPLIED
+    elif current > amount:
+        spend_result = state.spend_command_points(
+            player_id=player_id,
+            amount=current - amount,
+            source_id=f"phase12c-balance:{player_id}:{amount}",
+        )
+        assert spend_result.status is CommandPointSpendStatus.APPLIED
+    assert state.command_point_total(player_id) == amount
 
 
 def _decision_request(status: LifecycleStatus) -> DecisionRequest:

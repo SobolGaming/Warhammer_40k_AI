@@ -1,6 +1,7 @@
 # pyright: reportPrivateUsage=false
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -235,6 +236,25 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
             next(model.model_instance_id for model in unit.own_models if model != bearer),
         )
     )
+    alive_bearer_unit = replace(
+        unit,
+        own_models=tuple(
+            model if model == bearer else replace(model, wounds_remaining=0)
+            for model in unit.own_models
+        ),
+    )
+    destroyed_model_ids = set(destroyed_bearer_battlefield.removed_model_ids)
+    destroyed_bearer_unit = replace(
+        unit,
+        own_models=tuple(
+            replace(model, wounds_remaining=0)
+            if model.model_instance_id in destroyed_model_ids
+            else model
+            for model in unit.own_models
+        ),
+    )
+    alive_bearer_army = replace(army, units=(alive_bearer_unit,))
+    destroyed_bearer_army = replace(army, units=(destroyed_bearer_unit,))
     records_by_name = {record.definition.name: record for record in player_index.all_records()}
     starting_strength = (StartingStrengthRecord.from_unit(player_id=army.player_id, unit=unit),)
 
@@ -242,26 +262,29 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
         game_id="phase17k-game",
         battle_round=1,
         player_id=army.player_id,
-        army=army,
+        army=alive_bearer_army,
         battlefield_state=alive_bearer_battlefield,
         starting_strength_records=starting_strength,
+        battle_shocked_unit_ids=(),
     )
     alive_bearer_requests_with_index = collect_battle_shock_test_requests(
         game_id="phase17k-game",
         battle_round=1,
         player_id=army.player_id,
-        army=army,
+        army=alive_bearer_army,
         battlefield_state=alive_bearer_battlefield,
         starting_strength_records=starting_strength,
+        battle_shocked_unit_ids=(),
         ability_index=player_index,
     )
     destroyed_bearer_requests_with_index = collect_battle_shock_test_requests(
         game_id="phase17k-game",
         battle_round=1,
         player_id=army.player_id,
-        army=army,
+        army=destroyed_bearer_army,
         battlefield_state=destroyed_bearer_battlefield,
         starting_strength_records=starting_strength,
+        battle_shocked_unit_ids=(),
         ability_index=player_index,
     )
 

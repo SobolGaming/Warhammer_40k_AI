@@ -68,6 +68,11 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     successful_hit_target_unit_ids_for_sequence,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.battle_shock_test_service import (
+    BattleShockTestRuntime,
+    apply_stratagem_battle_shock_reroll_decision,
+    is_stratagem_battle_shock_reroll_request,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
@@ -268,6 +273,7 @@ __all__ = (
     "BattlePhase",
     "BattlePhaseKind",
     "BattleShockHookRegistry",
+    "BattleShockTestRuntime",
     "BattlefieldScenario",
     "CLOSE_QUARTERS_RULE_ID",
     "CatalogDamagedShootingWeaponSelectionLimit",
@@ -318,6 +324,7 @@ __all__ = (
     "invalid_catalog_post_shoot_hit_target_status_status",
     "invalid_catalog_post_shoot_hit_target_effect_status",
     "is_catalog_selected_target_battle_shock_reroll_request",
+    "is_stratagem_battle_shock_reroll_request",
     "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE",
     "SELECT_DESTRUCTION_REACTION_DECISION_TYPE",
     "SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE",
@@ -380,6 +387,7 @@ __all__ = (
     "apply_precision_allocation_decision",
     "apply_resolve_target_unit_decision",
     "apply_source_backed_attack_dice_reroll_decision",
+    "apply_stratagem_battle_shock_reroll_decision",
     "attack_sequence_completed_event_id",
     "attacks_for_profile",
     "battle_phase_kind_from_token",

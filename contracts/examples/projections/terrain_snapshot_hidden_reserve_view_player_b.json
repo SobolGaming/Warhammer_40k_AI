@@ -14868,7 +14868,7 @@
     }
   ],
   "projection_schema": "game-view-v11-phase17n-step4",
-  "projection_state_hash": "2ec6866c74c2d4c47940974e2f16b6bfa9eb0cb87264169bff7570ae3902aed2",
+  "projection_state_hash": "4f62ddd9b7c62296d275c4770169cd273e45761468a4a82ab40e775267fb8cac",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
@@ -14879,7 +14879,7 @@
           "battle_round": 1,
           "cap_exempt": true,
           "player_id": "player-a",
-          "source_id": "command-phase-start:round-01:active-player-a",
+          "source_id": "gw-11e-core-rules:command-phase:gain-core-cp:round-01:active-player-a",
           "source_kind": "command_phase_start",
           "transaction_id": "command-point:player-a:round-01:000001"
         }
@@ -14894,7 +14894,7 @@
           "battle_round": 1,
           "cap_exempt": true,
           "player_id": "player-b",
-          "source_id": "command-phase-start:round-01:active-player-a",
+          "source_id": "gw-11e-core-rules:command-phase:gain-core-cp:round-01:active-player-a",
           "source_kind": "command_phase_start",
           "transaction_id": "command-point:player-b:round-01:000001"
         }

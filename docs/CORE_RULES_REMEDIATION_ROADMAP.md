@@ -95,7 +95,7 @@ non-closable grouping label, not a finding ID or closure key.
 | Order | PR | Finding(s) | How it is currently done | How it must be done | Controlling 40k.app locator and operative requirement to pin | Prerequisites | Gate |
 |---:|---|---|---|---|---|---|---|
 | 1 | P15D | C15-04 | Fire Overwatch’s source row omits exact target/Snap wording; Crushing Impact’s row says Vehicle/Strength while runtime supports Monster-or-Vehicle/Toughness; older PDF numbering conflicts with current App headings and one App example has a stale cross-reference. | Correct only source records, stable identifiers, hashes, and provenance to current complete App text. Keep correct runtime behavior; bind by title/operative text and record the stale example reference. | [15.05–15.09](https://www.40k.app/rules/15-stratagems): current headings make Crushing Impact 15.05 and Explosives 15.06; the category 12 example’s contrary number is internal drift. | — | APP-INTERNAL-DRIFT |
-| 2 | P08A | C08-03 | Generic `START_PHASE` dispatch runs before the handler, but the Command-specific start registry runs after Core CP is granted. | Route every start-of-Command rule and choice through one canonical boundary before Core CP is granted. | [08.01–08.02](https://www.40k.app/rules/08-command-phase): resolve start-of-Command rules before the Gain Command Points step. | — | APP-AUTHORITY |
+| 2 | P08A | C08-03 | Generic `START_PHASE` dispatch runs before the handler, but the Command-specific start registry runs after Core CP is granted. | Route every start-of-Command rule and choice through one canonical boundary before Core CP is granted. | [08.01–08.02](https://www.40k.app/rules/08-command-phase): resolve start-of-Command rules before Gain Core CP. | — | APP-AUTHORITY |
 | 3 | P08B | C08-01, C08-02 | The active player’s Battle-shock is cleared at Command start, and tests are requested only below Half-strength. | Preserve existing Battle-shock until a required test succeeds; test each rules unit that is currently Battle-shocked or at/below Half-strength exactly once. | [08.03](https://www.40k.app/rules/08-command-phase): the required-test candidates are currently Battle-shocked or at/below Half-strength, and success removes Battle-shock. | P08A | APP-AUTHORITY |
 | 4 | P09A | C09-01 | Reserve arrivals are delayed until battlefield units are handled, while tactical disembarks are front-loaded separately. | Use one Move Units selection loop containing unselected battlefield, embarked, and Strategic Reserve units so moves, disembarks, and ingress can interleave. | [09.02 Move Units](https://www.40k.app/rules/09-movement-phase): the player selects an eligible unit and resolves its movement before selecting the next. | P08B | APP-AUTHORITY |
 | 5 | P09B | C09-02 | Voluntary Desperate Escape is offered but rejected without a forced/overflight cause; its hazard rolls and follow-up test are incomplete. | Permit Ordered Retreat as an optional Desperate Escape, roll once for every model, then test Battle-shock if the unit was not already shocked. | [09.02.02 and 09.07](https://www.40k.app/rules/09-movement-phase): Ordered Retreat may invoke Desperate Escape and its per-model hazard/test sequence. | P09A | APP-AUTHORITY |
@@ -246,7 +246,7 @@ Completion requires all of the following:
 
 ### P15D — C15-04
 
-Status: Implementation and validation complete; PR #406 is open pending review and merge.
+Status: Merged through PR #406.
 
 Finding IDs: `C15-04`.
 
@@ -347,7 +347,195 @@ Validation results:
   (`check-generated`, `tsc --noEmit`, `tsx --test`, and `tsx src/main.ts`) passed.
 
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/406`;
-merge commit pending review and merge.
+`43ffd74090c06e3b7db5d7e8249706ccecd9e650`.
+
+### P08A + P08B — C08-01, C08-02, C08-03
+
+Status: Combined P08A and P08B implementation is complete in PR #407 and pending review and
+merge.
+
+Finding IDs: `C08-01`, `C08-02`, `C08-03`.
+
+Dependencies and evidence gate: P00/PR #405 and P15D/PR #406 are merged. The retained 2026-08-26
+40k.app `/rules` search-index observation is authoritative RuleEvidence for the complete normalized
+Command-phase heading sequence. The retained category-08 audit row is category metadata only and
+does not satisfy exact-row evidence. The retained official Core Rules PDF separately pins the
+operative 08.01, 08.02, and 08.03 statements. With those evidence roles kept distinct,
+`APP-AUTHORITY` is satisfied and no `EXCEPTION-PAUSE` applies.
+
+Violated invariants: Every rule triggered at the start of the Command phase, including every
+engine-owned player choice, must resolve at one deterministic, resumable boundary before Gain Core
+CP. Battle-shock must not be cleared merely because the active player's Command phase began. On the
+first entry to the 08.03 Battle-shock step, the engine must snapshot the eligibility of every living
+active-player canonical rules unit. It must resolve exactly one required test for every eligible
+on-battlefield member, report eligible off-battlefield members as typed unsupported without
+completing the step, and clear carried phase-start Battle-shock only when that required test
+succeeds.
+
+How it was done before this combined remediation: `BattleRoundFlow` dispatched the generic
+`START_PHASE` window before entering `CommandPhaseHandler`, but the handler granted Core CP and
+emitted `command_step_started` before its Command-specific synchronous hooks, status effects, and
+finite choices. It also cleared the active player's existing Battle-shock at Command start, before
+08.03 could test it, and the later Battle-shock request collection selected only units below
+Half-strength. A currently Battle-shocked unit above Half-strength therefore lost the status without
+a test, while a rules unit satisfying both predicates had no explicit immutable one-test snapshot.
+
+Combined implementation: Keep generic `START_PHASE` as the outer lifecycle boundary. Inside the
+Command handler, preserve all existing Battle-shock while the Command-start registry runs its
+one-time synchronous pass, resumable effect pass, and finite-choice pass. If any nested or finite
+decision remains pending, return without granting Core CP. After each accepted
+`GameLifecycle.submit_decision(...)`, auto-advance to the next Command-start request or to boundary
+completion. Final boundary completion grants each player 1CP exactly once and then emits
+`command_step_started`; scoring and other Command-step work follow without clearing Battle-shock.
+
+When the lifecycle first enters 08.03, snapshot every living active-player canonical attached
+rules-unit identity together with its eligibility reasons and step-start strength context. Do not
+snapshot future dice, Leadership, model placement, modifiers, or test requests. An eligible unit
+with no alive placed model produces a typed `off_battlefield_battle_shock_test` unsupported result
+containing the 08.03 source ID, canonical rules-unit ID, component IDs, and eligibility reasons; the
+step remains unresolved. P01 remains responsible for implementing those off-battlefield tests.
+
+For eligible on-battlefield units, use the existing generic sequencing decision when more than one
+test is required. Materialize and persist only the current in-flight request, using the candidate's
+actual eligibility reason and live dice, Leadership, model, placement, and modifier state. After
+that test and all of its nested outcome continuations finish, record its completion and materialize
+the next request from current authoritative state. Persist the candidate order, single in-flight
+request, and completed prefix across reroll decisions, serialization, replay, and lifecycle re-entry.
+A rules unit satisfying both predicates appears once and receives exactly one required test. A
+successful required test clears Battle-shock when that candidate carried it into the step; a failed
+test preserves or applies Battle-shock through the ordinary engine-owned outcome path.
+
+Specific authoritative 40k.app rule/statement and source ID: The authoritative August 26 `/rules`
+observation pins the complete normalized Command-phase heading order: Start of Command Phase, Gain
+Core CP, Battle-shock, Command Abilities, and End of Command Phase. Stable source IDs
+`gw-11e-core-rules:command-phase:start-of-command-phase`,
+`gw-11e-core-rules:command-phase:gain-core-cp`, and
+`gw-11e-core-rules:command-phase:battle-shock` bind the implemented 08.01-08.03 semantics without
+runtime display-name or text matching. The official PDF is separate primary evidence for the
+complete operative statements: resolve
+start-of-Command triggers first; both players then gain 1CP; then test every active-player unit that
+is currently Battle-shocked or at/below Half-strength and remove Battle-shock on a successful test.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules`, observed `2026-08-26T14:49:10-04:00`. The source package must retain the
+full normalized heading sequence, per-heading transcription hashes, and a source-observation
+fingerprint whose hashed payload covers the headings and their order. The category-08 row from the
+2026-08-25 category audit remains metadata-only context because its fingerprint covers no heading or
+operative text. Direct category access returned a security checkpoint, so no category-body capture
+is claimed. The retained five-heading observation hash is
+`e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab`; exact per-rule
+observation hashes are `9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76`
+(08.01), `9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a`
+(08.02), and `e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78`
+(08.03). The generated package hash is
+`8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127`, its canonical
+artifact-byte SHA-256 is `78b2264047e263ab5537c71c7d1be681874bdda31191816b6b297eb9a39425e6`,
+and the final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:f529cb38565ef94f103e10500ca3a863ce50e50965c4d3c46f79e6ff1d3e45ac`.
+
+Load and execution support: The final source package must record all three implemented rows as
+`loaded` only after each row is linked to the authoritative `/rules` observation and the separate
+official-PDF operative statement. Rows 08.01 and 08.02 are `executable_engine_runtime`; 08.03 is
+truthfully `partial_engine_runtime`: every living active-player canonical rules unit is included in
+the eligibility snapshot, but eligible off-battlefield tests stop with a typed unsupported result
+until P01 supplies their execution semantics. The runtime consumer mapping covers the Command-start
+boundary, Core CP transaction, eligibility snapshot, live one-at-a-time request materialization,
+and successful phase-start recovery path.
+
+Scope and explicit exclusions: This combined section covers the Command-phase timing owner,
+resumable Command-start progress, one-time Core CP gain, preservation of phase-start Battle-shock,
+the active-player canonical-rules-unit eligibility snapshot, typed eligible-off-battlefield
+unsupported boundary, deterministic multi-test sequencing, live single-request materialization,
+required-test completion progress, success-only recovery, deterministic events/replay/projections,
+exact 08.01-08.03 source evidence, static ownership audits, generated build identity/contracts, and
+timing documentation. It does not implement Battle-shock testing while embarked or in Strategic
+Reserves; that execution work remains P01. It adds no faction content, proposal kind, movement,
+geometry, or adapter-owned mutation.
+
+Owning state/validation/mutation/event/replay path: `BattleRoundFlow` generic `START_PHASE` dispatch
+→ `CommandPhaseHandler` canonical Command-start boundary with Battle-shock preserved → serialized
+one-time synchronous/effect/finite-choice progress → engine-owned Core CP transactions → two
+`command_points_gained` events → `command_step_started` → scoring/Command work → one-time 08.03
+canonical-rules-unit eligibility snapshot → typed eligible-off-battlefield unsupported boundary or
+bounded select-next sequencing choice → one live in-flight Battle-shock request/result and optional-reroll path →
+success-only clearing of carried phase-start Battle-shock → exact
+`battle_shock_modifier_applications_recorded` producer/source/operand authority → universal
+`attached_rules_unit_split_reconciled` lineage authority whenever an Attached Unit splits → exact
+immediate `battle_shock_state_transferred_after_attached_unit_split` authority when that historical
+rules unit was shocked → `battle_shock_step_completed` →
+serialized game state, event log, replay, adapter projection, and event delta. No adapter validates
+the predicate, constructs the snapshot, rolls the test, or mutates Battle-shock state.
+
+Decision and viewer-visibility impact: The existing
+`select_faction_rule_command_phase_start_option` decision type, option IDs, payload shapes,
+stale/drift validation, queue behavior, record shapes, and public viewer visibility remain
+unchanged. Multiple required Battle-shock tests reuse the public generic
+`resolve_sequencing_order` decision with deterministic candidate IDs and one option per remaining
+candidate; each selected test and its outcome finish before the next selection is requested, and
+the final sole candidate is automatic. No future test request is materialized before its candidate
+is selected. Battle-shock rerolls retain decision type
+`select_dice_reroll` and their option IDs, but
+their adapter-visible `battle_shock_context` now requires `passed_state_policy`: `preserve` for
+non-Command forced-test success and `clear_if_step_start_shocked` for 08.03 success. The lifecycle
+validates that field and the exact source, request, roll, phase-start IDs, base payload, resolved
+event types, snapshot position, and completed-result prefix before queue pop. Public
+`battle_shock_test_resolved` payloads now include `cleared_battle_shocked_unit_ids` beside the
+engine-owned `state_update`, so adapters can audit success-only recovery without applying it. While
+a Command-start choice is pending, both CP totals and all Battle-shock state remain unchanged. The public
+Command-start selection events precede both Core CP gains and `command_step_started`; the public
+`battle_shock_step_snapshot_created`, required-test request/result, and
+`battle_shock_step_completed` events expose only the same Battle-shock information already visible
+to both players. The public `battle_shock_modifier_applications_recorded` event exposes the exact
+loaded producer, actual source, and modifiers applied to that public test; adapters audit or display
+it but never apply it. Every Attached Unit split emits public
+`attached_rules_unit_split_reconciled` with immutable starting lineage and exact survivors. A
+shocked Attached Unit split additionally emits public
+`battle_shock_state_transferred_after_attached_unit_split` with the historical source state,
+complete survivor IDs, and successor states; adapters may display but never apply that transition.
+No hidden-information type or redaction set is added.
+
+Regression scenarios and same-bug-class search: Required coverage includes synchronous, effect, and
+finite Command-start work before CP; nested decision pause/resume without duplicated work; a
+currently Battle-shocked unit remaining shocked through Command start and scoring; above-half,
+below-half, and dual-reason snapshot membership; eligible off-battlefield typed unsupported payload
+and unresolved step; exact-once attached-rules-unit testing; success-only recovery; failure
+persistence; optional reroll pause/round-trip; snapshot drift rejection; destroyed
+or detached component handling through canonical rules-unit identity; an outcome-enqueued nested
+decision preempting the next required test while retaining the exact completed prefix; event
+ordering; generic multi-test sequencing before dice materialization; live recomputation of a later
+request after an earlier outcome removes a modifier source; actual forced-reason propagation into
+dice hooks; post-Command history validation; authentic clear-before-split and split-before-clear
+lineage histories; split-transfer deletion, partial-successor, and payload-tamper rejection;
+required-test predicate tamper; loaded modifier producer/source/operand tamper; exact
+move-completed trigger and source-binding tamper; attached producer paths for move hooks, generic
+RuleIR Stratagems, and named Stratagems; replay; and both-viewer projections/event deltas.
+P01-specific embarked and Strategic
+Reserve behavior is not presented as covered here.
+
+Generated artifacts/documentation: The combined PR updates the packaged Command-phase source
+artifact and typed fail-closed loader, offline source/hash builder, engine build manifest, affected
+external contract fixtures, `ARCHITECTURE_V2.md`, `docs/ADAPTER_DECISION_CONTRACT.md`,
+`docs/DECISION_SUBMISSION_CATALOG.md`, and this finding record. The final source-package,
+artifact-byte, retained-observation, and engine-build hashes are recorded above.
+
+Validation results:
+
+- All required `AGENTS.md` gates passed: Ruff check, Ruff format check, mypy, Pyright, the
+  coverage-enabled xdist work-stealing suite (`6198 passed`), four-shard inventory, import-linter,
+  and all-files pre-commit.
+- The final module-size gate and focused Fight On Death physical-history regressions passed
+  (`3` policy tests and `15` focused behavioral tests); the final Fulgrim Command-start/poison
+  regressions passed (`5` tests).
+- Command-phase source builder check, 40k.app audit check, engine-build check, external-contract
+  base-ref check, installed-wheel smoke (`2449` resources), and generated ability-support audit
+  (`19 passed`) all passed.
+- The repository-pinned TypeScript generated-client, type, and unit checks passed (`5` unit tests),
+  and the certified HTTP conformance scenario passed all `342` assertions. This host still exposes
+  the required bundled Node runtime without an `npm` executable, so the equivalent pinned local
+  binaries were invoked directly.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/407`; merge commit
+pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all

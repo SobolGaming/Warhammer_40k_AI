@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -109,13 +110,19 @@ def charge_lifecycle(
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
     state.battle_round = 1
     state.active_player_id = "player-a"
+    decisions = GameLifecycle().decision_controller
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=config,
+    )
     payload = cast(
         GameLifecyclePayload,
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": GameLifecycle().decision_controller.to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": {"frames": []},
         },
     )

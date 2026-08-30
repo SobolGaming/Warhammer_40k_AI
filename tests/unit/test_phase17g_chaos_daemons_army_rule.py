@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -14,8 +15,10 @@ from tests.phase11c_command_phase_helpers import (
     default_unit_selection,
     remove_first_models,
     unit_by_id,
+    unit_selection,
     with_model_offsets,
 )
+from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -45,6 +48,7 @@ from warhammer40k_core.engine.battle_shock import (
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
+    BattleShockModifierContext,
     BattleShockOutcomeContext,
 )
 from warhammer40k_core.engine.battlefield_state import (
@@ -53,7 +57,10 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     UnitPlacement,
 )
-from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.command_points import (
+    CommandPointGainStatus,
+    CommandPointSourceKind,
+)
 from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -61,9 +68,12 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     army_rule,
@@ -82,7 +92,11 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
-from warhammer40k_core.engine.healing import SELECT_HEALING_MODEL_DECISION_TYPE
+from warhammer40k_core.engine.healing import (
+    SELECT_HEALING_MODEL_DECISION_TYPE,
+    HealingEffect,
+    resolve_healing_until_blocked,
+)
 from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
 )
@@ -100,9 +114,22 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
+from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_historical_events import (
+    record_primary_battlefield_departure_event,
+)
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_destroyed_model_departures,
+)
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.sequencing import (
+    SEQUENCING_DECISION_TYPE,
+    sequencing_decision_event_from_request,
+)
 from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
 )
@@ -112,7 +139,11 @@ from warhammer40k_core.engine.stratagems import (
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemTargetKind,
+    StratagemTargetProposal,
+    apply_stratagem_target_proposal,
     create_stratagem_use_decision_request,
+    invalid_stratagem_target_proposal_status,
+    request_stratagem_target_proposal,
     stratagem_decline_payload,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -386,8 +417,12 @@ def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> N
     remove_first_models(state, unit_instance_id=unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
     decisions = DecisionController()
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=decisions,
+        unit_instance_id=unit_id,
+    )
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
@@ -445,8 +480,12 @@ def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
     remove_first_models(state, unit_instance_id=target_unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, target_unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
-    _record_battle_shock_auto_pass(state, unit_instance_id=target_unit_id)
     decisions = DecisionController()
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=decisions,
+        unit_instance_id=target_unit_id,
+    )
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
@@ -492,8 +531,12 @@ def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() 
     remove_first_models(state, unit_instance_id=target_unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, target_unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
-    _record_battle_shock_auto_pass(state, unit_instance_id=target_unit_id)
     decisions = DecisionController()
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=decisions,
+        unit_instance_id=target_unit_id,
+    )
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
@@ -676,19 +719,89 @@ def test_semantic_shadow_aura_executes_rule_ir_and_honours_wargear_bearer_state(
         source_id="phase17g:test:semantic-shadow-faction-source",
         source_kind=CatalogAbilitySourceKind.FACTION,
     )
-    assert army_rule._semantic_shadow_aura_ability_active(  # pyright: ignore[reportPrivateUsage]
+    assert army_rule._semantic_shadow_aura_source_model_ids(  # pyright: ignore[reportPrivateUsage]
         unit=source,
         ability=equipped,
     )
-    assert not army_rule._semantic_shadow_aura_ability_active(  # pyright: ignore[reportPrivateUsage]
+    assert not army_rule._semantic_shadow_aura_source_model_ids(  # pyright: ignore[reportPrivateUsage]
         unit=source,
         ability=unequipped,
     )
-    assert not army_rule._semantic_shadow_aura_ability_active(  # pyright: ignore[reportPrivateUsage]
+    assert not army_rule._semantic_shadow_aura_source_model_ids(  # pyright: ignore[reportPrivateUsage]
         unit=source,
         ability=faction_source,
     )
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_semantic_shadow_aura_source_does_not_expand_to_attached_bodyguards() -> None:
+    source_bodyguard_id = "army-alpha:shadow-bodyguard"
+    source_leader_id = "army-alpha:shadow-leader"
+    target_unit_id = "army-alpha:shadow-target"
+    state = battle_state(
+        game_id="phase17g-chaos-daemons-attached-semantic-aura-source",
+        player_a_units=(
+            default_unit_selection("shadow-bodyguard"),
+            unit_selection(
+                unit_selection_id="shadow-leader",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            default_unit_selection("shadow-target"),
+        ),
+        player_a_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="shadow-leader",
+                bodyguard_unit_selection_id="shadow-bodyguard",
+            ),
+        ),
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_leader_id,
+        keywords=("Character", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_semantic_shadow_aura_ability(allegiance="Khorne"),),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    marker = center_marker_definition(state)
+    battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id(source_leader_id),
+            marker,
+            offsets=((-15.0, 0.0),),
+        )
+    )
+    battlefield_state = battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id(source_bodyguard_id),
+            marker,
+            offsets=((0.0, 0.0), (0.4, 0.0), (0.8, 0.0), (1.2, 0.0), (1.6, 0.0)),
+        )
+    )
+    battlefield_state = battlefield_state.with_unit_placement(
+        with_model_offsets(
+            state.battlefield_state.unit_placement_by_id(target_unit_id),
+            marker,
+            offsets=((3.0, 0.0), (3.4, 0.0), (3.8, 0.0), (4.2, 0.0), (4.6, 0.0)),
+        )
+    )
+    state.battlefield_state = battlefield_state
+
+    assert not army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
 
 
 def test_semantic_shadow_aura_skips_self_unplaced_sources_and_non_shadow_rule_ir() -> None:
@@ -951,7 +1064,7 @@ def test_greater_daemon_shadow_aura_host_table_covers_all_datasheet_sources() ->
 
 def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> None:
     state = battle_state()
-    state.game_id = "phase17g-overheal-seed-1"
+    state.game_id = "phase17g-overheal-seed-2"
     _mark_player_as_chaos_daemons(
         state,
         player_id="player-a",
@@ -969,8 +1082,12 @@ def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> 
         )
     wounded_model_id = _placed_model_ids(state, unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
     decisions = DecisionController()
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=decisions,
+        unit_instance_id=unit_id,
+    )
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
@@ -1142,6 +1259,325 @@ def test_staged_july_daemonic_manifestation_revival_uses_adapter_decisions() -> 
     replay_payload = session.lifecycle.decision_controller.to_payload()
     assert DecisionController.from_payload(replay_payload).to_payload() == replay_payload
     assert "<" not in json.dumps(replay_payload, sort_keys=True)
+
+
+def test_daemonic_manifestation_effect_kind_drift_rejects_before_lifecycle_mutation() -> None:
+    session, state, destroyed_model_ids, _return_placements, request = (
+        _july_manifestation_revival_session()
+    )
+    lifecycle = session.lifecycle
+    bundle = _runtime_content_bundle(lifecycle)
+    decisions = lifecycle.decision_controller
+    request_payload = cast(dict[str, object], deepcopy(request.payload))
+    effect_payload = cast(dict[str, object], request_payload["effect"])
+    source_context = cast(dict[str, object], effect_payload["source_context"])
+    source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-effect"
+    forged_options = tuple(
+        replace(
+            option,
+            payload=validate_json_value(
+                {
+                    **cast(dict[str, JsonValue], deepcopy(option.payload)),
+                    "source_context": {
+                        **cast(
+                            dict[str, JsonValue],
+                            deepcopy(cast(dict[str, JsonValue], option.payload)["source_context"]),
+                        ),
+                        "effect_kind": "phase17g:forged-daemonic-manifestation-effect",
+                    },
+                }
+            ),
+        )
+        for option in request.options
+    )
+    forged_request = replace(
+        request,
+        payload=validate_json_value(request_payload),
+        options=forged_options,
+    )
+    decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
+
+    original_request_payload = request.to_payload()
+    forged_request_payload = forged_request.to_payload()
+    changed_request_event = False
+    drifted_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type == "decision_requested" and event.payload == original_request_payload:
+            drifted_events.append(
+                replace(event, payload=validate_json_value(forged_request_payload))
+            )
+            changed_request_event = True
+            continue
+        drifted_events.append(event)
+    assert changed_request_event
+    decisions.event_log.replace_records(tuple(drifted_events))
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+    selected_model_id = destroyed_model_ids[-1]
+    result = DecisionResult.for_request(
+        result_id="phase17g-daemonic-manifestation-effect-kind-drift:select",
+        request=forged_request,
+        selected_option_id=_healing_option_id_for_model(forged_request, selected_model_id),
+    )
+    before_state = state.to_payload()
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+    before_dice_events = sum(event.event_type == "dice_rolled" for event in before_events)
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        lifecycle.submit_decision(result)
+
+    assert state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert (
+        sum(event.event_type == "dice_rolled" for event in decisions.event_log.records)
+        == before_dice_events
+    )
+    assert all(
+        _model_by_id(state, model_instance_id).wounds_remaining == 0
+        for model_instance_id in destroyed_model_ids
+    )
+
+
+def test_daemonic_manifestation_dual_identity_drift_keeps_provider_ownership() -> None:
+    session, state, destroyed_model_ids, _return_placements, request = (
+        _july_manifestation_revival_session()
+    )
+    lifecycle = session.lifecycle
+    bundle = _runtime_content_bundle(lifecycle)
+    decisions = lifecycle.decision_controller
+    request_payload = cast(dict[str, object], deepcopy(request.payload))
+    effect_payload = cast(dict[str, object], request_payload["effect"])
+    effect_payload["source_rule_id"] = "phase17g:forged-daemonic-manifestation-source"
+    source_context = cast(dict[str, object], effect_payload["source_context"])
+    source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-effect"
+    forged_options = tuple(
+        replace(
+            option,
+            payload=validate_json_value(
+                {
+                    **cast(dict[str, JsonValue], deepcopy(option.payload)),
+                    "source_rule_id": "phase17g:forged-daemonic-manifestation-source",
+                    "source_context": {
+                        **cast(
+                            dict[str, JsonValue],
+                            deepcopy(cast(dict[str, JsonValue], option.payload)["source_context"]),
+                        ),
+                        "effect_kind": "phase17g:forged-daemonic-manifestation-effect",
+                    },
+                }
+            ),
+        )
+        for option in request.options
+    )
+    forged_request = replace(
+        request,
+        payload=validate_json_value(request_payload),
+        options=forged_options,
+    )
+    decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
+
+    original_request_payload = request.to_payload()
+    forged_request_payload = forged_request.to_payload()
+    changed_request_event = False
+    drifted_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type == "decision_requested" and event.payload == original_request_payload:
+            drifted_events.append(
+                replace(event, payload=validate_json_value(forged_request_payload))
+            )
+            changed_request_event = True
+            continue
+        drifted_events.append(event)
+    assert changed_request_event
+    decisions.event_log.replace_records(tuple(drifted_events))
+
+    pending_marker = _event_payload(
+        decisions,
+        "chaos_daemons_daemonic_manifestation_revival_pending",
+    )
+    assert pending_marker["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
+    assert pending_marker["decision_request_id"] == request.request_id
+    assert cast(dict[str, JsonValue], request.payload)["effect"] != effect_payload
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+    selected_model_id = destroyed_model_ids[-1]
+    result = DecisionResult.for_request(
+        result_id="phase17g-daemonic-manifestation-dual-identity-drift:select",
+        request=forged_request,
+        selected_option_id=_healing_option_id_for_model(forged_request, selected_model_id),
+    )
+    before_state = state.to_payload()
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+    before_dice_events = sum(event.event_type == "dice_rolled" for event in before_events)
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        lifecycle.submit_decision(result)
+
+    assert state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert (
+        sum(event.event_type == "dice_rolled" for event in decisions.event_log.records)
+        == before_dice_events
+    )
+    assert all(
+        _model_by_id(state, model_instance_id).wounds_remaining == 0
+        for model_instance_id in destroyed_model_ids
+    )
+
+
+@pytest.mark.parametrize(
+    ("erase_selection_lineage", "rewrite_request_id"),
+    [(False, False), (True, False), (True, True)],
+    ids=(
+        "selection-lineage-preserved",
+        "selection-lineage-erased",
+        "request-id-and-selection-lineage-erased",
+    ),
+)
+def test_daemonic_manifestation_placement_identity_drift_retains_provider_ownership(
+    erase_selection_lineage: bool,
+    rewrite_request_id: bool,
+) -> None:
+    session, state, destroyed_model_ids, return_placements, selection_request = (
+        _july_manifestation_revival_session()
+    )
+    lifecycle = session.lifecycle
+    bundle = _runtime_content_bundle(lifecycle)
+    selected_model_id = destroyed_model_ids[-1]
+    placement_status = session.submit_option(
+        request_id=selection_request.request_id,
+        option_id=_healing_option_id_for_model(selection_request, selected_model_id),
+        result_id="phase17g-daemonic-manifestation-lineage-drift:selection",
+    )
+    placement_request = _required_decision_request(placement_status)
+    assert placement_request.decision_type == SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    assert restored.decision_controller.queue.peek_next() == placement_request
+
+    decisions = lifecycle.decision_controller
+    placement_payload = cast(dict[str, object], deepcopy(placement_request.payload))
+    selection_request_id = cast(str, placement_payload["source_selection_request_id"])
+    selection_result_id = cast(str, placement_payload["source_selection_result_id"])
+    selection_records = tuple(
+        record
+        for record in decisions.records
+        if record.request.request_id == selection_request_id
+        and record.result.result_id == selection_result_id
+    )
+    assert len(selection_records) == 1
+    assert selection_records[0].request == selection_request
+    pending_marker = _event_payload(
+        decisions,
+        "chaos_daemons_daemonic_manifestation_revival_pending",
+    )
+    assert pending_marker["decision_request_id"] == selection_request_id
+    assert pending_marker["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
+
+    effect_payload = cast(dict[str, object], placement_payload["effect"])
+    forged_effect_id = "phase17g:forged-daemonic-manifestation-effect"
+    effect_payload["effect_id"] = forged_effect_id
+    effect_payload["source_rule_id"] = "phase17g:forged-daemonic-manifestation-source"
+    source_context = cast(dict[str, object], effect_payload["source_context"])
+    source_context["effect_kind"] = "phase17g:forged-daemonic-manifestation-kind"
+    source_context["hook_id"] = "phase17g:forged-daemonic-manifestation-hook"
+    if erase_selection_lineage:
+        placement_payload["source_selection_request_id"] = None
+        placement_payload["source_selection_result_id"] = None
+    forged_request = replace(
+        placement_request,
+        request_id=(
+            f"{forged_effect_id}:healing-step-"
+            f"{cast(int, placement_payload['step_index']):03d}:placement"
+            if rewrite_request_id
+            else placement_request.request_id
+        ),
+        payload=validate_json_value(placement_payload),
+    )
+    assert (forged_request.request_id == placement_request.request_id) is not rewrite_request_id
+    assert (
+        forged_request.request_id.startswith(
+            f"{army_rule.JULY_HOOK_ID}:daemonic-manifestation-battleline:"
+        )
+        is not rewrite_request_id
+    )
+    decisions.queue._pending_requests[0] = forged_request  # pyright: ignore[reportPrivateUsage]
+
+    original_request_payload = placement_request.to_payload()
+    forged_request_payload = forged_request.to_payload()
+    changed_request_event = False
+    drifted_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type == "decision_requested" and event.payload == original_request_payload:
+            drifted_events.append(
+                replace(event, payload=validate_json_value(forged_request_payload))
+            )
+            changed_request_event = True
+            continue
+        drifted_events.append(event)
+    assert changed_request_event
+    decisions.event_log.replace_records(tuple(drifted_events))
+    expected_selection_request_id = None if erase_selection_lineage else selection_request_id
+    expected_selection_result_id = None if erase_selection_lineage else selection_result_id
+    assert placement_payload["source_selection_request_id"] == expected_selection_request_id
+    assert placement_payload["source_selection_result_id"] == expected_selection_result_id
+
+    with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+    result = DecisionResult(
+        result_id="phase17g-daemonic-manifestation-lineage-drift:placement",
+        request_id=forged_request.request_id,
+        decision_type=forged_request.decision_type,
+        actor_id=forged_request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=_healing_revival_payload(
+            request=forged_request,
+            placement=return_placements[selected_model_id],
+        ),
+    )
+    before_state = state.to_payload()
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+
+    if rewrite_request_id:
+        with pytest.raises(GameLifecycleError, match="provider identity drifted"):
+            lifecycle.submit_decision(result)
+    else:
+        invalid_status = lifecycle.submit_decision(result)
+        assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+
+    assert state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert _model_by_id(state, selected_model_id).wounds_remaining == 0
+    assert state.battlefield_state is not None
+    assert selected_model_id not in state.battlefield_state.placed_model_ids()
 
 
 def test_staged_july_daemonic_manifestation_can_finish_before_first_revival() -> None:
@@ -1385,8 +1821,12 @@ def test_staged_july_daemonic_manifestation_has_no_effect_without_eligible_model
             model_instance_id=model_instance_id,
             wounds_remaining=0,
         )
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
     decisions = DecisionController()
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=decisions,
+        unit_instance_id=unit_id,
+    )
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=BattleShockHookRegistry.from_bindings(
@@ -1435,23 +1875,39 @@ def test_staged_july_daemonic_manifestation_uses_attached_rules_unit_models() ->
             model_instance_id=model_instance_id,
             wounds_remaining=0,
         )
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=formation.attached_unit_instance_id,
+    )
+    below_half_context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=rules_unit,
+        starting_strength=state.starting_strength_record_for_unit(
+            formation.attached_unit_instance_id
+        ),
+        current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
+    )
     request = BattleShockTestRequest.for_unit(
         request_id="phase17g-july-attached-battle-shock",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id="player-a",
-        unit_instance_id=bodyguard.unit_instance_id,
+        unit_instance_id=formation.attached_unit_instance_id,
         reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
         leadership_target=7,
-        below_half_strength_context=BelowHalfStrengthContext(
-            player_id="player-a",
-            unit_instance_id=bodyguard.unit_instance_id,
-            starting_model_count=5,
-            current_model_count=2,
-            single_model_starting_wounds=None,
-            single_model_wounds_remaining=None,
-        ),
+        below_half_strength_context=below_half_context,
     )
+    modifiers = BattleShockHookRegistry.from_bindings(
+        july_2026_candidate.runtime_contribution().battle_shock_hook_bindings
+    ).modifiers_for(
+        BattleShockModifierContext(
+            state=state,
+            request=request,
+            active_player_id="player-a",
+            phase=BattlePhase.COMMAND,
+            phase_start_battle_shocked_unit_ids=(),
+        )
+    )
+    assert tuple(modifier.operand for modifier in modifiers) == (1,)
     decisions = DecisionController()
     dice_manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = dice_manager.roll_fixed(request.spec, (6, 6))
@@ -1485,6 +1941,212 @@ def test_staged_july_daemonic_manifestation_uses_attached_rules_unit_models() ->
     assert source_context["eligible_revival_model_ids"] == sorted(bodyguard_destroyed_ids)
 
 
+def test_completed_attached_manifestation_survives_split_with_later_healing() -> None:
+    config = replace(
+        _chaos_daemons_lifecycle_config(attached=True),
+        game_id="phase17g-attached-manifestation-historical-split",
+    )
+    session = LocalGameSession()
+    session.start(config)
+    lifecycle = session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    for army in _mustered_armies(config):
+        state.record_army_definition(army)
+    daemon_army = state.army_definition_for_player("player-a")
+    assert daemon_army is not None
+    formation = daemon_army.attached_units[0]
+    bodyguard = unit_by_id(state, formation.bodyguard_unit_instance_id)
+    leader = unit_by_id(state, formation.leader_unit_instance_ids[0])
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-chaos-daemons-battlefield",
+        armies=tuple(state.army_definitions),
+    )
+    leader_placement = scenario.battlefield_state.unit_placement_by_id(leader.unit_instance_id)
+    leader_model_placement = leader_placement.model_placements[0]
+    battlefield = scenario.battlefield_state.with_unit_placement(
+        replace(
+            leader_placement,
+            model_placements=(
+                replace(
+                    leader_model_placement,
+                    pose=Pose.at(
+                        x=12.0,
+                        y=8.0,
+                        z=leader_model_placement.pose.position.z,
+                    ),
+                ),
+            ),
+        )
+    )
+    state.record_battlefield_state(battlefield)
+    starting_placements = {
+        placement.model_instance_id: placement
+        for placement in battlefield.unit_placement_by_id(
+            bodyguard.unit_instance_id
+        ).model_placements
+    }
+    destroyed_model_ids = tuple(starting_placements)[:3]
+    state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
+    state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
+    complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
+    destruction_attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-b",
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=None,
+        source_model_instance_id=None,
+    )
+    for index, model_instance_id in enumerate(destroyed_model_ids, start=1):
+        destroyed_event = lifecycle.decision_controller.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.COMMAND.value,
+                **destruction_attribution.to_payload(),
+                "target_unit_instance_id": formation.attached_unit_instance_id,
+                "model_instance_id": model_instance_id,
+                "damage_kind": "normal",
+                "damage_event_id": f"phase17g:historical-split:damage:{index}",
+                "destroyed_model_rules_triggered": True,
+            },
+        )
+        remove_first_models(state, unit_instance_id=bodyguard.unit_instance_id, count=1)
+        departures = record_primary_destroyed_model_departures(
+            state=state,
+            destroyed_model_instance_ids=(model_instance_id,),
+            source_id=(f"core-rules:primary-unit-destruction-tracking:{destroyed_event.event_id}"),
+            occurrence_id=destroyed_event.event_id,
+        )
+        for departure in departures:
+            record_primary_battlefield_departure_event(
+                event_log=lifecycle.decision_controller.event_log,
+                departure=departure,
+            )
+    candidate = july_2026_candidate.runtime_contribution()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
+            candidate.battle_shock_hook_bindings
+        ),
+    )
+    manifestation_request = _required_decision_request(
+        handler.begin_phase(state=state, decisions=lifecycle.decision_controller)
+    )
+    selected_model_id = destroyed_model_ids[-1]
+    survivor_anchor = starting_placements[tuple(starting_placements)[3]].pose.position
+    return_placement = starting_placements[selected_model_id].with_pose(
+        Pose.at(
+            x=survivor_anchor.x + 2.0,
+            y=survivor_anchor.y + 2.0,
+            z=survivor_anchor.z,
+        )
+    )
+    placement_request = _required_decision_request(
+        session.submit_option(
+            request_id=manifestation_request.request_id,
+            option_id=_healing_option_id_for_model(
+                manifestation_request,
+                selected_model_id,
+            ),
+            result_id="phase17g-attached-manifestation-historical-split:selection",
+        )
+    )
+    placement_payload = _healing_revival_payload(
+        request=placement_request,
+        placement=return_placement,
+    )
+    finish_request = _required_decision_request(
+        session.submit_parameterized_payload(
+            request_id=placement_request.request_id,
+            payload=placement_payload,
+            result_id="phase17g-attached-manifestation-historical-split:placement",
+        )
+    )
+    completed = session.submit_option(
+        request_id=finish_request.request_id,
+        option_id=_healing_finish_option_id(finish_request),
+        result_id="phase17g-attached-manifestation-historical-split:finish",
+    )
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    movement_request = lifecycle.decision_controller.queue.peek_next()
+    assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=formation.attached_unit_instance_id,
+        surviving_unit_instance_ids=tuple(sorted(formation.component_unit_instance_ids)),
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    current_army = state.army_definition_for_player("player-a")
+    assert current_army is not None
+    assert current_army.attached_units == ()
+
+    remaining_destroyed_model_id = destroyed_model_ids[0]
+    current_bodyguard = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    unrelated_effect = HealingEffect(
+        effect_id="phase17g:unrelated-healing-after-attached-split",
+        target_unit_instance_id=bodyguard.unit_instance_id,
+        amount=1,
+        opposing_player_id="player-b",
+        selection_actor_player_id="player-a",
+        source_rule_id="phase17g:unrelated-healing-source",
+        source_context=validate_json_value(
+            {
+                "eligible_revival_model_ids": [remaining_destroyed_model_id],
+                "revive_destroyed_models_only": True,
+                "revive_model_full_health": True,
+                "allow_revival_finish": True,
+            }
+        ),
+        phase_start_model_ids=tuple(
+            model.model_instance_id for model in current_bodyguard.alive_models()
+        ),
+    )
+    _pending_effect, later_request = resolve_healing_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        effect=unrelated_effect,
+    )
+    assert later_request is not None
+
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+    )
+    restored_movement_request = restored.decision_controller.queue.peek_next()
+    assert restored_movement_request == movement_request
+    movement_status = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g:movement-before-unrelated-healing",
+            request=restored_movement_request,
+            selected_option_id=restored_movement_request.options[0].option_id,
+        )
+    )
+    restored_request = _required_decision_request(movement_status)
+    assert restored_request == later_request
+    restored_status = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g:unrelated-healing-after-attached-split:finish",
+            request=restored_request,
+            selected_option_id=_healing_finish_option_id(restored_request),
+        )
+    )
+    assert restored_status.status_kind is not LifecycleStatusKind.INVALID
+    assert all(
+        request.request_id != later_request.request_id
+        for request in restored.decision_controller.queue.pending_requests
+    )
+
+
 def test_default_june_daemonic_manifestation_battleline_branch_remains_unsupported() -> None:
     state = battle_state()
     _mark_player_as_chaos_daemons(state, player_id="player-a")
@@ -1497,8 +2159,12 @@ def test_default_june_daemonic_manifestation_battleline_branch_remains_unsupport
             model_instance_id=model_instance_id,
             wounds_remaining=0,
         )
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
     decisions = DecisionController()
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=decisions,
+        unit_instance_id=unit_id,
+    )
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
@@ -1538,7 +2204,11 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
     remove_first_models(state, unit_instance_id=unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id=unit_id,
+    )
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
 
@@ -1583,6 +2253,24 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
+    )
+
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+    sequencing_request = _required_decision_request(waiting)
+    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
+    sequencing_result = DecisionResult.for_request(
+        result_id="phase17g-shadow-command-battle-shock-order",
+        request=sequencing_request,
+        selected_option_id=sequencing_request.options[0].option_id,
+    )
+    sequencing_record = decisions.submit_result(sequencing_result)
+    sequencing_event_type, sequencing_event_payload = sequencing_decision_event_from_request(
+        request=sequencing_record.request,
+        result=sequencing_record.result,
+    )
+    decisions.event_log.append(
+        sequencing_event_type,
+        sequencing_event_payload,
     )
 
     completed = handler.begin_phase(state=state, decisions=decisions)
@@ -1775,13 +2463,16 @@ def test_daemonic_terror_noops_for_pass_or_ineligible_target_and_reports_fnp_cho
     ineligible_state = battle_state()
     _mark_player_as_chaos_daemons(ineligible_state, player_id="player-a")
     ineligible_decisions = DecisionController()
-    target = unit_by_id(ineligible_state, target_unit_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=ineligible_state,
+        unit_instance_id=target_unit_id,
+    )
     daemon_army = ineligible_state.army_definition_for_player("player-a")
     assert daemon_army is not None
     assert not army_rule._daemonic_terror_applies(  # pyright: ignore[reportPrivateUsage]
         state=ineligible_state,
         daemon_army=daemon_army,
-        target_unit=target,
+        target_rules_unit=target_rules_unit,
         battle_shocked_unit_ids=(),
     )
     army_rule.resolve_battle_shock_outcome(
@@ -2317,23 +3008,91 @@ def _corrupted_realspace_sticky_state(
     )
 
 
-def _record_battle_shock_auto_pass(state: GameState, *, unit_instance_id: str) -> None:
-    state.record_persisting_effect(
-        PersistingEffect(
-            effect_id=f"phase17g-auto-pass:{unit_instance_id}",
-            source_rule_id="phase17g:test:auto-pass",
-            owner_player_id="player-a",
-            target_unit_instance_ids=(unit_instance_id,),
-            started_battle_round=state.battle_round,
-            started_phase=BattlePhase.COMMAND,
-            expiration=EffectExpiration.end_phase(
-                battle_round=state.battle_round,
-                phase=BattlePhase.COMMAND,
-                player_id="player-a",
+def _record_battle_shock_auto_pass(
+    state: GameState,
+    *,
+    decisions: DecisionController,
+    unit_instance_id: str,
+) -> None:
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    )
+    player_id = rules_unit.owner_player_id
+    if state.active_player_id != player_id:
+        raise AssertionError("Insane Bravery fixture requires the target player's turn.")
+    catalog_record = next(
+        record
+        for record in eleventh_edition_stratagem_index().all_records()
+        if record.definition.stratagem_id == "insane-bravery"
+    )
+    gain = state.gain_command_points(
+        player_id=player_id,
+        amount=1,
+        source_id=f"phase17g-insane-bravery-fixture:{player_id}",
+        source_kind=CommandPointSourceKind.OTHER,
+    )
+    if gain.status is not CommandPointGainStatus.APPLIED:
+        raise AssertionError("Insane Bravery fixture CP grant must apply.")
+    decisions.event_log.append("command_points_gained", gain.to_payload())
+    proposal_request = StratagemTargetProposal.for_request(
+        context=StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=player_id,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            timing_window_id=(
+                f"insane-bravery-battle-shock-round-{state.battle_round}-player-{player_id}"
             ),
-            effect_payload={"effect_kind": "battle_shock_auto_pass"},
+        ),
+        catalog_record=catalog_record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=decisions,
+        proposal_request=proposal_request,
+    )
+    request = waiting.decision_request
+    if waiting.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION or request is None:
+        raise AssertionError("Insane Bravery fixture must request a target proposal.")
+    submitted = proposal_request.with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id=player_id,
+            target_unit_instance_id=unit_instance_id,
         )
     )
+    result = DecisionResult(
+        result_id=f"{request.request_id}:phase17g-insane-bravery-result",
+        request_id=request.request_id,
+        decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=validate_json_value({"proposal": submitted.to_payload()}),
+    )
+    invalid = invalid_stratagem_target_proposal_status(
+        state=state,
+        request=request,
+        result=result,
+        ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        decisions=decisions,
+    )
+    if invalid is not None:
+        raise AssertionError(f"Insane Bravery fixture proposal was invalid: {invalid}.")
+    decisions.submit_result(result)
+    use_record = apply_stratagem_target_proposal(
+        state=state,
+        result=result,
+        decisions=decisions,
+        ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+    )
+    if (
+        use_record.command_point_cost != 1
+        or use_record.command_point_transaction_id is None
+        or state.command_point_total(player_id) != 0
+    ):
+        raise AssertionError("Insane Bravery fixture must spend exactly 1CP.")
 
 
 def _placed_model_ids(state: GameState, unit_instance_id: str) -> tuple[str, ...]:
@@ -2546,7 +3305,7 @@ def _july_manifestation_revival_session() -> tuple[
 ]:
     config = replace(
         _chaos_daemons_lifecycle_config(battleline=True),
-        game_id="phase17g-config-seed-1",
+        game_id="phase17g-config-canonical-seed-2",
     )
     session = LocalGameSession()
     session.start(config)
@@ -2585,7 +3344,11 @@ def _july_manifestation_revival_session() -> tuple[
             model_instance_id=model_instance_id,
             wounds_remaining=0,
         )
-    _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
+    _record_battle_shock_auto_pass(
+        state,
+        decisions=session.lifecycle.decision_controller,
+        unit_instance_id=unit_id,
+    )
     candidate = july_2026_candidate.runtime_contribution()
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
@@ -2597,11 +3360,9 @@ def _july_manifestation_revival_session() -> tuple[
         state=state,
         decisions=session.lifecycle.decision_controller,
     )
-    if completed.status_kind is not LifecycleStatusKind.ADVANCED:
-        raise AssertionError("Manifestation test command phase did not advance.")
+    selection_request = _required_decision_request(completed)
     if candidate.battle_shock_hook_bindings[0].source_id != army_rule.JULY_SOURCE_RULE_ID:
         raise AssertionError("Manifestation test did not load the July source.")
-    selection_request = _required_decision_request(session.advance_until_decision_or_terminal())
     return (
         session,
         state,
@@ -2623,6 +3384,11 @@ def _kairos_realm_lifecycle(
     state = _record_lifecycle_battle_state(lifecycle=lifecycle, config=config)
     state.active_player_id = "player-a"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     state.gain_command_points(
         player_id="player-b",
         amount=3,

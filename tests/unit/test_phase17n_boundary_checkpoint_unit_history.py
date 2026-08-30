@@ -20,25 +20,41 @@ from tests.phase13b_shooting_declaration_helpers import (
     shooting_lifecycle,
 )
 from tests.phase17n_primary_mission_helpers import phase17n_event_setup
+from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
 
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockForcedTestContext,
     BattleShockHookBinding,
     BattleShockHookRegistry,
     BattleShockModifierContext,
 )
+from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockPassedStatePolicy,
+    record_battle_shock_result_and_outcome_events,
+)
+from warhammer40k_core.engine.command_battle_shock_candidates import (
+    CommandBattleShockCandidate,
+    CommandBattleShockEligibilityReason,
+)
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.mission_decisions import request_mission_action_opportunity
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
@@ -52,23 +68,40 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    capture_primary_mission_boundary_checkpoint,
+)
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
     PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
+    PrimaryMissionBoundaryCheckpoint,
 )
+from warhammer40k_core.engine.primary_mission_boundary_unit_history_authority import (
+    validate_primary_mission_boundary_unit_history_authority,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 type MovementHistoryKind = Literal["advance", "fall_back"]
 
 _HISTORY_UNIT_ID = "army-beta:intercessor-unit-3"
 _ELIGIBLE_UNIT_ID = "army-beta:intercessor-unit-4"
+_ATTACHED_HISTORY_UNIT_ID = "attached-unit:army-beta:intercessor-unit-3"
+_HISTORY_LEADER_UNIT_ID = "army-beta:history-leader"
 
 
 @pytest.mark.parametrize(
     ("history_kind", "expected_message"),
     [
         ("advance", "Primary mission boundary Advance state lacks exact authority"),
-        ("fall_back", "Primary mission boundary Fall Back state lacks exact authority"),
+        (
+            "fall_back",
+            (
+                "Primary mission boundary Fall Back state lacks exact authority|"
+                "Physical event-bound history lacks an exact pre-mutation anchor"
+            ),
+        ),
     ],
 )
 def test_phase17n_restore_rejects_coordinated_movement_history_erasure(
@@ -106,9 +139,167 @@ def test_phase17n_restore_rejects_coordinated_battle_shock_history_erasure() -> 
 
     with pytest.raises(
         GameLifecycleError,
-        match="Primary mission Battle-shock causal state was erased",
+        match="Battle-shock",
     ):
         GameLifecycle.from_payload(forged_payload)
+
+
+def test_phase17n_primary_boundary_accepts_split_before_attached_root_failure() -> None:
+    state, decisions, checkpoint = _split_before_attached_root_failure_checkpoint()
+
+    assert checkpoint.battle_shocked_unit_instance_ids == (
+        _HISTORY_LEADER_UNIT_ID,
+        _HISTORY_UNIT_ID,
+    )
+    validate_primary_mission_boundary_unit_history_authority(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        checkpoint_index=len(decisions.event_log.records),
+        checkpoint=checkpoint,
+    )
+
+
+@pytest.mark.parametrize("tamper_kind", ["delete", "omit_survivor"])
+def test_phase17n_primary_boundary_rejects_unshocked_attached_split_event_tamper(
+    tamper_kind: str,
+) -> None:
+    state, decisions, checkpoint = _split_before_attached_root_failure_checkpoint()
+    controller_payload = deepcopy(decisions.to_payload())
+    events = controller_payload["event_log"]
+    split_index = next(
+        index
+        for index, event in enumerate(events)
+        if event["event_type"] == "attached_rules_unit_split_reconciled"
+    )
+    if tamper_kind == "delete":
+        events.pop(split_index)
+        for event_index, event in enumerate(events, start=1):
+            event["event_id"] = f"event-{event_index:06d}"
+    else:
+        split_payload = events[split_index]["payload"]
+        assert isinstance(split_payload, dict)
+        split_payload["surviving_unit_instance_ids"] = [_HISTORY_UNIT_ID]
+    forged = DecisionController.from_payload(controller_payload)
+
+    with pytest.raises(GameLifecycleError, match=r"Attached rules-unit split|Battle-shock"):
+        validate_primary_mission_boundary_unit_history_authority(
+            state=state,
+            event_records=forged.event_log.records,
+            decision_records=forged.records,
+            checkpoint_index=len(forged.event_log.records),
+            checkpoint=checkpoint,
+        )
+
+
+def _split_before_attached_root_failure_checkpoint() -> tuple[
+    GameState,
+    DecisionController,
+    PrimaryMissionBoundaryCheckpoint,
+]:
+    state, _config = _phase17n_attached_history_state(
+        game_id="phase17n-attached-split-before-failed-result"
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+    bodyguard = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == _HISTORY_UNIT_ID
+    )
+    for model in bodyguard.own_models[:3]:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+    attached = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+    )
+    strength_context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=attached,
+        starting_strength=state.starting_strength_record_for_unit(_ATTACHED_HISTORY_UNIT_ID),
+        current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="phase17n-attached-split-before-failed-result:request",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-b",
+        unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+        reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
+        leadership_target=6,
+        below_half_strength_context=strength_context,
+    )
+    decisions = DecisionController()
+    base_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": "player-b",
+        "phase": BattlePhase.COMMAND.value,
+        "source_kind": "command_battle_shock",
+    }
+    decisions.event_log.append(
+        "battle_shock_step_snapshot_created",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": "player-b",
+            "phase": BattlePhase.COMMAND.value,
+            "battle_shock_phase_start_unit_ids": [],
+            "battle_shock_candidate_inventory": [
+                CommandBattleShockCandidate(
+                    unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+                    component_unit_instance_ids=tuple(sorted(attached.component_unit_instance_ids)),
+                    is_battle_shocked=False,
+                    below_half_strength_context=strength_context,
+                    eligibility_reasons=(
+                        CommandBattleShockEligibilityReason.AT_OR_BELOW_HALF_STRENGTH,
+                    ),
+                ).to_payload()
+            ],
+        },
+    )
+    decisions.event_log.append(
+        "battle_shock_test_requested",
+        {
+            **base_payload,
+            "battle_shock_test_request": request.to_payload(),
+        },
+    )
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = manager.roll_fixed(request.spec, [1, 1])
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-b",
+        attached_unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
+        surviving_unit_instance_ids=(_HISTORY_LEADER_UNIT_ID, _HISTORY_UNIT_ID),
+        event_log=decisions.event_log,
+    )
+    record_battle_shock_result_and_outcome_events(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        battle_shock_hooks=BattleShockHookRegistry.empty(),
+        request=request,
+        roll_state=roll_state,
+        active_player_id="player-b",
+        phase=BattlePhase.COMMAND,
+        auto_passed=False,
+        phase_start_battle_shocked_unit_ids=(),
+        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
+        base_payload=base_payload,
+        resolved_event_types=("battle_shock_test_resolved",),
+    )
+    checkpoint = capture_primary_mission_boundary_checkpoint(
+        state=state,
+        boundary_kind="action_request",
+        player_id="player-b",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    return state, decisions, checkpoint
 
 
 def test_phase17n_restore_rejects_coordinated_prior_shooting_history_erasure() -> None:
@@ -204,6 +395,11 @@ def _pending_action_opportunity_after_movement(
         )
 
     decisions = DecisionController()
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=config,
+    )
     handler = MovementPhaseHandler(
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
@@ -293,7 +489,7 @@ def _pending_action_opportunity_after_failed_battle_shock() -> tuple[
     DecisionController,
 ]:
     state, _config = _phase17n_two_unit_state(
-        game_id="phase17n-boundary-battle-shock-history",
+        game_id="phase17n-boundary-battle-shock-history-2",
         single_model_history_unit=True,
     )
     _place_action_units_at_central_objective(state)
@@ -370,6 +566,11 @@ def _pending_action_opportunity_after_shooting() -> tuple[
     )
     state = cast(GameState, lifecycle.state)
     decisions = lifecycle.decision_controller
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=lifecycle.config,
+    )
     history_unit_id = units["intercessor-1"].unit_instance_id
     eligible_unit_id = units["intercessor-2"].unit_instance_id
     selection_status = lifecycle.advance_until_decision_or_terminal()
@@ -487,6 +688,33 @@ def _phase17n_two_unit_state(
             ),
         ),
     )
+    return _phase17n_state_from_config(config)
+
+
+def _phase17n_attached_history_state(*, game_id: str) -> tuple[GameState, GameConfig]:
+    config = phase11c_config(
+        game_id=game_id,
+        player_b_units=(
+            default_unit_selection("intercessor-unit-3"),
+            unit_selection(
+                unit_selection_id="history-leader",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            default_unit_selection("intercessor-unit-4"),
+        ),
+        player_b_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="history-leader",
+                bodyguard_unit_selection_id="intercessor-unit-3",
+            ),
+        ),
+    )
+    return _phase17n_state_from_config(config)
+
+
+def _phase17n_state_from_config(config: GameConfig) -> tuple[GameState, GameConfig]:
     state = GameState.from_config(config)
     for army in mustered_armies(config):
         state.record_army_definition(army)
@@ -588,9 +816,9 @@ def _force_history_unit_battle_shock_failure(
     assert context.request.unit_instance_id == _HISTORY_UNIT_ID
     return (
         RollModifier(
-            modifier_id="phase17n-test:battle-shock-minus-five",
+            modifier_id="phase17n-test:battle-shock-minus-seven",
             source_id="phase17n-test:forced-battle-shock",
-            operand=-5,
+            operand=-4,
         ),
     )
 

@@ -26,6 +26,7 @@ from tests.phase17n_primary_mission_helpers import (
 from tests.phase17n_primary_mission_helpers import (
     phase17n_started_primary_action_fixture as shared_started_primary_action_fixture,
 )
+from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
 
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
@@ -207,6 +208,7 @@ from warhammer40k_core.engine.primary_victory_point_policy import (
     validate_primary_victory_point_transaction,
     validate_victory_point_ledger_policy,
 )
+from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
@@ -221,7 +223,14 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
 )
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
+from warhammer40k_core.engine.triggered_movement import (
+    DECLINE_TRIGGERED_MOVEMENT_OPTION_ID,
+    TriggeredMovementDescriptor,
+    TriggeredMovementHandler,
+    TriggeredMovementKind,
+)
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
@@ -5783,51 +5792,75 @@ def test_phase17n_vanguard_completion_evidence_requires_enemy_terrain_row() -> N
         )
 
 
-def test_phase17n_reconciliation_interrupts_post_start_charge_move_once() -> None:
+def test_phase17n_reconciliation_interrupts_post_start_triggered_move_once() -> None:
     state, decisions, action, _target_id = _phase17n_started_primary_action_fixture(
         layout_id="purge-the-foe-vs-priority-assets-layout-1",
         attacker_force_disposition_id="purge-the-foe",
         defender_force_disposition_id="priority-assets",
         player_id="player-b",
         mission_action_id="maintain-control",
-        current_phase=BattlePhase.CHARGE,
+        current_phase=BattlePhase.SHOOTING,
+        movement_legal_formation=True,
     )
     assert state.battlefield_state is not None
     unit_placement = state.battlefield_state.unit_placement_by_id(action.unit_instance_id)
-    model_placement = unit_placement.model_placements[0]
-    displacement = ModelDisplacementRecord(
-        model_instance_id=model_placement.model_instance_id,
-        displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
-        start_pose=model_placement.pose,
-        end_pose=Pose.at(
-            model_placement.pose.position.x + 1.0,
-            model_placement.pose.position.y,
-            model_placement.pose.position.z,
-            facing_degrees=model_placement.pose.facing.degrees,
-        ),
-    )
-    evidence = decisions.event_log.append(
-        "charge_move_completed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.CHARGE.value,
-            "unit_instance_id": action.unit_instance_id,
-            "transition_batch": BattlefieldTransitionBatch(
-                displacements=(displacement,)
-            ).to_payload(),
-        },
-    )
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        unit_placement.with_model_placements(
-            tuple(
-                placement.with_pose(displacement.end_pose)
-                if placement.model_instance_id == displacement.model_instance_id
-                else placement
-                for placement in unit_placement.model_placements
+    witness = PathWitness.for_paths(
+        tuple(
+            (
+                model_placement.model_instance_id,
+                (
+                    model_placement.pose,
+                    Pose.at(
+                        model_placement.pose.position.x + 0.125,
+                        model_placement.pose.position.y,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
+                    ),
+                    Pose.at(
+                        model_placement.pose.position.x + 0.25,
+                        model_placement.pose.position.y,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
+                    ),
+                ),
             )
+            for model_placement in unit_placement.model_placements
         )
+    )
+    handler = TriggeredMovementHandler(ruleset_descriptor=state.runtime_ruleset_descriptor())
+    request = handler.request_from_state(
+        state=state,
+        unit_instance_id=action.unit_instance_id,
+        descriptor=TriggeredMovementDescriptor(
+            movement_kind=TriggeredMovementKind.TRIGGERED,
+            source_rule_id="test:mission-action:forced-move",
+            trigger_timing=ReactionWindow(
+                phase=BattlePhase.SHOOTING,
+                window_kind=ReactionWindowKind.RULE_TRIGGER,
+                source_step="mission-action-interruption",
+                source_event_id=None,
+            ),
+            max_distance_inches=1.0,
+        ),
+        candidate_witnesses=(witness,),
+    )
+    decisions.request_decision(request)
+    selected_option_id = next(
+        option.option_id
+        for option in request.options
+        if option.option_id != DECLINE_TRIGGERED_MOVEMENT_OPTION_ID
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17n-mission-action-triggered-move",
+        request=request,
+        selected_option_id=selected_option_id,
+    )
+    decisions.submit_result(result)
+    assert handler.apply_decision(state=state, result=result, decisions=decisions) is None
+    evidence = next(
+        event
+        for event in reversed(decisions.event_log.records)
+        if event.event_type == "triggered_movement_resolved"
     )
 
     interrupted = reconcile_primary_mission_action_interruptions(
@@ -6199,6 +6232,7 @@ def _phase17n_started_primary_action_fixture(
     current_phase: BattlePhase,
     player_unit_count: int = 1,
     completion_control_kind: str | None = None,
+    movement_legal_formation: bool = False,
 ) -> tuple[GameState, DecisionController, MissionActionState, str]:
     if player_unit_count == 1:
         state = battle_state()
@@ -6321,7 +6355,17 @@ def _phase17n_started_primary_action_fixture(
             with_model_offsets(
                 placement,
                 target_marker,
-                offsets=((0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (0.0, 1.0), (1.0, 1.0)),
+                offsets=(
+                    (
+                        (0.0, 0.0),
+                        (1.5, 0.0),
+                        (3.0, 0.0),
+                        (0.75, 1.5),
+                        (2.25, 1.5),
+                    )
+                    if movement_legal_formation
+                    else ((0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (0.0, 1.0), (1.0, 1.0))
+                ),
             )
         )
         additional_targets = tuple(
@@ -6376,6 +6420,22 @@ def _phase17n_started_primary_action_fixture(
                 )
             )
     decisions = DecisionController()
+    fixture_config = phase11c_config(
+        game_id=state.game_id,
+        player_a_units=(
+            (
+                default_unit_selection("intercessor-unit-1"),
+                default_unit_selection("intercessor-unit-2"),
+            )
+            if player_unit_count == 2
+            else None
+        ),
+    )
+    record_completed_command_occurrences_for_fixture(
+        state,
+        decisions=decisions,
+        config=fixture_config,
+    )
     status = request_mission_action_start(
         state=state,
         decisions=decisions,
@@ -6409,8 +6469,6 @@ def _phase17n_started_primary_action_fixture(
                 model_instance_ids=unit.own_model_ids(),
                 source_result_id="phase17n-completion-control-battle-shock",
                 battle_round_started=state.battle_round,
-                expires_at_player_command_phase_start=action.player_id,
-                expires_at_battle_round=state.battle_round + 1,
             )
         ]
     elif completion_control_kind == "non_lineage_contributor":

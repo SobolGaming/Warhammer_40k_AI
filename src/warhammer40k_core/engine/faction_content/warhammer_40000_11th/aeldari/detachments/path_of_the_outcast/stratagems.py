@@ -1,22 +1,12 @@
 from __future__ import annotations
 
-from typing import cast
-
-from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
-from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battle_shock import (
-    BattleShockResult,
-    BattleShockTestReason,
-    BattleShockTestRequest,
-)
-from warhammer40k_core.engine.battlefield_state import PlacementError
-from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
-    BATTLE_SHOCK_TEST_ROLL_TYPE,
-    selected_target_test_roll_modifiers,
+from warhammer40k_core.engine.battle_shock_test_service import (
+    BattleShockTestRuntime,
+    is_stratagem_battle_shock_reroll_request,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -32,6 +22,7 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.ranged_rule_effects import detection_range_bonus_payload
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems import (
     GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_ENEMY_UNIT_CONTEXT_KEY,
@@ -48,6 +39,9 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTimingDescriptor,
     destroyed_target_unit_ids_from_context,
 )
+from warhammer40k_core.engine.stratagems_generic_rule_ir import (
+    _apply_generic_rule_ir_stratagem_handler,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
@@ -55,8 +49,7 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementKind,
     triggered_movement_unit_selection_request,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
@@ -106,82 +99,41 @@ def apply_eldritch_suppression(
     validation = validate_eldritch_suppression(context)
     if validation.reason is not None:
         return validation
-    enemy_unit_id = _hit_enemy_unit_id(context)
-    enemy_owner = _unit_owner(context, unit_instance_id=enemy_unit_id)
-    enemy_unit = _unit_by_id(context, unit_instance_id=enemy_unit_id)
-    current_model_ids = _current_battlefield_model_ids(context, unit=enemy_unit)
-    starting_strength = _starting_strength_record(context, unit_instance_id=enemy_unit_id)
-    below_half_context = BelowHalfStrengthContext.from_unit(
-        player_id=enemy_owner,
-        unit=enemy_unit,
-        starting_strength=starting_strength,
-        current_model_ids=current_model_ids,
-    )
-    request = BattleShockTestRequest.for_unit(
-        request_id=f"{context.use_record.use_id}:battle-shock:{enemy_unit_id}",
-        game_id=context.state.game_id,
-        battle_round=context.state.battle_round,
-        player_id=enemy_owner,
-        unit_instance_id=enemy_unit_id,
-        reason=BattleShockTestReason.FORCED_BY_STRATAGEM,
-        leadership_target=_best_leadership(enemy_unit, current_model_ids=current_model_ids),
-        below_half_strength_context=below_half_context,
-    )
-    context.decisions.event_log.append(
-        "battle_shock_test_requested",
-        {
-            "game_id": context.state.game_id,
-            "battle_round": context.state.battle_round,
-            "active_player_id": context.state.active_player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "battle_shock_test_request": validate_json_value(request.to_payload()),
-            "source_stratagem_use": context.use_record.to_payload(),
-        },
-    )
-    manager = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log)
-    roll_state = manager.roll(request.spec)
-    destroyed_model_modifiers = _eldritch_suppression_modifiers(
-        context=context,
-        enemy_unit_id=enemy_unit_id,
-    )
-    selected_target_modifiers = selected_target_test_roll_modifiers(
+    selected_enemy_unit_id = _hit_enemy_unit_id(context)
+    enemy_unit_id = rules_unit_view_by_id(
         state=context.state,
-        unit_instance_id=enemy_unit_id,
-        roll_type=BATTLE_SHOCK_TEST_ROLL_TYPE,
+        unit_instance_id=selected_enemy_unit_id,
+    ).unit_instance_id
+    if type(context.battle_shock_runtime) is not BattleShockTestRuntime:
+        raise GameLifecycleError("Eldritch Suppression requires loaded Battle-shock runtime.")
+    _apply_generic_rule_ir_stratagem_handler(
+        state=context.state,
+        decisions=context.decisions,
+        context=context.eligibility_context,
+        target_binding=context.target_binding,
+        definition=context.definition,
+        use_record=context.use_record,
+        ruleset_descriptor=context.ruleset_descriptor,
+        army_catalog=context.army_catalog,
+        battle_shock_runtime=context.battle_shock_runtime,
+        shooting_unit_selected_grant_hooks=None,
     )
-    modifiers = (*destroyed_model_modifiers, *selected_target_modifiers)
-    result = BattleShockResult.from_roll_state(
-        result_id=f"{request.request_id}:result",
-        request=request,
-        roll_state=roll_state,
-        modifiers=modifiers,
+    pending_rerolls = tuple(
+        request
+        for request in context.decisions.queue.pending_requests
+        if is_stratagem_battle_shock_reroll_request(request)
     )
-    context.state.record_battle_shock_result(result)
-    context.decisions.event_log.append(
-        "battle_shock_test_resolved",
-        {
-            "game_id": context.state.game_id,
-            "battle_round": context.state.battle_round,
-            "active_player_id": context.state.active_player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "battle_shock_result": validate_json_value(result.to_payload()),
-            "auto_passed": False,
-            "source_stratagem_use": context.use_record.to_payload(),
-        },
-    )
+    if len(pending_rerolls) > 1:
+        raise GameLifecycleError("Eldritch Suppression produced duplicate Battle-shock rerolls.")
     replay_payload = {
         "effect_kind": "eldritch_suppression",
         "enemy_unit_instance_id": enemy_unit_id,
-        "battle_shock_result_id": result.result_id,
-        "destroyed_model_modifier_applied": bool(destroyed_model_modifiers),
-        "selected_target_modifier_ids": [
-            modifier.modifier_id for modifier in selected_target_modifiers
-        ],
-        "selected_target_modifier_source_ids": [
-            modifier.source_id
-            for modifier in selected_target_modifiers
-            if modifier.source_id is not None
-        ],
+        "battle_shock_result_id": (
+            f"{context.use_record.use_id}:battle-shock:{enemy_unit_id}:result"
+        ),
+        "battle_shock_reroll_pending": bool(pending_rerolls),
+        "destroyed_model_modifier_applied": selected_enemy_unit_id
+        in destroyed_target_unit_ids_from_context(context.eligibility_context),
     }
     return StratagemHandlerExecutionResult.applied(
         handler_id=ELDRITCH_SUPPRESSION_HANDLER_ID,
@@ -540,22 +492,6 @@ def _generic_rule_ir_payload(coverage_descriptor_id: str) -> dict[str, JsonValue
     return {"rule_ir": validate_json_value(payload)}
 
 
-def _eldritch_suppression_modifiers(
-    *,
-    context: StratagemHandlerContext,
-    enemy_unit_id: str,
-) -> tuple[RollModifier, ...]:
-    if enemy_unit_id not in destroyed_target_unit_ids_from_context(context.eligibility_context):
-        return ()
-    return (
-        RollModifier(
-            modifier_id=f"{context.use_record.use_id}:eldritch-suppression:-1",
-            source_id=SOURCE_RULE_ID,
-            operand=-1,
-        ),
-    )
-
-
 def _target_unit_id(context: StratagemHandlerContext) -> str:
     target_unit_id = context.target_binding.target_unit_instance_id
     if target_unit_id is None:
@@ -617,15 +553,6 @@ def _unit_in_army(*, army: ArmyDefinition, unit_instance_id: str) -> UnitInstanc
     raise GameLifecycleError("Path of the Outcast target unit is not in the selected army.")
 
 
-def _unit_by_id(context: StratagemHandlerContext, *, unit_instance_id: str) -> UnitInstance:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in context.state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Path of the Outcast unit is unknown.")
-
-
 def _unit_owner(context: StratagemHandlerContext, *, unit_instance_id: str) -> str:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in context.state.army_definitions:
@@ -634,81 +561,9 @@ def _unit_owner(context: StratagemHandlerContext, *, unit_instance_id: str) -> s
     raise GameLifecycleError("Path of the Outcast unit owner is unknown.")
 
 
-def _starting_strength_record(
-    context: StratagemHandlerContext,
-    *,
-    unit_instance_id: str,
-) -> StartingStrengthRecord:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for record in context.state.starting_strength_records:
-        if record.unit_instance_id == requested_unit_id:
-            return record
-    raise GameLifecycleError("Path of the Outcast target is missing starting strength.")
-
-
-def _current_battlefield_model_ids(
-    context: StratagemHandlerContext,
-    *,
-    unit: UnitInstance,
-) -> tuple[str, ...]:
-    battlefield_state = context.state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Path of the Outcast requires battlefield state.")
-    try:
-        placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Path of the Outcast target unit is not placed.") from exc
-    unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
-    current_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        model = unit_model_by_id.get(model_placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError("Battlefield placement contains unknown model.")
-        if model.is_alive:
-            current_ids.append(model.model_instance_id)
-    if not current_ids:
-        raise GameLifecycleError("Path of the Outcast target unit has no current models.")
-    return tuple(sorted(current_ids))
-
-
-def _best_leadership(unit: UnitInstance, *, current_model_ids: tuple[str, ...]) -> int:
-    model_ids = set(_validate_identifier_tuple("current_model_ids", current_model_ids))
-    leadership_values = tuple(
-        _model_leadership(model)
-        for model in unit.own_models
-        if model.model_instance_id in model_ids
-    )
-    if not leadership_values:
-        raise GameLifecycleError("Path of the Outcast found no current Leadership values.")
-    return min(leadership_values)
-
-
-def _model_leadership(model: ModelInstance) -> int:
-    if type(model) is not ModelInstance:
-        raise GameLifecycleError("Leadership lookup requires a ModelInstance.")
-    for characteristic in model.characteristics:
-        if characteristic.characteristic is Characteristic.LEADERSHIP:
-            return characteristic.final
-    raise GameLifecycleError("Path of the Outcast target model is missing Leadership.")
-
-
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    return tuple(sorted(identifiers))

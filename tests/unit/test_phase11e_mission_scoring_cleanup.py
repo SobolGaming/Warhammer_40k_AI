@@ -91,6 +91,7 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
 )
+from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -311,7 +312,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
     unit_destruction_completion_events_for_interval,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -7713,7 +7714,8 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     action = _attached_cleanse_action(state=state, action_id="phase11e-attached-before-split")
     state.record_mission_action_state(action)
     bodyguard_model_ids = state.army_definitions[0].unit_by_id(bodyguard_id).own_model_ids()
-    state.battlefield_state = state.battlefield_state.with_removed_models(bodyguard_model_ids)
+    for model_instance_id in bodyguard_model_ids:
+        destroy_model_by_rule(state=state, model_instance_id=model_instance_id)
     source_session = LocalGameSession(lifecycle=lifecycle)
     event_cursor = EventStreamCursor(source_session.event_record_count())
 
@@ -7737,8 +7739,11 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
             event_cursor,
             viewer_player_id=viewer_player_id,
         )
-        assert len(event_delta["events"]) == 1
-        interruption_event = event_delta["events"][0]
+        assert tuple(event["event_type"] for event in event_delta["events"]) == (
+            "attached_rules_unit_split_reconciled",
+            "mission_action_interrupted",
+        )
+        interruption_event = event_delta["events"][1]
         assert interruption_event["event_type"] == "mission_action_interrupted"
         event_payload = cast(dict[str, JsonValue], interruption_event["payload"])
         assert event_payload["action_id"] == action.action_id
@@ -7839,24 +7844,20 @@ def test_attached_action_cannot_complete_after_component_fails_battle_shock() ->
         action_id="phase11e-attached-battle-shocked",
     )
     state.record_mission_action_state(action)
-    bodyguard = state.army_definitions[0].unit_by_id(bodyguard_id)
-    starting_strength = StartingStrengthRecord.from_unit(
-        player_id="player-a",
-        unit=bodyguard,
-    )
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    starting_strength = state.starting_strength_record_for_unit(attached_id)
     request = BattleShockTestRequest.for_unit(
         request_id="phase11e-attached-component-battle-shock",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id="player-a",
-        unit_instance_id=bodyguard_id,
+        unit_instance_id=attached_id,
         reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
         leadership_target=6,
-        below_half_strength_context=BelowHalfStrengthContext.from_unit(
-            player_id="player-a",
-            unit=bodyguard,
+        below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
+            rules_unit=rules_unit,
             starting_strength=starting_strength,
-            current_model_ids=bodyguard.own_model_ids(),
+            current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
         ),
     )
     state.record_battle_shock_result(
@@ -7870,7 +7871,7 @@ def test_attached_action_cannot_complete_after_component_fails_battle_shock() ->
         )
     )
 
-    assert state.battle_shocked_unit_ids == [bodyguard_id]
+    assert state.battle_shocked_unit_ids == [attached_id]
     assert rules_unit_is_battle_shocked(state=state, unit_instance_id=attached_id)
     with pytest.raises(GameLifecycleError, match="cannot complete actions"):
         state.complete_mission_action(

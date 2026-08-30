@@ -30,6 +30,7 @@ JULY_FACTION_PACK_PACKAGE = (
 )
 FACTION_PACK_RULE_IR_PACKAGE = EDITION_SOURCE_PACKAGES / "faction_pack_rule_ir"
 CORE_STRATAGEM_APP_SOURCE_PACKAGE = EDITION_SOURCE_PACKAGES / "core_stratagems_2026_08"
+CORE_COMMAND_PHASE_SOURCE_PACKAGE = EDITION_SOURCE_PACKAGES / "core_command_phase_2026_08"
 DATASHEETS_SOURCE_SNAPSHOT = faction_rule_ir_generator.DATASHEETS_SOURCE_PATH
 DATASHEET_ABILITIES_SOURCE_SNAPSHOT = DATASHEETS_SOURCE_SNAPSHOT.with_name(
     "Datasheets_abilities.json"
@@ -56,6 +57,9 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "court_of_slaughter_anvanth_2026_08": "official_roster_source",
     "core_stratagems_2026_08": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
+    "core_command_phase_2026_08": (
+        "project_reviewed_transcription_with_authoritative_search_index_sequence_and_official_pdf_text"
     ),
     "event_companion_2026_06_artifacts": "official_event_source",
     "event_companion_layouts_2026_06": "official_event_source",
@@ -138,6 +142,33 @@ def test_core_stratagem_app_source_uses_one_typed_json_artifact() -> None:
 def test_core_stratagem_app_source_artifact_is_current() -> None:
     completed = subprocess.run(
         (sys.executable, "tools/build_core_stratagem_app_source.py", "--check"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+
+
+def test_core_command_phase_source_uses_one_typed_json_artifact() -> None:
+    python_modules = tuple(
+        sorted(path.name for path in CORE_COMMAND_PHASE_SOURCE_PACKAGE.glob("*.py"))
+    )
+    json_artifacts = tuple(
+        sorted(
+            path.name for path in (CORE_COMMAND_PHASE_SOURCE_PACKAGE / "artifacts").glob("*.json")
+        )
+    )
+
+    assert python_modules == ("__init__.py", "_artifacts.py")
+    assert json_artifacts == ("package.json",)
+    assert _line_count(CORE_COMMAND_PHASE_SOURCE_PACKAGE / "_artifacts.py") < 1500
+
+
+def test_core_command_phase_source_artifact_is_current() -> None:
+    completed = subprocess.run(
+        (sys.executable, "tools/build_core_command_phase_source.py", "--check"),
         cwd=ROOT,
         check=False,
         capture_output=True,
@@ -309,6 +340,11 @@ def test_core_rules_app_mirror_sources_use_project_authority_not_official_captur
     assert (
         _EDITION_SOURCE_PACKAGE_CLASSIFICATION["core_stratagems_2026_08"]
         == "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    )
+    assert (
+        _EDITION_SOURCE_PACKAGE_CLASSIFICATION["core_command_phase_2026_08"]
+        == "project_reviewed_transcription_with_authoritative_search_index_sequence_"
+        "and_official_pdf_text"
     )
     assert (
         _EDITION_SOURCE_PACKAGE_CLASSIFICATION["july_rules_updates_2026_07"]

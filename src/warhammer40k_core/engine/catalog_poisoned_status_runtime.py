@@ -18,11 +18,14 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartEffectContext,
     CommandPhaseStartHookBinding,
+    CommandPhaseStartNestedPendingAuthorityContext,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
     resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
@@ -63,6 +66,9 @@ def catalog_poisoned_command_start_bindings(
             hook_id=CATALOG_IR_POISONED_COMMAND_MORTAL_WOUNDS_CONSUMER_ID,
             source_id=CATALOG_IR_POISONED_COMMAND_MORTAL_WOUNDS_CONSUMER_ID,
             effect_handler=resolve_catalog_poisoned_command_mortal_wounds,
+            nested_pending_authority_validator=(
+                validate_catalog_poisoned_command_nested_pending_authority
+            ),
         ),
     )
 
@@ -142,6 +148,52 @@ def apply_catalog_poisoned_mortal_wound_feel_no_pain_decision(
         ),
     )
     return None
+
+
+def validate_catalog_poisoned_command_nested_pending_authority(
+    context: CommandPhaseStartNestedPendingAuthorityContext,
+) -> bool:
+    if type(context) is not CommandPhaseStartNestedPendingAuthorityContext:
+        raise GameLifecycleError(
+            "Catalog poisoned status requires nested pending authority context."
+        )
+    if not is_mortal_wound_feel_no_pain_request(context.request):
+        return False
+    source_context = mortal_wound_feel_no_pain_source_context(context.request)
+    if not isinstance(source_context, dict) or source_context.get("source_kind") != (
+        CATALOG_POISONED_COMMAND_MORTAL_WOUNDS_SOURCE_KIND
+    ):
+        return False
+    if (
+        source_context.get("game_id") != context.state.game_id
+        or source_context.get("battle_round") != context.state.battle_round
+        or source_context.get("phase") != BattlePhase.COMMAND.value
+        or source_context.get("active_player_id") != context.active_player_id
+    ):
+        raise GameLifecycleError("Catalog poisoned nested pending source context drifted.")
+    rolled_events = tuple(
+        event
+        for event in context.decisions.event_log.records
+        if event.event_type == CATALOG_POISONED_COMMAND_ROLLED_EVENT
+        and event.payload == source_context
+    )
+    if len(rolled_events) != 1:
+        raise GameLifecycleError(
+            "Catalog poisoned nested pending request lacks exact roll authority."
+        )
+    pending_events = tuple(
+        event
+        for event in context.decisions.event_log.records
+        if event.event_type == CATALOG_POISONED_COMMAND_PENDING_EVENT
+        and isinstance(event.payload, dict)
+        and {key: value for key, value in event.payload.items() if key != "request_id"}
+        == source_context
+    )
+    if len(pending_events) != 1:
+        raise GameLifecycleError(
+            "Catalog poisoned nested pending request lacks exact pause authority."
+        )
+    return True
 
 
 def _resolve_poisoned_target(

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import replace
 from enum import StrEnum
 from typing import cast
@@ -14,16 +15,22 @@ from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
+    BattleShockModifierApplicationAuthorityContext,
+    BattleShockModifierApplicationValidator,
     BattleShockModifierContext,
     BattleShockModifierHandler,
     BattleShockOutcomeContext,
     BattleShockOutcomeHandler,
-)
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
-    geometry_model_for_placement,
+    BattleShockPendingOutcomeAuthority,
+    BattleShockPendingOutcomeAuthorityContext,
+    BattleShockPendingOutcomeAuthorityValidator,
+    HistoricalBattleShockContribution,
+    battle_shock_modifier_applications_from_modifiers,
 )
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
@@ -52,6 +59,10 @@ from warhammer40k_core.engine.rule_execution import (
     RuleExecutionStatus,
     default_rule_execution_registry,
     execute_rule_ir,
+)
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_component_unit,
+    placed_alive_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.sticky_objective_control import apply_sticky_objective_control
@@ -105,7 +116,9 @@ def runtime_contribution() -> RuntimeContentContribution:
         hook_id=HOOK_ID,
         source_rule_id=SOURCE_RULE_ID,
         modifier_handler=battle_shock_modifiers,
+        modifier_application_validator=validate_battle_shock_modifier_application,
         outcome_handler=resolve_battle_shock_outcome,
+        historical_handler=historical_battle_shock_contribution,
     )
 
 
@@ -115,7 +128,10 @@ def staged_july_runtime_contribution() -> RuntimeContentContribution:
         hook_id=JULY_HOOK_ID,
         source_rule_id=JULY_SOURCE_RULE_ID,
         modifier_handler=july_battle_shock_modifiers,
+        modifier_application_validator=validate_july_battle_shock_modifier_application,
         outcome_handler=resolve_july_battle_shock_outcome,
+        pending_outcome_authority_validator=(validate_july_daemonic_manifestation_pending_outcome),
+        historical_handler=historical_july_battle_shock_contribution,
     )
 
 
@@ -125,7 +141,14 @@ def _runtime_contribution(
     hook_id: str,
     source_rule_id: str,
     modifier_handler: BattleShockModifierHandler,
+    modifier_application_validator: BattleShockModifierApplicationValidator,
     outcome_handler: BattleShockOutcomeHandler,
+    historical_handler: Callable[
+        [HistoricalBattleShockAuthorityContext], HistoricalBattleShockContribution
+    ],
+    pending_outcome_authority_validator: (
+        BattleShockPendingOutcomeAuthorityValidator | None
+    ) = None,
 ) -> RuntimeContentContribution:
     return RuntimeContentContribution(
         contribution_id=contribution_id,
@@ -134,9 +157,26 @@ def _runtime_contribution(
                 hook_id=hook_id,
                 source_id=source_rule_id,
                 modifier_handler=modifier_handler,
+                modifier_application_validator=modifier_application_validator,
                 outcome_handler=outcome_handler,
+                pending_outcome_authority_validator=(pending_outcome_authority_validator),
+                historical_contribution_handler=historical_handler,
             ),
         ),
+    )
+
+
+def validate_july_daemonic_manifestation_pending_outcome(
+    context: BattleShockPendingOutcomeAuthorityContext,
+) -> BattleShockPendingOutcomeAuthority | None:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        battle_shock_outcome_authority,
+    )
+
+    return battle_shock_outcome_authority.validate_july_daemonic_manifestation_pending_outcome(
+        context,
+        hook_id=JULY_HOOK_ID,
+        source_rule_id=JULY_SOURCE_RULE_ID,
     )
 
 
@@ -160,6 +200,224 @@ def july_battle_shock_modifiers(
     )
 
 
+def historical_battle_shock_contribution(
+    context: HistoricalBattleShockAuthorityContext,
+) -> HistoricalBattleShockContribution:
+    return _historical_battle_shock_contribution(
+        context,
+        hook_id=HOOK_ID,
+        source_rule_id=SOURCE_RULE_ID,
+    )
+
+
+def historical_july_battle_shock_contribution(
+    context: HistoricalBattleShockAuthorityContext,
+) -> HistoricalBattleShockContribution:
+    return _historical_battle_shock_contribution(
+        context,
+        hook_id=JULY_HOOK_ID,
+        source_rule_id=JULY_SOURCE_RULE_ID,
+    )
+
+
+def _historical_battle_shock_contribution(
+    context: HistoricalBattleShockAuthorityContext,
+    *,
+    hook_id: str,
+    source_rule_id: str,
+) -> HistoricalBattleShockContribution:
+    if type(context) is not HistoricalBattleShockAuthorityContext:
+        raise GameLifecycleError("Chaos Daemons historical authority requires context.")
+    target = context.rules_unit(context.request.unit_instance_id)
+    if target.owner_player_id != context.request.player_id:
+        raise GameLifecycleError("Chaos Daemons historical target owner drifted.")
+    modifiers: list[RollModifier] = []
+    for army in context.armies:
+        if army.detachment_selection.faction_id != CHAOS_DAEMONS_FACTION_ID:
+            continue
+        if army.player_id == target.owner_player_id:
+            applies = historical_daemonic_manifestation_applies(
+                context=context,
+                daemon_army=army,
+                target=target,
+            )
+            operand = 1
+            kind = "daemonic-manifestation"
+        else:
+            applies = _historical_daemonic_terror_applies(
+                context=context,
+                daemon_army=army,
+                target=target,
+            )
+            operand = -1
+            kind = "daemonic-terror"
+        if applies:
+            modifiers.append(
+                RollModifier(
+                    modifier_id=(f"{hook_id}:{kind}:{context.request.request_id}:{army.player_id}"),
+                    source_id=source_rule_id,
+                    operand=operand,
+                )
+            )
+    return HistoricalBattleShockContribution(modifiers=tuple(modifiers))
+
+
+def historical_daemonic_manifestation_applies(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    daemon_army: ArmyDefinition,
+    target: RulesUnitView,
+) -> bool:
+    return _rules_unit_has_faction_keyword(target, LEGIONES_DAEMONICA) and (
+        _historical_unit_intersects_owner_deployment(
+            context=context,
+            player_id=daemon_army.player_id,
+            target=target,
+        )
+        or _historical_greater_daemon_shadow_aura(
+            context=context,
+            daemon_army=daemon_army,
+            target=target,
+        )
+    )
+
+
+def _historical_daemonic_terror_applies(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    daemon_army: ArmyDefinition,
+    target: RulesUnitView,
+) -> bool:
+    return _historical_unit_intersects_owner_deployment(
+        context=context,
+        player_id=daemon_army.player_id,
+        target=target,
+    ) or _historical_greater_daemon_terror(
+        context=context,
+        daemon_army=daemon_army,
+        target=target,
+    )
+
+
+def _historical_unit_intersects_owner_deployment(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    player_id: str,
+    target: RulesUnitView,
+) -> bool:
+    zones = tuple(
+        zone for zone in context.mission_setup.deployment_zones if zone.player_id == player_id
+    )
+    if not zones:
+        raise GameLifecycleError("Chaos Daemons historical deployment zone is missing.")
+    return any(
+        shapely_backend.base_footprint_intersects_deployment_zone(
+            model.base,
+            model.pose,
+            zone,
+        )
+        for model in context.geometry_models(target.unit_instance_id)
+        for zone in zones
+    )
+
+
+def _historical_greater_daemon_shadow_aura(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    daemon_army: ArmyDefinition,
+    target: RulesUnitView,
+) -> bool:
+    target_models = context.geometry_models(target.unit_instance_id)
+    for source in daemon_army.units:
+        if source.unit_instance_id in target.component_unit_instance_ids:
+            continue
+        keyword = _greater_daemon_shadow_aura_keyword(source)
+        if keyword is None or not rules_unit_has_keyword(target, keyword):
+            continue
+        if any(
+            source_model.base_distance_to(target_model) <= 6.0
+            for source_model in context.component_geometry_models(source.unit_instance_id)
+            for target_model in target_models
+        ):
+            return True
+    return False
+
+
+def _historical_greater_daemon_terror(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    daemon_army: ArmyDefinition,
+    target: RulesUnitView,
+) -> bool:
+    target_models = context.geometry_models(target.unit_instance_id)
+    return any(
+        source_model.base_distance_to(target_model) <= 6.0
+        for unit in daemon_army.units
+        if _is_greater_daemon_terror_unit(unit)
+        for source_model in context.component_geometry_models(unit.unit_instance_id)
+        for target_model in target_models
+    )
+
+
+def validate_battle_shock_modifier_application(
+    context: BattleShockModifierApplicationAuthorityContext,
+) -> None:
+    _validate_battle_shock_modifier_application(
+        context,
+        hook_id=HOOK_ID,
+        source_rule_id=SOURCE_RULE_ID,
+    )
+
+
+def validate_july_battle_shock_modifier_application(
+    context: BattleShockModifierApplicationAuthorityContext,
+) -> None:
+    _validate_battle_shock_modifier_application(
+        context,
+        hook_id=JULY_HOOK_ID,
+        source_rule_id=JULY_SOURCE_RULE_ID,
+    )
+
+
+def _validate_battle_shock_modifier_application(
+    context: BattleShockModifierApplicationAuthorityContext,
+    *,
+    hook_id: str,
+    source_rule_id: str,
+) -> None:
+    if type(context) is not BattleShockModifierApplicationAuthorityContext:
+        raise GameLifecycleError("Chaos Daemons modifier authority requires context.")
+    application = context.application
+    if application.hook_id != hook_id or application.source_id != source_rule_id:
+        raise GameLifecycleError("Chaos Daemons Battle-shock modifier source drifted.")
+    prefix_by_operand = {
+        1: f"{hook_id}:daemonic-manifestation:{context.request.request_id}:",
+        -1: f"{hook_id}:daemonic-terror:{context.request.request_id}:",
+    }
+    for modifier in application.modifiers:
+        prefix = prefix_by_operand.get(modifier.operand)
+        if prefix is None or not modifier.modifier_id.startswith(prefix):
+            raise GameLifecycleError("Chaos Daemons Battle-shock modifier operand drifted.")
+        if not modifier.modifier_id.removeprefix(prefix):
+            raise GameLifecycleError("Chaos Daemons Battle-shock modifier identity drifted.")
+    expected = battle_shock_modifier_applications_from_modifiers(
+        provider_id=hook_id,
+        modifiers=_battle_shock_modifiers(
+            BattleShockModifierContext(
+                state=context.state,
+                request=context.request,
+                active_player_id=context.active_player_id,
+                phase=context.phase,
+                phase_start_battle_shocked_unit_ids=(context.phase_start_battle_shocked_unit_ids),
+            ),
+            hook_id=hook_id,
+            source_rule_id=source_rule_id,
+        ),
+    )
+    if application not in expected:
+        raise GameLifecycleError("Chaos Daemons Battle-shock modifier predicate drifted.")
+
+
 def _battle_shock_modifiers(
     context: BattleShockModifierContext,
     *,
@@ -168,7 +426,12 @@ def _battle_shock_modifiers(
 ) -> tuple[RollModifier, ...]:
     if type(context) is not BattleShockModifierContext:
         raise GameLifecycleError("Chaos Daemons Battle-shock modifiers require a context.")
-    target_unit = _unit_by_id(context.state, context.request.unit_instance_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.request.unit_instance_id,
+    )
+    if target_rules_unit.owner_player_id != context.request.player_id:
+        raise GameLifecycleError("Chaos Daemons Battle-shock target owner drift.")
     target_player_id = context.request.player_id
     modifiers: list[RollModifier] = []
     for daemon_army in _chaos_daemons_armies(context.state):
@@ -176,7 +439,7 @@ def _battle_shock_modifiers(
             if _daemonic_manifestation_applies(
                 state=context.state,
                 daemon_player_id=daemon_army.player_id,
-                unit=target_unit,
+                rules_unit=target_rules_unit,
                 battle_shocked_unit_ids=context.phase_start_battle_shocked_unit_ids,
             ):
                 modifiers.append(
@@ -193,7 +456,7 @@ def _battle_shock_modifiers(
         if _daemonic_terror_applies(
             state=context.state,
             daemon_army=daemon_army,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
             battle_shocked_unit_ids=context.phase_start_battle_shocked_unit_ids,
         ):
             modifiers.append(
@@ -236,14 +499,19 @@ def _resolve_battle_shock_outcome(
 ) -> None:
     if type(context) is not BattleShockOutcomeContext:
         raise GameLifecycleError("Chaos Daemons Battle-shock outcomes require a context.")
-    target_unit = _unit_by_id(context.state, context.result.request.unit_instance_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.result.request.unit_instance_id,
+    )
+    if target_rules_unit.owner_player_id != context.result.request.player_id:
+        raise GameLifecycleError("Chaos Daemons Battle-shock target owner drift.")
     target_player_id = context.result.request.player_id
     for daemon_army in _chaos_daemons_armies(context.state):
         if daemon_army.player_id == target_player_id:
             _resolve_daemonic_manifestation(
                 context=context,
                 daemon_player_id=daemon_army.player_id,
-                target_unit=target_unit,
+                target_rules_unit=target_rules_unit,
                 hook_id=hook_id,
                 source_rule_id=source_rule_id,
                 battleline_revival_enabled=battleline_revival_enabled,
@@ -252,7 +520,7 @@ def _resolve_battle_shock_outcome(
         _resolve_daemonic_terror(
             context=context,
             daemon_army=daemon_army,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
             source_rule_id=source_rule_id,
         )
 
@@ -261,7 +529,7 @@ def _resolve_daemonic_manifestation(
     *,
     context: BattleShockOutcomeContext,
     daemon_player_id: str,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     hook_id: str,
     source_rule_id: str,
     battleline_revival_enabled: bool,
@@ -272,7 +540,7 @@ def _resolve_daemonic_manifestation(
     if not _daemonic_manifestation_applies(
         state=context.state,
         daemon_player_id=daemon_player_id,
-        unit=target_unit,
+        rules_unit=target_rules_unit,
         battle_shocked_unit_ids=context.phase_start_battle_shocked_unit_ids,
     ):
         return
@@ -280,22 +548,18 @@ def _resolve_daemonic_manifestation(
         context=context,
         reason="Daemonic Manifestation",
         roll_type="chaos_daemons.daemonic_manifestation_d3",
-        actor_id=target_unit.unit_instance_id,
+        actor_id=target_rules_unit.unit_instance_id,
     )
-    rules_unit = rules_unit_view_by_id(
-        state=context.state,
-        unit_instance_id=target_unit.unit_instance_id,
-    )
-    if _rules_unit_has_keyword(rules_unit, "BATTLELINE"):
+    if rules_unit_has_keyword(target_rules_unit, "BATTLELINE"):
         destroyed_model_ids = _eligible_destroyed_non_character_model_ids(
             state=context.state,
-            rules_unit=rules_unit,
+            rules_unit=target_rules_unit,
         )
         if destroyed_model_ids:
             if not battleline_revival_enabled:
                 _emit_daemonic_manifestation_unsupported(
                     context=context,
-                    target_unit=target_unit,
+                    target_rules_unit=target_rules_unit,
                     d3_result=d3_result,
                     source_rule_id=source_rule_id,
                     unsupported_reason="battleline_model_return_requires_placement_decision",
@@ -304,8 +568,7 @@ def _resolve_daemonic_manifestation(
             _resolve_july_battleline_daemonic_manifestation(
                 context=context,
                 daemon_player_id=daemon_player_id,
-                target_unit=target_unit,
-                rules_unit=rules_unit,
+                target_rules_unit=target_rules_unit,
                 destroyed_model_ids=destroyed_model_ids,
                 d3_result=d3_result,
                 hook_id=hook_id,
@@ -314,20 +577,20 @@ def _resolve_daemonic_manifestation(
         else:
             _emit_daemonic_manifestation_no_effect(
                 context=context,
-                target_unit=target_unit,
+                target_rules_unit=target_rules_unit,
                 d3_result=d3_result,
                 source_rule_id=source_rule_id,
                 no_effect_reason="battleline_unit_has_no_destroyed_models",
             )
         return
     wounded_models: list[ModelInstance] = []
-    for model in rules_unit.own_models:
+    for model in target_rules_unit.own_models:
         if model.is_alive and model.wounds_remaining < model.starting_wounds:
             wounded_models.append(model)
     if not wounded_models:
         _emit_daemonic_manifestation_no_effect(
             context=context,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
             d3_result=d3_result,
             source_rule_id=source_rule_id,
             no_effect_reason="unit_has_no_wounded_models",
@@ -336,7 +599,7 @@ def _resolve_daemonic_manifestation(
     if len(wounded_models) > 1:
         _emit_daemonic_manifestation_unsupported(
             context=context,
-            target_unit=target_unit,
+            target_rules_unit=target_rules_unit,
             d3_result=d3_result,
             source_rule_id=source_rule_id,
             unsupported_reason="multiple_wounded_models_require_decision",
@@ -347,7 +610,7 @@ def _resolve_daemonic_manifestation(
     healing_amount = min(d3_result.value, missing_wounds)
     effect = HealingEffect(
         effect_id=f"{hook_id}:daemonic-manifestation:{result.result_id}",
-        target_unit_instance_id=rules_unit.unit_instance_id,
+        target_unit_instance_id=target_rules_unit.unit_instance_id,
         amount=healing_amount,
         opposing_player_id=_opposing_player_id(
             state=context.state,
@@ -360,14 +623,14 @@ def _resolve_daemonic_manifestation(
                 "effect_kind": "daemonic_manifestation",
                 "battle_shock_result_id": result.result_id,
                 "player_id": daemon_player_id,
-                "unit_instance_id": target_unit.unit_instance_id,
+                "unit_instance_id": target_rules_unit.unit_instance_id,
                 "model_instance_id": model.model_instance_id,
                 "d3_result": d3_result.to_payload(),
             }
         ),
         phase_start_model_ids=_placed_model_ids_for_unit(
             state=context.state,
-            rules_unit=rules_unit,
+            rules_unit=target_rules_unit,
         ),
     )
     resolved_effect, pending_request = resolve_healing_until_blocked(
@@ -387,7 +650,7 @@ def _resolve_daemonic_manifestation(
             "source_rule_id": source_rule_id,
             "battle_shock_result_id": result.result_id,
             "player_id": daemon_player_id,
-            "unit_instance_id": target_unit.unit_instance_id,
+            "unit_instance_id": target_rules_unit.unit_instance_id,
             "d3_result": validate_json_value(d3_result.to_payload()),
             "healing_effect": validate_json_value(resolved_effect.to_payload()),
         },
@@ -398,8 +661,7 @@ def _resolve_july_battleline_daemonic_manifestation(
     *,
     context: BattleShockOutcomeContext,
     daemon_player_id: str,
-    target_unit: UnitInstance,
-    rules_unit: RulesUnitView,
+    target_rules_unit: RulesUnitView,
     destroyed_model_ids: tuple[str, ...],
     d3_result: D3RollResult,
     hook_id: str,
@@ -407,7 +669,7 @@ def _resolve_july_battleline_daemonic_manifestation(
 ) -> None:
     effect = HealingEffect(
         effect_id=(f"{hook_id}:daemonic-manifestation-battleline:{context.result.result_id}"),
-        target_unit_instance_id=rules_unit.unit_instance_id,
+        target_unit_instance_id=target_rules_unit.unit_instance_id,
         amount=d3_result.value,
         opposing_player_id=_opposing_player_id(
             state=context.state,
@@ -421,7 +683,7 @@ def _resolve_july_battleline_daemonic_manifestation(
                 "effect_kind": "daemonic_manifestation_battleline_revival",
                 "battle_shock_result_id": context.result.result_id,
                 "player_id": daemon_player_id,
-                "unit_instance_id": rules_unit.unit_instance_id,
+                "unit_instance_id": target_rules_unit.unit_instance_id,
                 "eligible_revival_model_ids": list(destroyed_model_ids),
                 "revive_destroyed_models_only": True,
                 "revive_model_full_health": True,
@@ -431,7 +693,7 @@ def _resolve_july_battleline_daemonic_manifestation(
         ),
         phase_start_model_ids=_placed_model_ids_for_unit(
             state=context.state,
-            rules_unit=rules_unit,
+            rules_unit=target_rules_unit,
         ),
     )
     pending_effect, pending_request = resolve_healing_until_blocked(
@@ -453,8 +715,8 @@ def _resolve_july_battleline_daemonic_manifestation(
             "source_rule_id": source_rule_id,
             "battle_shock_result_id": context.result.result_id,
             "player_id": daemon_player_id,
-            "unit_instance_id": target_unit.unit_instance_id,
-            "rules_unit_instance_id": rules_unit.unit_instance_id,
+            "unit_instance_id": target_rules_unit.unit_instance_id,
+            "rules_unit_instance_id": target_rules_unit.unit_instance_id,
             "eligible_destroyed_model_ids": list(destroyed_model_ids),
             "d3_result": validate_json_value(d3_result.to_payload()),
             "healing_effect": validate_json_value(pending_effect.to_payload()),
@@ -467,7 +729,7 @@ def _resolve_daemonic_terror(
     *,
     context: BattleShockOutcomeContext,
     daemon_army: ArmyDefinition,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     source_rule_id: str,
 ) -> None:
     result = context.result
@@ -476,7 +738,7 @@ def _resolve_daemonic_terror(
     if not _daemonic_terror_applies(
         state=context.state,
         daemon_army=daemon_army,
-        target_unit=target_unit,
+        target_rules_unit=target_rules_unit,
         battle_shocked_unit_ids=context.phase_start_battle_shocked_unit_ids,
     ):
         return
@@ -484,9 +746,9 @@ def _resolve_daemonic_terror(
         context=context,
         reason="Daemonic Terror mortal wounds",
         roll_type="chaos_daemons.daemonic_terror_mortal_wounds_d3",
-        actor_id=target_unit.unit_instance_id,
+        actor_id=target_rules_unit.unit_instance_id,
     )
-    if _unit_has_feel_no_pain_choice(context.state, target_unit):
+    if _rules_unit_has_feel_no_pain_choice(context.state, target_rules_unit):
         context.decisions.event_log.append(
             "chaos_daemons_daemonic_terror_unsupported",
             {
@@ -496,7 +758,7 @@ def _resolve_daemonic_terror(
                 "source_rule_id": source_rule_id,
                 "battle_shock_result_id": result.result_id,
                 "player_id": daemon_army.player_id,
-                "target_unit_instance_id": target_unit.unit_instance_id,
+                "target_unit_instance_id": target_rules_unit.unit_instance_id,
                 "unsupported_reason": "mortal_wound_feel_no_pain_requires_decision",
                 "d3_result": validate_json_value(d3_result.to_payload()),
             },
@@ -506,13 +768,13 @@ def _resolve_daemonic_terror(
         {
             "battle_shock_result": result.to_payload(),
             "d3_result": d3_result.to_payload(),
-            "target_unit_instance_id": target_unit.unit_instance_id,
+            "target_unit_instance_id": target_rules_unit.unit_instance_id,
         }
     )
     application = apply_mortal_wounds_to_unit(
         state=context.state,
         decisions=context.decisions,
-        application_id=f"{result.result_id}:daemonic-terror:{target_unit.unit_instance_id}",
+        application_id=(f"{result.result_id}:daemonic-terror:{target_rules_unit.unit_instance_id}"),
         source_rule_id=source_rule_id,
         source_context=source_context,
         destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
@@ -524,7 +786,7 @@ def _resolve_daemonic_terror(
             action_phase=context.phase,
             source_step="daemonic_terror_mortal_wounds",
         ),
-        target_unit_instance_id=target_unit.unit_instance_id,
+        target_unit_instance_id=target_rules_unit.unit_instance_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
         dice_manager=context.dice_manager,
@@ -539,7 +801,7 @@ def _resolve_daemonic_terror(
             "source_rule_id": source_rule_id,
             "battle_shock_result_id": result.result_id,
             "player_id": daemon_army.player_id,
-            "target_unit_instance_id": target_unit.unit_instance_id,
+            "target_unit_instance_id": target_rules_unit.unit_instance_id,
             "d3_result": validate_json_value(d3_result.to_payload()),
             "mortal_wound_application": validate_json_value(application.to_payload()),
         },
@@ -619,13 +881,16 @@ def _daemonic_manifestation_applies(
     *,
     state: GameState,
     daemon_player_id: str,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     battle_shocked_unit_ids: tuple[str, ...],
 ) -> bool:
-    return _unit_has_faction_keyword(unit, LEGIONES_DAEMONICA) and _unit_within_shadow(
+    return _rules_unit_has_faction_keyword(
+        rules_unit,
+        LEGIONES_DAEMONICA,
+    ) and _unit_within_shadow(
         state=state,
         player_id=daemon_player_id,
-        unit_instance_id=unit.unit_instance_id,
+        unit_instance_id=rules_unit.unit_instance_id,
         battle_shocked_unit_ids=battle_shocked_unit_ids,
     )
 
@@ -634,18 +899,18 @@ def _daemonic_terror_applies(
     *,
     state: GameState,
     daemon_army: ArmyDefinition,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     battle_shocked_unit_ids: tuple[str, ...],
 ) -> bool:
     return _unit_within_shadow(
         state=state,
         player_id=daemon_army.player_id,
-        unit_instance_id=target_unit.unit_instance_id,
+        unit_instance_id=target_rules_unit.unit_instance_id,
         battle_shocked_unit_ids=battle_shocked_unit_ids,
     ) or _unit_within_greater_daemon_terror(
         state=state,
         daemon_army=daemon_army,
-        target_unit=target_unit,
+        target_rules_unit=target_rules_unit,
     )
 
 
@@ -786,28 +1051,32 @@ def _unit_within_greater_daemon_shadow_aura(
     player_id: str,
     unit_instance_id: str,
 ) -> bool:
-    target_unit = _unit_by_id(state, unit_instance_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    )
     daemon_army = _army_for_player(state=state, player_id=player_id)
-    if not any(unit.unit_instance_id == target_unit.unit_instance_id for unit in daemon_army.units):
+    if target_rules_unit.owner_player_id != daemon_army.player_id:
         return False
-    if not _unit_has_faction_keyword(target_unit, LEGIONES_DAEMONICA):
+    if not _rules_unit_has_faction_keyword(target_rules_unit, LEGIONES_DAEMONICA):
         return False
     target_models = _unit_geometry_models(
         state=state,
-        unit_instance_id=target_unit.unit_instance_id,
+        unit_instance_id=target_rules_unit.unit_instance_id,
     )
     if not target_models:
         return False
     for source_unit in daemon_army.units:
-        if source_unit.unit_instance_id == target_unit.unit_instance_id:
+        if source_unit.unit_instance_id in target_rules_unit.component_unit_instance_ids:
             continue
         aura_keyword = _greater_daemon_shadow_aura_keyword(source_unit)
         if aura_keyword is None:
             continue
-        if not _unit_has_keyword(target_unit, aura_keyword):
+        if not rules_unit_has_keyword(target_rules_unit, aura_keyword):
             continue
-        for source_model in _unit_geometry_models(
-            state=state, unit_instance_id=source_unit.unit_instance_id
+        for source_model in placed_alive_geometry_models_for_component_unit(
+            state=state,
+            component_unit_instance_id=source_unit.unit_instance_id,
         ):
             if any(
                 shapely_backend.base_footprint_distance(
@@ -841,70 +1110,88 @@ def _unit_within_semantic_shadow_aura(
     player_id: str,
     unit_instance_id: str,
 ) -> bool:
-    target_unit = _unit_by_id(state, unit_instance_id)
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=unit_instance_id,
+    )
     target_models = _unit_geometry_models(
         state=state,
-        unit_instance_id=target_unit.unit_instance_id,
+        unit_instance_id=target_rules_unit.unit_instance_id,
     )
     if not target_models:
         return False
     daemon_army = _army_for_player(state=state, player_id=player_id)
     for source_unit in daemon_army.units:
-        if source_unit.unit_instance_id == target_unit.unit_instance_id:
+        if source_unit.unit_instance_id in target_rules_unit.component_unit_instance_ids:
             continue
-        if not _unit_geometry_models(state=state, unit_instance_id=source_unit.unit_instance_id):
+        source_models_by_id = {
+            model.model_id: model
+            for model in placed_alive_geometry_models_for_component_unit(
+                state=state,
+                component_unit_instance_id=source_unit.unit_instance_id,
+            )
+        }
+        if not source_models_by_id:
             continue
         for ability in source_unit.datasheet_abilities:
-            if not _semantic_shadow_aura_ability_active(unit=source_unit, ability=ability):
+            source_model_ids = _semantic_shadow_aura_source_model_ids(
+                unit=source_unit,
+                ability=ability,
+            )
+            if not source_model_ids:
                 continue
             rule_ir = _semantic_rule_ir_for_ability(ability)
             if not _rule_ir_sets_shadow_of_chaos_status(rule_ir):
                 continue
-            result = execute_rule_ir(
-                rule_ir=rule_ir,
-                context=RuleExecutionContext(
-                    game_id=state.game_id,
-                    player_id=player_id,
-                    battle_round=max(1, state.battle_round),
-                    phase=BattlePhaseKind.COMMAND,
-                    active_player_id=state.active_player_id,
-                    timing_window_id="chaos-daemons-shadow-of-chaos-semantic-aura",
-                    source_unit_instance_id=source_unit.unit_instance_id,
-                    target_unit_instance_ids=(),
-                    source_keywords=(
-                        *source_unit.keywords,
-                        *source_unit.faction_keywords,
+            for source_model_id in source_model_ids:
+                if source_model_id not in source_models_by_id:
+                    continue
+                result = execute_rule_ir(
+                    rule_ir=rule_ir,
+                    context=RuleExecutionContext(
+                        game_id=state.game_id,
+                        player_id=player_id,
+                        battle_round=max(1, state.battle_round),
+                        phase=BattlePhaseKind.COMMAND,
+                        active_player_id=state.active_player_id,
+                        timing_window_id="chaos-daemons-shadow-of-chaos-semantic-aura",
+                        source_unit_instance_id=source_unit.unit_instance_id,
+                        source_model_instance_id=source_model_id,
+                        target_unit_instance_ids=(),
+                        source_keywords=(
+                            *source_unit.keywords,
+                            *source_unit.faction_keywords,
+                        ),
+                        trigger_payload={
+                            "source": "chaos_daemons_shadow_of_chaos_semantic_aura",
+                            "target_unit_instance_id": target_rules_unit.unit_instance_id,
+                        },
+                        state=state,
                     ),
-                    trigger_payload={
-                        "source": "chaos_daemons_shadow_of_chaos_semantic_aura",
-                        "target_unit_instance_id": target_unit.unit_instance_id,
-                    },
-                    state=state,
-                ),
-                registry=default_rule_execution_registry(),
-            )
-            if result.status is not RuleExecutionStatus.APPLIED:
-                reason = result.reason
-                if reason is None:
-                    raise GameLifecycleError(
-                        "Shadow of Chaos semantic aura returned a non-applied result."
-                    )
-                raise GameLifecycleError(
-                    f"Shadow of Chaos semantic aura execution failed: {reason}."
+                    registry=default_rule_execution_registry(),
                 )
-            if _execution_result_sets_shadow_status_for_unit(
-                result,
-                unit_instance_id=target_unit.unit_instance_id,
-            ):
-                return True
+                if result.status is not RuleExecutionStatus.APPLIED:
+                    reason = result.reason
+                    if reason is None:
+                        raise GameLifecycleError(
+                            "Shadow of Chaos semantic aura returned a non-applied result."
+                        )
+                    raise GameLifecycleError(
+                        f"Shadow of Chaos semantic aura execution failed: {reason}."
+                    )
+                if _execution_result_sets_shadow_status_for_unit(
+                    result,
+                    unit_instance_id=target_rules_unit.unit_instance_id,
+                ):
+                    return True
     return False
 
 
-def _semantic_shadow_aura_ability_active(
+def _semantic_shadow_aura_source_model_ids(
     *,
     unit: UnitInstance,
     ability: DatasheetAbilityDescriptor,
-) -> bool:
+) -> tuple[str, ...]:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Shadow of Chaos semantic aura requires a UnitInstance.")
     if type(ability) is not DatasheetAbilityDescriptor:
@@ -912,21 +1199,23 @@ def _semantic_shadow_aura_ability_active(
             "Shadow of Chaos semantic aura requires DatasheetAbilityDescriptor values."
         )
     if ability.support is not CatalogAbilitySupport.GENERIC_RULE_IR:
-        return False
+        return ()
     if ability.rule_ir_payload is None:
         raise GameLifecycleError("Shadow of Chaos semantic aura ability is missing RuleIR.")
     if ability.source_kind is CatalogAbilitySourceKind.DATASHEET:
-        return any(model.is_alive for model in unit.own_models)
+        return tuple(model.model_instance_id for model in unit.own_models if model.is_alive)
     if ability.source_kind is CatalogAbilitySourceKind.WARGEAR:
         source_wargear_id = ability.source_wargear_id
         if source_wargear_id is None:
             raise GameLifecycleError(
                 "Shadow of Chaos semantic aura wargear ability is missing source_wargear_id."
             )
-        return any(
-            model.is_alive and source_wargear_id in model.wargear_ids for model in unit.own_models
+        return tuple(
+            model.model_instance_id
+            for model in unit.own_models
+            if model.is_alive and source_wargear_id in model.wargear_ids
         )
-    return False
+    return ()
 
 
 def _semantic_rule_ir_for_ability(ability: DatasheetAbilityDescriptor) -> RuleIR:
@@ -1061,19 +1350,22 @@ def _unit_within_greater_daemon_terror(
     *,
     state: GameState,
     daemon_army: ArmyDefinition,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
 ) -> bool:
     target_models = _unit_geometry_models(
         state=state,
-        unit_instance_id=target_unit.unit_instance_id,
+        unit_instance_id=target_rules_unit.unit_instance_id,
     )
     if not target_models:
         return False
-    greater_daemon_unit_ids = tuple(
-        unit.unit_instance_id for unit in daemon_army.units if _is_greater_daemon_terror_unit(unit)
+    greater_daemon_units = tuple(
+        unit for unit in daemon_army.units if _is_greater_daemon_terror_unit(unit)
     )
-    for source_unit_id in greater_daemon_unit_ids:
-        for source_model in _unit_geometry_models(state=state, unit_instance_id=source_unit_id):
+    for source_unit in greater_daemon_units:
+        for source_model in placed_alive_geometry_models_for_component_unit(
+            state=state,
+            component_unit_instance_id=source_unit.unit_instance_id,
+        ):
             if any(
                 shapely_backend.base_footprint_distance(
                     source_model.base,
@@ -1093,22 +1385,9 @@ def _unit_geometry_models(
     state: GameState,
     unit_instance_id: str,
 ) -> tuple[GeometryModel, ...]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Unit geometry lookup requires battlefield_state.")
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    unit_placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
-    if unit_placement is None:
-        return ()
-    return tuple(
-        geometry_model_for_placement(
-            model=scenario.model_instance_for_placement(model_placement),
-            placement=model_placement,
-        )
-        for model_placement in unit_placement.model_placements
-        if scenario.model_instance_for_placement(model_placement).is_alive
+    return placed_alive_geometry_models_for_rules_unit(
+        state=state,
+        unit_instance_id=unit_instance_id,
     )
 
 
@@ -1214,7 +1493,7 @@ def _opposing_player_id(*, state: GameState, player_id: str) -> str:
 def _emit_daemonic_manifestation_unsupported(
     *,
     context: BattleShockOutcomeContext,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     d3_result: D3RollResult,
     source_rule_id: str,
     unsupported_reason: str,
@@ -1227,7 +1506,7 @@ def _emit_daemonic_manifestation_unsupported(
             "phase": context.phase.value,
             "source_rule_id": source_rule_id,
             "battle_shock_result_id": context.result.result_id,
-            "unit_instance_id": target_unit.unit_instance_id,
+            "unit_instance_id": target_rules_unit.unit_instance_id,
             "unsupported_reason": _validate_identifier(
                 "unsupported_reason",
                 unsupported_reason,
@@ -1240,7 +1519,7 @@ def _emit_daemonic_manifestation_unsupported(
 def _emit_daemonic_manifestation_no_effect(
     *,
     context: BattleShockOutcomeContext,
-    target_unit: UnitInstance,
+    target_rules_unit: RulesUnitView,
     d3_result: D3RollResult,
     source_rule_id: str,
     no_effect_reason: str,
@@ -1253,18 +1532,21 @@ def _emit_daemonic_manifestation_no_effect(
             "phase": context.phase.value,
             "source_rule_id": source_rule_id,
             "battle_shock_result_id": context.result.result_id,
-            "unit_instance_id": target_unit.unit_instance_id,
+            "unit_instance_id": target_rules_unit.unit_instance_id,
             "no_effect_reason": _validate_identifier("no_effect_reason", no_effect_reason),
             "d3_result": validate_json_value(d3_result.to_payload()),
         },
     )
 
 
-def _unit_has_feel_no_pain_choice(state: GameState, unit: UnitInstance) -> bool:
+def _rules_unit_has_feel_no_pain_choice(
+    state: GameState,
+    rules_unit: RulesUnitView,
+) -> bool:
     return any(
         state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id)
         or state.feel_no_pain_decline_allowed_for_model(model_instance_id=model.model_instance_id)
-        for model in unit.own_models
+        for model in rules_unit.own_models
         if model.is_alive
     )
 
@@ -1279,7 +1561,7 @@ def _eligible_destroyed_non_character_model_ids(
     removed_ids = set(state.battlefield_state.removed_model_ids)
     character_model_ids = set(rules_unit.character_model_ids(rules_unit.own_models))
     for component in rules_unit.components:
-        if _unit_has_keyword(component.unit, "CHARACTER"):
+        if unit_has_keyword(component.unit, "CHARACTER"):
             character_model_ids.update(
                 model.model_instance_id for model in component.unit.own_models
             )
@@ -1304,28 +1586,19 @@ def _is_greater_daemon_terror_unit(unit: UnitInstance) -> bool:
     )
 
 
-def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+def unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
 
 
-def _rules_unit_has_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
+def rules_unit_has_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in rules_unit.keywords)
 
 
-def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
+def _rules_unit_has_faction_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
-    return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
-
-
-def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Chaos Daemons army rule target unit is unknown.")
+    return any(_canonical_keyword(stored) == canonical for stored in rules_unit.faction_keywords)
 
 
 def _army_for_player(*, state: GameState, player_id: str) -> ArmyDefinition:

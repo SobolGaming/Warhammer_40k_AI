@@ -64,6 +64,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
+    BattlefieldTransitionBatch,
+    ModelDisplacementKind,
+    ModelDisplacementRecord,
     ModelPlacement,
     UnitPlacement,
 )
@@ -176,6 +179,7 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
     WargearSelection,
 )
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -739,19 +743,27 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             },
         )
 
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        (
+            BattleShockHookBinding(
+                hook_id="phase17g-inescapable-battle-shock-hook",
+                source_id=stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID,
+                modifier_handler=battle_shock_modifier,
+                reroll_permission_handler=battle_shock_reroll,
+                outcome_handler=record_battle_shock_outcome,
+            ),
+        )
+    )
+    runtime_bundle = lifecycle._runtime_content_bundle  # pyright: ignore[reportPrivateUsage]
+    assert runtime_bundle is not None
+    lifecycle._runtime_content_bundle = replace(  # pyright: ignore[reportPrivateUsage]
+        runtime_bundle,
+        battle_shock_hook_registry=battle_shock_hooks,
+        hook_bindings_by_event={},
+    )
     lifecycle._movement_phase_handler = replace(  # pyright: ignore[reportPrivateUsage]
         lifecycle._movement_phase_handler,  # pyright: ignore[reportPrivateUsage]
-        battle_shock_hooks=BattleShockHookRegistry.from_bindings(
-            (
-                BattleShockHookBinding(
-                    hook_id="phase17g-inescapable-battle-shock-hook",
-                    source_id=stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID,
-                    modifier_handler=battle_shock_modifier,
-                    reroll_permission_handler=battle_shock_reroll,
-                    outcome_handler=record_battle_shock_outcome,
-                ),
-            )
-        ),
+        battle_shock_hooks=battle_shock_hooks,
     )
 
     unit_placement = _unit_placement(state, _ENEMY_UNIT_ID)
@@ -863,6 +875,41 @@ def _move_enemy_unit_into_coherent_side_engagement(lifecycle: GameLifecycle) -> 
             )
             for index, placement in enumerate(enemy.model_placements)
         )
+    )
+    transition = BattlefieldTransitionBatch(
+        displacements=tuple(
+            ModelDisplacementRecord(
+                model_instance_id=before.model_instance_id,
+                displacement_kind=ModelDisplacementKind.TRIGGERED_MOVE,
+                start_pose=before.pose,
+                end_pose=after.pose,
+                path_witness=PathWitness.for_paths(
+                    ((before.model_instance_id, (before.pose, after.pose)),)
+                ),
+                source_phase=BattlePhase.MOVEMENT.value,
+                source_step="triggered_movement",
+                source_rule_id="test:phase17g:inescapable:engagement-fixture",
+            )
+            for before, after in zip(
+                enemy.model_placements,
+                updated_enemy.model_placements,
+                strict=True,
+            )
+        )
+    )
+    lifecycle.decision_controller.event_log.append(
+        "triggered_movement_resolved",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": _ENEMY_UNIT_ID,
+            "triggered_movement_kind": "reactive",
+            "source_rule_id": "test:phase17g:inescapable:engagement-fixture",
+            "phase_body_status": "triggered_movement_resolved",
+            "transition_batch": transition.to_payload(),
+        },
     )
     state.replace_battlefield_state(battlefield.with_unit_placement(updated_enemy))
 
@@ -2268,6 +2315,11 @@ def _decline_stratagem_target_proposal_if_present(
     *,
     result_id: str,
 ) -> LifecycleStatus:
+    if (
+        status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION
+        or status.decision_request is None
+    ):
+        return status
     request = decision_request(status)
     if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
         return status

@@ -37,6 +37,10 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequestPayload,
 )
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.attached_unit_split_history import (
+    alive_attached_component_unit_ids,
+    record_attached_rules_unit_split,
+)
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,
@@ -57,6 +61,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_deadly_demise_sources_for_unit,
     record_core_feel_no_pain_sources_for_unit,
     record_core_fights_first_source_for_unit,
+)
+from warhammer40k_core.engine.command_battle_shock_history import (
+    validate_command_battle_shock_state_snapshot,
 )
 from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
@@ -1657,6 +1664,7 @@ class GameState:
                 )
         _validate_hover_mode_state_references(self)
         _validate_state_stage_indexes(self)
+        validate_command_battle_shock_state_snapshot(state=self)
 
     @classmethod
     def from_config(cls, config: GameConfig) -> Self:
@@ -2176,6 +2184,7 @@ class GameState:
 
     def replace_command_step_state(self, command_step_state: CommandStepState | None) -> None:
         self.command_step_state = _validate_optional_command_step_state(command_step_state)
+        validate_command_battle_shock_state_snapshot(state=self)
 
     def replace_movement_phase_state(
         self,
@@ -3539,13 +3548,17 @@ class GameState:
             and starting_attached_record.player_id != requested_player_id
         ):
             raise GameLifecycleError("Attached-unit split attached-unit record player_id drift.")
-        recovery_unit_ids = (
-            starting_attached_record.component_unit_instance_ids
-            if starting_attached_record is not None
-            else surviving_ids
+        if starting_attached_record is None:
+            raise GameLifecycleError("Attached-unit split lacks starting identity authority.")
+        expected_surviving_ids = alive_attached_component_unit_ids(
+            state=self,
+            starting_record=starting_attached_record,
         )
-        if any(unit_id not in recovery_unit_ids for unit_id in surviving_ids):
-            raise GameLifecycleError("Attached-unit split survivor is not an attached component.")
+        if surviving_ids != expected_surviving_ids:
+            raise GameLifecycleError(
+                "Attached-unit split survivors must be the exact alive components."
+            )
+        recovery_unit_ids = starting_attached_record.component_unit_instance_ids
         unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
         recovered_records: list[StartingStrengthRecord] = []
         for unit_id in recovery_unit_ids:
@@ -3564,8 +3577,15 @@ class GameState:
             attached_unit_instance_id=requested_attached_unit_id,
             surviving_unit_instance_ids=surviving_ids,
         )
+        record_attached_rules_unit_split(
+            state=self,
+            event_log=event_log,
+            starting_record=starting_attached_record,
+            surviving_unit_instance_ids=surviving_ids,
+        )
         transfer_battle_shock_after_attached_unit_split(
             state=self,
+            event_log=event_log,
             attached_unit_instance_id=requested_attached_unit_id,
             surviving_unit_instance_ids=surviving_ids,
         )
@@ -3606,30 +3626,6 @@ class GameState:
                 continue
             updated_armies.append(replace(army_definition, attached_units=remaining_attached_units))
         self.army_definitions = sorted(updated_armies, key=lambda stored: stored.player_id)
-
-    def clear_battle_shock_for_player(self, player_id: str) -> tuple[str, ...]:
-        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
-        unit_owner_by_id = _known_rules_unit_owner_ids(
-            army_definitions=self.army_definitions,
-            starting_strength_records=self.starting_strength_records,
-        )
-        cleared_ids = tuple(
-            unit_id
-            for unit_id in self.battle_shocked_unit_ids
-            if unit_owner_by_id.get(unit_id) == requested_player_id
-        )
-        if not cleared_ids:
-            return ()
-        cleared_set = set(cleared_ids)
-        self.battle_shocked_unit_ids = [
-            unit_id for unit_id in self.battle_shocked_unit_ids if unit_id not in cleared_set
-        ]
-        self.battle_shocked_unit_states = [
-            state
-            for state in self.battle_shocked_unit_states
-            if state.unit_instance_id not in cleared_set
-        ]
-        return tuple(sorted(cleared_ids))
 
     def record_battle_shock_result(self, result: BattleShockResult) -> None:
         record_battle_shock_result(state=self, result=result)

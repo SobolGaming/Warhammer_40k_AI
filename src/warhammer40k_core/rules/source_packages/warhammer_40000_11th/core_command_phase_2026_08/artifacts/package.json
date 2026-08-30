@@ -1,0 +1,314 @@
+{
+  "artifact_schema": "core-v2-command-phase-source-v2",
+  "evidence_records": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-p08a-source-review:start-of-command-phase",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "a7b62f3bd25472b0895f678499799d685a3a71f88a274543145b0ea1caa3f33c",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.command_phase_start_authority:resolve_command_phase_start_boundary"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of the Command-phase section heading",
+      "source_url": null,
+      "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-command-phase-search-index-2026-08-26:start-of-command-phase",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76",
+      "observed_at": "2026-08-26T14:49:10-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-command-phase-search-index-2026-08-26",
+      "review_audit_row_id": "heading-sequence:command-phase",
+      "review_audit_source_observation_sha256": "e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab",
+      "rule_source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.command_phase_start_authority:resolve_command_phase_start_boundary"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules search-index Command-phase heading sequence",
+      "source_url": "https://www.40k.app/rules",
+      "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-p08a-source-review:gain-core-cp",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "1e78d9bf1747212e3f3d2ddc03ca8fc44755f6a38ccac3f455c7a1f973f3534d",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.command:_resolve_gain_core_command_points_step"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of the Command-phase section heading",
+      "source_url": null,
+      "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-command-phase-search-index-2026-08-26:gain-core-cp",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a",
+      "observed_at": "2026-08-26T14:49:10-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-command-phase-search-index-2026-08-26",
+      "review_audit_row_id": "heading-sequence:command-phase",
+      "review_audit_source_observation_sha256": "e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab",
+      "rule_source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.command:_resolve_gain_core_command_points_step"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules search-index Command-phase heading sequence",
+      "source_url": "https://www.40k.app/rules",
+      "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-p08b-source-review:battle-shock",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "8f1a6267b957431f620bbb7e8cee0a1f82a7dda25672babfab3e1cdd8e63699e",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:command-phase:battle-shock",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.command:_resolve_battle_shock_step",
+        "warhammer40k_core.engine.battle_shock:collect_battle_shock_test_requests",
+        "warhammer40k_core.engine.battle_shock_resolution:record_battle_shock_result_and_outcome_events"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of the Command-phase section heading",
+      "source_url": null,
+      "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-command-phase-search-index-2026-08-26:battle-shock",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78",
+      "observed_at": "2026-08-26T14:49:10-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-command-phase-search-index-2026-08-26",
+      "review_audit_row_id": "heading-sequence:command-phase",
+      "review_audit_source_observation_sha256": "e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab",
+      "rule_source_id": "gw-11e-core-rules:command-phase:battle-shock",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.command:_resolve_battle_shock_step",
+        "warhammer40k_core.engine.battle_shock:collect_battle_shock_test_requests",
+        "warhammer40k_core.engine.battle_shock_resolution:record_battle_shock_result_and_outcome_events"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules search-index Command-phase heading sequence",
+      "source_url": "https://www.40k.app/rules",
+      "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "8785dda65406ce76add419f29263be499239122e1330941ab55a1dc3e6f10127",
+  "rules": [
+    {
+      "display_order": 1,
+      "evidence_ids": [
+        "core-v2-p08a-source-review:start-of-command-phase",
+        "40k-app-command-phase-search-index-2026-08-26:start-of-command-phase"
+      ],
+      "load_support_status": "loaded",
+      "official_pdf_source_text": "Rules that are triggered at the start of the Command phase are resolved now.",
+      "official_pdf_transcription_sha256": "539a37c85bcb22ebe08ae017a6e926489bbc8b311680d80514d5151855ed1c31",
+      "rule_id": "start-of-command-phase",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.command_phase_start_authority:resolve_command_phase_start_boundary"
+      ],
+      "section_heading": "START OF COMMAND PHASE",
+      "section_id": "08.01",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:command-phase:start-of-command-phase",
+      "source_observation_sha256": "9b5ce8b7402b6719772dec0ebca6e477d6f2c9a0ddb3b83f8504d2337d5c6d76",
+      "source_text": "START OF COMMAND PHASE",
+      "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33"
+    },
+    {
+      "display_order": 2,
+      "evidence_ids": [
+        "core-v2-p08a-source-review:gain-core-cp",
+        "40k-app-command-phase-search-index-2026-08-26:gain-core-cp"
+      ],
+      "load_support_status": "loaded",
+      "official_pdf_source_text": "Both players gain 1 Command Point (CP).",
+      "official_pdf_transcription_sha256": "6a09ea8b545e04dfbb0755408986862f7cf19991bb023106cafcbbb63b8e55d0",
+      "rule_id": "gain-core-cp",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.command:_resolve_gain_core_command_points_step"
+      ],
+      "section_heading": "GAIN CORE CP",
+      "section_id": "08.02",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:command-phase:gain-core-cp",
+      "source_observation_sha256": "9809dd16794d824ee12f6b7d6a8e0075e61cabde43c93a9bdfe9b797b5df283a",
+      "source_text": "GAIN CORE CP",
+      "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f"
+    },
+    {
+      "display_order": 3,
+      "evidence_ids": [
+        "core-v2-p08b-source-review:battle-shock",
+        "40k-app-command-phase-search-index-2026-08-26:battle-shock"
+      ],
+      "load_support_status": "loaded",
+      "official_pdf_source_text": "The active player must now make one battle-shock roll (01.07) for each unit in their army that fulfils one or both of the following conditions:\n- That unit is currently battle-shocked.\n- That unit is at, or below, half-strength.\nIf a unit was battle-shocked at the start of this step and its battle-shock roll during this step succeeds, it is no longer battle-shocked.",
+      "official_pdf_transcription_sha256": "f674a5dd207cb868ab364152a82090c61c1191479531c92464c99fe5318ef958",
+      "rule_id": "battle-shock",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.command:_resolve_battle_shock_step",
+        "warhammer40k_core.engine.battle_shock:collect_battle_shock_test_requests",
+        "warhammer40k_core.engine.battle_shock_resolution:record_battle_shock_result_and_outcome_events"
+      ],
+      "section_heading": "BATTLE-SHOCK",
+      "section_id": "08.03",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-rules:command-phase:battle-shock",
+      "source_observation_sha256": "e60b785371c3815fe3a9a2b77ca4dc012c6e5541c95dbcc22f68b5452c576a78",
+      "source_text": "BATTLE-SHOCK",
+      "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56"
+    }
+  ],
+  "search_index_observation": {
+    "headings": [
+      {
+        "display_order": 1,
+        "heading_id": "start-of-command-phase",
+        "normalized_heading": "START OF COMMAND PHASE",
+        "transcription_sha256": "c7076d22487eaacd4966ce616ed23632f73c1c1e77e97264779f58571855cd33"
+      },
+      {
+        "display_order": 2,
+        "heading_id": "gain-core-cp",
+        "normalized_heading": "GAIN CORE CP",
+        "transcription_sha256": "15b5a4c0e0184c03730be6b15d9aad113b1b59bb262028d00173ea5475f7a42f"
+      },
+      {
+        "display_order": 3,
+        "heading_id": "battle-shock",
+        "normalized_heading": "BATTLE-SHOCK",
+        "transcription_sha256": "621c1dac0261aaeb2443a843f9d4dd05d253f6ac01a6e251620739eece408e56"
+      },
+      {
+        "display_order": 4,
+        "heading_id": "command-abilities",
+        "normalized_heading": "COMMAND ABILITIES",
+        "transcription_sha256": "f4ea3d1b71326aa37f7fa0d10387f5d36584781ec17cc6bbd8ccb431626265f2"
+      },
+      {
+        "display_order": 5,
+        "heading_id": "end-of-command-phase",
+        "normalized_heading": "END OF COMMAND PHASE",
+        "transcription_sha256": "2783396269169e5333be1049e5cb0ca511b6601ecf3d650668316155988dca01"
+      }
+    ],
+    "normalized_observed_text": "START OF COMMAND PHASE\nGAIN CORE CP\nBATTLE-SHOCK\nCOMMAND ABILITIES\nEND OF COMMAND PHASE",
+    "observation_id": "40k-app-command-phase-search-index-2026-08-26",
+    "observation_row_id": "heading-sequence:command-phase",
+    "observation_scope": "command_phase_five_heading_sequence_only",
+    "observed_at": "2026-08-26T14:49:10-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    "provider_name": "40k.app",
+    "provider_non_affiliation_recorded": true,
+    "sequence_transcription_sha256": "3ab49c279f743d16d6a122b6b3d3ea42736bd64acf2009b61e5b946f45a03a4c",
+    "source_observation_sha256": "e646d81ba284b1a4b5572b96d68cbfca52ef8cdf15cedf7c2c69ae8b5066c0ab",
+    "source_platform": "Web",
+    "source_url": "https://www.40k.app/rules"
+  },
+  "source_document": {
+    "authoritative_category_observed_at": "2026-08-25T00:00:00-04:00",
+    "authoritative_category_scope": "category_08_review_audit_record",
+    "authoritative_category_url": "https://www.40k.app/rules/08-command-phase",
+    "category_body_capture_status": "review_audit_without_retained_page_body",
+    "document_id": "warhammer-40000-command-phase-observed-2026-08-26",
+    "exact_text_source_scope": "retained_official_pdf_sections_08.01_through_08.03",
+    "official_pdf_path": "docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
+    "official_pdf_sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "official_pdf_source_id": "gw-11e-core-rules:manifest:local-core-rules-pdf",
+    "review_audit_id": "40k-app-core-rules-2026-08-25",
+    "review_audit_row_id": "category:08",
+    "review_audit_source_observation_sha256": "0920fa00c1f4ecbc9e46795c1d72695872b61e7577eeaa693c57eb12c26c871e",
+    "source_title": "Warhammer 40,000 Core Rules - Command Phase"
+  },
+  "source_package_id": "gw-11e-core-command-phase",
+  "source_version": "40k-app-search-index-observed-2026-08-26"
+}
