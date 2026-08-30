@@ -106,13 +106,34 @@ def test_p09a_move_units_source_artifact_is_pinned_typed_and_executable() -> Non
     )
 
 
+def test_p09b_fall_back_source_artifact_pins_optional_desperate_escape_sequence() -> None:
+    package = core_movement_phase_2026_08.source_package()
+    selecting_modes = core_movement_phase_2026_08.source_rule_record_by_id("selecting-modes")
+    fall_back = core_movement_phase_2026_08.source_rule_record_by_id("fall-back-move")
+
+    assert selecting_modes.section_id == "09.02.02"
+    assert "ordered retreat is not mandatory" in selecting_modes.source_text
+    assert "select desperate escape instead" in selecting_modes.source_text
+    assert selecting_modes.semantic_execution_status == "partial_engine_runtime"
+    assert fall_back.section_id == "09.07"
+    assert "Make a hazard roll for each model in your unit" in fall_back.source_text
+    assert "If your unit is not battle-shocked" in fall_back.source_text
+    assert "make a battle-shock roll for your unit" in fall_back.source_text
+    assert fall_back.semantic_execution_status == "executable_engine_runtime"
+    assert package.evidence_required_source_ids == tuple(
+        sorted(rule.source_id for rule in core_movement_phase_2026_08.source_rule_records())
+    )
+    assert len(package.source_evidence_catalog.records_for_source_id(fall_back.source_id)) == 2
+
+
 def test_p09a_move_units_source_artifact_rejects_text_and_byte_drift() -> None:
     artifact_path = Path(
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
         "core_movement_phase_2026_08/artifacts/package.json"
     )
     payload = cast(dict[str, object], json.loads(artifact_path.read_text()))
-    rule = cast(dict[str, object], payload["rule"])
+    rules = cast(list[dict[str, object]], payload["rules"])
+    rule = rules[0]
     rule["source_text"] = f"{rule['source_text']} altered"
     with pytest.raises(
         core_movement_phase_2026_08.CoreMovementPhaseSourceArtifactError,

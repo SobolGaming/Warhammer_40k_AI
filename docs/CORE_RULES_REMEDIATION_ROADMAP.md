@@ -538,8 +538,7 @@ PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/4
 
 ### P09A — C09-01
 
-Status: Implementation and all required validation are complete; PR #408 is published and pending
-review and merge.
+Status: Merged through PR #408.
 
 Finding IDs: `C09-01`.
 
@@ -699,7 +698,141 @@ Validation results:
   The repository-pinned scripts were invoked through `npm.cmd` with the bundled Node runtime.
 
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/408`;
-merge commit pending review and merge.
+`c63900a546c1da65a3400cc5dd8fa057408514f3`.
+
+### P09B — C09-02
+
+Status: Implementation and required validation are complete; PR publication is pending.
+
+Finding IDs: `C09-02`.
+
+Dependencies and evidence gate: P09A/PR #408 is merged at
+`c63900a546c1da65a3400cc5dd8fa057408514f3`. The exact 09.02.02 Selecting Modes and 09.07
+Fall-back Move statements are retained separately as reviewed transcriptions and authoritative
+40k.app mirror observations, with their evidence roles kept distinct and linked to the recorded
+non-affiliation/project-authority policy. This satisfies `APP-AUTHORITY`; no `EXCEPTION-PAUSE`
+applies.
+
+Violated invariant: Selecting Desperate Escape is a legal alternative to Ordered Retreat for an
+unshocked engaged rules unit. That selection must create one Hazard Roll for every model in the
+complete canonical rules unit, apply all casualty and grouped movement mutations through the
+engine, and then resolve the source-required Battle-shock test exactly when a model survives and
+the unit is not already Battle-shocked.
+
+How it was done before P09B: The finite Fall Back action request exposed
+`fall_back:desperate_escape`, but `_fall_back_mode_violation_code(...)` rejected it when no
+Battle-shock, overflight, or content source had already manufactured a Desperate Escape
+requirement. Requirements and Hazard Rolls therefore covered only models reached by those other
+causes, not every model based on the selected mode. The accepted Fall Back terminal path applied
+casualties and movement and completed the activation without the 09.07 post-move Battle-shock
+test.
+
+How it is done after P09B: The selected Fall Back mode is a required input to the standalone and
+group-aware resolvers. Desperate Escape contributes `selected_mode` to every model's typed
+requirement; Battle-shock, forced-rule, and overflight reasons can be additive. Validation requires
+the selected-mode requirement IDs to equal the exact `PathWitness` model inventory, and the dice
+manager rolls each requirement once. Hazard casualties are selected through the existing finite
+decision, removed through the authoritative grouped transition and primary destroyed-departure
+path, and excluded from current-strength materialization only when those departure records prove
+their absence. The engine applies the Fall Back transition, records `fall_back_move_applied`, and
+uses the shared Battle-shock service. A surviving unit that is not Battle-shocked after moving
+tests with reason/source kind `desperate_escape`; a shocked unit or a unit with no survivors does
+not. Optional rerolls serialize and resume the same movement continuation before Embark or
+activation completion.
+
+Specific authoritative 40k.app rule/statement and source ID: 09.02.02, `SELECTING MODES`, states
+that modes are mutually exclusive and assessed in order, but Ordered Retreat is not mandatory so
+Desperate Escape may be selected instead. Its stable source ID is
+`gw-11e-core-rules:movement-phase:selecting-modes`. 09.07, `FALL-BACK MOVE`, requires Desperate
+Escape to make a Hazard Roll for each model and, after moving, requires a Battle-shock roll if the
+unit is not Battle-shocked. Its stable source ID is
+`gw-11e-core-rules:movement-phase:fall-back-move`. Runtime behavior binds to those IDs and typed
+mode/state records, never headings, display names, or source-text tokens.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/09-movement-phase`, observed
+`2026-08-30T13:55:17-04:00`:
+
+- Selecting Modes: transcription
+  `094c4bf218bd4c900864ee622364987378851fc06f23610ca95bd6574ee3c2d6`; reviewed-transcription
+  observation `d573029a847de5780c46b2f4047b9057ed71c6258f27f9c16690ca7e529f7d7a`; authoritative-mirror
+  observation `e5c209da27f60c11654788ed26c561e63374791fb345a032f3ce9a4620838db0`.
+- Fall-back Move: transcription
+  `2f9a2b3a35e8ca0f2d76a43b788c93b9feccaa66f2bba19a8b0ce348d401db0b`; reviewed-transcription
+  observation `10a4ebcba3fb3c33df9e32ac9917d0ba0a2c7b2048cc9767c60ee587c909bd20`; authoritative-mirror
+  observation `97d7323f54195e968c0cff8e7c8434ce5b5f8fe9dca4be3dc558359b3d1e9d23`.
+
+The expanded generated package hash is
+`0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105` and its canonical artifact
+byte SHA-256 is `f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:d5341b984933517139b246ebf78fc08f7e84ca098c25f5ced3e154400f076a32`.
+
+Load and execution support: All three movement rule rows and all six evidence rows are `loaded`.
+Move Units and Fall-back Move are `executable_engine_runtime`. Selecting Modes is truthfully
+`partial_engine_runtime` because this package certifies its Fall Back consumer, not every mode in
+the complete rules corpus. Reviewed-transcription rows remain
+`unverified_transcription_only`/`unverified`; only the linked mirror observations carry project
+authority.
+
+Scope and explicit exclusions: P09B owns Fall Back mode validation, per-model Desperate Escape
+requirements/Hazard Rolls, Hazard casualty transition evidence, the post-move Battle-shock and
+reroll continuation, source identities/artifacts, replay integrity, adapter documentation, and
+regressions for this bug class. It does not change general Hazard semantics, Ordered Retreat
+movement geometry, non-Fall-Back modes, Transport rules, faction-specific effect semantics,
+Command-phase Battle-shock, AI, or any out-of-scope content. Existing typed `PathWitness` and
+canonical rules-unit movement remain the sole physical movement path.
+
+Owning state/validation/mutation/event/replay path: reviewed generated JSON and fail-closed loader
+→ stable Selecting Modes/Fall-back source IDs → finite `select_movement_action` mode option → typed
+`submit_movement_proposal` with the same mode and group `PathWitness` → group-aware Fall Back
+resolver and exact requirement/roll inventory → optional casualty selection → engine-owned
+battlefield transition and primary departure/destruction events → `fall_back_move_applied` →
+shared Battle-shock request/result/reroll service → Embark or movement activation completion →
+historical physical/source authority validation → lifecycle serialization/replay → shared adapter
+projection and event-delta paths.
+
+Decision and viewer-visibility impact: No new decision type or proposal kind is introduced. The
+existing unshocked Fall Back action space now truthfully accepts both deterministic mode options;
+the existing Desperate Escape casualty choice and `select_dice_reroll` family handle nested
+choices. Fall Back payloads add stable source IDs, `selected_mode` reasons,
+`battle_shocked_after_move`, and the exact requirement/roll/casualty inventory. Public
+`fall_back_move_applied` authenticates the mutation while a follow-up test is pending. These facts
+are public and symmetric, so the one shared adapter redaction path needs no hidden-type branch.
+`docs/ADAPTER_DECISION_CONTRACT.md` confirms that the additive payload/event fields remain within
+Contract 11.1.0.
+
+Regression scenarios and same-bug-class search: Coverage includes voluntary Desperate Escape with
+no forced or overflight cause, exact all-model selected-mode requirements and rolls, facade-driven
+LocalGameSession submission, grouped movement/casualty application, the post-move Battle-shock
+source/event ordering, optional reroll lifecycle serialization and resumption, shocked/no-survivor
+predicate behavior, forced-source coexistence, Ordered Retreat exclusion, exact source/package
+identity, and retained stale/malformed mode rejection. The repository-wide search updated every
+direct Fall Back resolver caller to supply a typed mode, replaced the permissive
+`desperate_escape_has_no_requirements` branch with exact inventory validation, and found no second
+local voluntary-mode rejection or post-move Battle-shock implementation.
+
+Generated artifacts/documentation: P09B expands
+`core_movement_phase_2026_08/artifacts/package.json` and its typed loader/source catalog, updates
+the offline movement-source builder, engine build manifest, affected external-contract fixtures and
+manifest, adapter decision contract, decision-submission catalog, P09A merge record, and this
+finding record. No behavioral test file was added, removed, moved, or renamed, so the committed
+four-shard inventory does not change.
+
+Validation results:
+
+- Every required `AGENTS.md` gate passes: Ruff check, Ruff format check, mypy, Pyright, the
+  coverage-enabled xdist work-stealing suite (`6317 passed`), four-shard inventory, import-linter,
+  and all-files pre-commit.
+- The final P09B Fall Back, adapter-proposal, source-identity, and static bug-class regression set
+  passes (`169 passed`).
+- Movement source builder check, 40k.app audit check, engine-build check, external-contract base-ref
+  check, installed-wheel smoke (`2460` resources and `27` schemas), and generated ability-support
+  audit (`19 passed`) all pass.
+- The repository-pinned TypeScript generated-client, type, and unit checks pass (`5` unit tests),
+  and the certified HTTP conformance scenario passes all `342` assertions on Contract `11.1.0`.
+
+PR URL and merge commit: pending publication; merge commit pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all

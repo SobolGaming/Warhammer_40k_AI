@@ -610,10 +610,30 @@ def _physical_authority_by_model(
     no_trigger_destroyed_departure_ids: frozenset[str] = frozenset(),
 ) -> dict[str, _PhysicalAuthority]:
     authority = {} if initial is None else dict(initial)
+    applied_fall_back_transitions: dict[tuple[str, str], BattlefieldTransitionBatch] = {}
     for event in event_records:
         for damage in direct_mortal_wound_damage_applications_from_event(event):
             _apply_damage_application(authority=authority, damage=damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
+        if event.event_type == "fall_back_move_applied":
+            transition = authoritative_battlefield_transition_batch_or_none(
+                event=EventRecord(
+                    event_id=event.event_id,
+                    event_type="movement_activation_completed",
+                    payload=event.payload,
+                )
+            )
+            event_key = _movement_event_key(event)
+            if transition is None or event_key in applied_fall_back_transitions:
+                raise GameLifecycleError("Fall Back applied transition authority drifted.")
+            applied_fall_back_transitions[event_key] = transition
+        elif event.event_type == "movement_activation_completed":
+            event_key = _movement_event_key(event)
+            applied_transition = applied_fall_back_transitions.get(event_key)
+            if applied_transition is not None:
+                if transition != applied_transition:
+                    raise GameLifecycleError("Fall Back terminal transition authority drifted.")
+                transition = None
         if transition is not None:
             _apply_transition(
                 authority=authority,
@@ -896,16 +916,22 @@ def _desperate_escape_transition_model_ids(
     event: EventRecord,
     departure_by_id: dict[str, PrimaryBattlefieldDepartureState] | None,
 ) -> frozenset[str]:
-    if event.event_type != "movement_activation_completed":
+    if event.event_type not in {"fall_back_move_applied", "movement_activation_completed"}:
         return frozenset()
     if not isinstance(event.payload, dict):
         raise GameLifecycleError("Primary mission movement event payload is invalid.")
-    mutation_id = event.payload.get("desperate_escape_source_mutation_id")
+    movement_payload = event.payload
+    if event.event_type == "fall_back_move_applied":
+        raw_movement_payload = event.payload.get("movement_payload")
+        if not isinstance(raw_movement_payload, dict):
+            raise GameLifecycleError("Primary mission Fall Back applied payload is invalid.")
+        movement_payload = raw_movement_payload
+    mutation_id = movement_payload.get("desperate_escape_source_mutation_id")
     if mutation_id is None:
         return frozenset()
     if type(mutation_id) is not str or not mutation_id:
         raise GameLifecycleError("Primary mission Desperate Escape mutation identity is invalid.")
-    raw_model_ids = event.payload.get("destroyed_model_ids")
+    raw_model_ids = movement_payload.get("destroyed_model_ids")
     if not isinstance(raw_model_ids, list) or any(
         type(model_id) is not str or not model_id for model_id in raw_model_ids
     ):
@@ -925,6 +951,16 @@ def _desperate_escape_transition_model_ids(
     if event_model_ids != departure_model_ids:
         raise GameLifecycleError("Primary mission Desperate Escape departure evidence drifted.")
     return event_model_ids
+
+
+def _movement_event_key(event: EventRecord) -> tuple[str, str]:
+    if not isinstance(event.payload, dict):
+        raise GameLifecycleError("Physical movement event payload is invalid.")
+    request_id = event.payload.get("request_id")
+    result_id = event.payload.get("result_id")
+    if type(request_id) is not str or not request_id or type(result_id) is not str or not result_id:
+        raise GameLifecycleError("Physical movement event decision identity is invalid.")
+    return request_id, result_id
 
 
 def _apply_damage_step(

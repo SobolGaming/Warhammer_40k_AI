@@ -108,6 +108,7 @@ class FallBackModeKind(StrEnum):
 
 
 class DesperateEscapeRequirementReason(StrEnum):
+    SELECTED_MODE = "selected_mode"
     ENEMY_MODEL_OVERFLIGHT = "enemy_model_overflight"
     BATTLE_SHOCKED = "battle_shocked"
     FORCED_BY_RULE = "forced_by_rule"

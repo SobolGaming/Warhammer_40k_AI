@@ -26,6 +26,7 @@ from warhammer40k_core.core.datasheet import (
     CatalogAbilitySupport,
     CatalogJsonObject,
     DatasheetAbilityDescriptor,
+    DatasheetKeywordSet,
 )
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.abilities import AbilityCatalogRecord
@@ -41,7 +42,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     UnitPlacement,
 )
-from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -92,6 +93,9 @@ from warhammer40k_core.engine.phases.movement import (
     _roll_desperate_escape_dice,
     resolve_fall_back_move,
 )
+from warhammer40k_core.engine.phases.movement_fall_back_embark import (
+    desperate_escape_battle_shock_required,
+)
 from warhammer40k_core.engine.phases.movement_geometry import (
     _enemy_engaged_unit_ids_for_unit_placement,
     _enemy_engagement_model_ids_for_unit,
@@ -131,6 +135,9 @@ _TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09a-coherency-0006"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+)
+_DESPERATE_FALL_BACK_OPTION_ID = (
+    f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}"
 )
 
 
@@ -189,12 +196,14 @@ def test_fall_back_allows_engagement_transit_but_rejects_endpoint_in_engagement(
     valid_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
     invalid_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(5.8, 6.0)),
     )
@@ -285,6 +294,7 @@ def test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requireme
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -315,6 +325,7 @@ def test_generic_movement_transit_auto_passes_enemy_overflight_desperate_escape(
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         state=state,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
@@ -322,6 +333,7 @@ def test_generic_movement_transit_auto_passes_enemy_overflight_desperate_escape(
     battle_shocked_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         state=state,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
@@ -358,6 +370,7 @@ def test_generic_movement_transit_fall_back_rejects_excluded_titanic_overflight(
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         state=state,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
@@ -402,6 +415,7 @@ def test_fall_back_full_unit_no_op_witness_emits_only_changed_displacement() -> 
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=witness,
     )
@@ -443,6 +457,7 @@ def test_fly_and_titanic_fall_back_overflight_avoid_desperate_escape_requirement
         resolution = resolve_fall_back_move(
             scenario=scenario,
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
             unit_placement=unit_placement,
             path_witness=_fall_back_witness(
                 unit_placement,
@@ -462,6 +477,7 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
         battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -471,6 +487,39 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
     assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)
     assert all(
         DesperateEscapeRequirementReason.BATTLE_SHOCKED in requirement.reasons
+        for requirement in resolution.desperate_escape_requirements
+    )
+
+
+def test_voluntary_desperate_escape_requires_one_hazard_roll_for_every_model() -> None:
+    scenario = _engaged_scenario()
+    state = _state_for_scenario_with_effects(scenario, effects=())
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        state=state,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+    )
+    rolls = _roll_desperate_escape_dice(
+        state=state,
+        decisions=DecisionController(),
+        resolution=resolution,
+    )
+
+    assert resolution.is_valid
+    assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)
+    assert len(rolls) == len(unit_placement.model_placements)
+    assert all(
+        DesperateEscapeRequirementReason.SELECTED_MODE in requirement.reasons
         for requirement in resolution.desperate_escape_requirements
     )
 
@@ -486,6 +535,7 @@ def test_forced_desperate_escape_rolls_every_model() -> None:
         scenario=scenario,
         state=state,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(
             unit_placement,
@@ -508,6 +558,34 @@ def test_forced_desperate_escape_rolls_every_model() -> None:
     assert not any(
         event.event_type.startswith("forced_desperate_escape_battle_shock")
         for event in decisions.event_log.records
+    )
+
+
+def test_desperate_escape_follow_up_requires_survivors_and_unshocked_state() -> None:
+    base_payload: dict[str, JsonValue] = {
+        "fall_back_mode": FallBackModeKind.DESPERATE_ESCAPE.value,
+        "battle_shocked_after_move": False,
+        "forced_desperate_escape_sources": [{"source_rule_id": "phase10o-forced-source"}],
+    }
+
+    assert desperate_escape_battle_shock_required(
+        movement_payload=base_payload,
+        has_surviving_models=True,
+    )
+    assert not desperate_escape_battle_shock_required(
+        movement_payload={**base_payload, "battle_shocked_after_move": True},
+        has_surviving_models=True,
+    )
+    assert not desperate_escape_battle_shock_required(
+        movement_payload=base_payload,
+        has_surviving_models=False,
+    )
+    assert not desperate_escape_battle_shock_required(
+        movement_payload={
+            **base_payload,
+            "fall_back_mode": FallBackModeKind.ORDERED_RETREAT.value,
+        },
+        has_surviving_models=True,
     )
 
 
@@ -656,7 +734,10 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
     assert all(
         removal.source_step == MovementPhaseStepKind.MOVE_UNITS.value for removal in batch.removals
     )
-    assert all(removal.source_rule_id == "desperate_escape" for removal in batch.removals)
+    assert all(
+        removal.source_rule_id == "gw-11e-core-rules:movement-phase:fall-back-move"
+        for removal in batch.removals
+    )
     assert batch.displacements
     assert all(
         displacement.displacement_kind is ModelDisplacementKind.FALL_BACK
@@ -672,6 +753,186 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+def test_voluntary_desperate_escape_moves_then_tests_unshocked_rules_unit() -> None:
+    lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
+        _config(game_id="phase10o-p09b-voluntary-desperate-escape")
+    )
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10o-p09b-select-unit",
+    )
+    action_request = _decision_request(action_status)
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=action_request,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        action_result_id="phase10o-p09b-select-desperate",
+        proposal_result_id="phase10o-p09b-desperate-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+    )
+    if (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    ):
+        status = _submit_result(
+            lifecycle,
+            request=status.decision_request,
+            option_id=status.decision_request.options[0].option_id,
+            result_id="phase10o-p09b-destroy-failed-models",
+        )
+
+    roll_events = _event_payloads(lifecycle, "desperate_escape_roll_resolved")
+    battle_shock_event = _last_event_payload(lifecycle, "desperate_escape_battle_shock_resolved")
+    movement_event = _last_event_payload(lifecycle, "movement_activation_completed")
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert len(roll_events) == len(unit_placement.model_placements)
+    assert battle_shock_event["source_rule_id"] == (
+        "gw-11e-core-rules:movement-phase:fall-back-move"
+    )
+    assert battle_shock_event["unit_instance_id"] == unit_placement.unit_instance_id
+    assert movement_event["fall_back_mode"] == FallBackModeKind.DESPERATE_ESCAPE.value
+    assert next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "desperate_escape_battle_shock_resolved"
+    ) < next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "movement_activation_completed"
+    )
+
+
+def test_voluntary_desperate_escape_battle_shock_reroll_restores_and_resumes() -> None:
+    lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
+        _config(
+            game_id="phase10o-p09b-voluntary-desperate-reroll",
+            with_battle_shock_reroll_ability=True,
+        )
+    )
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10o-p09b-reroll-select-unit",
+    )
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=_decision_request(action_status),
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        action_result_id="phase10o-p09b-reroll-select-desperate",
+        proposal_result_id="phase10o-p09b-reroll-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+    )
+    if (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    ):
+        status = _submit_result(
+            lifecycle,
+            request=status.decision_request,
+            option_id=status.decision_request.options[0].option_id,
+            result_id="phase10o-p09b-reroll-destroy-failed-models",
+        )
+    reroll_request = _decision_request(status)
+
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert cast(dict[str, JsonValue], status.payload)["phase_body_status"] == (
+        "desperate_escape_battle_shock_reroll_pending"
+    )
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(payload)
+    assert restored.to_payload() == lifecycle.to_payload()
+
+    tampered_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    pending_request_payload = tampered_payload["decisions"]["queue"]["pending_requests"][0]
+    pending_context = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], pending_request_payload["payload"])["battle_shock_context"],
+    )
+    cast(dict[str, JsonValue], pending_context["base_payload"])["source_rule_id"] = (
+        "phase10o-p09b-tampered-source"
+    )
+    matching_requested_events = tuple(
+        event
+        for event in tampered_payload["decisions"]["event_log"]
+        if event["event_type"] == "decision_requested"
+        and cast(dict[str, JsonValue], event["payload"])["request_id"] == reroll_request.request_id
+    )
+    assert len(matching_requested_events) == 1
+    requested_context = cast(
+        dict[str, JsonValue],
+        cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], matching_requested_events[0]["payload"])["payload"],
+        )["battle_shock_context"],
+    )
+    cast(dict[str, JsonValue], requested_context["base_payload"])["source_rule_id"] = (
+        "phase10o-p09b-tampered-source"
+    )
+    matching_test_requested_events = tuple(
+        event
+        for event in tampered_payload["decisions"]["event_log"]
+        if event["event_type"] == "battle_shock_test_requested"
+        and cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], event["payload"])["battle_shock_test_request"],
+        )["request_id"]
+        == cast(
+            dict[str, JsonValue],
+            pending_context["battle_shock_test_request"],
+        )["request_id"]
+    )
+    assert len(matching_test_requested_events) == 1
+    cast(dict[str, JsonValue], matching_test_requested_events[0]["payload"])["source_rule_id"] = (
+        "phase10o-p09b-tampered-source"
+    )
+    with pytest.raises(GameLifecycleError, match="Desperate Escape source occurrence drifted"):
+        GameLifecycle.from_payload(tampered_payload)
+
+    resumed = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10o-p09b-reroll-decline",
+            request=reroll_request,
+            selected_option_id="decline",
+        )
+    )
+
+    assert resumed.status_kind is not LifecycleStatusKind.INVALID
+    assert _event_payloads(restored, "desperate_escape_battle_shock_resolved")
+    assert _event_payloads(restored, "movement_activation_completed")
 
 
 def test_fall_back_without_desperate_escape_completes_immediately() -> None:
@@ -728,6 +989,7 @@ def test_fall_back_payload_round_trip() -> None:
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -809,6 +1071,7 @@ def test_fall_back_destruction_selection_can_make_otherwise_incoherent_endpoint_
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness_with_end_poses(unit_placement, attempted_end_poses),
         battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -860,6 +1123,7 @@ def test_fall_back_result_rejects_destruction_selection_drift() -> None:
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -894,6 +1158,7 @@ def test_fall_back_transition_batch_rejects_unresolved_desperate_escape_requirem
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -910,12 +1175,14 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     invalid_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(5.8, 6.0)),
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -977,6 +1244,7 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     partial_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(
             unit_placement,
@@ -1557,8 +1825,36 @@ def _forced_desperate_escape_descriptor() -> DatasheetAbilityDescriptor:
     )
 
 
-def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyCatalog:
-    descriptor = _forced_desperate_escape_descriptor()
+def _battle_shock_reroll_descriptor() -> DatasheetAbilityDescriptor:
+    source_text = RuleSourceText.from_raw(
+        source_id="phase10o:catalog-ability:battle-shock-reroll",
+        raw_text=(
+            'While a friendly Khorne Legiones Daemonica unit is within 6" of this '
+            "FORTIFICATION, each time you take a Battle-shock test for that unit, you can "
+            "re-roll that test."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    return DatasheetAbilityDescriptor(
+        ability_id="phase10o:catalog-ability:battle-shock-reroll",
+        name="Battle-shock Reroll",
+        source_id=source_text.source_id,
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description=source_text.raw_text,
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+    )
+
+
+def _catalog_with_datasheet_ability(
+    catalog: ArmyCatalog,
+    descriptor: DatasheetAbilityDescriptor,
+) -> ArmyCatalog:
     target_datasheet_id = "core-intercessor-like-infantry"
     matches = tuple(
         datasheet
@@ -1566,11 +1862,28 @@ def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyC
         if datasheet.datasheet_id == target_datasheet_id
     )
     if len(matches) != 1:
-        raise AssertionError("Forced Desperate Escape fixture datasheet is ambiguous.")
+        raise AssertionError("Catalog ability fixture datasheet is ambiguous.")
     datasheets = tuple(
         replace(
             datasheet,
             abilities=(*datasheet.abilities, descriptor),
+            keywords=(
+                DatasheetKeywordSet(
+                    keywords=tuple(
+                        sorted({*datasheet.keywords.keywords, "FORTIFICATION", "KHORNE"})
+                    ),
+                    faction_keywords=tuple(
+                        sorted(
+                            {
+                                *datasheet.keywords.faction_keywords,
+                                "LEGIONES DAEMONICA",
+                            }
+                        )
+                    ),
+                )
+                if descriptor.source_id == "phase10o:catalog-ability:battle-shock-reroll"
+                else datasheet.keywords
+            ),
             source_ids=tuple(sorted({*datasheet.source_ids, descriptor.source_id})),
         )
         if datasheet.datasheet_id == target_datasheet_id
@@ -1582,6 +1895,11 @@ def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyC
         datasheets=datasheets,
         source_ids=tuple(sorted({*catalog.source_ids, descriptor.source_id})),
     )
+
+
+def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyCatalog:
+    descriptor = _forced_desperate_escape_descriptor()
+    return _catalog_with_datasheet_ability(catalog, descriptor)
 
 
 def _forced_desperate_escape_catalog_record(catalog: ArmyCatalog) -> AbilityCatalogRecord:
@@ -1873,10 +2191,16 @@ def _config(
     *,
     game_id: str = "phase10o-desperate",
     with_forced_desperate_escape_ability: bool = False,
+    with_battle_shock_reroll_ability: bool = False,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     if with_forced_desperate_escape_ability:
         catalog = _catalog_with_forced_desperate_escape_ability(catalog)
+    if with_battle_shock_reroll_ability:
+        catalog = _catalog_with_datasheet_ability(
+            catalog,
+            _battle_shock_reroll_descriptor(),
+        )
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,

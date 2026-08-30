@@ -118,6 +118,27 @@ def test_spatial_context_validation_precedes_specialized_physical_proposal_routi
         )
 
 
+def test_desperate_escape_mode_requires_exact_selected_model_inventory() -> None:
+    _source_path, requirement_function = _function_by_name(
+        MOVEMENT_PHASE,
+        "_desperate_escape_requirements_for_fall_back",
+    )
+    requirement_source = ast.unparse(requirement_function)
+    assert "fall_back_mode" in {argument.arg for argument in requirement_function.args.kwonlyargs}
+    assert "fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE" in requirement_source
+    assert "DesperateEscapeRequirementReason.SELECTED_MODE" in requirement_source
+
+    _source_path, validation_function = _function_by_name(
+        MOVEMENT_PHASE,
+        "_fall_back_mode_violation_code",
+    )
+    validation_source = ast.unparse(validation_function)
+    assert "DesperateEscapeRequirementReason.SELECTED_MODE" in validation_source
+    assert "resolution.witness.model_ids()" in validation_source
+    assert "desperate_escape_requirement_inventory_incomplete" in validation_source
+    assert "desperate_escape_has_no_requirements" not in validation_source
+
+
 def _function_by_name(path: Path, name: str) -> tuple[Path, ast.FunctionDef]:
     for source_path, tree in _parsed_sources(path):
         for node in ast.walk(tree):

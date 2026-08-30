@@ -26,9 +26,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 from ._artifacts import (
     EXPECTED_OBSERVED_AT,
     EXPECTED_PACKAGE_HASH,
-    EXPECTED_RULE_SOURCE_ID,
+    EXPECTED_RULE_IDENTITIES,
     EXPECTED_SOURCE_URL,
-    EXPECTED_TRANSCRIPTION_SHA256,
     CoreMovementPhaseSourceArtifactError,
     CoreMovementPhaseSourcePackageArtifact,
     CoreMovementPhaseSourceRuleArtifact,
@@ -36,7 +35,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "d55ccf8fa6f77cd06553be34153ed137b8d5c438dd8a454ff092c8333efcc2ee"
+EXPECTED_ARTIFACT_SHA256: Final = "f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2"
 
 
 def _load_artifact() -> CoreMovementPhaseSourcePackageArtifact:
@@ -64,12 +63,27 @@ SOURCE_VERSION: Final = _ARTIFACT.source_version
 SOURCE_URL: Final = EXPECTED_SOURCE_URL
 OBSERVED_AT: Final = EXPECTED_OBSERVED_AT
 PACKAGE_HASH: Final = EXPECTED_PACKAGE_HASH
-MOVE_UNITS_STEP_SOURCE_ID: Final = EXPECTED_RULE_SOURCE_ID
-TRANSCRIPTION_SHA256: Final = EXPECTED_TRANSCRIPTION_SHA256
+SELECTING_MODES_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES["selecting-modes"][0]
+FALL_BACK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES["fall-back-move"][0]
+MOVE_UNITS_STEP_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES["move-units-step"][0]
+TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES["move-units-step"][3]
 
 
 def source_rule_record() -> CoreMovementPhaseSourceRuleArtifact:
-    return _ARTIFACT.rule
+    return source_rule_record_by_id("move-units-step")
+
+
+def source_rule_record_by_id(rule_id: str) -> CoreMovementPhaseSourceRuleArtifact:
+    matches = tuple(rule for rule in _ARTIFACT.rules if rule.rule_id == rule_id)
+    if len(matches) != 1:
+        raise CoreMovementPhaseSourceArtifactError(
+            "Movement-phase source rule identity is unknown or duplicated."
+        )
+    return matches[0]
+
+
+def source_rule_records() -> tuple[CoreMovementPhaseSourceRuleArtifact, ...]:
+    return _ARTIFACT.rules
 
 
 def source_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
@@ -84,7 +98,7 @@ def source_package() -> RuleSourcePackage:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 8, 29),
+        source_date=date(2026, 8, 30),
     )
     document_id = SourceDocumentId(
         package_id=package_id,
@@ -97,11 +111,12 @@ def source_package() -> RuleSourcePackage:
             SourceDocument(
                 document_id=document_id,
                 title=_ARTIFACT.source_document.source_title,
-                source_texts=(
+                source_texts=tuple(
                     RuleSourceText.from_raw(
-                        source_id=MOVE_UNITS_STEP_SOURCE_ID,
-                        raw_text=_ARTIFACT.rule.source_text,
-                    ),
+                        source_id=rule.source_id,
+                        raw_text=rule.source_text,
+                    )
+                    for rule in _ARTIFACT.rules
                 ),
             ),
         ),
@@ -109,7 +124,7 @@ def source_package() -> RuleSourcePackage:
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-move-units-source-observed-2026-08-29"
+                    version="core-v2-movement-phase-source-observed-2026-08-30"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
@@ -120,15 +135,17 @@ def source_package() -> RuleSourcePackage:
     return RuleSourcePackage(
         source_catalog=source_catalog,
         source_evidence_catalog=SourceEvidenceCatalog(records=source_evidence_records()),
-        evidence_required_source_ids=(MOVE_UNITS_STEP_SOURCE_ID,),
+        evidence_required_source_ids=tuple(sorted(rule.source_id for rule in _ARTIFACT.rules)),
     )
 
 
 __all__ = (
     "EXPECTED_ARTIFACT_SHA256",
+    "FALL_BACK_MOVE_SOURCE_ID",
     "MOVE_UNITS_STEP_SOURCE_ID",
     "OBSERVED_AT",
     "PACKAGE_HASH",
+    "SELECTING_MODES_SOURCE_ID",
     "SOURCE_PACKAGE_ID",
     "SOURCE_URL",
     "SOURCE_VERSION",
@@ -138,5 +155,7 @@ __all__ = (
     "source_evidence_records",
     "source_package",
     "source_rule_record",
+    "source_rule_record_by_id",
+    "source_rule_records",
     "validate_core_movement_phase_source_artifact_bytes",
 )

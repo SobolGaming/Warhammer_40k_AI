@@ -756,6 +756,35 @@ players.
 
 Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. Remain Stationary resolves as a finite action. Normal Move, Advance, and Fall Back always emit a follow-up `submit_movement_proposal` request carrying the same mode context; adapters must submit the actual `PathWitness` and model poses through that parameterized request.
 
+P09B makes those two Fall Back modes authoritative rather than merely descriptive. An unshocked
+engaged rules unit receives both `fall_back:ordered_retreat` and
+`fall_back:desperate_escape`; a Battle-shocked unit receives only Desperate Escape. Selecting
+Desperate Escape is legal even when no overflight or content rule forces it. The accepted
+`submit_movement_proposal` must preserve the emitted `fall_back_mode`, and the engine creates one
+`selected_mode` Desperate Escape requirement and one Hazard Roll for every model in the complete
+canonical rules unit. Overflight, Battle-shock, and source-backed forced reasons may coexist on
+those same per-model requirements; they do not replace the selected-mode inventory.
+
+The engine resolves any Hazard Roll casualties, applies the grouped `PathWitness` transition, and
+then checks the unit's authoritative Battle-shock state. If at least one model survives and the
+unit is not Battle-shocked after moving, the engine resolves a Battle-shock test with reason
+`desperate_escape` before Embark or `movement_activation_completed`. An available reroll uses the
+existing `select_dice_reroll` finite decision and serializes the movement continuation in its
+engine-owned source context. If the unit is already Battle-shocked or no model survives, no
+follow-up test is created. Adapters must not roll Hazard dice, choose whether the follow-up test
+occurs, remove models, apply Battle-shock, or complete the movement locally.
+
+Fall Back resolution and completion payloads now carry the stable source IDs
+`gw-11e-core-rules:movement-phase:selecting-modes` and
+`gw-11e-core-rules:movement-phase:fall-back-move`, the selected mode, the exact per-model
+requirement/roll inventory, casualty IDs, and `battle_shocked_after_move`. When the follow-up test
+is required, public event `fall_back_move_applied` records the exact transition before
+`battle_shock_test_resolved` and `desperate_escape_battle_shock_resolved`; the later movement
+completion repeats the authenticated transition without applying it twice. These facts are public
+and symmetric in the current rules scope, so existing shared event projection and redaction apply
+to both viewers. This adds no decision type, proposal kind, hidden-information family, or
+adapter-owned mutation and therefore remains within the existing Contract 11.1.0 families.
+
 When source-backed runtime content lets the selected unit ignore any or all
 applicable Move-characteristic or Advance-roll modifiers, the existing
 `select_movement_action` finite space enumerates every legal physical-modifier

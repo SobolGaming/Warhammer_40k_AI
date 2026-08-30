@@ -778,6 +778,7 @@ def _desperate_escape_model_selection_request(
     state: GameState,
     fall_back_result: FallBackActionResult,
     action_result: DecisionResult,
+    movement_proposal_request_id: str,
 ) -> DecisionRequest:
     failed_model_ids = tuple(
         roll.requirement.model_instance_id
@@ -798,6 +799,10 @@ def _desperate_escape_model_selection_request(
                 "action_request_id": action_result.request_id,
                 "action_result_id": action_result.result_id,
                 "action_selected_option_id": action_result.selected_option_id,
+                "movement_proposal_request_id": _validate_identifier(
+                    "movement_proposal_request_id",
+                    movement_proposal_request_id,
+                ),
                 "fall_back_result": validate_json_value(fall_back_result.to_payload()),
                 "failed_model_ids": list(failed_model_ids),
             }

@@ -200,6 +200,7 @@ def _desperate_escape_requirements_for_fall_back(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     witness: PathWitness,
+    fall_back_mode: FallBackModeKind,
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...],
     forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
@@ -213,6 +214,8 @@ def _desperate_escape_requirements_for_fall_back(
         raise GameLifecycleError("Desperate Escape requirements require a UnitPlacement.")
     if type(witness) is not PathWitness:
         raise GameLifecycleError("Desperate Escape requirements require a PathWitness.")
+    if type(fall_back_mode) is not FallBackModeKind:
+        raise GameLifecycleError("Desperate Escape requirements require a FallBackModeKind.")
     requirement_battle_round = _validate_positive_int(
         "Desperate Escape requirements battle_round",
         battle_round,
@@ -252,6 +255,8 @@ def _desperate_escape_requirements_for_fall_back(
     for index, placement in enumerate(unit_placement.model_placements, start=1):
         reasons: list[DesperateEscapeRequirementReason] = []
         enemy_model_ids: tuple[str, ...] = ()
+        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+            reasons.append(DesperateEscapeRequirementReason.SELECTED_MODE)
         if (
             unit_placement.unit_instance_id in battle_shocked_ids
             and not battle_shocked_desperate_escape_suppressed
