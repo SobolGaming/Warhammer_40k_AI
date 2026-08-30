@@ -126,8 +126,8 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
 
-_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-one-0009"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-authenticated-001-003-0002"
+_ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09a-dice-0003"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09a-coherency-0006"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -830,7 +830,7 @@ def test_fall_back_destruction_selection_can_make_otherwise_incoherent_endpoint_
     surviving_placement = result.surviving_attempted_placement(
         destroyed_model_ids=(destroyed_model_id,),
     )
-    assert surviving_placement is not None
+    assert isinstance(surviving_placement, UnitPlacement)
 
     survivor_coherency = unit_placement_coherency_result(
         scenario=scenario,

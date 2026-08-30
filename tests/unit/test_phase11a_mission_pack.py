@@ -61,6 +61,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.phases.movement import (
+    MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
 )
@@ -1433,13 +1434,13 @@ def test_live_reinforcements_without_mission_setup_fails_fast() -> None:
     with pytest.raises(
         GameLifecycleError, match="Physical proposal context requires mission setup"
     ):
-        _submit_handler_decision(
+        _submit_reserve_ingress_action(
             handler=handler,
             state=state,
             decisions=decisions,
-            request=selection_request,
-            option_id=reserve_state.unit_instance_id,
-            result_id="phase11a-select-missing-setup",
+            selection_request=selection_request,
+            unit_instance_id=reserve_state.unit_instance_id,
+            result_id_prefix="phase11a-missing-setup",
         )
 
 
@@ -1455,13 +1456,13 @@ def test_live_reinforcements_use_mission_deployment_zones_for_round_2_restrictio
         battle_round=2,
     )
     placement_request = _decision_request(
-        _submit_handler_decision(
+        _submit_reserve_ingress_action(
             handler=handler,
             state=state,
             decisions=decisions,
-            request=selection_request,
-            option_id=reserve_state.unit_instance_id,
-            result_id="phase11a-select-reserve",
+            selection_request=selection_request,
+            unit_instance_id=reserve_state.unit_instance_id,
+            result_id_prefix="phase11a-reserve",
         )
     )
     reserve_unit = _reserve_unit(state=state, reserve_state=reserve_state)
@@ -1520,13 +1521,13 @@ def test_live_reinforcements_use_manifested_battlefield_terrain_for_endpoint_val
         )
     )
     placement_request = _decision_request(
-        _submit_handler_decision(
+        _submit_reserve_ingress_action(
             handler=handler,
             state=state,
             decisions=decisions,
-            request=selection_request,
-            option_id=reserve_state.unit_instance_id,
-            result_id="phase11a-select-terrain",
+            selection_request=selection_request,
+            unit_instance_id=reserve_state.unit_instance_id,
+            result_id_prefix="phase11a-terrain",
         )
     )
 
@@ -1676,6 +1677,36 @@ def _submit_handler_decision(
     )
     decisions.submit_result(result)
     return handler.apply_decision(state=state, decisions=decisions, result=result)
+
+
+def _submit_reserve_ingress_action(
+    *,
+    handler: MovementPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    selection_request: DecisionRequest,
+    unit_instance_id: str,
+    result_id_prefix: str,
+) -> LifecycleStatus | None:
+    selection_status = _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=selection_request,
+        option_id=unit_instance_id,
+        result_id=f"{result_id_prefix}-select",
+    )
+    if selection_status is not None:
+        raise AssertionError("reserve selection must continue to an action request")
+    action_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    return _submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        option_id=MovementPhaseActionKind.INGRESS.value,
+        result_id=f"{result_id_prefix}-ingress",
+    )
 
 
 def _submit_reserve_placement_payload(

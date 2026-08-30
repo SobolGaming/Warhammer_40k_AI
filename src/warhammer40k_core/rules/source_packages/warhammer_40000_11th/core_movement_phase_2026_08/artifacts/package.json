@@ -1,0 +1,92 @@
+{
+  "artifact_schema": "core-v2-movement-phase-source-v1",
+  "evidence": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-p09a-source-review:move-units-step",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "5aa9978655e58af7c7d41cabd57c47d3bc8dc0daa884e2d2243206bd68f17afc",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.begin_phase",
+        "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.apply_decision",
+        "warhammer40k_core.engine.phases.movement_action_decisions:_movement_action_options_for_selected_unit"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 09.02 Move Units Step",
+      "source_url": null,
+      "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-movement-phase-2026-08-29:move-units-step",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "a881b7623692015b3c92772f7fd508da782f832a225a922226735c9ed3e8fbc9",
+      "observed_at": "2026-08-29T20:56:52-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:09",
+      "review_audit_source_observation_sha256": "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+      "rule_source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.begin_phase",
+        "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.apply_decision",
+        "warhammer40k_core.engine.phases.movement_action_decisions:_movement_action_options_for_selected_unit"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 09.02 Move Units Step",
+      "source_url": "https://www.40k.app/rules/09-movement-phase",
+      "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "199be38f35856eddfb6f72395ffff7448f48be1b099db784788a8b64f0e97058",
+  "rule": {
+    "load_support_status": "loaded",
+    "rule_id": "move-units-step",
+    "runtime_consumer_ids": [
+      "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.begin_phase",
+      "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.apply_decision",
+      "warhammer40k_core.engine.phases.movement_action_decisions:_movement_action_options_for_selected_unit"
+    ],
+    "section_heading": "MOVE UNITS STEP",
+    "section_id": "09.02",
+    "semantic_execution_status": "executable_engine_runtime",
+    "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+    "source_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
+    "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f"
+  },
+  "source_document": {
+    "document_id": "40k-app-movement-phase-2026-08-29",
+    "observed_at": "2026-08-29T20:56:52-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    "source_title": "40k.app Core Rules Movement Phase",
+    "source_url": "https://www.40k.app/rules/09-movement-phase"
+  },
+  "source_package_id": "gw-11e-core-movement-phase",
+  "source_version": "40k-app-move-units-observed-2026-08-29"
+}

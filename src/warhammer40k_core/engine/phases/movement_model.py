@@ -11,10 +11,10 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mission_setup import MissionSetup
     from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
-    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _begin_reinforcements_step, _complete_reinforcements_step
+    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_end_opponent_movement_reaction_if_available, _request_end_movement_active_player_stratagem_if_available, _request_rapid_ingress_reaction_if_available, _request_fire_overwatch_reaction_if_available, _request_selected_to_move_stratagem_if_available, _request_selected_to_fall_back_stratagem_if_available, _request_friendly_unit_fell_back_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _request_movement_end_surge_if_available, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
-    from warhammer40k_core.engine.phases.movement_reinforcements import _reinforcement_unit_options, _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _apply_reinforcement_unit_selection_decision, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
-    from warhammer40k_core.engine.phases.movement_transports import _request_pre_move_disembark_if_available, _request_post_normal_move_disembark_if_available, _pre_move_disembark_entries, _post_normal_move_disembark_entries, _disembark_unit_selection_options, _apply_disembark_unit_selection_decision, _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission
+    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
@@ -23,18 +23,15 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
     from warhammer40k_core.engine.phases.movement_geometry import _movement_action_availability_context, _enemy_engagement_model_ids_for_unit, _enemy_engaged_unit_ids_for_unit_placement, _hover_mode_state_for_unit, _desperate_escape_requirements_for_fall_back, _enemy_model_ids_crossed_by_witness, _sampled_witness_transit_poses, _interpolate_pose, _model_at_pose, _geometry_models_for_unit_placement, _friendly_geometry_models_for_path, _enemy_geometry_models_for_player, _friendly_vehicle_monster_model_ids, _enemy_vehicle_monster_model_ids_for_player, _unit_has_vehicle_or_monster_keyword, _unit_has_deep_strike_keyword, _canonical_keyword, _validate_ability_index_mapping, _ability_index_for_player, _validate_move_witness_matches_unit, _path_result_with_aircraft_violations, _normal_move_violation_code
     from warhammer40k_core.engine.phases.movement_validation import _movement_action_invalid_payload, assert_move_units_step_complete_for_reinforcements, _remaining_move_units_unit_ids, _normal_move_invalid_message, _ensure_movement_phase_state, _validate_movement_phase_state, _battlefield_scenario, _movement_unit_options, _active_player_id, movement_phase_action_kind_from_token, fall_back_mode_kind_from_token, movement_phase_step_kind_from_token, desperate_escape_requirement_reason_from_token, movement_mode_for_phase_action, _movement_mode_from_payload, _movement_mode_from_proposal_submission, _fall_back_mode_from_payload, _fall_back_mode_from_proposal_submission, _movement_action_option_id, _movement_action_label, _movement_modes_for_action_options, _unit_can_take_to_the_skies, _fall_back_modes_for_parameterized_option, _fall_back_result_with_mode, _fall_back_mode_violation_code, _model_movement_inches, _model_base_movement_inches, _model_movement_budget_inches, _movement_distance_modifier_inches, _movement_mode_for_action, _temporary_movement_keywords_for_unit, _movement_bonus_inches_for_unit, _effective_movement_keywords, _model_default_movement_distance_inches, _modified_movement_inches, _runtime_modifier_registry, _default_move_end_pose, _ruleset_descriptor_for_handler, _mission_setup_for_live_reinforcements, _objective_markers_for_state, _active_movement_selection, _ensure_transport_cargo_phase_states, _unit_instance_by_id, _unit_has_keyword, _transport_status_for_movement_action, _movement_completion_context_payload, _transport_operation_invalid_payload, _request_payload_for_result, _decision_payload_object, _payload_string, _payload_object, _payload_json_object, _identifier_list_from_json_object, _payload_positive_int, _optional_payload_path_witness, _payload_model_displacement_kind, _payload_transition_batch, _payload_json_array, _validate_json_object, _validate_movement_action_tuple, _validate_transport_restriction_override_tuple, _validate_path_validation_result_tuple, _validate_terrain_path_legality_result_tuple, _validate_desperate_escape_reason_tuple, _validate_desperate_escape_requirement_tuple, _validate_desperate_escape_roll_tuple, _validate_identifier_tuple, _validate_movement_distance_records, _validate_objective_marker_tuple, _validate_advance_roll_spec, _validate_identifier, _validate_positive_int, _validate_non_negative_finite_number, _validate_bool
+
 # fmt: on
 
 __all__ = (
-    "COMPLETE_DISEMBARKS_OPTION_ID",
-    "COMPLETE_REINFORCEMENTS_OPTION_ID",
     "DECLINE_EMBARK_OPTION_ID",
     "SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE",
-    "SELECT_DISEMBARK_UNIT_DECISION_TYPE",
     "SELECT_EMBARK_TRANSPORT_DECISION_TYPE",
     "SELECT_MOVEMENT_ACTION_DECISION_TYPE",
     "SELECT_MOVEMENT_UNIT_DECISION_TYPE",
-    "SELECT_REINFORCEMENT_UNIT_DECISION_TYPE",
     "_ADVANCED_UNIT_CLEANUP_POINT",
     "_ADVANCE_REROLL_KEYWORD",
     "_DESPERATE_ESCAPE_ROLL_TYPE",
@@ -68,6 +65,7 @@ __all__ = (
     "MovementPhaseActionKind",
     "MovementPhaseStatePayload",
     "MovementPhaseStepKind",
+    "MovementUnitLocationKind",
     "MovementUnitSelection",
     "MovementUnitSelectionPayload",
     "PendingMovementActionSelection",
@@ -80,11 +78,7 @@ __all__ = (
 SELECT_MOVEMENT_UNIT_DECISION_TYPE = "select_movement_unit"
 SELECT_MOVEMENT_ACTION_DECISION_TYPE = "select_movement_action"
 SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE = "select_desperate_escape_model"
-SELECT_REINFORCEMENT_UNIT_DECISION_TYPE = "select_reinforcement_unit"
-SELECT_DISEMBARK_UNIT_DECISION_TYPE = "select_disembark_unit"
 SELECT_EMBARK_TRANSPORT_DECISION_TYPE = "select_embark_transport"
-COMPLETE_REINFORCEMENTS_OPTION_ID = "complete_reinforcements"
-COMPLETE_DISEMBARKS_OPTION_ID = "complete_disembarks"
 DECLINE_EMBARK_OPTION_ID = "decline_embark"
 
 
@@ -98,6 +92,14 @@ class MovementPhaseActionKind(StrEnum):
     NORMAL_MOVE = "normal_move"
     ADVANCE = "advance"
     FALL_BACK = "fall_back"
+    DISEMBARK = "disembark"
+    INGRESS = "ingress"
+
+
+class MovementUnitLocationKind(StrEnum):
+    BATTLEFIELD = "battlefield"
+    EMBARKED = "embarked"
+    STRATEGIC_RESERVES = "strategic_reserves"
 
 
 class FallBackModeKind(StrEnum):
@@ -180,14 +182,13 @@ class MovementPhaseStatePayload(TypedDict):
     battle_round: int
     active_player_id: str
     step: str
-    reinforcements_completed: bool
-    declined_disembark_unit_ids: list[str]
-    declined_post_normal_move_disembark_unit_ids: list[str]
+    move_units_completed: bool
     selected_unit_ids: list[str]
     moved_unit_ids: list[str]
     movement_distance_records: NotRequired[list[MovementDistanceRecordPayload]]
     active_selection: MovementUnitSelectionPayload | None
     pending_action: PendingMovementActionSelectionPayload | None
+    pending_setup_event_id: NotRequired[str | None]
 
 
 class MovementActionAvailabilityContextPayload(TypedDict):
@@ -275,7 +276,8 @@ class FellBackUnitStatePayload(TypedDict):
 
 class FallBackActionResultPayload(TypedDict):
     unit_instance_id: str
-    attempted_placement: UnitPlacementPayload
+    attempted_placement: NotRequired[UnitPlacementPayload]
+    attempted_rules_unit_placement: NotRequired[RulesUnitPlacementPayload]
     witness: PathWitnessPayload
     desperate_escape_requirements: list[DesperateEscapeRequirementPayload]
     desperate_escape_rolls: list[DesperateEscapeRollPayload]

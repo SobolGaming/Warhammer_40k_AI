@@ -50,7 +50,11 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.phases.fight import FightPhaseHandler
-from warhammer40k_core.engine.phases.movement import MovementPhaseHandler, MovementPhaseState
+from warhammer40k_core.engine.phases.movement import (
+    MovementPhaseActionKind,
+    MovementPhaseHandler,
+    MovementPhaseState,
+)
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
 )
@@ -1263,10 +1267,24 @@ def _arrive_rules_unit_from_strategic_reserves(
         selected_option_id=rules_unit_instance_id,
     )
     decisions.submit_result(selection_result)
-    placement_status = handler.apply_decision(
+    selection_apply_status = handler.apply_decision(
         state=state,
         decisions=decisions,
         result=selection_result,
+    )
+    assert selection_apply_status is None
+    action_status = handler.begin_phase(state=state, decisions=decisions)
+    assert action_status.decision_request is not None
+    action_result = DecisionResult.for_request(
+        result_id=f"{result_id_prefix}-ingress",
+        request=action_status.decision_request,
+        selected_option_id=MovementPhaseActionKind.INGRESS.value,
+    )
+    decisions.submit_result(action_result)
+    placement_status = handler.apply_decision(
+        state=state,
+        decisions=decisions,
+        result=action_result,
     )
     assert placement_status is not None
     assert placement_status.decision_request is not None

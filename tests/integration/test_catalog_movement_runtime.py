@@ -110,6 +110,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
 )
 from warhammer40k_core.engine.phases.movement import (
+    MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
     _advance_reroll_permission_for_unit,
@@ -517,10 +518,24 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
         selected_option_id=unit.unit_instance_id,
     )
     decisions.submit_result(arrival_selection_result)
-    arrival_placement_status = movement_handler.apply_decision(
+    arrival_selection_apply_status = movement_handler.apply_decision(
         state=state,
         decisions=decisions,
         result=arrival_selection_result,
+    )
+    assert arrival_selection_apply_status is None
+    arrival_action_status = movement_handler.begin_phase(state=state, decisions=decisions)
+    assert arrival_action_status.decision_request is not None
+    arrival_action_result = DecisionResult.for_request(
+        result_id="result-flesh-hounds-arrival-ingress",
+        request=arrival_action_status.decision_request,
+        selected_option_id=MovementPhaseActionKind.INGRESS.value,
+    )
+    decisions.submit_result(arrival_action_result)
+    arrival_placement_status = movement_handler.apply_decision(
+        state=state,
+        decisions=decisions,
+        result=arrival_action_result,
     )
     assert arrival_placement_status is not None
     assert arrival_placement_status.decision_request is not None
@@ -764,7 +779,7 @@ def test_phase17n_hunters_from_the_warp_repeated_entries_preserve_real_casualtie
 
     missing_record_payload: GameLifecyclePayload = deepcopy(baseline_payload)
     decision_records = missing_record_payload["decisions"]["records"]
-    assert len(decision_records) == 4
+    assert len(decision_records) == 5
     decision_records.pop()
     with pytest.raises(
         GameLifecycleError,

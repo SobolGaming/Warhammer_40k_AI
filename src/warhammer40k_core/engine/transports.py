@@ -1959,11 +1959,14 @@ def resolve_embark(
         transport=transport,
         transport_placement=transport_placement,
     )
-    if unit_placement.unit_instance_id != selection.unit_instance_id:
+    if selection.unit_instance_id not in {
+        rules_unit.unit_instance_id,
+        unit_placement.unit_instance_id,
+    }:
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Embark unit placement does not match selected unit.",
+                message="Embark placement does not match the selected rules unit.",
                 unit_instance_id=selection.unit_instance_id,
             )
         )

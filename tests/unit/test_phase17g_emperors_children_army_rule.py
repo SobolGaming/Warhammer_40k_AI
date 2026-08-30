@@ -71,10 +71,8 @@ from warhammer40k_core.engine.phases.charge import (
     _charge_target_candidates,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.movement import (
-    COMPLETE_REINFORCEMENTS_OPTION_ID,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
@@ -1175,14 +1173,6 @@ def _decision_request_of_type(
                 lifecycle,
                 status=current,
                 result_id=f"{result_id_prefix}-decline-stratagem-{index}",
-            )
-            continue
-        if request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
-            current = _submit_result(
-                lifecycle,
-                request=request,
-                option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
-                result_id=f"{result_id_prefix}-complete-reinforcements-{index}",
             )
             continue
         raise AssertionError(f"Expected {decision_type}, got {request.decision_type}.")

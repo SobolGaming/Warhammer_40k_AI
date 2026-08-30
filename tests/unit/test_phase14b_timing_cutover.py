@@ -226,7 +226,7 @@ def test_phase14b_end_opponent_movement_reactions_emit_fire_overwatch_before_rap
     state.movement_phase_state = MovementPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
-        reinforcements_completed=True,
+        move_units_completed=True,
         selected_unit_ids=("army-alpha:intercessor-unit-1",),
         moved_unit_ids=("army-alpha:intercessor-unit-1",),
     )

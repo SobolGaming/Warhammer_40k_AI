@@ -297,7 +297,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     identities = _field_object(capability_manifest, "identities")
     assert _field_object(identities, "mission_pack")
     assert _field_object(identities, "terrain_layout")
-    assert _field_object(identities, "contract_schema")["contract_version"] == "11.0.0"
+    assert _field_object(identities, "contract_schema")["contract_version"] == "11.1.0"
 
     player_a_support = _request(
         server,

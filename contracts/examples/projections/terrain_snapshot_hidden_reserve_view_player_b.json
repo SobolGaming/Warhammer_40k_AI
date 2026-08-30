@@ -14798,6 +14798,9 @@
         "label": "CORE Intercessor-like Infantry",
         "option_id": "army-alpha:intercessor-unit-1",
         "payload": {
+          "component_unit_instance_ids": [
+            "army-alpha:intercessor-unit-1"
+          ],
           "model_instance_ids": [
             "army-alpha:intercessor-unit-1:core-intercessor-like:001",
             "army-alpha:intercessor-unit-1:core-intercessor-like:002",
@@ -14805,7 +14808,8 @@
             "army-alpha:intercessor-unit-1:core-intercessor-like:004",
             "army-alpha:intercessor-unit-1:core-intercessor-like:005"
           ],
-          "unit_instance_id": "army-alpha:intercessor-unit-1"
+          "unit_instance_id": "army-alpha:intercessor-unit-1",
+          "unit_location": "battlefield"
         }
       }
     ],
@@ -14813,7 +14817,8 @@
       "active_player_id": "player-a",
       "battle_round": 1,
       "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
-      "phase": "movement"
+      "phase": "movement",
+      "source_rule_id": "gw-11e-core-rules:movement-phase:move-units-step"
     },
     "request_id": "decision-request-000006",
     "schema_version": "decision-request-view-v5-phase17n-step4"
@@ -14868,7 +14873,7 @@
     }
   ],
   "projection_schema": "game-view-v11-phase17n-step4",
-  "projection_state_hash": "4f62ddd9b7c62296d275c4770169cd273e45761468a4a82ab40e775267fb8cac",
+  "projection_state_hash": "4df5d68b49ae342ee3212c041c768aa6f136923c9ff377abdfcb5835301751cc",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

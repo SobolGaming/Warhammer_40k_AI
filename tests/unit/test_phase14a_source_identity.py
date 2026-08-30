@@ -10,6 +10,7 @@ from tools.build_core_command_phase_source import (
     CoreCommandPhaseSourceBuildError,
     build_core_command_phase_source_payload,
 )
+from tools.build_core_movement_phase_source import build_payload as build_movement_source_payload
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -29,6 +30,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27,
     core_abilities,
     core_command_phase_2026_08,
+    core_movement_phase_2026_08,
     core_rules,
     core_stratagems,
     core_stratagems_2026_08,
@@ -58,6 +60,75 @@ def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() ->
     assert "<" not in encoded
     assert "object at 0x" not in encoded
     assert SourceCatalog.from_payload(payload).to_payload() == payload
+
+
+def test_p09a_move_units_source_artifact_is_pinned_typed_and_executable() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_movement_phase_2026_08/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    package = core_movement_phase_2026_08.source_package()
+    rule = core_movement_phase_2026_08.source_rule_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert hashlib.sha256(raw).hexdigest() == (core_movement_phase_2026_08.EXPECTED_ARTIFACT_SHA256)
+    assert json.loads(raw) == build_movement_source_payload()
+    assert rule.section_id == "09.02"
+    assert rule.transcription_sha256 == core_movement_phase_2026_08.TRANSCRIPTION_SHA256
+    assert {
+        "battlefield",
+        "Strategic Reserves",
+        "embarked within a Transport",
+        "DISEMBARK (18.04)",
+        "INGRESS (20.04)",
+    } <= {
+        token
+        for token in (
+            "battlefield",
+            "Strategic Reserves",
+            "embarked within a Transport",
+            "DISEMBARK (18.04)",
+            "INGRESS (20.04)",
+        )
+        if token in rule.source_text
+    }
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert {record.semantic_execution_status for record in evidence} == {
+        "executable_engine_runtime"
+    }
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
+        package.source_catalog.to_payload()
+    )
+
+
+def test_p09a_move_units_source_artifact_rejects_text_and_byte_drift() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_movement_phase_2026_08/artifacts/package.json"
+    )
+    payload = cast(dict[str, object], json.loads(artifact_path.read_text()))
+    rule = cast(dict[str, object], payload["rule"])
+    rule["source_text"] = f"{rule['source_text']} altered"
+    with pytest.raises(
+        core_movement_phase_2026_08.CoreMovementPhaseSourceArtifactError,
+        match="reviewed identity",
+    ):
+        core_movement_phase_2026_08.core_movement_phase_source_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+    raw = artifact_path.read_bytes()
+    core_movement_phase_2026_08.validate_core_movement_phase_source_artifact_bytes(raw)
+    with pytest.raises(
+        core_movement_phase_2026_08.CoreMovementPhaseSourceArtifactError,
+        match="artifact bytes drifted",
+    ):
+        core_movement_phase_2026_08.validate_core_movement_phase_source_artifact_bytes(raw + b"\n")
 
 
 def test_july_rules_updates_source_catalog_cites_pdfs_and_preserves_identity() -> None:

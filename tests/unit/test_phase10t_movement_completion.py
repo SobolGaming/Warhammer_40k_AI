@@ -118,7 +118,7 @@ def test_full_movement_phase_completion_exits_to_shooting_after_all_work_is_comp
 
     assert _event_index(lifecycle, "movement_activation_completed") < _event_index(
         lifecycle,
-        "move_units_reserve_arrivals_completed",
+        "move_units_completed",
     )
     assert _last_event_payload(lifecycle, "battle_phase_completed") == {
         "game_id": "phase10t-game",
@@ -155,23 +155,21 @@ def test_move_units_continues_before_reserve_arrivals_when_units_remain() -> Non
     assert {option.option_id for option in request.options} == {"army-alpha:intercessor-unit-2"}
 
 
-def test_reserve_arrivals_reject_selected_units_that_have_not_moved() -> None:
+def test_move_units_state_rejects_selected_units_without_active_or_completed_state() -> None:
     lifecycle, _movement_status = _advance_to_movement_unit_selection()
     assert lifecycle.state is not None
-    lifecycle.state.movement_phase_state = MovementPhaseState(
-        battle_round=1,
-        active_player_id="player-a",
-        selected_unit_ids=(
-            "army-alpha:intercessor-unit-1",
-            "army-alpha:intercessor-unit-2",
-        ),
-        moved_unit_ids=("army-alpha:intercessor-unit-1",),
-    )
-
-    with pytest.raises(GameLifecycleError, match="Move Units step must be complete"):
-        MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
-            state=lifecycle.state,
-            decisions=DecisionController(),
+    with pytest.raises(
+        GameLifecycleError,
+        match="selected units require an active selection or completion",
+    ):
+        MovementPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=(
+                "army-alpha:intercessor-unit-1",
+                "army-alpha:intercessor-unit-2",
+            ),
+            moved_unit_ids=("army-alpha:intercessor-unit-1",),
         )
 
 
@@ -201,8 +199,8 @@ def test_reserve_arrivals_complete_when_only_inactive_units_remain_unselected() 
     assert isinstance(status.payload, dict)
     assert status.payload["step"] == MovementPhaseStepKind.MOVE_UNITS.value
     assert status.payload["phase_body_status"] == "move_units_complete"
-    assert lifecycle.state.movement_phase_state.reinforcements_completed
-    events = _event_payloads_from_decisions(decisions, "move_units_reserve_arrivals_completed")
+    assert lifecycle.state.movement_phase_state.move_units_completed
+    events = _event_payloads_from_decisions(decisions, "move_units_completed")
     assert events
     assert events[-1]["step"] == MovementPhaseStepKind.MOVE_UNITS.value
 

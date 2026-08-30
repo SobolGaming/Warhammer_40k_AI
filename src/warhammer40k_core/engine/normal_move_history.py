@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_canonical_identity,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -125,16 +128,12 @@ def validate_normal_move_state_consistency(*, state: GameState) -> None:
         return
     if state.stage is not GameLifecycleStage.BATTLE:
         raise GameLifecycleError("normal_move_states require battle stage.")
-    unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
     for normal_move_state in state.normal_move_states:
-        owner = unit_owner_by_id.get(normal_move_state.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("normal_move_states unit is unknown.")
-        if owner != normal_move_state.player_id:
+        views = current_rules_unit_views_for_canonical_identity(
+            state=state,
+            unit_instance_id=normal_move_state.unit_instance_id,
+        )
+        if any(view.owner_player_id != normal_move_state.player_id for view in views):
             raise GameLifecycleError("normal_move_states player_id does not match unit owner.")
 
 

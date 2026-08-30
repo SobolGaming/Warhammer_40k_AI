@@ -202,10 +202,6 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.DICE_SELECTION,
             ("die",),
         ),
-        "select_disembark_unit": InteractionSpec(
-            InteractionKind.ENTITY_SELECTION,
-            ("unit",),
-        ),
         "select_embark_transport": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("transport",),
@@ -253,10 +249,6 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.FINITE_OPTION_LIST
         ),
         "select_redeploy_unit": InteractionSpec(
-            InteractionKind.ENTITY_SELECTION,
-            ("unit",),
-        ),
-        "select_reinforcement_unit": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("unit",),
         ),

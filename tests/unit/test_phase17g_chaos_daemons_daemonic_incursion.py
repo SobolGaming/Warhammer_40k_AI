@@ -147,7 +147,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
-    COMPLETE_REINFORCEMENTS_OPTION_ID,
+    MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
 )
@@ -1677,7 +1677,7 @@ def test_realm_of_chaos_replay_rejects_arrival_source_and_event_order_tamper(
     )
     selection_decision = _decision_record_payload_for_result(
         payload,
-        result_id="phase17n-realm-authority-select",
+        result_id="phase17n-realm-authority-select-ingress",
     )
     selection_terminal_event = _event_record_for_request_id(
         payload,
@@ -3577,14 +3577,25 @@ def _arrive_realm_target_from_reserves(
     )
     decisions = lifecycle.decision_controller
     selection_request = decision_request(handler.begin_phase(state=state, decisions=decisions))
+    selection_status = submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=selection_request,
+        option_id=reserve_state.unit_instance_id,
+        result_id=f"{result_id_prefix}-select-unit",
+    )
+    if selection_status is not None:
+        raise AssertionError("selecting the reserve unit must continue to its action choice")
+    action_request = decision_request(handler.begin_phase(state=state, decisions=decisions))
     placement_request = decision_request(
         submit_handler_decision(
             handler=handler,
             state=state,
             decisions=decisions,
-            request=selection_request,
-            option_id=reserve_state.unit_instance_id,
-            result_id=f"{result_id_prefix}-select",
+            request=action_request,
+            option_id=MovementPhaseActionKind.INGRESS.value,
+            result_id=f"{result_id_prefix}-select-ingress",
         )
     )
     placement_kind = (
@@ -3620,7 +3631,7 @@ def _arrive_realm_target_from_reserves(
         placement_request = decisions.queue.peek_next()
         if placement_request.decision_type != PLACEMENT_PROPOSAL_DECISION_TYPE:
             raise AssertionError("test requires one retry placement request")
-    completion_status = submit_reserve_placement_payload(
+    submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
@@ -3645,16 +3656,6 @@ def _arrive_realm_target_from_reserves(
         ),
         result_id=f"{result_id_prefix}-place",
     )
-    if completion_status is not None and completion_status.decision_request is not None:
-        completion_request = decision_request(completion_status)
-        submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=completion_request,
-            option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
-            result_id=f"{result_id_prefix}-complete",
-        )
 
 
 def _active_ingress_record(
@@ -4236,7 +4237,18 @@ def _submit_reserve_arrival(
         decisions=decisions,
         request=selection_request,
         option_id=reserve_state.unit_instance_id,
-        result_id=f"{result_id}:select",
+        result_id=f"{result_id}:select-unit",
+    )
+    if placement_status is not None:
+        raise AssertionError("selecting the reserve unit must continue to its action choice")
+    action_request = decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_status = submit_handler_decision(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=action_request,
+        option_id=MovementPhaseActionKind.INGRESS.value,
+        result_id=f"{result_id}:select-ingress",
     )
     placement_request = decision_request(placement_status)
     result_status = submit_reserve_placement_payload(

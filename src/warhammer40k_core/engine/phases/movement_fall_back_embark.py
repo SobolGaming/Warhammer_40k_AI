@@ -29,12 +29,12 @@ from warhammer40k_core.engine.phases.movement_resolution_flow import *
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mission_setup import MissionSetup
-    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_REINFORCEMENT_UNIT_DECISION_TYPE, SELECT_DISEMBARK_UNIT_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, COMPLETE_REINFORCEMENTS_OPTION_ID, COMPLETE_DISEMBARKS_OPTION_ID, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
+    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
     from warhammer40k_core.engine.phases.movement_state import MovementPhaseState, NormalMoveResolution, AdvanceMoveResolution, FallBackActionResult, _ResolvedUnitMove
-    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _begin_reinforcements_step, _complete_reinforcements_step
+    from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_end_opponent_movement_reaction_if_available, _request_end_movement_active_player_stratagem_if_available, _request_rapid_ingress_reaction_if_available, _request_fire_overwatch_reaction_if_available, _request_selected_to_move_stratagem_if_available, _request_selected_to_fall_back_stratagem_if_available, _request_friendly_unit_fell_back_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _request_movement_end_surge_if_available, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
-    from warhammer40k_core.engine.phases.movement_reinforcements import _reinforcement_unit_options, _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _apply_reinforcement_unit_selection_decision, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
-    from warhammer40k_core.engine.phases.movement_transports import _request_pre_move_disembark_if_available, _request_post_normal_move_disembark_if_available, _pre_move_disembark_entries, _post_normal_move_disembark_entries, _disembark_unit_selection_options, _apply_disembark_unit_selection_decision, _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission
+    from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
+    from warhammer40k_core.engine.phases.movement_transports import _request_disembark_placement, _resolve_disembark_placement_submission, _allowed_disembark_modes_for_placement_request, _resolve_combat_disembark_placement_submission, _disembark_candidate_for_movement_unit
     from warhammer40k_core.engine.phases.movement_placement_proposals import _parse_movement_proposal_submission_or_invalid, _parse_placement_proposal_submission_or_invalid, _proposal_payload_parse_failure, _key_error_field, _apply_placement_proposal_decision, _missing_disembark_proposal_field, _apply_valid_disembark, _apply_valid_combat_disembark
     from warhammer40k_core.engine.phases.movement_action_decisions import _request_movement_action, _apply_movement_action_decision, _request_advance_move_grant_decision_if_available, _decline_advance_move_grant_option, _advance_move_grant_option, _apply_advance_move_grant_decision, _assert_advance_move_grant_still_available, _record_movement_action_grant_effects, _movement_action_grant_unit_effect_target_ids, _movement_action_grant_effect_expiration, _resolve_pending_movement_action_after_grants, _resolve_pending_advance_action, _request_pending_movement_action_proposal, _request_movement_proposal, _forced_desperate_escape_sources_for_unit, _forced_desperate_escape_source_rule_ids_from_context, _request_movement_proposal_retry
     from warhammer40k_core.engine.phases.movement_resolution_flow import _apply_movement_proposal_decision, _action_result_from_proposal_request, _reject_invalid_proposal, _reject_invalid_movement_resolution, _apply_advance_roll_reroll_decision, _resolve_and_apply_advance_move, _advance_move_grants_from_context, _selected_advance_move_grant_hook_ids_from_context, _apply_advance_move_grants, _grant_ranged_weapon_keywords, _aircraft_reserve_transition_reason_for_normal_move, _apply_aircraft_reserve_transition_for_normal_move
@@ -98,7 +98,15 @@ def _apply_desperate_escape_model_selection_decision(
         )
     )
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        rules_unit_placement_for_movement,
+    )
+
+    _rules_unit, unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
     action_result = DecisionResult(
         result_id=_payload_string(context_payload, key="action_result_id"),
         request_id=_payload_string(context_payload, key="action_request_id"),
@@ -131,7 +139,7 @@ def _apply_fall_back_result(
     decisions: DecisionController,
     result: DecisionResult,
     destruction_source_result_id: str | None,
-    unit_placement: UnitPlacement,
+    unit_placement: UnitPlacement | RulesUnitPlacement,
     fall_back_result: FallBackActionResult,
     destroyed_model_ids: tuple[str, ...],
     ruleset_descriptor: RulesetDescriptor,
@@ -141,6 +149,13 @@ def _apply_fall_back_result(
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
+    movement_unit_id = (
+        unit_placement.unit_instance_id
+        if isinstance(unit_placement, UnitPlacement)
+        else unit_placement.rules_unit_instance_id
+    )
+    if movement_unit_id != fall_back_result.unit_instance_id:
+        raise GameLifecycleError("Fall Back rules-unit identity drift.")
     destruction_source_payload: dict[str, JsonValue] = {}
     if destroyed_model_ids:
         if destruction_source_result_id is None:
@@ -159,17 +174,22 @@ def _apply_fall_back_result(
         destroyed_model_ids=destroyed_model_ids,
     )
     if surviving_placement is not None:
-        survivor_coherency_result = unit_placement_coherency_result(
+        from warhammer40k_core.engine.phases.movement_rules_units import (
+            rules_unit_placement_coherency_result,
+        )
+
+        survivor_coherency_result = rules_unit_placement_coherency_result(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=surviving_placement,
+            placement=surviving_placement,
+            rules_unit_instance_id=movement_unit_id,
         )
         if not survivor_coherency_result.is_coherent:
             violation_code = "unit_coherency_broken"
             invalid_payload = _movement_action_invalid_payload(
                 state=state,
                 active_player_id=active_player_id,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 action=MovementPhaseActionKind.FALL_BACK,
                 result=result,
                 violation_code=violation_code,
@@ -191,7 +211,7 @@ def _apply_fall_back_result(
                     "phase_body_status": "movement_action_invalid",
                     "battle_round": state.battle_round,
                     "active_player_id": active_player_id,
-                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "unit_instance_id": movement_unit_id,
                     "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
                     "violation_code": violation_code,
                 },
@@ -200,19 +220,27 @@ def _apply_fall_back_result(
         before=unit_placement,
         destroyed_model_ids=destroyed_model_ids,
     )
+    engagement_placement = (
+        unit_placement
+        if isinstance(unit_placement, UnitPlacement)
+        else unit_placement.component_unit_placements[0]
+    )
     start_engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
         scenario=scenario,
-        unit_placement=unit_placement,
+        unit_placement=engagement_placement,
         ruleset_descriptor=ruleset_descriptor,
     )
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Fall Back requires battlefield_state.")
-    state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(
-            fall_back_result.attempted_placement
-        ).with_removed_models(destroyed_model_ids)
-    )
+    attempted = fall_back_result.attempted_placement
+    if isinstance(attempted, UnitPlacement):
+        updated_battlefield = battlefield_state.with_unit_placement(attempted)
+    else:
+        updated_battlefield = battlefield_state
+        for component in attempted.component_unit_placements:
+            updated_battlefield = updated_battlefield.with_unit_placement(component)
+    state.replace_battlefield_state(updated_battlefield.with_removed_models(destroyed_model_ids))
     if destroyed_model_ids:
         destruction_source_id = _payload_string(
             destruction_source_payload,
@@ -253,7 +281,7 @@ def _apply_fall_back_result(
                 state=state,
                 player_id=active_player_id,
                 battle_round=state.battle_round,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 movement_request_id=result.request_id,
                 movement_result_id=result.result_id,
             )
@@ -262,7 +290,7 @@ def _apply_fall_back_result(
             FellBackUnitState(
                 player_id=active_player_id,
                 battle_round=state.battle_round,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
                 can_shoot=any(grant.can_shoot for grant in permission_grants),
                 can_declare_charge=any(grant.can_declare_charge for grant in permission_grants),
@@ -276,7 +304,7 @@ def _apply_fall_back_result(
                     "battle_round": state.battle_round,
                     "active_player_id": active_player_id,
                     "phase": BattlePhase.MOVEMENT.value,
-                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "unit_instance_id": movement_unit_id,
                     "request_id": result.request_id,
                     "result_id": result.result_id,
                     "grants": [
@@ -325,11 +353,11 @@ def _request_embark_after_move_or_complete_activation(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Movement activation completion requires battlefield_state.")
-    if active_selection.unit_instance_id not in {
-        placement.unit_instance_id
-        for army in battlefield_state.placed_armies
-        for placement in army.unit_placements
-    }:
+    reconciliation = reconcile_rules_unit_identity(
+        state=state,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    if reconciliation.placed_surviving_unit_instance_ids != (active_selection.unit_instance_id,):
         _complete_movement_activation(
             state=state,
             decisions=decisions,
@@ -420,8 +448,6 @@ def _complete_activation_then_request_post_normal_disembark_if_available(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
 ) -> LifecycleStatus | None:
-    active_selection = _active_movement_selection(state)
-    transport_unit_instance_id = active_selection.unit_instance_id
     _complete_movement_activation(
         state=state,
         decisions=decisions,
@@ -432,17 +458,7 @@ def _complete_activation_then_request_post_normal_disembark_if_available(
         displacement_kind=displacement_kind,
         transition_batch=transition_batch,
     )
-    if action is not MovementPhaseActionKind.NORMAL_MOVE:
-        return None
-    movement_state = state.movement_phase_state
-    if movement_state is None:
-        raise GameLifecycleError("Post-move Disembark requires movement_phase_state.")
-    return _request_post_normal_move_disembark_if_available(
-        state=state,
-        decisions=decisions,
-        movement_state=movement_state,
-        transport_unit_instance_id=transport_unit_instance_id,
-    )
+    return None
 
 
 def _post_move_embark_options(
@@ -452,7 +468,27 @@ def _post_move_embark_options(
     movement_phase_action: TransportMovementStatus,
 ) -> tuple[DecisionOption, ...]:
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        representative_movement_placement,
+        rules_unit_placement_for_movement,
+    )
+
+    rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    )
+    placed_model_ids = set(scenario.battlefield_state.placed_model_ids())
+    if any(
+        model.is_alive and model.model_instance_id not in placed_model_ids
+        for model in rules_unit.own_models
+    ):
+        return ()
+    _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
+    unit_placement = representative_movement_placement(rules_unit_placement)
     options: list[DecisionOption] = []
     for cargo_state in state.transport_cargo_states:
         if cargo_state.player_id != unit_placement.player_id:
@@ -521,7 +557,6 @@ def _apply_embark_transport_selection_decision(
     if transport_decision == DECLINE_EMBARK_OPTION_ID:
         if _payload_string(payload, key="unit_instance_id") != active_selection.unit_instance_id:
             raise GameLifecycleError("Embark decline unit drift.")
-        declined_unit_id = active_selection.unit_instance_id
         _complete_movement_activation_with_record_ids(
             state=state,
             decisions=decisions,
@@ -546,17 +581,7 @@ def _apply_embark_transport_selection_decision(
                 "phase_body_status": "embark_declined",
             },
         )
-        if action is not MovementPhaseActionKind.NORMAL_MOVE:
-            return None
-        movement_state = state.movement_phase_state
-        if movement_state is None:
-            raise GameLifecycleError("Post-move Disembark requires movement_phase_state.")
-        return _request_post_normal_move_disembark_if_available(
-            state=state,
-            decisions=decisions,
-            movement_state=movement_state,
-            transport_unit_instance_id=declined_unit_id,
-        )
+        return None
     if transport_decision != "embark_unit":
         raise GameLifecycleError("Unsupported Embark selection payload.")
     selection = EmbarkSelection.from_payload(
@@ -581,13 +606,21 @@ def _apply_embark_transport_selection_decision(
     if cargo_state is None:
         raise GameLifecycleError("Embark requires TransportCargoState.")
     scenario = _battlefield_scenario(state)
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        representative_movement_placement,
+        rules_unit_placement_for_movement,
+    )
+
+    _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
     resolution = resolve_embark(
         scenario=scenario,
         cargo_state=cargo_state,
         selection=selection,
-        unit_placement=scenario.battlefield_state.unit_placement_by_id(
-            active_selection.unit_instance_id
-        ),
+        unit_placement=representative_movement_placement(rules_unit_placement),
         transport_placement=scenario.battlefield_state.unit_placement_by_id(
             selection.transport_unit_instance_id
         ),
@@ -859,11 +892,10 @@ def _interrupt_started_mission_actions_for_movement_activation(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         return
-    active_unit_on_battlefield = active_selection.unit_instance_id in {
-        placement.unit_instance_id
-        for army in battlefield_state.placed_armies
-        for placement in army.unit_placements
-    }
+    active_unit_on_battlefield = reconcile_rules_unit_identity(
+        state=state,
+        unit_instance_id=active_selection.unit_instance_id,
+    ).placed_surviving_unit_instance_ids == (active_selection.unit_instance_id,)
     for action_state in tuple(state.mission_action_states):
         if not _mission_action_state_is_active_for_unit(
             action_state=action_state,

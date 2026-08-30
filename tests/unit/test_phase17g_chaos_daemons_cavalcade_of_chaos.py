@@ -143,11 +143,9 @@ from warhammer40k_core.engine.phases.charge import (
     ChargePhaseHandler,
 )
 from warhammer40k_core.engine.phases.movement import (
-    COMPLETE_REINFORCEMENTS_OPTION_ID,
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
     DesperateEscapeRequirementReason,
     FallBackModeKind,
     MovementPhaseActionKind,
@@ -552,13 +550,31 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
             dx=1.0,
         ),
     )
-    reinforcement_request = decision_request(movement_status)
-    assert reinforcement_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+    reserve_selection_request = decision_request(movement_status)
+    assert reserve_selection_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     movement_status = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase17g-from-veil-complete-normal-reinforcements",
-            request=reinforcement_request,
-            selected_option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
+            result_id="phase17g-from-veil-select-reserve-unit",
+            request=reserve_selection_request,
+            selected_option_id=reserve_state.unit_instance_id,
+        )
+    )
+    movement_status = _decline_stratagem_window_if_present(
+        lifecycle,
+        movement_status,
+        result_id="phase17g-from-veil-decline-reserve-warp-riders",
+    )
+    reserve_action_request = decision_request(movement_status)
+    assert reserve_action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert {option.option_id for option in reserve_action_request.options} == {
+        MovementPhaseActionKind.INGRESS.value,
+        MovementPhaseActionKind.REMAIN_STATIONARY.value,
+    }
+    movement_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-from-veil-complete-reserve-activation",
+            request=reserve_action_request,
+            selected_option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
         )
     )
     movement_status = _decline_stratagem_target_proposal_if_present(

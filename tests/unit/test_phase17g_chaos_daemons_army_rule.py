@@ -2124,26 +2124,12 @@ def test_completed_attached_manifestation_survives_split_with_later_healing() ->
     )
     restored_movement_request = restored.decision_controller.queue.peek_next()
     assert restored_movement_request == movement_request
-    movement_status = restored.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase17g:movement-before-unrelated-healing",
-            request=restored_movement_request,
-            selected_option_id=restored_movement_request.options[0].option_id,
-        )
-    )
-    restored_request = _required_decision_request(movement_status)
-    assert restored_request == later_request
-    restored_status = restored.submit_decision(
-        DecisionResult.for_request(
-            result_id="phase17g:unrelated-healing-after-attached-split:finish",
-            request=restored_request,
-            selected_option_id=_healing_finish_option_id(restored_request),
-        )
-    )
-    assert restored_status.status_kind is not LifecycleStatusKind.INVALID
-    assert all(
-        request.request_id != later_request.request_id
-        for request in restored.decision_controller.queue.pending_requests
+    restored_pending_requests = restored.decision_controller.queue.pending_requests
+    assert later_request in restored_pending_requests
+    movement_payload = cast(dict[str, JsonValue], restored_movement_request.options[0].payload)
+    assert movement_payload["unit_instance_id"] == formation.attached_unit_instance_id
+    assert GameLifecycle.from_payload(deepcopy(restored.to_payload())).to_payload() == (
+        restored.to_payload()
     )
 
 

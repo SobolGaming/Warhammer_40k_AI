@@ -16,7 +16,9 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.movement_model import (
-    SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    MovementPhaseActionKind,
+    MovementUnitLocationKind,
 )
 from warhammer40k_core.engine.primary_historical_events import reserve_entry_evidence_payload
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
@@ -59,6 +61,9 @@ from warhammer40k_core.engine.stratagems_selection import (
 )
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.rules.rule_ir import RuleIRError
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_movement_phase_2026_08,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -529,22 +534,24 @@ def _validate_ordinary_arrival_selection_chain(
         "game_id": proposal_request.game_id,
         "battle_round": proposal_request.battle_round,
         "phase": proposal_request.phase,
-        "step": "move_units",
         "active_player_id": expected_owner_id,
+        "unit_instance_id": proposal_request.unit_instance_id,
+        "source_rule_id": core_movement_phase_2026_08.MOVE_UNITS_STEP_SOURCE_ID,
     }
     expected_result_payload: dict[str, JsonValue] = {
-        "reinforcement_decision": "select_arrival",
+        "movement_phase_action": MovementPhaseActionKind.INGRESS.value,
         "unit_instance_id": proposal_request.unit_instance_id,
+        "unit_location": MovementUnitLocationKind.STRATEGIC_RESERVES.value,
         "reserve_kind": reserve_state.reserve_kind.value,
         "reserve_origin": reserve_state.reserve_origin.value,
     }
     if (
-        source.request.decision_type != SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
-        or source.result.decision_type != SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
+        source.request.decision_type != SELECT_MOVEMENT_ACTION_DECISION_TYPE
+        or source.result.decision_type != SELECT_MOVEMENT_ACTION_DECISION_TYPE
         or source.request.actor_id != expected_owner_id
         or source.result.actor_id != expected_owner_id
         or source.request.payload != expected_request_payload
-        or source.result.selected_option_id != proposal_request.unit_instance_id
+        or source.result.selected_option_id != MovementPhaseActionKind.INGRESS.value
         or source.result.payload != expected_result_payload
     ):
         raise GameLifecycleError("Reserve arrival reinforcement selection authority drift.")
@@ -569,6 +576,7 @@ def _validate_ordinary_arrival_selection_chain(
         "unit_instance_id": proposal_request.unit_instance_id,
         "request_id": source.result.request_id,
         "result_id": source.result.result_id,
+        "selected_move_type": MovementPhaseActionKind.INGRESS.value,
         "phase_body_status": "reinforcement_unit_selected",
     }
     terminal_events = tuple(

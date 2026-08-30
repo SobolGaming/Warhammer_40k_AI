@@ -707,6 +707,53 @@ status = submit_option(
 
 Adapter helper APIs should take `request_id` explicitly even when a local wrapper can infer the current pending request. Explicit request IDs let network, replay, and UI adapters fail fast on stale-client drift before constructing a `DecisionRecord`.
 
+P09A makes Move Units one finite unit/action loop. Every currently unselected
+friendly rules unit on the battlefield, embarked in a Transport, or in
+Strategic Reserves is selected through `select_movement_unit`. Its engine-owned
+option payload carries `unit_location`, the complete model IDs, and, for an
+embarked unit, `transport_unit_instance_id`. It also carries the complete
+ordered `component_unit_instance_ids`; an attached formation appears exactly
+once under its canonical synthetic rules-unit ID, never once per physical
+component. The selected unit then receives
+one `select_movement_action` request: battlefield units use the ordinary
+Remain Stationary, Normal Move, Advance, and Fall Back space; embarked units
+may choose Remain Stationary or Disembark; reserve units may choose Remain
+Stationary or Ingress, while a required arrival exposes only Ingress. Adapters
+must select the exact pending unit and action option IDs and must not infer a
+separate reserve or Transport sub-step. The retired
+`select_reinforcement_unit`, `complete_reinforcements`,
+`select_disembark_unit`, and `complete_disembarks` finite surfaces are not
+registered adapter decisions. Both request families carry the stable
+`source_rule_id: "gw-11e-core-rules:movement-phase:move-units-step"`; adapters
+preserve it as engine-authored audit context and do not use it to mutate state.
+
+Normal Move, Advance, Fall Back, and Remain Stationary retain that canonical
+identity through validation, state, completion events, replay, and adapter
+projection. For an attached rules unit, one movement proposal witness covers
+every alive placed model in every component. The engine validates paths and
+endpoint coherency across the complete flattened group and applies every
+component endpoint atomically or none; adapters must not submit a component
+alias or split one attached activation into component actions.
+
+Disembark and Ingress actions emit the existing typed
+`submit_placement_proposal` request. Accepted Rapid Disembark and Ingress
+placements complete the selected unit activation. An attached rules unit uses
+one `attempted_rules_unit_placement` containing every component and alive model
+for either action. Accepted Tactical Disembark keeps that same unit active but
+does not expose its follow-up action until the exact emitted `unit_disembarked`
+occurrence has closed all registered setup/move-completed hooks. Any nested
+target or Feel No Pain request serializes that occurrence-bound continuation.
+Only after those requests resolve does the engine return to
+`select_movement_action` for the required Normal Move or Advance; if the setup
+effect destroys or otherwise invalidates the disembarking rules unit, the
+engine completes that canonical activation without emitting a stale action.
+Malformed, stale, wrong-location, wrong-Transport, wrong-reserve-state, and
+wrong-action submissions reject through the shared lifecycle validation path
+before engine mutation. These unit locations and actions are public battlefield
+state in the current rules scope, so the existing public request, record,
+event, projection, and event-delta visibility applies symmetrically to both
+players.
+
 Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. Remain Stationary resolves as a finite action. Normal Move, Advance, and Fall Back always emit a follow-up `submit_movement_proposal` request carrying the same mode context; adapters must submit the actual `PathWitness` and model poses through that parameterized request.
 
 When source-backed runtime content lets the selected unit ignore any or all
@@ -1519,7 +1566,7 @@ decision type or proposal field is introduced.
 
 Adapters must not synthesize these timing windows, `effect_selection` keys, charge-move reachable-target snapshots, model Toughness rolls, Fights First effects, Precision effects, or mortal-wound applications. They select pending options or submit the pending proposal shape, and the engine owns validation and mutation.
 
-Phase 14H updates Transport Disembark decisions to expose the source-backed `disembark_mode` on every pending `select_disembark_unit`, `submit_placement_proposal`, Disembark selection payload, Disembarked unit state, destroyed-Transport disembark payload, and `unit_disembarked` event. Valid mode tokens are `rapid_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`. Adapters must submit the pending mode token unchanged unless the pending placement proposal context exposes an explicit `allowed_disembark_modes` list containing the submitted token; stale, malformed, omitted, or wrong-mode finite and parameterized submissions reject before authoritative mutation. Tactical and Rapid Disembark placement is always submitted through `submit_placement_proposal`; adapters must not infer or synthesize model placement from finite option payloads. `rapid_disembark` is used for post-Normal/Ingress Transport movement and records no further movement or charge permission. `tactical_disembark` is used for pre-move stationary/not-yet-selected Transports, forbids choosing Remain Stationary afterward, and routes the unit back through the shared Movement action decision path. When a pre-move Tactical placement proposal advertises both `tactical_disembark` and `combat_disembark` in `allowed_disembark_modes`, a submitted Combat placement is accepted only after the engine first evaluates the same submitted placement as Tactical and records deterministic Tactical-invalid fallback evidence; if that Tactical placement is legal, the Combat submission is rejected and the placement request is re-emitted. `destroyed_transport` and `emergency_disembark` are replay/domain modes for the corresponding source-backed destroyed-Transport rule paths and must not be inferred locally from placement distance; the engine emits the required placement proposal from the actual destruction event before Transport removal and Deadly Demise resolution, and lifecycle submission routes the accepted placement back through the owning attack sequence. `combat_disembark` has a dedicated domain resolver for 6" placement, official 1-2 Hazard Rolls, shared mortal-wound/Feel No Pain routing, Battle-shock, no-charge state, and the narrow permission to set up engaged only with enemy units engaged with the Transport.
+Phase 14H updates Transport Disembark decisions to expose the source-backed `disembark_mode` on every pending Disembark `select_movement_action`, `submit_placement_proposal`, Disembark selection payload, Disembarked unit state, destroyed-Transport disembark payload, and `unit_disembarked` event. Valid mode tokens are `rapid_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`. Adapters must submit the pending mode token unchanged unless the pending placement proposal context exposes an explicit `allowed_disembark_modes` list containing the submitted token; stale, malformed, omitted, or wrong-mode finite and parameterized submissions reject before authoritative mutation. Tactical and Rapid Disembark placement is always submitted through `submit_placement_proposal`; adapters must not infer or synthesize model placement from finite option payloads. `rapid_disembark` is used after a Transport's Normal/Ingress movement and records no further movement or charge permission. `tactical_disembark` is used when the Transport has not moved, forbids choosing Remain Stationary afterward, and keeps the unit in the shared Movement action decision path after the exact `unit_disembarked` setup-hook occurrence closes. When a Tactical placement proposal advertises both `tactical_disembark` and `combat_disembark` in `allowed_disembark_modes`, a submitted Combat placement is accepted only after the engine first evaluates the same submitted placement as Tactical and records deterministic Tactical-invalid fallback evidence; if that Tactical placement is legal, the Combat submission is rejected and the placement request is re-emitted. `destroyed_transport` and `emergency_disembark` are replay/domain modes for the corresponding source-backed destroyed-Transport rule paths and must not be inferred locally from placement distance; the engine emits the required placement proposal from the actual destruction event before Transport removal and Deadly Demise resolution, and lifecycle submission routes the accepted placement back through the owning attack sequence. `combat_disembark` has a dedicated domain resolver for 6" placement, official 1-2 Hazard Rolls, shared mortal-wound/Feel No Pain routing, Battle-shock, no-charge state, and the narrow permission to set up engaged only with enemy units engaged with the Transport. Attached passengers use one canonical grouped resolver: all component placements, cargo transitions, per-model Hazard Rolls, damage allocation, activation completion, and serialized FNP continuation succeed atomically under the attached rules-unit ID or none do.
 
 Phase 14H Healing Wounds effects use the finite `select_healing_model` decision when the next one-wound healing step has multiple legal targets. The engine iterates each healing amount separately: wounded models are healed before any revival; if the unit is below Starting Strength and every alive model is at full wounds, one destroyed removed model becomes the next revival candidate; if the unit is at Starting Strength and full wounds, the step records no effect. Ambiguous wounded-model choices and ambiguous destroyed-model revival choices default to the opposing player, but source-backed effects may set `selection_actor_player_id` when the source rule gives the choice to another player; Necrons Reanimation Protocols uses the owning Necrons player. Option IDs are emitted by the engine, and model-option payloads include `submission_kind: "select_healing_model"`, `selection_kind` (`heal_wound` or `revive_model`), `effect_id`, `target_unit_instance_id`, `step_index`, the selected `model_instance_id`, `legal_model_ids`, and source rule/context. A source-backed optional revival may also set `allow_revival_finish: true`; the engine then emits `select_healing_model` even for one candidate and adds a deterministic `selection_kind: "finish"` option with `model_instance_id: null` before the first revival and after every completed revival while legal candidates remain. Selecting it records a replay-safe terminal healing step without returning another model. The request payload embeds the serialized `HealingEffect`, including `selection_actor_player_id` when present. Adapters select one pending option ID and do not invent model IDs, early-completion state, or wound mutations from local state.
 
@@ -3082,7 +3129,7 @@ arrival.
 
 The request's `placement_kinds` field enumerates the legal physical placement methods available for that unit and state. The submitted payload must match the pending request.
 
-Reserve-arrival requests identify the canonical rules unit and carry deterministic `component_unit_instance_ids` and `model_instance_ids` in their source context. A non-attached unit may use `attempted_placement`. An attached rules unit must instead use `attempted_rules_unit_placement`, containing the canonical `rules_unit_instance_id` and exactly one complete `UnitPlacement` for every physical component. The two attempted-placement fields are mutually exclusive. The engine rejects component or model drift before queue pop and validates battlefield legality and coherency across the flattened rules unit before adding any component.
+Reserve-arrival and Disembark requests identify the canonical rules unit and carry deterministic `component_unit_instance_ids` and `model_instance_ids` in their source context. A non-attached unit may use `attempted_placement`. An attached rules unit must instead use `attempted_rules_unit_placement`, containing the canonical `rules_unit_instance_id` and exactly one complete `UnitPlacement` for every physical component. The two attempted-placement fields are mutually exclusive. The engine rejects component or model drift before queue pop and validates battlefield legality and coherency across the flattened rules unit before adding any component.
 
 Example Strategic Reserves submission shape:
 
