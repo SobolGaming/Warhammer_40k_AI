@@ -538,8 +538,8 @@ PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/4
 
 ### P09A — C09-01
 
-Status: Implementation and all required validation are complete on the P09A branch; PR publication
-is in progress.
+Status: Implementation and all required validation are complete; PR #408 is published and pending
+review and merge.
 
 Finding IDs: `C09-01`.
 
@@ -667,7 +667,8 @@ Validation results:
   This host has no `npm` executable, so the equivalent repository-pinned scripts and local binaries
   were invoked directly with Node `26.1.0`, which satisfies the declared Node `>=24` requirement.
 
-PR URL and merge commit: PR URL assigned on publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/408`;
+merge commit pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
