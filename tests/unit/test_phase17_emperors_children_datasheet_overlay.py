@@ -18,6 +18,7 @@ from tests.setup_completion_helpers import (
     record_existing_primary_turn_start_evidence_events_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
 )
+from tests.support.catalog_runtime_fixtures import set_current_model_wounds
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -946,6 +947,12 @@ def test_post_shoot_pending_decision_after_target_set_change_replays() -> None:
     )
     battlefield = state.battlefield_state
     assert battlefield is not None
+    for model_instance_id in target_a.own_model_ids():
+        set_current_model_wounds(
+            state,
+            model_instance_id=model_instance_id,
+            wounds_remaining=0,
+        )
     state.replace_battlefield_state(battlefield.with_removed_models(target_a.own_model_ids()))
 
     assert runtime.post_shoot_hit_target_request(context) is not None

@@ -108,9 +108,21 @@ def _apply_movement_proposal_decision(
     if proposal_request.unit_instance_id != movement_state.active_selection.unit_instance_id:
         raise GameLifecycleError("Movement proposal unit must match active selection.")
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(
-        proposal_request.unit_instance_id
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        replace_rules_unit_placement,
+        representative_movement_placement,
+        resolve_rules_unit_advance_move,
+        resolve_rules_unit_fall_back_move,
+        resolve_rules_unit_normal_move,
+        rules_unit_placement_for_movement,
     )
+
+    rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=proposal_request.unit_instance_id,
+    )
+    unit_placement = representative_movement_placement(rules_unit_placement)
     action = movement_phase_action_kind_from_token(submission.movement_phase_action)
     source_selected_option_id = _payload_string(
         proposal_request.context or {},
@@ -121,13 +133,14 @@ def _apply_movement_proposal_decision(
             submission=submission,
             action=action,
         )
-        resolution = resolve_normal_move(
+        resolution = resolve_rules_unit_normal_move(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=unit_placement,
-            state=state,
+            rules_unit=rules_unit,
+            before=rules_unit_placement,
+            witness=submission.witness,
             movement_mode=movement_mode,
-            path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
             movement_bonus_inches=_movement_bonus_inches_for_unit(
@@ -183,12 +196,12 @@ def _apply_movement_proposal_decision(
                 message=_normal_move_invalid_message(_normal_move_violation_code(resolution)),
                 proposal_request=proposal_request,
             )
-        transition_batch = resolution.transition_batch(before=unit_placement)
-        battlefield_state = state.battlefield_state
-        if battlefield_state is None:
-            raise GameLifecycleError("Normal Move proposal requires battlefield_state.")
-        state.replace_battlefield_state(
-            battlefield_state.with_unit_placement(resolution.attempted_placement)
+        transition_batch = resolution.transition_batch(before=rules_unit_placement)
+        if type(resolution.attempted_placement) is not RulesUnitPlacement:
+            raise GameLifecycleError("Normal Move rules-unit resolution lost grouped placement.")
+        replace_rules_unit_placement(
+            state=state,
+            placement=resolution.attempted_placement,
         )
         return _request_embark_after_move_or_complete_activation(
             state=state,
@@ -226,14 +239,15 @@ def _apply_movement_proposal_decision(
         advance_roll = AdvanceRollResult.from_payload(
             cast(AdvanceRollResultPayload, advance_roll_payload)
         )
-        advance_resolution = resolve_advance_move(
+        advance_resolution = resolve_rules_unit_advance_move(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=unit_placement,
-            state=state,
+            rules_unit=rules_unit,
+            before=rules_unit_placement,
+            witness=submission.witness,
             advance_roll=advance_roll,
             movement_mode=movement_mode,
-            path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
             movement_bonus_inches=_movement_bonus_inches_for_unit(
@@ -270,17 +284,17 @@ def _apply_movement_proposal_decision(
                 ),
                 proposal_request=proposal_request,
             )
-        transition_batch = advance_resolution.transition_batch(before=unit_placement)
-        battlefield_state = state.battlefield_state
-        if battlefield_state is None:
-            raise GameLifecycleError("Advance proposal requires battlefield_state.")
-        state.replace_battlefield_state(
-            battlefield_state.with_unit_placement(advance_resolution.attempted_placement)
+        transition_batch = advance_resolution.transition_batch(before=rules_unit_placement)
+        if type(advance_resolution.attempted_placement) is not RulesUnitPlacement:
+            raise GameLifecycleError("Advance rules-unit resolution lost grouped placement.")
+        replace_rules_unit_placement(
+            state=state,
+            placement=advance_resolution.attempted_placement,
         )
         movement_dice_record = MovementDiceRecord(
             player_id=active_player_id,
             battle_round=state.battle_round,
-            unit_instance_id=unit_placement.unit_instance_id,
+            unit_instance_id=proposal_request.unit_instance_id,
             movement_phase_action=MovementPhaseActionKind.ADVANCE,
             advance_roll=advance_roll,
         )
@@ -289,7 +303,7 @@ def _apply_movement_proposal_decision(
                 state=state,
                 player_id=active_player_id,
                 battle_round=state.battle_round,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=proposal_request.unit_instance_id,
                 movement_request_id=proposal_request.request_id,
                 movement_result_id=result.result_id,
             )
@@ -298,7 +312,7 @@ def _apply_movement_proposal_decision(
             AdvancedUnitState(
                 player_id=active_player_id,
                 battle_round=state.battle_round,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=proposal_request.unit_instance_id,
                 movement_dice_record=movement_dice_record,
                 can_shoot=any(grant.can_shoot for grant in permission_grants),
                 can_declare_charge=any(grant.can_declare_charge for grant in permission_grants),
@@ -312,7 +326,7 @@ def _apply_movement_proposal_decision(
                     "battle_round": state.battle_round,
                     "active_player_id": active_player_id,
                     "phase": BattlePhase.MOVEMENT.value,
-                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "unit_instance_id": proposal_request.unit_instance_id,
                     "request_id": proposal_request.request_id,
                     "result_id": result.result_id,
                     "grants": [
@@ -325,7 +339,7 @@ def _apply_movement_proposal_decision(
             decisions=decisions,
             registry=advance_move_hooks,
             player_id=active_player_id,
-            unit_instance_id=unit_placement.unit_instance_id,
+            unit_instance_id=proposal_request.unit_instance_id,
             proposal_request=proposal_request,
             proposal_result=result,
         )
@@ -389,13 +403,14 @@ def _apply_movement_proposal_decision(
             != forced_desperate_escape_source_rule_ids
         ):
             raise GameLifecycleError("Forced Desperate Escape source payload IDs drift.")
-        fall_back_resolution = resolve_fall_back_move(
+        fall_back_resolution = resolve_rules_unit_fall_back_move(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=unit_placement,
-            state=state,
+            rules_unit=rules_unit,
+            before=rules_unit_placement,
+            witness=submission.witness,
             movement_mode=movement_mode,
-            path_witness=submission.witness,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             forced_desperate_escape_source_rule_ids=forced_desperate_escape_source_rule_ids,
@@ -503,7 +518,7 @@ def _apply_movement_proposal_decision(
             decisions=decisions,
             fall_back_result=fall_back_result,
             action_result=action_result,
-            unit_placement=unit_placement,
+            unit_placement=rules_unit_placement,
             movement_proposal_request_id=proposal_request.request_id,
             ruleset_descriptor=ruleset_descriptor,
             reaction_queue=reaction_queue,
@@ -576,8 +591,14 @@ def _apply_forced_desperate_escape_battle_shock_reroll_decision(
     )
     action_result = DecisionResult.from_payload(cast(DecisionResultPayload, action_result_payload))
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(
-        fall_back_result.unit_instance_id
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        rules_unit_placement_for_movement,
+    )
+
+    _rules_unit, unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=fall_back_result.unit_instance_id,
     )
     return _continue_forced_desperate_escape_fall_back(
         state=state,
@@ -599,7 +620,7 @@ def _continue_forced_desperate_escape_fall_back(
     decisions: DecisionController,
     fall_back_result: FallBackActionResult,
     action_result: DecisionResult,
-    unit_placement: UnitPlacement,
+    unit_placement: UnitPlacement | RulesUnitPlacement,
     movement_proposal_request_id: str,
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
@@ -793,8 +814,6 @@ def _apply_advance_roll_reroll_decision(
         request=advance_request,
         roll_state=rerolled_state,
     )
-    scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
     movement_mode = _movement_mode_from_payload(
         payload=context_payload,
         action=MovementPhaseActionKind.ADVANCE,
@@ -816,7 +835,7 @@ def _apply_advance_roll_reroll_decision(
         decisions=decisions,
         result=action_result,
         ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
+        unit_instance_id=unit_instance_id,
         advance_roll=advance_roll,
         movement_mode=movement_mode,
         selected_advance_move_grants=_advance_move_grants_from_context(context_payload),
@@ -831,7 +850,7 @@ def _resolve_and_apply_advance_move(
     decisions: DecisionController,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
-    unit_placement: UnitPlacement,
+    unit_instance_id: str,
     advance_roll: AdvanceRollResult,
     movement_mode: MovementMode,
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
@@ -847,7 +866,7 @@ def _resolve_and_apply_advance_move(
         state=state,
         decisions=decisions,
         result=result,
-        unit_instance_id=unit_placement.unit_instance_id,
+        unit_instance_id=unit_instance_id,
         action=MovementPhaseActionKind.ADVANCE,
         proposal_kind=ProposalKind.ADVANCE,
         context={

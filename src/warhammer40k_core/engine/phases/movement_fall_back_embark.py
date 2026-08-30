@@ -98,7 +98,15 @@ def _apply_desperate_escape_model_selection_decision(
         )
     )
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        rules_unit_placement_for_movement,
+    )
+
+    _rules_unit, unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
     action_result = DecisionResult(
         result_id=_payload_string(context_payload, key="action_result_id"),
         request_id=_payload_string(context_payload, key="action_request_id"),
@@ -131,7 +139,7 @@ def _apply_fall_back_result(
     decisions: DecisionController,
     result: DecisionResult,
     destruction_source_result_id: str | None,
-    unit_placement: UnitPlacement,
+    unit_placement: UnitPlacement | RulesUnitPlacement,
     fall_back_result: FallBackActionResult,
     destroyed_model_ids: tuple[str, ...],
     ruleset_descriptor: RulesetDescriptor,
@@ -141,6 +149,13 @@ def _apply_fall_back_result(
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
+    movement_unit_id = (
+        unit_placement.unit_instance_id
+        if isinstance(unit_placement, UnitPlacement)
+        else unit_placement.rules_unit_instance_id
+    )
+    if movement_unit_id != fall_back_result.unit_instance_id:
+        raise GameLifecycleError("Fall Back rules-unit identity drift.")
     destruction_source_payload: dict[str, JsonValue] = {}
     if destroyed_model_ids:
         if destruction_source_result_id is None:
@@ -159,17 +174,22 @@ def _apply_fall_back_result(
         destroyed_model_ids=destroyed_model_ids,
     )
     if surviving_placement is not None:
-        survivor_coherency_result = unit_placement_coherency_result(
+        from warhammer40k_core.engine.phases.movement_rules_units import (
+            rules_unit_placement_coherency_result,
+        )
+
+        survivor_coherency_result = rules_unit_placement_coherency_result(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=surviving_placement,
+            placement=surviving_placement,
+            rules_unit_instance_id=movement_unit_id,
         )
         if not survivor_coherency_result.is_coherent:
             violation_code = "unit_coherency_broken"
             invalid_payload = _movement_action_invalid_payload(
                 state=state,
                 active_player_id=active_player_id,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 action=MovementPhaseActionKind.FALL_BACK,
                 result=result,
                 violation_code=violation_code,
@@ -191,7 +211,7 @@ def _apply_fall_back_result(
                     "phase_body_status": "movement_action_invalid",
                     "battle_round": state.battle_round,
                     "active_player_id": active_player_id,
-                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "unit_instance_id": movement_unit_id,
                     "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
                     "violation_code": violation_code,
                 },
@@ -200,19 +220,27 @@ def _apply_fall_back_result(
         before=unit_placement,
         destroyed_model_ids=destroyed_model_ids,
     )
+    engagement_placement = (
+        unit_placement
+        if isinstance(unit_placement, UnitPlacement)
+        else unit_placement.component_unit_placements[0]
+    )
     start_engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
         scenario=scenario,
-        unit_placement=unit_placement,
+        unit_placement=engagement_placement,
         ruleset_descriptor=ruleset_descriptor,
     )
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Fall Back requires battlefield_state.")
-    state.replace_battlefield_state(
-        battlefield_state.with_unit_placement(
-            fall_back_result.attempted_placement
-        ).with_removed_models(destroyed_model_ids)
-    )
+    attempted = fall_back_result.attempted_placement
+    if isinstance(attempted, UnitPlacement):
+        updated_battlefield = battlefield_state.with_unit_placement(attempted)
+    else:
+        updated_battlefield = battlefield_state
+        for component in attempted.component_unit_placements:
+            updated_battlefield = updated_battlefield.with_unit_placement(component)
+    state.replace_battlefield_state(updated_battlefield.with_removed_models(destroyed_model_ids))
     if destroyed_model_ids:
         destruction_source_id = _payload_string(
             destruction_source_payload,
@@ -253,7 +281,7 @@ def _apply_fall_back_result(
                 state=state,
                 player_id=active_player_id,
                 battle_round=state.battle_round,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 movement_request_id=result.request_id,
                 movement_result_id=result.result_id,
             )
@@ -262,7 +290,7 @@ def _apply_fall_back_result(
             FellBackUnitState(
                 player_id=active_player_id,
                 battle_round=state.battle_round,
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 desperate_escape_rolls=fall_back_result.desperate_escape_rolls,
                 can_shoot=any(grant.can_shoot for grant in permission_grants),
                 can_declare_charge=any(grant.can_declare_charge for grant in permission_grants),
@@ -276,7 +304,7 @@ def _apply_fall_back_result(
                     "battle_round": state.battle_round,
                     "active_player_id": active_player_id,
                     "phase": BattlePhase.MOVEMENT.value,
-                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "unit_instance_id": movement_unit_id,
                     "request_id": result.request_id,
                     "result_id": result.result_id,
                     "grants": [
@@ -325,11 +353,11 @@ def _request_embark_after_move_or_complete_activation(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Movement activation completion requires battlefield_state.")
-    if active_selection.unit_instance_id not in {
-        placement.unit_instance_id
-        for army in battlefield_state.placed_armies
-        for placement in army.unit_placements
-    }:
+    reconciliation = reconcile_rules_unit_identity(
+        state=state,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    if reconciliation.placed_surviving_unit_instance_ids != (active_selection.unit_instance_id,):
         _complete_movement_activation(
             state=state,
             decisions=decisions,
@@ -440,7 +468,27 @@ def _post_move_embark_options(
     movement_phase_action: TransportMovementStatus,
 ) -> tuple[DecisionOption, ...]:
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        representative_movement_placement,
+        rules_unit_placement_for_movement,
+    )
+
+    rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    )
+    placed_model_ids = set(scenario.battlefield_state.placed_model_ids())
+    if any(
+        model.is_alive and model.model_instance_id not in placed_model_ids
+        for model in rules_unit.own_models
+    ):
+        return ()
+    _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
+    unit_placement = representative_movement_placement(rules_unit_placement)
     options: list[DecisionOption] = []
     for cargo_state in state.transport_cargo_states:
         if cargo_state.player_id != unit_placement.player_id:
@@ -558,13 +606,21 @@ def _apply_embark_transport_selection_decision(
     if cargo_state is None:
         raise GameLifecycleError("Embark requires TransportCargoState.")
     scenario = _battlefield_scenario(state)
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        representative_movement_placement,
+        rules_unit_placement_for_movement,
+    )
+
+    _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
     resolution = resolve_embark(
         scenario=scenario,
         cargo_state=cargo_state,
         selection=selection,
-        unit_placement=scenario.battlefield_state.unit_placement_by_id(
-            active_selection.unit_instance_id
-        ),
+        unit_placement=representative_movement_placement(rules_unit_placement),
         transport_placement=scenario.battlefield_state.unit_placement_by_id(
             selection.transport_unit_instance_id
         ),
@@ -836,11 +892,10 @@ def _interrupt_started_mission_actions_for_movement_activation(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         return
-    active_unit_on_battlefield = active_selection.unit_instance_id in {
-        placement.unit_instance_id
-        for army in battlefield_state.placed_armies
-        for placement in army.unit_placements
-    }
+    active_unit_on_battlefield = reconcile_rules_unit_identity(
+        state=state,
+        unit_instance_id=active_selection.unit_instance_id,
+    ).placed_surviving_unit_instance_ids == (active_selection.unit_instance_id,)
     for action_state in tuple(state.mission_action_states):
         if not _mission_action_state_is_active_for_unit(
             action_state=action_state,

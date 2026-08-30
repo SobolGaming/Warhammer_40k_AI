@@ -55,9 +55,18 @@ def _disembark_candidate_for_movement_unit(
     if cargo_state is None or cargo_state.player_id != movement_state.active_player_id:
         return None
     active_cargo = cargo_state.for_movement_phase(battle_round=state.battle_round)
-    if not active_cargo.contains_unit(unit_id):
+    rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_id,
+    )
+    if rules_unit.unit_instance_id != unit_id:
+        raise GameLifecycleError("Disembark candidate requires canonical rules-unit identity.")
+    component_ids = rules_unit.component_unit_instance_ids
+    if not all(active_cargo.contains_unit(component_id) for component_id in component_ids):
         return None
-    if not active_cargo.unit_started_phase_embarked(unit_id):
+    if not all(
+        active_cargo.unit_started_phase_embarked(component_id) for component_id in component_ids
+    ):
         return None
     if (
         state.disembarked_unit_state_for_unit(
@@ -133,6 +142,12 @@ def _request_disembark_placement(
     selection: DisembarkCandidate,
     ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus:
+    rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=selection.unit_instance_id,
+    )
+    if rules_unit.unit_instance_id != selection.unit_instance_id:
+        raise GameLifecycleError("Disembark request requires canonical rules-unit identity.")
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
         decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -148,6 +163,10 @@ def _request_disembark_placement(
         placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
         context={
             "transport_unit_instance_id": selection.transport_unit_instance_id,
+            "component_unit_instance_ids": list(rules_unit.component_unit_instance_ids),
+            "model_instance_ids": validate_json_value(
+                sorted(model.model_instance_id for model in rules_unit.alive_models())
+            ),
             "disembark_mode": selection.disembark_mode.value,
             "allowed_disembark_modes": list(
                 _allowed_disembark_modes_for_placement_request(selection)
@@ -211,7 +230,7 @@ def _resolve_disembark_placement_submission(
     ruleset_descriptor: RulesetDescriptor,
     unit_instance_id: str,
     transport_unit_instance_id: str,
-    attempted_placement: UnitPlacement,
+    attempted_placement: RulesUnitPlacement,
     disembark_mode: DisembarkModeKind,
     transport_movement_status: TransportMovementStatus,
     restriction_overrides: tuple[TransportRestrictionOverride, ...],
@@ -220,7 +239,18 @@ def _resolve_disembark_placement_submission(
     active_player_id = _active_player_id(state)
     if result.actor_id != active_player_id:
         raise GameLifecycleError("Disembark placement actor must be the active player.")
-    selection = DisembarkSelection(
+    from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+        RulesUnitDisembarkSelection,
+        apply_rules_unit_combat_disembark_to_state,
+        resolve_rules_unit_combat_disembark,
+        resolve_rules_unit_disembark,
+    )
+
+    rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    )
+    selection = RulesUnitDisembarkSelection(
         player_id=active_player_id,
         battle_round=state.battle_round,
         unit_instance_id=unit_instance_id,
@@ -238,22 +268,90 @@ def _resolve_disembark_placement_submission(
         transport_unit_instance_id
     )
     if disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
-        return _resolve_combat_disembark_placement_submission(
-            state=state,
-            result=result,
-            decisions=decisions,
-            ruleset_descriptor=ruleset_descriptor,
-            selection=selection,
+        dice_manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
+        combat_result = resolve_rules_unit_combat_disembark(
             cargo_state=cargo_state,
             scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            selection=selection,
+            rules_unit=rules_unit,
             transport_placement=transport_placement,
+            dice_manager=dice_manager,
+            objective_markers=_objective_markers_for_state(state),
         )
-    resolution = resolve_disembark(
+        if combat_result.tactical_resolution.is_valid:
+            invalid_payload = _transport_operation_invalid_payload(
+                state=state,
+                active_player_id=active_player_id,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id=transport_unit_instance_id,
+                result=result,
+                phase_body_status="combat_disembark_tactical_available",
+                violations=(
+                    TransportOperationViolation(
+                        violation_code=(
+                            TransportOperationViolationCode.COMBAT_DISEMBARK_TACTICAL_AVAILABLE
+                        ),
+                        message=(
+                            "Combat Disembark requires engine-owned evidence that the submitted "
+                            "rules-unit placement is not legal as Tactical Disembark."
+                        ),
+                        unit_instance_id=unit_instance_id,
+                        blocker_id=transport_unit_instance_id,
+                    ),
+                ),
+            )
+            decisions.event_log.append("combat_disembark_tactical_available", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Combat Disembark requires Tactical-impossible evidence.",
+                payload=invalid_payload,
+            )
+        if not combat_result.placement.is_valid:
+            invalid_payload = _transport_operation_invalid_payload(
+                state=state,
+                active_player_id=active_player_id,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id=transport_unit_instance_id,
+                result=result,
+                phase_body_status="combat_disembark_placement_invalid",
+                violations=combat_result.placement.violations,
+            )
+            decisions.event_log.append("combat_disembark_placement_invalid", invalid_payload)
+            return LifecycleStatus.invalid(
+                stage=GameLifecycleStage.BATTLE,
+                message="Combat Disembark placement is invalid.",
+                payload=invalid_payload,
+            )
+        pending_request = apply_rules_unit_combat_disembark_to_state(
+            state=state,
+            decisions=decisions,
+            combat_disembark=combat_result,
+            result=result,
+            dice_manager=dice_manager,
+        )
+        if pending_request is not None:
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=pending_request,
+                payload={
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "unit_instance_id": unit_instance_id,
+                    "transport_unit_instance_id": transport_unit_instance_id,
+                    "disembark_mode": disembark_mode.value,
+                    "decision_type": pending_request.decision_type,
+                    "phase_body_status": "transport_hazard_feel_no_pain_required",
+                },
+            )
+        return None
+    resolution = resolve_rules_unit_disembark(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         cargo_state=cargo_state,
         selection=selection,
-        unit=_unit_instance_by_id(state=state, unit_instance_id=unit_instance_id),
+        rules_unit=rules_unit,
         transport_placement=transport_placement,
         objective_markers=_objective_markers_for_state(state),
     )

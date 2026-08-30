@@ -76,13 +76,24 @@ def _movement_action_options_for_selected_unit(
     )
     if candidate.location is MovementUnitLocationKind.BATTLEFIELD:
         scenario = _battlefield_scenario(state)
-        unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+        from warhammer40k_core.engine.phases.movement_rules_units import (
+            representative_movement_placement,
+            rules_unit_placement_for_movement,
+        )
+
+        _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+            state=state,
+            scenario=scenario,
+            unit_instance_id=unit_instance_id,
+        )
+        unit_placement = representative_movement_placement(rules_unit_placement)
         return _movement_action_options(
             state=state,
             ability_index=ability_index,
             runtime_modifier_registry=runtime_modifier_registry,
             scenario=scenario,
             unit_placement=unit_placement,
+            rules_unit_placement=rules_unit_placement,
             ruleset_descriptor=ruleset_descriptor,
             normal_move_already_made=_unit_already_made_normal_move_this_phase(
                 state=state,
@@ -341,9 +352,17 @@ def _apply_movement_action_decision(  # noqa: RET503
         raise GameLifecycleError("Movement action requires a battlefield unit.")
 
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(
-        active_selection.unit_instance_id
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        representative_movement_placement,
+        rules_unit_placement_for_movement,
     )
+
+    _rules_unit, rules_unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=active_selection.unit_instance_id,
+    )
+    unit_placement = representative_movement_placement(rules_unit_placement)
     availability_result = _movement_action_availability_result(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -416,7 +435,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         movement_grant_status = _request_advance_move_grant_decision_if_available(
             state=state,
             decisions=decisions,
-            unit_placement=unit_placement,
+            unit_placement=rules_unit_placement,
             pending_action=pending_action,
             registry=advance_move_hooks,
             ruleset_descriptor=ruleset_descriptor,
@@ -455,7 +474,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         advance_grant_status = _request_advance_move_grant_decision_if_available(
             state=state,
             decisions=decisions,
-            unit_placement=unit_placement,
+            unit_placement=rules_unit_placement,
             pending_action=pending_action,
             registry=advance_move_hooks,
             ruleset_descriptor=ruleset_descriptor,
@@ -475,7 +494,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             decisions=decisions,
             pending_action=pending_action,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=unit_placement,
+            unit_placement=rules_unit_placement,
             selected_advance_move_grants=(),
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
@@ -533,7 +552,7 @@ def _apply_movement_action_decision(  # noqa: RET503
         movement_grant_status = _request_advance_move_grant_decision_if_available(
             state=state,
             decisions=decisions,
-            unit_placement=unit_placement,
+            unit_placement=rules_unit_placement,
             pending_action=pending_action,
             registry=advance_move_hooks,
             ruleset_descriptor=ruleset_descriptor,
@@ -560,7 +579,7 @@ def _request_advance_move_grant_decision_if_available(
     *,
     state: GameState,
     decisions: DecisionController,
-    unit_placement: UnitPlacement,
+    unit_placement: RulesUnitPlacement,
     pending_action: PendingMovementActionSelection,
     registry: AdvanceMoveHookRegistry,
     ruleset_descriptor: RulesetDescriptor,
@@ -578,7 +597,7 @@ def _request_advance_move_grant_decision_if_available(
             state=state,
             player_id=pending_action.player_id,
             battle_round=state.battle_round,
-            unit_instance_id=unit_placement.unit_instance_id,
+            unit_instance_id=unit_placement.rules_unit_instance_id,
             movement_phase_action=pending_action.movement_phase_action.value,
             movement_request_id=pending_action.request_id,
             movement_result_id=pending_action.result_id,
@@ -610,7 +629,7 @@ def _request_advance_move_grant_decision_if_available(
                 "battle_round": state.battle_round,
                 "active_player_id": pending_action.player_id,
                 "phase": BattlePhase.MOVEMENT.value,
-                "unit_instance_id": unit_placement.unit_instance_id,
+                "unit_instance_id": unit_placement.rules_unit_instance_id,
                 "movement_phase_action": pending_action.movement_phase_action.value,
                 "source_decision_request_id": pending_action.request_id,
                 "source_decision_result_id": pending_action.result_id,
@@ -643,7 +662,7 @@ def _request_advance_move_grant_decision_if_available(
             "battle_round": state.battle_round,
             "phase": BattlePhase.MOVEMENT.value,
             "active_player_id": pending_action.player_id,
-            "unit_instance_id": unit_placement.unit_instance_id,
+            "unit_instance_id": unit_placement.rules_unit_instance_id,
             "movement_phase_action": pending_action.movement_phase_action.value,
             "movement_mode": pending_action.movement_mode.value,
             "source_decision_request_id": pending_action.request_id,
@@ -673,7 +692,7 @@ def _request_advance_move_grant_decision_if_available(
             "battle_round": state.battle_round,
             "active_player_id": pending_action.player_id,
             "phase": BattlePhase.MOVEMENT.value,
-            "unit_instance_id": unit_placement.unit_instance_id,
+            "unit_instance_id": unit_placement.rules_unit_instance_id,
             "movement_phase_action": pending_action.movement_phase_action.value,
             "request_id": request.request_id,
             "source_decision_request_id": pending_action.request_id,
@@ -690,7 +709,7 @@ def _request_advance_move_grant_decision_if_available(
             "phase_body_status": "movement_action_grant_decision_pending",
             "battle_round": state.battle_round,
             "active_player_id": pending_action.player_id,
-            "unit_instance_id": unit_placement.unit_instance_id,
+            "unit_instance_id": unit_placement.rules_unit_instance_id,
         },
     )
 
@@ -855,8 +874,14 @@ def _apply_advance_move_grant_decision(
     )
 
     scenario = _battlefield_scenario(state)
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(
-        pending_action.unit_instance_id
+    from warhammer40k_core.engine.phases.movement_rules_units import (
+        rules_unit_placement_for_movement,
+    )
+
+    _rules_unit, unit_placement = rules_unit_placement_for_movement(
+        state=state,
+        scenario=scenario,
+        unit_instance_id=pending_action.unit_instance_id,
     )
     return _resolve_pending_movement_action_after_grants(
         state=state,
@@ -1065,7 +1090,7 @@ def _resolve_pending_movement_action_after_grants(
     decisions: DecisionController,
     pending_action: PendingMovementActionSelection,
     ruleset_descriptor: RulesetDescriptor,
-    unit_placement: UnitPlacement,
+    unit_placement: RulesUnitPlacement,
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
@@ -1133,7 +1158,7 @@ def _resolve_pending_advance_action(
     decisions: DecisionController,
     pending_action: PendingMovementActionSelection,
     ruleset_descriptor: RulesetDescriptor,
-    unit_placement: UnitPlacement,
+    unit_placement: RulesUnitPlacement,
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
@@ -1143,12 +1168,9 @@ def _resolve_pending_advance_action(
     if pending_action.movement_phase_action is not MovementPhaseActionKind.ADVANCE:
         raise GameLifecycleError("Pending Advance resolution requires an Advance action.")
     action_result = pending_action.to_decision_result()
-    scenario = _battlefield_scenario(state)
-    unit = scenario.unit_instance_for_placement(unit_placement)
     advance_roll_request = _advance_roll_request_for_action(
         state=state,
-        unit=unit,
-        unit_placement=unit_placement,
+        rules_unit_placement=unit_placement,
         action_result=action_result,
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
@@ -1186,7 +1208,7 @@ def _resolve_pending_advance_action(
             decisions=decisions,
             result=action_result,
             ruleset_descriptor=ruleset_descriptor,
-            unit_placement=unit_placement,
+            unit_instance_id=unit_placement.rules_unit_instance_id,
             advance_roll=AdvanceRollResult.from_roll_state(
                 request=advance_roll_request,
                 roll_state=fixed_state,
@@ -1232,7 +1254,7 @@ def _resolve_pending_advance_action(
         decisions=decisions,
         result=action_result,
         ruleset_descriptor=ruleset_descriptor,
-        unit_placement=unit_placement,
+        unit_instance_id=unit_placement.rules_unit_instance_id,
         advance_roll=advance_roll,
         movement_mode=pending_action.movement_mode,
         selected_advance_move_grants=selected_advance_move_grants,

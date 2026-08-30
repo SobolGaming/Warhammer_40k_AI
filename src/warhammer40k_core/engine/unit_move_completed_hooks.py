@@ -480,6 +480,7 @@ def resolve_unit_move_completed_mortal_wound_hooks(
     event_type: str,
     movement_actions: tuple[str, ...],
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = MappingProxyType({}),
+    trigger_event_id: str | None = None,
 ) -> LifecycleStatus | None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Unit move completed hooks require a DecisionController.")
@@ -494,17 +495,24 @@ def resolve_unit_move_completed_mortal_wound_hooks(
     phase = _battle_phase_from_token(completed_phase)
     requested_event_type = _validate_identifier("event_type", event_type)
     requested_actions = _validate_identifier_tuple("movement_actions", movement_actions)
+    requested_trigger_event_id = (
+        None
+        if trigger_event_id is None
+        else _validate_identifier("trigger_event_id", trigger_event_id)
+    )
     ability_indexes = _validate_ability_index_mapping(ability_indexes_by_player_id)
-    if not registry.all_bindings():
-        return None
-    processed_effect_keys = _processed_effect_keys(decisions)
-    for event_id, payload in _unprocessed_move_completion_events(
+    events = _unprocessed_move_completion_events(
         state=state,
         decisions=decisions,
         completed_phase=phase,
         event_type=requested_event_type,
         movement_actions=requested_actions,
-    ):
+        trigger_event_id=requested_trigger_event_id,
+    )
+    if not registry.all_bindings():
+        return None
+    processed_effect_keys = _processed_effect_keys(decisions)
+    for event_id, payload in events:
         triggering_unit_id = _payload_string(payload, "unit_instance_id")
         triggering_player_id = _payload_string(payload, "active_player_id")
         movement_action = _movement_action_from_payload(
@@ -1013,9 +1021,17 @@ def _unprocessed_move_completion_events(
     completed_phase: BattlePhase,
     event_type: str,
     movement_actions: tuple[str, ...],
+    trigger_event_id: str | None = None,
 ) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
+    requested_event_id = (
+        None
+        if trigger_event_id is None
+        else _validate_identifier("trigger_event_id", trigger_event_id)
+    )
     events: list[tuple[str, dict[str, JsonValue]]] = []
     for record in decisions.event_log.records:
+        if requested_event_id is not None and record.event_id != requested_event_id:
+            continue
         if record.event_type != event_type:
             continue
         payload = record.payload
@@ -1030,6 +1046,10 @@ def _unprocessed_move_completion_events(
         if _movement_action_from_payload(payload, event_type=event_type) not in movement_actions:
             continue
         events.append((record.event_id, payload))
+    if requested_event_id is not None and not events:
+        raise GameLifecycleError(
+            "Move-completed hook trigger occurrence is missing or has drifted context."
+        )
     return tuple(events)
 
 

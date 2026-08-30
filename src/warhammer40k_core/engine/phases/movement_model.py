@@ -188,6 +188,7 @@ class MovementPhaseStatePayload(TypedDict):
     movement_distance_records: NotRequired[list[MovementDistanceRecordPayload]]
     active_selection: MovementUnitSelectionPayload | None
     pending_action: PendingMovementActionSelectionPayload | None
+    pending_setup_event_id: NotRequired[str | None]
 
 
 class MovementActionAvailabilityContextPayload(TypedDict):
@@ -275,7 +276,8 @@ class FellBackUnitStatePayload(TypedDict):
 
 class FallBackActionResultPayload(TypedDict):
     unit_instance_id: str
-    attempted_placement: UnitPlacementPayload
+    attempted_placement: NotRequired[UnitPlacementPayload]
+    attempted_rules_unit_placement: NotRequired[RulesUnitPlacementPayload]
     witness: PathWitnessPayload
     desperate_escape_requirements: list[DesperateEscapeRequirementPayload]
     desperate_escape_rolls: list[DesperateEscapeRollPayload]

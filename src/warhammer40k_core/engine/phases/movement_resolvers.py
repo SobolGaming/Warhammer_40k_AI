@@ -69,7 +69,13 @@ def resolve_normal_move(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
+    rules_unit_instance_id: str | None = None,
 ) -> NormalMoveResolution:
+    resolved_unit_id = (
+        unit_placement.unit_instance_id
+        if rules_unit_instance_id is None
+        else _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
+    )
     resolved = _resolve_unit_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -94,6 +100,7 @@ def resolve_normal_move(
         runtime_modifier_registry=runtime_modifier_registry,
         ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
+        rules_unit_instance_id=resolved_unit_id,
     )
     return NormalMoveResolution(
         unit_instance_id=unit_placement.unit_instance_id,
@@ -124,9 +131,15 @@ def resolve_advance_move(
     ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
     ignores_vertical_distance: bool = False,
+    rules_unit_instance_id: str | None = None,
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
         raise GameLifecycleError("Advance requires an AdvanceRollResult.")
+    resolved_unit_id = (
+        unit_placement.unit_instance_id
+        if rules_unit_instance_id is None
+        else _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
+    )
     resolved = _resolve_unit_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -152,6 +165,7 @@ def resolve_advance_move(
         ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
         ignores_vertical_distance=ignores_vertical_distance,
+        rules_unit_instance_id=resolved_unit_id,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -188,7 +202,13 @@ def resolve_fall_back_move(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
+    rules_unit_instance_id: str | None = None,
 ) -> FallBackActionResult:
+    resolved_unit_id = (
+        unit_placement.unit_instance_id
+        if rules_unit_instance_id is None
+        else _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
+    )
     forced_source_ids = _validate_identifier_tuple(
         "forced_desperate_escape_source_rule_ids",
         forced_desperate_escape_source_rule_ids,
@@ -227,6 +247,7 @@ def resolve_fall_back_move(
         runtime_modifier_registry=runtime_modifier_registry,
         ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
+        rules_unit_instance_id=resolved_unit_id,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
@@ -283,6 +304,7 @@ def _resolve_unit_move(
     ability_index: AbilityCatalogIndex | None,
     temporary_movement_keywords: tuple[str, ...],
     ignores_vertical_distance: bool = False,
+    rules_unit_instance_id: str | None = None,
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError(f"{action_label} requires a BattlefieldScenario.")
@@ -304,11 +326,14 @@ def _resolve_unit_move(
         f"{action_label} objective_markers",
         objective_markers,
     )
+    movement_unit_id = (
+        unit_placement.unit_instance_id
+        if rules_unit_instance_id is None
+        else _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
+    )
     unit = scenario.unit_instance_for_placement(unit_placement)
     unit_persisting_effects = (
-        tuple(state.persisting_effects_for_unit(unit_placement.unit_instance_id))
-        if state is not None
-        else ()
+        tuple(state.persisting_effects_for_unit(movement_unit_id)) if state is not None else ()
     )
     hover_mode_state = _hover_mode_state_for_unit(
         hover_mode_states=hover_mode_states,
@@ -364,7 +389,7 @@ def _resolve_unit_move(
             model=model,
             aircraft_policy=aircraft_policy,
             state=state,
-            unit_instance_id=unit_placement.unit_instance_id,
+            unit_instance_id=movement_unit_id,
             model_instance_id=placement.model_instance_id,
             runtime_modifier_registry=runtime_modifier_registry,
         )
@@ -373,7 +398,7 @@ def _resolve_unit_move(
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
             state=state,
-            unit_instance_id=unit_placement.unit_instance_id,
+            unit_instance_id=movement_unit_id,
             model_instance_id=placement.model_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
@@ -385,7 +410,7 @@ def _resolve_unit_move(
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
             state=state,
-            unit_instance_id=unit_placement.unit_instance_id,
+            unit_instance_id=movement_unit_id,
             model_instance_id=placement.model_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,

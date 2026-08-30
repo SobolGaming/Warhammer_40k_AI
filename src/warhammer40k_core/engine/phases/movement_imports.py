@@ -188,10 +188,15 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
-from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.engine.rules_unit_placement import (
+    RulesUnitPlacement,
+    RulesUnitPlacementPayload,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
+    reconcile_rules_unit_identity,
     rules_unit_display_name,
+    rules_unit_identity_history_contains,
     rules_unit_view_from_armies,
     rules_unit_views_from_armies,
 )
@@ -434,7 +439,10 @@ __all__ = (
     "ReserveKind",
     "ReserveState",
     "RulesUnitPlacement",
+    "RulesUnitPlacementPayload",
     "RulesUnitView",
+    "reconcile_rules_unit_identity",
+    "rules_unit_identity_history_contains",
     "rules_unit_display_name",
     "rules_unit_view_from_armies",
     "rules_unit_views_from_armies",

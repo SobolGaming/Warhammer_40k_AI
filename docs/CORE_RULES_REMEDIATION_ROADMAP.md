@@ -568,19 +568,33 @@ paths made the legal order diverge from 09.02 and exposed four retired finite to
 Implementation: `MovementPhaseHandler` now derives one deterministic candidate set from the
 authoritative `GameState`, canonical rules-unit identity, battlefield placement, `ReserveState`,
 and Transport cargo state. Every `select_movement_unit` option carries the exact unit location,
-physical model IDs, and Transport ID when embarked. The subsequent `select_movement_action`
+complete component and physical model IDs, and Transport ID when embarked. An attached formation
+is enumerated exactly once under its synthetic canonical rules-unit ID; component aliases are not
+independent Move Units candidates. The subsequent `select_movement_action`
 request derives actions from that same revalidated candidate: battlefield actions use the existing
 movement resolvers, embarked units may Remain Stationary or Disembark when source-backed Transport
 state permits it, and Strategic Reserve units may Remain Stationary or Ingress subject to their
 arrival eligibility and requirement. Required arrivals expose only Ingress. Invalid, stale,
 ambiguous-location, and unaccounted-model states fail closed before mutation.
 
+Normal Move, Advance, Fall Back, and Remain Stationary preserve that canonical identity across
+action selection, grouped path/coherency validation, mutation, completion records, lifecycle state,
+replay, and adapter projection. One attached-unit witness contains every alive placed model across
+all physical components, and the engine applies all component endpoints atomically or none. Embark,
+Disembark, and reserve arrival likewise consume the complete canonical group and reject partial
+cargo, placement, component, or model inventories.
+
 An accepted ordinary Ingress action opens the existing typed placement proposal and completes that
 unit only after valid engine-owned placement. Rapid and Combat Disembark complete the passenger's
-activation after typed placement. Tactical Disembark preserves the same active selection and
-immediately offers only its legal Normal Move or Advance continuation before any other unit can be
-selected. Transport movement no longer injects a separate passenger selector; eligible passengers
-remain ordinary candidates in the unified loop. The retired split decision types, option IDs,
+activation after typed placement; attached Combat Disembark performs every component placement and
+Hazard Roll as one grouped operation and routes mortal wounds and nested Feel No Pain under the
+canonical attached identity. Tactical Disembark preserves the same active selection and binds the
+exact emitted `unit_disembarked` event ID as a setup boundary. The engine closes all registered
+move-completed/setup hooks for that occurrence, including serialized target and Feel No Pain
+continuations, before offering the legal Normal Move or Advance continuation. If those effects
+destroy or invalidate the disembarking rules unit, its canonical activation completes without a
+stale follow-up action. Transport movement no longer injects a separate passenger selector;
+eligible passengers remain ordinary candidates in the unified loop. The retired split decision types, option IDs,
 dispatch registrations, interaction metadata, and dead selection helpers are removed rather than
 retained as compatibility shims.
 
@@ -600,7 +614,7 @@ the authoritative mirror observation SHA-256 is
 `a881b7623692015b3c92772f7fd508da782f832a225a922226735c9ed3e8fbc9`. The generated package hash
 is `199be38f35856eddfb6f72395ffff7448f48be1b099db784788a8b64f0e97058`, its canonical artifact-byte
 SHA-256 is `d55ccf8fa6f77cd06553be34153ed137b8d5c438dd8a454ff092c8333efcc2ee`, and the final engine build
-ID is `warhammer40k-core-v2:runtime-tree-sha256-v1:1fd70b76de22cc41b11fb23106b7de2ca3ed831d25a6637703654af93e2f9ff0`.
+ID is `warhammer40k-core-v2:runtime-tree-sha256-v1:a7dc8b89dafbf12969b40bdfc5889649807e785d608902271830c363ecbc2cc4`.
 
 Load and execution support: The generated rule row and both evidence rows are `loaded`; the rule
 and authoritative mirror row are `executable_engine_runtime`. The reviewed transcription remains
@@ -646,6 +660,13 @@ static code-quality audit proves the four retired tokens are absent from engine 
 and interaction metadata. The bug-class search also updated every test helper and affected faction
 scenario that drove the old split selectors.
 
+PR #408 review remediation additionally covers one-option attached-unit enumeration; grouped
+Remain Stationary, Normal Move, Advance, Fall Back, cross-component coherency, partial-cargo
+rejection, Embark, Tactical/Combat Disembark, Strategic Reserve arrival, two-viewer adapter replay,
+and grouped Hazard/FNP serialization. The real Swooping Hawks Grenade Pack catalog hook proves the
+exact `unit_disembarked` occurrence resolves its target and FNP decisions before the follow-up move;
+a destruction regression proves no stale movement action survives that setup boundary.
+
 Generated artifacts/documentation: P09A adds the typed fail-closed movement source package and
 offline builder, updates the 40k.app audit inventory, engine build manifest, Contract 11.1.0 live
 decision schema and generated fixtures/manifest, `ARCHITECTURE_V2.md`,
@@ -654,18 +675,19 @@ decision schema and generated fixtures/manifest, `ARCHITECTURE_V2.md`,
 Validation results:
 
 - Every required `AGENTS.md` gate passes: Ruff check, Ruff format check, mypy, Pyright, the
-  coverage-enabled xdist work-stealing suite (`6298 passed`), four-shard inventory, import-linter,
+  coverage-enabled xdist work-stealing suite (`6311 passed`), four-shard inventory, import-linter,
   and all-files pre-commit.
+- The PR #408 review-focused Fall Back, reserve, Transport, Swooping Hawks, and adapter suite passes
+  (`243 passed`).
 - Unified movement/reserve/Transport and retired-surface regressions pass (`151 passed`); corrected
   faction/replay scenarios pass (`17 passed`); source identity and generated artifact checks pass
   (`99 passed`).
 - The movement source builder, 40k.app audit, engine-build check, external-contract exact
-  `--base-ref origin/main` check, installed-wheel smoke (`2456` resources and `27` schemas), and
+  `--base-ref origin/main` check, installed-wheel smoke (`2458` resources and `27` schemas), and
   generated ability-support audit (`19 passed`) all pass.
 - The repository-pinned TypeScript generated-client, type, and unit checks pass (`5` unit tests),
   and the certified HTTP conformance scenario passes all `342` assertions on Contract `11.1.0`.
-  This host has no `npm` executable, so the equivalent repository-pinned scripts and local binaries
-  were invoked directly with Node `26.1.0`, which satisfies the declared Node `>=24` requirement.
+  The repository-pinned scripts were invoked through `npm.cmd` with the bundled Node runtime.
 
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/408`;
 merge commit pending review and merge.

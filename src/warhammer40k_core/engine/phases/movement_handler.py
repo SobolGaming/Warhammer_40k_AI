@@ -161,6 +161,68 @@ class MovementPhaseHandler:
         _ensure_transport_cargo_phase_states(state)
         active_selection = movement_state.active_selection
         if active_selection is not None:
+            if movement_state.pending_setup_event_id is not None:
+                setup_status = resolve_unit_move_completed_mortal_wound_hooks(
+                    state=state,
+                    decisions=decisions,
+                    registry=self.unit_move_completed_mortal_wound_hooks,
+                    ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                    completed_phase=BattlePhase.MOVEMENT,
+                    event_type="unit_disembarked",
+                    movement_actions=("set_up",),
+                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+                    trigger_event_id=movement_state.pending_setup_event_id,
+                )
+                if setup_status is not None:
+                    return setup_status
+                state.replace_movement_phase_state(movement_state.without_pending_setup_event())
+                reconciliation = reconcile_rules_unit_identity(
+                    state=state,
+                    unit_instance_id=active_selection.unit_instance_id,
+                )
+                if reconciliation.placed_surviving_unit_instance_ids != (
+                    active_selection.unit_instance_id,
+                ):
+                    trigger_event = next(
+                        record
+                        for record in decisions.event_log.records
+                        if record.event_id == movement_state.pending_setup_event_id
+                    )
+                    if not isinstance(trigger_event.payload, dict):
+                        raise GameLifecycleError(
+                            "Tactical Disembark trigger event payload must be an object."
+                        )
+                    _complete_movement_activation_with_record_ids(
+                        state=state,
+                        decisions=decisions,
+                        request_id=_payload_string(trigger_event.payload, key="request_id"),
+                        result_id=_payload_string(trigger_event.payload, key="result_id"),
+                        action=MovementPhaseActionKind.DISEMBARK,
+                        witness=None,
+                        movement_payload={
+                            "movement_inches": 0,
+                            "model_movements": [],
+                            "setup_boundary_event_id": trigger_event.event_id,
+                            "rules_unit_identity_reconciliation": validate_json_value(
+                                reconciliation.to_payload()
+                            ),
+                        },
+                    )
+                    return self.begin_phase(
+                        state=state,
+                        decisions=decisions,
+                        reaction_queue=reaction_queue,
+                    )
+                current_movement_state = state.movement_phase_state
+                if (
+                    current_movement_state is None
+                    or current_movement_state.active_selection is None
+                ):
+                    raise GameLifecycleError(
+                        "Tactical Disembark setup boundary lost active selection."
+                    )
+                movement_state = current_movement_state
             if movement_state.pending_action is not None:
                 from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
                     request_catalog_movement_target_pair_start_if_available,

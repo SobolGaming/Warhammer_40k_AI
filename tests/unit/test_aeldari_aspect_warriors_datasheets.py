@@ -25,7 +25,11 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
@@ -63,12 +67,13 @@ from warhammer40k_core.engine.catalog_unit_move_completed_mortal_wounds_runtime 
     CatalogUnitMoveCompletedMortalWoundsRuntime,
     apply_catalog_unit_move_completed_mortal_wounds_target_result,
 )
+from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -77,13 +82,24 @@ from warhammer40k_core.engine.movement_phase_end_mortal_wounds import (
     MOVEMENT_PHASE_END_MORTAL_WOUNDS_ROLLED_EVENT,
     resolve_movement_phase_end_mortal_wounds,
 )
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalPayload,
+    MovementProposalRequest,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
 )
-from warhammer40k_core.engine.phases.movement import MovementPhaseHandler
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    MovementPhaseActionKind,
+    MovementPhaseHandler,
+    MovementPhaseState,
+    MovementUnitSelection,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -100,10 +116,12 @@ from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT,
     UnitMoveCompletedMortalWoundHookRegistry,
+    apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
     resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection, WargearSelection
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_ir import RuleIR
@@ -709,6 +727,237 @@ def test_grenade_pack_consumes_pre_and_post_move_disembark_as_setup(
     payload = cast(dict[str, Any], status.decision_request.payload)
     assert payload["movement_action"] == "set_up"
     assert payload["trigger_event_id"] == decisions.event_log.records[0].event_id
+
+
+def test_tactical_disembark_closes_actual_grenade_pack_boundary_before_follow_up_move() -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    decisions, registry = _grenade_pack_runtime(fixture)
+    trigger_event = decisions.event_log.append(
+        "unit_disembarked",
+        {
+            "game_id": fixture.state.game_id,
+            "battle_round": fixture.state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": "player-a",
+            "unit_instance_id": fixture.swooping_hawks.unit_instance_id,
+            "transport_unit_instance_id": "army-a:test-transport",
+            "transport_movement_status": "not_moved",
+            "request_id": "grenade-pack:disembark-request",
+            "result_id": "grenade-pack:disembark-result",
+        },
+    )
+    movement_state = MovementPhaseState(
+        battle_round=fixture.state.battle_round,
+        active_player_id="player-a",
+    ).with_unit_selection(
+        MovementUnitSelection(
+            player_id="player-a",
+            battle_round=fixture.state.battle_round,
+            unit_instance_id=fixture.swooping_hawks.unit_instance_id,
+            request_id="grenade-pack:select-unit-request",
+            result_id="grenade-pack:select-unit-result",
+        )
+    )
+    fixture.state.movement_phase_state = movement_state.with_pending_setup_event(
+        trigger_event.event_id
+    )
+    target_model = fixture.enemy_monster.own_models[0]
+    fixture.state.record_model_feel_no_pain_sources(
+        model_instance_id=target_model.model_instance_id,
+        sources=(FeelNoPainSource(source_id="grenade-pack:test-fnp", threshold=5),),
+        decline_allowed=True,
+    )
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        unit_move_completed_mortal_wound_hooks=registry,
+        ability_indexes_by_player_id=fixture.indexes,
+    )
+
+    target_status = handler.begin_phase(state=fixture.state, decisions=decisions)
+
+    assert target_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    target_request = target_status.decision_request
+    assert target_request is not None
+    assert target_request.decision_type != SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    target_option = next(
+        option for option in target_request.options if option.label != "Decline ability"
+    )
+    assert fixture.enemy_monster.unit_instance_id in target_option.label
+    assert fixture.enemy_infantry.unit_instance_id not in {
+        option.label for option in target_request.options
+    }
+    assert fixture.state.movement_phase_state is not None
+    assert fixture.state.movement_phase_state.pending_setup_event_id == trigger_event.event_id
+
+    hypothetical_state = GameState.from_payload(fixture.state.to_payload())
+    _move_unit(
+        hypothetical_state,
+        fixture.swooping_hawks.unit_instance_id,
+        x=45.0,
+        y=10.0,
+    )
+    hypothetical_decisions = DecisionController()
+    _record_move_completed_event(
+        hypothetical_state,
+        hypothetical_decisions,
+        event_type="unit_disembarked",
+        movement_action=None,
+        transport_movement_status="not_moved",
+    )
+    hypothetical_status = resolve_unit_move_completed_mortal_wound_hooks(
+        state=hypothetical_state,
+        decisions=hypothetical_decisions,
+        registry=registry,
+        ruleset_descriptor=hypothetical_state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.MOVEMENT,
+        event_type="unit_disembarked",
+        movement_actions=("set_up",),
+        ability_indexes_by_player_id=fixture.indexes,
+    )
+    assert hypothetical_status is not None
+    assert hypothetical_status.decision_request is not None
+    hypothetical_labels = {option.label for option in hypothetical_status.decision_request.options}
+    assert fixture.enemy_infantry.unit_instance_id in str(hypothetical_labels)
+    assert fixture.enemy_monster.unit_instance_id not in str(hypothetical_labels)
+
+    restored_state = GameState.from_payload(fixture.state.to_payload())
+    restored_decisions = DecisionController.from_payload(decisions.to_payload())
+    restored_target_request = restored_decisions.queue.peek_next()
+    assert restored_target_request.to_payload() == target_request.to_payload()
+    target_result = DecisionResult.for_request(
+        result_id="grenade-pack:boundary-target-result",
+        request=restored_target_request,
+        selected_option_id=target_option.option_id,
+    )
+    restored_decisions.submit_result(target_result)
+    assert (
+        apply_catalog_unit_move_completed_mortal_wounds_target_result(
+            state=restored_state,
+            decisions=restored_decisions,
+            result=target_result,
+            ruleset_descriptor=restored_state.runtime_ruleset_descriptor(),
+        )
+        is None
+    )
+
+    fnp_status = handler.begin_phase(state=restored_state, decisions=restored_decisions)
+
+    assert fnp_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    fnp_request = fnp_status.decision_request
+    assert fnp_request is not None
+    assert fnp_request.decision_type == "select_feel_no_pain"
+    assert restored_state.movement_phase_state is not None
+    assert restored_state.movement_phase_state.pending_setup_event_id == trigger_event.event_id
+    fnp_checkpoint_state = GameState.from_payload(restored_state.to_payload())
+    fnp_checkpoint_decisions = DecisionController.from_payload(restored_decisions.to_payload())
+    restored_fnp_request = fnp_checkpoint_decisions.queue.peek_next()
+    assert restored_fnp_request.to_payload() == fnp_request.to_payload()
+    fnp_result = DecisionResult.for_request(
+        result_id="grenade-pack:boundary-fnp-result",
+        request=restored_fnp_request,
+        selected_option_id="decline",
+    )
+    fnp_checkpoint_decisions.submit_result(fnp_result)
+    assert (
+        apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
+            state=fnp_checkpoint_state,
+            result=fnp_result,
+            decisions=fnp_checkpoint_decisions,
+        )
+        is None
+    )
+
+    action_status = handler.begin_phase(
+        state=fnp_checkpoint_state,
+        decisions=fnp_checkpoint_decisions,
+    )
+
+    assert action_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    action_request = action_status.decision_request
+    assert action_request is not None
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+    assert fnp_checkpoint_state.movement_phase_state is not None
+    assert fnp_checkpoint_state.movement_phase_state.pending_setup_event_id is None
+    action_result = DecisionResult.for_request(
+        result_id="grenade-pack:boundary-normal-action",
+        request=action_request,
+        selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+    )
+    fnp_checkpoint_decisions.submit_result(action_result)
+    proposal_status = handler.apply_decision(
+        state=fnp_checkpoint_state,
+        result=action_result,
+        decisions=fnp_checkpoint_decisions,
+    )
+    assert proposal_status is not None
+    proposal_request = proposal_status.decision_request
+    assert proposal_request is not None
+    assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    assert fnp_checkpoint_state.battlefield_state is not None
+    placement = fnp_checkpoint_state.battlefield_state.unit_placement_by_id(
+        fixture.swooping_hawks.unit_instance_id
+    )
+    witness = PathWitness.for_paths(
+        tuple(
+            (
+                model.model_instance_id,
+                (
+                    model.pose,
+                    Pose.at(
+                        model.pose.position.x + 0.125,
+                        model.pose.position.y,
+                        model.pose.position.z,
+                    ),
+                    Pose.at(
+                        model.pose.position.x + 0.25,
+                        model.pose.position.y,
+                        model.pose.position.z,
+                    ),
+                ),
+            )
+            for model in placement.model_placements
+        )
+    )
+    proposal_payload = MovementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=proposal.proposal_kind,
+        unit_instance_id=proposal.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+        witness=witness,
+        movement_mode=MovementMode.NORMAL.value,
+    ).to_payload()
+    proposal_result = DecisionResult(
+        result_id="grenade-pack:boundary-normal-proposal",
+        request_id=proposal_request.request_id,
+        decision_type=proposal_request.decision_type,
+        actor_id=proposal_request.actor_id,
+        selected_option_id="submit_parameterized_payload",
+        payload=validate_json_value(proposal_payload),
+    )
+    assert (
+        handler.invalid_proposal_submission_status(
+            state=fnp_checkpoint_state,
+            request=proposal_request,
+            result=proposal_result,
+            decisions=fnp_checkpoint_decisions,
+        )
+        is None
+    )
+    fnp_checkpoint_decisions.submit_result(proposal_result)
+    assert (
+        handler.apply_decision(
+            state=fnp_checkpoint_state,
+            result=proposal_result,
+            decisions=fnp_checkpoint_decisions,
+        )
+        is None
+    )
+    event_types = [event.event_type for event in fnp_checkpoint_decisions.event_log.records]
+    assert event_types.index(UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT) < (
+        event_types.index("movement_activation_completed")
+    )
 
 
 def test_grenade_pack_resolves_per_hawk_caps_damage_restricts_grenades_and_is_once_per_turn() -> (

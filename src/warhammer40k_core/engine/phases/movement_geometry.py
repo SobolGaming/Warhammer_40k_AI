@@ -673,6 +673,6 @@ def _normal_move_violation_code(
         if terrain_result.is_valid:
             continue
         return terrain_result.violations[0].violation_code
-    if resolution.rollback_record is not None:
+    if resolution.rollback_record is not None or not resolution.coherency_result.is_coherent:
         return "unit_coherency_broken"
     return "normal_move_invalid"

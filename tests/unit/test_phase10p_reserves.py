@@ -1388,7 +1388,7 @@ def test_attached_rules_unit_strategic_reserve_arrival_adds_every_component_atom
         armies=armies,
     ).battlefield_state
     battlefield = placed
-    for unit in (*alpha.units, *armies[1].units):
+    for unit in alpha.units:
         battlefield = battlefield.without_unit_placement(unit.unit_instance_id)
     scenario = BattlefieldScenario(armies=armies, battlefield_state=battlefield)
     reserve_state = ReserveState.declared_before_battle(
@@ -1404,6 +1404,34 @@ def test_attached_rules_unit_strategic_reserve_arrival_adds_every_component_atom
         state.record_army_definition(army)
     state.record_battlefield_state(battlefield)
     state.record_reserve_state(reserve_state)
+
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.battle_round = 3
+    state.active_player_id = alpha.player_id
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=3,
+        active_player_id=alpha.player_id,
+    )
+    decisions = DecisionController()
+    selection_request = _decision_request(
+        MovementPhaseHandler(ruleset_descriptor=_ruleset()).begin_phase(
+            state=state,
+            decisions=decisions,
+        )
+    )
+    assert tuple(option.option_id for option in selection_request.options) == (attached_id,)
+    selection_payload = cast(
+        dict[str, JsonValue],
+        selection_request.option_by_id(attached_id).payload,
+    )
+    assert selection_payload == {
+        "unit_instance_id": attached_id,
+        "component_unit_instance_ids": list(formation.component_unit_instance_ids),
+        "model_instance_ids": sorted((*bodyguard.own_model_ids(), *leader.own_model_ids())),
+        "unit_location": "strategic_reserves",
+    }
 
     assert state.reserve_state_for_unit(attached_id) == reserve_state
     assert state.reserve_state_for_unit(bodyguard.unit_instance_id) == reserve_state

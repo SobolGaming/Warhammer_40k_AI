@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+    RulesUnitDisembarkResolution,
+)
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
@@ -242,7 +245,7 @@ def _apply_placement_proposal_decision(
             ruleset_descriptor=ruleset_descriptor,
             unit_instance_id=submission.unit_instance_id,
             transport_unit_instance_id=submission.transport_unit_instance_id,
-            attempted_placement=submission.require_unit_placement(),
+            attempted_placement=submission.resolved_rules_unit_placement(),
             disembark_mode=submission.disembark_mode,
             transport_movement_status=submission.transport_movement_status,
             restriction_overrides=submission.restriction_overrides,
@@ -277,7 +280,7 @@ def _apply_valid_disembark(
     *,
     state: GameState,
     decisions: DecisionController,
-    disembark: DisembarkResolution,
+    disembark: DisembarkResolution | RulesUnitDisembarkResolution,
     result: DecisionResult,
 ) -> None:
     battlefield_state = state.battlefield_state
@@ -285,12 +288,21 @@ def _apply_valid_disembark(
         raise GameLifecycleError("Disembark placement requires battlefield_state.")
     if disembark.updated_cargo_state is None or disembark.disembarked_unit_state is None:
         raise GameLifecycleError("Valid DisembarkResolution requires state records.")
-    state.replace_battlefield_state(
-        apply_disembark_to_battlefield(
+    if isinstance(disembark, RulesUnitDisembarkResolution):
+        from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
+            apply_rules_unit_disembark_to_battlefield,
+        )
+
+        updated_battlefield = apply_rules_unit_disembark_to_battlefield(
             battlefield_state=battlefield_state,
             disembark=disembark,
         )
-    )
+    else:
+        updated_battlefield = apply_disembark_to_battlefield(
+            battlefield_state=battlefield_state,
+            disembark=disembark,
+        )
+    state.replace_battlefield_state(updated_battlefield)
     state.replace_transport_cargo_state(disembark.updated_cargo_state)
     state.record_disembarked_unit_state(disembark.disembarked_unit_state)
     movement_state = state.movement_phase_state
@@ -306,7 +318,7 @@ def _apply_valid_disembark(
                 maximum_model_horizontal_distance_inches=0.0,
             )
         )
-    decisions.event_log.append(
+    disembark_event = decisions.event_log.append(
         "unit_disembarked",
         {
             "game_id": state.game_id,
@@ -329,6 +341,13 @@ def _apply_valid_disembark(
             else None,
         },
     )
+    if disembark.selection.disembark_mode is DisembarkModeKind.TACTICAL_DISEMBARK:
+        current_movement_state = state.movement_phase_state
+        if current_movement_state is None or current_movement_state.active_selection is None:
+            raise GameLifecycleError("Tactical Disembark setup boundary lost active selection.")
+        state.replace_movement_phase_state(
+            current_movement_state.with_pending_setup_event(disembark_event.event_id)
+        )
 
 
 def _apply_valid_combat_disembark(

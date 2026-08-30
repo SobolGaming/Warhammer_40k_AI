@@ -198,7 +198,7 @@ def _validate_embark_departures(
             event_name="Embark mutation",
         )
         request_id = _required_string(payload, "request_id", event_name="Embark mutation")
-        if unit_id not in departure.component_unit_instance_ids:
+        if unit_id != departure.rules_unit_instance_id:
             raise GameLifecycleError("Primary EMBARK mutation selected-unit identity drift.")
         _validate_embark_transition(
             payload=payload.get("transition_batch"),

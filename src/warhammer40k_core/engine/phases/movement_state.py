@@ -46,6 +46,7 @@ class MovementPhaseState:
     movement_distance_records: tuple[MovementDistanceRecord, ...] = ()
     active_selection: MovementUnitSelection | None = None
     pending_action: PendingMovementActionSelection | None = None
+    pending_setup_event_id: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -149,6 +150,23 @@ class MovementPhaseState:
                 raise GameLifecycleError(
                     "MovementPhaseState pending_action must match active_selection."
                 )
+        if self.pending_setup_event_id is not None:
+            object.__setattr__(
+                self,
+                "pending_setup_event_id",
+                _validate_identifier(
+                    "MovementPhaseState pending_setup_event_id",
+                    self.pending_setup_event_id,
+                ),
+            )
+            if self.active_selection is None:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending setup event requires active_selection."
+                )
+            if self.pending_action is not None:
+                raise GameLifecycleError(
+                    "MovementPhaseState pending setup event cannot coexist with pending_action."
+                )
 
     def legal_unit_ids(
         self,
@@ -191,6 +209,7 @@ class MovementPhaseState:
             movement_distance_records=self.movement_distance_records,
             active_selection=selection,
             pending_action=None,
+            pending_setup_event_id=None,
         )
 
     def with_pending_action(self, pending_action: PendingMovementActionSelection) -> Self:
@@ -208,6 +227,8 @@ class MovementPhaseState:
             raise GameLifecycleError("Movement pending action battle_round drift.")
         if pending_action.unit_instance_id != self.active_selection.unit_instance_id:
             raise GameLifecycleError("Movement pending action unit drift.")
+        if self.pending_setup_event_id is not None:
+            raise GameLifecycleError("Movement pending action requires setup boundary completion.")
         return type(self)(
             battle_round=self.battle_round,
             active_player_id=self.active_player_id,
@@ -218,6 +239,7 @@ class MovementPhaseState:
             movement_distance_records=self.movement_distance_records,
             active_selection=self.active_selection,
             pending_action=pending_action,
+            pending_setup_event_id=None,
         )
 
     def without_pending_action(self) -> Self:
@@ -233,6 +255,43 @@ class MovementPhaseState:
             movement_distance_records=self.movement_distance_records,
             active_selection=self.active_selection,
             pending_action=None,
+            pending_setup_event_id=self.pending_setup_event_id,
+        )
+
+    def with_pending_setup_event(self, event_id: str) -> Self:
+        if self.active_selection is None:
+            raise GameLifecycleError("Movement setup boundary requires active_selection.")
+        if self.pending_action is not None:
+            raise GameLifecycleError("Movement setup boundary requires no pending_action.")
+        if self.pending_setup_event_id is not None:
+            raise GameLifecycleError("Movement setup boundary is already pending.")
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            move_units_completed=self.move_units_completed,
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=self.active_selection,
+            pending_action=None,
+            pending_setup_event_id=_validate_identifier("event_id", event_id),
+        )
+
+    def without_pending_setup_event(self) -> Self:
+        if self.pending_setup_event_id is None:
+            return self
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            move_units_completed=self.move_units_completed,
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=self.active_selection,
+            pending_action=None,
+            pending_setup_event_id=None,
         )
 
     def with_activation_complete(
@@ -280,6 +339,7 @@ class MovementPhaseState:
             ),
             active_selection=None,
             pending_action=None,
+            pending_setup_event_id=None,
         )
 
     def with_step(self, step: MovementPhaseStepKind) -> Self:
@@ -310,6 +370,7 @@ class MovementPhaseState:
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
             pending_action=None,
+            pending_setup_event_id=None,
         )
 
     def with_move_units_completed(self) -> Self:
@@ -327,6 +388,7 @@ class MovementPhaseState:
             movement_distance_records=self.movement_distance_records,
             active_selection=None,
             pending_action=None,
+            pending_setup_event_id=None,
         )
 
     def to_payload(self) -> MovementPhaseStatePayload:
@@ -346,6 +408,7 @@ class MovementPhaseState:
             "pending_action": (
                 None if self.pending_action is None else self.pending_action.to_payload()
             ),
+            "pending_setup_event_id": self.pending_setup_event_id,
         }
 
     @classmethod
@@ -373,13 +436,14 @@ class MovementPhaseState:
                 if pending_action_payload is None
                 else PendingMovementActionSelection.from_payload(pending_action_payload)
             ),
+            pending_setup_event_id=payload.get("pending_setup_event_id"),
         )
 
 
 @dataclass(frozen=True, slots=True)
 class NormalMoveResolution:
     unit_instance_id: str
-    attempted_placement: UnitPlacement
+    attempted_placement: UnitPlacement | RulesUnitPlacement
     witness: PathWitness
     path_validation_results: tuple[PathValidationResult, ...]
     terrain_path_legality_results: tuple[TerrainPathLegalityResult, ...]
@@ -393,11 +457,12 @@ class NormalMoveResolution:
             "unit_instance_id",
             _validate_identifier("NormalMoveResolution unit_instance_id", self.unit_instance_id),
         )
-        if type(self.attempted_placement) is not UnitPlacement:
+        if type(self.attempted_placement) not in {UnitPlacement, RulesUnitPlacement}:
             raise GameLifecycleError(
-                "NormalMoveResolution attempted_placement must be a UnitPlacement."
+                "NormalMoveResolution attempted_placement must be a physical or rules-unit "
+                "placement."
             )
-        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+        if _movement_placement_unit_id(self.attempted_placement) != self.unit_instance_id:
             raise GameLifecycleError(
                 "NormalMoveResolution attempted_placement must match unit_instance_id."
             )
@@ -443,23 +508,29 @@ class NormalMoveResolution:
         return (
             all(result.is_valid for result in self.path_validation_results)
             and all(result.is_valid for result in self.terrain_path_legality_results)
+            and self.coherency_result.is_coherent
             and self.rollback_record is None
         )
 
-    def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
+    def transition_batch(
+        self,
+        *,
+        before: UnitPlacement | RulesUnitPlacement,
+    ) -> BattlefieldTransitionBatch:
         if not self.is_valid:
             raise GameLifecycleError("Invalid Normal Move cannot emit displacement records.")
-        return _normal_move_transition_batch(
+        return _rules_unit_movement_transition_batch(
             before=before,
             after=self.attempted_placement,
             witness=self.witness,
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
         )
 
 
 @dataclass(frozen=True, slots=True)
 class AdvanceMoveResolution:
     unit_instance_id: str
-    attempted_placement: UnitPlacement
+    attempted_placement: UnitPlacement | RulesUnitPlacement
     witness: PathWitness
     advance_roll: AdvanceRollResult
     path_validation_results: tuple[PathValidationResult, ...]
@@ -474,11 +545,12 @@ class AdvanceMoveResolution:
             "unit_instance_id",
             _validate_identifier("AdvanceMoveResolution unit_instance_id", self.unit_instance_id),
         )
-        if type(self.attempted_placement) is not UnitPlacement:
+        if type(self.attempted_placement) not in {UnitPlacement, RulesUnitPlacement}:
             raise GameLifecycleError(
-                "AdvanceMoveResolution attempted_placement must be a UnitPlacement."
+                "AdvanceMoveResolution attempted_placement must be a physical or rules-unit "
+                "placement."
             )
-        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+        if _movement_placement_unit_id(self.attempted_placement) != self.unit_instance_id:
             raise GameLifecycleError(
                 "AdvanceMoveResolution attempted_placement must match unit_instance_id."
             )
@@ -530,13 +602,18 @@ class AdvanceMoveResolution:
         return (
             all(result.is_valid for result in self.path_validation_results)
             and all(result.is_valid for result in self.terrain_path_legality_results)
+            and self.coherency_result.is_coherent
             and self.rollback_record is None
         )
 
-    def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
+    def transition_batch(
+        self,
+        *,
+        before: UnitPlacement | RulesUnitPlacement,
+    ) -> BattlefieldTransitionBatch:
         if not self.is_valid:
             raise GameLifecycleError("Invalid Advance cannot emit displacement records.")
-        return _movement_transition_batch(
+        return _rules_unit_movement_transition_batch(
             before=before,
             after=self.attempted_placement,
             witness=self.witness,
@@ -547,7 +624,7 @@ class AdvanceMoveResolution:
 @dataclass(frozen=True, slots=True)
 class FallBackActionResult:
     unit_instance_id: str
-    attempted_placement: UnitPlacement
+    attempted_placement: UnitPlacement | RulesUnitPlacement
     witness: PathWitness
     desperate_escape_requirements: tuple[DesperateEscapeRequirement, ...]
     desperate_escape_rolls: tuple[DesperateEscapeRoll, ...]
@@ -563,11 +640,12 @@ class FallBackActionResult:
             "unit_instance_id",
             _validate_identifier("FallBackActionResult unit_instance_id", self.unit_instance_id),
         )
-        if type(self.attempted_placement) is not UnitPlacement:
+        if type(self.attempted_placement) not in {UnitPlacement, RulesUnitPlacement}:
             raise GameLifecycleError(
-                "FallBackActionResult attempted_placement must be a UnitPlacement."
+                "FallBackActionResult attempted_placement must be a physical or rules-unit "
+                "placement."
             )
-        if self.attempted_placement.unit_instance_id != self.unit_instance_id:
+        if _movement_placement_unit_id(self.attempted_placement) != self.unit_instance_id:
             raise GameLifecycleError(
                 "FallBackActionResult attempted_placement must match unit_instance_id."
             )
@@ -581,8 +659,11 @@ class FallBackActionResult:
                 self.desperate_escape_requirements,
             ),
         )
+        eligible_requirement_unit_ids = set(
+            _movement_placement_component_unit_ids(self.attempted_placement)
+        )
         for requirement in self.desperate_escape_requirements:
-            if requirement.unit_instance_id != self.unit_instance_id:
+            if requirement.unit_instance_id not in eligible_requirement_unit_ids:
                 raise GameLifecycleError("FallBackActionResult requirement unit drift.")
         object.__setattr__(
             self,
@@ -649,7 +730,7 @@ class FallBackActionResult:
         cls,
         *,
         unit_instance_id: str,
-        attempted_placement: UnitPlacement,
+        attempted_placement: UnitPlacement | RulesUnitPlacement,
         witness: PathWitness,
         desperate_escape_requirements: tuple[DesperateEscapeRequirement, ...],
         path_validation_results: tuple[PathValidationResult, ...],
@@ -713,7 +794,7 @@ class FallBackActionResult:
     def transition_batch(
         self,
         *,
-        before: UnitPlacement,
+        before: UnitPlacement | RulesUnitPlacement,
         destroyed_model_ids: tuple[str, ...],
     ) -> BattlefieldTransitionBatch:
         if not self.is_valid:
@@ -739,10 +820,11 @@ class FallBackActionResult:
                 raise GameLifecycleError(
                     "Fall Back destroyed_model_ids must be eligible falling-back models."
                 )
-        return _fall_back_transition_batch(
+        return _rules_unit_movement_transition_batch(
             before=before,
             after=self.attempted_placement,
             witness=self.witness,
+            displacement_kind=ModelDisplacementKind.FALL_BACK,
             destroyed_model_ids=destroyed_ids,
         )
 
@@ -750,21 +832,43 @@ class FallBackActionResult:
         self,
         *,
         destroyed_model_ids: tuple[str, ...],
-    ) -> UnitPlacement | None:
+    ) -> UnitPlacement | RulesUnitPlacement | None:
         destroyed_ids = set(_validate_identifier_tuple("destroyed_model_ids", destroyed_model_ids))
-        surviving_placements = tuple(
-            placement
-            for placement in self.attempted_placement.model_placements
-            if placement.model_instance_id not in destroyed_ids
+        if isinstance(self.attempted_placement, UnitPlacement):
+            surviving_placements = tuple(
+                placement
+                for placement in self.attempted_placement.model_placements
+                if placement.model_instance_id not in destroyed_ids
+            )
+            if not surviving_placements:
+                return None
+            return self.attempted_placement.with_model_placements(surviving_placements)
+        surviving_components = tuple(
+            component.with_model_placements(
+                tuple(
+                    placement
+                    for placement in component.model_placements
+                    if placement.model_instance_id not in destroyed_ids
+                )
+            )
+            for component in self.attempted_placement.component_unit_placements
+            if any(
+                placement.model_instance_id not in destroyed_ids
+                for placement in component.model_placements
+            )
         )
-        if not surviving_placements:
+        if not surviving_components:
             return None
-        return self.attempted_placement.with_model_placements(surviving_placements)
+        if len(surviving_components) == 1:
+            return surviving_components[0]
+        return RulesUnitPlacement(
+            rules_unit_instance_id=self.attempted_placement.rules_unit_instance_id,
+            component_unit_placements=surviving_components,
+        )
 
     def to_payload(self) -> FallBackActionResultPayload:
-        return {
+        payload: FallBackActionResultPayload = {
             "unit_instance_id": self.unit_instance_id,
-            "attempted_placement": self.attempted_placement.to_payload(),
             "witness": self.witness.to_payload(),
             "desperate_escape_requirements": [
                 requirement.to_payload() for requirement in self.desperate_escape_requirements
@@ -782,13 +886,30 @@ class FallBackActionResult:
             ),
             "movement_payload": self.movement_payload,
         }
+        if isinstance(self.attempted_placement, UnitPlacement):
+            payload["attempted_placement"] = self.attempted_placement.to_payload()
+        else:
+            payload["attempted_rules_unit_placement"] = self.attempted_placement.to_payload()
+        return payload
 
     @classmethod
     def from_payload(cls, payload: FallBackActionResultPayload) -> Self:
         rollback_payload = payload["rollback_record"]
+        physical_payload = payload.get("attempted_placement")
+        rules_unit_payload = payload.get("attempted_rules_unit_placement")
+        if (physical_payload is None) == (rules_unit_payload is None):
+            raise GameLifecycleError(
+                "FallBackActionResult payload requires exactly one attempted placement."
+            )
         return cls(
             unit_instance_id=payload["unit_instance_id"],
-            attempted_placement=UnitPlacement.from_payload(payload["attempted_placement"]),
+            attempted_placement=(
+                UnitPlacement.from_payload(physical_payload)
+                if physical_payload is not None
+                else RulesUnitPlacement.from_payload(
+                    cast(RulesUnitPlacementPayload, rules_unit_payload)
+                )
+            ),
             witness=PathWitness.from_payload(payload["witness"]),
             desperate_escape_requirements=tuple(
                 DesperateEscapeRequirement.from_payload(requirement)
@@ -825,3 +946,102 @@ class _ResolvedUnitMove:
     rollback_record: MovementRollbackRecord | None
     movement_payload: dict[str, JsonValue]
     desperate_escape_auto_pass_model_ids: tuple[str, ...] = ()
+
+
+def _movement_placement_unit_id(
+    placement: UnitPlacement | RulesUnitPlacement,
+) -> str:
+    if type(placement) is UnitPlacement:
+        return placement.unit_instance_id
+    if type(placement) is RulesUnitPlacement:
+        return placement.rules_unit_instance_id
+    raise GameLifecycleError("Movement placement must be physical or rules-unit grouped.")
+
+
+def _movement_placement_component_unit_ids(
+    placement: UnitPlacement | RulesUnitPlacement,
+) -> tuple[str, ...]:
+    if type(placement) is UnitPlacement:
+        return (placement.unit_instance_id,)
+    if type(placement) is RulesUnitPlacement:
+        return placement.component_unit_instance_ids
+    raise GameLifecycleError("Movement placement must be physical or rules-unit grouped.")
+
+
+def _rules_unit_movement_transition_batch(
+    *,
+    before: UnitPlacement | RulesUnitPlacement,
+    after: UnitPlacement | RulesUnitPlacement,
+    witness: PathWitness,
+    displacement_kind: ModelDisplacementKind,
+    destroyed_model_ids: tuple[str, ...] = (),
+) -> BattlefieldTransitionBatch:
+    if type(before) is UnitPlacement and type(after) is UnitPlacement:
+        if displacement_kind is ModelDisplacementKind.FALL_BACK:
+            return _fall_back_transition_batch(
+                before=before,
+                after=after,
+                witness=witness,
+                destroyed_model_ids=destroyed_model_ids,
+            )
+        if destroyed_model_ids:
+            raise GameLifecycleError("Only Fall Back transitions can destroy models.")
+        return _movement_transition_batch(
+            before=before,
+            after=after,
+            witness=witness,
+            displacement_kind=displacement_kind,
+        )
+    if type(before) is not RulesUnitPlacement or type(after) is not RulesUnitPlacement:
+        raise GameLifecycleError("Movement transition placement kinds must match.")
+    if before.rules_unit_instance_id != after.rules_unit_instance_id:
+        raise GameLifecycleError("Movement transition rules-unit identity drift.")
+    before_by_id = {
+        component.unit_instance_id: component for component in before.component_unit_placements
+    }
+    after_by_id = {
+        component.unit_instance_id: component for component in after.component_unit_placements
+    }
+    if before_by_id.keys() != after_by_id.keys():
+        raise GameLifecycleError("Movement transition component identity drift.")
+    batches: list[BattlefieldTransitionBatch] = []
+    for component_id in sorted(before_by_id):
+        component_witness = PathWitness.for_paths(
+            tuple(
+                (
+                    placement.model_instance_id,
+                    witness.poses_for_model(placement.model_instance_id),
+                )
+                for placement in before_by_id[component_id].model_placements
+            )
+        )
+        component_destroyed_ids = tuple(
+            model_id
+            for model_id in destroyed_model_ids
+            if any(
+                placement.model_instance_id == model_id
+                for placement in before_by_id[component_id].model_placements
+            )
+        )
+        if displacement_kind is ModelDisplacementKind.FALL_BACK:
+            batch = _fall_back_transition_batch(
+                before=before_by_id[component_id],
+                after=after_by_id[component_id],
+                witness=component_witness,
+                destroyed_model_ids=component_destroyed_ids,
+            )
+        else:
+            if component_destroyed_ids:
+                raise GameLifecycleError("Only Fall Back transitions can destroy models.")
+            batch = _movement_transition_batch(
+                before=before_by_id[component_id],
+                after=after_by_id[component_id],
+                witness=component_witness,
+                displacement_kind=displacement_kind,
+            )
+        batches.append(batch)
+    return BattlefieldTransitionBatch(
+        placements=tuple(record for batch in batches for record in batch.placements),
+        removals=tuple(record for batch in batches for record in batch.removals),
+        displacements=tuple(record for batch in batches for record in batch.displacements),
+    )

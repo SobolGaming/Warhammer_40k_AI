@@ -185,6 +185,94 @@ def test_local_session_drives_setup_movement_shooting_and_charge_via_facade() ->
 
 
 @pytest.mark.integration
+def test_local_session_projects_and_completes_one_attached_movement_activation() -> None:
+    bodyguard = UnitMusterSelection(
+        unit_selection_id="attached-bodyguard",
+        datasheet_id="core-intercessor-like-infantry",
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="core-intercessor-like",
+                model_count=5,
+            ),
+        ),
+    )
+    leader = UnitMusterSelection(
+        unit_selection_id="attached-leader",
+        datasheet_id="core-character-leader",
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+    )
+    config = phase11c_config(
+        game_id="ws13-attached-movement-projection",
+        player_a_units=(bodyguard, leader),
+        player_a_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="attached-leader",
+                bodyguard_unit_selection_id="attached-bodyguard",
+            ),
+        ),
+    )
+    session = LocalGameSession()
+    session.start(config)
+    status = _submit_fixed_secondaries(
+        session,
+        status=session.advance_until_decision_or_terminal(),
+    )
+    status = _submit_all_deployments(session, status=status)
+    request = _assert_request(status, SELECT_MOVEMENT_UNIT_DECISION_TYPE)
+    state = session.lifecycle.state
+    assert state is not None
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id="army-alpha:attached-bodyguard",
+    )
+    canonical_id = rules_unit.unit_instance_id
+    component_ids = rules_unit.component_unit_instance_ids
+    model_ids = tuple(sorted(model.model_instance_id for model in rules_unit.alive_models()))
+
+    assert tuple(option.option_id for option in request.options) == (canonical_id,)
+    option_payload = _json_object(request.option_by_id(canonical_id).payload)
+    assert option_payload["component_unit_instance_ids"] == list(component_ids)
+    assert option_payload["model_instance_ids"] == list(model_ids)
+    for viewer_player_id in state.player_ids:
+        pending = session.view(viewer_player_id=viewer_player_id)["pending_decision"]
+        assert pending is not None
+        assert [option["option_id"] for option in pending["options"]] == [canonical_id]
+        assert pending["options"][0]["payload"] == option_payload
+
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=canonical_id,
+        result_id="ws13-attached-movement-select",
+    )
+    action_request = _assert_request(status, SELECT_MOVEMENT_ACTION_DECISION_TYPE)
+    status = session.submit_option(
+        request_id=action_request.request_id,
+        option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
+        result_id="ws13-attached-movement-remain",
+    )
+
+    completion_events = tuple(
+        event
+        for event in session.lifecycle.decision_controller.event_log.records
+        if event.event_type == "movement_activation_completed"
+    )
+    assert len(completion_events) == 1
+    completion_payload = _json_object(completion_events[0].payload)
+    assert completion_payload["unit_instance_id"] == canonical_id
+    assert completion_payload["unit_instance_id"] not in component_ids
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:ws13:attached-movement")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
 def test_local_session_drives_charge_completion_via_projection_and_events() -> None:
     lifecycle, _units = charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),

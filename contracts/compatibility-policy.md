@@ -77,12 +77,13 @@ consumed by the Primary rules evaluation, including a zero-award result. The
 authoritative registry is replay/audit state and is deliberately omitted from
 viewer projections.
 
-Contract 11.1 adds the optional `source_rule_id` and `unit_location` fields to
-the live movement decision-family schema and admits the `disembark` and
-`ingress` movement-action option variants. The engine emits these fields for
-the unified Move Units loop, while Contract 11.0 movement responses remain
-valid under the widened schema. The closed v3 operator persistence family
-retains its original `external_contract_version: "11.0.0"` identity.
+Contract 11.1 adds the optional `source_rule_id`, `unit_location`, and
+`component_unit_instance_ids` fields to the live movement decision-family
+schema and admits the `disembark` and `ingress` movement-action option variants.
+The engine emits these fields for the unified Move Units loop, while Contract
+11.0 movement responses remain valid under the widened schema. The closed v3
+operator persistence family retains its original
+`external_contract_version: "11.0.0"` identity.
 
 The registry is exactly inverse-complete over applicable assigned-Primary
 rules: every required ordinary or end-of-battle evaluation boundary has one

@@ -100,6 +100,12 @@
                   "payload": {
                     "additionalProperties": false,
                     "properties": {
+                      "component_unit_instance_ids": {
+                        "items": {"$ref": "#/$defs/identifier"},
+                        "minItems": 1,
+                        "type": "array",
+                        "uniqueItems": true
+                      },
                       "model_instance_ids": {
                         "items": {"$ref": "#/$defs/identifier"},
                         "minItems": 1,

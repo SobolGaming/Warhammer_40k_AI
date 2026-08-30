@@ -293,6 +293,7 @@ class _MovementUnitCandidate:
     unit_instance_id: str
     label: str
     location: MovementUnitLocationKind
+    component_unit_instance_ids: tuple[str, ...]
     model_instance_ids: tuple[str, ...]
     transport_unit_instance_id: str | None = None
     reserve_state: ReserveState | None = None
@@ -313,87 +314,144 @@ def _movement_unit_candidates(
     unarrived_reserves = state.unarrived_reserve_states_for_player(movement_state.active_player_id)
     candidates_by_id: dict[str, _MovementUnitCandidate] = {}
 
-    for reserve_state in unarrived_reserves:
+    reserve_by_rules_unit_id: dict[str, ReserveState] = {}
+    for candidate_reserve_state in unarrived_reserves:
         rules_unit = rules_unit_view_from_armies(
             armies=tuple(state.army_definitions),
-            unit_instance_id=reserve_state.unit_instance_id,
+            unit_instance_id=candidate_reserve_state.unit_instance_id,
         )
-        alive_model_ids = tuple(
-            sorted(model.model_instance_id for model in rules_unit.alive_models())
-        )
-        if not alive_model_ids:
-            continue
-        candidates_by_id[reserve_state.unit_instance_id] = _MovementUnitCandidate(
-            unit_instance_id=reserve_state.unit_instance_id,
-            label=rules_unit_display_name(rules_unit),
-            location=MovementUnitLocationKind.STRATEGIC_RESERVES,
-            model_instance_ids=alive_model_ids,
-            reserve_state=reserve_state,
-        )
+        if candidate_reserve_state.unit_instance_id != rules_unit.unit_instance_id:
+            raise GameLifecycleError(
+                "Reserve movement location must use canonical rules-unit identity."
+            )
+        if rules_unit.unit_instance_id in reserve_by_rules_unit_id:
+            raise GameLifecycleError("Rules unit has ambiguous Reserve state.")
+        reserve_by_rules_unit_id[rules_unit.unit_instance_id] = candidate_reserve_state
 
-    embarked_transport_by_unit_id: dict[str, str] = {}
+    embarked_transport_by_component_id: dict[str, str] = {}
     for cargo_state in state.transport_cargo_states:
         if cargo_state.player_id != movement_state.active_player_id:
             continue
         for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
-            previous_transport_id = embarked_transport_by_unit_id.get(embarked_unit_id)
+            previous_transport_id = embarked_transport_by_component_id.get(embarked_unit_id)
             if (
                 previous_transport_id is not None
                 and previous_transport_id != cargo_state.transport_unit_instance_id
             ):
                 raise GameLifecycleError("Unit has ambiguous embarked Transport state.")
-            embarked_transport_by_unit_id[embarked_unit_id] = cargo_state.transport_unit_instance_id
-    for reserve_state in unarrived_reserves:
-        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
-            previous_transport_id = embarked_transport_by_unit_id.get(embarked_unit_id)
+            embarked_transport_by_component_id[embarked_unit_id] = (
+                cargo_state.transport_unit_instance_id
+            )
+    for unarrived_reserve_state in unarrived_reserves:
+        for embarked_unit_id in unarrived_reserve_state.embarked_unit_instance_ids:
+            previous_transport_id = embarked_transport_by_component_id.get(embarked_unit_id)
             if previous_transport_id is not None and previous_transport_id != (
-                reserve_state.unit_instance_id
+                unarrived_reserve_state.unit_instance_id
             ):
                 raise GameLifecycleError("Unit embarked Transport identity drift.")
-            embarked_transport_by_unit_id[embarked_unit_id] = reserve_state.unit_instance_id
-    for embarked_unit_id, transport_unit_id in embarked_transport_by_unit_id.items():
-        if embarked_unit_id in candidates_by_id:
-            raise GameLifecycleError("Unit cannot be both embarked and directly in Reserves.")
-        unit = _unit_instance_by_id(state=state, unit_instance_id=embarked_unit_id)
-        alive_model_ids = tuple(
-            sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
-        )
-        if not alive_model_ids:
-            continue
-        candidates_by_id[embarked_unit_id] = _MovementUnitCandidate(
-            unit_instance_id=embarked_unit_id,
-            label=unit.name,
-            location=MovementUnitLocationKind.EMBARKED,
-            model_instance_ids=alive_model_ids,
-            transport_unit_instance_id=transport_unit_id,
-        )
+            embarked_transport_by_component_id[embarked_unit_id] = (
+                unarrived_reserve_state.unit_instance_id
+            )
 
     placed_army = scenario.battlefield_state.placed_army_for_player_or_none(
         movement_state.active_player_id
     )
-    if placed_army is not None:
-        for placement in placed_army.unit_placements:
-            if placement.unit_instance_id in candidates_by_id:
-                raise GameLifecycleError("Unit has multiple movement locations.")
-            unit = scenario.unit_instance_for_placement(placement)
-            candidates_by_id[placement.unit_instance_id] = _MovementUnitCandidate(
-                unit_instance_id=placement.unit_instance_id,
-                label=unit.name,
-                location=MovementUnitLocationKind.BATTLEFIELD,
-                model_instance_ids=tuple(
-                    sorted(
-                        model_placement.model_instance_id
-                        for model_placement in placement.model_placements
-                    )
-                ),
-            )
-
-    selected = set(movement_state.selected_unit_ids)
-    return tuple(
-        candidate
-        for unit_id, candidate in sorted(candidates_by_id.items())
-        if include_selected or unit_id not in selected
+    placed_component_ids: set[str] = (
+        set()
+        if placed_army is None
+        else {placement.unit_instance_id for placement in placed_army.unit_placements}
     )
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if rules_unit.owner_player_id != movement_state.active_player_id:
+            continue
+        if not include_selected and rules_unit_identity_history_contains(
+            state=state,
+            identity_ids=movement_state.selected_unit_ids,
+            unit_instance_id=rules_unit.unit_instance_id,
+        ):
+            continue
+        alive_components = tuple(
+            component
+            for component in rules_unit.components
+            if any(model.is_alive for model in component.unit.own_models)
+        )
+        if not alive_components:
+            continue
+        component_ids = tuple(component.unit.unit_instance_id for component in alive_components)
+        alive_model_ids = tuple(
+            sorted(
+                model.model_instance_id
+                for component in alive_components
+                for model in component.unit.own_models
+                if model.is_alive
+            )
+        )
+        reserve_state = reserve_by_rules_unit_id.get(rules_unit.unit_instance_id)
+        component_transport_ids = {
+            embarked_transport_by_component_id[component_id]
+            for component_id in component_ids
+            if component_id in embarked_transport_by_component_id
+        }
+        embarked_component_ids = {
+            component_id
+            for component_id in component_ids
+            if component_id in embarked_transport_by_component_id
+        }
+        placed_component_ids_for_rules_unit = set(component_ids).intersection(placed_component_ids)
+        location_count = (
+            int(reserve_state is not None)
+            + int(bool(component_transport_ids))
+            + int(bool(placed_component_ids_for_rules_unit))
+        )
+        if location_count != 1:
+            raise GameLifecycleError(
+                "Every living rules unit must have exactly one authoritative movement location."
+            )
+        if reserve_state is not None:
+            candidate = _MovementUnitCandidate(
+                unit_instance_id=rules_unit.unit_instance_id,
+                label=rules_unit_display_name(rules_unit),
+                location=MovementUnitLocationKind.STRATEGIC_RESERVES,
+                component_unit_instance_ids=component_ids,
+                model_instance_ids=alive_model_ids,
+                reserve_state=reserve_state,
+            )
+        elif component_transport_ids:
+            if len(component_transport_ids) != 1 or embarked_component_ids != set(component_ids):
+                raise GameLifecycleError(
+                    "Attached rules-unit components must be embarked in the same Transport."
+                )
+            candidate = _MovementUnitCandidate(
+                unit_instance_id=rules_unit.unit_instance_id,
+                label=rules_unit_display_name(rules_unit),
+                location=MovementUnitLocationKind.EMBARKED,
+                component_unit_instance_ids=component_ids,
+                model_instance_ids=alive_model_ids,
+                transport_unit_instance_id=next(iter(component_transport_ids)),
+            )
+        else:
+            if placed_component_ids_for_rules_unit != set(component_ids):
+                raise GameLifecycleError(
+                    "Attached rules-unit components must share one battlefield location."
+                )
+            grouped = RulesUnitPlacement.from_battlefield(
+                view=rules_unit,
+                battlefield_state=scenario.battlefield_state,
+            )
+            if tuple(
+                sorted(placement.model_instance_id for placement in grouped.model_placements)
+            ) != (alive_model_ids):
+                raise GameLifecycleError("Rules-unit battlefield model inventory drift.")
+            candidate = _MovementUnitCandidate(
+                unit_instance_id=rules_unit.unit_instance_id,
+                label=rules_unit_display_name(rules_unit),
+                location=MovementUnitLocationKind.BATTLEFIELD,
+                component_unit_instance_ids=component_ids,
+                model_instance_ids=alive_model_ids,
+            )
+        candidates_by_id[rules_unit.unit_instance_id] = candidate
+
+    return tuple(candidate for _unit_id, candidate in sorted(candidates_by_id.items()))
 
 
 def _movement_unit_candidate(
@@ -425,6 +483,7 @@ def _movement_unit_options(
     for candidate in candidates:
         payload: dict[str, JsonValue] = {
             "unit_instance_id": candidate.unit_instance_id,
+            "component_unit_instance_ids": list(candidate.component_unit_instance_ids),
             "model_instance_ids": list(candidate.model_instance_ids),
             "unit_location": candidate.location.value,
         }

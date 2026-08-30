@@ -14798,6 +14798,9 @@
         "label": "CORE Intercessor-like Infantry",
         "option_id": "army-alpha:intercessor-unit-1",
         "payload": {
+          "component_unit_instance_ids": [
+            "army-alpha:intercessor-unit-1"
+          ],
           "model_instance_ids": [
             "army-alpha:intercessor-unit-1:core-intercessor-like:001",
             "army-alpha:intercessor-unit-1:core-intercessor-like:002",
@@ -14870,7 +14873,7 @@
     }
   ],
   "projection_schema": "game-view-v11-phase17n-step4",
-  "projection_state_hash": "4d51e21fb6b0512df244d3b246927fc9a407c6284195d73670f5e73abfd577fe",
+  "projection_state_hash": "f2d0a8d88770e5b244f9a55b3e2ef5970721513e013f2a645c33d483667498ef",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

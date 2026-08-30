@@ -50,6 +50,9 @@
       "label": "CORE Intercessor-like Infantry",
       "option_id": "army-alpha:intercessor-unit-1",
       "payload": {
+        "component_unit_instance_ids": [
+          "army-alpha:intercessor-unit-1"
+        ],
         "model_instance_ids": [
           "army-alpha:intercessor-unit-1:core-intercessor-like:001",
           "army-alpha:intercessor-unit-1:core-intercessor-like:002",

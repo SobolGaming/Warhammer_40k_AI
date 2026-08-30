@@ -101,6 +101,7 @@ def _movement_action_options(
     runtime_modifier_registry: RuntimeModifierRegistry,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    rules_unit_placement: RulesUnitPlacement,
     ruleset_descriptor: RulesetDescriptor,
     normal_move_already_made: bool,
     battle_round: int = 1,
@@ -117,6 +118,11 @@ def _movement_action_options(
         raise GameLifecycleError(
             "Movement action options disembarked_unit_state must be DisembarkedUnitState."
         )
+    if type(rules_unit_placement) is not RulesUnitPlacement:
+        raise GameLifecycleError("Movement action options require RulesUnitPlacement.")
+    if unit_placement.unit_instance_id not in rules_unit_placement.component_unit_instance_ids:
+        raise GameLifecycleError("Movement action representative is not in the rules unit.")
+    movement_unit_id = rules_unit_placement.rules_unit_instance_id
     availability_result = _movement_action_availability_result(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -143,7 +149,7 @@ def _movement_action_options(
                     label="Remain Stationary",
                     payload={
                         "movement_phase_action": MovementPhaseActionKind.REMAIN_STATIONARY.value,
-                        "unit_instance_id": unit_placement.unit_instance_id,
+                        "unit_instance_id": movement_unit_id,
                         "movement_inches": 0,
                         "model_movements": [],
                         "witness": None,
@@ -175,7 +181,7 @@ def _movement_action_options(
                         ),
                         payload={
                             "movement_phase_action": MovementPhaseActionKind.NORMAL_MOVE.value,
-                            "unit_instance_id": unit_placement.unit_instance_id,
+                            "unit_instance_id": movement_unit_id,
                             "movement_mode": movement_mode.value,
                         },
                     )
@@ -202,7 +208,7 @@ def _movement_action_options(
                         ),
                         payload={
                             "movement_phase_action": action.value,
-                            "unit_instance_id": unit_placement.unit_instance_id,
+                            "unit_instance_id": movement_unit_id,
                             "movement_mode": movement_mode.value,
                         },
                     )
@@ -218,7 +224,7 @@ def _movement_action_options(
             )
             for movement_mode in movement_modes:
                 for fall_back_mode in _fall_back_modes_for_parameterized_option(
-                    unit_instance_id=unit_placement.unit_instance_id,
+                    unit_instance_id=movement_unit_id,
                     battle_shocked_unit_ids=battle_shocked_unit_ids,
                 ):
                     options.append(
@@ -235,7 +241,7 @@ def _movement_action_options(
                             ),
                             payload={
                                 "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
-                                "unit_instance_id": unit_placement.unit_instance_id,
+                                "unit_instance_id": movement_unit_id,
                                 "movement_mode": movement_mode.value,
                                 "fall_back_mode": fall_back_mode.value,
                             },
@@ -246,7 +252,7 @@ def _movement_action_options(
         state=state,
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
-        unit_placement=unit_placement,
+        rules_unit_placement=rules_unit_placement,
         options=tuple(options),
     )
 
@@ -256,24 +262,39 @@ def _movement_options_with_modifier_ignore_choices(
     state: GameState,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
-    unit_placement: UnitPlacement,
+    rules_unit_placement: RulesUnitPlacement,
     options: tuple[DecisionOption, ...],
 ) -> tuple[DecisionOption, ...]:
-    unit = _unit_instance_by_id(
-        state=state,
-        unit_instance_id=unit_placement.unit_instance_id,
-    )
+    if type(rules_unit_placement) is not RulesUnitPlacement:
+        raise GameLifecycleError("Movement modifier choices require RulesUnitPlacement.")
+    movement_unit_id = rules_unit_placement.rules_unit_instance_id
     current_model_ids = tuple(
-        sorted(placement.model_instance_id for placement in unit_placement.model_placements)
+        sorted(placement.model_instance_id for placement in rules_unit_placement.model_placements)
     )
-    permissions = catalog_modifier_ignore_permissions_for_unit(
-        ability_index=ability_index,
-        unit=unit,
-        current_model_instance_ids=current_model_ids,
+    component_units = tuple(
+        _unit_instance_by_id(state=state, unit_instance_id=component_id)
+        for component_id in rules_unit_placement.component_unit_instance_ids
+    )
+    permissions = tuple(
+        permission
+        for unit in component_units
+        for permission in catalog_modifier_ignore_permissions_for_unit(
+            ability_index=ability_index,
+            unit=unit,
+            current_model_instance_ids=tuple(
+                sorted(
+                    placement.model_instance_id
+                    for placement in rules_unit_placement.model_placements
+                    if placement.unit_instance_id == unit.unit_instance_id
+                )
+            ),
+        )
     )
     if not permissions:
         return options
-    models_by_id = {model.model_instance_id: model for model in unit.own_models}
+    models_by_id = {
+        model.model_instance_id: model for unit in component_units for model in unit.own_models
+    }
     movement_snapshots: list[ModifierIgnoreSnapshot] = []
     for model_id in current_model_ids:
         model = models_by_id.get(model_id)
@@ -283,7 +304,7 @@ def _movement_options_with_modifier_ignore_choices(
         _modified, applications = runtime_modifier_registry.movement_budget_modifier_trace(
             MovementBudgetModifierContext(
                 state=state,
-                unit_instance_id=unit.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 model_instance_id=model_id,
                 base_movement_inches=base_movement,
                 current_movement_inches=base_movement,
@@ -301,7 +322,7 @@ def _movement_options_with_modifier_ignore_choices(
     advance_modifiers = runtime_modifier_registry.advance_roll_modifiers(
         AdvanceRollModifierContext(
             state=state,
-            unit_instance_id=unit.unit_instance_id,
+            unit_instance_id=movement_unit_id,
             current_roll_modifiers=(),
         )
     )
@@ -328,7 +349,7 @@ def _movement_options_with_modifier_ignore_choices(
         expanded.extend(
             options_with_modifier_ignore_choices(
                 option=option,
-                unit_instance_id=unit.unit_instance_id,
+                unit_instance_id=movement_unit_id,
                 permissions=permissions,
                 available_modifiers=snapshots,
             )
@@ -339,44 +360,58 @@ def _movement_options_with_modifier_ignore_choices(
 def _advance_roll_request_for_action(
     *,
     state: GameState,
-    unit: UnitInstance,
-    unit_placement: UnitPlacement,
+    rules_unit_placement: RulesUnitPlacement,
     action_result: DecisionResult,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> AdvanceRollRequest:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Advance roll requires a UnitInstance.")
-    if type(unit_placement) is not UnitPlacement:
-        raise GameLifecycleError("Advance roll requires a UnitPlacement.")
+    if type(rules_unit_placement) is not RulesUnitPlacement:
+        raise GameLifecycleError("Advance roll requires RulesUnitPlacement.")
+    unit_instance_id = rules_unit_placement.rules_unit_instance_id
     roll_modifiers = runtime_modifier_registry.advance_roll_modifiers(
         AdvanceRollModifierContext(
             state=state,
-            unit_instance_id=unit.unit_instance_id,
+            unit_instance_id=unit_instance_id,
             current_roll_modifiers=(),
         )
     )
+    reroll_permissions = tuple(
+        permission
+        for component_placement in rules_unit_placement.component_unit_placements
+        for permission in (
+            _advance_reroll_permission_for_unit(
+                state=state,
+                unit=_unit_instance_by_id(
+                    state=state,
+                    unit_instance_id=component_placement.unit_instance_id,
+                ),
+                unit_instance_id=unit_instance_id,
+                player_id=rules_unit_placement.player_id,
+                keywords=_unit_instance_by_id(
+                    state=state,
+                    unit_instance_id=component_placement.unit_instance_id,
+                ).keywords,
+                ability_index=ability_index,
+                current_model_instance_ids=tuple(
+                    sorted(
+                        model_placement.model_instance_id
+                        for model_placement in component_placement.model_placements
+                    )
+                ),
+            ),
+        )
+        if permission is not None
+    )
+    if len(reroll_permissions) > 1:
+        raise GameLifecycleError("Rules unit has multiple Advance reroll permissions.")
     return AdvanceRollRequest.for_unit(
         request_id=f"{action_result.result_id}:advance-roll",
         game_id=state.game_id,
         battle_round=state.battle_round,
-        player_id=unit_placement.player_id,
-        unit_instance_id=unit_placement.unit_instance_id,
+        player_id=rules_unit_placement.player_id,
+        unit_instance_id=unit_instance_id,
         roll_modifiers=roll_modifiers,
-        reroll_permission=_advance_reroll_permission_for_unit(
-            state=state,
-            unit=unit,
-            unit_instance_id=unit_placement.unit_instance_id,
-            player_id=unit_placement.player_id,
-            keywords=unit.keywords,
-            ability_index=ability_index,
-            current_model_instance_ids=tuple(
-                sorted(
-                    model_placement.model_instance_id
-                    for model_placement in unit_placement.model_placements
-                )
-            ),
-        ),
+        reroll_permission=None if not reroll_permissions else reroll_permissions[0],
     )
 
 
