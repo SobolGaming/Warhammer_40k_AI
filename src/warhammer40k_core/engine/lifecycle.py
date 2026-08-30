@@ -3572,7 +3572,11 @@ def _validate_payload_consistency(
         state=state,
         event_records=event_records,
     )
-    validate_movement_phase_state_consistency(state=state)
+    validate_movement_phase_state_consistency(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)

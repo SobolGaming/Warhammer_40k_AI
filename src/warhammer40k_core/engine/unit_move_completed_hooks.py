@@ -481,6 +481,8 @@ def resolve_unit_move_completed_mortal_wound_hooks(
     movement_actions: tuple[str, ...],
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = MappingProxyType({}),
     trigger_event_id: str | None = None,
+    expected_triggering_unit_instance_id: str | None = None,
+    expected_triggering_player_id: str | None = None,
 ) -> LifecycleStatus | None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Unit move completed hooks require a DecisionController.")
@@ -500,6 +502,34 @@ def resolve_unit_move_completed_mortal_wound_hooks(
         if trigger_event_id is None
         else _validate_identifier("trigger_event_id", trigger_event_id)
     )
+    requested_triggering_unit_id = (
+        None
+        if expected_triggering_unit_instance_id is None
+        else _validate_identifier(
+            "expected_triggering_unit_instance_id",
+            expected_triggering_unit_instance_id,
+        )
+    )
+    requested_triggering_player_id = (
+        None
+        if expected_triggering_player_id is None
+        else _validate_identifier(
+            "expected_triggering_player_id",
+            expected_triggering_player_id,
+        )
+    )
+    if requested_trigger_event_id is None and (
+        requested_triggering_unit_id is not None or requested_triggering_player_id is not None
+    ):
+        raise GameLifecycleError(
+            "Expected move-completed trigger identity requires an exact trigger event."
+        )
+    if requested_trigger_event_id is not None and (
+        requested_triggering_unit_id is None or requested_triggering_player_id is None
+    ):
+        raise GameLifecycleError(
+            "Exact move-completed trigger event requires expected unit and player identities."
+        )
     ability_indexes = _validate_ability_index_mapping(ability_indexes_by_player_id)
     events = _unprocessed_move_completion_events(
         state=state,
@@ -508,6 +538,8 @@ def resolve_unit_move_completed_mortal_wound_hooks(
         event_type=requested_event_type,
         movement_actions=requested_actions,
         trigger_event_id=requested_trigger_event_id,
+        expected_triggering_unit_instance_id=requested_triggering_unit_id,
+        expected_triggering_player_id=requested_triggering_player_id,
     )
     if not registry.all_bindings():
         return None
@@ -1022,11 +1054,29 @@ def _unprocessed_move_completion_events(
     event_type: str,
     movement_actions: tuple[str, ...],
     trigger_event_id: str | None = None,
+    expected_triggering_unit_instance_id: str | None = None,
+    expected_triggering_player_id: str | None = None,
 ) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
     requested_event_id = (
         None
         if trigger_event_id is None
         else _validate_identifier("trigger_event_id", trigger_event_id)
+    )
+    requested_unit_id = (
+        None
+        if expected_triggering_unit_instance_id is None
+        else _validate_identifier(
+            "expected_triggering_unit_instance_id",
+            expected_triggering_unit_instance_id,
+        )
+    )
+    requested_player_id = (
+        None
+        if expected_triggering_player_id is None
+        else _validate_identifier(
+            "expected_triggering_player_id",
+            expected_triggering_player_id,
+        )
     )
     events: list[tuple[str, dict[str, JsonValue]]] = []
     for record in decisions.event_log.records:
@@ -1042,6 +1092,13 @@ def _unprocessed_move_completion_events(
         if payload.get("battle_round") != state.battle_round:
             continue
         if payload.get("phase") != completed_phase.value:
+            continue
+        if requested_unit_id is not None and payload.get("unit_instance_id") != requested_unit_id:
+            continue
+        if (
+            requested_player_id is not None
+            and payload.get("active_player_id") != requested_player_id
+        ):
             continue
         if _movement_action_from_payload(payload, event_type=event_type) not in movement_actions:
             continue

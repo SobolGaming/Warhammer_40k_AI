@@ -2,15 +2,25 @@ from __future__ import annotations
 
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.rules_units import (
     current_rules_unit_views_for_canonical_identity,
     rules_unit_views_from_armies,
 )
+from warhammer40k_core.engine.tactical_disembark_setup_boundary import (
+    resolve_pending_tactical_disembark_setup_boundary,
+)
 
 
-def validate_movement_phase_state_consistency(*, state: GameState) -> None:
+def validate_movement_phase_state_consistency(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
     movement_state = state.movement_phase_state
     if movement_state is None:
         return
@@ -84,6 +94,11 @@ def validate_movement_phase_state_consistency(*, state: GameState) -> None:
         raise GameLifecycleError(
             "movement_phase_state active selection is not active player's unit."
         )
+    resolve_pending_tactical_disembark_setup_boundary(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
 
 
 def canonical_rules_unit_identity_matches_physical_units(

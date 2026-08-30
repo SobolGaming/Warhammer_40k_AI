@@ -8,6 +8,9 @@ from warhammer40k_core.engine import physical_proposal_context as _physical_cont
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.tactical_disembark_setup_boundary import (
+    resolve_pending_tactical_disembark_setup_boundary,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -162,6 +165,13 @@ class MovementPhaseHandler:
         active_selection = movement_state.active_selection
         if active_selection is not None:
             if movement_state.pending_setup_event_id is not None:
+                setup_boundary = resolve_pending_tactical_disembark_setup_boundary(
+                    state=state,
+                    event_records=decisions.event_log.records,
+                    decision_records=decisions.records,
+                )
+                if setup_boundary is None:
+                    raise GameLifecycleError("Tactical Disembark setup boundary is missing.")
                 setup_status = resolve_unit_move_completed_mortal_wound_hooks(
                     state=state,
                     decisions=decisions,
@@ -173,6 +183,8 @@ class MovementPhaseHandler:
                     movement_actions=("set_up",),
                     ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                     trigger_event_id=movement_state.pending_setup_event_id,
+                    expected_triggering_unit_instance_id=active_selection.unit_instance_id,
+                    expected_triggering_player_id=movement_state.active_player_id,
                 )
                 if setup_status is not None:
                     return setup_status
@@ -184,11 +196,7 @@ class MovementPhaseHandler:
                 if reconciliation.placed_surviving_unit_instance_ids != (
                     active_selection.unit_instance_id,
                 ):
-                    trigger_event = next(
-                        record
-                        for record in decisions.event_log.records
-                        if record.event_id == movement_state.pending_setup_event_id
-                    )
+                    trigger_event = setup_boundary.event
                     if not isinstance(trigger_event.payload, dict):
                         raise GameLifecycleError(
                             "Tactical Disembark trigger event payload must be an object."

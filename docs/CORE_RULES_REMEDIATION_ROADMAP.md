@@ -614,7 +614,7 @@ the authoritative mirror observation SHA-256 is
 `a881b7623692015b3c92772f7fd508da782f832a225a922226735c9ed3e8fbc9`. The generated package hash
 is `199be38f35856eddfb6f72395ffff7448f48be1b099db784788a8b64f0e97058`, its canonical artifact-byte
 SHA-256 is `d55ccf8fa6f77cd06553be34153ed137b8d5c438dd8a454ff092c8333efcc2ee`, and the final engine build
-ID is `warhammer40k-core-v2:runtime-tree-sha256-v1:a7dc8b89dafbf12969b40bdfc5889649807e785d608902271830c363ecbc2cc4`.
+ID is `warhammer40k-core-v2:runtime-tree-sha256-v1:c32f7a73a0f02ceff271cbae7507c9fbbe702e40d3cd349fe1f3850b3361d63e`.
 
 Load and execution support: The generated rule row and both evidence rows are `loaded`; the rule
 and authoritative mirror row are `executable_engine_runtime`. The reviewed transcription remains
@@ -667,6 +667,15 @@ and grouped Hazard/FNP serialization. The real Swooping Hawks Grenade Pack catal
 exact `unit_disembarked` occurrence resolves its target and FNP decisions before the follow-up move;
 a destruction regression proves no stale movement action survives that setup boundary.
 
+The replay-integrity re-review remediation authenticates a pending Tactical Disembark setup
+boundary against exactly one `unit_disembarked` event and its retained player, round, phase,
+canonical rules-unit, Transport, accepted action/proposal records, Disembarked state, cargo
+transition, and complete component/model placement inventory. Lifecycle restore rejects boundary
+ID substitution immediately; live resumption performs the same validation before hook dispatch,
+boundary clearing, or any new decision. A same-round two-Disembark regression pauses the second
+occurrence on its real Grenade Pack target request, substitutes the first event ID, and proves both
+restore and resumption fail without mutation or a deferred post-move setup effect.
+
 Generated artifacts/documentation: P09A adds the typed fail-closed movement source package and
 offline builder, updates the 40k.app audit inventory, engine build manifest, Contract 11.1.0 live
 decision schema and generated fixtures/manifest, `ARCHITECTURE_V2.md`,
@@ -683,7 +692,7 @@ Validation results:
   faction/replay scenarios pass (`17 passed`); source identity and generated artifact checks pass
   (`99 passed`).
 - The movement source builder, 40k.app audit, engine-build check, external-contract exact
-  `--base-ref origin/main` check, installed-wheel smoke (`2458` resources and `27` schemas), and
+  `--base-ref origin/main` check, installed-wheel smoke (`2459` resources and `27` schemas), and
   generated ability-support audit (`19 passed`) all pass.
 - The repository-pinned TypeScript generated-client, type, and unit checks pass (`5` unit tests),
   and the certified HTTP conformance scenario passes all `342` assertions on Contract `11.1.0`.
