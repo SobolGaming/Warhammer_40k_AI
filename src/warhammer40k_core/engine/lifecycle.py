@@ -858,7 +858,7 @@ class GameLifecycle:
             invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:
                 return invalid_status
-            _bsa.validate_pending_outcome_request(
+            _bsa.validate_pre_submission_outcome_request(
                 state=state,
                 decisions=self.decision_controller,
                 request=pending_request,

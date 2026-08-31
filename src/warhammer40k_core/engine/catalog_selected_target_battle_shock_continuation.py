@@ -27,6 +27,7 @@ from warhammer40k_core.engine.battle_shock_source_family_authority import (
     validate_battle_shock_source_family_authority,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -393,6 +394,19 @@ def refresh_catalog_selected_target_battle_shock_provider_request(
         raise GameLifecycleError(
             "Catalog selected-target provider outcome must be the sole queue head."
         )
+    provider_records = _provider_decision_records(
+        continuation=continuation,
+        decisions=decisions,
+    )
+    if pending[0] == continuation.provider_pending_request:
+        if provider_records:
+            raise GameLifecycleError(
+                "Catalog selected-target pending provider request is already completed."
+            )
+    elif len(provider_records) != 1:
+        raise GameLifecycleError(
+            "Catalog selected-target provider request advanced without exact decision closure."
+        )
     authority = _validate_continuation_authority(
         continuation=continuation,
         decisions=decisions,
@@ -420,28 +434,23 @@ def validate_pending_catalog_selected_target_battle_shock_continuation(
     if continuation is None:
         return
     _validate_continuation_authority(continuation=continuation, decisions=decisions)
-    if _final_event_count(continuation=continuation, decisions=decisions):
-        if continuation.continuation_phase is (
-            CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_PROVIDER_OUTCOME
-        ):
-            raise GameLifecycleError(
-                "Catalog selected-target final event preceded its provider outcome."
-            )
-        return
+    final_event_count = _final_event_count(continuation=continuation, decisions=decisions)
     pending = decisions.queue.pending_requests
-    if not pending:
-        if require_pending_request:
-            raise GameLifecycleError(
-                "Restored catalog selected-target continuation lacks a pending request."
-            )
-        return
-    if len(pending) != 1:
-        raise GameLifecycleError(
-            "Catalog selected-target continuation requires one decision queue head."
-        )
     if continuation.continuation_phase is (
         CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_PROVIDER_OUTCOME
     ):
+        if _provider_decision_records(continuation=continuation, decisions=decisions):
+            raise GameLifecycleError(
+                "Catalog selected-target pending provider request is already completed."
+            )
+        if final_event_count:
+            raise GameLifecycleError(
+                "Catalog selected-target final event preceded its provider outcome."
+            )
+        if len(pending) != 1:
+            raise GameLifecycleError(
+                "Catalog selected-target provider outcome must be the sole queue head."
+            )
         if pending[0] != continuation.provider_pending_request:
             raise GameLifecycleError("Catalog selected-target provider request drifted.")
         authority = _validate_continuation_authority(
@@ -460,6 +469,39 @@ def validate_pending_catalog_selected_target_battle_shock_continuation(
             or claim.resolved_event_index != continuation.provider_resolved_event_index
         ):
             raise GameLifecycleError("Catalog selected-target provider claim drifted.")
+        return
+
+    if continuation.provider_pending_request in pending:
+        raise GameLifecycleError(
+            "Catalog selected-target completed provider request remains queued."
+        )
+    _validate_provider_completion(
+        continuation=continuation,
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=battle_shock_hooks,
+    )
+    if final_event_count:
+        if pending:
+            raise GameLifecycleError(
+                "Catalog selected-target final event cannot retain a pending continuation."
+            )
+        return
+    if not pending:
+        if require_pending_request:
+            raise GameLifecycleError(
+                "Restored catalog selected-target continuation lacks a pending request."
+            )
+        return
+    if len(pending) != 1:
+        raise GameLifecycleError(
+            "Catalog selected-target continuation requires one decision queue head."
+        )
+    _validate_remaining_effect_pending_request(
+        continuation=continuation,
+        decisions=decisions,
+        request=pending[0],
+    )
 
 
 def resume_catalog_selected_target_battle_shock_continuation(
@@ -593,9 +635,37 @@ def validate_catalog_selected_target_battle_shock_submitted_status(
         decisions=decisions,
         battle_shock_hooks=bundle.battle_shock_hook_registry,
     )
+    validate_pending_catalog_selected_target_battle_shock_continuation(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=bundle.battle_shock_hook_registry,
+        require_pending_request=True,
+    )
     if status.decision_request != decisions.queue.peek_next():
         raise GameLifecycleError(
             "Catalog selected-target continuation status is not the queue head."
+        )
+
+
+def validate_catalog_selected_target_battle_shock_pre_submission(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    runtime_content_bundle: RuntimeContentBundle | None,
+) -> None:
+    if state.pending_catalog_selected_target_battle_shock_continuation is None:
+        return
+    bundle = _require_runtime_content_bundle(runtime_content_bundle)
+    validate_pending_catalog_selected_target_battle_shock_continuation(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=bundle.battle_shock_hook_registry,
+        require_pending_request=True,
+    )
+    if decisions.queue.peek_next() != request:
+        raise GameLifecycleError(
+            "Catalog selected-target continuation submission is not the queue head."
         )
 
 
@@ -838,10 +908,9 @@ def _validate_provider_completion(
     decisions: DecisionController,
     battle_shock_hooks: BattleShockHookRegistry,
 ) -> None:
-    provider_records = tuple(
-        record
-        for record in decisions.records
-        if record.request == continuation.provider_pending_request
+    provider_records = _provider_decision_records(
+        continuation=continuation,
+        decisions=decisions,
     )
     if len(provider_records) != 1:
         raise GameLifecycleError(
@@ -850,6 +919,88 @@ def _validate_provider_completion(
     battle_shock_hooks.validate_completed_outcome_authority(
         BattleShockCompletedOutcomeAuthorityContext(state=state, decisions=decisions)
     )
+
+
+def _provider_decision_records(
+    *,
+    continuation: PendingCatalogSelectedTargetBattleShockContinuation,
+    decisions: DecisionController,
+) -> tuple[DecisionRecord, ...]:
+    return tuple(
+        record
+        for record in decisions.records
+        if record.request == continuation.provider_pending_request
+    )
+
+
+def _validate_remaining_effect_pending_request(
+    *,
+    continuation: PendingCatalogSelectedTargetBattleShockContinuation,
+    decisions: DecisionController,
+    request: DecisionRequest,
+) -> None:
+    from warhammer40k_core.engine.catalog_selected_target_mortal_wounds import (
+        CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND,
+    )
+    from warhammer40k_core.engine.damage_allocation import (
+        is_mortal_wound_feel_no_pain_request,
+        mortal_wound_feel_no_pain_source_context,
+    )
+
+    if not is_mortal_wound_feel_no_pain_request(request):
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects request is not a supported continuation."
+        )
+    if any(record.request == request for record in decisions.records):
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects request is already completed."
+        )
+    request_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "decision_requested" and event.payload == request.to_payload()
+    )
+    if len(request_events) != 1:
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects request event authority drifted."
+        )
+    source_context = _json_object(
+        "remaining_effect_source_context",
+        mortal_wound_feel_no_pain_source_context(request),
+    )
+    if source_context.get("source_kind") != CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND:
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects request source kind drifted."
+        )
+    if (
+        source_context.get("selected_target_decision_result")
+        != continuation.selected_target_result.to_payload()
+        or source_context.get("selected_target_payload") != continuation.selected_target_payload
+    ):
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects request parent authority drifted."
+        )
+    effect_record = _payload_object(source_context, "selected_target_effect_record")
+    remaining_after = _payload_object_tuple(
+        source_context,
+        "selected_target_remaining_effect_records_after_mortal_wounds",
+    )
+    remaining_start_index = _payload_non_negative_int(
+        source_context,
+        "selected_target_remaining_effect_start_index",
+    )
+    matches = tuple(
+        index
+        for index, record in enumerate(continuation.remaining_effect_records)
+        if record == effect_record
+        and record.get("immediate_effect_kind") == "inflict_mortal_wounds"
+        and tuple(continuation.remaining_effect_records[index + 1 :]) == remaining_after
+        and continuation.remaining_effect_start_index + index + 1 == remaining_start_index
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects request ancestry drifted."
+        )
 
 
 def _validate_progressive_replacement(
@@ -976,6 +1127,7 @@ __all__ = (
     "refresh_catalog_selected_target_battle_shock_provider_request",
     "resume_catalog_selected_target_battle_shock_continuation",
     "retain_catalog_selected_target_battle_shock_continuation",
+    "validate_catalog_selected_target_battle_shock_pre_submission",
     "validate_catalog_selected_target_battle_shock_submitted_status",
     "validate_pending_catalog_selected_target_battle_shock_continuation",
     "validate_restored_catalog_selected_target_battle_shock_continuation",

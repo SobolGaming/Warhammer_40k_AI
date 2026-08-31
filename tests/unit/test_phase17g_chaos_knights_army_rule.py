@@ -81,6 +81,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockRerollPermissionContext,
     HistoricalBattleShockContribution,
 )
+from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
+    CatalogSelectedTargetBattleShockContinuationPhase,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     CATALOG_SELECTED_TARGET_EFFECT_SELECTED_EVENT,
@@ -1512,6 +1515,208 @@ def test_phase_start_selected_target_battle_shock_waits_for_delirium_outcome_via
     _assert_phase_start_selected_target_delirium_continuation(phase=phase)
 
 
+def test_selected_target_continuation_phase_tamper_rejects_before_provider_mutation() -> None:
+    lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
+        game_id="phase17g-selected-target-delirium-phase-tamper"
+    )
+    payload = deepcopy(lifecycle.to_payload())
+    state_payload = cast(dict[str, Any], payload["state"])
+    continuation_payload = cast(
+        dict[str, Any],
+        state_payload["pending_catalog_selected_target_battle_shock_continuation"],
+    )
+    assert continuation_payload["continuation_phase"] == "awaiting_provider_outcome"
+    continuation_payload["continuation_phase"] = "awaiting_remaining_effects"
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="completed provider request remains queued",
+    ):
+        GameLifecycle.from_payload(payload, runtime_content_bundle=bundle)
+
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("selected-target phase tamper requires state")
+    continuation = state.pending_catalog_selected_target_battle_shock_continuation
+    if continuation is None:
+        raise AssertionError("selected-target phase tamper requires continuation")
+    state.replace_catalog_selected_target_battle_shock_continuation(
+        replace(
+            continuation,
+            continuation_phase=(
+                CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
+            ),
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17g-selected-target-delirium-phase-tamper:decline",
+        request=provider_request,
+        selected_option_id="decline",
+    )
+    decisions = lifecycle.decision_controller
+    before_state = deepcopy(state.to_payload())
+    before_queue = decisions.queue.pending_requests
+    before_records = decisions.records
+    before_events = decisions.event_log.records
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="completed provider request remains queued",
+    ):
+        lifecycle.submit_decision(result)
+
+    assert state.to_payload() == before_state
+    assert decisions.queue.pending_requests == before_queue
+    assert decisions.records == before_records
+    assert decisions.event_log.records == before_events
+    assert not _events_of_type(
+        decisions,
+        CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+    )
+
+
+def test_selected_target_continuation_rejects_completed_provider_in_pending_phase() -> None:
+    lifecycle, bundle, provider_request = _selected_target_delirium_provider_checkpoint(
+        game_id="phase17g-selected-target-delirium-completed-provider-phase"
+    )
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("selected-target completed provider requires state")
+    continuation = state.pending_catalog_selected_target_battle_shock_continuation
+    if continuation is None:
+        raise AssertionError("selected-target completed provider requires continuation")
+    assert continuation.continuation_phase is (
+        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_PROVIDER_OUTCOME
+    )
+    assert continuation.provider_pending_request == provider_request
+    retained_pending_continuation = continuation
+    session = LocalGameSession(lifecycle=lifecycle)
+    for provider_decision_index in range(30):
+        provider_request = lifecycle.decision_controller.queue.peek_next()
+        session.submit_option(
+            request_id=provider_request.request_id,
+            option_id="decline",
+            result_id=(
+                "phase17g-selected-target-delirium-completed-provider-phase:"
+                f"decline:{provider_decision_index}"
+            ),
+        )
+        if state.pending_catalog_selected_target_battle_shock_continuation is None:
+            break
+    else:
+        raise AssertionError("selected-target provider outcome did not complete")
+    assert any(
+        record.request == retained_pending_continuation.provider_pending_request
+        for record in lifecycle.decision_controller.records
+    )
+    state.replace_catalog_selected_target_battle_shock_continuation(retained_pending_continuation)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="pending provider request is already completed",
+    ):
+        GameLifecycle.from_payload(
+            deepcopy(lifecycle.to_payload()),
+            runtime_content_bundle=bundle,
+        )
+
+
+def test_selected_target_remaining_effect_request_requires_retained_ancestry() -> None:
+    selected_target_record = _selected_target_battle_shock_then_mortal_record()
+    lifecycle, bundle, _provider_request = _selected_target_delirium_provider_checkpoint(
+        game_id="phase17g-selected-target-delirium-remaining-mortal-wounds",
+        selected_target_record=selected_target_record,
+    )
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("selected-target remaining effects require state")
+    session = LocalGameSession(lifecycle=lifecycle)
+    for provider_decision_index in range(30):
+        continuation = state.pending_catalog_selected_target_battle_shock_continuation
+        if continuation is None:
+            raise AssertionError("selected-target remaining mortal-wound roll resolved to zero")
+        if continuation.continuation_phase is (
+            CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
+        ):
+            break
+        provider_request = lifecycle.decision_controller.queue.peek_next()
+        session.submit_option(
+            request_id=provider_request.request_id,
+            option_id="decline",
+            result_id=(
+                "phase17g-selected-target-delirium-remaining-mortal-wounds:"
+                f"provider:{provider_decision_index}"
+            ),
+        )
+    else:
+        raise AssertionError("selected-target provider outcome did not reach remaining effects")
+
+    nested_request = lifecycle.decision_controller.queue.peek_next()
+    assert nested_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    assert restored.state is not None
+    assert restored.state.pending_catalog_selected_target_battle_shock_continuation is not None
+
+    forged_request = replace(
+        nested_request,
+        request_id=f"{nested_request.request_id}:unrelated",
+    )
+    lifecycle.decision_controller.queue._pending_requests[0] = (  # pyright: ignore[reportPrivateUsage]
+        forged_request
+    )
+    result = DecisionResult.for_request(
+        result_id=("phase17g-selected-target-delirium-remaining-mortal-wounds:forged-result"),
+        request=forged_request,
+        selected_option_id="decline",
+    )
+    before_state = deepcopy(state.to_payload())
+    before_queue = lifecycle.decision_controller.queue.pending_requests
+    before_records = lifecycle.decision_controller.records
+    before_events = lifecycle.decision_controller.event_log.records
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="remaining-effects request event authority drifted",
+    ):
+        lifecycle.submit_decision(result)
+
+    assert state.to_payload() == before_state
+    assert lifecycle.decision_controller.queue.pending_requests == before_queue
+    assert lifecycle.decision_controller.records == before_records
+    assert lifecycle.decision_controller.event_log.records == before_events
+
+    restored_session = LocalGameSession(lifecycle=restored)
+    for nested_decision_index in range(30):
+        if _events_of_type(
+            restored.decision_controller,
+            CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+        ):
+            break
+        current_request = restored.decision_controller.queue.peek_next()
+        restored_session.submit_option(
+            request_id=current_request.request_id,
+            option_id="decline",
+            result_id=(
+                "phase17g-selected-target-delirium-remaining-mortal-wounds:"
+                f"nested:{nested_decision_index}"
+            ),
+        )
+    else:
+        raise AssertionError("selected-target remaining effects did not complete")
+    assert (
+        len(
+            _events_of_type(
+                restored.decision_controller,
+                CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+            )
+        )
+        == 1
+    )
+
+
 def test_delirium_source_identity_drift_rejects_before_lifecycle_mutation() -> None:
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
         game_id="phase17g-chaos-knights-delirium-source-identity-drift",
@@ -2291,6 +2496,44 @@ def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()
 
 
+def _selected_target_delirium_provider_checkpoint(
+    *,
+    game_id: str,
+    selected_target_record: AbilityCatalogRecord | None = None,
+) -> tuple[GameLifecycle, RuntimeContentBundle, DecisionRequest]:
+    selected_target_record = (
+        _selected_target_battle_shock_then_modifier_record()
+        if selected_target_record is None
+        else selected_target_record
+    )
+    lifecycle, bundle = _command_delirium_lifecycle_fixture(
+        game_id=game_id,
+        with_feel_no_pain=True,
+        selected_target_record=selected_target_record,
+        target_starting_wounds=30,
+        begin_command_phase=False,
+    )
+    lifecycle = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    _queue_selected_target_delirium_request(
+        lifecycle=lifecycle,
+        selected_target_record=selected_target_record,
+    )
+    selected_request = lifecycle.decision_controller.queue.peek_next()
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = session.submit_option(
+        request_id=selected_request.request_id,
+        option_id=selected_request.options[0].option_id,
+        result_id=f"{game_id}:selected-target-result",
+    )
+    provider_request = lifecycle.decision_controller.queue.peek_next()
+    assert status.decision_request == provider_request
+    assert provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    return lifecycle, bundle, provider_request
+
+
 def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePhase) -> None:
     game_id = f"phase17g-selected-target-{phase.value}-start-delirium"
     selected_target_record = _phase_start_selected_target_battle_shock_record(phase=phase)
@@ -2420,6 +2663,43 @@ def _selected_target_battle_shock_then_modifier_record() -> AbilityCatalogRecord
             source_id=source.source_id,
             when_descriptor="After this model has shot.",
             effect_descriptor="Battle-shock, then a persisting modifier.",
+            restrictions_descriptor="Select one enemy unit hit by those attacks.",
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT
+            ),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="core-intercessor-like-infantry",
+    )
+
+
+def _selected_target_battle_shock_then_mortal_record() -> AbilityCatalogRecord:
+    source = RuleSourceText.from_raw(
+        source_id="phase17g:test:selected-target-battle-shock-then-mortal-wounds",
+        raw_text=(
+            "In your Shooting phase, after this model has shot, select one enemy unit that "
+            "was hit by one or more of those attacks. That unit must take a Battle-shock "
+            "test. Roll three D6: for each 4+, that enemy unit suffers 1 mortal wound."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    if not rule_ir.is_supported:
+        raise AssertionError("selected-target Battle-shock/mortal-wound fixture must compile")
+    return AbilityCatalogRecord(
+        record_id="phase17g:test:selected-target-battle-shock-then-mortal-wounds",
+        definition=AbilityDefinition(
+            ability_id="phase17g:test:selected-target-battle-shock-then-mortal-wounds:ability",
+            name="Selected-target remaining-effects continuation regression",
+            source_id=source.source_id,
+            when_descriptor="After this model has shot.",
+            effect_descriptor="Battle-shock, then mortal wounds.",
             restrictions_descriptor="Select one enemy unit hit by those attacks.",
             timing=AbilityTimingDescriptor(
                 trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT
