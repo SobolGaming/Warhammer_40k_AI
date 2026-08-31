@@ -343,11 +343,13 @@ def test_battle_shock_resolution_result_rejects_invalid_shapes() -> None:
             pending_status=None,
         )
 
-    with pytest.raises(GameLifecycleError, match="resolved or pending"):
-        battle_shock_resolution.BattleShockResolutionResult(
-            resolved_payload={},
-            pending_status=LifecycleStatus.advanced(stage=GameLifecycleStage.BATTLE),
-        )
+    pending_status = LifecycleStatus.advanced(stage=GameLifecycleStage.BATTLE)
+    resolved_with_pending_outcome = battle_shock_resolution.BattleShockResolutionResult(
+        resolved_payload={},
+        pending_status=pending_status,
+    )
+    assert resolved_with_pending_outcome.resolved_payload == {}
+    assert resolved_with_pending_outcome.pending_status is pending_status
 
     with pytest.raises(GameLifecycleError, match="pending status"):
         battle_shock_resolution.BattleShockResolutionResult(
@@ -729,7 +731,7 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
         unit=target_unit,
         request_id="request:failed-battle-shock-recorded",
     )
-    payload = battle_shock_resolution.record_battle_shock_result_and_outcome_events(
+    resolution = battle_shock_resolution.record_battle_shock_result_and_outcome_events(
         state=state,
         decisions=DecisionController(),
         manager=DiceRollManager(state.game_id),
@@ -755,7 +757,7 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
         resolved_event_types=("test_battle_shock_resolved",),
     )
 
-    resolved_payload = cast(dict[str, JsonValue], payload)
+    resolved_payload = cast(dict[str, JsonValue], resolution.resolved_payload)
     assert resolved_payload["state_update"] == "recorded_battle_shocked"
     assert target_unit.unit_instance_id in state.battle_shocked_unit_ids
 
@@ -784,7 +786,7 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
             list(state.battle_shocked_unit_states),
         )
     )
-    already_payload = battle_shock_resolution.record_battle_shock_result_and_outcome_events(
+    already_resolution = battle_shock_resolution.record_battle_shock_result_and_outcome_events(
         state=already_shocked_state,
         decisions=DecisionController(),
         manager=DiceRollManager(already_shocked_state.game_id),
@@ -810,7 +812,10 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
         resolved_event_types=("test_battle_shock_resolved",),
     )
 
-    already_resolved_payload = cast(dict[str, JsonValue], already_payload)
+    already_resolved_payload = cast(
+        dict[str, JsonValue],
+        already_resolution.resolved_payload,
+    )
     assert already_resolved_payload["state_update"] == "already_battle_shocked"
     assert target_unit.unit_instance_id in already_shocked_state.battle_shocked_unit_ids
 

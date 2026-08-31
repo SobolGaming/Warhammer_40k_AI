@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
+from warhammer40k_core.engine.decision_result import DecisionResultPayload
 
 # fmt: off
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.mission_setup import MissionSetup
-    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
+    from warhammer40k_core.engine.phases.movement_model import SELECT_MOVEMENT_UNIT_DECISION_TYPE, SELECT_MOVEMENT_ACTION_DECISION_TYPE, SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE, SELECT_EMBARK_TRANSPORT_DECISION_TYPE, DECLINE_EMBARK_OPTION_ID, MovementPhaseStepKind, MovementPhaseActionKind, MovementUnitLocationKind, FallBackModeKind, DesperateEscapeRequirementReason, _MOVEMENT_ACTIONS_OUTSIDE_ENEMY_ENGAGEMENT, _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT, _ADVANCE_REROLL_KEYWORD, _ADVANCED_UNIT_CLEANUP_POINT, _FELL_BACK_UNIT_CLEANUP_POINT, _DESPERATE_ESCAPE_ROLL_TYPE, _empty_ability_indexes, _MovementProposalParseResult, _PlacementProposalParseResult, MovementUnitSelectionPayload, PendingMovementActionSelectionPayload, MovementPhaseStatePayload, MovementActionAvailabilityContextPayload, MovementActionAvailabilityResultPayload, MovementDistanceRecordPayload, AdvanceRollRequestPayload, AdvanceRollResultPayload, MovementDiceRecordPayload, AdvancedUnitStatePayload, DesperateEscapeRequirementPayload, DesperateEscapeRollPayload, FellBackUnitStatePayload, FallBackActionResultPayload, PendingDesperateEscapeBattleShockContinuationPayload, MovementActionAvailabilityContext, MovementActionAvailabilityResult, AdvanceRollRequest, AdvanceRollResult, MovementDiceRecord, AdvancedUnitState, DesperateEscapeRequirement, DesperateEscapeRoll, FellBackUnitState, MovementUnitSelection, PendingMovementActionSelection, DisembarkCandidate, MovementDistanceRecord
     from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler, _complete_move_units_step
     from warhammer40k_core.engine.phases.movement_reactions import _request_end_opponent_movement_reaction_if_available, _request_end_movement_active_player_stratagem_if_available, _request_rapid_ingress_reaction_if_available, _request_fire_overwatch_reaction_if_available, _request_selected_to_move_stratagem_if_available, _request_selected_to_fall_back_stratagem_if_available, _request_friendly_unit_fell_back_stratagem_if_available, _friendly_unit_fell_back_context_from_event, _friendly_unit_fell_back_timing_window_id, _stratagem_used_for_context, _selected_to_fall_back_trigger_payload, _selected_to_fall_back_timing_window_id, _selected_to_move_timing_window_id, _stratagem_use_payload_factory, _stratagem_target_proposal_payload_factory, _request_movement_end_surge_if_available, _movement_end_surge_distance_roll_spec, _eligible_triggered_movement_units_from_grants, _movement_end_surge_grant_distance_bonus, _movement_end_surge_event_already_processed, _active_player_end_movement_overwatch_trigger_unit_ids, _fire_overwatch_end_movement_trigger_payload
     from warhammer40k_core.engine.phases.movement_reinforcements import _eligible_reinforcement_reserve_states, _required_reinforcement_reserve_states, _overdue_required_reinforcement_reserve_states, _request_reinforcement_placement, _reserve_placement_kinds_for_unit, _reserve_proposal_kind, _request_placement_proposal_retry, _optional_proposal_context_string, _resolve_reinforcement_placement_submission, _deep_strike_enemy_distance_for_reserve_arrival, _unit_for_reserve_state, _apply_valid_reinforcement_placement
@@ -28,11 +29,24 @@ if TYPE_CHECKING:
 
 __all__ = (
     "AdvanceMoveResolution",
+    "DesperateEscapeBattleShockContinuationPhase",
+    "DesperateEscapeBattleShockContinuationSourceKind",
     "FallBackActionResult",
     "MovementPhaseState",
     "NormalMoveResolution",
+    "PendingDesperateEscapeBattleShockContinuation",
     "_ResolvedUnitMove",
 )
+
+
+class DesperateEscapeBattleShockContinuationSourceKind(StrEnum):
+    FORCED_PRE_MOVE = "forced_pre_move"
+    VOLUNTARY_POST_MOVE = "voluntary_post_move"
+
+
+class DesperateEscapeBattleShockContinuationPhase(StrEnum):
+    AWAITING_BATTLE_SHOCK = "awaiting_battle_shock"
+    AWAITING_OUTCOME = "awaiting_outcome"
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +61,9 @@ class MovementPhaseState:
     active_selection: MovementUnitSelection | None = None
     pending_action: PendingMovementActionSelection | None = None
     pending_setup_event_id: str | None = None
+    pending_desperate_escape_battle_shock_continuation: (
+        PendingDesperateEscapeBattleShockContinuation | None
+    ) = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -167,6 +184,25 @@ class MovementPhaseState:
                 raise GameLifecycleError(
                     "MovementPhaseState pending setup event cannot coexist with pending_action."
                 )
+        continuation = self.pending_desperate_escape_battle_shock_continuation
+        if continuation is not None:
+            if type(continuation) is not PendingDesperateEscapeBattleShockContinuation:
+                raise GameLifecycleError(
+                    "MovementPhaseState Desperate Escape continuation must be typed."
+                )
+            if self.active_selection is None:
+                raise GameLifecycleError(
+                    "MovementPhaseState Desperate Escape continuation requires active_selection."
+                )
+            if continuation.canonical_unit_instance_id != (self.active_selection.unit_instance_id):
+                raise GameLifecycleError(
+                    "MovementPhaseState Desperate Escape continuation unit drift."
+                )
+            if self.pending_action is not None or self.pending_setup_event_id is not None:
+                raise GameLifecycleError(
+                    "MovementPhaseState Desperate Escape continuation cannot coexist with "
+                    "another movement continuation."
+                )
 
     def legal_unit_ids(
         self,
@@ -210,6 +246,7 @@ class MovementPhaseState:
             active_selection=selection,
             pending_action=None,
             pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=None,
         )
 
     def with_pending_action(self, pending_action: PendingMovementActionSelection) -> Self:
@@ -240,6 +277,9 @@ class MovementPhaseState:
             active_selection=self.active_selection,
             pending_action=pending_action,
             pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=(
+                self.pending_desperate_escape_battle_shock_continuation
+            ),
         )
 
     def without_pending_action(self) -> Self:
@@ -256,6 +296,9 @@ class MovementPhaseState:
             active_selection=self.active_selection,
             pending_action=None,
             pending_setup_event_id=self.pending_setup_event_id,
+            pending_desperate_escape_battle_shock_continuation=(
+                self.pending_desperate_escape_battle_shock_continuation
+            ),
         )
 
     def with_pending_setup_event(self, event_id: str) -> Self:
@@ -276,6 +319,7 @@ class MovementPhaseState:
             active_selection=self.active_selection,
             pending_action=None,
             pending_setup_event_id=_validate_identifier("event_id", event_id),
+            pending_desperate_escape_battle_shock_continuation=None,
         )
 
     def without_pending_setup_event(self) -> Self:
@@ -292,6 +336,9 @@ class MovementPhaseState:
             active_selection=self.active_selection,
             pending_action=None,
             pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=(
+                self.pending_desperate_escape_battle_shock_continuation
+            ),
         )
 
     def with_activation_complete(
@@ -340,6 +387,7 @@ class MovementPhaseState:
             active_selection=None,
             pending_action=None,
             pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=None,
         )
 
     def with_step(self, step: MovementPhaseStepKind) -> Self:
@@ -371,6 +419,7 @@ class MovementPhaseState:
             active_selection=None,
             pending_action=None,
             pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=None,
         )
 
     def with_move_units_completed(self) -> Self:
@@ -389,6 +438,7 @@ class MovementPhaseState:
             active_selection=None,
             pending_action=None,
             pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=None,
         )
 
     def to_payload(self) -> MovementPhaseStatePayload:
@@ -409,12 +459,18 @@ class MovementPhaseState:
                 None if self.pending_action is None else self.pending_action.to_payload()
             ),
             "pending_setup_event_id": self.pending_setup_event_id,
+            "pending_desperate_escape_battle_shock_continuation": (
+                None
+                if self.pending_desperate_escape_battle_shock_continuation is None
+                else self.pending_desperate_escape_battle_shock_continuation.to_payload()
+            ),
         }
 
     @classmethod
     def from_payload(cls, payload: MovementPhaseStatePayload) -> Self:
         active_selection_payload = payload["active_selection"]
         pending_action_payload = payload["pending_action"]
+        continuation_payload = payload["pending_desperate_escape_battle_shock_continuation"]
         return cls(
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
@@ -437,6 +493,68 @@ class MovementPhaseState:
                 else PendingMovementActionSelection.from_payload(pending_action_payload)
             ),
             pending_setup_event_id=payload.get("pending_setup_event_id"),
+            pending_desperate_escape_battle_shock_continuation=(
+                None
+                if continuation_payload is None
+                else PendingDesperateEscapeBattleShockContinuation.from_payload(
+                    continuation_payload
+                )
+            ),
+        )
+
+    def with_desperate_escape_battle_shock_continuation(
+        self,
+        continuation: PendingDesperateEscapeBattleShockContinuation,
+    ) -> Self:
+        if type(continuation) is not PendingDesperateEscapeBattleShockContinuation:
+            raise GameLifecycleError("Desperate Escape continuation must be typed.")
+        if self.active_selection is None:
+            raise GameLifecycleError("Desperate Escape continuation requires active selection.")
+        if self.pending_setup_event_id is not None:
+            raise GameLifecycleError(
+                "Desperate Escape continuation requires no other movement continuation."
+            )
+        if self.pending_action is not None and (
+            self.pending_action.movement_phase_action is not MovementPhaseActionKind.FALL_BACK
+            or self.pending_action.unit_instance_id != continuation.canonical_unit_instance_id
+            or self.pending_action.player_id != continuation.action_result.actor_id
+            or self.pending_action.request_id != continuation.action_result.request_id
+            or self.pending_action.result_id != continuation.action_result.result_id
+            or self.pending_action.selected_option_id
+            != continuation.action_result.selected_option_id
+        ):
+            raise GameLifecycleError(
+                "Desperate Escape continuation does not consume the pending Fall Back action."
+            )
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            move_units_completed=self.move_units_completed,
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=self.active_selection,
+            pending_action=None,
+            pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=continuation,
+        )
+
+    def without_desperate_escape_battle_shock_continuation(self) -> Self:
+        if self.pending_desperate_escape_battle_shock_continuation is None:
+            return self
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            move_units_completed=self.move_units_completed,
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=self.active_selection,
+            pending_action=None,
+            pending_setup_event_id=None,
+            pending_desperate_escape_battle_shock_continuation=None,
         )
 
 
@@ -933,6 +1051,221 @@ class FallBackActionResult:
                 else MovementRollbackRecord.from_payload(rollback_payload)
             ),
             movement_payload=payload["movement_payload"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PendingDesperateEscapeBattleShockContinuation:
+    source_kind: DesperateEscapeBattleShockContinuationSourceKind
+    continuation_phase: DesperateEscapeBattleShockContinuationPhase
+    canonical_unit_instance_id: str
+    movement_proposal_request_id: str
+    action_result: DecisionResult
+    fall_back_result: FallBackActionResult
+    fall_back_applied_event_id: str | None
+    movement_payload: dict[str, JsonValue] | None
+    transition_batch: BattlefieldTransitionBatch | None
+    battle_shock_request_id: str
+    battle_shock_result_id: str | None = None
+    battle_shock_reroll_request_id: str | None = None
+    battle_shock_reroll_result_id: str | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.source_kind) is not DesperateEscapeBattleShockContinuationSourceKind:
+            raise GameLifecycleError("Desperate Escape continuation source kind must be typed.")
+        if type(self.continuation_phase) is not DesperateEscapeBattleShockContinuationPhase:
+            raise GameLifecycleError("Desperate Escape continuation phase must be typed.")
+        for field_name in (
+            "canonical_unit_instance_id",
+            "movement_proposal_request_id",
+            "battle_shock_request_id",
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                _validate_identifier(
+                    f"Desperate Escape continuation {field_name}",
+                    getattr(self, field_name),
+                ),
+            )
+        if type(self.action_result) is not DecisionResult:
+            raise GameLifecycleError("Desperate Escape continuation action result must be typed.")
+        if type(self.fall_back_result) is not FallBackActionResult:
+            raise GameLifecycleError(
+                "Desperate Escape continuation Fall Back result must be typed."
+            )
+        if (
+            self.action_result.request_id == self.movement_proposal_request_id
+            or self.action_result.result_id == self.movement_proposal_request_id
+        ):
+            raise GameLifecycleError(
+                "Desperate Escape continuation proposal request must be distinct from action IDs."
+            )
+        if self.fall_back_result.unit_instance_id != self.canonical_unit_instance_id:
+            raise GameLifecycleError("Desperate Escape continuation Fall Back unit drift.")
+        for field_name in (
+            "fall_back_applied_event_id",
+            "battle_shock_result_id",
+            "battle_shock_reroll_request_id",
+            "battle_shock_reroll_result_id",
+        ):
+            value = getattr(self, field_name)
+            if value is not None:
+                object.__setattr__(
+                    self,
+                    field_name,
+                    _validate_identifier(
+                        f"Desperate Escape continuation {field_name}",
+                        value,
+                    ),
+                )
+        if self.movement_payload is not None:
+            object.__setattr__(
+                self,
+                "movement_payload",
+                _validate_json_object(
+                    "Desperate Escape continuation movement_payload",
+                    self.movement_payload,
+                ),
+            )
+        if (
+            self.transition_batch is not None
+            and type(self.transition_batch) is not BattlefieldTransitionBatch
+        ):
+            raise GameLifecycleError(
+                "Desperate Escape continuation transition batch must be typed."
+            )
+        post_move_fields = (
+            self.fall_back_applied_event_id,
+            self.movement_payload,
+            self.transition_batch,
+        )
+        if self.source_kind is DesperateEscapeBattleShockContinuationSourceKind.VOLUNTARY_POST_MOVE:
+            if any(value is None for value in post_move_fields):
+                raise GameLifecycleError(
+                    "Post-move Desperate Escape continuation requires applied movement authority."
+                )
+        elif any(value is not None for value in post_move_fields):
+            raise GameLifecycleError(
+                "Pre-move Desperate Escape continuation cannot contain applied movement authority."
+            )
+        if (
+            self.continuation_phase
+            is DesperateEscapeBattleShockContinuationPhase.AWAITING_BATTLE_SHOCK
+        ):
+            if (
+                self.battle_shock_result_id is not None
+                or self.battle_shock_reroll_result_id is not None
+            ):
+                raise GameLifecycleError(
+                    "Unresolved Desperate Escape Battle-shock cannot contain result authority."
+                )
+        elif self.battle_shock_result_id is None:
+            raise GameLifecycleError(
+                "Desperate Escape outcome continuation requires Battle-shock result authority."
+            )
+        if (
+            (self.battle_shock_reroll_request_id is None)
+            != (self.battle_shock_reroll_result_id is None)
+            and self.continuation_phase
+            is DesperateEscapeBattleShockContinuationPhase.AWAITING_OUTCOME
+        ):
+            raise GameLifecycleError(
+                "Desperate Escape reroll request/result authority is incomplete."
+            )
+
+    def awaiting_reroll(self, request_id: str) -> Self:
+        return replace(
+            self,
+            continuation_phase=DesperateEscapeBattleShockContinuationPhase.AWAITING_BATTLE_SHOCK,
+            battle_shock_result_id=None,
+            battle_shock_reroll_request_id=_validate_identifier(
+                "Desperate Escape reroll request_id", request_id
+            ),
+            battle_shock_reroll_result_id=None,
+        )
+
+    def awaiting_outcome(
+        self,
+        *,
+        battle_shock_result_id: str,
+        battle_shock_reroll_result_id: str | None,
+    ) -> Self:
+        reroll_result_id = (
+            None
+            if battle_shock_reroll_result_id is None
+            else _validate_identifier(
+                "Desperate Escape reroll result_id", battle_shock_reroll_result_id
+            )
+        )
+        if (self.battle_shock_reroll_request_id is None) != (reroll_result_id is None):
+            raise GameLifecycleError("Desperate Escape reroll continuation authority drift.")
+        return replace(
+            self,
+            continuation_phase=DesperateEscapeBattleShockContinuationPhase.AWAITING_OUTCOME,
+            battle_shock_result_id=_validate_identifier(
+                "Desperate Escape Battle-shock result_id", battle_shock_result_id
+            ),
+            battle_shock_reroll_result_id=reroll_result_id,
+        )
+
+    def to_payload(self) -> PendingDesperateEscapeBattleShockContinuationPayload:
+        return {
+            "source_kind": self.source_kind.value,
+            "continuation_phase": self.continuation_phase.value,
+            "canonical_unit_instance_id": self.canonical_unit_instance_id,
+            "movement_proposal_request_id": self.movement_proposal_request_id,
+            "action_result": cast(
+                dict[str, JsonValue], validate_json_value(self.action_result.to_payload())
+            ),
+            "fall_back_result": self.fall_back_result.to_payload(),
+            "fall_back_applied_event_id": self.fall_back_applied_event_id,
+            "movement_payload": self.movement_payload,
+            "transition_batch": (
+                None if self.transition_batch is None else self.transition_batch.to_payload()
+            ),
+            "battle_shock_request_id": self.battle_shock_request_id,
+            "battle_shock_result_id": self.battle_shock_result_id,
+            "battle_shock_reroll_request_id": self.battle_shock_reroll_request_id,
+            "battle_shock_reroll_result_id": self.battle_shock_reroll_result_id,
+        }
+
+    @classmethod
+    def from_payload(
+        cls,
+        payload: PendingDesperateEscapeBattleShockContinuationPayload,
+    ) -> Self:
+        movement_payload = payload["movement_payload"]
+        transition_payload = payload["transition_batch"]
+        try:
+            source_kind = DesperateEscapeBattleShockContinuationSourceKind(payload["source_kind"])
+            continuation_phase = DesperateEscapeBattleShockContinuationPhase(
+                payload["continuation_phase"]
+            )
+        except ValueError as exc:
+            raise GameLifecycleError(
+                "Desperate Escape continuation payload contains an unsupported token."
+            ) from exc
+        return cls(
+            source_kind=source_kind,
+            continuation_phase=continuation_phase,
+            canonical_unit_instance_id=payload["canonical_unit_instance_id"],
+            movement_proposal_request_id=payload["movement_proposal_request_id"],
+            action_result=DecisionResult.from_payload(
+                cast(DecisionResultPayload, payload["action_result"])
+            ),
+            fall_back_result=FallBackActionResult.from_payload(payload["fall_back_result"]),
+            fall_back_applied_event_id=payload["fall_back_applied_event_id"],
+            movement_payload=movement_payload,
+            transition_batch=(
+                None
+                if transition_payload is None
+                else BattlefieldTransitionBatch.from_payload(transition_payload)
+            ),
+            battle_shock_request_id=payload["battle_shock_request_id"],
+            battle_shock_result_id=payload["battle_shock_result_id"],
+            battle_shock_reroll_request_id=payload["battle_shock_reroll_request_id"],
+            battle_shock_reroll_result_id=payload["battle_shock_reroll_result_id"],
         )
 
 

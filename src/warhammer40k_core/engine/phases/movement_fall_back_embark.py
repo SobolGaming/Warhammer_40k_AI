@@ -28,6 +28,10 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
 )
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.phases.movement_battle_shock_continuation import (
+    begin_desperate_escape_battle_shock_continuation,
+    record_desperate_escape_battle_shock_resolution,
+)
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
@@ -353,6 +357,7 @@ def _apply_fall_back_result(
             validate_json_value(grant.to_payload()) for grant in permission_grants
         ],
     }
+    fall_back_applied_event_id: str | None = None
     if desperate_escape_battle_shock_required(
         movement_payload=movement_payload,
         has_surviving_models=surviving_placement is not None,
@@ -376,6 +381,26 @@ def _apply_fall_back_result(
                 "movement_payload": validate_json_value(movement_payload),
                 "transition_batch": validate_json_value(transition_batch.to_payload()),
             },
+        )
+        fall_back_applied_event_id = applied_event.event_id
+        begin_desperate_escape_battle_shock_continuation(
+            state=state,
+            continuation=PendingDesperateEscapeBattleShockContinuation(
+                source_kind=(DesperateEscapeBattleShockContinuationSourceKind.VOLUNTARY_POST_MOVE),
+                continuation_phase=(
+                    DesperateEscapeBattleShockContinuationPhase.AWAITING_BATTLE_SHOCK
+                ),
+                canonical_unit_instance_id=movement_unit_id,
+                movement_proposal_request_id=movement_proposal_request_id,
+                action_result=result,
+                fall_back_result=fall_back_result,
+                fall_back_applied_event_id=applied_event.event_id,
+                movement_payload=movement_payload,
+                transition_batch=transition_batch,
+                battle_shock_request_id=(
+                    f"desperate-escape:{state.battle_round:02d}:{movement_unit_id}"
+                ),
+            ),
         )
         battle_shock_status = _resolve_desperate_escape_battle_shock_after_move(
             state=state,
@@ -404,6 +429,7 @@ def _apply_fall_back_result(
         ruleset_descriptor=ruleset_descriptor,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        fall_back_applied_event_id=fall_back_applied_event_id,
     )
 
 
@@ -461,7 +487,13 @@ def _resolve_desperate_escape_battle_shock_after_move(
         ),
         pending_phase_body_status="desperate_escape_battle_shock_reroll_pending",
     )
-    return execution.resolution.pending_status
+    return record_desperate_escape_battle_shock_resolution(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=battle_shock_hooks,
+        resolution=execution.resolution,
+        reroll_result_id=None,
+    )
 
 
 def desperate_escape_battle_shock_required(
@@ -494,11 +526,20 @@ def _request_embark_after_move_or_complete_activation(
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    fall_back_applied_event_id: str | None = None,
 ) -> LifecycleStatus | None:
     active_selection = _active_movement_selection(state)
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Movement activation completion requires battlefield_state.")
+    if fall_back_applied_event_id is not None:
+        movement_payload = {
+            **movement_payload,
+            "fall_back_applied_event_id": _validate_identifier(
+                "fall_back_applied_event_id",
+                fall_back_applied_event_id,
+            ),
+        }
     reconciliation = reconcile_rules_unit_identity(
         state=state,
         unit_instance_id=active_selection.unit_instance_id,
@@ -510,7 +551,12 @@ def _request_embark_after_move_or_complete_activation(
             result=result,
             action=action,
             witness=witness,
-            movement_payload=movement_payload,
+            movement_payload={
+                **movement_payload,
+                "rules_unit_identity_reconciliation": validate_json_value(
+                    reconciliation.to_payload()
+                ),
+            },
             displacement_kind=displacement_kind,
             transition_batch=transition_batch,
         )

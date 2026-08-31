@@ -673,12 +673,14 @@ def harbingers_forced_battle_shock_unit_ids(
     return tuple(sorted(forced_ids))
 
 
-def resolve_harbingers_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
+def resolve_harbingers_battle_shock_outcome(
+    context: BattleShockOutcomeContext,
+) -> LifecycleStatus | None:
     if type(context) is not BattleShockOutcomeContext:
         raise GameLifecycleError("Harbingers of Dread Battle-shock outcome requires context.")
     result = context.result
     if result.passed:
-        return
+        return None
     target_rules_unit = rules_unit_view_by_id(
         state=context.state,
         unit_instance_id=result.request.unit_instance_id,
@@ -705,11 +707,12 @@ def resolve_harbingers_battle_shock_outcome(context: BattleShockOutcomeContext) 
             target_unit_instance_id=target_rules_unit.unit_instance_id,
         ):
             continue
-        _apply_delirium_mortal_wounds(
+        return _apply_delirium_mortal_wounds(
             context=context,
             chaos_knights_player_id=chaos_knights_army.player_id,
             target_rules_unit=target_rules_unit,
         )
+    return None
 
 
 def _apply_delirium_mortal_wounds(
@@ -717,7 +720,7 @@ def _apply_delirium_mortal_wounds(
     context: BattleShockOutcomeContext,
     chaos_knights_player_id: str,
     target_rules_unit: RulesUnitView,
-) -> None:
+) -> LifecycleStatus | None:
     d3_result = _roll_d3(
         context=context,
         reason="Delirium mortal wounds",
@@ -769,7 +772,7 @@ def _apply_delirium_mortal_wounds(
         progress=progress,
         dice_manager=context.dice_manager,
     )
-    _resolve_routed_delirium_mortal_wounds(
+    return _resolve_routed_delirium_mortal_wounds(
         state=context.state,
         decisions=context.decisions,
         routed_request=routed.request,

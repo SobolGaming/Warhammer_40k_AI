@@ -739,7 +739,18 @@ their absence. The engine applies the Fall Back transition, records `fall_back_m
 uses the shared Battle-shock service. A surviving unit that is not Battle-shocked after moving
 tests with reason/source kind `desperate_escape`; a shocked unit or a unit with no survivors does
 not. Optional rerolls serialize and resume the same movement continuation before Embark or
-activation completion.
+activation completion. Nested Battle-shock outcome decisions use that same serialized parent and
+must close before movement can continue.
+
+PR #409 review remediation: the original P09B path preserved an optional reroll, but the shared
+Battle-shock outcome registry discarded a provider-returned `LifecycleStatus`. A failed post-move
+test under Chaos Knights Delirium could therefore queue Feel No Pain while movement independently
+enqueued Embark or completed the activation. The corrected registry propagates exactly one status
+and proves that it names the actual sole queue head. A typed parent continuation now spans both
+reroll and outcome phases and pins the exact Fall Back occurrence, action/proposal authority,
+transition and payload, Battle-shock request/result, optional reroll record, source kind, phase,
+and provider claim. Movement resumes only after that outcome queue closes, then reconciles the
+historical rules-unit identity before deciding whether Embark remains legal.
 
 Specific authoritative 40k.app rule/statement and source ID: 09.02.02, `SELECTING MODES`, states
 that modes are mutually exclusive and assessed in order, but Ordered Retreat is not mandatory so
@@ -767,7 +778,7 @@ The expanded generated package hash is
 `0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105` and its canonical artifact
 byte SHA-256 is `f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:d5341b984933517139b246ebf78fc08f7e84ca098c25f5ced3e154400f076a32`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:8d8c5acc77e9782ca89f52d2e5380cb3246f214fc68237f300c0c3a929e2600e`.
 
 Load and execution support: All three movement rule rows and all six evidence rows are `loaded`.
 Move Units and Fall-back Move are `executable_engine_runtime`. Selecting Modes is truthfully
@@ -789,7 +800,8 @@ Owning state/validation/mutation/event/replay path: reviewed generated JSON and 
 `submit_movement_proposal` with the same mode and group `PathWitness` → group-aware Fall Back
 resolver and exact requirement/roll inventory → optional casualty selection → engine-owned
 battlefield transition and primary departure/destruction events → `fall_back_move_applied` →
-shared Battle-shock request/result/reroll service → Embark or movement activation completion →
+shared Battle-shock request/result/reroll/outcome continuation → identity reconciliation → Embark
+or movement activation completion →
 historical physical/source authority validation → lifecycle serialization/replay → shared adapter
 projection and event-delta paths.
 
@@ -813,6 +825,16 @@ direct Fall Back resolver caller to supply a typed mode, replaced the permissive
 `desperate_escape_has_no_requirements` branch with exact inventory validation, and found no second
 local voluntary-mode rejection or post-move Battle-shock implementation.
 
+Review regressions add a facade-driven, full-lifecycle occurrence with an unshocked below-Half-
+strength unit, voluntary Desperate Escape, an eligible Transport, a failed post-move test inside
+the enemy Chaos Knights Delirium aura, and the resulting mortal-wound Feel No Pain chain. Direct
+and optional-reroll variants prove the exact FNP queue head blocks Embark and activation
+completion across serialization. A surviving target resumes into Embark and then completes; a
+destroyed target emits no stale Embark request, records an empty-survivor identity reconciliation,
+and restores/replays with the same authoritative result. The regression also pins the Fall Back
+event, action/result/proposal identities, transition, movement payload, Battle-shock request/result,
+phase, and provider-owned pending authority.
+
 Generated artifacts/documentation: P09B expands
 `core_movement_phase_2026_08/artifacts/package.json` and its typed loader/source catalog, updates
 the offline movement-source builder, engine build manifest, affected external-contract fixtures and
@@ -823,12 +845,12 @@ four-shard inventory does not change.
 Validation results:
 
 - Every required `AGENTS.md` gate passes: Ruff check, Ruff format check, mypy, Pyright, the
-  coverage-enabled xdist work-stealing suite (`6317 passed`), four-shard inventory, import-linter,
+  coverage-enabled xdist work-stealing suite (`6321 passed`), four-shard inventory, import-linter,
   and all-files pre-commit.
-- The final P09B Fall Back, adapter-proposal, source-identity, and static bug-class regression set
-  passes (`169 passed`).
+- The final P09B Fall Back/static regression set and the cross-faction outcome-provider regression
+  set pass (`74` and `77` tests respectively).
 - Movement source builder check, 40k.app audit check, engine-build check, external-contract base-ref
-  check, installed-wheel smoke (`2460` resources and `27` schemas), and generated ability-support
+  check, installed-wheel smoke (`2461` resources and `27` schemas), and generated ability-support
   audit (`19 passed`) all pass.
 - The repository-pinned TypeScript generated-client, type, and unit checks pass (`5` unit tests),
   and the certified HTTP conformance scenario passes all `342` assertions on Contract `11.1.0`.

@@ -25,7 +25,7 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventLog, EventRecord
 from warhammer40k_core.engine.mortal_wound_application_authority import (
-    direct_mortal_wound_damage_applications_from_event,
+    direct_mortal_wound_damage_snapshot_from_event,
     validate_direct_mortal_wound_application_event_authority,
 )
 from warhammer40k_core.engine.objective_control_record_authority import (
@@ -611,9 +611,17 @@ def _physical_authority_by_model(
 ) -> dict[str, _PhysicalAuthority]:
     authority = {} if initial is None else dict(initial)
     applied_fall_back_transitions: dict[tuple[str, str], BattlefieldTransitionBatch] = {}
+    applied_direct_mortal_wound_damage: dict[str, set[DamageApplication]] = {}
     for event in event_records:
-        for damage in direct_mortal_wound_damage_applications_from_event(event):
-            _apply_damage_application(authority=authority, damage=damage)
+        damage_snapshot = direct_mortal_wound_damage_snapshot_from_event(event)
+        if damage_snapshot is not None:
+            application_id, applications = damage_snapshot
+            applied = applied_direct_mortal_wound_damage.setdefault(application_id, set())
+            for damage in applications:
+                if damage in applied:
+                    continue
+                _apply_damage_application(authority=authority, damage=damage)
+                applied.add(damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
         if event.event_type == "fall_back_move_applied":
             transition = authoritative_battlefield_transition_batch_or_none(
@@ -633,6 +641,11 @@ def _physical_authority_by_model(
             if applied_transition is not None:
                 if transition != applied_transition:
                     raise GameLifecycleError("Fall Back terminal transition authority drifted.")
+                transition = None
+            elif (
+                isinstance(event.payload, dict)
+                and event.payload.get("fall_back_applied_event_id") is not None
+            ):
                 transition = None
         if transition is not None:
             _apply_transition(
@@ -990,7 +1003,7 @@ def _apply_damage_application(
     prior = authority.get(damage.model_instance_id)
     if prior is not None and (
         prior.wounds_remaining == damage.final_wounds_remaining
-        and prior.presence == ("destroyed" if damage.destroyed else "battlefield")
+        and prior.presence in ({"destroyed"} if damage.destroyed else {None, "battlefield"})
     ):
         return
     if prior is not None and (

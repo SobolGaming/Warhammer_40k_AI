@@ -732,11 +732,17 @@ def _resolve_forced_desperate_escape_battle_shock(
         ),
         pending_phase_body_status=("forced_desperate_escape_battle_shock_reroll_pending"),
     )
-    if battle_shock_resolution.pending_status is not None:
-        return battle_shock_resolution.pending_status
-    if battle_shock_resolution.resolved_payload is None:
-        raise GameLifecycleError("Forced Desperate Escape Battle-shock did not resolve.")
-    return None
+    from warhammer40k_core.engine.phases.movement_battle_shock_continuation import (
+        record_desperate_escape_battle_shock_resolution,
+    )
+
+    return record_desperate_escape_battle_shock_resolution(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=battle_shock_hooks,
+        resolution=battle_shock_resolution,
+        reroll_result_id=None,
+    )
 
 
 def _desperate_escape_roll_modifiers(

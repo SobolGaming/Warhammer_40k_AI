@@ -52,7 +52,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
     resolve_objective_control,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionResult,
@@ -472,8 +472,10 @@ def _battle_shock_modifiers(
     return tuple(modifiers)
 
 
-def resolve_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
-    _resolve_battle_shock_outcome(
+def resolve_battle_shock_outcome(
+    context: BattleShockOutcomeContext,
+) -> LifecycleStatus | None:
+    return _resolve_battle_shock_outcome(
         context,
         hook_id=HOOK_ID,
         source_rule_id=SOURCE_RULE_ID,
@@ -481,8 +483,10 @@ def resolve_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
     )
 
 
-def resolve_july_battle_shock_outcome(context: BattleShockOutcomeContext) -> None:
-    _resolve_battle_shock_outcome(
+def resolve_july_battle_shock_outcome(
+    context: BattleShockOutcomeContext,
+) -> LifecycleStatus | None:
+    return _resolve_battle_shock_outcome(
         context,
         hook_id=JULY_HOOK_ID,
         source_rule_id=JULY_SOURCE_RULE_ID,
@@ -496,7 +500,7 @@ def _resolve_battle_shock_outcome(
     hook_id: str,
     source_rule_id: str,
     battleline_revival_enabled: bool,
-) -> None:
+) -> LifecycleStatus | None:
     if type(context) is not BattleShockOutcomeContext:
         raise GameLifecycleError("Chaos Daemons Battle-shock outcomes require a context.")
     target_rules_unit = rules_unit_view_by_id(
@@ -506,9 +510,10 @@ def _resolve_battle_shock_outcome(
     if target_rules_unit.owner_player_id != context.result.request.player_id:
         raise GameLifecycleError("Chaos Daemons Battle-shock target owner drift.")
     target_player_id = context.result.request.player_id
+    pending_status: LifecycleStatus | None = None
     for daemon_army in _chaos_daemons_armies(context.state):
         if daemon_army.player_id == target_player_id:
-            _resolve_daemonic_manifestation(
+            status = _resolve_daemonic_manifestation(
                 context=context,
                 daemon_player_id=daemon_army.player_id,
                 target_rules_unit=target_rules_unit,
@@ -516,6 +521,12 @@ def _resolve_battle_shock_outcome(
                 source_rule_id=source_rule_id,
                 battleline_revival_enabled=battleline_revival_enabled,
             )
+            if status is not None:
+                if pending_status is not None:
+                    raise GameLifecycleError(
+                        "Chaos Daemons Battle-shock outcome queued multiple decisions."
+                    )
+                pending_status = status
             continue
         _resolve_daemonic_terror(
             context=context,
@@ -523,6 +534,7 @@ def _resolve_battle_shock_outcome(
             target_rules_unit=target_rules_unit,
             source_rule_id=source_rule_id,
         )
+    return pending_status
 
 
 def _resolve_daemonic_manifestation(
@@ -533,17 +545,17 @@ def _resolve_daemonic_manifestation(
     hook_id: str,
     source_rule_id: str,
     battleline_revival_enabled: bool,
-) -> None:
+) -> LifecycleStatus | None:
     result = context.result
     if not result.passed:
-        return
+        return None
     if not _daemonic_manifestation_applies(
         state=context.state,
         daemon_player_id=daemon_player_id,
         rules_unit=target_rules_unit,
         battle_shocked_unit_ids=context.phase_start_battle_shocked_unit_ids,
     ):
-        return
+        return None
     d3_result = _roll_d3(
         context=context,
         reason="Daemonic Manifestation",
@@ -564,8 +576,8 @@ def _resolve_daemonic_manifestation(
                     source_rule_id=source_rule_id,
                     unsupported_reason="battleline_model_return_requires_placement_decision",
                 )
-                return
-            _resolve_july_battleline_daemonic_manifestation(
+                return None
+            return _resolve_july_battleline_daemonic_manifestation(
                 context=context,
                 daemon_player_id=daemon_player_id,
                 target_rules_unit=target_rules_unit,
@@ -574,15 +586,14 @@ def _resolve_daemonic_manifestation(
                 hook_id=hook_id,
                 source_rule_id=source_rule_id,
             )
-        else:
-            _emit_daemonic_manifestation_no_effect(
-                context=context,
-                target_rules_unit=target_rules_unit,
-                d3_result=d3_result,
-                source_rule_id=source_rule_id,
-                no_effect_reason="battleline_unit_has_no_destroyed_models",
-            )
-        return
+        _emit_daemonic_manifestation_no_effect(
+            context=context,
+            target_rules_unit=target_rules_unit,
+            d3_result=d3_result,
+            source_rule_id=source_rule_id,
+            no_effect_reason="battleline_unit_has_no_destroyed_models",
+        )
+        return None
     wounded_models: list[ModelInstance] = []
     for model in target_rules_unit.own_models:
         if model.is_alive and model.wounds_remaining < model.starting_wounds:
@@ -595,7 +606,7 @@ def _resolve_daemonic_manifestation(
             source_rule_id=source_rule_id,
             no_effect_reason="unit_has_no_wounded_models",
         )
-        return
+        return None
     if len(wounded_models) > 1:
         _emit_daemonic_manifestation_unsupported(
             context=context,
@@ -604,7 +615,7 @@ def _resolve_daemonic_manifestation(
             source_rule_id=source_rule_id,
             unsupported_reason="multiple_wounded_models_require_decision",
         )
-        return
+        return None
     model = wounded_models[0]
     missing_wounds = model.starting_wounds - model.wounds_remaining
     healing_amount = min(d3_result.value, missing_wounds)
@@ -655,6 +666,7 @@ def _resolve_daemonic_manifestation(
             "healing_effect": validate_json_value(resolved_effect.to_payload()),
         },
     )
+    return None
 
 
 def _resolve_july_battleline_daemonic_manifestation(
@@ -666,7 +678,7 @@ def _resolve_july_battleline_daemonic_manifestation(
     d3_result: D3RollResult,
     hook_id: str,
     source_rule_id: str,
-) -> None:
+) -> LifecycleStatus:
     effect = HealingEffect(
         effect_id=(f"{hook_id}:daemonic-manifestation-battleline:{context.result.result_id}"),
         target_unit_instance_id=target_rules_unit.unit_instance_id,
@@ -721,6 +733,19 @@ def _resolve_july_battleline_daemonic_manifestation(
             "d3_result": validate_json_value(d3_result.to_payload()),
             "healing_effect": validate_json_value(pending_effect.to_payload()),
             "decision_request_id": pending_request.request_id,
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=context.state.stage,
+        decision_request=pending_request,
+        payload={
+            "phase": context.phase.value,
+            "phase_body_status": "battle_shock_outcome_pending",
+            "battle_round": context.state.battle_round,
+            "active_player_id": context.active_player_id,
+            "player_id": daemon_player_id,
+            "unit_instance_id": target_rules_unit.unit_instance_id,
+            "pending_request_id": pending_request.request_id,
         },
     )
 

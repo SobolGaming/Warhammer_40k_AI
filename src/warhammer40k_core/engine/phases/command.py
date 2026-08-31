@@ -1393,6 +1393,7 @@ def _resolve_battle_shock_step(
             state=state,
             active_player_id=active_player_id,
         )
+        outcome_pending_status: LifecycleStatus | None = None
         if auto_pass_effect is None:
             roll_state = manager.roll(request.spec)
             resolution = resolve_battle_shock_test_with_optional_reroll(
@@ -1411,10 +1412,11 @@ def _resolve_battle_shock_step(
                 resolved_event_types=("battle_shock_test_resolved",),
                 pending_phase_body_status="battle_shock_reroll_pending",
             )
-            if resolution.pending_status is not None:
-                return resolution.pending_status
             if resolution.resolved_payload is None:
+                if resolution.pending_status is not None:
+                    return resolution.pending_status
                 raise GameLifecycleError("Battle-shock resolution did not return a result.")
+            outcome_pending_status = resolution.pending_status
         else:
             roll_state = manager.roll_fixed(
                 request.spec,
@@ -1431,7 +1433,7 @@ def _resolve_battle_shock_step(
                     "persisting_effect": validate_json_value(auto_pass_effect.to_payload()),
                 },
             )
-            record_battle_shock_result_and_outcome_events(
+            resolution = record_battle_shock_result_and_outcome_events(
                 state=state,
                 decisions=decisions,
                 manager=manager,
@@ -1446,10 +1448,17 @@ def _resolve_battle_shock_step(
                 base_payload=base_payload,
                 resolved_event_types=("battle_shock_test_resolved",),
             )
+            if resolution.resolved_payload is None:
+                raise GameLifecycleError(
+                    "Auto-pass Battle-shock resolution did not return a result."
+                )
+            outcome_pending_status = resolution.pending_status
         command_state = _command_step_state(state).with_completed_battle_shock_test_request(
             request.request_id
         )
         state.replace_command_step_state(command_state)
+        if outcome_pending_status is not None:
+            return outcome_pending_status
         pending_requests = decisions.queue.pending_requests
         if pending_requests:
             pending_request = pending_requests[0]

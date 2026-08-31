@@ -948,6 +948,25 @@ class GameLifecycle:
             preserve_existing_bundle=runtime_content_bundle is not None,
         )
         refreshed_bundle = lifecycle._runtime_content_bundle
+        movement_state = lifecycle._require_state().movement_phase_state
+        if (
+            movement_state is not None
+            and movement_state.pending_desperate_escape_battle_shock_continuation is not None
+        ):
+            if refreshed_bundle is None:
+                raise GameLifecycleError(
+                    "Desperate Escape Battle-shock restoration requires runtime content."
+                )
+            from warhammer40k_core.engine.phases.movement_battle_shock_continuation import (
+                validate_pending_desperate_escape_battle_shock_continuation,
+            )
+
+            validate_pending_desperate_escape_battle_shock_continuation(
+                state=lifecycle._require_state(),
+                decisions=lifecycle.decision_controller,
+                battle_shock_hooks=refreshed_bundle.battle_shock_hook_registry,
+                require_pending_request=True,
+            )
         rule_ir_authority_index = (
             None
             if refreshed_bundle is None

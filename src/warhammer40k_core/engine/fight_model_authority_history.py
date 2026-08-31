@@ -16,6 +16,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.battlefield_transition_history import (
     authoritative_battlefield_transition_batch_or_none,
+    prior_fall_back_applied_transition_or_none,
 )
 from warhammer40k_core.engine.catalog_model_materialization_runtime import (
     CATALOG_MODELS_MATERIALIZED_EVENT,
@@ -399,6 +400,16 @@ def _authority_mutations_by_event_index(
             )
         else:
             transition = authoritative_battlefield_transition_batch_or_none(event=event)
+            if (
+                transition is not None
+                and prior_fall_back_applied_transition_or_none(
+                    event_records=event_records,
+                    event_index=event_index,
+                    event=event,
+                )
+                is not None
+            ):
+                transition = None
             if transition is not None:
                 event_mutations.extend(
                     _physical_transition_mutations(

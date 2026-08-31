@@ -7,6 +7,9 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatchPayload,
     ModelDisplacementKind,
 )
+from warhammer40k_core.engine.battlefield_transition_history import (
+    prior_fall_back_applied_transition_or_none,
+)
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.movement_proposals import (
@@ -121,6 +124,11 @@ def validate_primary_mission_movement_event_decision_authority(
         or payload.get("witness") != proposal.witness.to_payload()
     ):
         raise GameLifecycleError("Primary mission movement proposal semantics drifted.")
+    _validate_prior_fall_back_application(
+        event_records=event_records,
+        mutation_index=mutation_index,
+        event=event_records[mutation_index],
+    )
     _validate_movement_transition(
         payload=payload,
         action=action,
@@ -267,6 +275,19 @@ def _validate_movement_transition(
         raise GameLifecycleError("Primary mission movement displacement kind drifted.")
     if not transition.displacements and raw_kind not in {None, expected_kind.value}:
         raise GameLifecycleError("Primary mission movement displacement kind drifted.")
+
+
+def _validate_prior_fall_back_application(
+    *,
+    event_records: tuple[EventRecord, ...],
+    mutation_index: int,
+    event: EventRecord,
+) -> None:
+    prior_fall_back_applied_transition_or_none(
+        event_records=event_records,
+        event_index=mutation_index,
+        event=event,
+    )
 
 
 def _validate_record_event_closure(

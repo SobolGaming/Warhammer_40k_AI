@@ -769,10 +769,22 @@ The engine resolves any Hazard Roll casualties, applies the grouped `PathWitness
 then checks the unit's authoritative Battle-shock state. If at least one model survives and the
 unit is not Battle-shocked after moving, the engine resolves a Battle-shock test with reason
 `desperate_escape` before Embark or `movement_activation_completed`. An available reroll uses the
-existing `select_dice_reroll` finite decision and serializes the movement continuation in its
-engine-owned source context. If the unit is already Battle-shocked or no model survives, no
-follow-up test is created. Adapters must not roll Hazard dice, choose whether the follow-up test
-occurs, remove models, apply Battle-shock, or complete the movement locally.
+existing `select_dice_reroll` finite decision. The engine serializes one parent movement
+continuation across both that reroll and any nested Battle-shock outcome decision. The parent pins
+the continuation phase and source kind, canonical rules-unit identity, exact action result and
+movement-proposal request, complete Fall Back result, applied-event identity, grouped transition,
+movement payload, Battle-shock request/result, and optional reroll request/result. If the unit is
+already Battle-shocked or no model survives, no follow-up test is created. Adapters must not roll
+Hazard dice, choose whether the follow-up test occurs, remove models, apply Battle-shock, or
+complete the movement locally.
+
+A Battle-shock outcome provider can return a nested decision such as Feel No Pain for mortal
+wounds. That provider's returned status must identify the actual and sole pending queue head; the
+engine does not enqueue Embark or emit `movement_activation_completed` until the complete outcome
+chain closes. Restore and replay authenticate the provider claim and every parent occurrence field
+before resumption. Once the outcome closes, the engine reconciles the historical rules-unit
+identity: surviving placed descendants may receive the ordinary Embark choice, while a destroyed
+or otherwise absent unit completes its activation without a stale Embark request.
 
 Fall Back resolution and completion payloads now carry the stable source IDs
 `gw-11e-core-rules:movement-phase:selecting-modes` and

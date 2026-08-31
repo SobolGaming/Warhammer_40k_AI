@@ -646,7 +646,7 @@ def apply_catalog_selected_target_battle_shock_reroll_decision(
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> LifecycleStatus | None:
-    resolved_payload = apply_battle_shock_reroll_resolution_decision(
+    battle_shock_resolution = apply_battle_shock_reroll_resolution_decision(
         state=state,
         decisions=decisions,
         result=result,
@@ -654,6 +654,9 @@ def apply_catalog_selected_target_battle_shock_reroll_decision(
         expected_source_kind=CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND,
         expected_passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
     )
+    resolved_payload = battle_shock_resolution.resolved_payload
+    if resolved_payload is None:
+        raise GameLifecycleError("Selected-target Battle-shock reroll did not resolve.")
     original_result = DecisionResult.from_payload(
         cast(
             DecisionResultPayload,

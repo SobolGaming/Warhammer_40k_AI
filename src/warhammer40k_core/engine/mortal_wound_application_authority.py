@@ -552,9 +552,18 @@ def direct_mortal_wound_damage_applications_from_event(
 ) -> tuple[DamageApplication, ...]:
     """Return cumulative direct mortal-wound damage retained by a canonical event."""
 
+    snapshot = direct_mortal_wound_damage_snapshot_from_event(event)
+    return () if snapshot is None else snapshot[1]
+
+
+def direct_mortal_wound_damage_snapshot_from_event(
+    event: EventRecord,
+) -> tuple[str, tuple[DamageApplication, ...]] | None:
+    """Return one application identity and its cumulative canonical damage snapshot."""
+
     progress = _direct_mortal_wound_progress_from_event(event)
     if progress is not None:
-        return progress.applications
+        return progress.application_id, progress.applications
     from warhammer40k_core.engine.damage_allocation import (
         MortalWoundApplication,
         MortalWoundApplicationPayload,
@@ -566,25 +575,34 @@ def direct_mortal_wound_damage_applications_from_event(
     )
 
     if event.event_type != MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
-        return ()
+        return None
     if mortal_wound_destruction_finalization_kind_from_event(event) is not (
         MortalWoundDestructionFinalizationKind.APPLICATION_PACKET
     ):
-        return ()
+        return None
     payload = event.payload
-    raw_application = payload.get("application") if isinstance(payload, dict) else None
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Direct mortal-wound terminal payload is invalid.")
+    raw_application = payload.get("application")
     if not isinstance(raw_application, dict):
         raise GameLifecycleError("Direct mortal-wound terminal application is invalid.")
+    application_id = _validate_identifier(
+        "Direct mortal-wound terminal application_id",
+        payload.get("application_id"),
+    )
     application = MortalWoundApplication.from_payload(
         cast(MortalWoundApplicationPayload, raw_application)
     )
     destroyed_model_ids = {
         damage.model_instance_id for damage in application.applications if damage.destroyed
     }
-    return tuple(
-        damage
-        for damage in application.applications
-        if damage.model_instance_id not in destroyed_model_ids
+    return (
+        application_id,
+        tuple(
+            damage
+            for damage in application.applications
+            if damage.model_instance_id not in destroyed_model_ids
+        ),
     )
 
 
@@ -1341,6 +1359,7 @@ __all__ = (
     "MortalWoundApplicationAuthorityPayload",
     "append_direct_mortal_wound_application_started",
     "direct_mortal_wound_damage_applications_from_event",
+    "direct_mortal_wound_damage_snapshot_from_event",
     "ensure_started",
     "mortal_wound_application_authority_from_event",
     "mortal_wound_application_authority_inventory",
