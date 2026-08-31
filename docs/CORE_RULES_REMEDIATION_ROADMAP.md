@@ -904,6 +904,122 @@ Validation results:
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/409`; merge commit
 pending review and merge.
 
+### P06A — C06-01
+
+Status: Implementation and required validation are complete; PR publication is in progress.
+
+Finding IDs: `C06-01`.
+
+Dependencies and evidence gate: P00 is merged. P06A has no gameplay prerequisite. The exact
+06.01 Visibility statement is retained as a reviewed transcription and a separately classified,
+project-authoritative 40k.app mirror observation linked to the recorded non-affiliation and
+source-authority policy. This satisfies `APP-AUTHORITY`; no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: The visibility rule requires an imaginary straight line 1mm wide from any
+part of the observing model to any part of the observed model. A zero-width mathematical segment
+can pass through a slit that is narrower than 1mm or miss terrain or a model hull by less than half
+the required width, incorrectly granting visibility to attacks and abilities.
+
+How it was done before P06A: `VisibilityQuery` used a broad phase bounded by the unexpanded
+segment and exact zero-width segment intersections for physical terrain and dynamic model hulls.
+`TerrainVisibilityContext` separately used zero-width polygon intersections for terrain-feature
+rules footprints and logical terrain areas. Attacks and visibility-gated abilities shared the
+context, so the same infinitesimal-ray defect propagated to every consumer.
+
+How it is done after P06A: One geometry-owned visibility-corridor module defines the fixed
+1mm width, its inch conversion, half-width, expanded broad-phase bounds, and the exact physical
+intersection surfaces. Every sampled source-to-target line is buffered horizontally by 0.5mm
+with flat endpoint caps. Physical terrain and model hull checks combine that shared horizontal
+corridor with the authoritative interpolated line height and obstacle vertical interval. Terrain
+feature rules footprints and logical terrain-area unions use the same corridor footprint. The
+central `TerrainVisibilityContext` remains the sole engine visibility owner, so shooting,
+Stratagems, mission actions, and generic RuleIR ability predicates all receive the correction
+without local rules or string parsing.
+
+Specific authoritative 40k.app rule/statement and source ID: 06.01, `VISIBILITY`, states that an
+observing model has line of sight only when an imaginary straight line 1mm wide can be drawn from
+any part of it to any part of the observed model; models in the observing and observed models'
+own units are ignored, while terrain applies its additional visibility rules. Its stable source
+ID is `gw-11e-core-rules:other-concepts:visibility`. Runtime behavior binds to fixed geometry and
+that source-backed execution record, never a display name or source-text token.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/06-other-concepts`, observed
+`2026-08-31T11:41:03-04:00`; transcription
+`eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883`;
+reviewed-transcription observation
+`7c9700d51718a74421b3a992336fef7ed34ba40e77c1f3ad6f70a4c91e2f7a30`;
+authoritative-mirror observation
+`cf12c5ecc2b7fdc082246161fcbab2e301df0a1eb8134f4b69175f0884a35a9a`.
+The generated package hash is
+`409c0bd79aa7e8f70495f714ecb05b45bff971520c3cac52360fcbdcf42fca99` and its canonical artifact
+byte SHA-256 is `bd3efb8e43386a951343915595b7d7eb5e189380f0e0e85a83c731baac44423b`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:155062a0cdb997a61d61d61f9378993336897f88e4f93bbaee1c446bf89f8ce1`.
+
+Load and execution support: The Visibility rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked mirror observation carries project
+authority. The fail-fast typed loader pins schema, document identity, rule identity, text hash,
+both evidence fingerprints, package hash, and canonical artifact byte hash.
+
+Scope and explicit exclusions: P06A owns the fixed corridor unit, 2.5D physical intersections,
+broad-phase expansion, terrain-feature and terrain-area use, source identity/artifact, consumer
+regressions, static bypass audit, adapter-contract confirmation, and build identity. It does not
+change which source/target-unit models are ignored, model-volume sampling, terrain-specific
+visibility exceptions, cover semantics, hidden-information policy, movement/pathing collision,
+decision families, event payload schemas, or out-of-scope content.
+
+Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed
+loader → stable Visibility source ID and executable consumer inventory → geometry-owned fixed
+corridor constants and Shapely exact intersections → expanded `VisibilityQuery` broad phase →
+`TerrainVisibilityContext` physical, feature-policy, and logical-area resolution → shared engine
+shooting/Stratagem/mission-action/generic-ability targeting services → unchanged deterministic
+line-of-sight witness, cache, decision, event, projection, and replay paths. Visibility is a pure
+query and does not mutate authoritative state.
+
+Decision and viewer-visibility impact: No new decision type, option family, proposal kind,
+adapter-visible payload shape, replay schema, or hidden-information family is introduced.
+Existing deterministic option lists can change only because the engine now computes correct
+visibility. Existing witness payload field names remain stable even though their sampled lines
+are evaluated as corridors. Visibility geometry and eligibility are public and symmetric in the
+current scope, so the shared redaction path needs no new branch.
+`docs/ADAPTER_DECISION_CONTRACT.md` confirms this remains within Contract 11.1.0.
+
+Regression scenarios and same-bug-class search: Geometry regressions prove a terrain edge and a
+dynamic circular model hull 0.01in from a centerline block, an edge 0.021in away remains clear,
+and a corridor above the obstacle's 2.5D height remains clear. Terrain-policy regressions cover
+both feature rules footprints and logical terrain-area unions. Consumer regressions prove a
+shooting target and a visibility-gated generic ability cannot exploit a 0.02in slit that remains
+clear to a zero-width line but is narrower than 1mm. Payload round trips retain deterministic
+results. A static audit fails if any central visibility module reintroduces the prior zero-width
+terrain/model/polygon helpers or if an engine module bypasses the central visibility owner by
+importing low-level corridor/query geometry directly.
+
+Generated artifacts/documentation: P06A adds
+`core_other_concepts_2026_08/artifacts/package.json`, its typed loader/source catalog, and its
+offline builder; regenerates the engine build manifest and affected external-contract fixtures;
+and updates the adapter decision contract and this finding record. No behavioral test file was
+added, removed, moved, or renamed, so the committed four-shard inventory does not change.
+
+Validation results:
+
+- Every required `AGENTS.md` gate passes: Ruff check, Ruff format check, mypy (`2641` source
+  files), Pyright (zero errors or warnings), the 18-worker xdist work-stealing suite
+  (`6339 passed`), four-shard inventory, all 11 import-linter contracts, and all-files pre-commit.
+- The final P06A geometry, terrain-policy, attack, ability, source-identity, and static regression
+  set passes (`125 passed`); the complete code-quality suite passes (`335 passed`).
+- Other Concepts source builder check, 40k.app audit check, engine-build check, external-contract
+  `--base-ref origin/main` check, and installed-wheel smoke pass (`2470` resources and `27`
+  schemas).
+- The repository-pinned TypeScript generated-client, type, and unit entrypoints pass (`5` unit
+  tests), and the certified HTTP conformance scenario passes all `342` assertions on Contract
+  `11.1.0`. This macOS host's bundled Node 24 runtime did not expose an `npm` executable, so the
+  equivalent pinned `node`, `tsc`, and `tsx` entrypoints ran directly; `npm ci` and the npm wrapper
+  commands could not be executed.
+
+PR URL and merge commit: pending publication; merge commit pending review and merge.
+
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
 25 categories before opening PFINAL. The audit must select one maintained-App

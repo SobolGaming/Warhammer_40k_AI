@@ -707,6 +707,22 @@ status = submit_option(
 
 Adapter helper APIs should take `request_id` explicitly even when a local wrapper can infer the current pending request. Explicit request IDs let network, replay, and UI adapters fail fast on stale-client drift before constructing a `DecisionRecord`.
 
+P06A changes the engine-owned visibility predicate but adds no decision type,
+finite option family, proposal kind, adapter-visible payload shape, replay
+schema, or viewer-redaction branch. Every attack, Stratagem, mission action,
+and generic RuleIR ability that requires visibility continues to consume the
+same `TerrainVisibilityContext` through the existing engine targeting service.
+That context now evaluates each sampled source-to-target line as one
+1mm-wide, height-aware corridor across physical terrain, rules footprints,
+logical terrain areas, and intervening model hulls. Existing line-of-sight
+witness payload field names and cache keys remain stable; only engine-derived
+eligibility changes when an obstacle is within half the corridor width of a
+sampled line. Model positions, terrain geometry, targeting eligibility, and
+visibility-gated options are public table information in the current rules
+scope, so both viewers receive the same result through the shared projection
+and event-delta paths. Adapters must not reconstruct a zero-width ray test or
+locally widen/narrow the corridor. This remains within Contract 11.1.0.
+
 P09A makes Move Units one finite unit/action loop. Every currently unselected
 friendly rules unit on the battlefield, embarked in a Transport, or in
 Strategic Reserves is selected through `select_movement_unit`. Its engine-owned

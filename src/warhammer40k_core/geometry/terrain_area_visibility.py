@@ -17,6 +17,9 @@ from warhammer40k_core.geometry.terrain_classification import (
     terrain_area_classification_from_token,
 )
 from warhammer40k_core.geometry.validation import IdentifierValidator
+from warhammer40k_core.geometry.visibility_corridor import (
+    line_of_sight_corridor_intersects_polygon_union,
+)
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -181,14 +184,18 @@ def model_wholly_within_terrain_area(model: Model, area: TerrainVisibilityArea) 
     )
 
 
-def ray_intersects_terrain_area(
+def line_of_sight_corridor_intersects_terrain_area(
     start: Point3,
     end: Point3,
     area: TerrainVisibilityArea,
 ) -> bool:
     if type(area) is not TerrainVisibilityArea:
-        raise GeometryError("ray terrain area must be TerrainVisibilityArea.")
-    return shapely_backend.segment_intersects_polygon_union(start, end, area.footprint_polygons)
+        raise GeometryError("line of sight corridor area must be TerrainVisibilityArea.")
+    return line_of_sight_corridor_intersects_polygon_union(
+        start,
+        end,
+        area.footprint_polygons,
+    )
 
 
 def feature_is_associated_with_terrain_area(

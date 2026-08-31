@@ -35,14 +35,17 @@ from warhammer40k_core.geometry.terrain_area_visibility import (
     TerrainVisibilityAreaPayload,
     classification_has_visibility_semantics,
     feature_ids_associated_with_terrain_areas,
+    line_of_sight_corridor_intersects_terrain_area,
     model_intersects_terrain_area,
-    ray_intersects_terrain_area,
     validate_terrain_visibility_areas,
 )
 from warhammer40k_core.geometry.terrain_classification import (
     TerrainAreaClassification,
     TerrainClassificationError,
     terrain_area_classification_from_token,
+)
+from warhammer40k_core.geometry.visibility_corridor import (
+    line_of_sight_corridor_intersects_polygon,
 )
 from warhammer40k_core.geometry.visibility_query import (
     VisibilityMetrics as VisibilityMetrics,
@@ -1405,7 +1408,10 @@ class TerrainVisibilityContext:
                 and not policy.blocks_full_visibility_through_footprint
             ):
                 continue
-            if not _ray_crosses_feature_footprint_between_observer_and_target(ray, feature):
+            if not _line_of_sight_corridor_crosses_feature_footprint_between_observer_and_target(
+                ray,
+                feature,
+            ):
                 continue
             exception = _terrain_feature_visibility_exception(
                 policy=policy,
@@ -1449,7 +1455,7 @@ class TerrainVisibilityContext:
         for area in self.terrain_areas:
             if not classification_has_visibility_semantics(area.classification):
                 continue
-            if not ray_intersects_terrain_area(ray[0], ray[1], area):
+            if not line_of_sight_corridor_intersects_terrain_area(ray[0], ray[1], area):
                 continue
             observer_intersects = model_intersects_terrain_area(self.observer_model, area)
             target_intersects = model_intersects_terrain_area(target_model, area)
@@ -1885,13 +1891,13 @@ def _model_footprint_wholly_within_feature(
     )
 
 
-def _ray_crosses_feature_footprint_between_observer_and_target(
+def _line_of_sight_corridor_crosses_feature_footprint_between_observer_and_target(
     ray: VisibilityRay,
     feature: TerrainFeatureDefinition,
 ) -> bool:
     if type(feature) is not TerrainFeatureDefinition:
         raise GeometryError("feature must be a TerrainFeatureDefinition.")
-    return shapely_backend.segment_intersects_polygon(
+    return line_of_sight_corridor_intersects_polygon(
         ray[0],
         ray[1],
         feature.rules_footprint_points(),

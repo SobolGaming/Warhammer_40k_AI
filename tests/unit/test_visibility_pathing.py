@@ -186,6 +186,68 @@ def test_visibility_dynamic_model_blocker_uses_2_5d_volume() -> None:
     assert clear_above.has_line_of_sight
 
 
+def test_p06a_visibility_uses_one_millimeter_corridor_for_terrain_and_model_hulls() -> None:
+    terrain_near_miss = ObstacleVolume(
+        terrain_id="terrain-near-miss",
+        bottom_center=Point3(0.0, 0.015, 0.0),
+        width=1.0,
+        depth=0.01,
+        height=3.0,
+    )
+    model_near_miss = _model("model-near-miss", 0.0, 0.51)
+    centerline = (Point3(-3.0, 0.0, 1.0), Point3(3.0, 0.0, 1.0))
+
+    terrain_result = VisibilityQuery.from_segment(
+        *centerline,
+        static_terrain=(terrain_near_miss,),
+    ).resolve()
+    model_result = VisibilityQuery.from_segment(
+        *centerline,
+        dynamic_model_blockers=(model_near_miss,),
+    ).resolve()
+
+    assert not terrain_result.has_line_of_sight
+    assert terrain_result.blocking_terrain_ids == ("terrain-near-miss",)
+    assert not model_result.has_line_of_sight
+    assert model_result.blocking_model_ids == ("model-near-miss",)
+
+
+def test_p06a_visibility_corridor_preserves_2_5d_height_and_half_width_boundary() -> None:
+    horizontally_clear = ObstacleVolume(
+        terrain_id="outside-half-width",
+        bottom_center=Point3(0.0, 0.026, 0.0),
+        width=1.0,
+        depth=0.01,
+        height=3.0,
+    )
+    vertically_clear = ObstacleVolume(
+        terrain_id="below-corridor",
+        bottom_center=Point3(0.0, 0.015, 0.0),
+        width=1.0,
+        depth=0.01,
+        height=3.0,
+    )
+
+    assert (
+        VisibilityQuery.from_segment(
+            Point3(-3.0, 0.0, 1.0),
+            Point3(3.0, 0.0, 1.0),
+            static_terrain=(horizontally_clear,),
+        )
+        .resolve()
+        .has_line_of_sight
+    )
+    assert (
+        VisibilityQuery.from_segment(
+            Point3(-3.0, 0.0, 4.0),
+            Point3(3.0, 0.0, 4.0),
+            static_terrain=(vertically_clear,),
+        )
+        .resolve()
+        .has_line_of_sight
+    )
+
+
 def test_visibility_payloads_round_trip_without_object_reprs() -> None:
     query = VisibilityQuery.from_segment(
         Point3(-3.0, 0.0, 1.0),

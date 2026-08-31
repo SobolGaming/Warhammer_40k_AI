@@ -3,12 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Point3Payload, validate_point3
 from warhammer40k_core.geometry.terrain import (
     TerrainVolume,
     TerrainVolumePayload,
     terrain_volume_from_payload,
+)
+from warhammer40k_core.geometry.visibility_corridor import (
+    line_of_sight_corridor_bounds,
+    line_of_sight_corridor_intersects_model,
+    line_of_sight_corridor_intersects_terrain_volume,
 )
 from warhammer40k_core.geometry.volume import Model, ModelPayload
 
@@ -266,13 +270,13 @@ class VisibilityQuery:
             terrain_blockers = tuple(
                 terrain.terrain_id
                 for terrain in terrain_candidates
-                if terrain.blocks_line_segment(start, end)
+                if line_of_sight_corridor_intersects_terrain_volume(start, end, terrain)
             )
             exact_model_check_count += len(model_candidates)
             model_blockers = tuple(
                 model.model_id
                 for model in model_candidates
-                if shapely_backend.segment_intersects_model_footprint(start, end, model)
+                if line_of_sight_corridor_intersects_model(start, end, model)
             )
             if not terrain_blockers and not model_blockers:
                 return VisibilityResult(
@@ -403,7 +407,8 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
 def _terrain_broad_phase_intersects(ray: VisibilityRay, terrain: TerrainVolume) -> bool:
     start, end = ray
     return _bounds_overlap(
-        _segment_bounds(start, end), (*terrain.horizontal_bounds(), *terrain.vertical_interval())
+        line_of_sight_corridor_bounds(start, end),
+        (*terrain.horizontal_bounds(), *terrain.vertical_interval()),
     )
 
 
@@ -416,21 +421,7 @@ def _model_broad_phase_intersects(ray: VisibilityRay, model: Model) -> bool:
         model.pose.position.y + radius,
         *model.volume.vertical_interval(model.pose),
     )
-    return _bounds_overlap(_segment_bounds(ray[0], ray[1]), model_bounds)
-
-
-def _segment_bounds(
-    start: Point3,
-    end: Point3,
-) -> tuple[float, float, float, float, float, float]:
-    return (
-        min(start.x, end.x),
-        min(start.y, end.y),
-        max(start.x, end.x),
-        max(start.y, end.y),
-        min(start.z, end.z),
-        max(start.z, end.z),
-    )
+    return _bounds_overlap(line_of_sight_corridor_bounds(ray[0], ray[1]), model_bounds)
 
 
 def _bounds_overlap(

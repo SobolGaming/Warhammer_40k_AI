@@ -8,6 +8,7 @@ from typing import Any, cast
 
 import pytest
 from tests.phase15a_charge_declaration_helpers import mission_setup as charge_mission_setup
+from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruins
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -5310,6 +5311,33 @@ def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> No
     assert (
         eligible_selection_target_unit_ids(
             state=blocked_state,
+            source_player_id=source_army.player_id,
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_model_id,
+            selection_clause=selection_clause,
+            explicit_target_unit_ids=None,
+        )
+        == ()
+    )
+
+    corridor_blocked_state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=replace(
+            battlefield,
+            terrain_features=one_millimeter_visibility_gap_ruins(
+                fixture_id="p06a-ability-gap",
+                center_x_inches=15.0,
+                gap_center_y_inches=10.0,
+                min_y_inches=0.0,
+                max_y_inches=44.0,
+            ),
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    assert (
+        eligible_selection_target_unit_ids(
+            state=corridor_blocked_state,
             source_player_id=source_army.player_id,
             source_unit_instance_id=source_unit.unit_instance_id,
             source_model_instance_id=source_model_id,
