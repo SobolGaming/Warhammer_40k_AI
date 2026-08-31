@@ -906,7 +906,8 @@ pending review and merge.
 
 ### P06A — C06-01
 
-Status: Implementation and required validation are complete; PR publication is in progress.
+Status: Implementation and required validation are complete; PR #410 is open pending review and
+merge.
 
 Finding IDs: `C06-01`.
 
@@ -1018,7 +1019,8 @@ Validation results:
   equivalent pinned `node`, `tsc`, and `tsx` entrypoints ran directly; `npm ci` and the npm wrapper
   commands could not be executed.
 
-PR URL and merge commit: pending publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/410`; merge commit
+pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
