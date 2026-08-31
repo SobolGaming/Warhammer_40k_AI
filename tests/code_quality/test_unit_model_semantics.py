@@ -83,6 +83,11 @@ SHOOTING_TARGETING = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting_targeting.py"
 )
 SHOOTING_TARGETS = ROOT / "src" / "warhammer40k_core" / "engine" / "shooting_targets.py"
+VISIBILITY = ROOT / "src" / "warhammer40k_core" / "geometry" / "visibility.py"
+VISIBILITY_QUERY = ROOT / "src" / "warhammer40k_core" / "geometry" / "visibility_query.py"
+TERRAIN_AREA_VISIBILITY = (
+    ROOT / "src" / "warhammer40k_core" / "geometry" / "terrain_area_visibility.py"
+)
 STRATAGEMS_GEOMETRY = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems_geometry.py"
 AELDARI_ARMY_RULE = (
     ROOT
@@ -1041,6 +1046,55 @@ def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> Non
     explicit_physical = stratagem_keywords.get("placed_alive_models_only")
     assert isinstance(explicit_physical, ast.Constant)
     assert explicit_physical.value is False
+
+
+def test_p06a_all_line_of_sight_blockers_use_the_shared_one_millimeter_corridor() -> None:
+    visibility_source = VISIBILITY.read_text(encoding="utf-8")
+    query_source = VISIBILITY_QUERY.read_text(encoding="utf-8")
+    terrain_area_source = TERRAIN_AREA_VISIBILITY.read_text(encoding="utf-8")
+
+    assert "line_of_sight_corridor_intersects_terrain_volume" in query_source
+    assert "line_of_sight_corridor_intersects_model" in query_source
+    assert "line_of_sight_corridor_bounds" in query_source
+    assert "line_of_sight_corridor_intersects_polygon" in visibility_source
+    assert "line_of_sight_corridor_intersects_terrain_area" in visibility_source
+    assert "line_of_sight_corridor_intersects_polygon_union" in terrain_area_source
+
+    forbidden_zero_width_calls = (
+        "blocks_line_segment(",
+        "segment_intersects_model_footprint(",
+        "segment_intersects_polygon(",
+        "segment_intersects_polygon_union(",
+        "segment_intersects_terrain_footprint(",
+    )
+    for path, source in (
+        (VISIBILITY, visibility_source),
+        (VISIBILITY_QUERY, query_source),
+        (TERRAIN_AREA_VISIBILITY, terrain_area_source),
+    ):
+        assert not any(marker in source for marker in forbidden_zero_width_calls), (
+            f"{path.relative_to(ROOT)} bypasses the shared visibility corridor."
+        )
+
+    forbidden_engine_geometry_imports = {
+        "warhammer40k_core.geometry.shapely_backend",
+        "warhammer40k_core.geometry.visibility_corridor",
+        "warhammer40k_core.geometry.visibility_query",
+    }
+    engine_bypasses: list[str] = []
+    for path in sorted(ENGINE.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.ImportFrom)
+                and node.module in forbidden_engine_geometry_imports
+            ):
+                engine_bypasses.append(f"{path.relative_to(ROOT)}:{node.lineno}")
+            if isinstance(node, ast.Import):
+                for imported in node.names:
+                    if imported.name in forbidden_engine_geometry_imports:
+                        engine_bypasses.append(f"{path.relative_to(ROOT)}:{node.lineno}")
+    assert engine_bypasses == []
 
 
 class _DirectEngagementRangeCallVisitor(ast.NodeVisitor):

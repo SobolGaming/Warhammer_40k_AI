@@ -44,7 +44,12 @@ class _Geometry(Protocol):
     @property
     def is_empty(self) -> bool: ...
 
-    def buffer(self, distance: float, quad_segs: int = _FOOTPRINT_QUAD_SEGS) -> _Geometry: ...
+    def buffer(
+        self,
+        distance: float,
+        quad_segs: int = _FOOTPRINT_QUAD_SEGS,
+        cap_style: str = "round",
+    ) -> _Geometry: ...
 
     def distance(self, other: _Geometry) -> float: ...
 
@@ -455,6 +460,34 @@ def segment_intersects_polygon_union(
     return line.intersects(footprint_for_polygon_union(polygons))
 
 
+def segment_corridor_intersects_polygon(
+    start: Point3,
+    end: Point3,
+    polygon: tuple[Point2D, ...],
+    *,
+    radius_inches: float,
+) -> bool:
+    return _segment_corridor_footprint(
+        start,
+        end,
+        radius_inches=radius_inches,
+    ).intersects(footprint_for_polygon(polygon))
+
+
+def segment_corridor_intersects_polygon_union(
+    start: Point3,
+    end: Point3,
+    polygons: tuple[tuple[Point2D, ...], ...],
+    *,
+    radius_inches: float,
+) -> bool:
+    return _segment_corridor_footprint(
+        start,
+        end,
+        radius_inches=radius_inches,
+    ).intersects(footprint_for_polygon_union(polygons))
+
+
 def polygon_within_polygon(
     inner: tuple[Point2D, ...],
     outer: tuple[Point2D, ...],
@@ -561,6 +594,44 @@ def segment_intersects_model_footprint(
         valid_end,
         footprint_for_base(valid_model.base, valid_model.pose),
         valid_model.volume.vertical_interval(valid_model.pose),
+    )
+
+
+def segment_corridor_intersects_terrain_footprint(
+    start: Point3,
+    end: Point3,
+    terrain: TerrainVolume,
+    *,
+    radius_inches: float,
+) -> bool:
+    valid_start = validate_point3("start", start)
+    valid_end = validate_point3("end", end)
+    valid_terrain = _validate_terrain("terrain", terrain)
+    return _segment_corridor_intersects_footprint_with_vertical_interval(
+        valid_start,
+        valid_end,
+        footprint_for_terrain(valid_terrain),
+        valid_terrain.vertical_interval(),
+        radius_inches=radius_inches,
+    )
+
+
+def segment_corridor_intersects_model_footprint(
+    start: Point3,
+    end: Point3,
+    model: Model,
+    *,
+    radius_inches: float,
+) -> bool:
+    valid_start = validate_point3("start", start)
+    valid_end = validate_point3("end", end)
+    valid_model = _validate_model("model", model)
+    return _segment_corridor_intersects_footprint_with_vertical_interval(
+        valid_start,
+        valid_end,
+        footprint_for_base(valid_model.base, valid_model.pose),
+        valid_model.volume.vertical_interval(valid_model.pose),
+        radius_inches=radius_inches,
     )
 
 
@@ -740,6 +811,54 @@ def _segment_intersects_footprint_with_vertical_interval(
     crossing_bottom = min(start_z, end_z)
     crossing_top = max(start_z, end_z)
     return crossing_top >= interval_bottom and crossing_bottom <= interval_top
+
+
+def _segment_corridor_intersects_footprint_with_vertical_interval(
+    start: Point3,
+    end: Point3,
+    footprint: _Geometry,
+    vertical_interval: tuple[float, float],
+    *,
+    radius_inches: float,
+) -> bool:
+    radius = _validate_positive_distance("corridor radius_inches", radius_inches)
+    if not _segment_corridor_footprint(start, end, radius_inches=radius).intersects(footprint):
+        return False
+    return _segment_intersects_footprint_with_vertical_interval(
+        start,
+        end,
+        footprint.buffer(radius, quad_segs=_FOOTPRINT_QUAD_SEGS),
+        vertical_interval,
+    )
+
+
+def _segment_corridor_footprint(
+    start: Point3,
+    end: Point3,
+    *,
+    radius_inches: float,
+) -> _Geometry:
+    valid_start = validate_point3("corridor start", start)
+    valid_end = validate_point3("corridor end", end)
+    radius = _validate_positive_distance("corridor radius_inches", radius_inches)
+    geometry = _geometry_module()
+    if valid_start.x == valid_end.x and valid_start.y == valid_end.y:
+        return geometry.Point(valid_start.x, valid_start.y).buffer(
+            radius,
+            quad_segs=_FOOTPRINT_QUAD_SEGS,
+        )
+    return geometry.LineString(((valid_start.x, valid_start.y), (valid_end.x, valid_end.y))).buffer(
+        radius,
+        quad_segs=_FOOTPRINT_QUAD_SEGS,
+        cap_style="flat",
+    )
+
+
+def _validate_positive_distance(field_name: str, value: object) -> float:
+    distance = validate_finite_number(field_name, value)
+    if distance <= 0.0:
+        raise GeometryError(f"{field_name} must be positive.")
+    return distance
 
 
 def _intersection_bounds_to_segment_interval(

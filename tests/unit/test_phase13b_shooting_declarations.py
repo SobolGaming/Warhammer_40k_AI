@@ -80,6 +80,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _weapon_payload_to_declaration_payload,
     _weapon_profile_by_wargear,
 )
+from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruins
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -381,6 +382,33 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
+
+
+def test_p06a_shooting_targets_cannot_use_a_sub_one_millimeter_visibility_gap() -> None:
+    lifecycle, units = _compact_shooting_lifecycle()
+    state = _state(lifecycle)
+    scenario = battlefield_scenario_for_state(state=state)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+
+    candidate = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        target_unit_ids=(defender.unit_instance_id,),
+        terrain_features=one_millimeter_visibility_gap_ruins(
+            fixture_id="p06a-shooting-gap",
+            center_x_inches=20.0,
+            gap_center_y_inches=35.0,
+            min_y_inches=0.0,
+            max_y_inches=60.0,
+        ),
+    )[0]
+
+    assert candidate.is_legal is False
+    assert candidate.violation_code is ShootingTargetViolationCode.NOT_VISIBLE
+    assert candidate.target_visible_model_ids == ()
 
 
 def _test_mortal_wound_destruction_evidence(

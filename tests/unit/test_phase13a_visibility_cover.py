@@ -275,6 +275,92 @@ def test_ruins_area_visibility_blocks_los_without_physical_wall_intersection() -
     assert not context.benefit_of_cover(witness).has_benefit
 
 
+def test_p06a_one_millimeter_corridor_applies_to_feature_rules_footprints() -> None:
+    feature = TerrainFeatureDefinition(
+        feature_id="one-millimeter-near-miss-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=0.0,
+        footprint_center_y_inches=0.01,
+        footprint_width_inches=1.0,
+        footprint_depth_inches=0.01,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.01,
+            width_inches=1.0,
+            depth_inches=0.01,
+        ).footprint_polygon,
+        display_geometry=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.01,
+            width_inches=1.0,
+            depth_inches=0.01,
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="near-miss-wall",
+                center_x_inches=0.0,
+                center_y_inches=0.01,
+                bottom_z_inches=0.0,
+                width_inches=1.0,
+                depth_inches=0.01,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="near-miss-floor",
+                center_x_inches=0.0,
+                center_y_inches=0.01,
+                bottom_z_inches=0.0,
+                width_inches=1.0,
+                depth_inches=0.01,
+                thickness_inches=0.001,
+            ),
+        ),
+        source_id="p06a-one-millimeter-corridor-test",
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:p06a-feature-corridor",
+        observer_model=_model("observer", -3.0, 0.0, radius=0.001),
+        target_models=(_model("target", 3.0, 0.0, radius=0.001),),
+        target_model_keywords=_target_model_keywords("target"),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+
+    assert not witness.unit_visible
+    assert {record.blocker_kind for record in witness.all_blocker_records()} >= {
+        VisibilityBlockerKind.TERRAIN_VOLUME,
+        VisibilityBlockerKind.TERRAIN_FEATURE,
+    }
+
+
+def test_p06a_one_millimeter_corridor_applies_to_logical_terrain_areas() -> None:
+    area = TerrainVisibilityArea(
+        terrain_area_id="one-millimeter-near-miss-area",
+        member_terrain_area_ids=("one-millimeter-near-miss-area",),
+        classification=TerrainAreaClassification.DENSE,
+        footprint_polygons=(((-0.5, 0.005), (0.5, 0.005), (0.5, 0.015), (-0.5, 0.015)),),
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:p06a-area-corridor",
+        observer_model=_model("observer", -3.0, 0.0, radius=0.001),
+        target_models=(_model("target", 3.0, 0.0, radius=0.001),),
+        target_model_keywords=_target_model_keywords("target"),
+        terrain_areas=(area,),
+    )
+
+    witness = context.resolve_line_of_sight()
+
+    assert not witness.unit_visible
+    assert {record.blocker_kind for record in witness.all_blocker_records()} == {
+        VisibilityBlockerKind.TERRAIN_AREA
+    }
+
+
 def test_ruins_visibility_uses_exact_rules_polygon_not_its_bounding_box() -> None:
     feature = _triangular_visibility_ruin()
     context = TerrainVisibilityContext.from_ruleset_descriptor(

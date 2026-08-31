@@ -1,0 +1,106 @@
+{
+  "artifact_schema": "core-v2-other-concepts-source-v1",
+  "evidence": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-other-concepts-source-review:visibility",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "7c9700d51718a74421b3a992336fef7ed34ba40e77c1f3ad6f70a4c91e2f7a30",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_terrain_volume",
+        "warhammer40k_core.engine.shooting_targets:shooting_target_candidates_for_unit",
+        "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 06.01 Visibility",
+      "source_url": null,
+      "transcription_sha256": "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-other-concepts-2026-08-31:visibility",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "cf12c5ecc2b7fdc082246161fcbab2e301df0a1eb8134f4b69175f0884a35a9a",
+      "observed_at": "2026-08-31T11:41:03-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:06",
+      "review_audit_source_observation_sha256": "646b405724eb9f1a7f441fed3b3af0cae62925c72fb4b069fc17118fbab13b73",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_terrain_volume",
+        "warhammer40k_core.engine.shooting_targets:shooting_target_candidates_for_unit",
+        "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 06.01 Visibility",
+      "source_url": "https://www.40k.app/rules/06-other-concepts",
+      "transcription_sha256": "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "409c0bd79aa7e8f70495f714ecb05b45bff971520c3cac52360fcbdcf42fca99",
+  "rules": [
+    {
+      "load_support_status": "loaded",
+      "rule_id": "visibility",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.geometry.visibility:TerrainVisibilityContext.resolve_line_of_sight",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_model",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_polygon_union",
+        "warhammer40k_core.geometry.visibility_corridor:line_of_sight_corridor_intersects_terrain_volume",
+        "warhammer40k_core.engine.shooting_targets:shooting_target_candidates_for_unit",
+        "warhammer40k_core.engine.shooting_targets:unit_has_line_of_sight_to_target"
+      ],
+      "section_heading": "VISIBILITY",
+      "section_id": "06.01",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:other-concepts:visibility",
+      "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model\u2019s unit and in the observed model\u2019s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).",
+      "transcription_sha256": "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883"
+    }
+  ],
+  "source_document": {
+    "document_id": "40k-app-other-concepts-2026-08-31",
+    "observed_at": "2026-08-31T11:41:03-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    "source_title": "40k.app Core Rules Other Concepts",
+    "source_url": "https://www.40k.app/rules/06-other-concepts"
+  },
+  "source_package_id": "gw-11e-core-other-concepts",
+  "source_version": "40k-app-other-concepts-observed-2026-08-31"
+}

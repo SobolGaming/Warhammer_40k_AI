@@ -11,6 +11,9 @@ from tools.build_core_command_phase_source import (
     build_core_command_phase_source_payload,
 )
 from tools.build_core_movement_phase_source import build_payload as build_movement_source_payload
+from tools.build_core_other_concepts_source import (
+    build_payload as build_other_concepts_source_payload,
+)
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -31,6 +34,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities,
     core_command_phase_2026_08,
     core_movement_phase_2026_08,
+    core_other_concepts_2026_08,
     core_rules,
     core_stratagems,
     core_stratagems_2026_08,
@@ -104,6 +108,62 @@ def test_p09a_move_units_source_artifact_is_pinned_typed_and_executable() -> Non
     assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
         package.source_catalog.to_payload()
     )
+
+
+def test_p06a_visibility_source_artifact_is_pinned_typed_and_executable() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_other_concepts_2026_08/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    package = core_other_concepts_2026_08.source_package()
+    rule = core_other_concepts_2026_08.source_rule_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert hashlib.sha256(raw).hexdigest() == (core_other_concepts_2026_08.EXPECTED_ARTIFACT_SHA256)
+    assert json.loads(raw) == build_other_concepts_source_payload()
+    assert rule.section_id == "06.01"
+    assert rule.source_id == core_other_concepts_2026_08.VISIBILITY_SOURCE_ID
+    assert rule.transcription_sha256 == core_other_concepts_2026_08.TRANSCRIPTION_SHA256
+    assert "imaginary straight line, 1 mm wide" in rule.source_text
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert {record.semantic_execution_status for record in evidence} == {
+        "executable_engine_runtime"
+    }
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
+        package.source_catalog.to_payload()
+    )
+
+
+def test_p06a_visibility_source_artifact_rejects_text_and_byte_drift() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_other_concepts_2026_08/artifacts/package.json"
+    )
+    payload = cast(dict[str, object], json.loads(artifact_path.read_text()))
+    rules = cast(list[dict[str, object]], payload["rules"])
+    rules[0]["source_text"] = f"{rules[0]['source_text']} altered"
+    with pytest.raises(
+        core_other_concepts_2026_08.CoreOtherConceptsSourceArtifactError,
+        match="reviewed identity",
+    ):
+        core_other_concepts_2026_08.core_other_concepts_source_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+    raw = artifact_path.read_bytes()
+    core_other_concepts_2026_08.validate_core_other_concepts_source_artifact_bytes(raw)
+    with pytest.raises(
+        core_other_concepts_2026_08.CoreOtherConceptsSourceArtifactError,
+        match="artifact bytes drifted",
+    ):
+        core_other_concepts_2026_08.validate_core_other_concepts_source_artifact_bytes(raw + b"\n")
 
 
 def test_p09b_fall_back_source_artifact_pins_optional_desperate_escape_sequence() -> None:
