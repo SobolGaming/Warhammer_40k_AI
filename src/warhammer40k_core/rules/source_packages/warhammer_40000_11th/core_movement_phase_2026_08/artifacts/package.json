@@ -1,5 +1,5 @@
 {
-  "artifact_schema": "core-v2-movement-phase-source-v1",
+  "artifact_schema": "core-v2-movement-phase-source-v2",
   "evidence": [
     {
       "app_build": null,
@@ -7,10 +7,10 @@
       "authority": "unverified_transcription_only",
       "capture_artifact_path": null,
       "capture_sha256": null,
-      "evidence_id": "core-v2-p09a-source-review:move-units-step",
+      "evidence_id": "core-v2-movement-source-review:move-units-step",
       "evidence_kind": "project_reviewed_app_transcription",
       "load_support_status": "loaded",
-      "observation_sha256": "5aa9978655e58af7c7d41cabd57c47d3bc8dc0daa884e2d2243206bd68f17afc",
+      "observation_sha256": "cc1d33663295747bf678e49ed908e9d23e98874f076fb2cadfe37133aef7ad13",
       "observed_at": null,
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": null,
@@ -38,11 +38,11 @@
       "authority": "project_authoritative_app_mirror",
       "capture_artifact_path": null,
       "capture_sha256": null,
-      "evidence_id": "40k-app-movement-phase-2026-08-29:move-units-step",
+      "evidence_id": "40k-app-movement-phase-2026-08-30:move-units-step",
       "evidence_kind": "third_party_mirror",
       "load_support_status": "loaded",
-      "observation_sha256": "a881b7623692015b3c92772f7fd508da782f832a225a922226735c9ed3e8fbc9",
-      "observed_at": "2026-08-29T20:56:52-04:00",
+      "observation_sha256": "fe123e0660e231a31e550414e2289ee66922b20312e055c69f077ab186e21800",
+      "observed_at": "2026-08-30T13:55:17-04:00",
       "official_corroborating_source_ids": [],
       "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
       "provider_name": "40k.app",
@@ -62,31 +62,184 @@
       "source_url": "https://www.40k.app/rules/09-movement-phase",
       "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f",
       "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-movement-source-review:selecting-modes",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "d573029a847de5780c46b2f4047b9057ed71c6258f27f9c16690ca7e529f7d7a",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:movement-phase:selecting-modes",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_validation:_fall_back_modes_for_parameterized_option",
+        "warhammer40k_core.engine.phases.movement_validation:_fall_back_mode_violation_code"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 09.02.02 Selecting Modes",
+      "source_url": null,
+      "transcription_sha256": "094c4bf218bd4c900864ee622364987378851fc06f23610ca95bd6574ee3c2d6",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-movement-phase-2026-08-30:selecting-modes",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "e5c209da27f60c11654788ed26c561e63374791fb345a032f3ce9a4620838db0",
+      "observed_at": "2026-08-30T13:55:17-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:09",
+      "review_audit_source_observation_sha256": "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+      "rule_source_id": "gw-11e-core-rules:movement-phase:selecting-modes",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_validation:_fall_back_modes_for_parameterized_option",
+        "warhammer40k_core.engine.phases.movement_validation:_fall_back_mode_violation_code"
+      ],
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 09.02.02 Selecting Modes",
+      "source_url": "https://www.40k.app/rules/09-movement-phase",
+      "transcription_sha256": "094c4bf218bd4c900864ee622364987378851fc06f23610ca95bd6574ee3c2d6",
+      "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-movement-source-review:fall-back-move",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "10a4ebcba3fb3c33df9e32ac9917d0ba0a2c7b2048cc9767c60ee587c909bd20",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:movement-phase:fall-back-move",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_geometry:_desperate_escape_requirements_for_fall_back",
+        "warhammer40k_core.engine.phases.movement_resolution_flow:_apply_movement_proposal_decision",
+        "warhammer40k_core.engine.phases.movement_fall_back_embark:_apply_fall_back_result"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 09.07 Fall-Back Move",
+      "source_url": null,
+      "transcription_sha256": "2f9a2b3a35e8ca0f2d76a43b788c93b9feccaa66f2bba19a8b0ce348d401db0b",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-movement-phase-2026-08-30:fall-back-move",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "97d7323f54195e968c0cff8e7c8434ce5b5f8fe9dca4be3dc558359b3d1e9d23",
+      "observed_at": "2026-08-30T13:55:17-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:09",
+      "review_audit_source_observation_sha256": "a00bccdc9dd090acd4fa211034bd397739392c4f018276667e3309f8d66960ae",
+      "rule_source_id": "gw-11e-core-rules:movement-phase:fall-back-move",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_geometry:_desperate_escape_requirements_for_fall_back",
+        "warhammer40k_core.engine.phases.movement_resolution_flow:_apply_movement_proposal_decision",
+        "warhammer40k_core.engine.phases.movement_fall_back_embark:_apply_fall_back_result"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 09.07 Fall-Back Move",
+      "source_url": "https://www.40k.app/rules/09-movement-phase",
+      "transcription_sha256": "2f9a2b3a35e8ca0f2d76a43b788c93b9feccaa66f2bba19a8b0ce348d401db0b",
+      "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "199be38f35856eddfb6f72395ffff7448f48be1b099db784788a8b64f0e97058",
-  "rule": {
-    "load_support_status": "loaded",
-    "rule_id": "move-units-step",
-    "runtime_consumer_ids": [
-      "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.begin_phase",
-      "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.apply_decision",
-      "warhammer40k_core.engine.phases.movement_action_decisions:_movement_action_options_for_selected_unit"
-    ],
-    "section_heading": "MOVE UNITS STEP",
-    "section_id": "09.02",
-    "semantic_execution_status": "executable_engine_runtime",
-    "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
-    "source_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
-    "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f"
-  },
+  "package_hash": "0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105",
+  "rules": [
+    {
+      "load_support_status": "loaded",
+      "rule_id": "move-units-step",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.begin_phase",
+        "warhammer40k_core.engine.phases.movement_handler:MovementPhaseHandler.apply_decision",
+        "warhammer40k_core.engine.phases.movement_action_decisions:_movement_action_options_for_selected_unit"
+      ],
+      "section_heading": "MOVE UNITS STEP",
+      "section_id": "09.02",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:movement-phase:move-units-step",
+      "source_text": "MOVE UNITS STEP\nThe active player moves their units, one unit at a time, until all their units have been selected and have finished making their moves. For each unit, use the sequence below.\n1 SELECT UNIT\nSelect a friendly unit that has not been selected in this step. That unit can either be on the battlefield, in Strategic Reserves (20.02), or embarked within a Transport model (18.01). That unit has now been selected to move.\n2 SELECT MOVE TYPE\nSelect one of the eligible move types listed below for your unit to make. Resolve that move type, after which that unit has finished making its move.\n- REMAIN STATIONARY (09.04)\n- NORMAL MOVE (09.05)\n- ADVANCE (09.06)\n- FALL-BACK (09.07)\n- DISEMBARK (18.04)\n- INGRESS (20.04)",
+      "transcription_sha256": "6ea310aedead79971d092f9ae035b0c0b79499bcc656e3899a5546ba6234c54f"
+    },
+    {
+      "load_support_status": "loaded",
+      "rule_id": "selecting-modes",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_validation:_fall_back_modes_for_parameterized_option",
+        "warhammer40k_core.engine.phases.movement_validation:_fall_back_mode_violation_code"
+      ],
+      "section_heading": "SELECTING MODES",
+      "section_id": "09.02.02",
+      "semantic_execution_status": "partial_engine_runtime",
+      "source_id": "gw-11e-core-rules:movement-phase:selecting-modes",
+      "source_text": "SELECTING MODES\nSome rules instruct you to select a mode, such as fall-back moves (09.07). Modes are mutually exclusive, and you must assess each one in the order presented. When making a move, if your unit does not meet the conditions of any of the modes, it cannot make that move.\nSometimes a mode will be mandatory if applicable (e.g. consolidation modes, 12.08), but in the case of fall-back moves, ordered retreat is not mandatory, so you could select desperate escape instead.\nMany move types state conditions you must meet while/after moving. Those that are labelled with a mode name only apply if you selected that mode; those not labelled with a mode name always apply.",
+      "transcription_sha256": "094c4bf218bd4c900864ee622364987378851fc06f23610ca95bd6574ee3c2d6"
+    },
+    {
+      "load_support_status": "loaded",
+      "rule_id": "fall-back-move",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.movement_geometry:_desperate_escape_requirements_for_fall_back",
+        "warhammer40k_core.engine.phases.movement_resolution_flow:_apply_movement_proposal_decision",
+        "warhammer40k_core.engine.phases.movement_fall_back_embark:_apply_fall_back_result"
+      ],
+      "section_heading": "FALL-BACK MOVE",
+      "section_id": "09.07",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:movement-phase:fall-back-move",
+      "source_text": "FALL-BACK MOVE\nWhen eligible: Your unit is engaged.\nMaximum distance: Your unit's M characteristic.\nEffect: Your unit moves as described in Moving (03).\nBefore moving: Select fall-back mode:\n* Ordered Retreat: If your unit is not battle-shocked, you can select this mode.\n* Desperate Escape: Otherwise, you must select this mode. Make a hazard roll for each model in your unit (06.03).\nWhile moving:\n* Desperate Escape: Each model that is moved can be moved through enemy models.\nAfter moving:\n* Your unit must be unengaged.\n* Until the end of the turn, unless otherwise stated, your unit is not eligible to shoot, declare a charge or start an action.\n* Desperate Escape: If your unit is not battle-shocked, you must make a battle-shock roll for your unit (01.07).",
+      "transcription_sha256": "2f9a2b3a35e8ca0f2d76a43b788c93b9feccaa66f2bba19a8b0ce348d401db0b"
+    }
+  ],
   "source_document": {
-    "document_id": "40k-app-movement-phase-2026-08-29",
-    "observed_at": "2026-08-29T20:56:52-04:00",
+    "document_id": "40k-app-movement-phase-2026-08-30",
+    "observed_at": "2026-08-30T13:55:17-04:00",
     "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
     "source_title": "40k.app Core Rules Movement Phase",
     "source_url": "https://www.40k.app/rules/09-movement-phase"
   },
   "source_package_id": "gw-11e-core-movement-phase",
-  "source_version": "40k-app-move-units-observed-2026-08-29"
+  "source_version": "40k-app-movement-phase-observed-2026-08-30"
 }

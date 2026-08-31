@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "1643959d295432033fc6bdb3020eec743d985fcd619cbbaa6bae43d5dfe8c8c9",
+  "content_hash": "58220cb6404cd46b5add52c81d35e96dfbdd0c6706c8c171e01190c5e212c9e8",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,7 +92,7 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c32f7a73a0f02ceff271cbae7507c9fbbe702e40d3cd349fe1f3850b3361d63e",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d0763f9c1beba10641fe9b52c4280d7c949dfa29e26b08b411296edd41edee57",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "11.0.0",
@@ -106,7 +106,7 @@
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "b556dc97296d977a6b3f2be3fb277fdbade0e833a1aeec1a06acde8266fe0acc",
+        "content_hash": "aa660f8ae78209b5dc1de881cc5c3d60a13ff8695913c2cad061d8461f8d8097",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
         "initial_replay_lifecycle": {
@@ -4695,6 +4695,7 @@
             "objective_control_records": [],
             "one_shot_weapon_use_records": [],
             "out_of_phase_shooting_state": null,
+            "pending_catalog_selected_target_battle_shock_continuation": null,
             "pending_return_on_death": [],
             "persisting_effects": [],
             "player_ids": [
@@ -9386,6 +9387,7 @@
             "objective_control_records": [],
             "one_shot_weapon_use_records": [],
             "out_of_phase_shooting_state": null,
+            "pending_catalog_selected_target_battle_shock_continuation": null,
             "pending_return_on_death": [],
             "persisting_effects": [],
             "player_ids": [
@@ -9491,7 +9493,7 @@
             ]
           }
         },
-        "lifecycle_hash": "148b3b68647b4ae35181c44dc89b96866a77723309dfca0c7e9ea9e18475c8c9",
+        "lifecycle_hash": "0414bd36b91c8ca78ab073b0cc5ffb49a77120ae22da5457d586e20f1b7caddf",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -14082,6 +14084,7 @@
               "objective_control_records": [],
               "one_shot_weapon_use_records": [],
               "out_of_phase_shooting_state": null,
+              "pending_catalog_selected_target_battle_shock_continuation": null,
               "pending_return_on_death": [],
               "persisting_effects": [],
               "player_ids": [
@@ -14308,7 +14311,7 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c32f7a73a0f02ceff271cbae7507c9fbbe702e40d3cd349fe1f3850b3361d63e",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d0763f9c1beba10641fe9b52c4280d7c949dfa29e26b08b411296edd41edee57",
               "engine_version": "0.1.0",
               "event_cursor": "388W53mqNJ9kUCV-Fj9fODjzD11j4q3iMJSAvsKPs-8cRXX5bVPD1YUATMEGNWi2",
               "game_id": "phase18l-contract-persistence",
@@ -14355,7 +14358,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "310648f20e7b5f8c0dafdbea29d4807c6765fcfb4a702ddf11cdf060b484407f",
+      "history_head": "f3389391c612079ef607f22b39e07ff1608cefff5fa9c4d23024dd53e11db97e",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -14427,8 +14430,8 @@
       "revision_history": [
         {
           "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
-          "authoritative_state_hash": "96eeb07f103e8bcd5dc07a7bcae86a6f6ea6cd2a34dc3284906a5965b7b8a60f",
-          "checkpoint_hash": "bf4b1f479a4bf6ac1002bd7809d8b60ee87fd32516b34dec61901cea7ab1d749",
+          "authoritative_state_hash": "87dba7046f64b1c90c111e8f5203afb9761791edc47a129a883e8e1d333d23bb",
+          "checkpoint_hash": "99a8307d0e09b6e796e1de6cd78fb978165504b304c2e27bf2032eb4f4618b32",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -14444,7 +14447,7 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "b8426fa6354289f5d7f31e442ea7285694b25aa96ff6986f7468c4915fdc2a41",
+          "revision_commitment": "a146eee3b8df4c4e45aa944708512919d33de284edee3642c0f3831b007353dc",
           "rng_draw_count": 0,
           "rng_history_count": 1,
           "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
@@ -14457,8 +14460,8 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "148b3b68647b4ae35181c44dc89b96866a77723309dfca0c7e9ea9e18475c8c9",
-          "checkpoint_hash": "29758c2888698f4cbe6f808d1fb2eb398057c5aa4176e19539e3e0fcaae407ab",
+          "authoritative_state_hash": "0414bd36b91c8ca78ab073b0cc5ffb49a77120ae22da5457d586e20f1b7caddf",
+          "checkpoint_hash": "c1e139681cf0cb9686e750f4b7f33c10f2843ddf08469bd7aa3f76e394ea34d4",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -14477,7 +14480,7 @@
             },
             "token": "YZJA38OJu5UyOZl4J5q7ELsstxFF_7eq5djAo-dtBx66u9ie5C6doHWxiFyJT5O1"
           },
-          "journal_entry_hash": "48f4190a6f8aa236661b8a3114635c378959b900d66c2dbeae6c29d6396082fc",
+          "journal_entry_hash": "425971b114665f10fc76b37c74f3f8f94ee486c20a62e3b3c4889856a4af574f",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -14494,9 +14497,9 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "b8426fa6354289f5d7f31e442ea7285694b25aa96ff6986f7468c4915fdc2a41",
-          "response_hash": "cca926fd329652f44cdc521a33cbe3074d972bc1633b783a0f7af050fbd129d0",
-          "revision_commitment": "310648f20e7b5f8c0dafdbea29d4807c6765fcfb4a702ddf11cdf060b484407f",
+          "previous_revision_commitment": "a146eee3b8df4c4e45aa944708512919d33de284edee3642c0f3831b007353dc",
+          "response_hash": "73e24b14a42c4028c013e10acbb652f8ab687e6e6bda491f88152211f9de9c4e",
+          "revision_commitment": "f3389391c612079ef607f22b39e07ff1608cefff5fa9c4d23024dd53e11db97e",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",
@@ -14524,7 +14527,7 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "e1b95366a7f9c7c73c3c7d67d54b042403e06a6641869d415f24e8e9a7ba10e2",
+            "content_hash": "75cd4745f068d9304c1e0e12577979ccca24d0d814c996413754d2e1e88e9b6f",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5cdef2eabf7518e2abf3976239e13cbd51731553a1c5c4fd64dee7a18b529d54",
             "initial_replay_lifecycle": null,
@@ -16835,6 +16838,7 @@
                 "objective_control_records": [],
                 "one_shot_weapon_use_records": [],
                 "out_of_phase_shooting_state": null,
+                "pending_catalog_selected_target_battle_shock_continuation": null,
                 "pending_return_on_death": [],
                 "persisting_effects": [],
                 "player_ids": [
@@ -16911,7 +16915,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "96eeb07f103e8bcd5dc07a7bcae86a6f6ea6cd2a34dc3284906a5965b7b8a60f",
+            "lifecycle_hash": "87dba7046f64b1c90c111e8f5203afb9761791edc47a129a883e8e1d333d23bb",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -19223,6 +19227,7 @@
                   "objective_control_records": [],
                   "one_shot_weapon_use_records": [],
                   "out_of_phase_shooting_state": null,
+                  "pending_catalog_selected_target_battle_shock_continuation": null,
                   "pending_return_on_death": [],
                   "persisting_effects": [],
                   "player_ids": [
@@ -19366,7 +19371,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "b556dc97296d977a6b3f2be3fb277fdbade0e833a1aeec1a06acde8266fe0acc",
+            "content_hash": "aa660f8ae78209b5dc1de881cc5c3d60a13ff8695913c2cad061d8461f8d8097",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
             "initial_replay_lifecycle": {
@@ -23955,6 +23960,7 @@
                 "objective_control_records": [],
                 "one_shot_weapon_use_records": [],
                 "out_of_phase_shooting_state": null,
+                "pending_catalog_selected_target_battle_shock_continuation": null,
                 "pending_return_on_death": [],
                 "persisting_effects": [],
                 "player_ids": [
@@ -28646,6 +28652,7 @@
                 "objective_control_records": [],
                 "one_shot_weapon_use_records": [],
                 "out_of_phase_shooting_state": null,
+                "pending_catalog_selected_target_battle_shock_continuation": null,
                 "pending_return_on_death": [],
                 "persisting_effects": [],
                 "player_ids": [
@@ -28751,7 +28758,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "148b3b68647b4ae35181c44dc89b96866a77723309dfca0c7e9ea9e18475c8c9",
+            "lifecycle_hash": "0414bd36b91c8ca78ab073b0cc5ffb49a77120ae22da5457d586e20f1b7caddf",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -33342,6 +33349,7 @@
                   "objective_control_records": [],
                   "one_shot_weapon_use_records": [],
                   "out_of_phase_shooting_state": null,
+                  "pending_catalog_selected_target_battle_shock_continuation": null,
                   "pending_return_on_death": [],
                   "persisting_effects": [],
                   "player_ids": [

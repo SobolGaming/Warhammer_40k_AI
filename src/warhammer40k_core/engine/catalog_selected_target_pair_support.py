@@ -276,7 +276,9 @@ def shooting_start_selected_target_effect_clauses_after(
     for clause in clauses[selection_index + 1 :]:
         if clause.template_id == "phase17c:selected-target-constraint":
             break
-        if selected_target_persisting_effect_clause_is_supported(clause):
+        if selected_target_persisting_effect_clause_is_supported(
+            clause
+        ) or clause_has_immediate_selected_target_battle_shock_effect(clause):
             selected.append(clause)
     return tuple(selected)
 
@@ -312,9 +314,10 @@ def fight_start_selected_target_pair_is_supported(
         raise GameLifecycleError(
             "Fight-start selected-target pair support requires RuleClause values."
         )
-    return clause_is_fight_start_selected_target_selection(
-        selection_clause
-    ) and selected_target_persisting_effect_clause_is_supported(effect_clause)
+    return clause_is_fight_start_selected_target_selection(selection_clause) and (
+        selected_target_persisting_effect_clause_is_supported(effect_clause)
+        or clause_has_immediate_selected_target_battle_shock_effect(effect_clause)
+    )
 
 
 def selected_target_persisting_effect_clause_is_supported(clause: RuleClause) -> bool:
@@ -409,6 +412,14 @@ def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
         and not clause.target.parameters
         and bool(clause.effects)
         and all(_effect_is_immediate_selected_target(effect) for effect in clause.effects)
+    )
+
+
+def clause_has_immediate_selected_target_battle_shock_effect(clause: RuleClause) -> bool:
+    if not clause_has_immediate_selected_target_effect(clause):
+        return False
+    return all(
+        effect_is_immediate_selected_target_battle_shock(effect) for effect in clause.effects
     )
 
 

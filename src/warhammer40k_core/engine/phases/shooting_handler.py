@@ -778,6 +778,9 @@ class ShootingPhaseHandler:
                     ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                     army_catalog=_army_catalog_for_handler(self),
                     shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+                    battle_shock_hooks=self.battle_shock_hooks,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 )
             )
             if type(phase_start_result) is LifecycleStatus:

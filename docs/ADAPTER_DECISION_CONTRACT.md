@@ -756,6 +756,64 @@ players.
 
 Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. Remain Stationary resolves as a finite action. Normal Move, Advance, and Fall Back always emit a follow-up `submit_movement_proposal` request carrying the same mode context; adapters must submit the actual `PathWitness` and model poses through that parameterized request.
 
+P09B makes those two Fall Back modes authoritative rather than merely descriptive. An unshocked
+engaged rules unit receives both `fall_back:ordered_retreat` and
+`fall_back:desperate_escape`; a Battle-shocked unit receives only Desperate Escape. Selecting
+Desperate Escape is legal even when no overflight or content rule forces it. The accepted
+`submit_movement_proposal` must preserve the emitted `fall_back_mode`, and the engine creates one
+`selected_mode` Desperate Escape requirement and one Hazard Roll for every model in the complete
+canonical rules unit. Overflight, Battle-shock, and source-backed forced reasons may coexist on
+those same per-model requirements; they do not replace the selected-mode inventory.
+
+The engine resolves any Hazard Roll casualties, applies the grouped `PathWitness` transition, and
+then checks the unit's authoritative Battle-shock state. If at least one model survives and the
+unit is not Battle-shocked after moving, the engine resolves a Battle-shock test with reason
+`desperate_escape` before Embark or `movement_activation_completed`. An available reroll uses the
+existing `select_dice_reroll` finite decision. The engine serializes one parent movement
+continuation across both that reroll and any nested Battle-shock outcome decision. The parent pins
+the continuation phase and source kind, canonical rules-unit identity, exact action result and
+movement-proposal request, complete Fall Back result, applied-event identity, grouped transition,
+movement payload, Battle-shock request/result, and optional reroll request/result. If the unit is
+already Battle-shocked or no model survives, no follow-up test is created. Adapters must not roll
+Hazard dice, choose whether the follow-up test occurs, remove models, apply Battle-shock, or
+complete the movement locally.
+
+A Battle-shock outcome provider can return a nested decision such as Feel No Pain for mortal
+wounds. That provider's returned status must identify the actual and sole pending queue head; the
+engine does not enqueue Embark or emit `movement_activation_completed` until the complete outcome
+chain closes. Restore and replay authenticate the provider claim and every parent occurrence field
+before resumption. Once the outcome closes, the engine reconciles the historical rules-unit
+identity: surviving placed descendants may receive the ordinary Embark choice, while a destroyed
+or otherwise absent unit completes its activation without a stale Embark request.
+
+The same ordering applies when an immediate catalog selected-target effect resolves a
+Battle-shock test and opens a provider-owned decision. Post-shoot, Shooting-start, and Fight-start
+selections serialize `pending_catalog_selected_target_battle_shock_continuation` in authoritative
+`GameState`. It retains the exact original selection request/result, phase-specific final event,
+catalog/source/clause/target/effect identity, resolved prefix and remaining effects,
+Battle-shock/reroll identity, and provider queue-head claim. Adapters continue to answer only the
+existing provider decision: they must not reselect the target, execute later effects, or infer
+completion. After the provider chain closes, the engine authenticates history, records the
+resolved Battle-shock effect once, resumes the remainder, and emits one final selected-target
+event. If that retained remainder reaches another immediate Battle-shock effect with an available
+reroll, the parent enters `awaiting_remaining_battle_shock_reroll` and authenticates the existing
+`select_dice_reroll` request against the exact retained selection, resolved prefix, current effect,
+remaining suffix, and starting index. Reroll resolution either continues the suffix or replaces the
+parent with the later provider-owned outcome before any following effect executes. This adds no
+decision type, proposal kind, payload family, hidden-information branch, or adapter mutation path;
+it is persisted engine-owned continuation state within Contract 11.1.0.
+
+Fall Back resolution and completion payloads now carry the stable source IDs
+`gw-11e-core-rules:movement-phase:selecting-modes` and
+`gw-11e-core-rules:movement-phase:fall-back-move`, the selected mode, the exact per-model
+requirement/roll inventory, casualty IDs, and `battle_shocked_after_move`. When the follow-up test
+is required, public event `fall_back_move_applied` records the exact transition before
+`battle_shock_test_resolved` and `desperate_escape_battle_shock_resolved`; the later movement
+completion repeats the authenticated transition without applying it twice. These facts are public
+and symmetric in the current rules scope, so existing shared event projection and redaction apply
+to both viewers. This adds no decision type, proposal kind, hidden-information family, or
+adapter-owned mutation and therefore remains within the existing Contract 11.1.0 families.
+
 When source-backed runtime content lets the selected unit ignore any or all
 applicable Move-characteristic or Advance-roll modifiers, the existing
 `select_movement_action` finite space enumerates every legal physical-modifier

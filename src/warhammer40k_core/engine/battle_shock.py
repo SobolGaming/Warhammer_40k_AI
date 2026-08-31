@@ -49,6 +49,7 @@ class BattleShockTestReason(StrEnum):
     BELOW_STARTING_STRENGTH_FORCED = "below_starting_strength_forced"
     FORCED_BY_STRATAGEM = "forced_by_stratagem"
     FORCED_BY_ARMY_RULE = "forced_by_army_rule"
+    DESPERATE_ESCAPE = "desperate_escape"
 
 
 class StratagemTargetPermissionStatus(StrEnum):

@@ -16,6 +16,10 @@ LIFECYCLE = ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle.py"
 STRATAGEMS = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 STRATAGEM_FILES = (STRATAGEMS, *sorted(STRATAGEMS.parent.glob("stratagems_*.py")))
 TRIGGERED_MOVEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement.py"
+BATTLE_SHOCK_HOOKS = ROOT / "src" / "warhammer40k_core" / "engine" / "battle_shock_hooks.py"
+BATTLE_SHOCK_RESOLUTION = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "battle_shock_resolution.py"
+)
 
 LIVE_MOVEMENT_CALLS = (
     (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_normal_move"),
@@ -116,6 +120,55 @@ def test_spatial_context_validation_precedes_specialized_physical_proposal_routi
             "Physical proposal spatial-context validation must run before specialized "
             f"routing through {validator_name}."
         )
+
+
+def test_desperate_escape_mode_requires_exact_selected_model_inventory() -> None:
+    _source_path, requirement_function = _function_by_name(
+        MOVEMENT_PHASE,
+        "_desperate_escape_requirements_for_fall_back",
+    )
+    requirement_source = ast.unparse(requirement_function)
+    assert "fall_back_mode" in {argument.arg for argument in requirement_function.args.kwonlyargs}
+    assert "fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE" in requirement_source
+    assert "DesperateEscapeRequirementReason.SELECTED_MODE" in requirement_source
+
+    _source_path, validation_function = _function_by_name(
+        MOVEMENT_PHASE,
+        "_fall_back_mode_violation_code",
+    )
+    validation_source = ast.unparse(validation_function)
+    assert "DesperateEscapeRequirementReason.SELECTED_MODE" in validation_source
+    assert "resolution.witness.model_ids()" in validation_source
+    assert "desperate_escape_requirement_inventory_incomplete" in validation_source
+    assert "desperate_escape_has_no_requirements" not in validation_source
+
+
+def test_desperate_escape_battle_shock_preserves_nested_outcome_status() -> None:
+    _source_path, registry_function = _function_by_name(
+        BATTLE_SHOCK_HOOKS,
+        "resolve_outcomes",
+    )
+    registry_source = ast.unparse(registry_function)
+    assert "pending_status = status" in registry_source
+    assert "queue_after[0] != pending_status.decision_request" in registry_source
+    assert "return pending_status" in registry_source
+
+    _source_path, resolution_function = _function_by_name(
+        BATTLE_SHOCK_RESOLUTION,
+        "record_precomputed_battle_shock_result_and_outcome_events",
+    )
+    resolution_source = ast.unparse(resolution_function)
+    assert "pending_status = battle_shock_hooks.resolve_outcomes" in resolution_source
+    assert "BattleShockResolutionResult" in resolution_source
+    assert "pending_status=pending_status" in resolution_source
+
+    _source_path, movement_function = _function_by_name(
+        MOVEMENT_PHASE,
+        "_resolve_desperate_escape_battle_shock_after_move",
+    )
+    movement_source = ast.unparse(movement_function)
+    assert "record_desperate_escape_battle_shock_resolution" in movement_source
+    assert "execution.resolution.pending_status" not in movement_source
 
 
 def _function_by_name(path: Path, name: str) -> tuple[Path, ast.FunctionDef]:

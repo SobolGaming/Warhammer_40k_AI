@@ -55,9 +55,10 @@ class BattleShockResolutionResult:
     pending_status: LifecycleStatus | None
 
     def __post_init__(self) -> None:
-        if (self.resolved_payload is None) == (self.pending_status is None):
+        if self.resolved_payload is None and self.pending_status is None:
             raise GameLifecycleError(
-                "Battle-shock resolution must be resolved or pending, but not both."
+                "Battle-shock resolution must be resolved or pending; a resolved result may "
+                "also have a pending outcome."
             )
         if self.resolved_payload is not None:
             object.__setattr__(
@@ -123,7 +124,7 @@ def resolve_battle_shock_test_with_optional_reroll(
         )
     )
     if permission is None:
-        resolved_payload = record_battle_shock_result_and_outcome_events(
+        return record_battle_shock_result_and_outcome_events(
             state=state,
             decisions=decisions,
             manager=manager,
@@ -138,10 +139,6 @@ def resolve_battle_shock_test_with_optional_reroll(
             base_payload=payload,
             resolved_event_types=event_types,
             additional_modifier_applications=additional_applications,
-        )
-        return BattleShockResolutionResult(
-            resolved_payload=cast(dict[str, JsonValue], resolved_payload),
-            pending_status=None,
         )
     reroll_request = manager.build_reroll_request(
         roll_state,
@@ -198,7 +195,7 @@ def apply_battle_shock_reroll_resolution_decision(
     battle_shock_hooks: BattleShockHookRegistry,
     expected_source_kind: str,
     expected_passed_state_policy: BattleShockPassedStatePolicy,
-) -> dict[str, JsonValue]:
+) -> BattleShockResolutionResult:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -275,7 +272,7 @@ def apply_battle_shock_reroll_resolution_decision(
         result=result,
         record_decision=False,
     )
-    resolved_payload = record_battle_shock_result_and_outcome_events(
+    return record_battle_shock_result_and_outcome_events(
         state=state,
         decisions=decisions,
         manager=manager,
@@ -291,7 +288,6 @@ def apply_battle_shock_reroll_resolution_decision(
         resolved_event_types=resolved_event_types,
         additional_modifier_applications=additional_modifier_applications,
     )
-    return cast(dict[str, JsonValue], resolved_payload)
 
 
 def record_battle_shock_result_and_outcome_events(
@@ -310,7 +306,7 @@ def record_battle_shock_result_and_outcome_events(
     base_payload: dict[str, JsonValue],
     resolved_event_types: tuple[str, ...],
     additional_modifier_applications: tuple[BattleShockModifierApplication, ...] = (),
-) -> JsonValue:
+) -> BattleShockResolutionResult:
     requested_phase = _battle_phase_from_token(phase)
     active_player = _validate_identifier("active_player_id", active_player_id)
     phase_start_ids = _validate_identifier_tuple(
@@ -375,7 +371,7 @@ def record_precomputed_battle_shock_result_and_outcome_events(
     base_payload: dict[str, JsonValue],
     resolved_event_types: tuple[str, ...],
     modifier_applications: tuple[BattleShockModifierApplication, ...] | None = None,
-) -> JsonValue:
+) -> BattleShockResolutionResult:
     if type(manager) is not DiceRollManager:
         raise GameLifecycleError("Precomputed Battle-shock resolution requires dice manager.")
     if type(battle_shock_hooks) is not BattleShockHookRegistry:
@@ -417,7 +413,7 @@ def record_precomputed_battle_shock_result_and_outcome_events(
         resolved_event_types=resolved_event_types,
         modifier_applications=applications,
     )
-    battle_shock_hooks.resolve_outcomes(
+    pending_status = battle_shock_hooks.resolve_outcomes(
         BattleShockOutcomeContext(
             state=state,
             decisions=decisions,
@@ -429,7 +425,10 @@ def record_precomputed_battle_shock_result_and_outcome_events(
             phase_start_battle_shocked_unit_ids=phase_start_ids,
         )
     )
-    return resolved_payload
+    return BattleShockResolutionResult(
+        resolved_payload=cast(dict[str, JsonValue], resolved_payload),
+        pending_status=pending_status,
+    )
 
 
 def record_precomputed_battle_shock_result_events(

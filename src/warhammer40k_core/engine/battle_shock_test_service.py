@@ -25,6 +25,7 @@ from warhammer40k_core.engine.battle_shock_resolution import (
     is_battle_shock_reroll_request,
     resolve_battle_shock_test_with_optional_reroll,
 )
+from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -133,7 +134,7 @@ def materialize_battle_shock_test_request(
         raise GameLifecycleError("Battle-shock test active player does not match live state.")
     target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_id)
     canonical_target_id = target_rules_unit.unit_instance_id
-    alive_model_ids = tuple(
+    all_alive_model_ids = tuple(
         sorted(model.model_instance_id for model in target_rules_unit.alive_models())
     )
     placed_model_ids = tuple(
@@ -145,10 +146,26 @@ def materialize_battle_shock_test_request(
             )
         )
     )
-    if not alive_model_ids or placed_model_ids != alive_model_ids:
+    alive_model_id_set = set(all_alive_model_ids)
+    placed_model_id_set = set(placed_model_ids)
+    absent_alive_model_ids = alive_model_id_set - placed_model_id_set
+    destroyed_departure_model_ids = {
+        model_id
+        for departure in state.primary_battlefield_departure_states
+        if departure.removal_kind is BattlefieldRemovalKind.DESTROYED
+        and departure.rules_unit_instance_id == canonical_target_id
+        for model_id in departure.removed_model_instance_ids
+    }
+    if (
+        not placed_model_ids
+        or not placed_model_id_set <= alive_model_id_set
+        or not absent_alive_model_ids <= destroyed_departure_model_ids
+    ):
         raise GameLifecycleError(
-            "Battle-shock target does not have every alive model on the battlefield."
+            "Battle-shock target does not have every alive model on the battlefield or lacks "
+            "destroyed-departure authority for an absent model."
         )
+    current_model_ids = placed_model_ids
     player_id = target_rules_unit.owner_player_id
     ability_index = runtime.ability_indexes_by_player_id.get(player_id)
     if ability_index is None:
@@ -180,7 +197,7 @@ def materialize_battle_shock_test_request(
         reason=reason,
         leadership_target=battle_shock_leadership_target_for_rules_unit(
             target_rules_unit,
-            current_model_ids=alive_model_ids,
+            current_model_ids=current_model_ids,
             ability_index=ability_index,
             state=state,
             runtime_modifier_registry=runtime.runtime_modifier_registry,
@@ -188,7 +205,7 @@ def materialize_battle_shock_test_request(
         below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
             rules_unit=target_rules_unit,
             starting_strength=state.starting_strength_record_for_unit(canonical_target_id),
-            current_model_ids=alive_model_ids,
+            current_model_ids=current_model_ids,
         ),
         dice_expression=dice_expression,
     )

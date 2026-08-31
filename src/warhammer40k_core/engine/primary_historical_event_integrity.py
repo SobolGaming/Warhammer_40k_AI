@@ -556,19 +556,33 @@ def _desperate_escape_departure_source(
     decision_model_ids = _json_identifier_list(
         result_payload.get("destroyed_model_ids"), name="Desperate Escape destroyed_model_ids"
     )
-    matching = tuple(
+    applied = tuple(
+        record
+        for record in event_records
+        if record.event_type == "fall_back_move_applied"
+        and isinstance(record.payload, dict)
+        and record.payload.get("desperate_escape_source_mutation_id") == mutation_id
+    )
+    completed = tuple(
         record
         for record in event_records
         if record.event_type == "movement_activation_completed"
         and isinstance(record.payload, dict)
         and record.payload.get("desperate_escape_source_mutation_id") == mutation_id
     )
-    if len(matching) != 1:
+    if len(applied) > 1 or len(completed) > 1 or (not applied and len(completed) != 1):
         raise GameLifecycleError(
             "Desperate Escape departure requires one authoritative movement terminal event."
         )
-    terminal = matching[0]
-    payload = _event_payload(terminal, event_name="movement_activation_completed")
+    if applied:
+        terminal = applied[0]
+    elif completed:
+        terminal = completed[0]
+    else:
+        raise GameLifecycleError(
+            "Desperate Escape departure requires one authoritative movement terminal event."
+        )
+    payload = _event_payload(terminal, event_name=terminal.event_type)
     terminal_model_ids = _json_identifier_list(
         payload.get("destroyed_model_ids"), name="Desperate Escape terminal destroyed_model_ids"
     )
@@ -582,6 +596,12 @@ def _desperate_escape_departure_source(
     _validate_destroyed_transition_batch(
         payload.get("transition_batch"), expected_model_ids=terminal_model_ids
     )
+    if applied and completed:
+        completed_payload = _event_payload(completed[0], event_name="movement_activation_completed")
+        if completed_payload.get("destroyed_model_ids") != list(
+            terminal_model_ids
+        ) or completed_payload.get("transition_batch") != payload.get("transition_batch"):
+            raise GameLifecycleError("Desperate Escape completion evidence drifted.")
     return _DestroyedDepartureSource(
         source_key=f"desperate-escape:{mutation_id}",
         completion_key=f"desperate-escape:{mutation_id}",

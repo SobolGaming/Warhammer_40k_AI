@@ -28,7 +28,6 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_destruction_reaction_decision,
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
-    apply_source_backed_attack_dice_reroll_decision,
     build_select_attack_weapon_group_request,
     build_select_post_roll_attack_pool_request,
     build_select_resolve_target_unit_request,
@@ -50,6 +49,9 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, Plac
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
     apply_catalog_post_fight_hit_target_effect_result,
+)
+from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
+    CatalogSelectedTargetBattleShockRuntime,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -92,6 +94,9 @@ from warhammer40k_core.engine.fight_activation_units import (
 from warhammer40k_core.engine.fight_attack_completion import (
     advance_fight_attack_sequence_until_completion,
     continue_completed_fight_attack_sequence,
+)
+from warhammer40k_core.engine.fight_dice_reroll_dispatch import (
+    apply_fight_dice_reroll_decision,
 )
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_eligible_to_fight_this_phase,
@@ -302,6 +307,9 @@ class FightPhaseHandler:
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
+    catalog_selected_target_battle_shock_runtime: CatalogSelectedTargetBattleShockRuntime = field(
+        default_factory=CatalogSelectedTargetBattleShockRuntime.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -345,6 +353,10 @@ class FightPhaseHandler:
             raise GameLifecycleError(
                 "FightPhaseHandler runtime_modifier_registry must be a registry."
             )
+        if type(self.catalog_selected_target_battle_shock_runtime) is not (
+            CatalogSelectedTargetBattleShockRuntime
+        ):
+            raise GameLifecycleError("FightPhaseHandler selected-target runtime is invalid.")
 
     @property
     def phase(self) -> BattlePhase:
@@ -537,6 +549,13 @@ class FightPhaseHandler:
                 state=state,
                 decisions=decisions,
                 result=result,
+                battle_shock_hooks=(
+                    self.catalog_selected_target_battle_shock_runtime.battle_shock_hooks
+                ),
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                ability_indexes_by_player_id=(
+                    self.catalog_selected_target_battle_shock_runtime.ability_indexes_by_player_id
+                ),
             )
         if result.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE:
             return apply_fight_phase_end_result(
@@ -559,11 +578,12 @@ class FightPhaseHandler:
                 policy=_fight_policy_for_handler(self),
             )
         if result.decision_type == DICE_REROLL_DECISION_TYPE:
-            return _apply_fight_dice_reroll_decision(
+            return apply_fight_dice_reroll_decision(
                 state=state,
                 result=result,
                 decisions=decisions,
                 runtime_modifier_registry=self.runtime_modifier_registry,
+                selected_target_runtime=self.catalog_selected_target_battle_shock_runtime,
             )
         raise GameLifecycleError("Fight phase received unsupported decision type.")
 
@@ -3239,30 +3259,6 @@ def _validate_fight_unit_selected_grant_payload_context(
         or _payload_string(payload, key="activation_result_id") != activation.result_id
     ):
         raise GameLifecycleError("Fight unit grant activation decision drift.")
-
-
-def _apply_fight_dice_reroll_decision(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> LifecycleStatus | None:
-    _validate_fight_phase_state(state)
-    fight_state = _require_fight_state(state)
-    attack_sequence = fight_state.attack_sequence
-    if attack_sequence is None:
-        raise GameLifecycleError("Fight dice reroll requires an active attack sequence.")
-    apply_source_backed_attack_dice_reroll_decision(
-        state=state,
-        result=result,
-        decisions=decisions,
-        attack_sequence=attack_sequence,
-        expected_phase=BattlePhase.FIGHT,
-        phase_label="Fight",
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
-    return None
 
 
 def _apply_fight_activation_ability_decision(

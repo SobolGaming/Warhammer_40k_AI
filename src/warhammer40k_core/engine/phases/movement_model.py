@@ -108,6 +108,7 @@ class FallBackModeKind(StrEnum):
 
 
 class DesperateEscapeRequirementReason(StrEnum):
+    SELECTED_MODE = "selected_mode"
     ENEMY_MODEL_OVERFLIGHT = "enemy_model_overflight"
     BATTLE_SHOCKED = "battle_shocked"
     FORCED_BY_RULE = "forced_by_rule"
@@ -189,6 +190,9 @@ class MovementPhaseStatePayload(TypedDict):
     active_selection: MovementUnitSelectionPayload | None
     pending_action: PendingMovementActionSelectionPayload | None
     pending_setup_event_id: NotRequired[str | None]
+    pending_desperate_escape_battle_shock_continuation: (
+        PendingDesperateEscapeBattleShockContinuationPayload | None
+    )
 
 
 class MovementActionAvailabilityContextPayload(TypedDict):
@@ -286,6 +290,22 @@ class FallBackActionResultPayload(TypedDict):
     coherency_result: UnitCoherencyResultPayload
     rollback_record: MovementRollbackRecordPayload | None
     movement_payload: dict[str, JsonValue]
+
+
+class PendingDesperateEscapeBattleShockContinuationPayload(TypedDict):
+    source_kind: str
+    continuation_phase: str
+    canonical_unit_instance_id: str
+    movement_proposal_request_id: str
+    action_result: dict[str, JsonValue]
+    fall_back_result: FallBackActionResultPayload
+    fall_back_applied_event_id: str | None
+    movement_payload: dict[str, JsonValue] | None
+    transition_batch: BattlefieldTransitionBatchPayload | None
+    battle_shock_request_id: str
+    battle_shock_result_id: str | None
+    battle_shock_reroll_request_id: str | None
+    battle_shock_reroll_result_id: str | None
 
 
 @dataclass(frozen=True, slots=True)

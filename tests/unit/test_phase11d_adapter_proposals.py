@@ -556,14 +556,13 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
     )
 
 
-def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
+def test_fall_back_proposal_accepts_voluntary_desperate_escape_for_every_model() -> None:
     session, movement_status = _local_session_at_movement_unit_selection(
         game_id="phase11d-desperate-escape-failure-0000",
         pose_factory=_fall_back_deployment_pose,
     )
     state = _session_state(session)
-    _mark_first_unit_battle_shocked(state)
-    _move_first_enemy_model_into_overflight_engagement(state)
+    _move_first_enemy_model_into_side_engagement(state)
     action_request = _decision_request(
         session.submit_option(
             request_id=_decision_request(movement_status).request_id,
@@ -572,7 +571,9 @@ def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
         )
     )
     assert movement_status.decision_request is not None
-    assert _DESPERATE_FALL_BACK_OPTION_ID in {option.option_id for option in action_request.options}
+    assert {_ORDERED_FALL_BACK_OPTION_ID, _DESPERATE_FALL_BACK_OPTION_ID} <= {
+        option.option_id for option in action_request.options
+    }
     proposal_request = _decision_request(
         session.submit_option(
             request_id=action_request.request_id,
@@ -603,8 +604,18 @@ def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
         result_id="phase11d-fall-back-proposal",
     )
     request = _decision_request(status)
+    fall_back_context = cast(
+        dict[str, object],
+        cast(dict[str, JsonValue], request.payload)["fall_back_context"],
+    )
+    fall_back_result = cast(dict[str, object], fall_back_context["fall_back_result"])
+    requirements = cast(list[dict[str, object]], fall_back_result["desperate_escape_requirements"])
+    rolls = cast(list[dict[str, object]], fall_back_result["desperate_escape_rolls"])
 
     assert request.decision_type == "select_desperate_escape_model"
+    assert len(requirements) == len(before.model_placements)
+    assert len(rolls) == len(before.model_placements)
+    assert all(requirement["reasons"] == ["selected_mode"] for requirement in requirements)
 
 
 def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> None:
@@ -1956,6 +1967,37 @@ def _move_first_enemy_model_into_overflight_engagement(state: GameState) -> None
     target_pose = Pose.at(
         first_friendly_pose.position.x,
         first_friendly_pose.position.y + 2.0,
+        first_friendly_pose.position.z,
+        facing_degrees=180.0,
+    )
+    first_enemy = enemy.model_placements[0]
+    delta_x = target_pose.position.x - first_enemy.pose.position.x
+    delta_y = target_pose.position.y - first_enemy.pose.position.y
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        enemy.with_model_placements(
+            tuple(
+                placement.with_pose(
+                    Pose.at(
+                        placement.pose.position.x + delta_x,
+                        placement.pose.position.y + delta_y,
+                        placement.pose.position.z,
+                        facing_degrees=180.0,
+                    )
+                )
+                for placement in enemy.model_placements
+            )
+        )
+    )
+
+
+def _move_first_enemy_model_into_side_engagement(state: GameState) -> None:
+    assert state.battlefield_state is not None
+    friendly = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    enemy = state.battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-3")
+    first_friendly_pose = friendly.model_placements[0].pose
+    target_pose = Pose.at(
+        first_friendly_pose.position.x,
+        first_friendly_pose.position.y - 2.0,
         first_friendly_pose.position.z,
         facing_degrees=180.0,
     )

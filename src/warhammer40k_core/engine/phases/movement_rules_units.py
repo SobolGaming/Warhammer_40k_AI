@@ -12,6 +12,10 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.desperate_escape import (
+    DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+    FALL_BACK_SELECTING_MODES_SOURCE_RULE_ID,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -20,6 +24,7 @@ from warhammer40k_core.engine.phases.movement_geometry import (
 )
 from warhammer40k_core.engine.phases.movement_model import (
     AdvanceRollResult,
+    FallBackModeKind,
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.phases.movement_resolvers import _resolve_unit_move
@@ -235,6 +240,7 @@ def resolve_rules_unit_fall_back_move(
     rules_unit: RulesUnitView,
     before: RulesUnitPlacement,
     witness: PathWitness,
+    fall_back_mode: FallBackModeKind,
     movement_mode: MovementMode,
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...],
@@ -276,6 +282,7 @@ def resolve_rules_unit_fall_back_move(
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=component,
             witness=_component_witness(witness=witness, component=component),
+            fall_back_mode=fall_back_mode,
             battle_round=battle_round,
             battle_shocked_unit_ids=tuple(sorted(shocked_ids)),
             forced_desperate_escape_source_rule_ids=forced_desperate_escape_source_rule_ids,
@@ -290,6 +297,9 @@ def resolve_rules_unit_fall_back_move(
     )
     movement_payload = {
         **resolved.movement_payload,
+        "fall_back_mode": fall_back_mode.value,
+        "fall_back_source_rule_id": DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+        "selecting_modes_source_rule_id": FALL_BACK_SELECTING_MODES_SOURCE_RULE_ID,
         "desperate_escape_requirements": validate_json_value(
             [requirement.to_payload() for requirement in requirements]
         ),

@@ -14,6 +14,7 @@ from tests.movement_submission_helpers import (
     submit_default_movement_proposal_if_pending,
     submit_movement_proposal,
 )
+from tests.phase11c_command_phase_helpers import unit_by_id
 from tests.setup_completion_helpers import (
     record_completed_command_occurrences_for_fixture,
     record_current_battlefield_placements_for_fixture,
@@ -21,18 +22,28 @@ from tests.setup_completion_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     CatalogJsonObject,
     DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
 )
+from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.abilities import AbilityCatalogRecord
 from warhammer40k_core.engine.ability_catalog import (
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battle_round_hooks import (
+    BattleRoundStartHookRegistry,
+    BattleRoundStartRequestContext,
+    BattleRoundStartResultContext,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldScenario,
@@ -41,19 +52,29 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     UnitPlacement,
 )
-from warhammer40k_core.engine.decision import DiceRollManager
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    FeelNoPainSource,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+)
+from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
     PersistingEffect,
 )
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights import (
+    army_rule as chaos_knights_army_rule,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -66,6 +87,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -79,6 +103,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+    SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     DesperateEscapeRequirement,
@@ -91,6 +116,9 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStepKind,
     _roll_desperate_escape_dice,
     resolve_fall_back_move,
+)
+from warhammer40k_core.engine.phases.movement_fall_back_embark import (
+    desperate_escape_battle_shock_required,
 )
 from warhammer40k_core.engine.phases.movement_geometry import (
     _enemy_engaged_unit_ids_for_unit_placement,
@@ -107,7 +135,15 @@ from warhammer40k_core.engine.primary_battlefield_departure import (
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+    StratagemTargetProposal,
+    StratagemTargetProposalPayload,
     stratagem_decline_payload,
+)
+from warhammer40k_core.engine.transports import (
+    TransportCapacityProfile,
+    TransportCargoState,
 )
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
@@ -127,10 +163,13 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09a-dice-0003"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09a-coherency-0006"
+_INCOHERENT_SURVIVORS_DESPERATE_ESCAPE_GAME_ID = "phase10o-p09b-coherency-0001"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+)
+_DESPERATE_FALL_BACK_OPTION_ID = (
+    f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.DESPERATE_ESCAPE.value}"
 )
 
 
@@ -189,12 +228,14 @@ def test_fall_back_allows_engagement_transit_but_rejects_endpoint_in_engagement(
     valid_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
     invalid_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(5.8, 6.0)),
     )
@@ -285,6 +326,7 @@ def test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requireme
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -315,6 +357,7 @@ def test_generic_movement_transit_auto_passes_enemy_overflight_desperate_escape(
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         state=state,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
@@ -322,6 +365,7 @@ def test_generic_movement_transit_auto_passes_enemy_overflight_desperate_escape(
     battle_shocked_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         state=state,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
@@ -358,6 +402,7 @@ def test_generic_movement_transit_fall_back_rejects_excluded_titanic_overflight(
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         state=state,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
@@ -402,6 +447,7 @@ def test_fall_back_full_unit_no_op_witness_emits_only_changed_displacement() -> 
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=witness,
     )
@@ -443,6 +489,7 @@ def test_fly_and_titanic_fall_back_overflight_avoid_desperate_escape_requirement
         resolution = resolve_fall_back_move(
             scenario=scenario,
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
             unit_placement=unit_placement,
             path_witness=_fall_back_witness(
                 unit_placement,
@@ -462,6 +509,7 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
         battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -471,6 +519,39 @@ def test_battle_shocked_fall_back_requires_desperate_escape_for_every_model() ->
     assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)
     assert all(
         DesperateEscapeRequirementReason.BATTLE_SHOCKED in requirement.reasons
+        for requirement in resolution.desperate_escape_requirements
+    )
+
+
+def test_voluntary_desperate_escape_requires_one_hazard_roll_for_every_model() -> None:
+    scenario = _engaged_scenario()
+    state = _state_for_scenario_with_effects(scenario, effects=())
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        state=state,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+    )
+    rolls = _roll_desperate_escape_dice(
+        state=state,
+        decisions=DecisionController(),
+        resolution=resolution,
+    )
+
+    assert resolution.is_valid
+    assert len(resolution.desperate_escape_requirements) == len(unit_placement.model_placements)
+    assert len(rolls) == len(unit_placement.model_placements)
+    assert all(
+        DesperateEscapeRequirementReason.SELECTED_MODE in requirement.reasons
         for requirement in resolution.desperate_escape_requirements
     )
 
@@ -486,6 +567,7 @@ def test_forced_desperate_escape_rolls_every_model() -> None:
         scenario=scenario,
         state=state,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(
             unit_placement,
@@ -508,6 +590,34 @@ def test_forced_desperate_escape_rolls_every_model() -> None:
     assert not any(
         event.event_type.startswith("forced_desperate_escape_battle_shock")
         for event in decisions.event_log.records
+    )
+
+
+def test_desperate_escape_follow_up_requires_survivors_and_unshocked_state() -> None:
+    base_payload: dict[str, JsonValue] = {
+        "fall_back_mode": FallBackModeKind.DESPERATE_ESCAPE.value,
+        "battle_shocked_after_move": False,
+        "forced_desperate_escape_sources": [{"source_rule_id": "phase10o-forced-source"}],
+    }
+
+    assert desperate_escape_battle_shock_required(
+        movement_payload=base_payload,
+        has_surviving_models=True,
+    )
+    assert not desperate_escape_battle_shock_required(
+        movement_payload={**base_payload, "battle_shocked_after_move": True},
+        has_surviving_models=True,
+    )
+    assert not desperate_escape_battle_shock_required(
+        movement_payload=base_payload,
+        has_surviving_models=False,
+    )
+    assert not desperate_escape_battle_shock_required(
+        movement_payload={
+            **base_payload,
+            "fall_back_mode": FallBackModeKind.ORDERED_RETREAT.value,
+        },
+        has_surviving_models=True,
     )
 
 
@@ -605,7 +715,7 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
     fall_back_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
-        option_id=_ORDERED_FALL_BACK_OPTION_ID,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
         action_result_id="phase10o-result-000004",
         proposal_result_id="phase10o-desperate-failed-proposal",
         unit_instance_id=unit_placement.unit_instance_id,
@@ -656,7 +766,10 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
     assert all(
         removal.source_step == MovementPhaseStepKind.MOVE_UNITS.value for removal in batch.removals
     )
-    assert all(removal.source_rule_id == "desperate_escape" for removal in batch.removals)
+    assert all(
+        removal.source_rule_id == "gw-11e-core-rules:movement-phase:fall-back-move"
+        for removal in batch.removals
+    )
     assert batch.displacements
     assert all(
         displacement.displacement_kind is ModelDisplacementKind.FALL_BACK
@@ -672,6 +785,478 @@ def test_failed_desperate_escape_removes_selected_model_and_records_fell_back_st
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+def test_voluntary_desperate_escape_moves_then_tests_unshocked_rules_unit() -> None:
+    lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
+        _config(game_id="phase10o-p09b-voluntary-desperate-escape")
+    )
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10o-p09b-select-unit",
+    )
+    action_request = _decision_request(action_status)
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=action_request,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        action_result_id="phase10o-p09b-select-desperate",
+        proposal_result_id="phase10o-p09b-desperate-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+    )
+    if (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    ):
+        status = _submit_result(
+            lifecycle,
+            request=status.decision_request,
+            option_id=status.decision_request.options[0].option_id,
+            result_id="phase10o-p09b-destroy-failed-models",
+        )
+
+    roll_events = _event_payloads(lifecycle, "desperate_escape_roll_resolved")
+    battle_shock_event = _last_event_payload(lifecycle, "desperate_escape_battle_shock_resolved")
+    movement_event = _last_event_payload(lifecycle, "movement_activation_completed")
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    assert len(roll_events) == len(unit_placement.model_placements)
+    assert battle_shock_event["source_rule_id"] == (
+        "gw-11e-core-rules:movement-phase:fall-back-move"
+    )
+    assert battle_shock_event["unit_instance_id"] == unit_placement.unit_instance_id
+    assert movement_event["fall_back_mode"] == FallBackModeKind.DESPERATE_ESCAPE.value
+    assert next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "desperate_escape_battle_shock_resolved"
+    ) < next(
+        index
+        for index, event in enumerate(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "movement_activation_completed"
+    )
+
+
+def test_voluntary_desperate_escape_battle_shock_reroll_restores_and_resumes() -> None:
+    lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
+        _config(
+            game_id="phase10o-p09b-voluntary-desperate-reroll",
+            with_battle_shock_reroll_ability=True,
+        )
+    )
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id="army-alpha:intercessor-unit-1",
+        result_id="phase10o-p09b-reroll-select-unit",
+    )
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=_decision_request(action_status),
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        action_result_id="phase10o-p09b-reroll-select-desperate",
+        proposal_result_id="phase10o-p09b-reroll-proposal",
+        unit_instance_id=unit_placement.unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+        ),
+    )
+    if (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    ):
+        status = _submit_result(
+            lifecycle,
+            request=status.decision_request,
+            option_id=status.decision_request.options[0].option_id,
+            result_id="phase10o-p09b-reroll-destroy-failed-models",
+        )
+    reroll_request = _decision_request(status)
+
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert cast(dict[str, JsonValue], status.payload)["phase_body_status"] == (
+        "desperate_escape_battle_shock_reroll_pending"
+    )
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(payload)
+    assert restored.to_payload() == lifecycle.to_payload()
+
+    tampered_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    pending_request_payload = tampered_payload["decisions"]["queue"]["pending_requests"][0]
+    pending_context = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], pending_request_payload["payload"])["battle_shock_context"],
+    )
+    cast(dict[str, JsonValue], pending_context["base_payload"])["source_rule_id"] = (
+        "phase10o-p09b-tampered-source"
+    )
+    matching_requested_events = tuple(
+        event
+        for event in tampered_payload["decisions"]["event_log"]
+        if event["event_type"] == "decision_requested"
+        and cast(dict[str, JsonValue], event["payload"])["request_id"] == reroll_request.request_id
+    )
+    assert len(matching_requested_events) == 1
+    requested_context = cast(
+        dict[str, JsonValue],
+        cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], matching_requested_events[0]["payload"])["payload"],
+        )["battle_shock_context"],
+    )
+    cast(dict[str, JsonValue], requested_context["base_payload"])["source_rule_id"] = (
+        "phase10o-p09b-tampered-source"
+    )
+    matching_test_requested_events = tuple(
+        event
+        for event in tampered_payload["decisions"]["event_log"]
+        if event["event_type"] == "battle_shock_test_requested"
+        and cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], event["payload"])["battle_shock_test_request"],
+        )["request_id"]
+        == cast(
+            dict[str, JsonValue],
+            pending_context["battle_shock_test_request"],
+        )["request_id"]
+    )
+    assert len(matching_test_requested_events) == 1
+    cast(dict[str, JsonValue], matching_test_requested_events[0]["payload"])["source_rule_id"] = (
+        "phase10o-p09b-tampered-source"
+    )
+    with pytest.raises(GameLifecycleError, match="Desperate Escape source occurrence drifted"):
+        GameLifecycle.from_payload(tampered_payload)
+
+    resumed = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10o-p09b-reroll-decline",
+            request=reroll_request,
+            selected_option_id="decline",
+        )
+    )
+
+    assert resumed.status_kind is not LifecycleStatusKind.INVALID
+    assert _event_payloads(restored, "desperate_escape_battle_shock_resolved")
+    assert _event_payloads(restored, "movement_activation_completed")
+
+
+def _advance_voluntary_desperate_escape_to_delirium_fnp(
+    *,
+    game_id: str,
+    with_reroll: bool,
+    target_wounds_remaining: int,
+) -> tuple[GameLifecycle, LifecycleStatus, str]:
+    lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
+        _config(
+            game_id=game_id,
+            with_battle_shock_reroll_ability=with_reroll,
+            with_chaos_knights_delirium=True,
+            with_transport=True,
+        ),
+        prepare_delirium_target=True,
+        delirium_target_wounds_remaining=target_wounds_remaining,
+    )
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id=target_unit_id,
+        result_id=f"{game_id}:select-unit",
+    )
+    state = _state(lifecycle)
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    unit_placement = battlefield_state.unit_placement_by_id(target_unit_id)
+    status = submit_action_and_movement_proposal(
+        lifecycle,
+        request=_decision_request(action_status),
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
+        action_result_id=f"{game_id}:select-desperate",
+        proposal_result_id=f"{game_id}:proposal",
+        unit_instance_id=target_unit_id,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        witness=_fall_back_witness(
+            unit_placement,
+            first_model_end_pose=Pose.at(
+                unit_placement.model_placements[0].pose.position.x,
+                unit_placement.model_placements[0].pose.position.y - 6.0,
+                unit_placement.model_placements[0].pose.position.z,
+            ),
+        ),
+    )
+    if (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
+    ):
+        status = _submit_result(
+            lifecycle,
+            request=status.decision_request,
+            option_id=status.decision_request.options[0].option_id,
+            result_id=f"{game_id}:hazard-selection",
+        )
+    if with_reroll:
+        reroll_request = _decision_request(status)
+        assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"{game_id}:decline-reroll",
+                request=reroll_request,
+                selected_option_id="decline",
+            )
+        )
+    fnp_request = _decision_request(status)
+    assert fnp_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    return lifecycle, status, target_unit_id
+
+
+@pytest.mark.parametrize("with_reroll", [False, True])
+def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
+    with_reroll: bool,
+) -> None:
+    seed_suffix = 15 if with_reroll else 3
+    game_id = f"phase10o-p09b-delirium-fnp-reroll-{int(with_reroll)}-{seed_suffix}"
+    lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
+        game_id=game_id,
+        with_reroll=with_reroll,
+        target_wounds_remaining=4,
+    )
+    state = _state(lifecycle)
+    fnp_request = _decision_request(status)
+
+    assert lifecycle.decision_controller.queue.pending_requests == (fnp_request,)
+    assert not _event_payloads(lifecycle, "movement_activation_completed")
+    assert fnp_request.decision_type != SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+    movement_state = state.movement_phase_state
+    assert movement_state is not None
+    assert movement_state.active_selection is not None
+    continuation = movement_state.pending_desperate_escape_battle_shock_continuation
+    assert continuation is not None
+    assert continuation.source_kind.value == "voluntary_post_move"
+    assert continuation.continuation_phase.value == "awaiting_outcome"
+    assert continuation.canonical_unit_instance_id == target_unit_id
+    assert continuation.battle_shock_result_id is not None
+    assert continuation.fall_back_applied_event_id is not None
+    (applied_event,) = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_id == continuation.fall_back_applied_event_id
+    )
+    assert applied_event.event_type == "fall_back_move_applied"
+    applied_payload = cast(dict[str, JsonValue], applied_event.payload)
+    assert applied_payload["request_id"] == continuation.action_result.request_id
+    assert applied_payload["result_id"] == continuation.action_result.result_id
+    assert (
+        applied_payload["movement_proposal_request_id"] == continuation.movement_proposal_request_id
+    )
+    assert applied_payload["fall_back_result"] == continuation.fall_back_result.to_payload()
+    assert applied_payload["movement_payload"] == continuation.movement_payload
+    assert continuation.transition_batch is not None
+    assert applied_payload["transition_batch"] == continuation.transition_batch.to_payload()
+    (proposal_record,) = tuple(
+        record
+        for record in lifecycle.decision_controller.records
+        if record.request.request_id == continuation.movement_proposal_request_id
+    )
+    assert proposal_record.result.request_id == continuation.movement_proposal_request_id
+    matching_battle_shock_events: list[EventRecord] = []
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type != "battle_shock_test_resolved" or not isinstance(event.payload, dict):
+            continue
+        raw_result = event.payload.get("battle_shock_result")
+        if (
+            isinstance(raw_result, dict)
+            and raw_result.get("result_id") == continuation.battle_shock_result_id
+        ):
+            matching_battle_shock_events.append(event)
+    (battle_shock_event,) = matching_battle_shock_events
+    battle_shock_payload = cast(dict[str, JsonValue], battle_shock_event.payload)
+    battle_shock_result_payload = cast(
+        dict[str, JsonValue],
+        battle_shock_payload["battle_shock_result"],
+    )
+    battle_shock_request_payload = cast(
+        dict[str, JsonValue],
+        battle_shock_result_payload["request"],
+    )
+    assert battle_shock_payload["phase"] == BattlePhase.MOVEMENT.value
+    assert battle_shock_request_payload["request_id"] == continuation.battle_shock_request_id
+    assert battle_shock_request_payload["unit_instance_id"] == target_unit_id
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    target_model_id = unit_by_id(state, target_unit_id).own_models[0].model_instance_id
+    transition_events = tuple(
+        (event.event_type, event.payload.get("transition_batch"))
+        for event in lifecycle.decision_controller.event_log.records
+        if isinstance(event.payload, dict)
+        and isinstance(event.payload.get("transition_batch"), dict)
+        and target_model_id in json.dumps(event.payload["transition_batch"], sort_keys=True)
+    )
+    authoritative_transition_events = tuple(
+        (event_type, transition)
+        for event_type, transition in transition_events
+        if event_type in {"battlefield_models_placed", "fall_back_move_applied"}
+    )
+    assert len(authoritative_transition_events) == 2
+    initial_transition = cast(dict[str, JsonValue], authoritative_transition_events[0][1])
+    fall_back_transition = cast(dict[str, JsonValue], authoritative_transition_events[1][1])
+    initial_model = next(
+        cast(dict[str, JsonValue], placement)
+        for placement in cast(list[JsonValue], initial_transition["placements"])
+        if cast(dict[str, JsonValue], placement)["model_instance_id"] == target_model_id
+    )
+    fall_back_model = next(
+        cast(dict[str, JsonValue], displacement)
+        for displacement in cast(list[JsonValue], fall_back_transition["displacements"])
+        if cast(dict[str, JsonValue], displacement)["model_instance_id"] == target_model_id
+    )
+    assert initial_model["pose"] == fall_back_model["start_pose"], (
+        initial_model["pose"],
+        fall_back_model["start_pose"],
+    )
+    restored = GameLifecycle.from_payload(payload)
+    replayed = GameLifecycle.from_payload(payload)
+    assert restored.to_payload() == lifecycle.to_payload()
+
+    restored_status = status
+    replayed_status = status
+    decision_index = 0
+    while _decision_request(restored_status).decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
+        restored_request = _decision_request(restored_status)
+        replayed_request = _decision_request(replayed_status)
+        assert replayed_request == restored_request
+        result_id = f"{game_id}:decline-fnp:{decision_index}"
+        restored_status = restored.submit_decision(
+            DecisionResult.for_request(
+                result_id=result_id,
+                request=restored_request,
+                selected_option_id="decline",
+            )
+        )
+        replayed_status = replayed.submit_decision(
+            DecisionResult.for_request(
+                result_id=result_id,
+                request=replayed_request,
+                selected_option_id="decline",
+            )
+        )
+        assert replayed.to_payload() == restored.to_payload()
+        if (
+            restored_status.decision_request is not None
+            and restored_status.decision_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+        ):
+            assert restored.decision_controller.queue.pending_requests == (
+                restored_status.decision_request,
+            )
+            assert not _event_payloads(restored, "movement_activation_completed")
+            assert all(
+                record.request.decision_type != SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+                for record in restored.decision_controller.records
+            )
+        decision_index += 1
+
+    embark_request = _decision_request(restored_status)
+    assert embark_request.decision_type == SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+    assert restored.decision_controller.queue.pending_requests == (embark_request,)
+    assert not _event_payloads(restored, "movement_activation_completed")
+    completed = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id=f"{game_id}:decline-embark",
+            request=embark_request,
+            selected_option_id="decline_embark",
+        )
+    )
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert _event_payloads(restored, "movement_activation_completed")
+    completed_state = _state(restored)
+    completed_movement_state = completed_state.movement_phase_state
+    assert completed_movement_state is not None
+    assert completed_movement_state.pending_desperate_escape_battle_shock_continuation is None
+
+
+def test_delirium_destruction_reconciles_identity_without_embark_request() -> None:
+    game_id = "phase10o-p09b-delirium-destroyed-0001"
+    lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
+        game_id=game_id,
+        with_reroll=False,
+        target_wounds_remaining=1,
+    )
+    fnp_request = _decision_request(status)
+
+    assert lifecycle.decision_controller.queue.pending_requests == (fnp_request,)
+    assert not _event_payloads(lifecycle, "movement_activation_completed")
+    restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    completed = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id=f"{game_id}:decline-fnp",
+            request=fnp_request,
+            selected_option_id="decline",
+        )
+    )
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert (
+        completed.decision_request is None
+        or completed.decision_request.decision_type != SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+    )
+    assert all(
+        record.request.decision_type != SELECT_EMBARK_TRANSPORT_DECISION_TYPE
+        for record in restored.decision_controller.records
+    )
+    completion = _last_event_payload(restored, "movement_activation_completed")
+    reconciliation = cast(
+        dict[str, JsonValue],
+        completion["rules_unit_identity_reconciliation"],
+    )
+    assert reconciliation["historical_unit_instance_id"] == target_unit_id
+    assert reconciliation["surviving_unit_instance_ids"] == []
+    assert reconciliation["placed_surviving_unit_instance_ids"] == []
+    restored_state = _state(restored)
+    restored_movement_state = restored_state.movement_phase_state
+    restored_battlefield_state = restored_state.battlefield_state
+    assert restored_movement_state is not None
+    assert restored_battlefield_state is not None
+    assert restored_movement_state.pending_desperate_escape_battle_shock_continuation is None
+    assert all(
+        model.model_instance_id in restored_battlefield_state.removed_model_ids
+        for model in unit_by_id(restored_state, target_unit_id).own_models
+    )
+    assert GameLifecycle.from_payload(restored.to_payload()).to_payload() == restored.to_payload()
 
 
 def test_fall_back_without_desperate_escape_completes_immediately() -> None:
@@ -728,6 +1313,7 @@ def test_fall_back_payload_round_trip() -> None:
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -738,7 +1324,7 @@ def test_fall_back_payload_round_trip() -> None:
 
 def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_selection() -> None:
     lifecycle, action_request = _advance_to_fall_back_action_request(
-        game_id=_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID,
+        game_id=_INCOHERENT_SURVIVORS_DESPERATE_ESCAPE_GAME_ID,
     )
     state = _state(lifecycle)
     battlefield_state = state.battlefield_state
@@ -748,7 +1334,7 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
     fall_back_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
-        option_id=_ORDERED_FALL_BACK_OPTION_ID,
+        option_id=_DESPERATE_FALL_BACK_OPTION_ID,
         action_result_id="phase10o-two-failed-action",
         proposal_result_id="phase10o-two-failed-proposal",
         unit_instance_id=unit_placement.unit_instance_id,
@@ -761,10 +1347,7 @@ def test_fall_back_revalidates_surviving_coherency_after_desperate_escape_select
         ),
     )
     removal_request = _decision_request(fall_back_status)
-    destroyed_model_ids = (
-        "army-alpha:intercessor-unit-1:core-intercessor-like:001",
-        "army-alpha:intercessor-unit-1:core-intercessor-like:003",
-    )
+    destroyed_model_ids = ("army-alpha:intercessor-unit-1:core-intercessor-like:003",)
     destroyed_option_id = "destroy:" + ",".join(destroyed_model_ids)
 
     assert removal_request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
@@ -809,6 +1392,7 @@ def test_fall_back_destruction_selection_can_make_otherwise_incoherent_endpoint_
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness_with_end_poses(unit_placement, attempted_end_poses),
         battle_shocked_unit_ids=("army-alpha:intercessor-unit-1",),
@@ -860,6 +1444,7 @@ def test_fall_back_result_rejects_destruction_selection_drift() -> None:
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -894,6 +1479,7 @@ def test_fall_back_transition_batch_rejects_unresolved_desperate_escape_requirem
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -910,12 +1496,14 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     invalid_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(5.8, 6.0)),
     )
     resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
     )
@@ -977,6 +1565,7 @@ def test_fall_back_result_fail_fast_paths_and_surviving_placement() -> None:
     partial_resolution = resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
         unit_placement=unit_placement,
         path_witness=_fall_back_witness(
             unit_placement,
@@ -1557,8 +2146,36 @@ def _forced_desperate_escape_descriptor() -> DatasheetAbilityDescriptor:
     )
 
 
-def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyCatalog:
-    descriptor = _forced_desperate_escape_descriptor()
+def _battle_shock_reroll_descriptor() -> DatasheetAbilityDescriptor:
+    source_text = RuleSourceText.from_raw(
+        source_id="phase10o:catalog-ability:battle-shock-reroll",
+        raw_text=(
+            'While a friendly Khorne Legiones Daemonica unit is within 6" of this '
+            "FORTIFICATION, each time you take a Battle-shock test for that unit, you can "
+            "re-roll that test."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    return DatasheetAbilityDescriptor(
+        ability_id="phase10o:catalog-ability:battle-shock-reroll",
+        name="Battle-shock Reroll",
+        source_id=source_text.source_id,
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description=source_text.raw_text,
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+    )
+
+
+def _catalog_with_datasheet_ability(
+    catalog: ArmyCatalog,
+    descriptor: DatasheetAbilityDescriptor,
+) -> ArmyCatalog:
     target_datasheet_id = "core-intercessor-like-infantry"
     matches = tuple(
         datasheet
@@ -1566,11 +2183,28 @@ def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyC
         if datasheet.datasheet_id == target_datasheet_id
     )
     if len(matches) != 1:
-        raise AssertionError("Forced Desperate Escape fixture datasheet is ambiguous.")
+        raise AssertionError("Catalog ability fixture datasheet is ambiguous.")
     datasheets = tuple(
         replace(
             datasheet,
             abilities=(*datasheet.abilities, descriptor),
+            keywords=(
+                DatasheetKeywordSet(
+                    keywords=tuple(
+                        sorted({*datasheet.keywords.keywords, "FORTIFICATION", "KHORNE"})
+                    ),
+                    faction_keywords=tuple(
+                        sorted(
+                            {
+                                *datasheet.keywords.faction_keywords,
+                                "LEGIONES DAEMONICA",
+                            }
+                        )
+                    ),
+                )
+                if descriptor.source_id == "phase10o:catalog-ability:battle-shock-reroll"
+                else datasheet.keywords
+            ),
             source_ids=tuple(sorted({*datasheet.source_ids, descriptor.source_id})),
         )
         if datasheet.datasheet_id == target_datasheet_id
@@ -1581,6 +2215,99 @@ def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyC
         catalog,
         datasheets=datasheets,
         source_ids=tuple(sorted({*catalog.source_ids, descriptor.source_id})),
+    )
+
+
+def _catalog_with_forced_desperate_escape_ability(catalog: ArmyCatalog) -> ArmyCatalog:
+    descriptor = _forced_desperate_escape_descriptor()
+    return _catalog_with_datasheet_ability(catalog, descriptor)
+
+
+def _catalog_with_chaos_knights_delirium(catalog: ArmyCatalog) -> ArmyCatalog:
+    source_datasheet_id = "core-intercessor-like-infantry"
+    target_datasheet_id = "core-character-leader"
+    datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id not in {source_datasheet_id, target_datasheet_id}:
+            datasheets.append(datasheet)
+            continue
+        datasheets.append(
+            replace(
+                datasheet,
+                model_profiles=tuple(
+                    replace(
+                        profile,
+                        characteristics=tuple(
+                            (
+                                CharacteristicValue.from_raw(Characteristic.WOUNDS, 9)
+                                if value.characteristic is Characteristic.WOUNDS
+                                and datasheet.datasheet_id == target_datasheet_id
+                                else CharacteristicValue.from_raw(
+                                    Characteristic.LEADERSHIP,
+                                    10,
+                                )
+                                if value.characteristic is Characteristic.LEADERSHIP
+                                else value
+                            )
+                            for value in profile.characteristics
+                        ),
+                    )
+                    for profile in datasheet.model_profiles
+                ),
+                keywords=DatasheetKeywordSet(
+                    keywords=(
+                        tuple(sorted({*datasheet.keywords.keywords, "KHORNE"}))
+                        if datasheet.datasheet_id == target_datasheet_id
+                        else datasheet.keywords.keywords
+                    ),
+                    faction_keywords=(
+                        tuple(
+                            sorted(
+                                {
+                                    *datasheet.keywords.faction_keywords,
+                                    chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_KEYWORD,
+                                }
+                            )
+                        )
+                        if datasheet.datasheet_id == source_datasheet_id
+                        else tuple(
+                            sorted(
+                                {
+                                    *datasheet.keywords.faction_keywords,
+                                    "LEGIONES DAEMONICA",
+                                }
+                            )
+                        )
+                    ),
+                ),
+            )
+        )
+    return replace(
+        catalog,
+        catalog_id="phase10o-p09b-chaos-knights-delirium",
+        source_package_id="data-package:core-v2:phase10o-p09b-delirium:0.1.0",
+        datasheets=tuple(datasheets),
+        factions=(
+            *catalog.factions,
+            FactionDefinition(
+                faction_id=chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_ID,
+                name="Chaos Knights",
+                faction_keywords=(chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_KEYWORD,),
+                source_ids=("phase10o:p09b:chaos-knights-faction",),
+            ),
+        ),
+        detachments=(
+            *catalog.detachments,
+            DetachmentDefinition(
+                detachment_id="phase17g-chaos-knights-delirium",
+                name="P09B Delirium Test Detachment",
+                faction_id=chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_ID,
+                detachment_point_cost=1,
+                unit_datasheet_ids=(source_datasheet_id,),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("phase10o:p09b:chaos-knights-delirium",),
+            ),
+        ),
     )
 
 
@@ -1676,6 +2403,9 @@ def _advance_to_movement_unit_selection(
 
 def _movement_lifecycle_with_overflight_engagement(
     config: GameConfig,
+    *,
+    prepare_delirium_target: bool = False,
+    delirium_target_wounds_remaining: int = 4,
 ) -> tuple[GameLifecycle, LifecycleStatus]:
     mission_setup = config.mission_setup
     assert mission_setup is not None
@@ -1707,6 +2437,26 @@ def _movement_lifecycle_with_overflight_engagement(
                     )
                 )
             )
+    transport_id = "army-alpha:transport-1"
+    if any(unit.unit_instance_id == transport_id for army in armies for unit in army.units):
+        transport = battlefield.unit_placement_by_id(transport_id)
+        battlefield = battlefield.with_unit_placement(
+            transport.with_model_placements(
+                tuple(
+                    placement.with_pose(Pose.at(3.0, 15.0, 0.0))
+                    for placement in transport.model_placements
+                )
+            )
+        )
+    if prepare_delirium_target:
+        reroll_source_id = "army-alpha:intercessor-unit-2"
+        reroll_source = battlefield.unit_placement_by_id(reroll_source_id)
+        battlefield = battlefield.with_unit_placement(
+            _translated_enemy_unit(
+                reroll_source,
+                first_model_pose=Pose.at(8.0, 20.0, 0.0),
+            )
+        )
     friendly = battlefield.unit_placement_by_id("army-alpha:intercessor-unit-1")
     enemy = battlefield.unit_placement_by_id("army-beta:intercessor-unit-2")
     first_friendly_pose = friendly.model_placements[0].pose
@@ -1740,12 +2490,139 @@ def _movement_lifecycle_with_overflight_engagement(
     state.active_player_id = "player-a"
     decisions = DecisionController()
     record_current_battlefield_placements_for_fixture(state, decisions=decisions)
+    if any(
+        army.detachment_selection.faction_id == chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_ID
+        for army in state.army_definitions
+    ):
+        state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+        registry = BattleRoundStartHookRegistry.from_bindings(
+            chaos_knights_army_rule.runtime_contribution().battle_round_start_hook_bindings
+        )
+        dread_request = registry.next_request_for(
+            BattleRoundStartRequestContext(state=state, decisions=decisions)
+        )
+        if dread_request is None:
+            raise AssertionError("P09B Delirium fixture requires a Dread selection request.")
+        decisions.request_decision(dread_request)
+        dread_result = DecisionResult.for_request(
+            result_id=f"{config.game_id}:delirium-selection",
+            request=dread_request,
+            selected_option_id=(
+                "chaos_knights:harbingers_of_dread:"
+                f"{chaos_knights_army_rule.DreadAbility.DELIRIUM.value}"
+            ),
+        )
+        decisions.submit_result(dread_result)
+        assert registry.apply_result(
+            BattleRoundStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=dread_request,
+                result=dread_result,
+            )
+        )
+        state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    if prepare_delirium_target:
+        target_unit_id = "army-alpha:intercessor-unit-1"
+        target = unit_by_id(state, target_unit_id)
+        fnp_model = next(model for model in target.own_models if model.is_alive)
+        target_wounds_remaining = delirium_target_wounds_remaining
+        routed = continue_mortal_wound_application(
+            state=state,
+            decisions=decisions,
+            request_id=f"{config.game_id}:prewound-request",
+            progress=MortalWoundApplicationProgress.start(
+                application_id=f"{config.game_id}:prewound",
+                source_rule_id="phase10o:p09b:prewound",
+                source_context={"source_kind": "phase10o_p09b_prewound"},
+                destruction_evidence=(
+                    MortalWoundDestructionEvidence.for_non_attack_state(
+                        state=state,
+                        destroying_player_id="player-b",
+                        source_rules_unit_instance_id=None,
+                        source_model_instance_id=None,
+                        destruction_source_kind=DestructionSourceKind.ABILITY,
+                        action_phase=BattlePhase.MOVEMENT,
+                        source_step="phase10o_p09b_prewound",
+                    )
+                ),
+                target_unit_instance_id=target_unit_id,
+                defender_player_id="player-a",
+                mortal_wounds=fnp_model.wounds_remaining - target_wounds_remaining,
+                spill_over=True,
+            ),
+            dice_manager=DiceRollManager(
+                state.game_id,
+                event_log=decisions.event_log,
+            ),
+        )
+        if routed.request is not None or routed.application is None:
+            raise AssertionError("P09B Delirium pre-wound must resolve immediately.")
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=fnp_model.model_instance_id,
+            sources=(FeelNoPainSource(source_id=f"{config.game_id}:fnp", threshold=5),),
+            decline_allowed=True,
+        )
+        transport_unit = unit_by_id(state, "army-alpha:transport-1")
+        state.record_transport_cargo_state(
+            TransportCargoState(
+                player_id="player-a",
+                transport_unit_instance_id=transport_unit.unit_instance_id,
+                capacity_profile=TransportCapacityProfile(
+                    transport_datasheet_id=transport_unit.datasheet_id,
+                    max_model_count=10,
+                    allowed_keywords=("INFANTRY",),
+                ),
+                phase_battle_round=1,
+            )
+        )
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
+    if prepare_delirium_target:
+        state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+        lifecycle = GameLifecycle.from_payload(
+            cast(
+                GameLifecyclePayload,
+                {
+                    "config": config.to_payload(),
+                    "parameterized_movement_proposals": True,
+                    "state": state.to_payload(),
+                    "decisions": decisions.to_payload(),
+                    "reaction_queue": {"frames": []},
+                },
+            )
+        )
+        command_status = lifecycle.advance_until_decision_or_terminal()
+        insane_bravery_request = _decision_request(command_status)
+        proposal_payload = cast(dict[str, JsonValue], insane_bravery_request.payload)
+        insane_bravery_proposal = StratagemTargetProposal.from_payload(
+            cast(StratagemTargetProposalPayload, proposal_payload["proposal_request"])
+        ).with_binding(
+            StratagemTargetBinding(
+                target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+                target_player_id="player-a",
+                target_unit_instance_id="army-alpha:intercessor-unit-1",
+            )
+        )
+        command_status = lifecycle.submit_decision(
+            DecisionResult(
+                result_id=f"{config.game_id}:use-insane-bravery",
+                request_id=insane_bravery_request.request_id,
+                decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+                actor_id=insane_bravery_request.actor_id,
+                selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+                payload=cast(
+                    dict[str, JsonValue],
+                    validate_json_value({"proposal": insane_bravery_proposal.to_payload()}),
+                ),
+            )
+        )
+        assert _decision_request(command_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+        return lifecycle, command_status
     record_completed_command_occurrences_for_fixture(
         state,
         decisions=decisions,
         config=config,
     )
-    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     lifecycle = GameLifecycle.from_payload(
         cast(
             GameLifecyclePayload,
@@ -1873,10 +2750,20 @@ def _config(
     *,
     game_id: str = "phase10o-desperate",
     with_forced_desperate_escape_ability: bool = False,
+    with_battle_shock_reroll_ability: bool = False,
+    with_chaos_knights_delirium: bool = False,
+    with_transport: bool = False,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     if with_forced_desperate_escape_ability:
         catalog = _catalog_with_forced_desperate_escape_ability(catalog)
+    if with_battle_shock_reroll_ability:
+        catalog = _catalog_with_datasheet_ability(
+            catalog,
+            _battle_shock_reroll_descriptor(),
+        )
+    if with_chaos_knights_delirium:
+        catalog = _catalog_with_chaos_knights_delirium(catalog)
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
@@ -1889,13 +2776,26 @@ def _config(
                 catalog=catalog,
                 player_id="player-a",
                 army_id="army-alpha",
-                unit_selection_ids=("intercessor-unit-1", "intercessor-unit-2"),
+                unit_selection_ids=(
+                    "intercessor-unit-1",
+                    "intercessor-unit-2",
+                    *(("transport-1",) if with_transport else ()),
+                ),
+                delirium_target=with_chaos_knights_delirium,
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-2",),
+                detachment_selection=(
+                    DetachmentSelection(
+                        faction_id=chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_ID,
+                        detachment_ids=("phase17g-chaos-knights-delirium",),
+                    )
+                    if with_chaos_knights_delirium
+                    else None
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1936,6 +2836,8 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    detachment_selection: DetachmentSelection | None = None,
+    delirium_target: bool = False,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1943,19 +2845,40 @@ def _army_muster_request(
         catalog_id=catalog.catalog_id,
         source_package_id=catalog.source_package_id,
         ruleset_id=catalog.ruleset_id,
-        detachment_selection=DetachmentSelection(
-            faction_id="core-marine-force",
-            detachment_ids=("core-combined-arms",),
+        detachment_selection=(
+            DetachmentSelection(
+                faction_id="core-marine-force",
+                detachment_ids=("core-combined-arms",),
+            )
+            if detachment_selection is None
+            else detachment_selection
         ),
         force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
-                datasheet_id="core-intercessor-like-infantry",
+                datasheet_id=(
+                    "core-transport"
+                    if unit_selection_id == "transport-1"
+                    else "core-character-leader"
+                    if delirium_target and unit_selection_id == "intercessor-unit-1"
+                    else "core-intercessor-like-infantry"
+                ),
                 model_profile_selections=(
                     ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
+                        model_profile_id=(
+                            "core-transport"
+                            if unit_selection_id == "transport-1"
+                            else "core-character-leader"
+                            if delirium_target and unit_selection_id == "intercessor-unit-1"
+                            else "core-intercessor-like"
+                        ),
+                        model_count=(
+                            1
+                            if unit_selection_id == "transport-1"
+                            or (delirium_target and unit_selection_id == "intercessor-unit-1")
+                            else 5
+                        ),
                     ),
                 ),
             )

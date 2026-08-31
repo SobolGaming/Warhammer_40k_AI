@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import game_config_validation as _config_validation
+from warhammer40k_core.engine import game_state_phase_validation as _phase_validation
 from warhammer40k_core.engine import game_state_queries as _queries
 from warhammer40k_core.engine import mission_action_history as _action_history
 from warhammer40k_core.engine import (
@@ -61,6 +62,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_deadly_demise_sources_for_unit,
     record_core_feel_no_pain_sources_for_unit,
     record_core_fights_first_source_for_unit,
+)
+from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
+    PendingCatalogSelectedTargetBattleShockContinuation,
 )
 from warhammer40k_core.engine.command_battle_shock_history import (
     validate_command_battle_shock_state_snapshot,
@@ -1138,6 +1142,9 @@ class GameState:
     battlefield_state: BattlefieldRuntimeState | None = None
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
+    pending_catalog_selected_target_battle_shock_continuation: (
+        PendingCatalogSelectedTargetBattleShockContinuation | None
+    ) = None
     charge_phase_state: ChargePhaseState | None = None
     fight_phase_state: FightPhaseState | None = None
     shooting_phase_state: ShootingPhaseState | None = None
@@ -1368,12 +1375,21 @@ class GameState:
             self.mission_setup,
             army_definitions=self.army_definitions,
         )
-        self.movement_phase_state = _validate_optional_movement_phase_state(
+        self.movement_phase_state = _phase_validation.validate_optional_movement_phase_state(
             self.movement_phase_state
         )
-        self.charge_phase_state = _validate_optional_charge_phase_state(self.charge_phase_state)
-        self.fight_phase_state = _validate_optional_fight_phase_state(self.fight_phase_state)
-        self.shooting_phase_state = _validate_optional_shooting_phase_state(
+        self.pending_catalog_selected_target_battle_shock_continuation = (
+            _phase_validation.validate_optional_catalog_selected_target_battle_shock_continuation(
+                self.pending_catalog_selected_target_battle_shock_continuation
+            )
+        )
+        self.charge_phase_state = _phase_validation.validate_optional_charge_phase_state(
+            self.charge_phase_state
+        )
+        self.fight_phase_state = _phase_validation.validate_optional_fight_phase_state(
+            self.fight_phase_state
+        )
+        self.shooting_phase_state = _phase_validation.validate_optional_shooting_phase_state(
             self.shooting_phase_state
         )
         self.out_of_phase_shooting_state = _validate_optional_out_of_phase_shooting_state(
@@ -2190,19 +2206,37 @@ class GameState:
         self,
         movement_phase_state: MovementPhaseState | None,
     ) -> None:
-        self.movement_phase_state = _validate_optional_movement_phase_state(movement_phase_state)
+        self.movement_phase_state = _phase_validation.validate_optional_movement_phase_state(
+            movement_phase_state
+        )
+
+    def replace_catalog_selected_target_battle_shock_continuation(
+        self,
+        continuation: PendingCatalogSelectedTargetBattleShockContinuation | None,
+    ) -> None:
+        self.pending_catalog_selected_target_battle_shock_continuation = (
+            _phase_validation.validate_optional_catalog_selected_target_battle_shock_continuation(
+                continuation
+            )
+        )
 
     def replace_charge_phase_state(self, charge_phase_state: ChargePhaseState | None) -> None:
-        self.charge_phase_state = _validate_optional_charge_phase_state(charge_phase_state)
+        self.charge_phase_state = _phase_validation.validate_optional_charge_phase_state(
+            charge_phase_state
+        )
 
     def replace_fight_phase_state(self, fight_phase_state: FightPhaseState | None) -> None:
-        self.fight_phase_state = _validate_optional_fight_phase_state(fight_phase_state)
+        self.fight_phase_state = _phase_validation.validate_optional_fight_phase_state(
+            fight_phase_state
+        )
 
     def replace_shooting_phase_state(
         self,
         shooting_phase_state: ShootingPhaseState | None,
     ) -> None:
-        self.shooting_phase_state = _validate_optional_shooting_phase_state(shooting_phase_state)
+        self.shooting_phase_state = _phase_validation.validate_optional_shooting_phase_state(
+            shooting_phase_state
+        )
 
     def replace_out_of_phase_shooting_state(
         self,
@@ -4829,6 +4863,11 @@ class GameState:
                 if self.movement_phase_state is None
                 else self.movement_phase_state.to_payload()
             ),
+            "pending_catalog_selected_target_battle_shock_continuation": (
+                None
+                if self.pending_catalog_selected_target_battle_shock_continuation is None
+                else self.pending_catalog_selected_target_battle_shock_continuation.to_payload()
+            ),
             "charge_phase_state": (
                 None if self.charge_phase_state is None else self.charge_phase_state.to_payload()
             ),
@@ -5166,6 +5205,13 @@ class GameState:
                 None
                 if payload["movement_phase_state"] is None
                 else MovementPhaseState.from_payload(payload["movement_phase_state"])
+            ),
+            pending_catalog_selected_target_battle_shock_continuation=(
+                None
+                if payload["pending_catalog_selected_target_battle_shock_continuation"] is None
+                else PendingCatalogSelectedTargetBattleShockContinuation.from_payload(
+                    payload["pending_catalog_selected_target_battle_shock_continuation"]
+                )
             ),
             charge_phase_state=(
                 None
@@ -5924,46 +5970,6 @@ def _validate_optional_mission_setup(
         raise GameLifecycleError(
             "mission_setup players must exactly match the players in this game."
         )
-    return value
-
-
-def _validate_optional_movement_phase_state(
-    value: object | None,
-) -> MovementPhaseState | None:
-    if value is None:
-        return None
-    if type(value) is not MovementPhaseState:
-        raise GameLifecycleError("GameState movement_phase_state must be a MovementPhaseState.")
-    return value
-
-
-def _validate_optional_charge_phase_state(
-    value: object | None,
-) -> ChargePhaseState | None:
-    if value is None:
-        return None
-    if type(value) is not ChargePhaseState:
-        raise GameLifecycleError("GameState charge_phase_state must be a ChargePhaseState.")
-    return value
-
-
-def _validate_optional_fight_phase_state(
-    value: object | None,
-) -> FightPhaseState | None:
-    if value is None:
-        return None
-    if type(value) is not FightPhaseState:
-        raise GameLifecycleError("GameState fight_phase_state must be a FightPhaseState.")
-    return value
-
-
-def _validate_optional_shooting_phase_state(
-    value: object | None,
-) -> ShootingPhaseState | None:
-    if value is None:
-        return None
-    if type(value) is not ShootingPhaseState:
-        raise GameLifecycleError("GameState shooting_phase_state must be a ShootingPhaseState.")
     return value
 
 

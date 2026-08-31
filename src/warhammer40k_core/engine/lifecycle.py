@@ -7,8 +7,12 @@ from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
+from warhammer40k_core.engine import battle_shock_continuation_restore as _bs_restore
 from warhammer40k_core.engine import battle_shock_lifecycle_authority as _bsa
 from warhammer40k_core.engine import catalog_model_materialization_decision_dispatch as _cmmd
+from warhammer40k_core.engine import (
+    catalog_selected_target_battle_shock_continuation as _selected_target_bs,
+)
 from warhammer40k_core.engine import catalog_start_battle_keyword_choice as _sbkc
 from warhammer40k_core.engine import (
     catalog_unit_move_completed_mortal_wounds_runtime as _catalog_move_mw,
@@ -776,15 +780,16 @@ class GameLifecycle:
     def _advance_once(self) -> LifecycleStatus:
         state = self._require_state()
         pending_request = self._pending_decision_request()
-        if pending_request is not None:
-            return LifecycleStatus.waiting_for_decision(
-                stage=state.stage,
-                decision_request=pending_request,
-                payload={
-                    "game_id": state.game_id,
-                    "pending_request_id": pending_request.request_id,
-                },
+        continuation_status = (
+            _selected_target_bs.advance_catalog_selected_target_battle_shock_lifecycle(
+                state=state,
+                decisions=self.decision_controller,
+                pending_request=pending_request,
+                runtime_content_bundle=self._runtime_content_bundle,
             )
+        )
+        if continuation_status is not None:
+            return continuation_status
         out_of_phase_status = self._shooting_phase_handler.advance_out_of_phase_shooting_if_needed(
             state=state,
             decisions=self.decision_controller,
@@ -853,7 +858,7 @@ class GameLifecycle:
             invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:
                 return invalid_status
-            _bsa.validate_pending_outcome_request(
+            _bsa.validate_pre_submission_outcome_request(
                 state=state,
                 decisions=self.decision_controller,
                 request=pending_request,
@@ -867,6 +872,12 @@ class GameLifecycle:
         self._reconcile_catalog_model_state_changes()
         if self._runtime_content_bundle is not None:
             self._refresh_runtime_content_bundle_if_armies_mustered()
+        _selected_target_bs.validate_catalog_selected_target_battle_shock_submitted_status(
+            state=state,
+            decisions=self.decision_controller,
+            status=status,
+            runtime_content_bundle=self._runtime_content_bundle,
+        )
         return status
 
     def to_payload(self) -> GameLifecyclePayload:
@@ -948,6 +959,11 @@ class GameLifecycle:
             preserve_existing_bundle=runtime_content_bundle is not None,
         )
         refreshed_bundle = lifecycle._runtime_content_bundle
+        _bs_restore.validate_restored_battle_shock_continuations(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            runtime_content_bundle=refreshed_bundle,
+        )
         rule_ir_authority_index = (
             None
             if refreshed_bundle is None
@@ -2901,6 +2917,9 @@ class GameLifecycle:
             fight_phase_start_hooks=bundle.fight_phase_start_hook_registry,
             fight_phase_end_hooks=bundle.fight_phase_end_hook_registry,
             runtime_modifier_registry=bundle.runtime_modifier_registry,
+            catalog_selected_target_battle_shock_runtime=(
+                _selected_target_bs.CatalogSelectedTargetBattleShockRuntime.from_bundle(bundle)
+            ),
         )
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),

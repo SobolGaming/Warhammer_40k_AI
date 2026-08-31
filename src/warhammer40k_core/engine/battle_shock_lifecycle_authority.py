@@ -256,6 +256,31 @@ def validate_pending_outcome_request(
     )
 
 
+def validate_pre_submission_outcome_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    runtime_content_bundle: RuntimeContentBundle | None,
+) -> None:
+    from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
+        validate_catalog_selected_target_battle_shock_pre_submission,
+    )
+
+    validate_catalog_selected_target_battle_shock_pre_submission(
+        state=state,
+        decisions=decisions,
+        request=request,
+        runtime_content_bundle=runtime_content_bundle,
+    )
+    validate_pending_outcome_request(
+        state=state,
+        decisions=decisions,
+        request=request,
+        runtime_content_bundle=runtime_content_bundle,
+    )
+
+
 def validate_restore(
     state: GameState,
     event_records: tuple[EventRecord, ...],
@@ -276,5 +301,6 @@ __all__ = (
     "requires_command_prevalidation",
     "validate_loaded",
     "validate_pending_outcome_request",
+    "validate_pre_submission_outcome_request",
     "validate_restore",
 )

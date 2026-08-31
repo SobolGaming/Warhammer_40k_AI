@@ -732,11 +732,17 @@ def _resolve_forced_desperate_escape_battle_shock(
         ),
         pending_phase_body_status=("forced_desperate_escape_battle_shock_reroll_pending"),
     )
-    if battle_shock_resolution.pending_status is not None:
-        return battle_shock_resolution.pending_status
-    if battle_shock_resolution.resolved_payload is None:
-        raise GameLifecycleError("Forced Desperate Escape Battle-shock did not resolve.")
-    return None
+    from warhammer40k_core.engine.phases.movement_battle_shock_continuation import (
+        record_desperate_escape_battle_shock_resolution,
+    )
+
+    return record_desperate_escape_battle_shock_resolution(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=battle_shock_hooks,
+        resolution=battle_shock_resolution,
+        reroll_result_id=None,
+    )
 
 
 def _desperate_escape_roll_modifiers(
@@ -778,6 +784,7 @@ def _desperate_escape_model_selection_request(
     state: GameState,
     fall_back_result: FallBackActionResult,
     action_result: DecisionResult,
+    movement_proposal_request_id: str,
 ) -> DecisionRequest:
     failed_model_ids = tuple(
         roll.requirement.model_instance_id
@@ -798,6 +805,10 @@ def _desperate_escape_model_selection_request(
                 "action_request_id": action_result.request_id,
                 "action_result_id": action_result.result_id,
                 "action_selected_option_id": action_result.selected_option_id,
+                "movement_proposal_request_id": _validate_identifier(
+                    "movement_proposal_request_id",
+                    movement_proposal_request_id,
+                ),
                 "fall_back_result": validate_json_value(fall_back_result.to_payload()),
                 "failed_model_ids": list(failed_model_ids),
             }

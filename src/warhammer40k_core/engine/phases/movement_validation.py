@@ -715,8 +715,15 @@ def _fall_back_mode_violation_code(
             return "ordered_retreat_requires_desperate_escape"
         return None
     if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
-        if not resolution.desperate_escape_requirements:
-            return "desperate_escape_has_no_requirements"
+        requirement_model_ids = tuple(
+            sorted(
+                requirement.model_instance_id
+                for requirement in resolution.desperate_escape_requirements
+                if DesperateEscapeRequirementReason.SELECTED_MODE in requirement.reasons
+            )
+        )
+        if requirement_model_ids != tuple(sorted(resolution.witness.model_ids())):
+            return "desperate_escape_requirement_inventory_incomplete"
         return None
     raise GameLifecycleError("Unsupported Fall Back mode.")
 

@@ -9856,7 +9856,7 @@ def test_attached_root_failure_records_descendant_missing_from_partial_shock_sta
     )
     state.record_battle_shock_result(leader_failed)
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    resolved = record_battle_shock_result_and_outcome_events(
+    resolution = record_battle_shock_result_and_outcome_events(
         state=state,
         decisions=decisions,
         manager=manager,
@@ -9878,8 +9878,10 @@ def test_attached_root_failure_records_descendant_missing_from_partial_shock_sta
         resolved_event_types=("battle_shock_test_resolved",),
     )
 
-    assert isinstance(resolved, dict)
-    assert resolved["state_update"] == "recorded_missing_battle_shocked_descendants"
+    assert resolution.pending_status is None
+    resolved_payload = resolution.resolved_payload
+    assert isinstance(resolved_payload, dict)
+    assert resolved_payload["state_update"] == "recorded_missing_battle_shocked_descendants"
     assert tuple(state.battle_shocked_unit_ids) == tuple(sorted((bodyguard_id, leader_id)))
     assert {
         shocked_state.unit_instance_id: shocked_state.source_result_id
@@ -11417,7 +11419,7 @@ def _record_fixed_battle_shock_resolution(
 ) -> dict[str, Any]:
     decisions = DecisionController()
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    resolved = record_battle_shock_result_and_outcome_events(
+    resolution = record_battle_shock_result_and_outcome_events(
         state=state,
         decisions=decisions,
         manager=manager,
@@ -11437,8 +11439,10 @@ def _record_fixed_battle_shock_resolution(
         },
         resolved_event_types=("phase11c_battle_shock_resolved",),
     )
-    assert isinstance(resolved, dict)
-    return cast(dict[str, Any], resolved)
+    assert resolution.pending_status is None
+    resolved_payload = resolution.resolved_payload
+    assert isinstance(resolved_payload, dict)
+    return cast(dict[str, Any], resolved_payload)
 
 
 def _battle_shock_request_for_unit(

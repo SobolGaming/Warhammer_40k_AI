@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
+from warhammer40k_core.engine.desperate_escape import (
+    DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+    FALL_BACK_SELECTING_MODES_SOURCE_RULE_ID,
+)
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
 from warhammer40k_core.engine.phases.movement_handler import *
@@ -189,6 +193,7 @@ def resolve_fall_back_move(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
+    fall_back_mode: FallBackModeKind,
     state: GameState | None = None,
     movement_mode: MovementMode = MovementMode.FALL_BACK,
     path_witness: PathWitness | None = None,
@@ -254,6 +259,7 @@ def resolve_fall_back_move(
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
         witness=resolved.witness,
+        fall_back_mode=fall_back_mode,
         battle_round=battle_round,
         battle_shocked_unit_ids=battle_shocked_unit_ids,
         forced_desperate_escape_source_rule_ids=forced_source_ids,
@@ -261,6 +267,9 @@ def resolve_fall_back_move(
     )
     movement_payload = {
         **resolved.movement_payload,
+        "fall_back_mode": fall_back_mode.value,
+        "fall_back_source_rule_id": DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+        "selecting_modes_source_rule_id": FALL_BACK_SELECTING_MODES_SOURCE_RULE_ID,
         "desperate_escape_requirements": validate_json_value(
             [requirement.to_payload() for requirement in desperate_escape_requirements]
         ),
@@ -736,7 +745,7 @@ def _fall_back_transition_batch(
                     removal_kind=BattlefieldRemovalKind.DESTROYED,
                     source_phase=BattlePhase.MOVEMENT.value,
                     source_step=MovementPhaseStepKind.MOVE_UNITS.value,
-                    source_rule_id="desperate_escape",
+                    source_rule_id=DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
                     source_event_id=None,
                     destination_id=None,
                 )

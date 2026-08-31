@@ -16,6 +16,10 @@ from warhammer40k_core.engine.command_battle_shock_candidates import (
     CommandBattleShockCandidatePayload,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.desperate_escape import (
+    DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND,
+    DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+)
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
@@ -40,6 +44,7 @@ _STRATAGEM_SOURCE = "stratagem_battle_shock"
 _CATALOG_SELECTED_SOURCE = "catalog_selected_target_effect"
 _MOVE_COMPLETED_SOURCE = "unit_move_completed_battle_shock"
 _FORCED_DESPERATE_ESCAPE_SOURCE = "forced_desperate_escape_battle_shock"
+_DESPERATE_ESCAPE_SOURCE = DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_KIND
 
 _COMMAND_BASE_KEYS = frozenset(
     {"game_id", "battle_round", "active_player_id", "phase", "source_kind"}
@@ -60,8 +65,10 @@ _SELECTED_TARGET_BASE_KEYS = frozenset(
         "target_identity_resolution",
         "target_player_id",
         "effect_payload",
+        "selected_target_decision_request",
         "selected_target_decision_result",
         "selected_target_payload",
+        "selected_target_final_event_type",
         "selected_target_recorded_effects_before_battle_shock",
         "selected_target_remaining_effect_records_after_battle_shock",
         "selected_target_remaining_effect_start_index",
@@ -89,6 +96,19 @@ _FORCED_DESPERATE_ESCAPE_BASE_KEYS = frozenset(
         "fall_back_result",
         "action_result",
         "movement_proposal_request_id",
+    }
+)
+_DESPERATE_ESCAPE_BASE_KEYS = frozenset(
+    {
+        *_COMMAND_BASE_KEYS,
+        "unit_instance_id",
+        "source_rule_id",
+        "fall_back_applied_event_id",
+        "fall_back_result",
+        "action_result",
+        "movement_proposal_request_id",
+        "movement_payload",
+        "transition_batch",
     }
 )
 
@@ -189,6 +209,15 @@ def validate_battle_shock_source_family_authority(
             base=request_base,
         )
         return
+    if source_kind == _DESPERATE_ESCAPE_SOURCE:
+        _validate_desperate_escape_source(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=resolved_index,
+            request=result.request,
+            base=request_base,
+        )
+        return
     raise GameLifecycleError("Battle-shock result source kind is unsupported.")
 
 
@@ -220,6 +249,10 @@ def validate_pending_battle_shock_source_family_authority(
         _FORCED_DESPERATE_ESCAPE_SOURCE: (
             "battle_shock_test_resolved",
             "forced_desperate_escape_battle_shock_resolved",
+        ),
+        _DESPERATE_ESCAPE_SOURCE: (
+            "battle_shock_test_resolved",
+            "desperate_escape_battle_shock_resolved",
         ),
     }.get(source_kind)
     if expected_event_types is None:
@@ -297,6 +330,15 @@ def validate_pending_battle_shock_source_family_authority(
             phase=authority.phase,
             phase_start_battle_shocked_unit_ids=(authority.phase_start_battle_shocked_unit_ids),
             runtime_content_bundle=runtime_content_bundle,
+        )
+        return
+    if source_kind == _DESPERATE_ESCAPE_SOURCE:
+        _validate_desperate_escape_source(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=request_event_index,
+            request=authority.test_request,
+            base=authority.base_payload,
         )
         return
     _validate_pending_forced_desperate_escape_source(
@@ -411,6 +453,15 @@ def validate_battle_shock_runtime_source_family_authority(
             movement_record=movement_record,
             base=authority.base_payload,
             runtime_content_bundle=runtime_content_bundle,
+        )
+        return
+    if source_kind == _DESPERATE_ESCAPE_SOURCE:
+        _validate_desperate_escape_source(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=authority.request_event_index,
+            request=result.request,
+            base=authority.base_payload,
         )
 
 
@@ -661,6 +712,7 @@ def _validate_selected_target_source(
     if frozenset(base) != _SELECTED_TARGET_BASE_KEYS:
         raise GameLifecycleError("Selected-target Battle-shock source shape drifted.")
     raw_result = base.get("selected_target_decision_result")
+    raw_request = base.get("selected_target_decision_request")
     matching = tuple(
         record for record in decision_records if record.result.to_payload() == raw_result
     )
@@ -706,8 +758,10 @@ def _validate_selected_target_source(
     raw_recorded_before = base.get("selected_target_recorded_effects_before_battle_shock")
     raw_remaining = base.get("selected_target_remaining_effect_records_after_battle_shock")
     remaining_start_index = base.get("selected_target_remaining_effect_start_index")
+    final_event_type = base.get("selected_target_final_event_type")
     if (
         record.result.payload != selected_payload
+        or record.request.to_payload() != raw_request
         or selected_payload.get("catalog_record_id") != base.get("catalog_record_id")
         or selected_payload.get("source_rule_id") != base.get("source_rule_id")
         or selected_payload.get("source_unit_instance_id") != base.get("source_unit_instance_id")
@@ -719,6 +773,8 @@ def _validate_selected_target_source(
         or any(not isinstance(candidate, dict) for candidate in raw_recorded_before)
         or not isinstance(raw_remaining, list)
         or any(not isinstance(candidate, dict) for candidate in raw_remaining)
+        or type(final_event_type) is not str
+        or not final_event_type.strip()
         or remaining_start_index != matching_effect_indices[0] + 1
         or raw_remaining != list(effect_records[matching_effect_indices[0] + 1 :])
         or request.reason is not BattleShockTestReason.FORCED_BY_ARMY_RULE
@@ -735,6 +791,7 @@ def _validate_selected_target_source(
         recorded_before=tuple(
             cast(dict[str, JsonValue], candidate) for candidate in raw_recorded_before
         ),
+        final_event_type=final_event_type,
     )
     return record
 
@@ -747,10 +804,8 @@ def _validate_selected_target_recorded_prefix(
     effect_records: tuple[dict[str, JsonValue], ...],
     current_effect_index: int,
     recorded_before: tuple[dict[str, JsonValue], ...],
+    final_event_type: str = "catalog_post_shoot_hit_target_effect_selected",
 ) -> None:
-    from warhammer40k_core.engine.catalog_selected_target_effects import (
-        CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-    )
     from warhammer40k_core.engine.catalog_selected_target_effects_support import (
         recorded_effects_include_inflicted_mortal_wounds,
     )
@@ -786,7 +841,7 @@ def _validate_selected_target_recorded_prefix(
                         {
                             "effect_id": (
                                 f"{decision_record.result.result_id}:"
-                                f"{CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT}:"
+                                f"{final_event_type}:"
                                 f"{effect_index:03d}"
                             ),
                             "source_rule_id": effect_record["source_rule_id"],
@@ -847,6 +902,157 @@ def _selected_target_immediate_resolution_events(
             continue
         matches.append(payload)
     return tuple(matches)
+
+
+def _validate_desperate_escape_source(
+    *,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    mutation_index: int,
+    request: object,
+    base: dict[str, JsonValue],
+) -> DecisionRecord:
+    from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
+    from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
+    from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
+    from warhammer40k_core.engine.phases.movement_model import (
+        DesperateEscapeRequirementReason,
+        FallBackModeKind,
+    )
+    from warhammer40k_core.engine.phases.movement_state import (
+        FallBackActionResult,
+        FallBackActionResultPayload,
+    )
+
+    if type(request) is not BattleShockTestRequest:
+        raise GameLifecycleError("Desperate Escape Battle-shock request is invalid.")
+    if frozenset(base) != _DESPERATE_ESCAPE_BASE_KEYS:
+        raise GameLifecycleError("Desperate Escape Battle-shock source shape drifted.")
+    try:
+        fall_back = FallBackActionResult.from_payload(
+            cast(
+                FallBackActionResultPayload,
+                _object(base.get("fall_back_result"), "Fall Back result"),
+            )
+        )
+        action_result = DecisionResult.from_payload(
+            cast(
+                DecisionResultPayload,
+                _object(base.get("action_result"), "movement action result"),
+            )
+        )
+    except KeyError as exc:
+        raise GameLifecycleError("Desperate Escape source payload is incomplete.") from exc
+    proposal_request_id = base.get("movement_proposal_request_id")
+    action_matches = tuple(
+        record
+        for record in decision_records
+        if record.request.request_id == action_result.request_id
+        and record.result.result_id == action_result.result_id
+        and record.result.actor_id == action_result.actor_id
+        and record.result.decision_type == action_result.decision_type
+        and record.result.selected_option_id == action_result.selected_option_id
+    )
+    proposal_matches = tuple(
+        record for record in decision_records if record.request.request_id == proposal_request_id
+    )
+    if len(action_matches) != 1 or len(proposal_matches) != 1:
+        raise GameLifecycleError("Desperate Escape movement decision authority drifted.")
+    proposal_record = proposal_matches[0]
+    proposal = MovementProposalRequest.from_decision_request_payload(
+        proposal_record.request.payload
+    )
+    proposal_context = proposal.context or {}
+    fall_back_mode = fall_back.movement_payload.get("fall_back_mode")
+    movement_payload = _object(base.get("movement_payload"), "movement payload")
+    battle_shocked_after_move = movement_payload.get("battle_shocked_after_move")
+    requirement_model_ids = tuple(
+        sorted(
+            requirement.model_instance_id for requirement in fall_back.desperate_escape_requirements
+        )
+    )
+    selected_mode_model_ids = tuple(
+        sorted(
+            requirement.model_instance_id
+            for requirement in fall_back.desperate_escape_requirements
+            if DesperateEscapeRequirementReason.SELECTED_MODE in requirement.reasons
+        )
+    )
+    roll_model_ids = tuple(
+        sorted(roll.requirement.model_instance_id for roll in fall_back.desperate_escape_rolls)
+    )
+    expected_action_payload = {
+        "movement_phase_action": "fall_back",
+        "unit_instance_id": fall_back.unit_instance_id,
+        "witness": fall_back.witness.to_payload(),
+        **fall_back.movement_payload,
+    }
+    applied_event_id = base.get("fall_back_applied_event_id")
+    applied_matches = tuple(
+        event
+        for event in event_records[:mutation_index]
+        if event.event_id == applied_event_id and event.event_type == "fall_back_move_applied"
+    )
+    expected_applied_payload = {
+        "game_id": base.get("game_id"),
+        "battle_round": base.get("battle_round"),
+        "active_player_id": base.get("active_player_id"),
+        "phase": "movement",
+        "unit_instance_id": fall_back.unit_instance_id,
+        "source_rule_id": DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
+        "movement_phase_action": "fall_back",
+        "request_id": action_result.request_id,
+        "result_id": action_result.result_id,
+        "destroyed_model_ids": movement_payload.get("destroyed_model_ids"),
+        "movement_proposal_request_id": proposal_request_id,
+        "fall_back_result": fall_back.to_payload(),
+        "movement_payload": movement_payload,
+        "transition_batch": base.get("transition_batch"),
+    }
+    if "desperate_escape_source_mutation_id" in movement_payload:
+        expected_applied_payload["desperate_escape_source_mutation_id"] = movement_payload[
+            "desperate_escape_source_mutation_id"
+        ]
+    if (
+        base.get("source_rule_id") != DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID
+        or base.get("phase") != "movement"
+        or base.get("unit_instance_id") != fall_back.unit_instance_id
+        or request.unit_instance_id != fall_back.unit_instance_id
+        or request.player_id != fall_back.attempted_placement.player_id
+        or request.reason is not BattleShockTestReason.DESPERATE_ESCAPE
+        or fall_back_mode != FallBackModeKind.DESPERATE_ESCAPE.value
+        or battle_shocked_after_move is not False
+        or requirement_model_ids != tuple(sorted(fall_back.witness.model_ids()))
+        or selected_mode_model_ids != requirement_model_ids
+        or roll_model_ids != requirement_model_ids
+        or proposal.game_id != request.game_id
+        or proposal.battle_round != request.battle_round
+        or proposal.phase != "movement"
+        or proposal.unit_instance_id != fall_back.unit_instance_id
+        or proposal.movement_phase_action != "fall_back"
+        or proposal.source_decision_request_id != action_result.request_id
+        or proposal.source_decision_result_id != action_result.result_id
+        or proposal_context.get("fall_back_mode") != FallBackModeKind.DESPERATE_ESCAPE.value
+        or action_result.payload != expected_action_payload
+        or len(applied_matches) != 1
+        or applied_matches[0].payload != expected_applied_payload
+    ):
+        raise GameLifecycleError("Desperate Escape source occurrence drifted.")
+    validate_mutation_decision_closure(
+        event_records=event_records,
+        decision_records=decision_records,
+        mutation_index=mutation_index,
+        request_id=action_matches[0].request.request_id,
+        result_id=action_matches[0].result.result_id,
+    )
+    validate_mutation_decision_closure(
+        event_records=event_records,
+        decision_records=decision_records,
+        mutation_index=mutation_index,
+        request_id=proposal_record.request.request_id,
+        result_id=proposal_record.result.result_id,
+    )
+    return proposal_record
 
 
 def _validate_forced_desperate_escape_source(

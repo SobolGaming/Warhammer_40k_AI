@@ -662,6 +662,7 @@ def _validate_source_state_policy(
         {
             "catalog_selected_target_effect",
             "command_phase_start_battle_shock",
+            "desperate_escape_battle_shock",
             "forced_desperate_escape_battle_shock",
             "stratagem_battle_shock",
             "unit_move_completed_battle_shock",
