@@ -1504,6 +1504,191 @@ def test_selected_target_rerolled_battle_shock_waits_for_delirium_outcome_via_fa
     _assert_selected_target_delirium_continuation(reroll=True)
 
 
+def test_selected_target_later_battle_shock_reroll_retains_parent_via_facade() -> None:
+    game_id = "phase17g-selected-target-later-battle-shock-reroll"
+    selected_target_record = _selected_target_two_battle_shocks_then_modifier_record()
+
+    def reroll_permission(
+        context: BattleShockRerollPermissionContext,
+    ) -> RerollPermission | None:
+        if not context.request.request_id.endswith(":001"):
+            return None
+        return RerollPermission(
+            source_id="phase17g:test:selected-target-later-reroll",
+            timing_window="battle_shock_test",
+            owning_player_id=context.request.player_id,
+            eligible_roll_type=context.request.spec.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+
+    def historical_contribution(
+        context: HistoricalBattleShockAuthorityContext,
+    ) -> HistoricalBattleShockContribution:
+        if not context.request.request_id.endswith(":001"):
+            return HistoricalBattleShockContribution()
+        return HistoricalBattleShockContribution(
+            reroll_permission=RerollPermission(
+                source_id="phase17g:test:selected-target-later-reroll",
+                timing_window="battle_shock_test",
+                owning_player_id=context.request.player_id,
+                eligible_roll_type=context.request.spec.roll_type,
+                component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+            )
+        )
+
+    contribution = RuntimeContentContribution(
+        contribution_id="phase17g:test:selected-target-later-reroll",
+        battle_shock_hook_bindings=(
+            BattleShockHookBinding(
+                hook_id="phase17g:test:selected-target-later-reroll",
+                source_id="phase17g:test:selected-target-later-reroll",
+                reroll_permission_handler=reroll_permission,
+                historical_contribution_handler=historical_contribution,
+            ),
+        ),
+    )
+    lifecycle, bundle = _command_delirium_lifecycle_fixture(
+        game_id=game_id,
+        with_feel_no_pain=True,
+        selected_target_record=selected_target_record,
+        target_starting_wounds=50,
+        begin_command_phase=False,
+        extra_contributions=(contribution,),
+    )
+    lifecycle = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    _queue_selected_target_delirium_request(
+        lifecycle=lifecycle,
+        selected_target_record=selected_target_record,
+    )
+    initial_payload = deepcopy(lifecycle.to_payload())
+    initial_record_count = len(lifecycle.decision_controller.records)
+    session = LocalGameSession(lifecycle=lifecycle)
+    selected_request = lifecycle.decision_controller.queue.peek_next()
+    first_provider_status = session.submit_option(
+        request_id=selected_request.request_id,
+        option_id=selected_request.options[0].option_id,
+        result_id=f"{game_id}:selected-target-result",
+    )
+    first_provider_request = lifecycle.decision_controller.queue.peek_next()
+    assert first_provider_status.decision_request == first_provider_request
+    assert first_provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    assert lifecycle.decision_controller.queue.pending_requests == (first_provider_request,)
+
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("selected-target later-reroll fixture requires state")
+    for provider_decision_index in range(50):
+        current_request = lifecycle.decision_controller.queue.peek_next()
+        if current_request.decision_type == DICE_REROLL_DECISION_TYPE:
+            break
+        assert current_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+        status = session.submit_option(
+            request_id=current_request.request_id,
+            option_id="decline",
+            result_id=f"{game_id}:first-provider:{provider_decision_index}",
+        )
+        assert status.decision_request == lifecycle.decision_controller.queue.peek_next()
+    else:
+        raise AssertionError("first provider outcome did not reach the later Battle-shock reroll")
+
+    reroll_request = lifecycle.decision_controller.queue.peek_next()
+    assert lifecycle.decision_controller.queue.pending_requests == (reroll_request,)
+    continuation = state.pending_catalog_selected_target_battle_shock_continuation
+    assert continuation is not None
+    assert continuation.continuation_phase is (
+        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
+    )
+    assert len(state.persisting_effects) == 0
+    assert not _events_of_type(
+        lifecycle.decision_controller,
+        CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+    )
+
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    if restored.state is None:
+        raise AssertionError("restored selected-target later-reroll fixture requires state")
+    restored_continuation = restored.state.pending_catalog_selected_target_battle_shock_continuation
+    assert restored_continuation is not None
+    assert restored_continuation.to_payload() == continuation.to_payload()
+    restored_session = LocalGameSession(lifecycle=restored)
+    reroll_request = restored.decision_controller.queue.peek_next()
+    reroll_option_id = next(
+        option.option_id for option in reroll_request.options if option.option_id != "decline"
+    )
+    second_provider_status = restored_session.submit_option(
+        request_id=reroll_request.request_id,
+        option_id=reroll_option_id,
+        result_id=f"{game_id}:later-reroll-result",
+    )
+    second_provider_request = restored.decision_controller.queue.peek_next()
+    assert second_provider_status.decision_request == second_provider_request
+    assert second_provider_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    assert restored.decision_controller.queue.pending_requests == (second_provider_request,)
+    assert len(restored.state.persisting_effects) == 0
+
+    for provider_decision_index in range(50):
+        remaining_continuation = (
+            restored.state.pending_catalog_selected_target_battle_shock_continuation
+        )
+        if remaining_continuation is None:
+            break
+        current_request = restored.decision_controller.queue.peek_next()
+        assert current_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+        restored_session.submit_option(
+            request_id=current_request.request_id,
+            option_id="decline",
+            result_id=f"{game_id}:second-provider:{provider_decision_index}",
+        )
+        if restored.state.pending_catalog_selected_target_battle_shock_continuation is None:
+            break
+        assert len(restored.state.persisting_effects) == 0
+    else:
+        raise AssertionError("second provider outcome did not close")
+
+    assert len(restored.state.persisting_effects) == 1
+    requested = _events_of_type(restored.decision_controller, "battle_shock_test_requested")
+    resolved = _events_of_type(
+        restored.decision_controller,
+        "battle_shock_test_resolved",
+        source_kind="catalog_selected_target_effect",
+    )
+    assert len(requested) == 2
+    assert len(resolved) == 2
+    effect_indices = tuple(
+        cast(int, cast(dict[str, JsonValue], event.payload)["effect_index"]) for event in resolved
+    )
+    assert tuple(sorted(effect_indices)) == (0, 1)
+    assert (
+        len(
+            _events_of_type(
+                restored.decision_controller,
+                CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+            )
+        )
+        == 1
+    )
+    selected_records = tuple(
+        record
+        for record in restored.decision_controller.records
+        if record.request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE
+    )
+    assert len(selected_records) == 1
+
+    replay = GameLifecycle.from_payload(initial_payload, runtime_content_bundle=bundle)
+    replay_session = LocalGameSession(lifecycle=replay)
+    for record in restored.decision_controller.records[initial_record_count:]:
+        submit_replay_record(session=replay_session, record=record)
+    assert replay.state is not None
+    assert replay.state.to_payload() == restored.state.to_payload()
+    assert replay.decision_controller.to_payload() == restored.decision_controller.to_payload()
+
+
 @pytest.mark.parametrize(
     "phase",
     [BattlePhase.SHOOTING, BattlePhase.FIGHT],
@@ -2663,6 +2848,56 @@ def _selected_target_battle_shock_then_modifier_record() -> AbilityCatalogRecord
             source_id=source.source_id,
             when_descriptor="After this model has shot.",
             effect_descriptor="Battle-shock, then a persisting modifier.",
+            restrictions_descriptor="Select one enemy unit hit by those attacks.",
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT
+            ),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="core-intercessor-like-infantry",
+    )
+
+
+def _selected_target_two_battle_shocks_then_modifier_record() -> AbilityCatalogRecord:
+    source = RuleSourceText.from_raw(
+        source_id="phase17g:test:selected-target-two-battle-shocks-then-modifier",
+        raw_text=(
+            "In your Shooting phase, after this model has shot, select one enemy unit that "
+            "was hit by one or more of those attacks. That unit must take a Battle-shock "
+            "test. That unit must take a Battle-shock test. Until the end of the turn, "
+            "subtract 1 from the Hit roll for that unit."
+        ),
+    )
+    compiled_ir = compile_rule_source_text(
+        source,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    if not compiled_ir.is_supported or len(compiled_ir.clauses) != 4:
+        raise AssertionError("selected-target two-Battle-shock fixture must compile")
+    selection_clause, first_battle_shock, second_battle_shock, modifier_clause = compiled_ir.clauses
+    rule_ir = replace(
+        compiled_ir,
+        clauses=(
+            selection_clause,
+            replace(
+                first_battle_shock,
+                effects=(*first_battle_shock.effects, *second_battle_shock.effects),
+            ),
+            modifier_clause,
+        ),
+    )
+    return AbilityCatalogRecord(
+        record_id="phase17g:test:selected-target-two-battle-shocks-then-modifier",
+        definition=AbilityDefinition(
+            ability_id=("phase17g:test:selected-target-two-battle-shocks-then-modifier:ability"),
+            name="Selected-target later Battle-shock reroll continuation regression",
+            source_id=source.source_id,
+            when_descriptor="After this model has shot.",
+            effect_descriptor="Two Battle-shock tests, then a persisting modifier.",
             restrictions_descriptor="Select one enemy unit hit by those attacks.",
             timing=AbilityTimingDescriptor(
                 trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT

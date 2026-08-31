@@ -795,8 +795,13 @@ Battle-shock/reroll identity, and provider queue-head claim. Adapters continue t
 existing provider decision: they must not reselect the target, execute later effects, or infer
 completion. After the provider chain closes, the engine authenticates history, records the
 resolved Battle-shock effect once, resumes the remainder, and emits one final selected-target
-event. This adds no decision type, proposal kind, payload family, hidden-information branch, or
-adapter mutation path; it is persisted engine-owned continuation state within Contract 11.1.0.
+event. If that retained remainder reaches another immediate Battle-shock effect with an available
+reroll, the parent enters `awaiting_remaining_battle_shock_reroll` and authenticates the existing
+`select_dice_reroll` request against the exact retained selection, resolved prefix, current effect,
+remaining suffix, and starting index. Reroll resolution either continues the suffix or replaces the
+parent with the later provider-owned outcome before any following effect executes. This adds no
+decision type, proposal kind, payload family, hidden-information branch, or adapter mutation path;
+it is persisted engine-owned continuation state within Contract 11.1.0.
 
 Fall Back resolution and completion payloads now carry the stable source IDs
 `gw-11e-core-rules:movement-phase:selecting-modes` and

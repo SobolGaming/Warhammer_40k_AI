@@ -54,11 +54,13 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_selected_target_battle_shock_reroll import (
+    apply_catalog_selected_target_battle_shock_reroll_decision,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
     CatalogSelectedTargetEffectRuntime,
     apply_catalog_post_shoot_hit_target_effect_result,
-    apply_catalog_selected_target_battle_shock_reroll_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest

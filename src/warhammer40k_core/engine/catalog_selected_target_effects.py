@@ -16,11 +16,6 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     successful_hit_target_unit_ids_for_sequence,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
-from warhammer40k_core.engine.battle_shock_resolution import (
-    BattleShockPassedStatePolicy,
-    apply_battle_shock_reroll_resolution_decision,
-    is_battle_shock_reroll_request,
-)
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     post_fight_hit_target_request,
 )
@@ -44,6 +39,7 @@ from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
 )
 from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
     retain_catalog_selected_target_battle_shock_continuation,
+    retain_catalog_selected_target_remaining_battle_shock_reroll,
 )
 from warhammer40k_core.engine.catalog_selected_target_decisions import (
     SelectedTargetGroup as _SelectedTargetGroup,
@@ -195,7 +191,7 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -243,8 +239,6 @@ CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT = (
 CATALOG_SHOOTING_START_SELECTED_TARGET_EFFECT_SELECTED_EVENT = (
     "catalog_shooting_start_selected_target_effect_selected"
 )
-CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND = "catalog_selected_target_effect"
-
 _FIGHT_START_SUBMISSION_KIND = "catalog_selected_target_fight_start_effect"
 _SHOOTING_START_SUBMISSION_KIND = "catalog_selected_target_shooting_start_effect"
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -635,103 +629,6 @@ def apply_catalog_post_shoot_hit_target_effect_result(
         effects=recording.effects,
         event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
         phase=BattlePhase.SHOOTING,
-    )
-    return None
-
-
-def is_catalog_selected_target_battle_shock_reroll_request(request: DecisionRequest) -> bool:
-    return is_battle_shock_reroll_request(
-        request,
-        source_kind=CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND,
-    )
-
-
-def apply_catalog_selected_target_battle_shock_reroll_decision(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    result: DecisionResult,
-    battle_shock_hooks: BattleShockHookRegistry,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
-) -> LifecycleStatus | None:
-    battle_shock_resolution = apply_battle_shock_reroll_resolution_decision(
-        state=state,
-        decisions=decisions,
-        result=result,
-        battle_shock_hooks=battle_shock_hooks,
-        expected_source_kind=CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND,
-        expected_passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
-    )
-    resolved_payload = battle_shock_resolution.resolved_payload
-    if resolved_payload is None:
-        raise GameLifecycleError("Selected-target Battle-shock reroll did not resolve.")
-    try:
-        phase = BattlePhase(_payload_string(resolved_payload, key="phase"))
-    except ValueError as exc:
-        raise GameLifecycleError("Selected-target Battle-shock phase is unsupported.") from exc
-    final_event_type = _payload_string(
-        resolved_payload,
-        key="selected_target_final_event_type",
-    )
-    if battle_shock_resolution.pending_status is not None:
-        return retain_catalog_selected_target_battle_shock_continuation(
-            state=state,
-            decisions=decisions,
-            battle_shock_hooks=battle_shock_hooks,
-            resolution=battle_shock_resolution,
-            phase=phase,
-            final_event_type=final_event_type,
-        )
-    original_result = DecisionResult.from_payload(
-        cast(
-            DecisionResultPayload,
-            _payload_object(resolved_payload.get("selected_target_decision_result")),
-        )
-    )
-    selected_payload = _payload_object(resolved_payload.get("selected_target_payload"))
-    recorded_effects = list(
-        selected_target_json_object_tuple(
-            resolved_payload,
-            key="selected_target_recorded_effects_before_battle_shock",
-        )
-    )
-    recorded_effects.append(resolved_payload)
-    remaining_records = selected_target_json_object_tuple(
-        resolved_payload,
-        key="selected_target_remaining_effect_records_after_battle_shock",
-    )
-    if remaining_records:
-        recording = continue_selected_target_effect_records(
-            state=state,
-            decisions=decisions,
-            result=original_result,
-            payload=selected_payload,
-            effect_records=remaining_records,
-            phase=phase,
-            event_type=final_event_type,
-            battle_shock_hooks=battle_shock_hooks,
-            runtime_modifier_registry=runtime_modifier_registry,
-            ability_indexes_by_player_id=ability_indexes_by_player_id,
-            initial_recorded=tuple(recorded_effects),
-            effect_index_offset=_payload_int(
-                resolved_payload,
-                key="selected_target_remaining_effect_start_index",
-            ),
-        )
-        if recording.pending_status is not None:
-            return recording.pending_status
-        effects = recording.effects
-    else:
-        effects = tuple(recorded_effects)
-    append_selected_target_event(
-        state=state,
-        decisions=decisions,
-        result=original_result,
-        payload=selected_payload,
-        effects=effects,
-        event_type=final_event_type,
-        phase=phase,
     )
     return None
 
@@ -1444,6 +1341,12 @@ def continue_selected_target_effect_records(
                         resolution=resolution,
                         phase=phase,
                         final_event_type=event_type,
+                    )
+                elif state.pending_catalog_selected_target_battle_shock_continuation is not None:
+                    retain_catalog_selected_target_remaining_battle_shock_reroll(
+                        state=state,
+                        decisions=decisions,
+                        status=resolution.pending_status,
                     )
                 return SelectedTargetEffectRecording(
                     effects=tuple(recorded),

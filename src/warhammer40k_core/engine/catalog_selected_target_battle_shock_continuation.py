@@ -18,10 +18,15 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockPendingOutcomeAuthority,
     BattleShockPendingOutcomeAuthorityContext,
 )
-from warhammer40k_core.engine.battle_shock_resolution import BattleShockResolutionResult
+from warhammer40k_core.engine.battle_shock_resolution import (
+    BattleShockResolutionResult,
+    is_battle_shock_reroll_request,
+)
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     BattleShockResolutionAuthority,
+    PendingBattleShockRerollAuthority,
     parse_battle_shock_resolution_authority,
+    parse_pending_battle_shock_reroll_authority,
 )
 from warhammer40k_core.engine.battle_shock_source_family_authority import (
     validate_battle_shock_source_family_authority,
@@ -42,6 +47,7 @@ if TYPE_CHECKING:
 class CatalogSelectedTargetBattleShockContinuationPhase(StrEnum):
     AWAITING_PROVIDER_OUTCOME = "awaiting_provider_outcome"
     AWAITING_REMAINING_EFFECTS = "awaiting_remaining_effects"
+    AWAITING_REMAINING_BATTLE_SHOCK_REROLL = "awaiting_remaining_battle_shock_reroll"
 
 
 class PendingCatalogSelectedTargetBattleShockContinuationPayload(TypedDict):
@@ -108,7 +114,7 @@ class CatalogSelectedTargetBattleShockRuntime:
         result: DecisionResult,
         runtime_modifier_registry: RuntimeModifierRegistry,
     ) -> tuple[bool, LifecycleStatus | None]:
-        from warhammer40k_core.engine.catalog_selected_target_effects import (
+        from warhammer40k_core.engine.catalog_selected_target_battle_shock_reroll import (
             apply_catalog_selected_target_battle_shock_reroll_decision,
             is_catalog_selected_target_battle_shock_reroll_request,
         )
@@ -241,6 +247,14 @@ class PendingCatalogSelectedTargetBattleShockContinuation:
             self,
             continuation_phase=(
                 CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
+            ),
+        )
+
+    def awaiting_remaining_battle_shock_reroll(self) -> Self:
+        return replace(
+            self,
+            continuation_phase=(
+                CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
             ),
         )
 
@@ -378,6 +392,62 @@ def retain_catalog_selected_target_battle_shock_continuation(
     return status
 
 
+def retain_catalog_selected_target_remaining_battle_shock_reroll(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    continuation = state.pending_catalog_selected_target_battle_shock_continuation
+    if continuation is None or continuation.continuation_phase is not (
+        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
+    ):
+        raise GameLifecycleError(
+            "Catalog selected-target later Battle-shock reroll lacks its retained parent."
+        )
+    request = _validate_pending_status_queue_head(decisions=decisions, status=status)
+    if not is_battle_shock_reroll_request(
+        request,
+        source_kind="catalog_selected_target_effect",
+    ):
+        raise GameLifecycleError(
+            "Catalog selected-target later Battle-shock status is not a reroll request."
+        )
+    authority = parse_pending_battle_shock_reroll_authority(request)
+    _validate_remaining_battle_shock_reroll_ancestry(
+        continuation=continuation,
+        authority=authority,
+    )
+    state.replace_catalog_selected_target_battle_shock_continuation(
+        continuation.awaiting_remaining_battle_shock_reroll()
+    )
+    return status
+
+
+def complete_catalog_selected_target_remaining_battle_shock_reroll(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+) -> None:
+    continuation = state.pending_catalog_selected_target_battle_shock_continuation
+    if continuation is None:
+        return
+    if continuation.continuation_phase is not (
+        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
+    ):
+        raise GameLifecycleError("Catalog selected-target later Battle-shock reroll phase drifted.")
+    record = decisions.record_for_result(result)
+    authority = parse_pending_battle_shock_reroll_authority(record.request)
+    _validate_remaining_battle_shock_reroll_ancestry(
+        continuation=continuation,
+        authority=authority,
+    )
+    state.replace_catalog_selected_target_battle_shock_continuation(
+        continuation.awaiting_remaining_effects()
+    )
+
+
 def refresh_catalog_selected_target_battle_shock_provider_request(
     *,
     state: GameState,
@@ -427,7 +497,7 @@ def validate_pending_catalog_selected_target_battle_shock_continuation(
     *,
     state: GameState,
     decisions: DecisionController,
-    battle_shock_hooks: BattleShockHookRegistry,
+    runtime_content_bundle: RuntimeContentBundle,
     require_pending_request: bool,
 ) -> None:
     continuation = state.pending_catalog_selected_target_battle_shock_continuation
@@ -460,7 +530,7 @@ def validate_pending_catalog_selected_target_battle_shock_continuation(
         claim = _pending_claim(
             state=state,
             decisions=decisions,
-            battle_shock_hooks=battle_shock_hooks,
+            battle_shock_hooks=runtime_content_bundle.battle_shock_hook_registry,
             request=pending[0],
             authority=authority,
         )
@@ -479,7 +549,7 @@ def validate_pending_catalog_selected_target_battle_shock_continuation(
         continuation=continuation,
         state=state,
         decisions=decisions,
-        battle_shock_hooks=battle_shock_hooks,
+        battle_shock_hooks=runtime_content_bundle.battle_shock_hook_registry,
     )
     if final_event_count:
         if pending:
@@ -499,8 +569,10 @@ def validate_pending_catalog_selected_target_battle_shock_continuation(
         )
     _validate_remaining_effect_pending_request(
         continuation=continuation,
+        state=state,
         decisions=decisions,
         request=pending[0],
+        runtime_content_bundle=runtime_content_bundle,
     )
 
 
@@ -520,6 +592,12 @@ def resume_catalog_selected_target_battle_shock_continuation(
             "Catalog selected-target continuation cannot resume with a pending request."
         )
     _validate_continuation_authority(continuation=continuation, decisions=decisions)
+    if continuation.continuation_phase is (
+        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
+    ):
+        raise GameLifecycleError(
+            "Catalog selected-target later Battle-shock reroll disappeared before resolution."
+        )
     if continuation.continuation_phase is (
         CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
     ):
@@ -638,7 +716,7 @@ def validate_catalog_selected_target_battle_shock_submitted_status(
     validate_pending_catalog_selected_target_battle_shock_continuation(
         state=state,
         decisions=decisions,
-        battle_shock_hooks=bundle.battle_shock_hook_registry,
+        runtime_content_bundle=bundle,
         require_pending_request=True,
     )
     if status.decision_request != decisions.queue.peek_next():
@@ -660,7 +738,7 @@ def validate_catalog_selected_target_battle_shock_pre_submission(
     validate_pending_catalog_selected_target_battle_shock_continuation(
         state=state,
         decisions=decisions,
-        battle_shock_hooks=bundle.battle_shock_hook_registry,
+        runtime_content_bundle=bundle,
         require_pending_request=True,
     )
     if decisions.queue.peek_next() != request:
@@ -681,7 +759,7 @@ def validate_restored_catalog_selected_target_battle_shock_continuation(
     validate_pending_catalog_selected_target_battle_shock_continuation(
         state=state,
         decisions=decisions,
-        battle_shock_hooks=bundle.battle_shock_hook_registry,
+        runtime_content_bundle=bundle,
         require_pending_request=True,
     )
 
@@ -936,6 +1014,53 @@ def _provider_decision_records(
 def _validate_remaining_effect_pending_request(
     *,
     continuation: PendingCatalogSelectedTargetBattleShockContinuation,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    runtime_content_bundle: RuntimeContentBundle,
+) -> None:
+    if is_battle_shock_reroll_request(
+        request,
+        source_kind="catalog_selected_target_effect",
+    ):
+        if continuation.continuation_phase is not (
+            CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_BATTLE_SHOCK_REROLL
+        ):
+            raise GameLifecycleError(
+                "Catalog selected-target later Battle-shock reroll phase drifted."
+            )
+        from warhammer40k_core.engine.battle_shock_pending_authority import (
+            validate_live_pending_battle_shock_reroll_authority,
+        )
+
+        authority = validate_live_pending_battle_shock_reroll_authority(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            pending_request=request,
+            runtime_content_bundle=runtime_content_bundle,
+        )
+        _validate_remaining_battle_shock_reroll_ancestry(
+            continuation=continuation,
+            authority=authority,
+        )
+        return
+    if continuation.continuation_phase is not (
+        CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS
+    ):
+        raise GameLifecycleError(
+            "Catalog selected-target remaining-effects continuation phase drifted."
+        )
+    _validate_remaining_mortal_wound_pending_request(
+        continuation=continuation,
+        decisions=decisions,
+        request=request,
+    )
+
+
+def _validate_remaining_mortal_wound_pending_request(
+    *,
+    continuation: PendingCatalogSelectedTargetBattleShockContinuation,
     decisions: DecisionController,
     request: DecisionRequest,
 ) -> None:
@@ -1003,6 +1128,51 @@ def _validate_remaining_effect_pending_request(
         )
 
 
+def _validate_remaining_battle_shock_reroll_ancestry(
+    *,
+    continuation: PendingCatalogSelectedTargetBattleShockContinuation,
+    authority: PendingBattleShockRerollAuthority,
+) -> None:
+    base = authority.base_payload
+    selected_request = continuation.selected_target_request.to_payload()
+    selected_result = continuation.selected_target_result.to_payload()
+    recorded_before = _payload_object_tuple(
+        base,
+        "selected_target_recorded_effects_before_battle_shock",
+    )
+    remaining_after = _payload_object_tuple(
+        base,
+        "selected_target_remaining_effect_records_after_battle_shock",
+    )
+    remaining_start_index = _payload_non_negative_int(
+        base,
+        "selected_target_remaining_effect_start_index",
+    )
+    matches = _remaining_battle_shock_effect_indices(
+        continuation=continuation,
+        battle_shock_payload=base,
+    )
+    retained_prefix = (
+        *continuation.recorded_effects_before_battle_shock,
+        continuation.resolved_battle_shock_payload,
+    )
+    if (
+        authority.source_kind != "catalog_selected_target_effect"
+        or base.get("selected_target_decision_request") != selected_request
+        or base.get("selected_target_decision_result") != selected_result
+        or base.get("selected_target_payload") != continuation.selected_target_payload
+        or base.get("phase") != continuation.phase.value
+        or base.get("selected_target_final_event_type") != continuation.final_event_type
+        or len(matches) != 1
+        or tuple(continuation.remaining_effect_records[matches[0] + 1 :]) != remaining_after
+        or continuation.remaining_effect_start_index + matches[0] + 1 != remaining_start_index
+        or recorded_before[: len(retained_prefix)] != retained_prefix
+    ):
+        raise GameLifecycleError(
+            "Catalog selected-target later Battle-shock reroll ancestry drifted."
+        )
+
+
 def _validate_progressive_replacement(
     *,
     existing: PendingCatalogSelectedTargetBattleShockContinuation,
@@ -1012,6 +1182,10 @@ def _validate_progressive_replacement(
         *existing.recorded_effects_before_battle_shock,
         existing.resolved_battle_shock_payload,
     )
+    matches = _remaining_battle_shock_effect_indices(
+        continuation=existing,
+        battle_shock_payload=replacement.resolved_battle_shock_payload,
+    )
     if (
         existing.continuation_phase
         is not (CatalogSelectedTargetBattleShockContinuationPhase.AWAITING_REMAINING_EFFECTS)
@@ -1019,10 +1193,37 @@ def _validate_progressive_replacement(
         or replacement.selected_target_result != existing.selected_target_result
         or replacement.phase is not existing.phase
         or replacement.final_event_type != existing.final_event_type
-        or replacement.effect_index <= existing.effect_index
+        or len(matches) != 1
+        or tuple(existing.remaining_effect_records[matches[0] + 1 :])
+        != replacement.remaining_effect_records
+        or existing.remaining_effect_start_index + matches[0] + 1
+        != replacement.remaining_effect_start_index
         or replacement.recorded_effects_before_battle_shock[: len(prefix)] != prefix
     ):
         raise GameLifecycleError("Catalog selected-target continuation replacement drifted.")
+
+
+def _remaining_battle_shock_effect_indices(
+    *,
+    continuation: PendingCatalogSelectedTargetBattleShockContinuation,
+    battle_shock_payload: dict[str, JsonValue],
+) -> tuple[int, ...]:
+    effect_payload = _payload_object(battle_shock_payload, "effect_payload")
+    return tuple(
+        index
+        for index, record in enumerate(continuation.remaining_effect_records)
+        if record.get("immediate_effect_kind") == "force_battle_shock_test"
+        and record.get("catalog_record_id") == battle_shock_payload.get("catalog_record_id")
+        and record.get("source_rule_id") == battle_shock_payload.get("source_rule_id")
+        and record.get("source_unit_instance_id")
+        == battle_shock_payload.get("source_unit_instance_id")
+        and record.get("selection_clause_id") == battle_shock_payload.get("selection_clause_id")
+        and record.get("effect_clause_id") == battle_shock_payload.get("effect_clause_id")
+        and record.get("effect_index") == battle_shock_payload.get("effect_index")
+        and record.get("selected_target_unit_instance_id")
+        == battle_shock_payload.get("selected_target_unit_instance_id")
+        and record.get("effect_payload") == effect_payload
+    )
 
 
 def _validate_pending_status_queue_head(
@@ -1124,9 +1325,11 @@ __all__ = (
     "PendingCatalogSelectedTargetBattleShockContinuation",
     "PendingCatalogSelectedTargetBattleShockContinuationPayload",
     "advance_catalog_selected_target_battle_shock_lifecycle",
+    "complete_catalog_selected_target_remaining_battle_shock_reroll",
     "refresh_catalog_selected_target_battle_shock_provider_request",
     "resume_catalog_selected_target_battle_shock_continuation",
     "retain_catalog_selected_target_battle_shock_continuation",
+    "retain_catalog_selected_target_remaining_battle_shock_reroll",
     "validate_catalog_selected_target_battle_shock_pre_submission",
     "validate_catalog_selected_target_battle_shock_submitted_status",
     "validate_pending_catalog_selected_target_battle_shock_continuation",

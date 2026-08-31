@@ -84,12 +84,14 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     apply_catalog_post_shoot_hit_target_status_result,
     invalid_catalog_post_shoot_hit_target_status_status,
 )
+from warhammer40k_core.engine.catalog_selected_target_battle_shock_reroll import (
+    apply_catalog_selected_target_battle_shock_reroll_decision,
+    is_catalog_selected_target_battle_shock_reroll_request,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE,
     apply_catalog_post_shoot_hit_target_effect_result,
-    apply_catalog_selected_target_battle_shock_reroll_decision,
     invalid_catalog_post_shoot_hit_target_effect_status,
-    is_catalog_selected_target_battle_shock_reroll_request,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,

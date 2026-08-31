@@ -51,7 +51,7 @@ _EXPECTED_CALLS = {
         "resolve_battle_shock_test_with_optional_reroll",
     ): _ExpectedCall(_Policy.FORWARD_WHOLE_RESULT),
     (
-        "catalog_selected_target_effects.py",
+        "catalog_selected_target_battle_shock_reroll.py",
         "apply_catalog_selected_target_battle_shock_reroll_decision",
         "apply_battle_shock_reroll_resolution_decision",
     ): _ExpectedCall(_Policy.BOTH_FIELDS),

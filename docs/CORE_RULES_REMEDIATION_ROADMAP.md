@@ -764,6 +764,18 @@ and the final selected-target event is emitted once. A static caller inventory n
 shared Battle-shock resolution caller is added or stops consuming both result fields without an
 explicit no-parent proof.
 
+PR #409 final re-review remediation: a retained selected-target suffix could contain another
+immediate Battle-shock effect. When that later occurrence opened an optional reroll, the shared
+resolver correctly returned an unresolved `pending_status`, but the parent remained in
+`awaiting_remaining_effects` and authenticated only nested mortal-wound Feel No Pain. The retained
+parent now records `awaiting_remaining_battle_shock_reroll`, authenticates the normal live
+reroll request/roll/permission/event chain, and cross-binds its source record, resolved prefix,
+remaining suffix, absolute continuation index, and original selection request/result/payload to
+the retained parent. Reroll resolution returns the parent to remaining-effect processing or
+progressively replaces it with the later Battle-shock provider continuation. The cohesive reroll
+handler was extracted from the near-budget selected-target effects module so both production
+modules remain below the 1,500-line limit.
+
 Specific authoritative 40k.app rule/statement and source ID: 09.02.02, `SELECTING MODES`, states
 that modes are mutually exclusive and assessed in order, but Ordered Retreat is not mandatory so
 Desperate Escape may be selected instead. Its stable source ID is
@@ -790,7 +802,7 @@ The expanded generated package hash is
 `0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105` and its canonical artifact
 byte SHA-256 is `f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:e20ad666066761cb95e97d854ff0f0bb2d0d3bcf9919a1aed066fd2efffbff52`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:d0763f9c1beba10641fe9b52c4280d7c949dfa29e26b08b411296edd41edee57`.
 
 Load and execution support: All three movement rule rows and all six evidence rows are `loaded`.
 Move Units and Fall-back Move are `executable_engine_runtime`. Selecting Modes is truthfully
@@ -854,6 +866,14 @@ restoration retains the exact parent, replay produces one Battle-shock occurrenc
 selection event, and the original target-selection group is not offered again. Equivalent
 Shooting-start and Fight-start facade cases pin the phase-specific final event identities.
 
+The final selected-target continuation regression uses one supported selection containing two
+immediate Battle-shock effects followed by a persisting effect. Only the second effect receives a
+reroll permission. It proves that the first provider request remains the sole queue head, provider
+closure exposes the second reroll as the sole queue head, the new parent substate round-trips,
+reroll resolution orders a second provider outcome before the persisting effect, both Battle-shock
+occurrences and the final event are unique, target selection is not repeated, and replay reproduces
+the complete state, decision, dice, and event histories.
+
 Generated artifacts/documentation: P09B expands
 `core_movement_phase_2026_08/artifacts/package.json` and its typed loader/source catalog, updates
 the offline movement-source builder, engine build manifest, affected external-contract fixtures and
@@ -864,18 +884,22 @@ four-shard inventory does not change.
 Validation results:
 
 - Every required `AGENTS.md` gate passes: Ruff check, Ruff format check, mypy, Pyright, the
-  coverage-enabled xdist work-stealing suite (`6326 passed`), four-shard inventory, import-linter,
+  xdist work-stealing suite (`6330 passed`), four-shard inventory, import-linter,
   and all-files pre-commit.
 - The final P09B Fall Back/static regression set and the cross-faction outcome-provider regression
   set pass (`74` and `77` tests respectively).
 - The selected-target re-review facade set passes for direct, rerolled, Shooting-start, and
-  Fight-start provider continuations (`4 passed`); related selected-target runtime coverage passes
-  (`18 passed`), and the shared-result caller inventory plus module-size policy pass (`4 passed`).
+  Fight-start provider continuations plus the later-effect reroll boundary (`5 passed`); the final
+  selected-target/provider/static focused set passes (`63 passed`), and the shared-result caller
+  inventory plus module-size policy remain clean.
 - Movement source builder check, 40k.app audit check, engine-build check, external-contract base-ref
-  check, installed-wheel smoke (`2461` resources and `27` schemas), and generated ability-support
+  check, installed-wheel smoke (`2466` resources and `27` schemas), and generated ability-support
   audit (`19 passed`) all pass.
-- The repository-pinned TypeScript generated-client, type, and unit checks pass (`5` unit tests),
-  and the certified HTTP conformance scenario passes all `342` assertions on Contract `11.1.0`.
+- The repository-pinned TypeScript generated-client, type, and unit entrypoints pass (`5` unit
+  tests), and the certified HTTP conformance scenario passes all `342` assertions on Contract
+  `11.1.0`. This macOS host's bundled Node 24 runtime did not expose an `npm` executable, so the
+  equivalent pinned `node`, `tsc`, and `tsx` entrypoints ran directly; `npm ci` and the npm wrapper
+  commands could not be executed.
 
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/409`; merge commit
 pending review and merge.
