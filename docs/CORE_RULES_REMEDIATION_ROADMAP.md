@@ -1024,8 +1024,8 @@ pending review and merge.
 
 ### P06B — C06-02
 
-Status: Implementation and required local validation are complete; remote PR publication is in
-progress.
+Status: Implementation, required local validation, and remote PR publication are complete; review
+and merge are pending.
 
 Finding IDs: `C06-02`.
 
@@ -1141,7 +1141,8 @@ Validation results:
   TypeScript client drift and type checks pass, and the two-server HTTP conformance scenario passes
   all `342` assertions for contract version `11.1.0`.
 
-PR URL and merge commit: pending publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/411`; merge commit
+pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
