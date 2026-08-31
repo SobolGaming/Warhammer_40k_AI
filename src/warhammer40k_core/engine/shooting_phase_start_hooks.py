@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -22,7 +23,10 @@ from warhammer40k_core.engine.target_restriction_hooks import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+    from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 
 SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE = (
@@ -84,6 +88,11 @@ class ShootingPhaseStartResultContext:
     ruleset_descriptor: RulesetDescriptor
     army_catalog: ArmyCatalog
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry
+    battle_shock_hooks: BattleShockHookRegistry | None = None
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -118,6 +127,30 @@ class ShootingPhaseStartResultContext:
                 "ShootingPhaseStartResultContext shooting_target_restriction_hooks must be a "
                 "registry."
             )
+        from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+        from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+        from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+
+        if (
+            self.battle_shock_hooks is not None
+            and type(self.battle_shock_hooks) is not BattleShockHookRegistry
+        ):
+            raise GameLifecycleError(
+                "ShootingPhaseStartResultContext Battle-shock hooks must be a registry."
+            )
+        if (
+            self.runtime_modifier_registry is not None
+            and type(self.runtime_modifier_registry) is not RuntimeModifierRegistry
+        ):
+            raise GameLifecycleError(
+                "ShootingPhaseStartResultContext runtime modifiers must be a registry."
+            )
+        indexes = dict(self.ability_indexes_by_player_id)
+        if any(type(player_id) is not str for player_id in indexes) or any(
+            type(index) is not AbilityCatalogIndex for index in indexes.values()
+        ):
+            raise GameLifecycleError("ShootingPhaseStartResultContext ability indexes are invalid.")
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(indexes))
         if (
             self.request.decision_type
             != SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE

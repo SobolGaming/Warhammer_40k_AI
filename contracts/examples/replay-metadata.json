@@ -15557,6 +15557,7 @@
       "objective_control_records": [],
       "one_shot_weapon_use_records": [],
       "out_of_phase_shooting_state": null,
+      "pending_catalog_selected_target_battle_shock_continuation": null,
       "pending_return_on_death": [],
       "persisting_effects": [],
       "player_ids": [

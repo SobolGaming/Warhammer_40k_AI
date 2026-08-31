@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -16,6 +19,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -58,6 +62,15 @@ class FightPhaseStartResultContext:
     decisions: DecisionController
     request: DecisionRequest
     result: DecisionResult
+    battle_shock_hooks: BattleShockHookRegistry = field(
+        default_factory=BattleShockHookRegistry.empty
+    )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -74,6 +87,20 @@ class FightPhaseStartResultContext:
             )
         if type(self.result) is not DecisionResult:
             raise GameLifecycleError("FightPhaseStartResultContext result must be DecisionResult.")
+        if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
+            raise GameLifecycleError(
+                "FightPhaseStartResultContext Battle-shock hooks must be a registry."
+            )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "FightPhaseStartResultContext runtime modifiers must be a registry."
+            )
+        indexes = dict(self.ability_indexes_by_player_id)
+        if any(type(player_id) is not str for player_id in indexes) or any(
+            type(index) is not AbilityCatalogIndex for index in indexes.values()
+        ):
+            raise GameLifecycleError("FightPhaseStartResultContext ability indexes are invalid.")
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(indexes))
         if self.request.decision_type != SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE:
             raise GameLifecycleError("FightPhaseStartResultContext request decision_type drift.")
         _validate_fight_phase_start_state(self.state)
@@ -168,6 +195,9 @@ def apply_fight_phase_start_result(
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
+    battle_shock_hooks: BattleShockHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> LifecycleStatus | None:
     phase_start_result = registry.apply_result(
         FightPhaseStartResultContext(
@@ -175,6 +205,9 @@ def apply_fight_phase_start_result(
             decisions=decisions,
             request=decisions.record_for_result(result).request,
             result=result,
+            battle_shock_hooks=battle_shock_hooks,
+            runtime_modifier_registry=runtime_modifier_registry,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
         )
     )
     if type(phase_start_result) is LifecycleStatus:

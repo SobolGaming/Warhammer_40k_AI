@@ -786,6 +786,18 @@ before resumption. Once the outcome closes, the engine reconciles the historical
 identity: surviving placed descendants may receive the ordinary Embark choice, while a destroyed
 or otherwise absent unit completes its activation without a stale Embark request.
 
+The same ordering applies when an immediate catalog selected-target effect resolves a
+Battle-shock test and opens a provider-owned decision. Post-shoot, Shooting-start, and Fight-start
+selections serialize `pending_catalog_selected_target_battle_shock_continuation` in authoritative
+`GameState`. It retains the exact original selection request/result, phase-specific final event,
+catalog/source/clause/target/effect identity, resolved prefix and remaining effects,
+Battle-shock/reroll identity, and provider queue-head claim. Adapters continue to answer only the
+existing provider decision: they must not reselect the target, execute later effects, or infer
+completion. After the provider chain closes, the engine authenticates history, records the
+resolved Battle-shock effect once, resumes the remainder, and emits one final selected-target
+event. This adds no decision type, proposal kind, payload family, hidden-information branch, or
+adapter mutation path; it is persisted engine-owned continuation state within Contract 11.1.0.
+
 Fall Back resolution and completion payloads now carry the stable source IDs
 `gw-11e-core-rules:movement-phase:selecting-modes` and
 `gw-11e-core-rules:movement-phase:fall-back-move`, the selected mode, the exact per-model

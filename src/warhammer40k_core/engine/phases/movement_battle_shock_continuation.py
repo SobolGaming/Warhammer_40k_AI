@@ -28,6 +28,7 @@ from warhammer40k_core.engine.phases.movement_state import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.game_state import GameState
 
 _FORCED_SOURCE_KIND = "forced_desperate_escape_battle_shock"
@@ -162,6 +163,30 @@ def validate_pending_desperate_escape_battle_shock_continuation(
         )
     battle_shock_hooks.validate_completed_outcome_authority(
         BattleShockCompletedOutcomeAuthorityContext(state=state, decisions=decisions)
+    )
+
+
+def validate_restored_desperate_escape_battle_shock_continuation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    runtime_content_bundle: RuntimeContentBundle | None,
+) -> None:
+    movement_state = state.movement_phase_state
+    if (
+        movement_state is None
+        or movement_state.pending_desperate_escape_battle_shock_continuation is None
+    ):
+        return
+    if runtime_content_bundle is None:
+        raise GameLifecycleError(
+            "Desperate Escape Battle-shock restoration requires runtime content."
+        )
+    validate_pending_desperate_escape_battle_shock_continuation(
+        state=state,
+        decisions=decisions,
+        battle_shock_hooks=runtime_content_bundle.battle_shock_hook_registry,
+        require_pending_request=True,
     )
 
 
@@ -409,4 +434,5 @@ __all__ = (
     "pending_desperate_escape_battle_shock_continuation",
     "record_desperate_escape_battle_shock_resolution",
     "validate_pending_desperate_escape_battle_shock_continuation",
+    "validate_restored_desperate_escape_battle_shock_continuation",
 )

@@ -65,8 +65,10 @@ _SELECTED_TARGET_BASE_KEYS = frozenset(
         "target_identity_resolution",
         "target_player_id",
         "effect_payload",
+        "selected_target_decision_request",
         "selected_target_decision_result",
         "selected_target_payload",
+        "selected_target_final_event_type",
         "selected_target_recorded_effects_before_battle_shock",
         "selected_target_remaining_effect_records_after_battle_shock",
         "selected_target_remaining_effect_start_index",
@@ -710,6 +712,7 @@ def _validate_selected_target_source(
     if frozenset(base) != _SELECTED_TARGET_BASE_KEYS:
         raise GameLifecycleError("Selected-target Battle-shock source shape drifted.")
     raw_result = base.get("selected_target_decision_result")
+    raw_request = base.get("selected_target_decision_request")
     matching = tuple(
         record for record in decision_records if record.result.to_payload() == raw_result
     )
@@ -755,8 +758,10 @@ def _validate_selected_target_source(
     raw_recorded_before = base.get("selected_target_recorded_effects_before_battle_shock")
     raw_remaining = base.get("selected_target_remaining_effect_records_after_battle_shock")
     remaining_start_index = base.get("selected_target_remaining_effect_start_index")
+    final_event_type = base.get("selected_target_final_event_type")
     if (
         record.result.payload != selected_payload
+        or record.request.to_payload() != raw_request
         or selected_payload.get("catalog_record_id") != base.get("catalog_record_id")
         or selected_payload.get("source_rule_id") != base.get("source_rule_id")
         or selected_payload.get("source_unit_instance_id") != base.get("source_unit_instance_id")
@@ -768,6 +773,8 @@ def _validate_selected_target_source(
         or any(not isinstance(candidate, dict) for candidate in raw_recorded_before)
         or not isinstance(raw_remaining, list)
         or any(not isinstance(candidate, dict) for candidate in raw_remaining)
+        or type(final_event_type) is not str
+        or not final_event_type.strip()
         or remaining_start_index != matching_effect_indices[0] + 1
         or raw_remaining != list(effect_records[matching_effect_indices[0] + 1 :])
         or request.reason is not BattleShockTestReason.FORCED_BY_ARMY_RULE
@@ -784,6 +791,7 @@ def _validate_selected_target_source(
         recorded_before=tuple(
             cast(dict[str, JsonValue], candidate) for candidate in raw_recorded_before
         ),
+        final_event_type=final_event_type,
     )
     return record
 
@@ -796,10 +804,8 @@ def _validate_selected_target_recorded_prefix(
     effect_records: tuple[dict[str, JsonValue], ...],
     current_effect_index: int,
     recorded_before: tuple[dict[str, JsonValue], ...],
+    final_event_type: str = "catalog_post_shoot_hit_target_effect_selected",
 ) -> None:
-    from warhammer40k_core.engine.catalog_selected_target_effects import (
-        CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-    )
     from warhammer40k_core.engine.catalog_selected_target_effects_support import (
         recorded_effects_include_inflicted_mortal_wounds,
     )
@@ -835,7 +841,7 @@ def _validate_selected_target_recorded_prefix(
                         {
                             "effect_id": (
                                 f"{decision_record.result.result_id}:"
-                                f"{CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT}:"
+                                f"{final_event_type}:"
                                 f"{effect_index:03d}"
                             ),
                             "source_rule_id": effect_record["source_rule_id"],

@@ -32,6 +32,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_string as _payload_string,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -72,6 +73,8 @@ def resolve_selected_target_battle_shock_effect(
     recorded_effects_before_battle_shock: tuple[dict[str, JsonValue], ...] = (),
     remaining_effect_records_after_battle_shock: tuple[dict[str, JsonValue], ...] = (),
     remaining_effect_start_index: int = 0,
+    phase: BattlePhase,
+    final_event_type: str,
 ) -> BattleShockResolutionResult:
     if len(target_unit_ids) != 1:
         raise GameLifecycleError("Catalog selected-target Battle-shock requires one target.")
@@ -102,6 +105,9 @@ def resolve_selected_target_battle_shock_effect(
         recorded_effects_before_battle_shock=recorded_effects_before_battle_shock,
         remaining_effect_records_after_battle_shock=remaining_effect_records_after_battle_shock,
         remaining_effect_start_index=remaining_effect_start_index,
+        selected_target_request=decisions.record_for_result(result).request,
+        phase=phase,
+        final_event_type=final_event_type,
     )
     if target_rules_unit is None:
         skipped_payload = cast(
@@ -150,7 +156,7 @@ def resolve_selected_target_battle_shock_effect(
             unit_instance_id=target_unit_id,
             reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
             active_player_id=active_player_id,
-            phase=BattlePhase.SHOOTING,
+            phase=phase,
             default_expression=DiceExpression(quantity=2, sides=6),
             phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
         )
@@ -197,7 +203,7 @@ def resolve_selected_target_battle_shock_effect(
         request=request,
         roll_state=roll_state,
         active_player_id=active_player_id,
-        phase=BattlePhase.SHOOTING,
+        phase=phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
         passed_state_policy=BattleShockPassedStatePolicy.PRESERVE,
         source_kind="catalog_selected_target_effect",
@@ -222,6 +228,9 @@ def _selected_target_battle_shock_base_payload(
     recorded_effects_before_battle_shock: tuple[dict[str, JsonValue], ...],
     remaining_effect_records_after_battle_shock: tuple[dict[str, JsonValue], ...],
     remaining_effect_start_index: int,
+    selected_target_request: DecisionRequest,
+    phase: BattlePhase,
+    final_event_type: str,
 ) -> dict[str, JsonValue]:
     return cast(
         dict[str, JsonValue],
@@ -230,7 +239,7 @@ def _selected_target_battle_shock_base_payload(
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "active_player_id": _active_player_id(state),
-                "phase": BattlePhase.SHOOTING.value,
+                "phase": phase.value,
                 "source_kind": "catalog_selected_target_effect",
                 "hook_id": _payload_string(payload, key="hook_id"),
                 "catalog_record_id": _payload_string(record, key="catalog_record_id"),
@@ -255,8 +264,12 @@ def _selected_target_battle_shock_base_payload(
                 ),
                 "target_player_id": target_player_id,
                 "effect_payload": validate_json_value(effect_payload),
+                "selected_target_decision_request": validate_json_value(
+                    selected_target_request.to_payload()
+                ),
                 "selected_target_decision_result": validate_json_value(result.to_payload()),
                 "selected_target_payload": validate_json_value(dict(payload)),
+                "selected_target_final_event_type": final_event_type,
                 "selected_target_recorded_effects_before_battle_shock": [
                     validate_json_value(recorded_effect)
                     for recorded_effect in recorded_effects_before_battle_shock

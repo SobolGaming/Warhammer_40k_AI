@@ -13,6 +13,9 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.battle_shock import BattleShockedUnitStatePayload
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeStatePayload
+from warhammer40k_core.engine.catalog_selected_target_battle_shock_continuation import (
+    PendingCatalogSelectedTargetBattleShockContinuationPayload,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointLedgerPayload,
     CommandStepStatePayload,
@@ -181,6 +184,9 @@ class GameStatePayload(TypedDict):
     battlefield_state: BattlefieldRuntimeStatePayload | None
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
+    pending_catalog_selected_target_battle_shock_continuation: (
+        PendingCatalogSelectedTargetBattleShockContinuationPayload | None
+    )
     charge_phase_state: ChargePhaseStatePayload | None
     fight_phase_state: FightPhaseStatePayload | None
     shooting_phase_state: ShootingPhaseStatePayload | None

@@ -752,6 +752,18 @@ transition and payload, Battle-shock request/result, optional reroll record, sou
 and provider claim. Movement resumes only after that outcome queue closes, then reconciles the
 historical rules-unit identity before deciding whether Embark remains legal.
 
+PR #409 re-review remediation: the same generalized `resolved_payload` plus `pending_status`
+contract exposed a selected-target parent-ordering defect. Immediate catalog Battle-shock effects
+now retain a typed, serialized parent across provider-owned healing or Feel No Pain chains for
+post-shoot, Shooting-start, and Fight-start selections. The parent pins the original selection
+request/result, phase and final event identity, loaded catalog/source/clause/target/effect
+authority, resolved prefix and remainder, Battle-shock and optional-reroll identities, and the
+provider's exact queue-head claim. Provider closure is authenticated before the resolved
+Battle-shock payload is appended once; later effects then resume without reselecting the target,
+and the final selected-target event is emitted once. A static caller inventory now fails when any
+shared Battle-shock resolution caller is added or stops consuming both result fields without an
+explicit no-parent proof.
+
 Specific authoritative 40k.app rule/statement and source ID: 09.02.02, `SELECTING MODES`, states
 that modes are mutually exclusive and assessed in order, but Ordered Retreat is not mandatory so
 Desperate Escape may be selected instead. Its stable source ID is
@@ -778,7 +790,7 @@ The expanded generated package hash is
 `0aacec8d0c56e882c0b03329a202a00512d9ace632d2b5f0e3bb53370e001105` and its canonical artifact
 byte SHA-256 is `f3e378e933f70c8b4b579acdd7d46a5c8ec519ee3fbfb5efda1611edc747cff2`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:8d8c5acc77e9782ca89f52d2e5380cb3246f214fc68237f300c0c3a929e2600e`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:e20ad666066761cb95e97d854ff0f0bb2d0d3bcf9919a1aed066fd2efffbff52`.
 
 Load and execution support: All three movement rule rows and all six evidence rows are `loaded`.
 Move Units and Fall-back Move are `executable_engine_runtime`. Selecting Modes is truthfully
@@ -835,6 +847,13 @@ and restores/replays with the same authoritative result. The regression also pin
 event, action/result/proposal identities, transition, movement payload, Battle-shock request/result,
 phase, and provider-owned pending authority.
 
+Selected-target re-review regressions drive the same loaded Chaos Knights Delirium provider
+through `LocalGameSession` after both a direct and rerolled immediate Battle-shock test. They
+prove the provider request is the sole queue head, a later persisting effect cannot execute early,
+restoration retains the exact parent, replay produces one Battle-shock occurrence and one final
+selection event, and the original target-selection group is not offered again. Equivalent
+Shooting-start and Fight-start facade cases pin the phase-specific final event identities.
+
 Generated artifacts/documentation: P09B expands
 `core_movement_phase_2026_08/artifacts/package.json` and its typed loader/source catalog, updates
 the offline movement-source builder, engine build manifest, affected external-contract fixtures and
@@ -845,10 +864,13 @@ four-shard inventory does not change.
 Validation results:
 
 - Every required `AGENTS.md` gate passes: Ruff check, Ruff format check, mypy, Pyright, the
-  coverage-enabled xdist work-stealing suite (`6321 passed`), four-shard inventory, import-linter,
+  coverage-enabled xdist work-stealing suite (`6326 passed`), four-shard inventory, import-linter,
   and all-files pre-commit.
 - The final P09B Fall Back/static regression set and the cross-faction outcome-provider regression
   set pass (`74` and `77` tests respectively).
+- The selected-target re-review facade set passes for direct, rerolled, Shooting-start, and
+  Fight-start provider continuations (`4 passed`); related selected-target runtime coverage passes
+  (`18 passed`), and the shared-result caller inventory plus module-size policy pass (`4 passed`).
 - Movement source builder check, 40k.app audit check, engine-build check, external-contract base-ref
   check, installed-wheel smoke (`2461` resources and `27` schemas), and generated ability-support
   audit (`19 passed`) all pass.
