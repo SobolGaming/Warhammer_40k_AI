@@ -49,6 +49,7 @@ __all__ = (
     "_enemy_unit_ids_for_player",
     "_heroic_intervention_reachable_target_distances",
     "_unit_made_charge_move",
+    "apply_crushing_impact_mortal_wound_decision",
     "apply_explosives_mortal_wound_feel_no_pain_decision",
 )
 
@@ -227,13 +228,13 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
 ) -> LifecycleStatus | None:
     record = decisions.record_for_result(result)
     request = record.request
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         raise GameLifecycleError("Explosives Feel No Pain requires mortal wound context.")
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     if not isinstance(source_context, dict) or source_context.get("source_kind") != "explosives":
         raise GameLifecycleError("Explosives Feel No Pain source context is invalid.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,
@@ -250,7 +251,7 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
                 "phase": state.current_battle_phase.value
                 if state.current_battle_phase is not None
                 else None,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": CORE_EXPLOSIVES_HANDLER_ID,
             },
         )
@@ -456,9 +457,196 @@ def _apply_crushing_impact_handler(
                 "source_kind": "crushing_impact_enemy",
                 "stratagem_use": use_record.to_payload(),
                 "roll_state": roll_state.to_payload(),
+                "source_mortal_wound_application": (
+                    None if source_application is None else source_application.to_payload()
+                ),
             }
         ),
     )
+    if decisions.queue.pending_requests:
+        return
+    _emit_crushing_impact_resolved(
+        state=state,
+        decisions=decisions,
+        use_record=use_record,
+        roll_state=roll_state,
+        source_unit_instance_id=source_unit_id,
+        source_model_instance_id=model_id,
+        target_unit_instance_id=enemy_unit_id,
+        source_mortal_wounds=source_mortal_wounds,
+        enemy_mortal_wounds=enemy_mortal_wounds,
+        source_mortal_wound_application=validate_json_value(
+            None if source_application is None else source_application.to_payload()
+        ),
+        enemy_mortal_wound_application=validate_json_value(
+            None if enemy_application is None else enemy_application.to_payload()
+        ),
+    )
+
+
+def apply_crushing_impact_mortal_wound_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    record = decisions.record_for_result(result)
+    request = record.request
+    if not is_mortal_wound_resolution_request(request):
+        raise GameLifecycleError("Crushing Impact requires mortal wound context.")
+    source_context = mortal_wound_resolution_source_context(request)
+    if not isinstance(source_context, dict) or source_context.get("source_kind") not in {
+        "crushing_impact_self",
+        "crushing_impact_enemy",
+    }:
+        raise GameLifecycleError("Crushing Impact mortal wound source context is invalid.")
+    (
+        use_record,
+        roll_state,
+        source_unit_id,
+        model_id,
+        enemy_unit_id,
+        source_mortal_wounds,
+        enemy_mortal_wounds,
+    ) = _crushing_impact_details(source_context)
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    routed = resolve_mortal_wound_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+        next_request_id=state.next_decision_request_id(),
+        dice_manager=manager,
+    )
+    if routed.request is not None:
+        decisions.request_decision(routed.request)
+        return _crushing_impact_pending_status(
+            state=state,
+            request=routed.request,
+        )
+    if routed.application is None:
+        raise GameLifecycleError("Crushing Impact mortal wounds did not finish routing.")
+    source_application_payload: JsonValue
+    enemy_application_payload: JsonValue
+    if source_context["source_kind"] == "crushing_impact_self":
+        source_application_payload = validate_json_value(routed.application.to_payload())
+        enemy_application = _apply_stratagem_mortal_wounds(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            use_record=use_record,
+            application_id=f"{use_record.use_id}:crushing-impact:enemy",
+            target_unit_instance_id=enemy_unit_id,
+            mortal_wounds=enemy_mortal_wounds,
+            source_context=validate_json_value(
+                {
+                    "source_kind": "crushing_impact_enemy",
+                    "stratagem_use": use_record.to_payload(),
+                    "roll_state": roll_state.to_payload(),
+                    "source_mortal_wound_application": source_application_payload,
+                }
+            ),
+        )
+        if decisions.queue.pending_requests:
+            return _crushing_impact_pending_status(
+                state=state,
+                request=decisions.queue.peek_next(),
+            )
+        enemy_application_payload = validate_json_value(
+            None if enemy_application is None else enemy_application.to_payload()
+        )
+    else:
+        source_application_payload = source_context.get("source_mortal_wound_application")
+        if source_mortal_wounds == 0:
+            if source_application_payload is not None:
+                raise GameLifecycleError(
+                    "Crushing Impact zero self mortal wounds cannot have an application."
+                )
+        elif not isinstance(source_application_payload, dict):
+            raise GameLifecycleError(
+                "Crushing Impact enemy continuation requires the self application."
+            )
+        enemy_application_payload = validate_json_value(routed.application.to_payload())
+    _emit_crushing_impact_resolved(
+        state=state,
+        decisions=decisions,
+        use_record=use_record,
+        roll_state=roll_state,
+        source_unit_instance_id=source_unit_id,
+        source_model_instance_id=model_id,
+        target_unit_instance_id=enemy_unit_id,
+        source_mortal_wounds=source_mortal_wounds,
+        enemy_mortal_wounds=enemy_mortal_wounds,
+        source_mortal_wound_application=source_application_payload,
+        enemy_mortal_wound_application=enemy_application_payload,
+    )
+    return None
+
+
+def _crushing_impact_details(
+    source_context: dict[str, JsonValue],
+) -> tuple[StratagemUseRecord, DiceRollState, str, str, str, int, int]:
+    use_payload = source_context.get("stratagem_use")
+    roll_payload = source_context.get("roll_state")
+    if not isinstance(use_payload, dict) or not isinstance(roll_payload, dict):
+        raise GameLifecycleError("Crushing Impact continuation payload is malformed.")
+    use_record = StratagemUseRecord.from_payload(cast(StratagemUseRecordPayload, use_payload))
+    if use_record.handler_id != CORE_CRUSHING_IMPACT_HANDLER_ID:
+        raise GameLifecycleError("Crushing Impact handler identity drifted.")
+    roll_state = DiceRollState.from_payload(cast(DiceRollStatePayload, roll_payload))
+    source_unit_id = _require_target_unit_id(use_record.target_binding)
+    enemy_unit_id = _crushing_impact_enemy_target_id_or_none(use_record.effect_selection)
+    model_id = _crushing_impact_model_id_or_none(use_record.effect_selection)
+    if enemy_unit_id is None or model_id is None:
+        raise GameLifecycleError("Crushing Impact continuation selection drifted.")
+    source_mortal_wounds = sum(1 for value in roll_state.current_values if value == 1)
+    enemy_mortal_wounds = min(
+        CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT,
+        sum(1 for value in roll_state.current_values if value >= 5),
+    )
+    return (
+        use_record,
+        roll_state,
+        source_unit_id,
+        model_id,
+        enemy_unit_id,
+        source_mortal_wounds,
+        enemy_mortal_wounds,
+    )
+
+
+def _crushing_impact_pending_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+) -> LifecycleStatus:
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": state.current_battle_phase.value
+            if state.current_battle_phase is not None
+            else None,
+            "decision_type": request.decision_type,
+            "source_rule_id": CORE_CRUSHING_IMPACT_HANDLER_ID,
+        },
+    )
+
+
+def _emit_crushing_impact_resolved(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    use_record: StratagemUseRecord,
+    roll_state: DiceRollState,
+    source_unit_instance_id: str,
+    source_model_instance_id: str,
+    target_unit_instance_id: str,
+    source_mortal_wounds: int,
+    enemy_mortal_wounds: int,
+    source_mortal_wound_application: JsonValue,
+    enemy_mortal_wound_application: JsonValue,
+) -> None:
     decisions.event_log.append(
         "crushing_impact_resolved",
         {
@@ -467,18 +655,14 @@ def _apply_crushing_impact_handler(
             "battle_round": use_record.battle_round,
             "phase": use_record.phase.value,
             "stratagem_use": use_record.to_payload(),
-            "source_unit_instance_id": source_unit_id,
-            "source_model_instance_id": model_id,
-            "target_unit_instance_id": enemy_unit_id,
+            "source_unit_instance_id": source_unit_instance_id,
+            "source_model_instance_id": source_model_instance_id,
+            "target_unit_instance_id": target_unit_instance_id,
             "roll_state": roll_state.to_payload(),
             "source_mortal_wounds": source_mortal_wounds,
             "enemy_mortal_wounds": enemy_mortal_wounds,
-            "source_mortal_wound_application": (
-                None if source_application is None else source_application.to_payload()
-            ),
-            "enemy_mortal_wound_application": (
-                None if enemy_application is None else enemy_application.to_payload()
-            ),
+            "source_mortal_wound_application": source_mortal_wound_application,
+            "enemy_mortal_wound_application": enemy_mortal_wound_application,
         },
     )
 

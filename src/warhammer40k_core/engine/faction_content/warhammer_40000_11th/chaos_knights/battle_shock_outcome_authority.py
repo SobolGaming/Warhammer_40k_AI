@@ -30,9 +30,6 @@ from warhammer40k_core.engine.command_battle_shock_forced_provider_authority imp
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationPayload,
-    MortalWoundApplicationProgress,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -47,6 +44,11 @@ from warhammer40k_core.engine.mortal_wound_application_authority import (
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_progress,
+    mortal_wound_resolution_source_context,
 )
 from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
@@ -83,15 +85,12 @@ def validate_delirium_pending_outcome_authority(
         and event.payload.get("feel_no_pain_request_id") == context.request.request_id
         for event in events
     )
-    if not is_mortal_wound_feel_no_pain_request(context.request):
+    if not is_mortal_wound_resolution_request(context.request):
         if marker_identifies_provider:
             raise GameLifecycleError("Delirium pending outcome provider identity drifted.")
         return None
-    source_context = mortal_wound_feel_no_pain_source_context(context.request)
-    request_payload = _payload_object(context.request.payload)
-    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        request_payload.get("lost_wound_context")
-    )
+    source_context = mortal_wound_resolution_source_context(context.request)
+    progress = mortal_wound_resolution_progress(context.request)
     from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights import (
         army_rule,
     )
@@ -458,12 +457,9 @@ def _feel_no_pain_records_for_application(
         raise GameLifecycleError("Delirium FNP history requires DecisionController.")
     records: list[DecisionRecord] = []
     for record in decisions.records:
-        if not is_mortal_wound_feel_no_pain_request(record.request):
+        if not is_mortal_wound_resolution_request(record.request):
             continue
-        request_payload = _payload_object(record.request.payload)
-        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-            request_payload.get("lost_wound_context")
-        )
+        progress = mortal_wound_resolution_progress(record.request)
         if progress.application_id == application_id:
             records.append(record)
     return tuple(records)
@@ -474,12 +470,9 @@ def _pending_mortal_wound_application_ids(
 ) -> frozenset[str]:
     application_ids: set[str] = set()
     for request in decisions.queue.pending_requests:
-        if not is_mortal_wound_feel_no_pain_request(request):
+        if not is_mortal_wound_resolution_request(request):
             continue
-        request_payload = _payload_object(request.payload)
-        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-            request_payload.get("lost_wound_context")
-        )
+        progress = mortal_wound_resolution_progress(request)
         application_ids.add(progress.application_id)
     return frozenset(application_ids)
 

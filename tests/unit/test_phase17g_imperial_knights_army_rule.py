@@ -41,7 +41,7 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainResultPayload,
     CommandPointGainStatus,
 )
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -51,6 +51,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpirationBoundary, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
@@ -75,6 +76,10 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    continue_mortal_wound_application,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -1923,27 +1928,60 @@ def _record_enemy_unit_destroyed(
     )
     assert expected_destroyed_model_ids
     source = unit_by_id(state, IMPERIAL_KNIGHTS_UNIT_ID)
-    application = apply_mortal_wounds_to_unit(
+    destruction_evidence = MortalWoundDestructionEvidence.for_non_attack_state(
         state=state,
-        decisions=decisions,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=source.unit_instance_id,
+        source_model_instance_id=source.own_models[0].model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=action_phase,
+        source_step="code_chivalric_unit_destruction_fixture",
+    )
+    progress = MortalWoundApplicationProgress.start(
         application_id=f"phase17g-imperial-knights:{model_destroyed_event_id_suffix}",
         source_rule_id="phase17g-imperial-knights-test-destruction",
         source_context={
             "source_kind": "code_chivalric_unit_destruction_fixture",
             "source_unit_instance_id": source.unit_instance_id,
         },
-        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
-            state=state,
-            destroying_player_id="player-a",
-            source_rules_unit_instance_id=source.unit_instance_id,
-            source_model_instance_id=source.own_models[0].model_instance_id,
-            destruction_source_kind=DestructionSourceKind.ABILITY,
-            action_phase=action_phase,
-            source_step="code_chivalric_unit_destruction_fixture",
-        ),
         target_unit_instance_id=enemy.unit_instance_id,
+        defender_player_id="player-b",
         mortal_wounds=sum(model.wounds_remaining for model in enemy.own_models),
+        spill_over=True,
+        destruction_evidence=destruction_evidence,
     )
+    routed = continue_mortal_wound_application(
+        state=state,
+        decisions=decisions,
+        request_id=state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+    )
+    for decision_index in range(128):
+        if routed.request is None:
+            break
+        decisions.request_decision(routed.request)
+        result = DecisionResult.for_request(
+            result_id=(
+                f"phase17g-imperial-knights:{model_destroyed_event_id_suffix}:"
+                f"model:{decision_index}"
+            ),
+            request=routed.request,
+            selected_option_id=routed.request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        routed = resolve_mortal_wound_decision(
+            state=state,
+            decisions=decisions,
+            request=routed.request,
+            result=result,
+            next_request_id=state.next_decision_request_id(),
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        )
+    else:
+        raise AssertionError("Code Chivalric destruction fixture choices did not drain.")
+    application = routed.application
+    assert application is not None
     destroyed_model_ids = tuple(
         damage.model_instance_id for damage in application.applications if damage.destroyed
     )

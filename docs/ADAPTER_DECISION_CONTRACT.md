@@ -1874,6 +1874,29 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   submissions reject before queue pop and before mutation. Accepted selections
   resume the same grouped save/damage resolver, and the save and damage events
   for that die carry the selected model ID.
+- `select_mortal_wound_model`: finite controlling-player choice emitted before
+  each mortal wound is resolved when more than one living model shares the
+  first applicable 06.02 priority tier. Option IDs are the sorted current legal
+  model IDs. The request payload includes `selection_kind:
+  "mortal_wound_model"`, `target_unit_instance_id`, `source_rule_id`,
+  replay-safe `source_context`, `remaining_mortal_wounds`,
+  `legal_model_ids`, `priority_tier`, and the complete
+  `mortal_wound_progress`; each option repeats its `selected_model_id` and
+  `priority_tier`. The four tier tokens are `wounded_non_character`,
+  `non_character`, `wounded_character`, and `character`, in that exact order.
+  The engine auto-selects only when the active tier contains exactly one legal
+  model. Accepted submissions resolve exactly one mortal wound on the selected
+  model, then recompute the priority tiers before the next mortal wound; any
+  resulting Feel No Pain choice remains a separate `select_feel_no_pain`
+  request. Stale, drifted, malformed, wrong-actor, wrong-option,
+  payload-mismatched, dead-model, or priority-tier-drift submissions return
+  `invalid_mortal_wound_model_result` before queue pop or authoritative
+  mutation. Shooting, Fight, Hazardous, Explosives, Deadly Demise, movement,
+  Transport, and registered runtime-content continuations all resume through
+  the same producer-owned mortal-wound path. Public projections expose the
+  request to both viewers with `entity_selection` interaction metadata and
+  `model` as the primary assignment; adapters must submit one pending option ID
+  and must never select a model or apply a wound locally.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Explosives mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves. Sources may carry `attack_condition: "psychic_attack"`; those sources are eligible only for lost wounds whose attack context has `is_psychic_attack: true`. Sources may also carry `mortal_wounds: true`; those sources are eligible for ordinary mortal-wound routing with no attack context.
 
 Phase 13E implements this destroyed-model attack-resolution decision:

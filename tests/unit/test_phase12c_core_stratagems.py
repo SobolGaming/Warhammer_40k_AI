@@ -50,8 +50,9 @@ from warhammer40k_core.engine.damage_allocation import (
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     DamageKind,
     FeelNoPainSource,
+    MortalWoundApplicationProgress,
     apply_damage_to_model,
-    apply_mortal_wounds_to_unit,
+    continue_mortal_wound_application,
     model_by_id,
 )
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
@@ -106,6 +107,9 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2903,6 +2907,18 @@ def test_phase15e_crushing_impact_uses_selected_enemy_and_model() -> None:
             CRUSHING_IMPACT_MODEL_CONTEXT_KEY: source_model_id,
         },
     )
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    ):
+        request = status.decision_request
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase15e-crushing-impact-model:{request.request_id}",
+                request=request,
+                selected_option_id=request.options[0].option_id,
+            )
+        )
     event = _last_event_payload(lifecycle.decision_controller, "crushing_impact_resolved")
 
     assert status.status_kind is not LifecycleStatusKind.INVALID
@@ -2944,28 +2960,39 @@ def test_phase15e_crushing_impact_rejects_retained_destroyed_source_model() -> N
     source_model_id = _first_model_id(state, unit_instance_id=source_unit_id)
     source_model = model_by_id(state=state, model_instance_id=source_model_id)
     enemy_unit_id = "army-beta:enemy-unit"
-    apply_mortal_wounds_to_unit(
+    prewound = continue_mortal_wound_application(
         state=state,
         decisions=lifecycle.decision_controller,
-        application_id="phase15e-crushing-impact-source-destruction",
-        source_rule_id="phase12c:test:fight-on-death",
-        source_context={"source_kind": "phase15e_crushing_impact_source_test"},
-        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
-            state=state,
-            destroying_player_id="player-b",
-            source_rules_unit_instance_id=enemy_unit_id,
-            source_model_instance_id=_first_model_id(
-                state,
-                unit_instance_id=enemy_unit_id,
+        request_id="phase15e-crushing-impact-source-destruction-request",
+        progress=MortalWoundApplicationProgress.start(
+            application_id="phase15e-crushing-impact-source-destruction",
+            source_rule_id="phase12c:test:fight-on-death",
+            source_context={"source_kind": "phase15e_crushing_impact_source_test"},
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+                state=state,
+                destroying_player_id="player-b",
+                source_rules_unit_instance_id=enemy_unit_id,
+                source_model_instance_id=_first_model_id(
+                    state,
+                    unit_instance_id=enemy_unit_id,
+                ),
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=BattlePhase.CHARGE,
+                source_step="phase15e_crushing_impact_source_test",
             ),
-            destruction_source_kind=DestructionSourceKind.ABILITY,
-            action_phase=BattlePhase.CHARGE,
-            source_step="phase15e_crushing_impact_source_test",
+            target_unit_instance_id=source_unit_id,
+            defender_player_id="player-a",
+            mortal_wounds=source_model.wounds_remaining,
+            spill_over=False,
+            priority_model_ids=(source_model_id,),
         ),
-        target_unit_instance_id=source_unit_id,
-        mortal_wounds=source_model.wounds_remaining,
-        spill_over=False,
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=lifecycle.decision_controller.event_log,
+        ),
     )
+    assert prewound.request is None
+    assert prewound.application is not None
     destroyed_event = next(
         event
         for event in reversed(lifecycle.decision_controller.event_log.records)
@@ -3814,6 +3841,18 @@ def test_phase13d_explosives_resolves_mortal_wounds_and_rejects_invalid_context(
         result_id="phase13d-explosives",
         trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
     )
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    ):
+        request = status.decision_request
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase13d-explosives-model:{request.request_id}",
+                request=request,
+                selected_option_id=request.options[0].option_id,
+            )
+        )
 
     explosives_payload = _last_event_payload(lifecycle.decision_controller, "explosives_resolved")
     assert status.status_kind is not LifecycleStatusKind.INVALID
@@ -3948,6 +3987,19 @@ def test_phase13d_explosives_enemy_effect_does_not_block_opponent_targeting() ->
         result_id="phase13d-explosives-blocks-enemy",
         trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
     )
+    while (
+        explosives_status.decision_request is not None
+        and explosives_status.decision_request.decision_type
+        == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    ):
+        request = explosives_status.decision_request
+        explosives_status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase13d-explosives-blocks-enemy:{request.request_id}",
+                request=request,
+                selected_option_id=request.options[0].option_id,
+            )
+        )
     command_reroll = _source_stratagem_record("command-reroll")
     roll_state = _roll_command_reroll_candidate(lifecycle, actor_id="player-b")
     context = _context(
@@ -4111,6 +4163,15 @@ def test_phase13d_explosives_mortal_wounds_route_decline_allowed_feel_no_pain() 
         result_id="phase13d-explosives-fnp",
         trigger_payload={EXPLOSIVES_TARGET_CONTEXT_KEY: "army-beta:enemy-unit"},
     )
+    model_request = _decision_request(status)
+    assert model_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-explosives-target-model",
+            request=model_request,
+            selected_option_id=target_model_id,
+        )
+    )
     request = _decision_request(status)
     stale_status = lifecycle.submit_decision(
         DecisionResult(
@@ -4138,14 +4199,31 @@ def test_phase13d_explosives_mortal_wounds_route_decline_allowed_feel_no_pain() 
         == target_model.wounds_remaining
     )
 
-    lifecycle.submit_decision(
+    status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase13d-explosives-valid-fnp-decline",
             request=request,
             selected_option_id="decline",
         )
     )
+    while status.decision_request is not None and status.decision_request.decision_type in {
+        "select_feel_no_pain",
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    }:
+        request = status.decision_request
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase13d-explosives-valid-fnp-decline:{request.request_id}",
+                request=request,
+                selected_option_id=(
+                    "decline"
+                    if request.decision_type == "select_feel_no_pain"
+                    else request.options[0].option_id
+                ),
+            )
+        )
     assert state.command_point_total("player-a") == 0
+    assert _has_event(lifecycle.decision_controller, "explosives_resolved")
 
 
 def test_rapid_ingress_target_and_placement_proposals_resolve_through_lifecycle() -> None:

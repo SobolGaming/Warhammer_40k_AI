@@ -61,7 +61,9 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
 )
-from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainSource,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -107,6 +109,13 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookRegistry,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_source_context,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -124,6 +133,7 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
 )
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     sequencing_decision_event_from_request,
@@ -2311,9 +2321,29 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
         battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
     )
 
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    waiting = handler.begin_phase(state=state, decisions=decisions)
+    assert waiting.decision_request is not None
+    request = waiting.decision_request
+    assert request.decision_type == "select_mortal_wound_model"
+    result = DecisionResult.for_request(
+        result_id="phase17g-daemonic-terror-model",
+        request=request,
+        selected_option_id=request.options[-1].option_id,
+    )
+    decisions.submit_result(result)
+    completed = _chaos_daemons_mortal_wound_registry().apply_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            source_context=mortal_wound_resolution_source_context(request),
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
 
-    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert completed is None
     resolved_payload = _event_payload(decisions, "battle_shock_test_resolved")
     result_payload = cast(dict[str, JsonValue], resolved_payload["battle_shock_result"])
     modified_roll = cast(dict[str, JsonValue], result_payload["modified_roll"])
@@ -2330,6 +2360,98 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
         model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
+
+
+def test_daemonic_terror_pending_model_choice_restores_with_provider_authority() -> None:
+    config = _chaos_daemons_lifecycle_config()
+    source_datasheet = config.army_catalog.datasheet_by_id(CHAOS_DAEMONS_TEST_DATASHEET_ID)
+    terror_datasheet = replace(
+        source_datasheet,
+        keywords=DatasheetKeywordSet(
+            keywords=("Character", "Monster", "Khorne"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        abilities=(_datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID),),
+    )
+    target_datasheet = config.army_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    high_leadership_target = replace(
+        target_datasheet,
+        model_profiles=tuple(
+            replace(
+                profile,
+                characteristics=tuple(
+                    CharacteristicValue.from_raw(Characteristic.LEADERSHIP, 13)
+                    if value.characteristic is Characteristic.LEADERSHIP
+                    else value
+                    for value in profile.characteristics
+                ),
+            )
+            for profile in target_datasheet.model_profiles
+        ),
+    )
+    config = replace(
+        config,
+        army_catalog=replace(
+            config.army_catalog,
+            datasheets=tuple(
+                (
+                    terror_datasheet
+                    if datasheet.datasheet_id == CHAOS_DAEMONS_TEST_DATASHEET_ID
+                    else high_leadership_target
+                    if datasheet.datasheet_id == "core-intercessor-like-infantry"
+                    else datasheet
+                )
+                for datasheet in config.army_catalog.datasheets
+            ),
+        ),
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _record_lifecycle_battle_state(lifecycle=lifecycle, config=config)
+    source_unit_id = "army-alpha:manifestation-daemon"
+    target_unit_id = "army-beta:enemy-unit"
+    state.active_player_id = "player-b"
+    state.command_step_state = None
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    if state.battlefield_state is None:
+        raise AssertionError("Daemonic Terror restore test requires battlefield state.")
+    marker = center_marker_definition(state)
+    source_placement = state.battlefield_state.unit_placement_by_id(source_unit_id)
+    target_placement = state.battlefield_state.unit_placement_by_id(target_unit_id)
+    battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            source_placement,
+            marker,
+            offsets=((-2.6, 0.0), (-1.3, 0.0), (0.0, 0.0), (1.3, 0.0), (2.6, 0.0)),
+        )
+    )
+    battlefield_state = battlefield_state.with_unit_placement(
+        with_model_offsets(
+            target_placement,
+            marker,
+            offsets=((-0.65, 3.0), (0.65, 3.0)),
+        )
+    )
+    state.battlefield_state = battlefield_state
+    bundle = _runtime_content_bundle(lifecycle)
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=bundle.battle_shock_hook_registry,
+    )
+
+    waiting = handler.begin_phase(
+        state=state,
+        decisions=lifecycle.decision_controller,
+    )
+    request = _required_decision_request(waiting)
+
+    assert request.decision_type == "select_mortal_wound_model"
+    restored = GameLifecycle.from_payload(
+        deepcopy(lifecycle.to_payload()),
+        runtime_content_bundle=bundle,
+    )
+    assert restored.decision_controller.queue.pending_requests == (request,)
+    assert restored.to_payload() == lifecycle.to_payload()
 
 
 def test_daemonic_manifestation_records_no_effect_and_multiple_wound_choice_boundaries() -> None:
@@ -2392,7 +2514,7 @@ def test_daemonic_manifestation_records_no_effect_and_multiple_wound_choice_boun
     )
 
 
-def test_daemonic_terror_noops_for_pass_or_ineligible_target_and_reports_fnp_choice() -> None:
+def test_daemonic_terror_noops_for_pass_and_routes_fnp_choice() -> None:
     state = battle_state()
     _mark_player_as_chaos_daemons(state, player_id="player-a")
     source_unit_id = "army-alpha:intercessor-unit-1"
@@ -2431,7 +2553,7 @@ def test_daemonic_terror_noops_for_pass_or_ineligible_target_and_reports_fnp_cho
     )
     assert _event_payloads(decisions, "chaos_daemons_daemonic_terror_unsupported") == ()
 
-    army_rule.resolve_battle_shock_outcome(
+    waiting = army_rule.resolve_battle_shock_outcome(
         _battle_shock_outcome_context(
             state=state,
             decisions=decisions,
@@ -2441,10 +2563,57 @@ def test_daemonic_terror_noops_for_pass_or_ineligible_target_and_reports_fnp_cho
             result_id="phase17g-terror-fnp-unsupported",
         )
     )
-    unsupported = _event_payload(decisions, "chaos_daemons_daemonic_terror_unsupported")
-    assert unsupported["unsupported_reason"] == "mortal_wound_feel_no_pain_requires_decision"
-    assert unsupported["target_unit_instance_id"] == target_unit_id
-    assert _event_payloads(decisions, "chaos_daemons_daemonic_terror_mortal_wounds_applied") == ()
+    assert waiting is not None
+    assert waiting.decision_request is not None
+    model_request = waiting.decision_request
+    selected_option_id = next(
+        option.option_id
+        for option in model_request.options
+        if cast(dict[str, JsonValue], option.payload)["selected_model_id"] == target_model_id
+    )
+    model_result = DecisionResult.for_request(
+        result_id="phase17g-terror-model-choice",
+        request=model_request,
+        selected_option_id=selected_option_id,
+    )
+    decisions.submit_result(model_result)
+    registry = _chaos_daemons_mortal_wound_registry()
+    routed_status = registry.apply_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=model_request,
+            result=model_result,
+            source_context=mortal_wound_resolution_source_context(model_request),
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    while routed_status is not None:
+        assert routed_status.decision_request is not None
+        fnp_request = routed_status.decision_request
+        assert fnp_request.decision_type == "select_feel_no_pain"
+        fnp_result = DecisionResult.for_request(
+            result_id=f"phase17g-terror-fnp-decline:{fnp_request.request_id}",
+            request=fnp_request,
+            selected_option_id="decline",
+        )
+        decisions.submit_result(fnp_result)
+        routed_status = registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=fnp_request,
+                result=fnp_result,
+                source_context=mortal_wound_resolution_source_context(fnp_request),
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+        )
+    assert _event_payloads(decisions, "chaos_daemons_daemonic_terror_unsupported") == ()
+    assert (
+        len(_event_payloads(decisions, "chaos_daemons_daemonic_terror_mortal_wounds_applied")) == 1
+    )
 
     ineligible_state = battle_state()
     _mark_player_as_chaos_daemons(ineligible_state, player_id="player-a")
@@ -2483,6 +2652,13 @@ def test_daemonic_terror_noops_for_pass_or_ineligible_target_and_reports_fnp_cho
 def _chaos_daemons_battle_shock_hooks() -> BattleShockHookRegistry:
     contribution = army_rule.runtime_contribution()
     return BattleShockHookRegistry.from_bindings(contribution.battle_shock_hook_bindings)
+
+
+def _chaos_daemons_mortal_wound_registry() -> MortalWoundFeelNoPainContinuationHookRegistry:
+    contribution = army_rule.runtime_contribution()
+    return MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        contribution.mortal_wound_feel_no_pain_hook_bindings
+    )
 
 
 def _chaos_daemons_army_rule_execution_record() -> Phase17FExecutionRecord:

@@ -1022,6 +1022,127 @@ Validation results:
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/410`; merge commit
 pending review and merge.
 
+### P06B — C06-02
+
+Status: Implementation and required local validation are complete; remote PR publication is in
+progress.
+
+Finding IDs: `C06-02`.
+
+Dependencies and evidence gate: P00 is merged. P06B has no gameplay prerequisite. The exact
+06.02 Mortal Wounds statement is retained as a reviewed transcription and a separately
+classified, project-authoritative 40k.app mirror observation linked to the recorded
+non-affiliation and source-authority policy. This satisfies `APP-AUTHORITY`; no
+`EXCEPTION-PAUSE` applies.
+
+Violated invariant: Mortal wounds are resolved individually and the target unit's controlling
+player selects the model for each wound under a mandatory four-tier priority. When multiple
+models share the active tier, silently selecting the first sorted model bypasses the decision
+contract and lets iteration order mutate authoritative wounds, destruction state, events, and
+replay.
+
+How it was done before P06B: The shared mortal-wound continuation reused ordinary attack damage
+allocation and selected `legal_model_ids[0]`. The direct helper likewise selected the first
+sorted legal model. Neither path represented an active-tier tie as a player choice, and several
+generic and faction producer continuations recognized only Feel No Pain requests, so a model
+choice could not pause and resume through one common engine-owned route.
+
+How it is done after P06B: The typed mortal-wound model allocator recomputes the legal tier before
+every individual wound in this exact order: wounded non-Character, other non-Character, wounded
+Character, then other Character. A sole legal model is selected automatically. A tie emits the
+finite public `select_mortal_wound_model` request to the target unit's controlling player with
+deterministic model IDs and complete serialized progress. Lifecycle validation recomputes the
+current tier before queue pop or mutation and rejects stale, drifted, malformed, wrong-actor, or
+wrong-context submissions. The selected model then resumes the same per-wound route, including
+Feel No Pain, destruction authority, event recording, producer continuation, and replay.
+
+Specific authoritative 40k.app rule/statement and source ID: 06.02, `MORTAL WOUNDS`, states that
+the controlling player resolves each mortal wound one at a time and must select, in order, a
+wounded non-Character model, another non-Character model, a wounded Character model, or another
+Character model; the selected model loses one wound. Its stable source ID is
+`gw-11e-core-rules:other-concepts:mortal-wounds`. Runtime behavior binds to the typed allocator
+and this source-backed execution record, never a display name or source-text token.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/06-other-concepts`, observed
+`2026-08-31T13:01:46-04:00`; transcription
+`9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831`;
+reviewed-transcription observation
+`57b9542afdef85452b316c1bf695591d5d66165a01bf2b0a6fc0b9104890516d`;
+authoritative-mirror observation
+`faa8f4b08ebb8663e2ae5f84373465d5691b58ca56d67e461b9e81fdea4abc8a`.
+The generated package hash is
+`006b551042407e17cdb2700c16b5ee708e50c4a71525cc1a0e3995c5d2c0d42e` and its canonical artifact
+byte SHA-256 is `208c07d45b22f534efbcb3eb2b91fea3c24837b4129ca4a7a24de72d87c7d861`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:6ff66acc231258f679bd49ed79bc9e12a2166a1cf27e928fdd07af37e6d2a500`.
+
+Load and execution support: The Mortal Wounds rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked mirror observation carries project
+authority. The fail-fast typed loader pins schema, document identity, rule identity, text hash,
+both evidence fingerprints, package hash, and canonical artifact byte hash.
+
+Scope and explicit exclusions: P06B owns the four priority tiers, per-wound recomputation, finite
+tie choice, sole-model auto-selection, serialized progress, lifecycle validation and dispatch,
+producer continuation migration, public adapter projection/event behavior, source identity,
+regressions, and static bypass audit. It does not change Mortal Wounds generation, Feel No Pain
+eligibility or dice rules, damage spill semantics, Character keyword ownership, ordinary attack
+damage allocation, out-of-scope content, or hidden-information policy.
+
+Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed
+loader → stable Mortal Wounds source ID and executable consumer inventory → producer-owned
+`MortalWoundApplicationProgress` → typed mortal-wound model allocator → deterministic finite
+`DecisionRequest`/`DecisionResult` → lifecycle prevalidation and shared decision dispatch →
+engine-owned one-wound mutation and optional Feel No Pain → destruction authority, producer
+continuation, events, projections, and replay. Adapters only submit an option ID and never select
+or mutate the model independently.
+
+Decision and viewer-visibility impact: P06B adds one finite decision family,
+`select_mortal_wound_model`, with deterministic model-instance option IDs. Its public request
+payload includes target unit, source rule, remaining wounds, active priority tier, legal model
+IDs, and replay-safe serialized progress; the selected option payload identifies the model and
+tier. The target unit's controlling player is the actor, while both viewers receive the same
+public pending request and public event delta. Shared adapter redaction remains the sole
+projection/event owner. `docs/ADAPTER_DECISION_CONTRACT.md` and
+`docs/DECISION_SUBMISSION_CATALOG.md` record the new family and stale-context behavior.
+
+Regression scenarios and same-bug-class search: Real attached-unit regressions walk all four
+tiers, prove serialization/restore, reject priority drift without queue pop or mutation, and
+prove model choice → Feel No Pain → later model choice continuation. Adapter coverage submits
+the option through `LocalGameSession` and verifies both public viewer projections and public event
+deltas. Producer regressions cover shooting/fight damage, Hazardous, Deadly Demise, transport and
+movement hazards, generic RuleIR mortal wounds, Explosives, Corsair Lethal Ruse, Daemonic Terror,
+Malice Made Manifest, Spiteful Demise, and existing faction army-rule continuations. The bug-class
+search migrated every production caller to the shared resolution request; the only remaining
+`apply_mortal_wounds_to_unit` production occurrence is its fail-closed wrapper definition. A
+static audit pins the allocator, lifecycle validator, direct-helper tie guard, adapter contract,
+and absence of the sorted-first fallback.
+
+Generated artifacts/documentation: P06B extends
+`core_other_concepts_2026_08/artifacts/package.json`, its typed loader/source catalog, and its
+offline builder; adds the typed allocator module; regenerates the engine build manifest and
+affected external-contract fixtures; and updates both decision-contract documents and this
+finding record. No behavioral test file was added, removed, moved, or renamed, so the committed
+four-shard inventory does not change.
+
+Validation results:
+
+- Focused source, tier-order, stale-decision, replay, adapter, producer, faction continuation,
+  and static-audit regression sweep passes (`129 passed`, `6229 deselected`).
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2644` source files;
+  Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
+  four-shard inventory check and all-files pre-commit gate pass.
+- The required xdist work-stealing suite passes (`6344 passed` in `457.29s`), and the dedicated
+  serial code-quality run passes (`336 passed` in `359.91s`).
+- The Other Concepts source artifact, final engine build identity, and external contract all pass
+  fail-closed drift checks, including the `origin/main` compatibility comparison.
+- Installed-wheel smoke passes with `2473` packaged engine resources and `27` schemas. Generated
+  TypeScript client drift and type checks pass, and the two-server HTTP conformance scenario passes
+  all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: pending publication; merge commit pending review and merge.
+
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
 25 categories before opening PFINAL. The audit must select one maintained-App

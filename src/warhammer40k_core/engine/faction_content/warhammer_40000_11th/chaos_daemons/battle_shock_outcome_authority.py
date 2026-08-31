@@ -43,6 +43,15 @@ from warhammer40k_core.engine.healing_revival import (
     SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
     healing_effect_from_revival_request,
 )
+from warhammer40k_core.engine.mortal_wound_application_authority import (
+    mortal_wound_application_authority_inventory,
+    validate_pending_mortal_wound_application_authority,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_progress,
+    mortal_wound_resolution_source_context,
+)
 from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
@@ -54,6 +63,7 @@ from warhammer40k_core.engine.rules_units import (
 
 _EFFECT_KIND = "daemonic_manifestation_battleline_revival"
 _PENDING_EVENT_TYPE = "chaos_daemons_daemonic_manifestation_revival_pending"
+_TERROR_PENDING_EVENT_TYPE = "chaos_daemons_daemonic_terror_mortal_wounds_pending"
 _SOURCE_CONTEXT_KEYS = frozenset(
     {
         "hook_id",
@@ -84,6 +94,171 @@ _PENDING_EVENT_KEYS = frozenset(
         "decision_request_id",
     }
 )
+
+
+def validate_daemonic_terror_pending_outcome(
+    context: BattleShockPendingOutcomeAuthorityContext,
+    *,
+    source_rule_id: str,
+) -> BattleShockPendingOutcomeAuthority | None:
+    """Authenticate a pending Daemonic Terror mortal-wound continuation."""
+
+    if type(context) is not BattleShockPendingOutcomeAuthorityContext:
+        raise GameLifecycleError("Daemonic Terror outcome authority requires context.")
+    events = context.decisions.event_log.records
+    marker_identifies_provider = any(
+        event.event_type == _TERROR_PENDING_EVENT_TYPE
+        and isinstance(event.payload, dict)
+        and event.payload.get("decision_request_id") == context.request.request_id
+        for event in events
+    )
+    if not is_mortal_wound_resolution_request(context.request):
+        if marker_identifies_provider:
+            raise GameLifecycleError("Daemonic Terror outcome provider identity drifted.")
+        return None
+    progress = mortal_wound_resolution_progress(context.request)
+    source_context = mortal_wound_resolution_source_context(context.request)
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        army_rule,
+    )
+
+    source_identifies_provider = progress.source_rule_id == source_rule_id
+    kind_identifies_provider = (
+        isinstance(source_context, dict)
+        and source_context.get("source_kind") == army_rule.DAEMONIC_TERROR_MORTAL_WOUNDS_SOURCE_KIND
+    )
+    application_identifies_provider = ":daemonic-terror:" in progress.application_id
+    if not any(
+        (
+            source_identifies_provider,
+            kind_identifies_provider,
+            application_identifies_provider,
+            marker_identifies_provider,
+        )
+    ):
+        return None
+    if not source_identifies_provider or not kind_identifies_provider:
+        raise GameLifecycleError("Daemonic Terror outcome provider identity drifted.")
+    if not isinstance(source_context, dict) or frozenset(source_context) != frozenset(
+        ("source_kind", "battle_shock_result", "resolution_payload")
+    ):
+        raise GameLifecycleError("Daemonic Terror source context drifted.")
+    result_payload = _object(source_context.get("battle_shock_result"), "Battle-shock result")
+    result = BattleShockResult.from_payload(cast(BattleShockResultPayload, result_payload))
+    resolution_payload = _object(
+        source_context.get("resolution_payload"),
+        "Daemonic Terror resolution",
+    )
+    request_event_index = _exact_request_event_index(events=events, request=context.request)
+    resolved_matches = tuple(
+        (index, event)
+        for index, event in enumerate(events[:request_event_index])
+        if event.event_type == "battle_shock_test_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("battle_shock_result") == result.to_payload()
+    )
+    if len(resolved_matches) != 1:
+        raise GameLifecycleError("Daemonic Terror Battle-shock result authority drifted.")
+    resolved_index, resolved_event = resolved_matches[0]
+    resolved_payload = _object(resolved_event.payload, "resolved event")
+    resolution = parse_battle_shock_resolution_authority(
+        event_records=events,
+        decision_records=context.decisions.records,
+        resolved_index=resolved_index,
+        resolved_payload=resolved_payload,
+        result=result,
+    )
+    historical = historical_battle_shock_authority_context(
+        state=context.state,
+        event_records=events,
+        decision_records=context.decisions.records,
+        boundary_event_index=resolved_index,
+        request=result.request,
+        active_player_id=resolution.active_player_id,
+        phase=resolution.phase,
+        phase_start_battle_shocked_unit_ids=resolution.phase_start_battle_shocked_unit_ids,
+    )
+    daemon_player_id = _identifier(resolution_payload.get("player_id"), "daemon player ID")
+    target = historical.rules_unit(result.request.unit_instance_id)
+    daemon_army = historical.army_for_player(daemon_player_id)
+    if (
+        result.passed
+        or daemon_player_id == result.request.player_id
+        or target.owner_player_id != result.request.player_id
+        or daemon_army.detachment_selection.faction_id != army_rule.CHAOS_DAEMONS_FACTION_ID
+        or not army_rule.historical_daemonic_terror_applies(
+            context=historical,
+            daemon_army=daemon_army,
+            target=target,
+        )
+    ):
+        raise GameLifecycleError("Daemonic Terror outcome predicate drifted.")
+    d3_result = _exact_daemonic_terror_d3(
+        events=events,
+        resolved_index=resolved_index,
+        request_event_index=request_event_index,
+        unit_instance_id=target.unit_instance_id,
+    )
+    expected_resolution = validate_json_value(
+        {
+            "game_id": context.state.game_id,
+            "battle_round": result.request.battle_round,
+            "phase": resolution.phase.value,
+            "source_rule_id": source_rule_id,
+            "battle_shock_result_id": result.result_id,
+            "player_id": daemon_player_id,
+            "target_unit_instance_id": target.unit_instance_id,
+            "d3_result": d3_result.to_payload(),
+        }
+    )
+    if resolution_payload != expected_resolution:
+        raise GameLifecycleError("Daemonic Terror resolution payload drifted.")
+    if (
+        progress.application_id != f"{result.result_id}:daemonic-terror:{target.unit_instance_id}"
+        or progress.target_unit_instance_id != target.unit_instance_id
+        or progress.defender_player_id != result.request.player_id
+        or progress.mortal_wounds != d3_result.value
+        or not progress.spill_over
+        or progress.destruction_evidence is None
+        or progress.destruction_evidence.destroying_player_id != daemon_player_id
+        or progress.destruction_evidence.action_phase is not resolution.phase
+        or progress.destruction_evidence.source_step != "daemonic_terror_mortal_wounds"
+    ):
+        raise GameLifecycleError("Daemonic Terror mortal wound progress drifted.")
+    validate_pending_mortal_wound_application_authority(
+        state=context.state,
+        event_records=events,
+        progress=progress,
+        request_event=events[request_event_index],
+        inventory=mortal_wound_application_authority_inventory(
+            event_records=events,
+            game_id=context.state.game_id,
+        ),
+    )
+    expected_marker = validate_json_value(
+        {
+            **resolution_payload,
+            "decision_request_id": context.request.request_id,
+            "remaining_mortal_wounds": progress.remaining_mortal_wounds,
+        }
+    )
+    markers = tuple(
+        (index, event)
+        for index, event in enumerate(events)
+        if event.event_type == _TERROR_PENDING_EVENT_TYPE
+        and isinstance(event.payload, dict)
+        and event.payload.get("decision_request_id") == context.request.request_id
+    )
+    if (
+        len(markers) != 1
+        or markers[0][0] <= request_event_index
+        or markers[0][1].payload != expected_marker
+    ):
+        raise GameLifecycleError("Daemonic Terror pending marker authority drifted.")
+    return BattleShockPendingOutcomeAuthority(
+        result=result,
+        resolved_event_index=resolved_index,
+    )
 
 
 def validate_july_daemonic_manifestation_pending_outcome(
@@ -696,6 +871,30 @@ def _exact_manifestation_d3(
     if len(matches) != 1:
         raise GameLifecycleError("Daemonic Manifestation D3 authority drifted.")
     return D3RollResult.from_source_d6_result(matches[0])
+
+
+def _exact_daemonic_terror_d3(
+    *,
+    events: tuple[EventRecord, ...],
+    resolved_index: int,
+    request_event_index: int,
+    unit_instance_id: str,
+) -> D3RollResult:
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Daemonic Terror mortal wounds",
+        roll_type="chaos_daemons.daemonic_terror_mortal_wounds_d3",
+        actor_id=unit_instance_id,
+    )
+    matches = tuple(
+        DiceRollResult.from_payload(cast(DiceRollResultPayload, event.payload))
+        for event in events[resolved_index + 1 : request_event_index]
+        if event.event_type == "dice_rolled" and isinstance(event.payload, dict)
+    )
+    exact = tuple(roll for roll in matches if roll.spec == spec)
+    if len(exact) != 1:
+        raise GameLifecycleError("Daemonic Terror D3 authority drifted.")
+    return D3RollResult.from_source_d6_result(exact[0])
 
 
 def _validate_initial_pending_event(

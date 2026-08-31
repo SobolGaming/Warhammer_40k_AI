@@ -194,6 +194,9 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
 from warhammer40k_core.engine.finite_decision_validation import (
     invalid_finite_decision_status as _invalid_finite_decision_status,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -1837,7 +1840,10 @@ def _apply_fight_attack_sequence_decision(
             stratagem_index=handler.stratagem_index,
             runtime_modifier_registry=handler.runtime_modifier_registry,
         )
-    elif result.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
+    elif result.decision_type in (
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    ):
         updated_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(
             state=state,
             decisions=decisions,

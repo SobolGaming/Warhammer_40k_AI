@@ -12,7 +12,6 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
-from warhammer40k_core.engine import mortal_wound_application_authority as _mwaa
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, PlacementError
 from warhammer40k_core.engine.damage_allocation_targets import (
     DamageKind as DamageKind,
@@ -83,9 +82,7 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     evidence_from_json,
     evidence_to_json,
     pre_removal_model_placement_for_mortal_wound_destruction,
-    record_finalized_mortal_wound_progress_destructions,
     validate_mortal_wound_destroyed_model_placements,
-    validate_mortal_wound_destruction_evidence_mode,
 )
 from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
@@ -96,7 +93,6 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    current_placed_alive_rules_unit_view_for_identity,
     rules_unit_owner_player_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
@@ -2382,112 +2378,19 @@ def continue_mortal_wound_application(
     remove_destroyed_models: bool = True,
     logical_death_recorder: MortalWoundLogicalDeathRecorder | None = None,
 ) -> MortalWoundRoutingResult:
-    if type(remove_destroyed_models) is not bool:
-        raise GameLifecycleError("remove_destroyed_models must be a bool.")
-    validate_mortal_wound_destruction_evidence_mode(
-        progress=progress,
-        remove_destroyed_models=remove_destroyed_models,
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        continue_mortal_wound_application as _continue_mortal_wound_application,
     )
-    if not remove_destroyed_models and (
-        progress.logical_death_cause_binding is None or logical_death_recorder is None
-    ):
-        raise GameLifecycleError("Retained mortal wound routing requires logical-death authority.")
-    _mwaa.ensure_started(state, decisions.event_log, progress)
-    current = progress
-    while current.remaining_mortal_wounds > 0:
-        rules_unit = current_placed_alive_rules_unit_view_for_identity(
-            state=state,
-            unit_instance_id=current.target_unit_instance_id,
-        )
-        if rules_unit is None:
-            completed = current.with_remaining_lost()
-            record_finalized_mortal_wound_progress_destructions(
-                state=state,
-                decisions=decisions,
-                progress=completed,
-                remove_destroyed_models=remove_destroyed_models,
-            )
-            return MortalWoundRoutingResult(
-                progress=completed,
-                application=completed.to_application(),
-            )
-        alive_priority_model_ids = tuple(
-            model_id
-            for model_id in current.priority_model_ids
-            if model_by_id(state=state, model_instance_id=model_id).is_alive
-        )
-        allocation_context = allocation_context_for_unit(
-            state=state,
-            target_unit_instance_id=rules_unit.unit_instance_id,
-            already_allocated_model_ids=(),
-            attacker_constraint=(
-                AttackAllocationConstraint(
-                    source_rule_ids=(current.source_rule_id,),
-                    allowed_model_ids=alive_priority_model_ids,
-                    can_allocate_protected_characters=True,
-                )
-                if alive_priority_model_ids
-                else None
-            ),
-        )
-        legal_model_ids = allocation_context.legal_model_ids()
-        if not legal_model_ids:
-            completed = current.with_remaining_lost()
-            record_finalized_mortal_wound_progress_destructions(
-                state=state,
-                decisions=decisions,
-                progress=completed,
-                remove_destroyed_models=remove_destroyed_models,
-            )
-            return MortalWoundRoutingResult(
-                progress=completed,
-                application=completed.to_application(),
-            )
-        model_id = legal_model_ids[0]
-        sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_id)
-        decline_allowed = _state_feel_no_pain_decline_allowed(
-            state=state, model_instance_id=model_id
-        )
-        if len(sources) > 1 or (sources and decline_allowed):
-            request = build_feel_no_pain_request(
-                request_id=request_id,
-                defender_player_id=current.defender_player_id,
-                lost_wound_context=validate_json_value(
-                    current.to_feel_no_pain_context(model_instance_id=model_id)
-                ),
-                sources=sources,
-                decline_allowed=decline_allowed,
-            )
-            return MortalWoundRoutingResult(progress=current, request=request)
-        if sources:
-            if dice_manager is None:
-                raise GameLifecycleError(
-                    "Mortal wound Feel No Pain resolution requires dice manager."
-                )
-            resolution = resolve_feel_no_pain_rolls(
-                manager=dice_manager,
-                source=sources[0],
-                player_id=current.defender_player_id,
-                model_instance_id=model_id,
-                requested_wounds=1,
-            )
-        else:
-            resolution = FeelNoPainResolution.declined(requested_wounds=1)
-        current = current.after_wound_resolution(
-            state=state,
-            decisions=decisions,
-            model_instance_id=model_id,
-            resolution=resolution,
-            remove_destroyed_model=remove_destroyed_models,
-            logical_death_recorder=logical_death_recorder,
-        )
-    record_finalized_mortal_wound_progress_destructions(
+
+    return _continue_mortal_wound_application(
         state=state,
         decisions=decisions,
-        progress=current,
+        request_id=request_id,
+        progress=progress,
+        dice_manager=dice_manager,
         remove_destroyed_models=remove_destroyed_models,
+        logical_death_recorder=logical_death_recorder,
     )
-    return MortalWoundRoutingResult(progress=current, application=current.to_application())
 
 
 def resolve_mortal_wound_feel_no_pain_decision(
@@ -3066,29 +2969,3 @@ def _validate_destruction_reaction_sources(
         forbidden_identity=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
         forbidden_message="Destruction reaction source ID conflicts with decline.",
     )
-
-
-def _state_feel_no_pain_sources(
-    *,
-    state: GameState,
-    model_instance_id: str,
-) -> tuple[FeelNoPainSource, ...]:
-    lookup = state.feel_no_pain_sources_for_model
-    sources = lookup(model_instance_id=model_instance_id)
-    return tuple(
-        source
-        for source in _validate_feel_no_pain_sources(sources)
-        if source.attack_condition is None or source.mortal_wounds
-    )
-
-
-def _state_feel_no_pain_decline_allowed(
-    *,
-    state: GameState,
-    model_instance_id: str,
-) -> bool:
-    lookup = state.feel_no_pain_decline_allowed_for_model
-    value = lookup(model_instance_id=model_instance_id)
-    if type(value) is not bool:
-        raise GameLifecycleError("Feel No Pain decline state must be a bool.")
-    return value

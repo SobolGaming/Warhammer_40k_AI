@@ -39,9 +39,7 @@ def validate_pending_model_destruction_cause_inventory(
     from warhammer40k_core.engine.attack_sequence_model import DEADLY_DEMISE_SOURCE_KIND
     from warhammer40k_core.engine.damage_allocation import (
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        is_mortal_wound_feel_no_pain_request,
         model_by_id,
-        mortal_wound_feel_no_pain_source_context,
     )
     from warhammer40k_core.engine.lifecycle_state_queries import (
         active_attack_sequence_for_state,
@@ -49,6 +47,10 @@ def validate_pending_model_destruction_cause_inventory(
     from warhammer40k_core.engine.model_destruction_cause_producers import (
         rule_effect_model_destruction_authority_context,
         rule_effect_model_destruction_cause_id,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_source_context,
     )
     from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
         RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
@@ -99,9 +101,9 @@ def validate_pending_model_destruction_cause_inventory(
                         )
                     if not parent.source_authority_finalized:
                         expected_cause_ids.add(parent_id)
-        if not is_mortal_wound_feel_no_pain_request(request):
+        if not is_mortal_wound_resolution_request(request):
             continue
-        source_context = mortal_wound_feel_no_pain_source_context(request)
+        source_context = mortal_wound_resolution_source_context(request)
         if not isinstance(source_context, dict):
             continue
         source_kind = source_context.get("source_kind")
@@ -237,13 +239,15 @@ def validate_model_logical_death_inventory(
     """Bind every private logical-death boundary to one authority or pending router."""
 
     from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        is_mortal_wound_feel_no_pain_request,
         model_by_id,
     )
     from warhammer40k_core.engine.model_logical_death import (
         MODEL_LOGICAL_DEATH_RECORDED_EVENT,
         model_logical_death_record_from_event,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
     )
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
@@ -275,14 +279,9 @@ def validate_model_logical_death_inventory(
             claims_by_event_id=claims_by_event_id,
         )
     for request in pending_decision_requests:
-        if not is_mortal_wound_feel_no_pain_request(request):
+        if not is_mortal_wound_resolution_request(request):
             continue
-        request_payload = request.payload
-        if not isinstance(request_payload, dict):
-            raise GameLifecycleError("Pending mortal-wound request payload is invalid.")
-        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-            request_payload.get("lost_wound_context")
-        )
+        progress = mortal_wound_resolution_progress(request)
         request_events = tuple(
             event
             for event in event_records

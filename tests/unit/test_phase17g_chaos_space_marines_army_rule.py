@@ -102,6 +102,10 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_model_request,
+    mortal_wound_resolution_source_context,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -1038,7 +1042,7 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
     )
     starting_wounds = sum(model.wounds_remaining for model in unit.own_models)
 
-    army_rule.resolve_dark_pact_attack_sequence_completion(
+    status = army_rule.resolve_dark_pact_attack_sequence_completion(
         AttackSequenceCompletedContext(
             state=state,
             decisions=decisions,
@@ -1049,6 +1053,30 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
             attack_sequence_completed_event_id=completed_event.event_id,
         )
     )
+    for decision_index in range(16):
+        if status is None:
+            break
+        request = _decision_request(status.decision_request)
+        assert is_mortal_wound_model_request(request)
+        result = DecisionResult.for_request(
+            result_id=f"dark-pact-model:{decision_index}",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        status = army_rule.apply_dark_pact_mortal_wound_feel_no_pain_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                source_context=mortal_wound_resolution_source_context(request),
+                dice_manager=manager,
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+        )
+    else:
+        raise AssertionError("Dark Pacts mortal wound model choices did not drain.")
 
     payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
     assert payload["passed"] is False
@@ -1157,6 +1185,28 @@ def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() 
             source_phase=BattlePhase.SHOOTING,
             attack_sequence=attack_sequence,
             attack_sequence_completed_event_id=completed_event.event_id,
+        )
+    )
+    model_request = _decision_request(None if status is None else status.decision_request)
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert is_mortal_wound_model_request(model_request)
+    model_result = DecisionResult.for_request(
+        result_id="dark-pact-model-with-fnp",
+        request=model_request,
+        selected_option_id=unit.own_models[0].model_instance_id,
+    )
+    decisions.submit_result(model_result)
+    status = army_rule.apply_dark_pact_mortal_wound_feel_no_pain_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=model_request,
+            result=model_result,
+            source_context=mortal_wound_resolution_source_context(model_request),
+            dice_manager=manager,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
     )
     request = _decision_request(None if status is None else status.decision_request)

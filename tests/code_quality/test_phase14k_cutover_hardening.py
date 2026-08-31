@@ -18,6 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = SRC_ROOT / "engine" / "attack_sequence.py"
 DAMAGE_ALLOCATION_PATH = SRC_ROOT / "engine" / "damage_allocation.py"
+DIRECT_MORTAL_WOUND_PATH = SRC_ROOT / "engine" / "direct_mortal_wound_application.py"
+MORTAL_WOUND_MODEL_ALLOCATION_PATH = SRC_ROOT / "engine" / "mortal_wound_model_allocation.py"
 SHOOTING_PHASE_PATH = SRC_ROOT / "engine" / "phases" / "shooting.py"
 SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 LIFECYCLE_PATH = SRC_ROOT / "engine" / "lifecycle.py"
@@ -92,6 +94,31 @@ def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registe
         "Phase 14K damage model allocation choice must be registered in runtime "
         "and the adapter contract:\n" + "\n".join(missing)
     )
+
+
+def test_p06b_mortal_wound_model_ties_cannot_use_sorted_first_fallback() -> None:
+    damage_source = source_for(DAMAGE_ALLOCATION_PATH)
+    mortal_wound_model_source = source_for(MORTAL_WOUND_MODEL_ALLOCATION_PATH)
+    direct_source = source_for(DIRECT_MORTAL_WOUND_PATH)
+    lifecycle_source = source_for(LIFECYCLE_PATH)
+    contract_source = source_for(ADAPTER_CONTRACT_PATH)
+
+    assert "SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE" in mortal_wound_model_source
+    assert "MortalWoundAllocationPriority" in mortal_wound_model_source
+    assert "build_mortal_wound_model_request" in mortal_wound_model_source
+    assert "if len(legal_model_ids) > 1:" in mortal_wound_model_source
+    assert "continue_mortal_wound_application as _continue_mortal_wound_application" in (
+        damage_source
+    )
+    assert "Mortal wound model choices require lifecycle routing." in direct_source
+    assert direct_source.index("if len(legal_model_ids) > 1:") < direct_source.index(
+        "model_id = next(iter(legal_model_ids))"
+    )
+    assert "invalid_mortal_wound_model_status" in mortal_wound_model_source
+    assert "_mw_model.invalid_mortal_wound_model_status" in lifecycle_source
+    assert "select_mortal_wound_model" in contract_source
+    assert "tuple(sorted(alive_model_ids))[0]" not in mortal_wound_model_source
+    assert "tuple(sorted(alive_model_ids))[0]" not in direct_source
 
 
 def test_phase14k_retired_aircraft_minimum_move_policy_absent_from_runtime_and_docs() -> None:

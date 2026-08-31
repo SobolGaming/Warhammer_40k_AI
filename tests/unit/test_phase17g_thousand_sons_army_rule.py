@@ -59,6 +59,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalPayload,
@@ -135,7 +138,6 @@ def test_lifecycle_requests_cabal_and_destinys_ruin_records_hit_reroll() -> None
             selected_option_id=option.option_id,
         )
     )
-
     assert status.status_kind is not LifecycleStatusKind.INVALID
     state = _require_state(lifecycle)
     attempt_states = state.faction_rule_states_for_player(
@@ -351,6 +353,22 @@ def test_doombolt_excludes_lone_operatives_beyond_twelve_and_applies_wounds() ->
             selected_option_id=option.option_id,
         )
     )
+    for decision_index in range(16):
+        mortal_request = status.decision_request
+        if mortal_request is None or not is_mortal_wound_resolution_request(mortal_request):
+            break
+        option_ids = {candidate.option_id for candidate in mortal_request.options}
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase17g-thousand-sons-doombolt-mortal:{decision_index}",
+                request=mortal_request,
+                selected_option_id=(
+                    "decline" if "decline" in option_ids else mortal_request.options[0].option_id
+                ),
+            )
+        )
+    else:
+        raise AssertionError("Doombolt mortal wound choices did not drain.")
 
     assert status.status_kind is not LifecycleStatusKind.INVALID
     after = _unit_remaining_wounds(_require_state(lifecycle), unit_instance_id=ENEMY_UNIT_ID)

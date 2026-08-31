@@ -6699,7 +6699,7 @@
       "battle_shock_hook_ids": [
         "catalog-ir:selected-target-test-roll-modifier"
       ],
-      "bundle_summary_hash": "baa2d6f563a715e828a21f8285cd3ee5ef293b2fd2919f4101fbbdd9b32c0686",
+      "bundle_summary_hash": "2d1b0d99d39e6096d25f90650f90b0625fb5044508737e65cbc50688c0e38d9c",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],
@@ -6717,7 +6717,9 @@
       "fight_unit_selected_grant_hook_ids": [],
       "fight_unit_selected_hook_ids": [],
       "hit_roll_modifier_ids": [],
-      "mortal_wound_feel_no_pain_hook_ids": [],
+      "mortal_wound_feel_no_pain_hook_ids": [
+        "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+      ],
       "movement_budget_modifier_ids": [],
       "movement_end_surge_hook_ids": [],
       "objective_control_modifier_ids": [],

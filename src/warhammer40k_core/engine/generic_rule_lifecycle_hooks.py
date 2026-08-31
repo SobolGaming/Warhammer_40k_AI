@@ -137,6 +137,12 @@ from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
 from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModifierBinding,
 )
+from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
+    GENERIC_RULE_IR_MORTAL_WOUNDS_HOOK_ID,
+    GENERIC_RULE_IR_MORTAL_WOUNDS_HOOK_SOURCE_ID,
+    GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND,
+    apply_generic_rule_ir_mortal_wound_decision,
+)
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     ShootingTargetRestrictionHandler,
@@ -762,7 +768,14 @@ def mortal_wound_feel_no_pain_hook_bindings(
     activation: RuntimeContentActivation,
     execution_records: tuple[_Phase17FExecutionRecord, ...],
 ) -> tuple[MortalWoundFeelNoPainContinuationHookBinding, ...]:
-    bindings: list[MortalWoundFeelNoPainContinuationHookBinding] = []
+    bindings = [
+        MortalWoundFeelNoPainContinuationHookBinding(
+            hook_id=GENERIC_RULE_IR_MORTAL_WOUNDS_HOOK_ID,
+            source_id=GENERIC_RULE_IR_MORTAL_WOUNDS_HOOK_SOURCE_ID,
+            source_kind=GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND,
+            handler=apply_generic_rule_ir_mortal_wound_decision,
+        )
+    ]
     for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.mortal_wound_feel_no_pain_abilities:
         sources = (
             *_generic_rule_ability_sources(

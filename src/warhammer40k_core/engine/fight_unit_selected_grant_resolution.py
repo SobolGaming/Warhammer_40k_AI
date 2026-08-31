@@ -6,12 +6,10 @@ from warhammer40k_core.core.dice import D3RollResult, D3RollResultPayload, DiceR
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     MortalWoundRoutingResult,
     continue_mortal_wound_application,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -45,6 +43,10 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
 from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     fixed_mortal_wound_logical_death_recorder,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_progress,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -315,19 +317,14 @@ def apply_selected_to_fight_self_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError(
             "Selected-to-fight self mortal-wound FNP continuation requires context."
         )
-    request_payload = context.request.payload
-    if not isinstance(request_payload, dict):
-        raise GameLifecycleError("Self mortal-wound FNP request payload must be an object.")
-    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        request_payload.get("lost_wound_context")
-    )
+    progress = mortal_wound_resolution_progress(context.request)
     if progress.source_context != context.source_context:
         raise GameLifecycleError("Self mortal-wound FNP source context drift.")
     validate_selected_to_fight_self_mortal_wound_progress(progress)
     logical_death_binding = progress.logical_death_cause_binding
     if logical_death_binding is None:
         raise GameLifecycleError("Self mortal-wound logical-death binding is missing.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -375,7 +372,7 @@ def _resolve_routed_self_mortal_wounds(
             decision_request=routed.request,
             payload={
                 "phase": BattlePhase.FIGHT.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": source_context["source_rule_id"],
                 "source_kind": SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_SOURCE_KIND,
                 "target_unit_instance_id": source_context["unit_instance_id"],

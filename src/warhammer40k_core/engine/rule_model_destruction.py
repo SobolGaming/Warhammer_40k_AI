@@ -31,7 +31,6 @@ from warhammer40k_core.engine.damage_allocation import (
     destroy_model_by_rule,
     model_owner_player_id,
     remove_destroyed_model_from_battlefield,
-    resolve_mortal_wound_feel_no_pain_decision,
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.deadly_demise import (
@@ -63,6 +62,10 @@ from warhammer40k_core.engine.model_destruction_cause_producers import (
 )
 from warhammer40k_core.engine.model_destruction_cause_producers import (
     reserve_rule_effect_model_destruction_cause as _reserve_destruction_cause,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_progress,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -308,14 +311,9 @@ def apply_rule_model_destruction_mortal_wound_decision(
     source = DestructionReactionSource.from_payload(
         cast(DestructionReactionSourcePayload, _payload_object_value(source_context, "source"))
     )
-    request_payload = request.payload
-    if not isinstance(request_payload, dict):
-        raise GameLifecycleError("Rule destruction mortal-wound request payload drift.")
-    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        request_payload.get("lost_wound_context")
-    )
+    progress = mortal_wound_resolution_progress(request)
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,

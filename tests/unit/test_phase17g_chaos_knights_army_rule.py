@@ -103,6 +103,7 @@ from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     FeelNoPainSource,
     MortalWoundApplicationProgress,
+    MortalWoundRoutingResult,
     continue_mortal_wound_application,
 )
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE
@@ -143,9 +144,14 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_source_context,
+    resolve_mortal_wound_decision,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
+    LifecycleStatus,
     LifecycleStatusKind,
     SetupStep,
 )
@@ -998,6 +1004,17 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
     )
 
     completed = handler.begin_phase(state=state, decisions=decisions)
+    assert completed.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert (
+        _drain_delirium_mortal_wound_requests(
+            state=state,
+            decisions=decisions,
+            status=completed,
+            battle_shock_hooks=_battle_shock_hooks(),
+        )
+        is None
+    )
+    completed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     delirium_payload = _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_applied")
@@ -1212,15 +1229,17 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
         contribution.mortal_wound_feel_no_pain_hook_bindings
     )
     while request is not None:
-        request_payload = cast(dict[str, JsonValue], request.payload)
-        lost_wound_context = cast(
-            dict[str, JsonValue],
-            request_payload["lost_wound_context"],
-        )
+        option_ids = {option.option_id for option in request.options}
         result = DecisionResult.for_request(
-            result_id=f"phase17g-chaos-knights-delirium-fnp-{request.request_id}",
+            result_id=f"phase17g-chaos-knights-delirium-mortal-{request.request_id}",
             request=request,
-            selected_option_id="decline",
+            selected_option_id=(
+                "decline"
+                if "decline" in option_ids
+                else fnp_model.model_instance_id
+                if fnp_model.model_instance_id in option_ids
+                else request.options[0].option_id
+            ),
         )
         decisions.submit_result(result)
         continuation = registry.apply_decision(
@@ -1229,7 +1248,7 @@ def test_delirium_routes_mortal_wound_fnp_choices_and_resumes_command_step() -> 
                 decisions=decisions,
                 request=request,
                 result=result,
-                source_context=lost_wound_context["source_context"],
+                source_context=mortal_wound_resolution_source_context(request),
                 dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
                 runtime_modifier_registry=_runtime_modifier_registry(),
                 battle_shock_hooks=hooks,
@@ -1264,6 +1283,15 @@ def test_delirium_applies_immediate_damage_in_non_command_phase() -> None:
         decisions=decisions,
         target_unit_id=target_unit_id,
         phase=BattlePhase.SHOOTING,
+    )
+    assert (
+        _drain_delirium_mortal_wound_requests(
+            state=state,
+            decisions=decisions,
+            status=None,
+            battle_shock_hooks=_battle_shock_hooks(),
+        )
+        is None
     )
 
     applied = _event_payload(decisions, "chaos_knights_delirium_mortal_wounds_applied")
@@ -1308,12 +1336,13 @@ def test_delirium_non_command_fnp_round_trips_and_resumes_from_retained_phase() 
     )
     while restored_decisions.queue.pending_requests:
         request = restored_decisions.queue.peek_next()
-        request_payload = cast(dict[str, JsonValue], request.payload)
-        lost_wound_context = cast(dict[str, JsonValue], request_payload["lost_wound_context"])
+        option_ids = {option.option_id for option in request.options}
         result = DecisionResult.for_request(
-            result_id=f"phase17g-delirium-shooting-fnp:{request.request_id}",
+            result_id=f"phase17g-delirium-shooting-mortal:{request.request_id}",
             request=request,
-            selected_option_id="decline",
+            selected_option_id=(
+                "decline" if "decline" in option_ids else request.options[0].option_id
+            ),
         )
         restored_decisions.submit_result(result)
         continuation = registry.apply_decision(
@@ -1322,7 +1351,7 @@ def test_delirium_non_command_fnp_round_trips_and_resumes_from_retained_phase() 
                 decisions=restored_decisions,
                 request=request,
                 result=result,
-                source_context=lost_wound_context["source_context"],
+                source_context=mortal_wound_resolution_source_context(request),
                 dice_manager=DiceRollManager(
                     restored_state.game_id,
                     event_log=restored_decisions.event_log,
@@ -1377,7 +1406,7 @@ def test_delirium_pending_authority_rejects_source_and_predicate_tamper(
         dict[str, Any],
         cast(list[dict[str, Any]], decisions_payload["queue"]["pending_requests"])[0]["payload"],
     )
-    lost_wound_context = cast(dict[str, Any], pending_payload["lost_wound_context"])
+    lost_wound_context = _mutable_mortal_wound_progress_payload(pending_payload)
     source_context = cast(dict[str, Any], lost_wound_context["source_context"])
     resolution_payload = cast(dict[str, Any], source_context["resolution_payload"])
     if tamper_kind == "wound_count":
@@ -1910,7 +1939,7 @@ def test_delirium_source_identity_drift_rejects_before_lifecycle_mutation() -> N
     decisions = lifecycle.decision_controller
     request = decisions.queue.peek_next()
     request_payload = cast(dict[str, Any], deepcopy(request.payload))
-    lost_wound_context = cast(dict[str, Any], request_payload["lost_wound_context"])
+    lost_wound_context = _mutable_mortal_wound_progress_payload(request_payload)
     application_id = cast(str, lost_wound_context["application_id"])
     lost_wound_context["source_rule_id"] = "phase17g:forged-delirium-source"
     forged_request = replace(request, payload=validate_json_value(request_payload))
@@ -1986,7 +2015,7 @@ def test_delirium_source_kind_drift_rejects_before_lifecycle_mutation() -> None:
     decisions = lifecycle.decision_controller
     request = decisions.queue.peek_next()
     request_payload = cast(dict[str, Any], deepcopy(request.payload))
-    lost_wound_context = cast(dict[str, Any], request_payload["lost_wound_context"])
+    lost_wound_context = _mutable_mortal_wound_progress_payload(request_payload)
     application_id = cast(str, lost_wound_context["application_id"])
     source_context = cast(dict[str, Any], lost_wound_context["source_context"])
     source_context["source_kind"] = "phase17g:forged-delirium-source-kind"
@@ -2067,7 +2096,7 @@ def test_delirium_dual_identity_drift_keeps_provider_ownership() -> None:
     decisions = lifecycle.decision_controller
     request = decisions.queue.peek_next()
     request_payload = cast(dict[str, Any], deepcopy(request.payload))
-    lost_wound_context = cast(dict[str, Any], request_payload["lost_wound_context"])
+    lost_wound_context = _mutable_mortal_wound_progress_payload(request_payload)
     application_id = cast(str, lost_wound_context["application_id"])
     lost_wound_context["source_rule_id"] = "phase17g:forged-delirium-source"
     source_context = cast(dict[str, Any], lost_wound_context["source_context"])
@@ -3327,6 +3356,12 @@ def _command_delirium_lifecycle_fixture(
         ),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
     )
+    prewound = _drain_fixture_mortal_wound_routing(
+        state=state,
+        decisions=decisions,
+        routed=prewound,
+        result_id_prefix=f"{game_id}:prewound",
+    )
     if prewound.request is not None or prewound.application is None:
         raise AssertionError("Delirium lifecycle pre-wound must resolve immediately")
     if with_feel_no_pain:
@@ -3522,6 +3557,12 @@ def _delirium_outcome_fixture(
             spill_over=True,
         ),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+    )
+    prewound = _drain_fixture_mortal_wound_routing(
+        state=state,
+        decisions=decisions,
+        routed=prewound,
+        result_id_prefix=f"{game_id}:prewound",
     )
     if prewound.request is not None or prewound.application is None:
         raise AssertionError("Delirium pre-wound fixture must resolve immediately")
@@ -3763,6 +3804,92 @@ def _weapon_profile() -> WeaponProfile:
         damage_profile=DamageProfile.fixed(1),
         source_ids=("phase17g:test:chaos-knights:weapon",),
     )
+
+
+def _mutable_mortal_wound_progress_payload(
+    request_payload: dict[str, Any],
+) -> dict[str, Any]:
+    raw_progress = request_payload.get(
+        "lost_wound_context",
+        request_payload.get("mortal_wound_progress"),
+    )
+    assert isinstance(raw_progress, dict)
+    return cast(dict[str, Any], raw_progress)
+
+
+def _drain_fixture_mortal_wound_routing(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    routed: MortalWoundRoutingResult,
+    result_id_prefix: str,
+) -> MortalWoundRoutingResult:
+    current = routed
+    for decision_index in range(128):
+        if current.request is None:
+            return current
+        decisions.request_decision(current.request)
+        result = DecisionResult.for_request(
+            result_id=f"{result_id_prefix}:model:{decision_index}",
+            request=current.request,
+            selected_option_id=current.request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        current = resolve_mortal_wound_decision(
+            state=state,
+            decisions=decisions,
+            request=current.request,
+            result=result,
+            next_request_id=f"{result_id_prefix}:request:{decision_index + 1}",
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        )
+    raise AssertionError("Fixture mortal wound model choices did not drain")
+
+
+def _drain_delirium_mortal_wound_requests(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    status: LifecycleStatus | None,
+    battle_shock_hooks: BattleShockHookRegistry,
+) -> LifecycleStatus | None:
+    registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        army_rule.runtime_contribution().mortal_wound_feel_no_pain_hook_bindings
+    )
+    current_status = status
+    for decision_index in range(128):
+        if current_status is None:
+            if not decisions.queue.pending_requests:
+                return None
+            request = decisions.queue.peek_next()
+        else:
+            status_request = current_status.decision_request
+            if status_request is None:
+                return current_status
+            request = status_request
+        option_ids = {option.option_id for option in request.options}
+        result = DecisionResult.for_request(
+            result_id=f"phase17g-delirium-mortal:{decision_index}:{request.request_id}",
+            request=request,
+            selected_option_id=(
+                "decline" if "decline" in option_ids else request.options[0].option_id
+            ),
+        )
+        decisions.submit_result(result)
+        current_status = registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                source_context=mortal_wound_resolution_source_context(request),
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=_runtime_modifier_registry(),
+                battle_shock_hooks=battle_shock_hooks,
+                ability_indexes_by_player_id={},
+            )
+        )
+    raise AssertionError("Delirium mortal wound choices did not drain")
 
 
 def _event_payload(decisions: DecisionController, event_type: str) -> dict[str, JsonValue]:

@@ -24,11 +24,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockOutcomeContext,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
@@ -58,6 +56,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
@@ -787,7 +788,7 @@ def apply_delirium_mortal_wound_feel_no_pain_decision(
 ) -> LifecycleStatus | None:
     if type(context) is not MortalWoundFeelNoPainContinuationContext:
         raise GameLifecycleError("Delirium FNP continuation requires context.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -838,7 +839,7 @@ def _resolve_routed_delirium_mortal_wounds(
             decision_request=routed_request,
             payload={
                 "phase": phase.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed_request.decision_type,
                 "source_rule_id": SOURCE_RULE_ID,
                 "source_kind": DELIRIUM_MORTAL_WOUNDS_SOURCE_KIND,
                 "target_unit_instance_id": routed_progress.target_unit_instance_id,

@@ -16,11 +16,9 @@ from warhammer40k_core.engine.battlefield_presence import (
     rules_unit_has_placed_alive_model,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    resolve_mortal_wound_feel_no_pain_decision,
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -61,6 +59,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -454,7 +455,7 @@ def apply_malice_made_manifest_mortal_wound_feel_no_pain_decision(
 ) -> LifecycleStatus | None:
     if type(context) is not MortalWoundFeelNoPainContinuationContext:
         raise GameLifecycleError("Malice Made Manifest FNP continuation requires context.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -748,7 +749,7 @@ def _resolve_routed_malice_made_manifest_mortal_wounds(
             decision_request=routed_request,
             payload={
                 "phase": BattlePhase.FIGHT.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed_request.decision_type,
                 "source_rule_id": MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
                 "source_kind": MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND,
                 "target_unit_instance_id": resolution_payload["target_enemy_unit_instance_id"],

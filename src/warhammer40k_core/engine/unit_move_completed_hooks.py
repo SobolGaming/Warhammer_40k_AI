@@ -11,12 +11,8 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -27,6 +23,11 @@ from warhammer40k_core.engine.event_log import JsonValue, canonical_json, valida
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_source_context,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -706,15 +707,15 @@ def apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Move-completed Feel No Pain requires DecisionController.")
     record = decisions.record_for_result(result)
     request = record.request
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         raise GameLifecycleError("Move-completed Feel No Pain requires mortal wound context.")
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     if not isinstance(source_context, dict) or source_context.get("source_kind") != (
         UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_SOURCE_KIND
     ):
         raise GameLifecycleError("Move-completed Feel No Pain source context is invalid.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,
@@ -731,7 +732,7 @@ def apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
                 "phase": state.current_battle_phase.value
                 if state.current_battle_phase is not None
                 else None,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": source_context["source_rule_id"],
             },
         )
@@ -753,9 +754,9 @@ def is_unit_move_completed_mortal_wound_feel_no_pain_request(
 ) -> bool:
     if type(request) is not DecisionRequest:
         return False
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         return False
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     return isinstance(source_context, dict) and source_context.get("source_kind") == (
         UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_SOURCE_KIND
     )
@@ -901,7 +902,7 @@ def _resolve_mortal_wound_effect(
             decision_request=routed.request,
             payload={
                 "phase": completed_phase.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": effect.source_rule_id,
                 "trigger_event_id": effect.trigger_event_id,
                 "target_unit_instance_id": effect.target_unit_instance_id,

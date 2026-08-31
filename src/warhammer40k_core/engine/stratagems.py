@@ -317,6 +317,7 @@ __all__ = (
     "_validate_supported_stratagem_handler_preflight",
     "_validate_target_policy_id",
     "apply_command_reroll_decision",
+    "apply_crushing_impact_mortal_wound_decision",
     "apply_explosives_mortal_wound_feel_no_pain_decision",
     "apply_heroic_intervention_charge_move",
     "apply_stratagem_decision",

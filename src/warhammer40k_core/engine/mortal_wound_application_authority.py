@@ -384,11 +384,11 @@ def validate_mortal_wound_application_authority_closure(
 ) -> None:
     """Require each packet root to have one pending request or terminal continuation."""
 
-    from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        is_mortal_wound_feel_no_pain_request,
-    )
     from warhammer40k_core.engine.decision_request import DecisionRequest
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
+    )
 
     if type(pending_decision_requests) is not tuple or any(
         type(request) is not DecisionRequest for request in pending_decision_requests
@@ -398,14 +398,9 @@ def validate_mortal_wound_application_authority_closure(
         )
     pending_application_ids: list[str] = []
     for request in cast(tuple[DecisionRequest, ...], pending_decision_requests):
-        if not is_mortal_wound_feel_no_pain_request(request):
+        if not is_mortal_wound_resolution_request(request):
             continue
-        request_payload = request.payload
-        if not isinstance(request_payload, dict):
-            raise GameLifecycleError("Pending mortal-wound request payload is invalid.")
-        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-            request_payload.get("lost_wound_context")
-        )
+        progress = mortal_wound_resolution_progress(request)
         pending_application_ids.append(progress.application_id)
     event_indexes = {event.event_id: index for index, event in enumerate(event_records)}
     if len(event_indexes) != len(event_records):
@@ -609,14 +604,14 @@ def direct_mortal_wound_damage_snapshot_from_event(
 def _direct_mortal_wound_progress_from_event(
     event: EventRecord,
 ) -> MortalWoundApplicationProgress | None:
-    from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        is_mortal_wound_feel_no_pain_request,
-    )
     from warhammer40k_core.engine.decision_request import (
         DecisionError,
         DecisionRequest,
         DecisionRequestPayload,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
     )
 
     if event.event_type != "decision_requested" or not isinstance(event.payload, dict):
@@ -625,14 +620,9 @@ def _direct_mortal_wound_progress_from_event(
         request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
     except (DecisionError, KeyError, TypeError) as exc:
         raise GameLifecycleError("Direct mortal-wound request event is invalid.") from exc
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         return None
-    request_payload = request.payload
-    if not isinstance(request_payload, dict):
-        raise GameLifecycleError("Direct mortal-wound request payload is invalid.")
-    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        request_payload.get("lost_wound_context")
-    )
+    progress = mortal_wound_resolution_progress(request)
     return progress if progress.destruction_evidence is not None else None
 
 

@@ -17,6 +17,12 @@ from tests.phase11c_command_phase_helpers import (
     secondary_choice,
 )
 from tests.phase13b_shooting_declaration_helpers import (
+    _attack_pool_for_test,
+    _first_weapon_profile,
+    _ruleset,
+    _state,
+)
+from tests.phase13b_shooting_declaration_helpers import (
     _proposal_from_request as shooting_declaration_proposal,
 )
 from tests.phase13b_shooting_declaration_helpers import (
@@ -35,11 +41,21 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
 )
+from warhammer40k_core.core.weapon_profiles import AbilityDescriptor, WeaponKeyword
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
+from warhammer40k_core.engine.damage_allocation import (
+    model_by_id,
+)
+from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.deferred_mortal_wounds import DeferredMortalWounds
 from warhammer40k_core.engine.deployment import (
     SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
     SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
@@ -62,6 +78,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalPayload,
@@ -83,6 +102,7 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_TYPE_DECISION_TYPE,
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+    ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_mission_choices import (
@@ -881,6 +901,101 @@ def test_local_session_drives_armour_of_contempt_fight_save_completion_and_repla
         session.replay_artifact(artifact_id="replay:ws14:aoc:fight-facade")
     ).run()
     assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
+    lifecycle, units = shooting_lifecycle(
+        alpha_unit_ids=("attacker",),
+        game_id="ws13-mortal-wound-model-choice",
+    )
+    state = _state(lifecycle)
+    attacker = units["attacker"]
+    defender = units["enemy"]
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="ws13-mortal-wound-model-choice-profile",
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS,),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
+    attack_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    deferred = DeferredMortalWounds(
+        source_rule_id="weapon-ability:devastating-wounds",
+        source_model_instance_id=attack_pool.attacker_model_instance_id,
+        source_weapon_profile=attack_pool.weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        attack_context_id="ws13-mortal-wound-model-choice:pool-001:attack-001",
+        mortal_wounds=1,
+    )
+    sequence = AttackSequence(
+        sequence_id="ws13-mortal-wound-model-choice",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(attack_pool,),
+        pool_index=1,
+        deferred_mortal_wounds=(deferred,),
+    )
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+    )
+    request = _assert_request(
+        cast(LifecycleStatus, status),
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
+    assert remaining is not None
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining.attack_pools,
+        attack_sequence=remaining,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+
+    player_a_pending = session.view(viewer_player_id="player-a")["pending_decision"]
+    player_b_pending = session.view(viewer_player_id="player-b")["pending_decision"]
+    assert player_a_pending is not None
+    assert player_b_pending is not None
+    assert player_a_pending == player_b_pending
+    assert player_b_pending["actor_id"] == "player-b"
+    interaction = player_b_pending["interaction"]
+    assert interaction is not None
+    assert interaction["interaction_kind"] == "entity_selection"
+    assert interaction["submission_kind"] == "finite"
+    selected_model_id = defender.own_models[-1].model_instance_id
+    cursor = _cursor_after(session, viewer_player_id="player-b")
+
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=selected_model_id,
+        result_id="ws13-mortal-wound-model-choice-result",
+    )
+
+    selected_model = model_by_id(
+        state=cast(GameState, session.lifecycle.state),
+        model_instance_id=selected_model_id,
+    )
+    assert selected_model.wounds_remaining == selected_model.starting_wounds - 1
+    _assert_event_types(
+        session.events_since(cursor, viewer_player_id="player-b"),
+        "decision_recorded",
+        "devastating_wounds_mortal_wounds_applied",
+    )
 
 
 @pytest.mark.integration

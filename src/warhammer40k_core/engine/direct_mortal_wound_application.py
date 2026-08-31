@@ -8,9 +8,6 @@ from warhammer40k_core.engine.damage_allocation import (
     DamageKind,
     FeelNoPainResolution,
     MortalWoundApplication,
-    _state_feel_no_pain_decline_allowed,
-    _state_feel_no_pain_sources,
-    allocation_context_for_unit,
     apply_damage_to_model,
     resolve_feel_no_pain_rolls,
 )
@@ -32,6 +29,11 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 )
 from warhammer40k_core.engine.mortal_wound_logical_death import (
     append_mortal_wound_damage_logical_death_event,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_feel_no_pain_decline_allowed,
+    mortal_wound_feel_no_pain_sources,
+    mortal_wound_priority_model_ids,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
@@ -97,16 +99,21 @@ def apply_direct_mortal_wounds_to_unit(
         if rules_unit is None:
             remaining_lost = remaining
             break
-        legal_model_ids = allocation_context_for_unit(
+        legal_model_ids = mortal_wound_priority_model_ids(
             state=state,
             target_unit_instance_id=rules_unit.unit_instance_id,
-        ).legal_model_ids()
+        )
         if not legal_model_ids:
             remaining_lost = remaining
             break
-        model_id = legal_model_ids[0]
-        sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_id)
-        decline_allowed = _state_feel_no_pain_decline_allowed(
+        if len(legal_model_ids) > 1:
+            raise GameLifecycleError("Mortal wound model choices require lifecycle routing.")
+        model_id = next(iter(legal_model_ids))
+        sources = mortal_wound_feel_no_pain_sources(
+            state=state,
+            model_instance_id=model_id,
+        )
+        decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
             state=state,
             model_instance_id=model_id,
         )
@@ -203,18 +210,20 @@ def _prevalidate_direct_mortal_wound_route(
         )
         if rules_unit is None:
             return
-        legal_model_ids = allocation_context_for_unit(
+        legal_model_ids = mortal_wound_priority_model_ids(
             state=simulated_state,
             target_unit_instance_id=rules_unit.unit_instance_id,
-        ).legal_model_ids()
+        )
         if not legal_model_ids:
             return
-        model_id = legal_model_ids[0]
-        sources = _state_feel_no_pain_sources(
+        if len(legal_model_ids) > 1:
+            raise GameLifecycleError("Mortal wound model choices require lifecycle routing.")
+        model_id = next(iter(legal_model_ids))
+        sources = mortal_wound_feel_no_pain_sources(
             state=simulated_state,
             model_instance_id=model_id,
         )
-        decline_allowed = _state_feel_no_pain_decline_allowed(
+        decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
             state=simulated_state,
             model_instance_id=model_id,
         )

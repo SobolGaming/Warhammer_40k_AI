@@ -267,7 +267,6 @@ __all__ = (
     "_target_unit_toughness",
     "_target_unit_within_any_objective_marker_range",
     "_toughness_values_for_models",
-    "_unit_has_model_within_deadly_demise_range",
     "_unit_instance_id_for_model",
     "_validate_allocation_group_payload_tuple",
     "_validate_allocation_group_tuple",

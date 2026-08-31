@@ -351,6 +351,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "select_mortal_wound_model",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "select_movement_action",
         "interaction_kinds": [
           "finite_option_list"
@@ -952,8 +959,8 @@
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "d8970b2b7ff6614a16b25345cf6c61b4be0943d83a407e3c6b745dca001d3306",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:155062a0cdb997a61d61d61f9378993336897f88e4f93bbaee1c446bf89f8ce1"
+        "identity_hash": "3ded1b9a0959037fb29ead52c15f541587df35edc853875e87cfcef30ef5d4a5",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6ff66acc231258f679bd49ed79bc9e12a2166a1cf27e928fdd07af37e6d2a500"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",
@@ -2943,6 +2950,13 @@
     },
     {
       "decision_type": "select_healing_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_mortal_wound_model",
       "interaction_kinds": [
         "entity_selection"
       ],

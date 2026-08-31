@@ -448,6 +448,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:army_rule:star_engines` | Battle Focus - Star Engines |
 | `warhammer_40000_11th:aeldari:army_rule:sudden_strike` | Battle Focus - Sudden Strike |
 | `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind` | Battle Focus - Swift as the Wind |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:lethal_ruse:mortal-wounds` | Mortal Wounds |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:relentless_raiders` | Relentless Raiders |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:void_thieves` | Void Thieves |
 | `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
@@ -465,6 +466,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Templar Vows |
+| `warhammer_40000_11th:chaos_daemons:army_rule:daemonic-terror:mortal-wounds` | Mortal Wounds |
 | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026` | Greater Daemon of Khorne (Aura)<br>Greater Daemon of Tzeentch (Aura)<br>July 2026<br>The Shadow of Chaos |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne` | Daemon Lord of Khorne |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage` | Relentless Carnage |

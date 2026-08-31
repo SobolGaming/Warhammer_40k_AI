@@ -141,6 +141,47 @@ def test_p06a_visibility_source_artifact_is_pinned_typed_and_executable() -> Non
     )
 
 
+def test_p06b_mortal_wounds_source_artifact_is_pinned_typed_and_executable() -> None:
+    package = core_other_concepts_2026_08.source_package()
+    rule = core_other_concepts_2026_08.source_rule_record_by_id("mortal-wounds")
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert rule.section_id == "06.02"
+    assert rule.source_id == core_other_concepts_2026_08.MORTAL_WOUNDS_SOURCE_ID
+    assert rule.transcription_sha256 == (
+        core_other_concepts_2026_08.MORTAL_WOUNDS_TRANSCRIPTION_SHA256
+    )
+    assert "for each of those mortal wounds" in rule.source_text
+    assert "If a non‑CHARACTER model in that unit has lost one or more wounds" in (  # noqa: RUF001
+        rule.source_text
+    )
+    assert "Otherwise, if that unit contains one or more non‑CHARACTER models" in (  # noqa: RUF001
+        rule.source_text
+    )
+    assert "one or more CHARACTER models in that unit have lost one or more wounds" in (
+        rule.source_text
+    )
+    assert "Otherwise, you must select one CHARACTER model" in rule.source_text
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert {record.semantic_execution_status for record in evidence} == {
+        "executable_engine_runtime"
+    }
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert package.evidence_required_source_ids == tuple(
+        sorted(
+            (
+                core_other_concepts_2026_08.VISIBILITY_SOURCE_ID,
+                core_other_concepts_2026_08.MORTAL_WOUNDS_SOURCE_ID,
+            )
+        )
+    )
+
+
 def test_p06a_visibility_source_artifact_rejects_text_and_byte_drift() -> None:
     artifact_path = Path(
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"

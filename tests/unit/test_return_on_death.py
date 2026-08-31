@@ -26,6 +26,7 @@ from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlace
 from warhammer40k_core.engine.catalog_return_on_death_runtime import CatalogReturnOnDeathRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
 from warhammer40k_core.engine.command_points import initial_command_point_ledgers
+from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -993,6 +994,13 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
         destroyed_model.model_instance_id
     )
     decisions = DecisionController()
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=beta.unit_instance_id,
+        model_instance_id=destroyed_model.model_instance_id,
+        damage=1,
+        damage_kind=DamageKind.NORMAL,
+    )
 
     application = apply_direct_mortal_wounds_to_unit(
         state=state,

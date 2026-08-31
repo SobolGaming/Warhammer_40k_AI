@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine import attack_sequence_destruction_authority as _asda
 from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     emit_deferred_mortal_wounds_applied as _emit_deferred_mortal_wounds_applied,
 )
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence_dispatch import apply_resolve_target_unit_decision, apply_attack_weapon_group_decision, resolve_attack_sequence_until_blocked
     from warhammer40k_core.engine.attack_sequence_destroyed_transport import is_destroyed_transport_disembark_proposal_request, invalid_destroyed_transport_disembark_proposal_status, apply_destroyed_transport_disembark_proposal_decision, _continue_pending_destroyed_transport_disembark, _remove_resolved_destroyed_transport_cargo_state, _begin_destroyed_transport_disembark_if_needed, _request_destroyed_transport_disembark_placement, _parse_destroyed_transport_disembark_submission_or_invalid, _destroyed_transport_proposal_parse_failure, _key_error_field, _missing_destroyed_transport_disembark_field, _destroyed_transport_proposal_invalid_status, _destroyed_transport_placement_invalid_status, _request_destroyed_transport_disembark_placement_retry, _resolve_destroyed_transport_disembark_submission, _apply_valid_destroyed_transport_disembark, _destroyed_transport_cargo_state_for_damage, _destroyed_transport_placement, _battlefield_scenario_for_attack_sequence, _objective_markers_for_attack_sequence
     from warhammer40k_core.engine.attack_sequence_grouped_allocation import _continue_grouped_allocation_for_wound_contexts, _continue_after_grouped_allocation_order, _resolve_grouped_damage_from, _alive_allocated_model_ids, _alive_allocated_model_ids_for_target_unit, _advance_after_current_pool, _attack_sequence_for_context, _grouped_attack_context_payload, _emit_grouped_allocation_event, _roll_grouped_saves, _emit_grouped_save_die_event
-    from warhammer40k_core.engine.attack_sequence_damage_resolution import _no_save_damage_order_roll_spec, _save_options_for_allocation, _resolve_lost_wound_stage, _apply_damage_after_feel_no_pain, _advance_after_resolved_hit, _destruction_reaction_status_if_needed, _optional_destruction_reaction_sources_after_trigger_rolls, _optional_destruction_reaction_trigger_descriptor, _optional_destruction_reaction_trigger_conditions_met, _optional_destruction_reaction_trigger_battle_round_is_current, _optional_destruction_reaction_active_effect_requirement_is_met, _destruction_reaction_trigger_threshold, _optional_destruction_reaction_trigger_roll_type, _resolve_mandatory_destruction_reactions_before_removal, _emit_mandatory_destruction_reaction_record, _resolve_deadly_demise_before_removal, _route_deadly_demise_mortal_wounds, _resolve_deadly_demise_secondary_destroyed_models, _continue_deadly_demise_after_secondary_destruction_reaction, _deadly_demise_secondary_continuation_payload, _is_deadly_demise_continuation, _destroyed_damage_applications, _deadly_demise_mortal_wounds_for_target, _emit_deadly_demise_mortal_wounds_applied, _deadly_demise_target_unit_ids, _unit_has_model_within_deadly_demise_range, _deadly_demise_descriptor, _deadly_demise_source_context_payload, _deadly_demise_attack_context_from_source_context, _pre_removal_destruction_reaction_context_payload, _destruction_reaction_context_payload
+    from warhammer40k_core.engine.attack_sequence_damage_resolution import _no_save_damage_order_roll_spec, _save_options_for_allocation, _resolve_lost_wound_stage, _apply_damage_after_feel_no_pain, _advance_after_resolved_hit, _destruction_reaction_status_if_needed, _optional_destruction_reaction_sources_after_trigger_rolls, _optional_destruction_reaction_trigger_descriptor, _optional_destruction_reaction_trigger_conditions_met, _optional_destruction_reaction_trigger_battle_round_is_current, _optional_destruction_reaction_active_effect_requirement_is_met, _destruction_reaction_trigger_threshold, _optional_destruction_reaction_trigger_roll_type, _resolve_mandatory_destruction_reactions_before_removal, _emit_mandatory_destruction_reaction_record, _resolve_deadly_demise_before_removal, _route_deadly_demise_mortal_wounds, _resolve_deadly_demise_secondary_destroyed_models, _continue_deadly_demise_after_secondary_destruction_reaction, _deadly_demise_secondary_continuation_payload, _is_deadly_demise_continuation, _destroyed_damage_applications, _deadly_demise_mortal_wounds_for_target, _emit_deadly_demise_mortal_wounds_applied, _deadly_demise_target_unit_ids, _deadly_demise_descriptor, _deadly_demise_source_context_payload, _deadly_demise_attack_context_from_source_context, _pre_removal_destruction_reaction_context_payload, _destruction_reaction_context_payload, _finish_resumed_deadly_demise_source_damage
     from warhammer40k_core.engine.attack_sequence_dice_rerolls import _roll_hit_and_wound, _roll_or_reuse_state, _latest_reroll_state_for_original_roll, _request_command_reroll_for_attack_roll_if_available, _request_source_backed_hit_reroll_if_available, _source_backed_hit_permission_for_attack, apply_source_backed_attack_dice_reroll_decision, _validate_current_source_backed_attack_reroll_context_if_required, _source_backed_attack_context_id_matches_active_pool, _source_backed_attack_kind_for_phase, _request_source_backed_wound_reroll_if_available, _source_backed_wound_permission_for_attack, _conditional_wound_full_reroll_applies, _target_unit_within_any_objective_marker_range, _canonical_keyword, _source_backed_reroll_already_answered, _command_reroll_opportunity_window, _command_reroll_opportunity_options, _command_reroll_opportunity_option, _command_reroll_opportunity_state_hash, _command_reroll_opportunity_boundary_state_payload, _dice_rolled_event_id_for_roll, _random_characteristic_roll_spec, _append_replay_resume_unique_event_once
     from warhammer40k_core.engine.attack_sequence_psychic_modifiers import _psychic_attack_modifier_ignore_request, _psychic_attack_modifier_ignore_options, _psychic_attack_modifier_ignore_selection_for_attack, validate_psychic_attack_modifier_ignore_decision, _has_detrimental_psychic_modifier, _has_beneficial_psychic_modifier
     from warhammer40k_core.engine.attack_sequence_hit_wound import _roll_hit, _hit_reroll_forbidden_rule_ids, _roll_wound, _wound_roll_modifier, _reroll_wound_for_twin_linked_if_needed, _selected_anti_keyword_ability_id, _emit_damage_event, _destroyed_model_removal_record, _destroyed_model_placement_payload, _emit_event, _target_has_effect_cover, _target_has_effect_cover_denial, _benefit_of_cover_ballistic_skill_penalty, _hit_skill_modifier, _hit_roll_modifier, _plunging_fire_ballistic_skill_improvement, _persisting_hit_roll_modifier, _unit_instance_id_for_model, _save_options_with_effect_invulnerable, _cover_result_with_effect_source, _melta_damage_modifier, _devastating_wounds_resolution_for_attack
@@ -402,12 +403,12 @@ def apply_feel_no_pain_decision(
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
-    if is_mortal_wound_feel_no_pain_request(request):
+    if is_mortal_wound_resolution_request(request):
         decision_attack_sequence = attack_sequence
         if attack_sequence.pending_grouped_damage is not None:
-            request_payload = _payload_object(request.payload)
-            lost_wound_context = _payload_object(request_payload["lost_wound_context"])
-            source_context = _payload_object(lost_wound_context["source_context"])
+            source_context = _payload_object(
+                mortal_wound_resolution_progress(request).source_context
+            )
             if source_context["source_kind"] != DEADLY_DEMISE_SOURCE_KIND:
                 raise GameLifecycleError(
                     "Pending grouped damage only supports Deadly Demise mortal wound FNP."
@@ -748,7 +749,7 @@ def _apply_deferred_mortal_wounds(
                     decision_request=routed.request,
                     payload={
                         "phase": attack_sequence.source_phase.value,
-                        "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                        "decision_type": routed.request.decision_type,
                         "sequence_id": attack_sequence.sequence_id,
                         "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
                     },
@@ -820,7 +821,7 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
                 decision_request=routed.request,
                 payload={
                     "phase": attack_sequence.source_phase.value,
-                    "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                    "decision_type": routed.request.decision_type,
                     "sequence_id": attack_sequence.sequence_id,
                     "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
                 },
@@ -907,7 +908,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
                 decision_request=routed.request,
                 payload={
                     "phase": attack_sequence.source_phase.value,
-                    "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                    "decision_type": routed.request.decision_type,
                     "sequence_id": attack_sequence.sequence_id,
                     "source_rule_id": routed.progress.source_rule_id,
                     "source_kind": DEADLY_DEMISE_SOURCE_KIND,
@@ -948,6 +949,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         DestructionReactionSource.from_payload(cast(DestructionReactionSourcePayload, payload))
         for payload in pending_source_payloads
     )
+    source_damage_completion = validate_json_value(source_context.get("source_damage_completion"))
     _emit_deadly_demise_mortal_wounds_applied(
         decisions=decisions,
         attack_sequence=attack_sequence,
@@ -973,6 +975,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         affected_target_unit_ids=affected_target_unit_ids,
         pending_target_unit_ids=pending_target_unit_ids,
         pending_sources=pending_sources,
+        source_damage_completion=source_damage_completion,
         secondary_damage_applications=_destroyed_damage_applications(
             routed.application.applications
         ),
@@ -994,6 +997,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         trigger_roll_payload=trigger_roll_payload,
         target_unit_ids=pending_target_unit_ids,
         pending_sources=pending_sources,
+        source_damage_completion=source_damage_completion,
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
@@ -1027,58 +1031,28 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         feel_no_pain=feel_no_pain,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
         sources=pending_sources,
+        parent_cause_ids=_asda.reserved_attack_damage_parent_cause_ids(
+            state=state,
+            attack_sequence=attack_sequence,
+            damage=damage,
+        ),
+        source_damage_completion=source_damage_completion,
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
-    destroyed_model_placement = _destroyed_model_placement_payload(
-        state=state,
-        model_instance_id=damage.model_instance_id,
-    )
-    remove_destroyed_model_from_battlefield(
-        state=state,
-        model_instance_id=damage.model_instance_id,
-    )
-    destroyed_emission = _emit_damage_event(
-        state=state,
-        decisions=decisions,
-        hooks=hooks,
-        attack_sequence=attack_sequence,
-        damage=damage,
-        saving_throw=None,
-        saving_throw_payload=validate_json_value(source_context["saving_throw"]),
-        feel_no_pain=feel_no_pain,
-        destroyed_model_placement=destroyed_model_placement,
-        destruction_attribution=ModelDestructionAttribution.for_attack(
-            destroying_player_id=attack_sequence.attacker_player_id,
-            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-            attacking_model_instance_id=(attack_sequence.current_pool().attacker_model_instance_id),
-            weapon_profile=attack_sequence.current_pool().weapon_profile,
-            attack_context_id=attack_context["attack_context_id"],
-        ),
-    )
-    reaction_status = _destruction_reaction_status_if_needed(
+    return _finish_resumed_deadly_demise_source_damage(
         state=state,
         decisions=decisions,
         manager=manager,
+        hooks=hooks,
         attack_sequence=attack_sequence,
+        already_allocated_model_ids=already_allocated_model_ids,
         attack_context=attack_context,
-        destruction_provenance=DestructionProvenance.for_attack(
-            weapon_profile=attack_sequence.current_pool().weapon_profile,
-            attack_context_id=attack_context["attack_context_id"],
-        ),
         damage=damage,
-        destroyed_emission=destroyed_emission,
+        saving_throw_payload=validate_json_value(source_context["saving_throw"]),
+        feel_no_pain=feel_no_pain,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
-    )
-    if reaction_status is not None:
-        return attack_sequence, already_allocated_model_ids, reaction_status
-    return (
-        _advance_after_resolved_hit(
-            attack_sequence=attack_sequence,
-            attack_context=attack_context,
-        ),
-        already_allocated_model_ids,
-        None,
+        source_damage_completion=source_damage_completion,
     )
 
 
