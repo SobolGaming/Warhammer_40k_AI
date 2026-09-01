@@ -8,12 +8,19 @@ ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_PACKAGE = ROOT / "src" / "warhammer40k_core"
 CORE = ROOT / "src" / "warhammer40k_core" / "core"
 ENGINE = ROOT / "src" / "warhammer40k_core" / "engine"
+GAME_STATE = ENGINE / "game_state.py"
+RESERVES = ENGINE / "reserves.py"
+PRIMARY_BATTLEFIELD_DEPARTURE = ENGINE / "primary_battlefield_departure.py"
+PRIMARY_RESERVE_ARRIVAL_INTEGRITY = ENGINE / "primary_reserve_arrival_integrity.py"
+STRATAGEMS_CORE_HANDLERS = ENGINE / "stratagems_core_handlers.py"
+STRATAGEMS_GENERIC_RULE_IR = ENGINE / "stratagems_generic_rule_ir.py"
 MOVEMENT_LEGALITY = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_legality.py"
 MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
 MOVEMENT_PHASE_FILES = (
     MOVEMENT_PHASE,
     *sorted(MOVEMENT_PHASE.parent.glob("movement_*.py")),
 )
+MOVEMENT_REINFORCEMENTS = MOVEMENT_PHASE.parent / "movement_reinforcements.py"
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 DEADLY_DEMISE = ROOT / "src" / "warhammer40k_core" / "engine" / "deadly_demise.py"
 RULE_MODEL_DESTRUCTION = ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction.py"
@@ -520,6 +527,27 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
             DAEMONIC_INCURSION_RULE,
             ("_god_keywords_for_rules_unit", "_rules_unit_has_faction_keyword"),
         ),
+        (
+            MOVEMENT_REINFORCEMENTS,
+            ("_request_reinforcement_placement", "_reserve_placement_kinds_for_unit"),
+        ),
+        (
+            RESERVES,
+            ("_append_reserve_state_violations", "_append_unit_placement_drift_violations"),
+        ),
+        (STRATAGEMS_GEOMETRY, ("_reserve_placement_kinds_for_unit",)),
+        (
+            STRATAGEMS_CORE_HANDLERS,
+            ("_apply_rapid_ingress_handler", "_apply_ingress_move_handler"),
+        ),
+        (
+            STRATAGEMS_GENERIC_RULE_IR,
+            ("_request_generic_rule_ir_strategic_reserves_placement",),
+        ),
+        (
+            PRIMARY_RESERVE_ARRIVAL_INTEGRITY,
+            ("validate_primary_reserve_arrival_placement_authority",),
+        ),
     ):
         for function_name in function_names:
             function = _function_node(path=path, function_name=function_name)
@@ -537,6 +565,48 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
         assert "keyword_contributing_components" not in path.read_text(encoding="utf-8"), (
             f"{path.relative_to(ROOT)} retains the superseded keyword-only component view."
         )
+
+
+def test_p19_reserve_departure_is_prepared_before_authoritative_mutation() -> None:
+    game_state_tree = ast.parse(
+        GAME_STATE.read_text(encoding="utf-8"),
+        filename=str(GAME_STATE),
+    )
+    reposition_matches = tuple(
+        node
+        for node in ast.walk(game_state_tree)
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "reposition_unit_to_strategic_reserves"
+    )
+    assert len(reposition_matches) == 1
+    reposition = reposition_matches[0]
+    source = ast.unparse(reposition)
+
+    assert "rules_unit_placement.component_unit_instance_ids" in source
+    assert "rules_unit_view.component_unit_instance_ids" not in source
+    assert source.index("prepare_primary_battlefield_departure") < source.index(
+        "self.record_reserve_state"
+    )
+    assert source.index("prepare_primary_battlefield_departure") < source.index(
+        "self.battlefield_state = updated_battlefield"
+    )
+    assert source.index("self.battlefield_state = updated_battlefield") < source.index(
+        "record_prepared_primary_battlefield_departure"
+    )
+
+    recorder = _function_node(
+        path=PRIMARY_BATTLEFIELD_DEPARTURE,
+        function_name="record_primary_battlefield_departure",
+    )
+    call_names = {
+        node.func.id
+        for node in ast.walk(recorder)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert {
+        "prepare_primary_battlefield_departure",
+        "record_prepared_primary_battlefield_departure",
+    }.issubset(call_names)
 
 
 def test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cleanup() -> None:

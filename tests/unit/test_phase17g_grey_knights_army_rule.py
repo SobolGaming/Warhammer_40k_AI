@@ -24,6 +24,7 @@ from warhammer40k_core.engine.attached_unit_reconciliation import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldRemovalKind,
     BattlefieldRuntimeState,
     ModelPlacement,
     PlacedArmy,
@@ -53,12 +54,19 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseHandler,
     MovementPhaseState,
 )
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    prepare_primary_battlefield_departure,
+    record_prepared_primary_battlefield_departure,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveOrigin,
 )
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
-from warhammer40k_core.engine.rules_units import rules_unit_identities_share_lineage
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_identities_share_lineage,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     unit_arrived_from_reserves_this_turn,
 )
@@ -440,13 +448,14 @@ def test_gate_of_infinity_can_be_used_after_attached_component_loss(
         opponent_xs=(42.0,),
         attached_units=(formation,),
     )
+    _configure_mission_state(state)
     _destroy_test_unit_model(
         state=state,
         unit_instance_id=destroyed.unit_instance_id,
     )
     assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.without_unit_placement(
-        destroyed.unit_instance_id
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        (destroyed.own_models[0].model_instance_id,)
     )
     validate_attached_rules_unit_identity_after_destruction(
         state=state,
@@ -470,11 +479,142 @@ def test_gate_of_infinity_can_be_used_after_attached_component_loss(
     assert reserve_state is not None
     assert reserve_state.unit_instance_id == attached_id
     assert state.battlefield_state.unit_placement_or_none(living.unit_instance_id) is None
+    assert len(state.primary_battlefield_departure_states) == 1
+    departure = state.primary_battlefield_departure_states[0]
+    assert departure.component_unit_instance_ids == formation.component_unit_instance_ids
+    assert departure.affected_component_unit_instance_ids == (living.unit_instance_id,)
+    assert departure.departed_component_unit_instance_ids == (living.unit_instance_id,)
+    assert departure.removed_model_instance_ids == (living.own_models[0].model_instance_id,)
     used_payload = _last_event_payload(decisions, army_rule.GATE_OF_INFINITY_USED_EVENT)
     assert used_payload["target_rules_unit_instance_id"] == attached_id
     assert used_payload["component_unit_instance_ids"] == list(
         formation.component_unit_instance_ids
     )
+    _arrive_rules_unit_from_strategic_reserves(
+        state=state,
+        decisions=decisions,
+        rules_unit_instance_id=attached_id,
+        component_unit_placements=(
+            UnitPlacement(
+                army_id="army-grey",
+                player_id="player-grey",
+                unit_instance_id=living.unit_instance_id,
+                model_placements=(
+                    ModelPlacement(
+                        army_id="army-grey",
+                        player_id="player-grey",
+                        unit_instance_id=living.unit_instance_id,
+                        model_instance_id=living.own_models[0].model_instance_id,
+                        pose=Pose.at(15.0, 0.75),
+                    ),
+                ),
+            ),
+        ),
+        battle_round=2,
+        result_id_prefix=f"gate-after-{destroyed_role}-loss-arrival",
+    )
+
+    arrived_state = state.reserve_state_for_unit(attached_id)
+    assert arrived_state is not None
+    assert arrived_state.status.value == "arrived"
+    assert state.battlefield_state.unit_placement_by_id(living.unit_instance_id) is not None
+    assert state.battlefield_state.unit_placement_or_none(destroyed.unit_instance_id) is None
+    baseline_payload = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+    ).to_payload()
+    assert GameLifecycle.from_payload(deepcopy(baseline_payload)).to_payload() == baseline_payload
+
+
+def test_gate_of_infinity_departure_validation_failure_is_atomic_after_component_loss() -> None:
+    attached_id = "attached-unit:army-grey:terminator-command"
+    bodyguard = _unit(
+        "army-grey:bodyguard",
+        "Brotherhood Terminators",
+        has_gate=False,
+    )
+    leader = _unit("army-grey:leader", "Brotherhood Captain", has_gate=True)
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="phase17g:grey-knights:test-attached-unit",
+        attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+    )
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(formation,),
+    )
+    _configure_mission_state(state)
+    _destroy_test_unit_model(state=state, unit_instance_id=bodyguard.unit_instance_id)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        (bodyguard.own_models[0].model_instance_id,)
+    )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
+    )
+    decisions = DecisionController()
+    request = _request_for(state=state, decisions=decisions)
+    result = DecisionResult.for_request(
+        result_id="result-gate-of-infinity-atomic-failure",
+        request=request,
+        selected_option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+
+    physical_placement = RulesUnitPlacement.from_battlefield(
+        view=rules_unit_view_by_id(state=state, unit_instance_id=attached_id),
+        battlefield_state=state.battlefield_state,
+    )
+    occurrence_id = f"{result.result_id}:reserve-entry:{attached_id}"
+    duplicate_departure = prepare_primary_battlefield_departure(
+        state=state,
+        battlefield_state=physical_placement.without_from_battlefield(state.battlefield_state),
+        rules_unit_instance_id=attached_id,
+        affected_component_unit_instance_ids=(leader.unit_instance_id,),
+        departed_component_unit_instance_ids=(leader.unit_instance_id,),
+        removed_model_instance_ids=(leader.own_models[0].model_instance_id,),
+        removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
+        occurrence_id=occurrence_id,
+        source_id=occurrence_id,
+    )
+    assert duplicate_departure is not None
+    record_prepared_primary_battlefield_departure(
+        state=state,
+        departure=duplicate_departure,
+    )
+    battlefield_before = state.battlefield_state
+    reserve_states_before = tuple(state.reserve_states)
+    departure_states_before = tuple(state.primary_battlefield_departure_states)
+    events_before = tuple(decisions.event_log.records)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary battlefield departure occurrence already exists",
+    ):
+        army_rule.apply_gate_of_infinity_turn_end_result(
+            TurnEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+    assert state.battlefield_state == battlefield_before
+    assert tuple(state.reserve_states) == reserve_states_before
+    assert tuple(state.primary_battlefield_departure_states) == departure_states_before
+    assert tuple(decisions.event_log.records) == events_before
 
 
 def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None:
@@ -499,15 +639,7 @@ def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None
         opponent_xs=(42.0,),
         attached_units=(formation,),
     )
-    mission_setup = _mission_setup()
-    state.mission_setup = mission_setup
-    assert state.battlefield_state is not None
-    state.battlefield_state = replace(
-        state.battlefield_state,
-        battlefield_width_inches=mission_setup.battlefield_width_inches,
-        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
-        terrain_features=mission_setup.terrain_features,
-    )
+    _configure_mission_state(state)
     decisions = DecisionController()
     request = _request_for(state=state, decisions=decisions)
     _apply_result(
@@ -557,6 +689,7 @@ def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None
     state.movement_phase_state = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     _destroy_test_unit_model(state=state, unit_instance_id=bodyguard.unit_instance_id)
+    assert state.battlefield_state is not None
     state.battlefield_state = state.battlefield_state.with_removed_models(
         (bodyguard.own_models[0].model_instance_id,)
     )
@@ -971,6 +1104,19 @@ def _mission_setup() -> MissionSetup:
     )
 
 
+def _configure_mission_state(state: GameState) -> None:
+    mission_setup = _mission_setup()
+    state.mission_setup = mission_setup
+    if state.battlefield_state is None:
+        raise AssertionError("Mission test fixture requires battlefield_state.")
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+    )
+
+
 def _destroy_test_unit_model(*, state: GameState, unit_instance_id: str) -> None:
     state.army_definitions = [
         replace(
@@ -1045,6 +1191,11 @@ def _arrive_rules_unit_from_strategic_reserves(
     proposal_request = MovementProposalRequest.from_decision_request_payload(
         placement_request.payload
     )
+    proposal_context = proposal_request.context
+    assert proposal_context is not None
+    assert proposal_context["component_unit_instance_ids"] == [
+        placement.unit_instance_id for placement in component_unit_placements
+    ]
     placement_result = DecisionResult(
         result_id=f"{result_id_prefix}-place",
         request_id=placement_request.request_id,

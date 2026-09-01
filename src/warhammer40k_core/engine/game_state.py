@@ -174,8 +174,9 @@ from warhammer40k_core.engine.prebattle_records import (
 )
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
+    prepare_primary_battlefield_departure,
     primary_battlefield_departure_states_from_payload,
-    record_primary_battlefield_departure,
+    record_prepared_primary_battlefield_departure,
 )
 from warhammer40k_core.engine.primary_destruction_evidence import (
     PrimaryUnattributedDestructionCause,
@@ -4185,7 +4186,7 @@ class GameState:
             battlefield_state=self.battlefield_state,
         )
         embarked_unit_ids: set[str] = set()
-        for component_unit_id in rules_unit_view.component_unit_instance_ids:
+        for component_unit_id in rules_unit_placement.component_unit_instance_ids:
             cargo_state = self.transport_cargo_state_for_transport(component_unit_id)
             if cargo_state is not None:
                 embarked_unit_ids.update(cargo_state.embarked_unit_instance_ids)
@@ -4209,22 +4210,28 @@ class GameState:
             required_arrival_placement_kind=required_arrival_placement_kind,
         )
         updated_battlefield = rules_unit_placement.without_from_battlefield(self.battlefield_state)
-        if existing_reserve_state is None:
-            self.record_reserve_state(reserve_state)
-        else:
-            self.replace_reserve_state(reserve_state)
-        self.battlefield_state = updated_battlefield
-        departure = record_primary_battlefield_departure(
+        physical_component_ids = rules_unit_placement.component_unit_instance_ids
+        departure = prepare_primary_battlefield_departure(
             state=self,
+            battlefield_state=updated_battlefield,
             rules_unit_instance_id=rules_unit_id,
-            affected_component_unit_instance_ids=(rules_unit_view.component_unit_instance_ids),
-            departed_component_unit_instance_ids=(rules_unit_view.component_unit_instance_ids),
+            affected_component_unit_instance_ids=physical_component_ids,
+            departed_component_unit_instance_ids=physical_component_ids,
             removed_model_instance_ids=tuple(
                 placement.model_instance_id for placement in rules_unit_placement.model_placements
             ),
             removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
             occurrence_id=provider.occurrence_id,
             source_id=provider.occurrence_id,
+        )
+        if existing_reserve_state is None:
+            self.record_reserve_state(reserve_state)
+        else:
+            self.replace_reserve_state(reserve_state)
+        self.battlefield_state = updated_battlefield
+        record_prepared_primary_battlefield_departure(
+            state=self,
+            departure=departure,
         )
         if departure is not None:
             record_primary_reserve_entry_mutation_event(

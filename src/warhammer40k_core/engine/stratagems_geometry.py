@@ -752,7 +752,7 @@ def _reserve_placement_kinds_for_unit(
     return placement_kinds_for_reserve_state(
         reserve_state,
         all_components_have_deep_strike=all(
-            _unit_has_deep_strike_keyword(component.unit) for component in unit.components
+            _unit_has_deep_strike_keyword(component.unit) for component in unit.living_components
         ),
     )
 

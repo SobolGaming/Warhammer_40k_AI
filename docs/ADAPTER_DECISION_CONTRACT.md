@@ -3233,7 +3233,7 @@ arrival.
 
 The request's `placement_kinds` field enumerates the legal physical placement methods available for that unit and state. The submitted payload must match the pending request.
 
-Reserve-arrival and Disembark requests identify the canonical rules unit and carry deterministic `component_unit_instance_ids` and `model_instance_ids` in their source context. A non-attached unit may use `attempted_placement`. An attached rules unit must instead use `attempted_rules_unit_placement`, containing the canonical `rules_unit_instance_id` and exactly one complete `UnitPlacement` for every physical component. The two attempted-placement fields are mutually exclusive. The engine rejects component or model drift before queue pop and validates battlefield legality and coherency across the flattened rules unit before adding any component.
+Reserve-arrival and Disembark requests identify the canonical rules unit and carry deterministic `component_unit_instance_ids` and `model_instance_ids` in their source context. Those inventories contain exactly the currently living physical components and models; destroyed component IDs remain only in immutable Attached Unit lineage and are not placement authority. A non-attached unit may use `attempted_placement`. An attached rules unit must instead use `attempted_rules_unit_placement`, containing the canonical `rules_unit_instance_id` and exactly one complete `UnitPlacement` for every currently living physical component. The two attempted-placement fields are mutually exclusive. The engine rejects component or model drift before queue pop and validates battlefield legality and coherency across the flattened rules unit before adding any component.
 
 Example Strategic Reserves submission shape:
 

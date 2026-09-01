@@ -595,7 +595,9 @@ def _apply_rapid_ingress_handler(
                     "stratagem_handler_id": use_record.handler_id,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
-                    "component_unit_instance_ids": list(unit.component_unit_instance_ids),
+                    "component_unit_instance_ids": [
+                        component.unit.unit_instance_id for component in unit.living_components
+                    ],
                     "model_instance_ids": sorted(
                         model.model_instance_id for model in unit.alive_models()
                     ),
@@ -661,7 +663,9 @@ def _apply_ingress_move_handler(
                     "stratagem_handler_id": GENERIC_INGRESS_MOVE_HANDLER_ID,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
-                    "component_unit_instance_ids": list(unit.component_unit_instance_ids),
+                    "component_unit_instance_ids": [
+                        component.unit.unit_instance_id for component in unit.living_components
+                    ],
                     "model_instance_ids": sorted(
                         model.model_instance_id for model in unit.alive_models()
                     ),

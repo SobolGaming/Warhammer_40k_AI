@@ -66,6 +66,14 @@ PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
         "edge_source_id",
     ),
 }
+PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES = {
+    relative_path: (
+        "prepare_primary_battlefield_departure"
+        if relative_path == "src/warhammer40k_core/engine/game_state.py"
+        else "record_primary_battlefield_departure"
+    )
+    for relative_path in PRIMARY_BATTLEFIELD_DEPARTURE_CALLS
+}
 PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
     "src/warhammer40k_core/engine/game_state.py": "provider.occurrence_id",
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": "result.result_id",
@@ -314,21 +322,18 @@ def test_primary_unit_destruction_tracking_uses_occurrence_identity() -> None:
 
 
 def test_primary_battlefield_departure_callers_and_provenance_are_fail_closed() -> None:
+    audited_call_names = set(PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES.values())
     calls_by_path: dict[str, list[ast.Call]] = {}
     for path in (SRC_ROOT / "engine").rglob("*.py"):
+        if path.name == "primary_battlefield_departure.py":
+            continue
         calls = [
             node
             for node in ast.walk(ast_for(path))
             if isinstance(node, ast.Call)
             and (
-                (
-                    isinstance(node.func, ast.Name)
-                    and node.func.id == "record_primary_battlefield_departure"
-                )
-                or (
-                    isinstance(node.func, ast.Attribute)
-                    and node.func.attr == "record_primary_battlefield_departure"
-                )
+                (isinstance(node.func, ast.Name) and node.func.id in audited_call_names)
+                or (isinstance(node.func, ast.Attribute) and node.func.attr in audited_call_names)
             )
         ]
         if calls:
@@ -356,7 +361,15 @@ def test_primary_battlefield_departure_callers_and_provenance_are_fail_closed() 
             for keyword in calls[0].keywords
             if keyword.arg is not None
         }
-        assert set(keyword_expressions) == required_keywords
+        expected_keywords = set(required_keywords)
+        if relative_path == "src/warhammer40k_core/engine/game_state.py":
+            expected_keywords.add("battlefield_state")
+            assert keyword_expressions["battlefield_state"] == "updated_battlefield"
+        assert set(keyword_expressions) == expected_keywords
+        call_function = calls[0].func
+        assert isinstance(call_function, (ast.Name, ast.Attribute))
+        call_name = call_function.id if isinstance(call_function, ast.Name) else call_function.attr
+        assert call_name == PRIMARY_BATTLEFIELD_DEPARTURE_CALL_NAMES[relative_path]
         assert keyword_expressions["removal_kind"] == expected_kind
         assert keyword_expressions["source_id"] == expected_source
         assert (
@@ -421,7 +434,8 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     assert "rules_unit_placement.without_from_battlefield(self.battlefield_state)" in (
         reserve_owner_source
     )
-    assert "record_primary_battlefield_departure(" in reserve_owner_source
+    assert "prepare_primary_battlefield_departure(" in reserve_owner_source
+    assert "record_prepared_primary_battlefield_departure(" in reserve_owner_source
 
     # Every destructive placement mutation converges on either the shared
     # model-destroyed event owner or an explicit unattributed transition owner.

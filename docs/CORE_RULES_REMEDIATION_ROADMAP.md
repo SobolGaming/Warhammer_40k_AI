@@ -1208,8 +1208,9 @@ split-state mutation are removed.
 `RulesUnitView.living_components` is the single authority for semantic component contribution.
 Rules-unit keyword aggregation, grouped battlefield placement, Embark capacity profiles, Gate of
 Infinity ability/presence/engagement checks, Datasheet/RuleIR/Enhancement reserve-entry authority,
-Daemonic Incursion keyword checks, movement-location enumeration, and Disembark eligibility and
-proposal authority all consume that view. Immutable
+ordinary and Stratagem reserve-arrival proposal context, Deep Strike placement-kind authority,
+arrival drift/integrity validation, Daemonic Incursion keyword checks, movement-location
+enumeration, and Disembark eligibility and proposal authority all consume that view. Immutable
 `component_unit_instance_ids` remain the lineage and replay identity surface; they are not a proxy
 for current semantic or physical presence.
 
@@ -1222,6 +1223,14 @@ physical component is destroyed, its ID is removed from current cargo without re
 start-of-phase history or treating destruction as a Disembark. An unarrived Transport's current
 ReserveState cargo manifest is updated with that cleanup, and transport-state integrity
 rejects any payload that retains a wholly destroyed component as current cargo.
+
+During-battle reserve departure likewise records affected/departed component IDs from the accepted
+living `RulesUnitPlacement`, while retaining the complete Attached Unit lineage on the evidence
+row. Gate of Infinity prepares and validates that evidence against the prospective battlefield
+before changing ReserveState or battlefield state, so a departure-evidence rejection cannot leave
+a partially moved unit. Ordinary, Rapid Ingress, and generic Stratagem arrival requests advertise
+only living physical components, and reserve placement plus replay integrity require that exact
+historical request inventory rather than every immutable lineage component.
 
 Battle-shock, ReserveState, persisting effects, Mission Actions, Fight activation consumption,
 selected-target chains, healing, scoring witnesses, and adapter-visible unit identities stay on the
@@ -1255,7 +1264,7 @@ The generated package hash is
 `3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570` and its canonical artifact
 byte SHA-256 is `748cf1bc4cbd2749655abab43e97c7e04acfa4e63e79b9f84b565001b9c17b66`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:4433f20483de37b564727acb8eb3c6fc0f8bb1330851bc49f42122a5b3f826a0`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:dbd3e0a74057c2fe69ad90b478795cfeffa6260f342881d6869124147a68a17e`.
 
 Load and execution support: The Attached Units rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1296,7 +1305,9 @@ all engine calls for the removed split/recovery/transfer APIs and requires every
 host to invoke retained-identity validation. Follow-up regressions cover Embark after either Leader
 or Bodyguard loss, including capacity exclusion and transition-model precision; Gate of Infinity
 after either loss, with the destroyed component lacking the ability and battlefield placement;
-Daemonic Incursion keyword aggregation; and complete affected-file behavior. Static audit also
+mission-backed Gate departure evidence, actual living-only reserve arrival, lifecycle replay, and
+failure atomicity; Daemonic Incursion keyword aggregation; and complete affected-file behavior.
+Static audit also
 requires grouped Embark placement and every identified ability, keyword, reserve-authority, and
 capacity consumer to use `living_components` instead of directly scanning immutable lineage. The
 post-loss Embark-to-Disembark regression proves cargo drains completely and the retained root is
@@ -1319,11 +1330,15 @@ Validation results:
   Gate of Infinity after either Leader or Bodyguard loss and Daemonic Incursion keyword authority;
   the remaining-blocker transport/static cluster passes all `118` tests, including post-loss
   Embark-to-Disembark, already-embarked destruction cleanup, unarrived-Reserve synchronization,
-  and stale-cargo rejection; the complete code-quality suite passes all `341` tests.
+  and stale-cargo rejection; the reserve-lifecycle follow-up cluster passes all `225` tests,
+  including mission-backed Gate departure, both component-loss arrival directions, replay,
+  failure atomicity, ordinary/Stratagem arrival authority, and the expanded static audit; the
+  complete affected reserve/departure/Stratagem/aircraft/static cluster passes all `529` tests;
+  the complete code-quality suite passes all `342` tests.
 - Repository-wide Ruff check and Ruff format check pass; mypy passes across `2647` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6359 passed` in `438.14s`), including the
+- The required final xdist work-stealing suite passes (`6361 passed` in `445.00s`), including the
   complete code-quality suite.
 - The Attached Units source artifact, final engine build identity, and regenerated external
   contract pass fail-closed checks, including the `origin/main` compatibility comparison.

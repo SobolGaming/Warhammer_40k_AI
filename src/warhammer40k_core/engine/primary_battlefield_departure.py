@@ -7,6 +7,7 @@ from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
+    BattlefieldRuntimeState,
     PlacementError,
     battlefield_removal_kind_from_token,
 )
@@ -307,6 +308,38 @@ def record_primary_battlefield_departure(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Primary battlefield departure tracking requires GameState.")
+    departure = prepare_primary_battlefield_departure(
+        state=state,
+        battlefield_state=state.battlefield_state,
+        rules_unit_instance_id=rules_unit_instance_id,
+        affected_component_unit_instance_ids=affected_component_unit_instance_ids,
+        departed_component_unit_instance_ids=departed_component_unit_instance_ids,
+        removed_model_instance_ids=removed_model_instance_ids,
+        removal_kind=removal_kind,
+        occurrence_id=occurrence_id,
+        source_id=source_id,
+    )
+    record_prepared_primary_battlefield_departure(state=state, departure=departure)
+    return departure
+
+
+def prepare_primary_battlefield_departure(
+    *,
+    state: GameState,
+    battlefield_state: BattlefieldRuntimeState | None,
+    rules_unit_instance_id: str,
+    affected_component_unit_instance_ids: tuple[str, ...],
+    departed_component_unit_instance_ids: tuple[str, ...],
+    removed_model_instance_ids: tuple[str, ...],
+    removal_kind: BattlefieldRemovalKind,
+    occurrence_id: str,
+    source_id: str,
+) -> PrimaryBattlefieldDepartureState | None:
+    """Build and validate departure evidence against a prospective battlefield."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Primary battlefield departure tracking requires GameState.")
     if state.mission_setup is None:
         return None
     if state.stage is not GameLifecycleStage.BATTLE:
@@ -366,8 +399,8 @@ def record_primary_battlefield_departure(
         raise GameLifecycleError(
             "Primary battlefield departure removed models do not belong to an affected component."
         )
-    battlefield = state.battlefield_state
-    if battlefield is None:
+    battlefield = battlefield_state
+    if type(battlefield) is not BattlefieldRuntimeState:
         raise GameLifecycleError("Primary battlefield departure requires battlefield_state.")
     if set(removed_model_ids).intersection(battlefield.placed_model_ids()):
         raise GameLifecycleError(
@@ -424,9 +457,34 @@ def record_primary_battlefield_departure(
         for existing in state.primary_battlefield_departure_states
     ):
         raise GameLifecycleError("Primary battlefield departure occurrence already exists.")
+    return departure
+
+
+def record_prepared_primary_battlefield_departure(
+    *,
+    state: GameState,
+    departure: PrimaryBattlefieldDepartureState | None,
+) -> None:
+    """Commit evidence that was validated before its authoritative mutation."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Primary battlefield departure tracking requires GameState.")
+    if departure is None:
+        if state.mission_setup is not None:
+            raise GameLifecycleError("Mission play requires prepared departure evidence.")
+        return
+    if type(departure) is not PrimaryBattlefieldDepartureState:
+        raise GameLifecycleError("Prepared primary battlefield departure must be typed evidence.")
+    if departure.game_id != state.game_id:
+        raise GameLifecycleError("Prepared primary battlefield departure game_id drift.")
+    if any(
+        existing.departure_id == departure.departure_id
+        for existing in state.primary_battlefield_departure_states
+    ):
+        raise GameLifecycleError("Primary battlefield departure occurrence already exists.")
     state.primary_battlefield_departure_states.append(departure)
     state.primary_battlefield_departure_states.sort(key=lambda value: value.departure_id)
-    return departure
 
 
 def primary_battlefield_departure_states_from_payload(

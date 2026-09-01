@@ -122,7 +122,9 @@ def _request_reinforcement_placement(
         context={
             "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "reserve_state": validate_json_value(reserve_state.to_payload()),
-            "component_unit_instance_ids": list(rules_unit.component_unit_instance_ids),
+            "component_unit_instance_ids": [
+                component.unit.unit_instance_id for component in rules_unit.living_components
+            ],
             "model_instance_ids": validate_json_value(
                 sorted(model.model_instance_id for model in rules_unit.alive_models())
             ),
@@ -173,7 +175,7 @@ def _reserve_placement_kinds_for_unit(
     return placement_kinds_for_reserve_state(
         reserve_state,
         all_components_have_deep_strike=all(
-            _unit_has_deep_strike_keyword(component.unit) for component in unit.components
+            _unit_has_deep_strike_keyword(component.unit) for component in unit.living_components
         ),
     )
 

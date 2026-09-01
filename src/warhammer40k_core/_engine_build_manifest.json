@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4433f20483de37b564727acb8eb3c6fc0f8bb1330851bc49f42122a5b3f826a0",
-  "fingerprint": "4433f20483de37b564727acb8eb3c6fc0f8bb1330851bc49f42122a5b3f826a0",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dbd3e0a74057c2fe69ad90b478795cfeffa6260f342881d6869124147a68a17e",
+  "fingerprint": "dbd3e0a74057c2fe69ad90b478795cfeffa6260f342881d6869124147a68a17e",
   "resource_count": 2477,
   "resources": [
     {
@@ -9210,9 +9210,9 @@
       "sha256": "546b87af37cf2ab8707ec2acdfc3e96f84b062fcc73ba046b28e44770c8d49df"
     },
     {
-      "byte_length": 311685,
+      "byte_length": 311952,
       "path": "warhammer40k_core/engine/game_state.py",
-      "sha256": "b10477dea5e507a54e9d9da230e5478d8bf5ecd998e4071ecd459a86d2c04ef9"
+      "sha256": "72b8f7fd9fc05800f870ab29de3ad1c09c140bb67ebf998d58abd8cb31796642"
     },
     {
       "byte_length": 11051,
@@ -9780,9 +9780,9 @@
       "sha256": "f465946f08576124ca28706ff482957985e717471bdd399363e83154f67159c0"
     },
     {
-      "byte_length": 29145,
+      "byte_length": 29217,
       "path": "warhammer40k_core/engine/phases/movement_reinforcements.py",
-      "sha256": "491788cdbb89f29119bbcc6bba0bb9342ed407922b9ecc28fa0eea51176248ea"
+      "sha256": "639bcee043b672588bf1af34cf9c6198924b689d98bc75ccecd5e48b33fa42ff"
     },
     {
       "byte_length": 64676,
@@ -9935,9 +9935,9 @@
       "sha256": "7da02ef2bd143f4b7c9f9b6dd92438e2c50d62928276a0f064f71588e5a410cf"
     },
     {
-      "byte_length": 25229,
+      "byte_length": 27774,
       "path": "warhammer40k_core/engine/primary_battlefield_departure.py",
-      "sha256": "d0a2d0b4d390d0501586a408b263e877b56b76a3bec6493b7aae8ba082427b4e"
+      "sha256": "02da50bb229ab91fff8f8aee1b2297dee80d591fa8c07857095576761d041487"
     },
     {
       "byte_length": 48666,
@@ -10140,9 +10140,9 @@
       "sha256": "1653edbabefd44e4fb2164a0eb6d2a6bc1a58016eea4f78c258555bfceeb05f7"
     },
     {
-      "byte_length": 47245,
+      "byte_length": 48363,
       "path": "warhammer40k_core/engine/primary_reserve_arrival_integrity.py",
-      "sha256": "72f6fddbddc599499b9f1b7f503a41f9bfb8e2586a1f2b43c0e307e94cb93712"
+      "sha256": "3643186833f4a11250a997813d408d2dcf003d919a723b391f2e9245370e9ada"
     },
     {
       "byte_length": 59980,
@@ -10385,9 +10385,9 @@
       "sha256": "143f9753380670125102cc075f39558c890a52593f501f01be12604d058bd555"
     },
     {
-      "byte_length": 111821,
+      "byte_length": 111923,
       "path": "warhammer40k_core/engine/reserves.py",
-      "sha256": "b734f6c2039034cb2f18515b83d8f8af75fa9eb85227e09d258a73cd01fa066f"
+      "sha256": "85e4d90c6ef2edb897c164b21a2a44e626d2bd4dbeed34bf67bfcc37dfda2cc3"
     },
     {
       "byte_length": 39094,
@@ -10745,9 +10745,9 @@
       "sha256": "a50efae6c9e0102236863ad2186addeeeea9d93bce53c794259030c2dd1c9828"
     },
     {
-      "byte_length": 40607,
+      "byte_length": 40769,
       "path": "warhammer40k_core/engine/stratagems_core_handlers.py",
-      "sha256": "86a9c1b20c094e8387ec97d483f9c987e8e4a1de062ec6a5cc94dd9701ddb0d1"
+      "sha256": "c73584a68a9dcb82905454d2f1f0639e06609380504b1f15254a384fb78766da"
     },
     {
       "byte_length": 46411,
@@ -10775,9 +10775,9 @@
       "sha256": "c09e484e4785ec135e6715335c1eebe1fad4387d2da68892da224a1febe87e7d"
     },
     {
-      "byte_length": 54426,
+      "byte_length": 54249,
       "path": "warhammer40k_core/engine/stratagems_generic_rule_ir.py",
-      "sha256": "4bbb41fd5e0a9e4b067ae9765d0d99a46460a1fbc041fd2d4229c7f80ed8f3ae"
+      "sha256": "94330a51276ebb7ad9a8ece2b23656d59fd05138c8511c46977aa1c0f381401e"
     },
     {
       "byte_length": 5388,
@@ -10790,9 +10790,9 @@
       "sha256": "74c9020840eb25ad301c08a37e5b6927118b5a1649e2741fe24eddbe86b4cd41"
     },
     {
-      "byte_length": 44207,
+      "byte_length": 44214,
       "path": "warhammer40k_core/engine/stratagems_geometry.py",
-      "sha256": "49ef01abc1b08339e5a7d03516253cf24ead46dacd7c77252e1fb8c1bdd27947"
+      "sha256": "3fd6b90d66155ca9ac7309a00480380e1122c9563ab46de84b01c4c8cb4f2548"
     },
     {
       "byte_length": 9819,
