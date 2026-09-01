@@ -109,6 +109,11 @@ def validate_pending_attack_destruction_boundary(
     if attack_sequence.attacks_resolved_event_id is None:
         if boundary_matches:
             raise GameLifecycleError("Pending attack destruction boundary evidence drift.")
+        _validate_pending_attack_destruction_queue_order(
+            attack_sequence=attack_sequence,
+            sequence_deferrals=sequence_deferrals,
+            before_boundary=True,
+        )
         if not attack_sequence.is_complete:
             _validate_pre_boundary_attack_destruction_evidence(
                 attack_sequence=attack_sequence,
@@ -155,6 +160,40 @@ def validate_pending_attack_destruction_boundary(
         or indexes[deferred_matches[0].event_id] >= indexes[attacks_resolved_event.event_id]
     ):
         raise GameLifecycleError("Pending attack destruction boundary evidence drift.")
+    _validate_pending_attack_destruction_queue_order(
+        attack_sequence=attack_sequence,
+        sequence_deferrals=sequence_deferrals,
+        before_boundary=False,
+    )
+
+
+def _validate_pending_attack_destruction_queue_order(
+    *,
+    attack_sequence: AttackSequence,
+    sequence_deferrals: tuple[EventRecord, ...],
+    before_boundary: bool,
+) -> None:
+    pending_order = tuple(
+        (
+            queued.damage_event_id,
+            queued.attack_context["attack_context_id"],
+        )
+        for queued in attack_sequence.pending_attack_destructions
+    )
+    deferral_order = tuple(
+        (
+            cast(dict[str, JsonValue], event.payload).get("damage_event_id"),
+            cast(dict[str, JsonValue], event.payload).get("attack_context_id"),
+        )
+        for event in sequence_deferrals
+    )
+    expected_order = (
+        deferral_order
+        if before_boundary
+        else deferral_order[len(deferral_order) - len(pending_order) :]
+    )
+    if pending_order != expected_order:
+        raise GameLifecycleError("Pending attack destruction queue order drift.")
 
 
 def _validate_pre_boundary_attack_destruction_evidence(

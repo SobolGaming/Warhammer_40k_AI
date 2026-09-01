@@ -12029,6 +12029,8 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     attacker = units["intercessor-1"]
     defender = units["enemy"]
     first_target = defender.own_models[0]
+    second_target = defender.own_models[1]
+    third_target = defender.own_models[2]
     deadly_demise_source = DestructionReactionSource(
         source_id="order-9-p05a-deadly-demise",
         reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
@@ -12051,6 +12053,16 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
             deadly_demise_source,
         ),
     )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=second_target.model_instance_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="order-9-p05a-second-shoot-on-death",
+                reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+                source_rule_id="order-9-p05a-second-shoot-on-death-rule",
+            ),
+        ),
+    )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         profile_id="order-9-p05a-rifle",
@@ -12071,7 +12083,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
                 attacker=attacker,
                 defender=defender,
                 weapon_profile=weapon_profile,
-                attacks=2,
+                attacks=3,
             ),
         ),
     )
@@ -12085,7 +12097,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
             ),
             value=6,
         )
-        for attack_number in (1, 2)
+        for attack_number in (1, 2, 3)
     )
     save_results = tuple(
         _fixed_roll_result(
@@ -12098,7 +12110,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
             ),
             value=1,
         )
-        for attack_number in (1, 2)
+        for attack_number in (1, 2, 3)
     )
     injected_results = (
         *wound_results,
@@ -12129,7 +12141,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     )
     for allocation_index in range(8):
         assert remaining is not None
-        if remaining.pending_attack_destructions:
+        if len(remaining.pending_attack_destructions) >= 2:
             break
         allocation_request = _decision_request(cast(LifecycleStatus, status))
         assert allocation_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
@@ -12152,7 +12164,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         raise AssertionError("Order 9 fixture did not reach pre-boundary destruction state.")
 
     assert remaining is not None
-    assert remaining.pending_attack_destructions
+    assert len(remaining.pending_attack_destructions) == 2
     assert remaining.attacks_resolved_event_id is None
     pre_boundary_request = _decision_request(cast(LifecycleStatus, status))
     assert pre_boundary_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
@@ -12178,6 +12190,28 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         pre_boundary_restored.decision_controller.queue.peek_next().request_id
         == pre_boundary_request.request_id
     )
+    reordered_pre_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(pre_boundary_checkpoint, sort_keys=True)),
+    )
+    reordered_pre_boundary_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], reordered_pre_boundary_checkpoint["state"])[
+                "shooting_phase_state"
+            ],
+        )["attack_sequence"],
+    )
+    cast(
+        list[dict[str, object]],
+        reordered_pre_boundary_sequence["pending_attack_destructions"],
+    ).reverse()
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction queue order drift",
+    ):
+        GameLifecycle.from_payload(reordered_pre_boundary_checkpoint)
     forged_pre_boundary_checkpoint = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(pre_boundary_checkpoint, sort_keys=True)),
@@ -12214,7 +12248,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     request = _decision_request(cast(LifecycleStatus, status))
     assert remaining is not None
     assert remaining.attacks_resolved_event_id is not None
-    assert len(remaining.pending_attack_destructions) == 1
+    assert len(remaining.pending_attack_destructions) == 2
     assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
     events = lifecycle.decision_controller.event_log.records
     event_index_by_id = {event.event_id: index for index, event in enumerate(events)}
@@ -12266,12 +12300,13 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         and event.payload.get("sequence_id") == sequence_id
     )
 
-    assert len(damage_events) == 2
+    assert len(damage_events) == 3
     assert {
         cast(dict[str, object], event.payload)["attack_context_id"] for event in damage_events
     } == {
         f"{sequence_id}:pool-001:attack-001",
         f"{sequence_id}:pool-001:attack-002",
+        f"{sequence_id}:pool-001:attack-003",
     }
     damage_applications = tuple(
         cast(
@@ -12286,7 +12321,8 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         for application in damage_applications
     } == {
         first_target.model_instance_id,
-        defender.own_models[1].model_instance_id,
+        second_target.model_instance_id,
+        third_target.model_instance_id,
     }
     deferred_damage_event_id = cast(dict[str, object], deferred_event.payload)["damage_event_id"]
     later_damage_event = next(
@@ -12295,7 +12331,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     assert cast(dict[str, object], deferred_event.payload)["timing_rule_id"] == (
         CORE_DESTROYED_TIMING_RULE_ID
     )
-    assert cast(dict[str, object], attacks_resolved_event.payload)["pending_destruction_count"] == 1
+    assert cast(dict[str, object], attacks_resolved_event.payload)["pending_destruction_count"] == 2
     assert (
         event_index_by_id[deferred_event.event_id] < event_index_by_id[later_damage_event.event_id]
     )
@@ -12348,6 +12384,27 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     assert restored_shooting is not None
     assert restored_shooting.attack_sequence == remaining
     assert restored.decision_controller.queue.peek_next().request_id == request.request_id
+    reordered_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    reordered_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], reordered_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    reordered_pending = cast(
+        list[dict[str, object]],
+        reordered_sequence["pending_attack_destructions"],
+    )
+    reordered_pending.reverse()
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction queue order drift",
+    ):
+        GameLifecycle.from_payload(reordered_checkpoint)
     drifted_checkpoint = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(checkpoint, sort_keys=True)),
@@ -12374,7 +12431,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         for event in drifted_boundary_checkpoint["decisions"]["event_log"]
         if event["event_type"] == "attack_sequence_attacks_resolved"
     )
-    cast(dict[str, object], boundary_event["payload"])["pending_destruction_count"] = 2
+    cast(dict[str, object], boundary_event["payload"])["pending_destruction_count"] = 3
     with pytest.raises(
         GameLifecycleError,
         match="Pending attack destruction boundary evidence drift",
@@ -12453,6 +12510,45 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         match="Pending attack destruction attack pool evidence drift",
     ):
         GameLifecycle.from_payload(drifted_profile_checkpoint)
+
+    declined_record = lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="order-9-p05a-first-reaction-declined",
+            request=request,
+            selected_option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        )
+    )
+    suffix_sequence, suffix_allocated_ids, suffix_status = apply_destruction_reaction_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=remaining,
+        result=declined_record.result,
+        already_allocated_model_ids=_allocated_ids,
+    )
+    assert suffix_sequence is not None
+    assert len(suffix_sequence.pending_attack_destructions) == 1
+    assert (
+        suffix_sequence.pending_attack_destructions[0].damage_application.model_instance_id
+        == second_target.model_instance_id
+    )
+    assert suffix_status is None
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=suffix_sequence,
+        allocated_model_ids_this_phase=suffix_allocated_ids,
+    )
+    suffix_restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    assert suffix_restored.state is not None
+    suffix_shooting = suffix_restored.state.shooting_phase_state
+    assert suffix_shooting is not None
+    assert suffix_shooting.attack_sequence == suffix_sequence
 
 
 def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywords() -> None:

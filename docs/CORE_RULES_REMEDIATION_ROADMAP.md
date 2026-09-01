@@ -1398,12 +1398,15 @@ on this resolver, so no adapter or phase-local timing path is introduced.
 Checkpoint restore validates each pending record against one logical-death authority, original
 damage event, deferral event, complete attack-pool commitment, captured sources and placement,
 attacks-resolved event, and event ordering. Before the boundary, restore requires the boundary
-event to be absent and accepts the retained queue only while ordinary attacks remain or a typed
-Devastating Wounds continuation is still pending. Once all pre-boundary work is complete, the
-attacks-resolved event is mandatory. A queued record may remain while its post-removal optional
-decision is pending, but a pre-removal record cannot be restored without its retained placement
-and unfinalized cause. Damage, deferral, attack-pool, boundary, removal, optional decision, and
-cause identities reject missing, duplicate, forged, or reordered evidence.
+event to be absent and requires the serialized queue's ordered damage-event/context pairs to equal
+the complete deferral-event order. It accepts that retained queue only while ordinary attacks
+remain or a typed Devastating Wounds continuation is still pending. Once all pre-boundary work is
+complete, the attacks-resolved event is mandatory. After the boundary, the serialized queue must
+be an exact suffix of deferral-event order because resolution can only remove index zero. A queued
+record may remain while its post-removal optional decision is pending, but a pre-removal record
+cannot be restored without its retained placement and unfinalized cause. Damage, deferral,
+attack-pool, queue-order, boundary, removal, optional decision, and cause identities reject
+missing, duplicate, forged, or reordered evidence.
 
 Specific authoritative 40k.app rule/statement and source ID: 05.04.04, `DESTROYED`, states that if
 a destruction-triggered rule applies to a model destroyed as the result of an attack, unless
@@ -1425,7 +1428,7 @@ The generated package hash is
 `ec4bf56033c8c90db0a2870051a5ea472a42f7767ed48299bc0352a2b1092a5f` and its canonical artifact
 byte SHA-256 is `161c67830d5976033e04f9ab64830e0ddc4ddca93e95e270945839b60d53bdd9`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:921c8f30ca56876ea2dcab86b2c8edf78cd580892ddbda9591eea497b1dd2942`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:626e1cc6ae12885b263c667b6b18f0ad7b4fecc90cffdbd08c91a8238fe54777`.
 
 Load and execution support: The Destroyed rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1450,8 +1453,10 @@ Regression scenarios and same-bug-class search: The Order 9 regression uses real
 and multiple attacks from one rules unit. Its first casualty owns mandatory Deadly Demise and an
 optional Shoot on Death source; it proves the later attack's damage precedes the attacks-resolved
 event, both reaction classes and removal follow that event, and the queue survives pre-boundary and
-post-boundary JSON/full-lifecycle round trips. Forged early or missing completed boundary evidence,
-damage-event binding, attacker-model attribution, and full weapon-profile payloads fail restore.
+post-boundary JSON/full-lifecycle round trips. Two retained casualties prove that reversing the
+queue fails both before and after the boundary while the legitimate remaining suffix restores.
+Forged early or missing completed boundary evidence, damage-event binding, attacker-model
+attribution, and full weapon-profile payloads fail restore.
 Existing grouped damage,
 Destroyed Transport, Deadly Demise secondary casualty, Fight On Death, optional reaction, and
 invalid-submission suites exercise the shared changes. Static audit requires attack damage to use
@@ -1466,15 +1471,15 @@ decision-contract documents and this finding record.
 
 Validation results:
 
-- The complete affected Shooting, Emperor's Children, Aeldari destruction-reaction, source, and
-  static-audit cluster passes all `409` tests after adopting the end-of-attacks boundary; the
-  focused Order 9 regression additionally covers pre-boundary restore and rejects forged or
-  missing boundary evidence, damage-event drift, attacker substitution, and full weapon-profile
-  substitution. The complete serial code-quality suite passes all `344` tests.
+- The focused Shooting and attack-resolution convergence cluster passes all `184` tests. The
+  focused Order 9 regression additionally covers pre-boundary restore, rejects reversed two-entry
+  queues before and after the boundary, accepts the legitimate post-boundary suffix, and rejects
+  forged or missing boundary evidence, damage-event drift, attacker substitution, and full
+  weapon-profile substitution. The complete code-quality suite is included in the final full run.
 - Repository-wide Ruff check and Ruff format check pass; mypy passes across `2653` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6366 passed` in `437.20s`), including the
+- The required final xdist work-stealing suite passes (`6366 passed` in `427.80s`), including the
   complete code-quality suite. The four CI-equivalent behavioral coverage shards also pass and
   their combined branch report satisfies the repository's `85%` threshold.
 - The Attack Sequence source artifact, final engine build identity, and regenerated external

@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:921c8f30ca56876ea2dcab86b2c8edf78cd580892ddbda9591eea497b1dd2942",
-  "fingerprint": "921c8f30ca56876ea2dcab86b2c8edf78cd580892ddbda9591eea497b1dd2942",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:626e1cc6ae12885b263c667b6b18f0ad7b4fecc90cffdbd08c91a8238fe54777",
+  "fingerprint": "626e1cc6ae12885b263c667b6b18f0ad7b4fecc90cffdbd08c91a8238fe54777",
   "resource_count": 2484,
   "resources": [
     {
@@ -9530,9 +9530,9 @@
       "sha256": "a8403755b9941d4cef8a5f8196eb1143f42c8e5489c282c1c94d633487152a52"
     },
     {
-      "byte_length": 13305,
+      "byte_length": 14605,
       "path": "warhammer40k_core/engine/model_destruction_cause_attack_restore.py",
-      "sha256": "29dbc600df6be1c48425e0c41d72e3b47b9383ded8f081a56cff48f87d65231b"
+      "sha256": "ae48b5d0d51b60539e78df718dd5812ba428abdf1dc32925aa2364898a7e0633"
     },
     {
       "byte_length": 43765,

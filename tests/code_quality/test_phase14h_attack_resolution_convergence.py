@@ -175,6 +175,8 @@ def test_p05a_attack_destruction_reactions_share_one_end_of_attacks_boundary() -
     assert "pending.attack_pool_evidence_sha256" in restore_source
     assert "if attack_sequence.attacks_resolved_event_id is None:" in restore_source
     assert "if not attack_sequence.is_complete:" in restore_source
+    assert "_validate_pending_attack_destruction_queue_order(" in restore_source
+    assert "pending_order != expected_order" in restore_source
     assert "remove_destroyed_model_from_battlefield(" in boundary_source
     assert "resolve_pending_attack_destruction_until_blocked(" in dispatch_source
     assert (
