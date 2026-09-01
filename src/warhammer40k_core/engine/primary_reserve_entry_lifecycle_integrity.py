@@ -62,14 +62,8 @@ from warhammer40k_core.engine.primary_reserve_entry_source_integrity import (
     validate_primary_reserve_entry_source_requirements,
     validate_primary_reserve_entry_source_terminal_semantics,
 )
-from warhammer40k_core.engine.primary_reserve_entry_state_integrity import (
-    validated_attached_split_reserve_source_by_successor_id,
-)
 from warhammer40k_core.engine.reserve_restriction_integrity import (
     reserve_arrival_restriction_expiry_is_proven,
-)
-from warhammer40k_core.engine.reserve_state_attached_split import (
-    RESERVE_STATE_ATTACHED_SPLIT_EVENT,
 )
 from warhammer40k_core.engine.reserves import (
     ReserveOrigin,
@@ -806,48 +800,12 @@ def _validate_during_battle_reserve_state_reverse_closure(
                     "Repeated reserve arrival decision predates its entry occurrence."
                 )
             consumed_arrival_orders.add(intervening[0].event_order)
-    split_source_by_successor_id = validated_attached_split_reserve_source_by_successor_id(
-        state=state,
-        event_records=event_records,
-    )
-    split_sources = {
-        source.unit_instance_id: source for source in split_source_by_successor_id.values()
-    }
-    split_transfer_order_by_source_id: dict[str, int] = {}
-    for event in event_records:
-        if event.event_type != RESERVE_STATE_ATTACHED_SPLIT_EVENT:
-            continue
-        payload = _json_object(event.payload, field_name="Attached split reserve event")
-        historical_id = _required_identifier(
-            payload.get("historical_unit_instance_id"),
-            field_name="Attached split historical reserve unit",
-        )
-        if historical_id in split_transfer_order_by_source_id:
-            raise GameLifecycleError("Attached split reserve source is duplicated.")
-        split_transfer_order_by_source_id[historical_id] = event_index_by_id[event.event_id]
     current_reserve_ids = {reserve_state.unit_instance_id for reserve_state in state.reserve_states}
-    for historical_unit_id, historical_occurrences in occurrences_by_historical_unit_id.items():
-        if historical_unit_id in current_reserve_ids:
-            continue
-        split_source = split_sources.get(historical_unit_id)
-        transfer_order = split_transfer_order_by_source_id.get(historical_unit_id)
-        if split_source is None or transfer_order is None:
-            raise GameLifecycleError(
-                "Authoritative reserve-entry occurrence lacks its persisted ReserveState."
-            )
-        pre_transfer = tuple(
-            occurrence
-            for occurrence in historical_occurrences
-            if occurrence.event_order < transfer_order
+    missing_current_ids = set(occurrences_by_historical_unit_id).difference(current_reserve_ids)
+    if missing_current_ids:
+        raise GameLifecycleError(
+            "Authoritative reserve-entry occurrence lacks its canonical ReserveState."
         )
-        if len(pre_transfer) != len(historical_occurrences) or not pre_transfer:
-            raise GameLifecycleError("Attached split reserve occurrence ordering drift.")
-        latest_pre_transfer = max(
-            pre_transfer,
-            key=lambda occurrence: occurrence.event_order,
-        )
-        if latest_pre_transfer.reserve_entry_state != reserve_entry_evidence_payload(split_source):
-            raise GameLifecycleError("Attached split reserve source occurrence drift.")
     for reserve_state in state.reserve_states:
         if reserve_state.reserve_origin not in during_battle_origins:
             continue
@@ -855,65 +813,23 @@ def _validate_during_battle_reserve_state_reverse_closure(
             reserve_state.unit_instance_id,
             [],
         )
-        if direct_occurrences:
-            latest = max(direct_occurrences, key=lambda occurrence: occurrence.event_order)
-            if reserve_entry_evidence_payload(reserve_state) != latest.reserve_entry_state:
-                raise GameLifecycleError(
-                    "During-battle ReserveState drifted from its authoritative entry occurrence."
-                )
-            consumed_order = _validate_current_reserve_status(
-                state=state,
-                reserve_state=reserve_state,
-                entry_order=latest.event_order,
-                arrival_occurrences=tuple(
-                    arrival
-                    for arrival in arrivals_by_unit_id.get(reserve_state.unit_instance_id, [])
-                    if arrival.event_order > latest.event_order
-                ),
-                event_records=event_records,
-                event_index_by_id=event_index_by_id,
-            )
-            if consumed_order is not None:
-                consumed_arrival_orders.add(consumed_order)
-            continue
-        split_source = split_source_by_successor_id.get(reserve_state.unit_instance_id)
-        if split_source is None or split_source.reserve_origin not in during_battle_origins:
+        if not direct_occurrences:
             raise GameLifecycleError(
                 "During-battle ReserveState lacks an authoritative entry occurrence."
             )
-        historical_occurrences = occurrences_by_historical_unit_id.get(
-            split_source.unit_instance_id,
-            [],
-        )
-        matching_source_occurrences = tuple(
-            occurrence
-            for occurrence in historical_occurrences
-            if occurrence.reserve_entry_state == reserve_entry_evidence_payload(split_source)
-        )
-        if not matching_source_occurrences:
+        latest = max(direct_occurrences, key=lambda occurrence: occurrence.event_order)
+        if reserve_entry_evidence_payload(reserve_state) != latest.reserve_entry_state:
             raise GameLifecycleError(
-                "Split during-battle ReserveState lacks its authoritative source occurrence."
+                "During-battle ReserveState drifted from its authoritative entry occurrence."
             )
-    for source_unit_id, split_source in split_sources.items():
-        if split_source.reserve_origin not in during_battle_origins:
-            continue
-        source_occurrences = occurrences_by_historical_unit_id.get(source_unit_id, [])
-        if not source_occurrences:
-            raise GameLifecycleError(
-                "Split during-battle ReserveState lacks its authoritative source occurrence."
-            )
-        latest_source = max(source_occurrences, key=lambda occurrence: occurrence.event_order)
-        transfer_order = split_transfer_order_by_source_id.get(source_unit_id)
-        if transfer_order is None or latest_source.event_order >= transfer_order:
-            raise GameLifecycleError("Attached split reserve occurrence ordering drift.")
         consumed_order = _validate_current_reserve_status(
             state=state,
-            reserve_state=split_source,
-            entry_order=latest_source.event_order,
+            reserve_state=reserve_state,
+            entry_order=latest.event_order,
             arrival_occurrences=tuple(
                 arrival
-                for arrival in arrivals_by_unit_id.get(source_unit_id, [])
-                if latest_source.event_order < arrival.event_order < transfer_order
+                for arrival in arrivals_by_unit_id.get(reserve_state.unit_instance_id, [])
+                if arrival.event_order > latest.event_order
             ),
             event_records=event_records,
             event_index_by_id=event_index_by_id,

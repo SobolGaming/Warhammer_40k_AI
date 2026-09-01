@@ -3630,10 +3630,10 @@ def test_phase17d_ability_bridge_executes_compiled_rule_ir_payload() -> None:
     assert rule_execution["rule_ir_hash"] == compiled.rule_ir.ir_hash()
 
 
-def test_phase17d_leading_model_condition_survives_destroyed_bodyguard_split() -> None:
-    leader_state = _bodyguard_destroyed_split_state()
-    support_state = _bodyguard_destroyed_split_state()
-    bodyguard_state = _bodyguard_destroyed_split_state()
+def test_phase17d_leading_model_condition_survives_destroyed_bodyguard() -> None:
+    leader_state = _bodyguard_destroyed_attached_state()
+    support_state = _bodyguard_destroyed_attached_state()
+    bodyguard_state = _bodyguard_destroyed_attached_state()
     bodyguard_id = "army-alpha:bodyguard-unit"
     leader_id = "army-alpha:leader-unit"
     support_id = "army-alpha:support-unit"
@@ -3670,7 +3670,7 @@ def test_phase17d_leading_model_condition_survives_destroyed_bodyguard_split() -
         registry=default_rule_execution_registry(),
     )
 
-    assert not leader_state.army_definitions[0].attached_units
+    assert len(leader_state.army_definitions[0].attached_units) == 1
     assert leader_state.unit_started_battle_as_attached_leader_or_support(leader_id)
     assert leader_state.unit_started_battle_as_attached_leader_or_support(support_id)
     assert (
@@ -3711,7 +3711,7 @@ def test_phase17d_leading_model_condition_fails_closed_without_state_or_source()
 
 
 def test_phase17d_ability_bridge_passes_state_for_leading_model_condition() -> None:
-    state = _bodyguard_destroyed_split_state()
+    state = _bodyguard_destroyed_attached_state()
     leader_id = "army-alpha:leader-unit"
     compiled = _compiled(_skullmaster_fury_text())
     record = AbilityCatalogRecord(
@@ -4219,7 +4219,7 @@ def _battle_state_with_attached_leader_support() -> GameState:
     return state
 
 
-def _bodyguard_destroyed_split_state() -> GameState:
+def _bodyguard_destroyed_attached_state() -> GameState:
     state = _battle_state_with_attached_leader_support()
     bodyguard = _unit_by_id(state, "army-alpha:bodyguard-unit")
     for model_instance_id in bodyguard.own_model_ids():
@@ -4228,15 +4228,6 @@ def _bodyguard_destroyed_split_state() -> GameState:
             model_instance_id=model_instance_id,
             remove_from_battlefield=False,
         )
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
-        surviving_unit_instance_ids=(
-            "army-alpha:leader-unit",
-            "army-alpha:support-unit",
-        ),
-        event_log=EventLog(),
-    )
     return state
 
 

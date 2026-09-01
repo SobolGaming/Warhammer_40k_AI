@@ -38,17 +38,12 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequestPayload,
 )
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
-from warhammer40k_core.engine.attached_unit_split_history import (
-    alive_attached_component_unit_ids,
-    record_attached_rules_unit_split,
-)
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,
 )
 from warhammer40k_core.engine.battle_shock_state import (
     record_battle_shock_result,
-    transfer_battle_shock_after_attached_unit_split,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
@@ -231,10 +226,6 @@ from warhammer40k_core.engine.ranged_attack_history_lineage import (
 )
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
     ranged_attack_history_unit_owner_ids as _ranged_attack_history_unit_owner_ids,
-)
-from warhammer40k_core.engine.reserve_state_attached_split import (
-    arrived_reserve_state_split_successors,
-    transfer_arrived_reserve_state_after_attached_unit_split,
 )
 from warhammer40k_core.engine.reserve_state_queries import (
     reserve_state_for_rules_unit,
@@ -3473,43 +3464,6 @@ class GameState:
         ]
         return tuple(sorted(expired, key=lambda effect: effect.effect_id))
 
-    def transfer_persisting_effects_after_attached_unit_split(
-        self,
-        *,
-        attached_unit_instance_id: str,
-        surviving_unit_instance_ids: tuple[str, ...],
-    ) -> tuple[PersistingEffect, ...]:
-        requested_attached_id = _validate_identifier(
-            "attached_unit_instance_id",
-            attached_unit_instance_id,
-        )
-        survivor_ids = _validate_identifier_tuple(
-            "surviving_unit_instance_ids",
-            surviving_unit_instance_ids,
-            min_length=1,
-            sort_values=True,
-        )
-        unit_ids = _known_rules_unit_ids(
-            army_definitions=self.army_definitions,
-            starting_strength_records=self.starting_strength_records,
-        )
-        if requested_attached_id not in unit_ids:
-            raise GameLifecycleError("Attached-unit split source unit is unknown.")
-        if any(unit_id not in unit_ids for unit_id in survivor_ids):
-            raise GameLifecycleError("Attached-unit split survivor unit is unknown.")
-        updated: list[PersistingEffect] = []
-        changed: list[PersistingEffect] = []
-        for effect in self.persisting_effects:
-            replacement = effect.with_attached_unit_split(
-                attached_unit_instance_id=requested_attached_id,
-                surviving_unit_instance_ids=survivor_ids,
-            )
-            updated.append(replacement)
-            if replacement is not effect:
-                changed.append(replacement)
-        self.persisting_effects = sorted(updated, key=lambda effect: effect.effect_id)
-        return tuple(sorted(changed, key=lambda effect: effect.effect_id))
-
     def starting_strength_record_for_unit(self, unit_instance_id: str) -> StartingStrengthRecord:
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
         for record in self.starting_strength_records:
@@ -3536,130 +3490,6 @@ class GameState:
             requested_unit_id in record.leader_or_support_unit_instance_ids()
             for record in self.starting_attached_unit_records
         )
-
-    def recover_starting_strength_after_attached_unit_split(
-        self,
-        *,
-        player_id: str,
-        attached_unit_instance_id: str,
-        surviving_unit_instance_ids: tuple[str, ...],
-        event_log: EventLog,
-    ) -> tuple[StartingStrengthRecord, ...]:
-        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
-        requested_attached_unit_id = _validate_identifier(
-            "attached_unit_instance_id",
-            attached_unit_instance_id,
-        )
-        surviving_ids = _validate_identifier_tuple(
-            "surviving_unit_instance_ids",
-            surviving_unit_instance_ids,
-            min_length=1,
-            sort_values=True,
-        )
-        if requested_attached_unit_id in surviving_ids:
-            raise GameLifecycleError(
-                "Attached-unit split survivors must not include attached_unit_instance_id."
-            )
-        attached_record = None
-        for record in self.starting_strength_records:
-            if record.unit_instance_id == requested_attached_unit_id:
-                attached_record = record
-                break
-        if attached_record is None:
-            raise GameLifecycleError(
-                "Attached-unit split requires an existing StartingStrengthRecord for "
-                "attached_unit_instance_id."
-            )
-        if attached_record.player_id != requested_player_id:
-            raise GameLifecycleError("Attached-unit split attached record player_id drift.")
-        starting_attached_record = None
-        for attached_unit_record in self.starting_attached_unit_records:
-            if attached_unit_record.attached_unit_instance_id == requested_attached_unit_id:
-                starting_attached_record = attached_unit_record
-                break
-        if (
-            starting_attached_record is not None
-            and starting_attached_record.player_id != requested_player_id
-        ):
-            raise GameLifecycleError("Attached-unit split attached-unit record player_id drift.")
-        if starting_attached_record is None:
-            raise GameLifecycleError("Attached-unit split lacks starting identity authority.")
-        expected_surviving_ids = alive_attached_component_unit_ids(
-            state=self,
-            starting_record=starting_attached_record,
-        )
-        if surviving_ids != expected_surviving_ids:
-            raise GameLifecycleError(
-                "Attached-unit split survivors must be the exact alive components."
-            )
-        recovery_unit_ids = starting_attached_record.component_unit_instance_ids
-        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
-        recovered_records: list[StartingStrengthRecord] = []
-        for unit_id in recovery_unit_ids:
-            owner = unit_owner_by_id.get(unit_id)
-            if owner is None:
-                raise GameLifecycleError("Attached-unit split survivor unit is unknown.")
-            if owner != requested_player_id:
-                raise GameLifecycleError("Attached-unit split survivor player_id drift.")
-            recovered_records.append(
-                StartingStrengthRecord.from_unit(
-                    player_id=requested_player_id,
-                    unit=self._unit_by_id(unit_id),
-                )
-            )
-        self.transfer_persisting_effects_after_attached_unit_split(
-            attached_unit_instance_id=requested_attached_unit_id,
-            surviving_unit_instance_ids=surviving_ids,
-        )
-        record_attached_rules_unit_split(
-            state=self,
-            event_log=event_log,
-            starting_record=starting_attached_record,
-            surviving_unit_instance_ids=surviving_ids,
-        )
-        transfer_battle_shock_after_attached_unit_split(
-            state=self,
-            event_log=event_log,
-            attached_unit_instance_id=requested_attached_unit_id,
-            surviving_unit_instance_ids=surviving_ids,
-        )
-        _action_history.interrupt_and_emit_attached_unit_split(
-            self, event_log, requested_attached_unit_id, surviving_ids
-        )
-        transfer_arrived_reserve_state_after_attached_unit_split(
-            state=self,
-            event_log=event_log,
-            attached_unit_instance_id=requested_attached_unit_id,
-            component_unit_instance_ids=tuple(sorted(recovery_unit_ids)),
-        )
-        self._remove_attached_unit_formation(attached_unit_instance_id=requested_attached_unit_id)
-        replaced_ids = {*recovery_unit_ids, requested_attached_unit_id}
-        self.starting_strength_records = [
-            record
-            for record in self.starting_strength_records
-            if record.unit_instance_id not in replaced_ids
-        ]
-        self.starting_strength_records.extend(recovered_records)
-        self.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
-        return tuple(sorted(recovered_records, key=lambda record: record.unit_instance_id))
-
-    def _remove_attached_unit_formation(self, *, attached_unit_instance_id: str) -> None:
-        requested_attached_unit_id = _validate_identifier(
-            "attached_unit_instance_id",
-            attached_unit_instance_id,
-        )
-        updated_armies: list[ArmyDefinition] = []
-        for army_definition in self.army_definitions:
-            remaining_attached_units = tuple(
-                attached_unit
-                for attached_unit in army_definition.attached_units
-                if attached_unit.attached_unit_instance_id != requested_attached_unit_id
-            )
-            if remaining_attached_units == army_definition.attached_units:
-                updated_armies.append(army_definition)
-                continue
-            updated_armies.append(replace(army_definition, attached_units=remaining_attached_units))
-        self.army_definitions = sorted(updated_armies, key=lambda stored: stored.player_id)
 
     def record_battle_shock_result(self, result: BattleShockResult) -> None:
         record_battle_shock_result(state=self, result=result)
@@ -4238,53 +4068,6 @@ class GameState:
                 self.reserve_states.sort(key=lambda state: state.unit_instance_id)
                 return
         raise GameLifecycleError("ReserveState does not exist for unit.")
-
-    def replace_arrived_reserve_state_after_attached_unit_split(
-        self,
-        *,
-        source_reserve_state: ReserveState,
-        successor_reserve_states: tuple[ReserveState, ...],
-    ) -> None:
-        """Atomically replace one historical attached-unit arrival with its components."""
-        if type(source_reserve_state) is not ReserveState:
-            raise GameLifecycleError("Attached split reserve source must be a ReserveState.")
-        if type(successor_reserve_states) is not tuple or not successor_reserve_states:
-            raise GameLifecycleError("Attached split reserve successors must be a non-empty tuple.")
-        if any(type(successor) is not ReserveState for successor in successor_reserve_states):
-            raise GameLifecycleError(
-                "Attached split reserve successors must contain ReserveState values."
-            )
-        successor_ids = tuple(successor.unit_instance_id for successor in successor_reserve_states)
-        expected_successors = arrived_reserve_state_split_successors(
-            source_state=source_reserve_state,
-            component_unit_instance_ids=successor_ids,
-        )
-        stored_sources = tuple(
-            stored
-            for stored in self.reserve_states
-            if stored.unit_instance_id == source_reserve_state.unit_instance_id
-        )
-        if stored_sources != (source_reserve_state,):
-            raise GameLifecycleError("Attached split ReserveState source persistence drift.")
-        if any(
-            stored.unit_instance_id in successor_ids
-            for stored in self.reserve_states
-            if stored.unit_instance_id != source_reserve_state.unit_instance_id
-        ):
-            raise GameLifecycleError("Attached split ReserveState successor already exists.")
-        if successor_reserve_states != expected_successors:
-            raise GameLifecycleError("Attached split ReserveState successor identity drift.")
-        self.reserve_states = _validate_reserve_states(
-            [
-                *(
-                    stored
-                    for stored in self.reserve_states
-                    if stored.unit_instance_id != source_reserve_state.unit_instance_id
-                ),
-                *successor_reserve_states,
-            ],
-            player_ids=self.player_ids,
-        )
 
     def record_cult_ambush_marker(self, marker: CultAmbushMarker) -> None:
         if type(marker) is not CultAmbushMarker:

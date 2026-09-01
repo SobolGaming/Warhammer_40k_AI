@@ -19,7 +19,7 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
     MortalWoundDestructionEvidencePayload,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
     RULE_MODEL_DESTRUCTION_CONTEXT_KIND,
@@ -29,9 +29,6 @@ from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.rule_model_destruction import RuleModelDestructionResult
-
-
-DEFER_ATTACHED_SPLIT_FIELD = "defer_attached_split_until_fight_activation_completion"
 
 
 def continue_applied_mortal_wound_destruction_with_rule_reactions(
@@ -45,7 +42,6 @@ def continue_applied_mortal_wound_destruction_with_rule_reactions(
     completion_event_type: str,
     completion_event_payload: JsonValue,
     destruction_evidence: MortalWoundDestructionEvidence,
-    defer_attached_split_until_fight_activation_completion: bool,
 ) -> RuleModelDestructionResult:
     if type(state) is not GameState:
         raise GameLifecycleError("Applied mortal-wound destruction requires GameState.")
@@ -57,8 +53,6 @@ def continue_applied_mortal_wound_destruction_with_rule_reactions(
         raise GameLifecycleError(
             "Applied mortal-wound destruction requires typed destruction evidence."
         )
-    if type(defer_attached_split_until_fight_activation_completion) is not bool:
-        raise GameLifecycleError("Applied mortal-wound attached split deferral must be a bool.")
     requested_rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
     requested_rule_id = _validate_identifier("source_rule_id", source_rule_id)
     requested_result_id = _validate_identifier("source_result_id", source_result_id)
@@ -95,11 +89,6 @@ def continue_applied_mortal_wound_destruction_with_rule_reactions(
         state=state,
         damage_application=damage_application,
     )
-    if defer_attached_split_until_fight_activation_completion:
-        _validate_attached_fight_activation_deferral(
-            state=state,
-            rules_unit_instance_id=requested_rules_unit_id,
-        )
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Applied mortal-wound destruction requires battlefield state.")
@@ -145,9 +134,6 @@ def continue_applied_mortal_wound_destruction_with_rule_reactions(
                 "destroyed_model_placement": placement.to_payload(),
                 "damage_application": damage_application.to_payload(),
                 "mortal_wound_destruction_evidence": destruction_evidence.to_payload(),
-                DEFER_ATTACHED_SPLIT_FIELD: (
-                    defer_attached_split_until_fight_activation_completion
-                ),
                 "completion_event_type": requested_completion_event_type,
                 "completion_event_payload": completion_payload,
                 "post_removal_mandatory_sources": [
@@ -196,7 +182,6 @@ def validate_applied_damage_rule_destruction_context(
     context: dict[str, JsonValue],
 ) -> bool:
     if context.get("completion_kind") != RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND:
-        defer_attached_split_from_rule_destruction_context(context)
         return False
     damage = damage_application_from_rule_context(context)
     if damage is None:
@@ -238,29 +223,11 @@ def validate_applied_damage_rule_destruction_context(
         raise GameLifecycleError(
             "Applied mortal-wound destruction cannot consume source liabilities."
         )
-    defer_split = defer_attached_split_from_rule_destruction_context(context)
-    if defer_split and not target_view.is_attached_rules_unit:
-        raise GameLifecycleError("Applied mortal-wound attached split context drift.")
     _payload_identifier(context, "source_rule_id")
     _payload_identifier(context, "source_result_id")
     _payload_identifier(context, "completion_event_type")
     _object_payload(context.get("completion_event_payload"), "completion_event_payload")
     return True
-
-
-def defer_attached_split_from_rule_destruction_context(
-    context: dict[str, JsonValue],
-) -> bool:
-    if context.get("completion_kind") != RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND:
-        if DEFER_ATTACHED_SPLIT_FIELD in context:
-            raise GameLifecycleError(
-                "Attached split deferral requires applied mortal-wound destruction."
-            )
-        return False
-    value = context.get(DEFER_ATTACHED_SPLIT_FIELD)
-    if type(value) is not bool:
-        raise GameLifecycleError("Applied mortal-wound attached split context is invalid.")
-    return value
 
 
 def _validate_destroyed_damage_matches_state(
@@ -275,27 +242,6 @@ def _validate_destroyed_damage_matches_state(
     model = model_by_id(state=state, model_instance_id=damage_application.model_instance_id)
     if model.wounds_remaining != damage_application.final_wounds_remaining or model.is_alive:
         raise GameLifecycleError("Applied mortal-wound destruction damage state drift.")
-
-
-def _validate_attached_fight_activation_deferral(
-    *,
-    state: GameState,
-    rules_unit_instance_id: str,
-) -> None:
-    if state.current_battle_phase is not BattlePhase.FIGHT:
-        raise GameLifecycleError("Attached split deferral requires the Fight phase.")
-    target_view = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
-    if not target_view.is_attached_rules_unit:
-        raise GameLifecycleError("Attached split deferral requires an attached rules unit.")
-    fight_state = state.fight_phase_state
-    if fight_state is None or fight_state.active_activation is None:
-        raise GameLifecycleError("Attached split deferral requires an active fight activation.")
-    active_view = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=fight_state.active_activation.unit_instance_id,
-    )
-    if active_view.unit_instance_id != rules_unit_instance_id:
-        raise GameLifecycleError("Attached split deferral fight activation drift.")
 
 
 def _object_payload(value: object, field_name: str) -> dict[str, JsonValue]:
@@ -315,8 +261,6 @@ _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 __all__ = (
-    "DEFER_ATTACHED_SPLIT_FIELD",
     "continue_applied_mortal_wound_destruction_with_rule_reactions",
-    "defer_attached_split_from_rule_destruction_context",
     "validate_applied_damage_rule_destruction_context",
 )

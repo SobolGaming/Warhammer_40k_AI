@@ -415,7 +415,7 @@ class ShootingPhaseHandler:
         )
         if completion_hook_status is not None:
             return completion_hook_status
-        _aur.reconcile_after_attack_sequence(state, decisions.event_log, completed_sequence)
+        _aur.reconcile_after_attack_sequence(state, completed_sequence)
         out_of_phase_state = state.out_of_phase_shooting_state
         if out_of_phase_state is None:
             raise GameLifecycleError("Out-of-phase shooting state disappeared during completion.")

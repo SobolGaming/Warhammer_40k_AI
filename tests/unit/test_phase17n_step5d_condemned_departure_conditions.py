@@ -83,6 +83,7 @@ from warhammer40k_core.engine.primary_scoring_turn_scope import (
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_destroyed_model_departures,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import VictoryPointSourceKind
 from warhammer40k_core.rules.mission_pack_import import (
@@ -327,7 +328,7 @@ def test_phase17n_step5d_attached_unit_requires_every_component_to_leave() -> No
     "removal_kind",
     [BattlefieldRemovalKind.EMBARK, BattlefieldRemovalKind.INTO_RESERVES],
 )
-def test_phase17n_step5d_mixed_attached_identities_score_after_split(
+def test_phase17n_step5d_mixed_attached_identities_score_after_component_loss(
     removal_kind: BattlefieldRemovalKind,
 ) -> None:
     setup = _punishment_setup()
@@ -890,12 +891,12 @@ def test_phase17n_step5d_caps_opponent_turn_condemned_award() -> None:
         ("leader", BattlefieldRemovalKind.INTO_RESERVES),
     ],
 )
-def test_phase17n_step5d_scores_mixed_attached_identity_after_split(
+def test_phase17n_step5d_scores_mixed_attached_identity_after_component_loss(
     destroyed_component: str,
     removal_kind: BattlefieldRemovalKind,
 ) -> None:
     state, record, decisions, attached_id, survivor_id = (
-        _resolved_condemned_attached_split_departure(
+        _resolved_condemned_attached_component_loss_departure(
             destroyed_component=destroyed_component,
             surviving_removal_kind=removal_kind,
         )
@@ -904,7 +905,7 @@ def test_phase17n_step5d_scores_mixed_attached_identity_after_split(
         departure.rules_unit_instance_id for departure in state.primary_battlefield_departure_states
     }
     assert attached_id in rules_ids
-    assert survivor_id in rules_ids
+    assert survivor_id not in rules_ids
     _assert_condemned_boundary_path(
         state=state,
         record=record,
@@ -914,9 +915,11 @@ def test_phase17n_step5d_scores_mixed_attached_identity_after_split(
     )
 
 
-def test_phase17n_step5d_mixed_attached_split_without_survivor_departure_scores_zero() -> None:
+def test_phase17n_step5d_mixed_attached_component_loss_without_survivor_departure_scores_zero() -> (
+    None
+):
     state, record, decisions, attached_id, survivor_id = (
-        _resolved_condemned_attached_split_departure(
+        _resolved_condemned_attached_component_loss_departure(
             destroyed_component="bodyguard",
             surviving_removal_kind=BattlefieldRemovalKind.EMBARK,
             depart_survivor=False,
@@ -1172,7 +1175,7 @@ def _resolved_condemned_departure(
     return state, record, decisions
 
 
-def _resolved_condemned_attached_split_departure(
+def _resolved_condemned_attached_component_loss_departure(
     *,
     destroyed_component: str,
     surviving_removal_kind: BattlefieldRemovalKind,
@@ -1202,7 +1205,7 @@ def _resolved_condemned_attached_split_departure(
     option = _condemn_attached_option(request, attached_id=attached_id)
     GameLifecycle(decision_controller=decisions, state=state).submit_decision(
         DecisionResult.for_request(
-            result_id="step5d-attached-split-condemn-result",
+            result_id="step5d-attached-component-loss-condemn-result",
             request=request,
             selected_option_id=option.option_id,
         )
@@ -1217,17 +1220,11 @@ def _resolved_condemned_attached_split_departure(
         component_id=destroyed_id,
         attached_id=attached_id,
     )
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(survivor_id,),
-        event_log=decisions.event_log,
-    )
     if depart_survivor:
         _depart_rules_unit(
             state=state,
             decisions=decisions,
-            rules_unit_instance_id=survivor_id,
+            rules_unit_instance_id=attached_id,
             removal_kind=surviving_removal_kind,
             occurrence_id=f"step5d-attached-survivor-{surviving_removal_kind.value}",
             battle_round=1,
@@ -1310,16 +1307,29 @@ def _depart_rules_unit(
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     if state.battlefield_state is None:
         raise AssertionError("Step 5D fixture requires battlefield state.")
-    placement = state.battlefield_state.unit_placement_by_id(rules_unit_instance_id)
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit_instance_id,
+    )
+    component_placements = tuple(
+        (component_id, state.battlefield_state.unit_placement_or_none(component_id))
+        for component_id in rules_unit.component_unit_instance_ids
+    )
+    affected_component_ids = tuple(
+        component_id for component_id, placement in component_placements if placement is not None
+    )
     removed_model_ids = tuple(
-        model_placement.model_instance_id for model_placement in placement.model_placements
+        model_placement.model_instance_id
+        for _component_id, placement in component_placements
+        if placement is not None
+        for model_placement in placement.model_placements
     )
     state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
     departure = record_primary_battlefield_departure(
         state=state,
         rules_unit_instance_id=rules_unit_instance_id,
-        affected_component_unit_instance_ids=(rules_unit_instance_id,),
-        departed_component_unit_instance_ids=(rules_unit_instance_id,),
+        affected_component_unit_instance_ids=affected_component_ids,
+        departed_component_unit_instance_ids=affected_component_ids,
         removed_model_instance_ids=removed_model_ids,
         removal_kind=removal_kind,
         occurrence_id=occurrence_id,

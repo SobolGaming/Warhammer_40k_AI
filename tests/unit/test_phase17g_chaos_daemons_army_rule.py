@@ -1951,10 +1951,10 @@ def test_staged_july_daemonic_manifestation_uses_attached_rules_unit_models() ->
     assert source_context["eligible_revival_model_ids"] == sorted(bodyguard_destroyed_ids)
 
 
-def test_completed_attached_manifestation_survives_split_with_later_healing() -> None:
+def test_completed_attached_manifestation_retains_identity_with_later_healing() -> None:
     config = replace(
         _chaos_daemons_lifecycle_config(attached=True),
-        game_id="phase17g-attached-manifestation-historical-split",
+        game_id="phase17g-attached-manifestation-retained-identity",
     )
     session = LocalGameSession()
     session.start(config)
@@ -2022,7 +2022,7 @@ def test_completed_attached_manifestation_survives_split_with_later_healing() ->
                 "target_unit_instance_id": formation.attached_unit_instance_id,
                 "model_instance_id": model_instance_id,
                 "damage_kind": "normal",
-                "damage_event_id": f"phase17g:historical-split:damage:{index}",
+                "damage_event_id": f"phase17g:retained-identity:damage:{index}",
                 "destroyed_model_rules_triggered": True,
             },
         )
@@ -2064,38 +2064,26 @@ def test_completed_attached_manifestation_survives_split_with_later_healing() ->
                 manifestation_request,
                 selected_model_id,
             ),
-            result_id="phase17g-attached-manifestation-historical-split:selection",
+            result_id="phase17g-attached-manifestation-retained-identity:selection",
         )
     )
     placement_payload = _healing_revival_payload(
         request=placement_request,
         placement=return_placement,
     )
-    finish_request = _required_decision_request(
+    movement_request = _required_decision_request(
         session.submit_parameterized_payload(
             request_id=placement_request.request_id,
             payload=placement_payload,
-            result_id="phase17g-attached-manifestation-historical-split:placement",
+            result_id="phase17g-attached-manifestation-retained-identity:placement",
         )
     )
-    completed = session.submit_option(
-        request_id=finish_request.request_id,
-        option_id=_healing_finish_option_id(finish_request),
-        result_id="phase17g-attached-manifestation-historical-split:finish",
-    )
-    assert completed.status_kind is not LifecycleStatusKind.INVALID
-    movement_request = lifecycle.decision_controller.queue.peek_next()
     assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert lifecycle.decision_controller.queue.peek_next() == movement_request
 
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=formation.attached_unit_instance_id,
-        surviving_unit_instance_ids=tuple(sorted(formation.component_unit_instance_ids)),
-        event_log=lifecycle.decision_controller.event_log,
-    )
     current_army = state.army_definition_for_player("player-a")
     assert current_army is not None
-    assert current_army.attached_units == ()
+    assert current_army.attached_units == (formation,)
 
     remaining_destroyed_model_id = destroyed_model_ids[0]
     current_bodyguard = rules_unit_view_by_id(
@@ -2103,8 +2091,8 @@ def test_completed_attached_manifestation_survives_split_with_later_healing() ->
         unit_instance_id=bodyguard.unit_instance_id,
     )
     unrelated_effect = HealingEffect(
-        effect_id="phase17g:unrelated-healing-after-attached-split",
-        target_unit_instance_id=bodyguard.unit_instance_id,
+        effect_id="phase17g:unrelated-healing-after-attached-component-loss",
+        target_unit_instance_id=formation.attached_unit_instance_id,
         amount=1,
         opposing_player_id="player-b",
         selection_actor_player_id="player-a",

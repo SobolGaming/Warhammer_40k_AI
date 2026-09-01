@@ -8,9 +8,6 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     reposition_destruction_policy,
 )
-from warhammer40k_core.engine.reserve_state_attached_split import (
-    RESERVE_STATE_ATTACHED_SPLIT_EVENT,
-)
 from warhammer40k_core.engine.reserves import (
     ReserveOrigin,
     ReserveState,
@@ -169,9 +166,6 @@ def validate_initial_reserve_destruction_policy_authority(
             raise GameLifecycleError("Initial reserve declaration evidence drift.")
         source_states_by_identity[identity] = source_state
 
-    split_routes_by_successor_identity = _initial_split_routes_by_successor_identity(
-        event_records=event_records
-    )
     consumed_source_identities = _initial_source_identities_with_arrival(
         source_states_by_identity=source_states_by_identity,
         event_records=event_records,
@@ -179,70 +173,14 @@ def validate_initial_reserve_destruction_policy_authority(
     for reserve_state in initial_states:
         identity = (reserve_state.player_id, reserve_state.unit_instance_id)
         recorded_state = source_states_by_identity.get(identity)
-        split_route = split_routes_by_successor_identity.get(identity)
-        if (recorded_state is None) == (split_route is None):
-            raise GameLifecycleError(
-                "Initial ReserveState requires exactly one declaration evidence route."
-            )
-        if recorded_state is not None:
-            if not _initial_reserve_fields_match(first=recorded_state, second=reserve_state):
-                raise GameLifecycleError("Initial reserve declaration evidence drift.")
-            consumed_source_identities.add(identity)
-            continue
-        if split_route is None:
-            raise GameLifecycleError(
-                "Initial ReserveState requires exactly one declaration evidence route."
-            )
-        split_source, split_successor = split_route
-        declared_source = source_states_by_identity.get(
-            (split_source.player_id, split_source.unit_instance_id)
-        )
-        if (
-            declared_source is None
-            or not _initial_reserve_fields_match(first=declared_source, second=split_source)
-            or not _initial_reserve_fields_match(first=split_successor, second=reserve_state)
+        if recorded_state is None or not _initial_reserve_fields_match(
+            first=recorded_state,
+            second=reserve_state,
         ):
             raise GameLifecycleError("Initial reserve declaration evidence drift.")
-        consumed_source_identities.add(
-            (declared_source.player_id, declared_source.unit_instance_id)
-        )
+        consumed_source_identities.add(identity)
     if consumed_source_identities != set(source_states_by_identity):
         raise GameLifecycleError("Initial reserve declaration source event is orphaned.")
-
-
-def _initial_split_routes_by_successor_identity(
-    *,
-    event_records: tuple[EventRecord, ...],
-) -> dict[tuple[str, str], tuple[ReserveState, ReserveState]]:
-    routes: dict[tuple[str, str], tuple[ReserveState, ReserveState]] = {}
-    for event in event_records:
-        if event.event_type != RESERVE_STATE_ATTACHED_SPLIT_EVENT:
-            continue
-        if not isinstance(event.payload, dict):
-            raise GameLifecycleError("Initial reserve split evidence is malformed.")
-        raw_source = event.payload.get("source_reserve_state")
-        raw_successors = event.payload.get("successor_reserve_states")
-        if not isinstance(raw_source, dict) or not isinstance(raw_successors, list):
-            raise GameLifecycleError("Initial reserve split evidence is malformed.")
-        try:
-            source = ReserveState.from_payload(cast(ReserveStatePayload, raw_source))
-            successors = tuple(
-                ReserveState.from_payload(cast(ReserveStatePayload, raw_successor))
-                for raw_successor in raw_successors
-                if isinstance(raw_successor, dict)
-            )
-        except (KeyError, TypeError, ValueError, GameLifecycleError) as exc:
-            raise GameLifecycleError("Initial reserve split evidence is malformed.") from exc
-        if len(successors) != len(raw_successors):
-            raise GameLifecycleError("Initial reserve split evidence is malformed.")
-        if source.reserve_origin not in _INITIAL_RESERVE_ORIGINS:
-            continue
-        for successor in successors:
-            identity = (successor.player_id, successor.unit_instance_id)
-            if identity in routes:
-                raise GameLifecycleError("Initial reserve split evidence is duplicated.")
-            routes[identity] = (source, successor)
-    return routes
 
 
 def _initial_source_identities_with_arrival(

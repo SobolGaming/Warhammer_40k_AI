@@ -28,14 +28,19 @@ from warhammer40k_core.engine import (
     rule_model_destruction,
     rule_model_destruction_applied_damage,
 )
-from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attached_unit_reconciliation import (
+    validate_attached_rules_unit_identity_after_destruction,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     ModelRemovalRecord,
 )
 from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     selected_target_charge_constraint_for_unit,
+)
+from warhammer40k_core.engine.catalog_selected_to_fight_risk_runtime import (
+    CatalogSelectedToFightRiskRuntime,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
@@ -75,7 +80,7 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
     effect_expiration_kind_from_token,
 )
-from warhammer40k_core.engine.event_log import EventLog, JsonValue
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_activation_units import (
     active_fight_activation_rules_unit,
     finalize_rule_destruction_after_fight_activation,
@@ -142,9 +147,7 @@ from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
 )
 from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
-    DEFER_ATTACHED_SPLIT_FIELD,
     continue_applied_mortal_wound_destruction_with_rule_reactions,
-    defer_attached_split_from_rule_destruction_context,
 )
 from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
     apply_rule_destruction_fight_on_death_reaction,
@@ -166,7 +169,6 @@ from warhammer40k_core.engine.sequencing import (
     create_sequencing_decision_request,
     request_sequencing_decision,
 )
-from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.timing_windows import (
     OutOfPhaseActionContext,
     ReactionWindow,
@@ -177,7 +179,6 @@ from warhammer40k_core.engine.timing_windows import (
     timing_trigger_kind_from_token,
 )
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
-from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -774,386 +775,148 @@ def test_persisting_effect_survives_embark_and_disembark() -> None:
     )
 
 
-def test_persisting_effect_survives_attached_unit_split() -> None:
-    state = _battle_state(unit_selection_ids=("intercessor-unit-1", "intercessor-unit-2"))
-    attached_id = "attached-unit:phase12a-intercessors"
-    state.starting_strength_records.append(
-        StartingStrengthRecord(
-            player_id="player-a",
-            unit_instance_id=attached_id,
-            starting_model_count=10,
-            single_model_starting_wounds=None,
-            source_id="phase12a-attached-unit-join",
-        )
+def test_persisting_effect_remains_scoped_to_retained_attached_identity() -> None:
+    state, _runtime, _decisions, bodyguard, leader, _enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture()
     )
-    state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
-    first_unit_id = "army-alpha:intercessor-unit-1"
-    second_unit_id = "army-alpha:intercessor-unit-2"
-    first_unit = next(
-        unit
-        for army in state.army_definitions
-        for unit in army.units
-        if unit.unit_instance_id == first_unit_id
-    )
-    second_unit = next(
-        unit
-        for army in state.army_definitions
-        for unit in army.units
-        if unit.unit_instance_id == second_unit_id
-    )
-    state.starting_attached_unit_records.append(
-        StartingAttachedUnitRecord(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            bodyguard_unit_instance_id=first_unit_id,
-            leader_unit_instance_ids=(second_unit_id,),
-            support_unit_instance_ids=(),
-            component_unit_instance_ids=(first_unit_id, second_unit_id),
-            starting_model_instance_ids_by_component=(
-                (first_unit_id, first_unit.own_model_ids()),
-                (second_unit_id, second_unit.own_model_ids()),
-            ),
-            starting_model_count=10,
-            source_id="phase12a-attached-unit-join",
-        )
-    )
-    effect = _persisting_effect(
-        effect_id="phase12a-effect-attached-split",
-        target_unit_instance_ids=(attached_id,),
-        expiration=EffectExpiration.end_battle_round(battle_round=1),
+    state.persisting_effects.clear()
+    effect = replace(
+        _persisting_effect(
+            effect_id="phase12a-effect-attached-retained",
+            target_unit_instance_ids=(attached_id,),
+            expiration=EffectExpiration.end_battle_round(battle_round=1),
+        ),
+        owner_player_id="player-source",
     )
     state.record_persisting_effect(effect)
 
-    recovered = state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(
-            "army-alpha:intercessor-unit-1",
-            "army-alpha:intercessor-unit-2",
-        ),
-        event_log=EventLog(),
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=attached_id,
+        model_instance_id=bodyguard.own_models[0].model_instance_id,
+        damage=bodyguard.own_models[0].wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
     )
 
-    assert tuple(record.unit_instance_id for record in recovered) == (
-        "army-alpha:intercessor-unit-1",
-        "army-alpha:intercessor-unit-2",
+    assert state.persisting_effects == [effect]
+    assert state.persisting_effects_for_unit(attached_id) == (effect,)
+    assert any(
+        formation.attached_unit_instance_id == attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
     )
-    assert state.persisting_effects_for_unit(attached_id) == ()
-    expected = effect.with_attached_unit_split(
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(
-            "army-alpha:intercessor-unit-1",
-            "army-alpha:intercessor-unit-2",
-        ),
+    assert attached_id in {record.unit_instance_id for record in state.starting_strength_records}
+    assert leader.unit_instance_id not in {
+        record.unit_instance_id for record in state.starting_strength_records
+    }
+    restored = GameState.from_payload(state.to_payload())
+    validate_attached_rules_unit_identity_after_destruction(
+        state=restored,
+        rules_unit_instance_id=attached_id,
     )
-    assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-1") == (expected,)
-    assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-2") == (expected,)
+    assert restored.persisting_effects_for_unit(attached_id) == (effect,)
 
 
-def test_selected_to_fight_risk_split_creates_one_liability_per_survivor() -> None:
-    state, runtime, decisions, bodyguard, leader, _enemy, _attached_id = (
-        attached_selected_to_fight_risk_fixture()
-    )
-    first = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
-    )
-    assert first is not None
-    decisions.request_decision(first)
-    record = decisions.submit_result(
-        DecisionResult.for_request(
-            result_id="attached-risk-first-destruction",
-            request=first,
-            selected_option_id=first.options[0].option_id,
-        )
-    )
-    assert (
-        runtime.apply_fight_phase_end_result(
-            FightPhaseEndResultContext(
-                state=state, decisions=decisions, request=record.request, result=record.result
-            )
-        )
-        is True
-    )
-    second = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
-    )
-    assert second is not None
-    first_unit = cast(str, cast(dict[str, JsonValue], first.payload)["rules_unit_instance_id"])
-    second_unit = cast(str, cast(dict[str, JsonValue], second.payload)["rules_unit_instance_id"])
-    assert {first_unit, second_unit} == {bodyguard.unit_instance_id, leader.unit_instance_id}
-    assert len(state.persisting_effects) == 2
-
-
-@pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
-def test_selected_target_charge_effect_source_identity_survives_attached_split(
-    destroyed_component: str,
-) -> None:
+def test_selected_target_charge_source_retains_original_attached_identity() -> None:
     state, runtime, decisions, bodyguard, leader, enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False)
+        attached_selected_to_fight_risk_fixture()
     )
     state.record_persisting_effect(
         selected_target_charge_persisting_effect(
             state=state,
-            effect_id=f"selected-target-charge-source-split:{destroyed_component}",
+            effect_id="selected-target-charge-source-retained",
             owner_player_id="player-source",
             source_rules_unit_instance_id=attached_id,
             source_component_unit_instance_id=bodyguard.unit_instance_id,
             selected_target_unit_instance_id=enemy.unit_instance_id,
         )
     )
-    destroyed_unit = bodyguard if destroyed_component == "bodyguard" else leader
-    survivor = leader if destroyed_component == "bodyguard" else bodyguard
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
-    )
-    assert request is not None
-    option = next(
-        item
-        for item in request.options
-        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"]
-        == destroyed_unit.own_models[0].model_instance_id
-    )
-    decisions.request_decision(request)
-    record = decisions.submit_result(
-        DecisionResult.for_request(
-            result_id=f"selected-target-charge-source-split:{destroyed_component}",
-            request=request,
-            selected_option_id=option.option_id,
-        )
-    )
-    assert (
-        runtime.apply_fight_phase_end_result(
-            FightPhaseEndResultContext(
-                state=state,
-                decisions=decisions,
-                request=record.request,
-                result=record.result,
-            )
-        )
-        is True
-    )
 
+    _resolve_failed_risk_model_destruction(
+        state=state,
+        runtime=runtime,
+        decisions=decisions,
+        model_instance_id=leader.own_models[0].model_instance_id,
+        result_id="selected-target-charge-source-retained:leader",
+    )
     constraint = selected_target_charge_constraint_for_unit(
         state=state,
-        unit_instance_id=survivor.unit_instance_id,
+        unit_instance_id=attached_id,
     )
 
     assert constraint is not None
     assert constraint.required_target_unit_instance_ids == (enemy.unit_instance_id,)
-    assert constraint.source_effect_ids == (
-        f"selected-target-charge-source-split:{destroyed_component}",
-    )
     assert constraint.source_lineages[0].historical_unit_instance_id == attached_id
-    assert constraint.source_lineages[0].surviving_unit_instance_ids == (survivor.unit_instance_id,)
+    assert constraint.source_lineages[0].current_unit_instance_ids == (attached_id,)
+    assert constraint.source_lineages[0].is_split is False
 
 
-@pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
-def test_selected_target_charge_effect_target_identity_expands_surviving_attached_successor(
-    destroyed_component: str,
-) -> None:
-    state, runtime, decisions, bodyguard, leader, enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False)
+def test_selected_target_charge_target_retains_original_attached_identity() -> None:
+    state, runtime, decisions, bodyguard, _leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture()
     )
     state.record_persisting_effect(
         selected_target_charge_persisting_effect(
             state=state,
-            effect_id=f"selected-target-charge-target-split:{destroyed_component}",
+            effect_id="selected-target-charge-target-retained",
             owner_player_id="player-enemy",
             source_rules_unit_instance_id=enemy.unit_instance_id,
             source_component_unit_instance_id=enemy.unit_instance_id,
             selected_target_unit_instance_id=attached_id,
         )
     )
-    destroyed_unit = bodyguard if destroyed_component == "bodyguard" else leader
-    survivor = leader if destroyed_component == "bodyguard" else bodyguard
-    request = runtime.next_fight_phase_end_request(
-        FightPhaseEndRequestContext(state=state, decisions=decisions)
-    )
-    assert request is not None
-    option = next(
-        item
-        for item in request.options
-        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"]
-        == destroyed_unit.own_models[0].model_instance_id
-    )
-    decisions.request_decision(request)
-    record = decisions.submit_result(
-        DecisionResult.for_request(
-            result_id=f"selected-target-charge-target-split:{destroyed_component}",
-            request=request,
-            selected_option_id=option.option_id,
-        )
-    )
-    assert (
-        runtime.apply_fight_phase_end_result(
-            FightPhaseEndResultContext(
-                state=state,
-                decisions=decisions,
-                request=record.request,
-                result=record.result,
-            )
-        )
-        is True
-    )
 
+    _resolve_failed_risk_model_destruction(
+        state=state,
+        runtime=runtime,
+        decisions=decisions,
+        model_instance_id=bodyguard.own_models[0].model_instance_id,
+        result_id="selected-target-charge-target-retained:bodyguard",
+    )
     constraint = selected_target_charge_constraint_for_unit(
         state=state,
         unit_instance_id=enemy.unit_instance_id,
     )
 
     assert constraint is not None
-    assert constraint.required_target_unit_instance_ids == (survivor.unit_instance_id,)
+    assert constraint.required_target_unit_instance_ids == (attached_id,)
     assert constraint.selected_target_identity_ids == (attached_id,)
-    assert constraint.target_lineages[0].is_split is True
+    assert constraint.target_lineages[0].current_unit_instance_ids == (attached_id,)
+    assert constraint.target_lineages[0].is_split is False
     assert constraint.target_lineages[0].is_destroyed is False
 
 
-def test_selected_target_charge_effect_round_trip_preserves_source_split_lineage_and_expiry() -> (
-    None
-):
-    state, _runtime, _decisions, bodyguard, leader, enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False)
-    )
-    state.persisting_effects.clear()
-    state.record_persisting_effect(
-        selected_target_charge_persisting_effect(
-            state=state,
-            effect_id="selected-target-charge-source-round-trip",
-            owner_player_id="player-source",
-            source_rules_unit_instance_id=attached_id,
-            source_component_unit_instance_id=leader.unit_instance_id,
-            selected_target_unit_instance_id=enemy.unit_instance_id,
-        )
-    )
-    restored = GameState.from_payload(
-        cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
-    )
-    restored.recover_starting_strength_after_attached_unit_split(
-        player_id="player-source",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
-        event_log=EventLog(),
-    )
-    expected_payload: dict[str, JsonValue] | None = None
-    for source_id in sorted((bodyguard.unit_instance_id, leader.unit_instance_id)):
-        constraint = selected_target_charge_constraint_for_unit(
-            state=restored,
-            unit_instance_id=source_id,
-        )
-        assert constraint is not None
-        assert constraint.required_target_unit_instance_ids == (enemy.unit_instance_id,)
-        if expected_payload is None:
-            expected_payload = constraint.to_payload()
-        else:
-            assert constraint.to_payload() == expected_payload
-    round_tripped = GameState.from_payload(restored.to_payload())
-    round_tripped_constraint = selected_target_charge_constraint_for_unit(
-        state=round_tripped,
-        unit_instance_id=bodyguard.unit_instance_id,
-    )
-    assert round_tripped_constraint is not None
-    assert round_tripped_constraint.to_payload() == expected_payload
-
-    expired = round_tripped.expire_persisting_effects_at_boundary(
-        EffectExpirationBoundary.turn_end(battle_round=1, player_id="player-source")
-    )
-
-    assert tuple(effect.effect_id for effect in expired) == (
-        "selected-target-charge-source-round-trip",
-    )
-    assert (
-        selected_target_charge_constraint_for_unit(
-            state=round_tripped,
-            unit_instance_id=bodyguard.unit_instance_id,
-        )
-        is None
-    )
-
-
-def test_selected_target_charge_effect_expands_all_current_attached_target_successors() -> None:
-    state, _runtime, _decisions, bodyguard, leader, enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture()
-    )
-    state.persisting_effects.clear()
-    state.record_persisting_effect(
-        selected_target_charge_persisting_effect(
-            state=state,
-            effect_id="selected-target-charge-target-successors",
-            owner_player_id="player-enemy",
-            source_rules_unit_instance_id=enemy.unit_instance_id,
-            source_component_unit_instance_id=enemy.unit_instance_id,
-            selected_target_unit_instance_id=attached_id,
-        )
-    )
-
-    constraint = selected_target_charge_constraint_for_unit(
-        state=GameState.from_payload(state.to_payload()),
-        unit_instance_id=enemy.unit_instance_id,
-    )
-
-    assert constraint is not None
-    assert constraint.required_target_unit_instance_ids == tuple(
-        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
-    )
-    assert constraint.target_lineages[0].current_unit_instance_ids == tuple(
-        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
-    )
-
-
-@pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
-def test_selected_to_fight_risk_destruction_splits_attached_unit_after_final_component_model(
-    destroyed_component: str,
+def _resolve_failed_risk_model_destruction(
+    *,
+    state: GameState,
+    runtime: CatalogSelectedToFightRiskRuntime,
+    decisions: DecisionController,
+    model_instance_id: str,
+    result_id: str,
 ) -> None:
-    state, runtime, decisions, bodyguard, leader, _enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False)
-    )
-    target = bodyguard if destroyed_component == "bodyguard" else leader
-    carried_effect = replace(
-        _persisting_effect(
-            effect_id=f"attached-risk-carried-effect:{destroyed_component}",
-            target_unit_instance_ids=(attached_id,),
-            expiration=EffectExpiration.end_battle_round(battle_round=1),
-        ),
-        owner_player_id="player-source",
-    )
-    state.record_persisting_effect(carried_effect)
-    mission_action = MissionActionState.start(
-        action_id=f"attached-risk-action:{destroyed_component}",
-        mission_action_id="attached-risk-action",
-        player_id="player-source",
-        unit_instance_id=attached_id,
-        target_id="attached-risk-objective",
-        condition_target_id="attached-risk-objective",
-        mission_id="attached-risk-mission",
-        battle_round=state.battle_round,
-        phase=BattlePhase.FIGHT.value,
-        start_timing="fight_phase",
-        completion_timing="turn_end",
-        eligible_unit_instance_ids=(attached_id,),
-        interruption_conditions=("unit_destroyed",),
-        scoring_source_id="attached-risk-mission",
-        victory_points=0,
-    )
-    state.record_mission_action_state(mission_action)
     request = runtime.next_fight_phase_end_request(
         FightPhaseEndRequestContext(state=state, decisions=decisions)
     )
-    assert request is not None
+    if request is None:
+        raise AssertionError("Expected selected-to-fight risk request.")
     option = next(
-        item
-        for item in request.options
-        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"]
-        == target.own_models[0].model_instance_id
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["selected_model_instance_id"]
+        == model_instance_id
     )
     decisions.request_decision(request)
     record = decisions.submit_result(
         DecisionResult.for_request(
-            result_id=f"attached-risk-destroy-{destroyed_component}",
+            result_id=result_id,
             request=request,
             selected_option_id=option.option_id,
         )
     )
-
     assert (
         runtime.apply_fight_phase_end_result(
             FightPhaseEndResultContext(
@@ -1164,41 +927,12 @@ def test_selected_to_fight_risk_destruction_splits_attached_unit_after_final_com
             )
         )
         is True
-    )
-    assert all(
-        formation.attached_unit_instance_id != attached_id
-        for army in state.army_definitions
-        for formation in army.attached_units
-    )
-    assert attached_id not in {item.unit_instance_id for item in state.starting_strength_records}
-    expected_survivor_id = (
-        leader.unit_instance_id
-        if destroyed_component == "bodyguard"
-        else bodyguard.unit_instance_id
-    )
-    assert expected_survivor_id in {
-        item.unit_instance_id for item in state.starting_strength_records
-    }
-    expected_carried_effect = carried_effect.with_attached_unit_split(
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(expected_survivor_id,),
-    )
-    assert state.persisting_effects == [expected_carried_effect]
-    interrupted_action = state.mission_action_state_by_id(mission_action.action_id)
-    assert interrupted_action.status is MissionActionStatus.INTERRUPTED
-    assert interrupted_action.interrupted_reason == "unit_destroyed"
-    assert any(
-        item.event_type == "mission_action_interrupted" for item in decisions.event_log.records
-    )
-    assert any(
-        item.event_type == "catalog_failed_fight_activation_model_destroyed"
-        for item in decisions.event_log.records
     )
 
 
 def test_fight_activation_resolves_canonical_attached_rules_unit() -> None:
     state, _runtime, _decisions, _bodyguard, _leader, _enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False)
+        attached_selected_to_fight_risk_fixture()
     )
     activation = FightActivationSelection(
         player_id="player-a",
@@ -1224,7 +958,6 @@ def test_fight_activation_resolves_canonical_attached_rules_unit() -> None:
 def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_unit() -> None:
     state, runtime, decisions, bodyguard, _leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             bodyguard_model_count=2,
         )
     )
@@ -1271,10 +1004,9 @@ def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_u
     assert not state.persisting_effects
 
 
-def test_selected_to_fight_risk_fight_on_death_cleans_at_phase_end_then_splits() -> None:
+def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity() -> None:
     state, runtime, decisions, bodyguard, leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             enemy_x=30.0,
         )
     )
@@ -1424,12 +1156,13 @@ def test_selected_to_fight_risk_fight_on_death_cleans_at_phase_end_then_splits()
     completed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
-    assert all(
-        formation.attached_unit_instance_id != attached_id
+    assert any(
+        formation.attached_unit_instance_id == attached_id
         for army in state.army_definitions
         for formation in army.attached_units
     )
-    assert leader.unit_instance_id in {
+    assert attached_id in {item.unit_instance_id for item in state.starting_strength_records}
+    assert leader.unit_instance_id not in {
         item.unit_instance_id for item in state.starting_strength_records
     }
     assert not state.persisting_effects
@@ -1443,7 +1176,6 @@ def test_selected_to_fight_risk_fight_on_death_cleans_at_phase_end_then_splits()
 def test_fight_end_fight_on_death_does_not_grant_second_activation() -> None:
     state, runtime, decisions, bodyguard, _leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             bodyguard_model_count=2,
         )
     )
@@ -1551,7 +1283,6 @@ def test_fight_end_fight_on_death_does_not_grant_second_activation() -> None:
 def test_deadly_demise_targets_attached_rules_unit_once() -> None:
     state, _runtime, _decisions, _bodyguard, _leader, enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             enemy_x=16.0,
         )
     )
@@ -1568,7 +1299,6 @@ def test_deadly_demise_targets_attached_rules_unit_once() -> None:
 def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() -> None:
     state, _runtime, decisions, bodyguard, leader, enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             enemy_x=16.0,
         )
     )
@@ -1719,7 +1449,6 @@ def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() 
 def test_rule_destruction_resume_rejects_source_unit_drift_without_source_model() -> None:
     state, _runtime, decisions, bodyguard, _leader, enemy, _attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             enemy_x=16.0,
         )
     )
@@ -1836,9 +1565,8 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
     mandatory_kind: DestructionReactionKind,
     expected_action_host: str,
 ) -> None:
-    state, _runtime, decisions, bodyguard, leader, enemy, _attached_id = (
+    state, _runtime, decisions, bodyguard, leader, enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=True,
             bodyguard_model_count=2,
             enemy_x=16.0,
         )
@@ -1915,12 +1643,36 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
     assert pause_status is not None
     assert pause_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert state.battlefield_state is not None
-    assert first_casualty_id not in state.battlefield_state.placed_model_ids()
+    assert first_casualty_id in state.battlefield_state.placed_model_ids()
     assert pending_casualty_id in state.battlefield_state.placed_model_ids()
     assert pending_target_model_id in state.battlefield_state.placed_model_ids()
     restored_state = GameState.from_payload(state.to_payload())
     restored_decisions = DecisionController.from_payload(decisions.to_payload())
     pause_request = restored_decisions.queue.peek_next()
+    continuation_index = 0
+    while is_mortal_wound_model_request(pause_request):
+        continuation_index += 1
+        selected_model_id = (
+            pending_casualty_id
+            if any(option.option_id == pending_casualty_id for option in pause_request.options)
+            else pause_request.options[0].option_id
+        )
+        continuation_record = restored_decisions.submit_result(
+            DecisionResult.for_request(
+                result_id=f"{source_id}:continued-model:{continuation_index}",
+                request=pause_request,
+                selected_option_id=selected_model_id,
+            )
+        )
+        continued_status = (
+            rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+                state=restored_state,
+                decisions=restored_decisions,
+                result=continuation_record.result,
+            )
+        )
+        assert continued_status is not None
+        pause_request = restored_decisions.queue.peek_next()
     pause_record = restored_decisions.submit_result(
         DecisionResult.for_request(
             result_id=f"{source_id}:optional-declined",
@@ -1941,7 +1693,7 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
     placed_model_ids = restored_state.battlefield_state.placed_model_ids()
     assert root_model_id not in placed_model_ids
     assert pending_casualty_id not in placed_model_ids
-    assert pending_target_model_id not in placed_model_ids
+    assert pending_target_model_id in placed_model_ids
     records = restored_decisions.event_log.records
     mandatory_index, mandatory_record = next(
         (index, record)
@@ -1964,8 +1716,7 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
         index
         for index, record in enumerate(records)
         if record.event_type == "deadly_demise_mortal_wounds_applied"
-        and cast(dict[str, JsonValue], record.payload)["target_unit_instance_id"]
-        == leader.unit_instance_id
+        and cast(dict[str, JsonValue], record.payload)["target_unit_instance_id"] == attached_id
     )
     assert mandatory_payload["selected_reaction_kind"] == mandatory_kind.value
     assert mandatory_payload["action_host"] == expected_action_host
@@ -1976,7 +1727,7 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
         ]
         == "deadly_demise"
     )
-    assert mandatory_index < pending_casualty_index < pending_target_index
+    assert pending_target_index < mandatory_index < pending_casualty_index
     assert all(
         effect.effect_id != liability.effect_id for effect in restored_state.persisting_effects
     )
@@ -1985,7 +1736,6 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
 def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction() -> None:
     state, _runtime, decisions, bodyguard, _leader, enemy, _attached_id = (
         attached_selected_to_fight_risk_fixture(
-            pre_split=False,
             enemy_x=16.0,
         )
     )
@@ -2345,7 +2095,6 @@ def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_proven
         completion_event_type="phase12a_applied_damage_completed",
         completion_event_payload={"application_id": "phase12a:applied-damage"},
         destruction_evidence=evidence,
-        defer_attached_split_until_fight_activation_completion=False,
     )
 
     assert destruction.status is None
@@ -2371,7 +2120,6 @@ def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_proven
         rule_model_destruction.RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
     )
     assert finalized["completion_kind"] == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
-    assert finalized[DEFER_ATTACHED_SPLIT_FIELD] is False
     restored_state = GameState.from_payload(state.to_payload())
     restored_decisions = DecisionController.from_payload(decisions.to_payload())
     assert restored_state.to_payload() == state.to_payload()
@@ -2396,7 +2144,7 @@ def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_proven
     assert len(tampered_finalizations) == 1
     tampered_finalization = tampered_finalizations[0]
     assert isinstance(tampered_finalization, dict)
-    tampered_finalization[DEFER_ATTACHED_SPLIT_FIELD] = True
+    tampered_finalization["forged_extra_field"] = True
     tampered_decisions = DecisionController.from_payload(tampered_decisions_payload)
     with pytest.raises(GameLifecycleError, match="Rule destruction finalization binding drift"):
         validate_model_destruction_cause_restore(
@@ -2495,7 +2243,6 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
         completion_event_type="phase12a_applied_optional_filter_completed",
         completion_event_payload={"filter": "optional-sources"},
         destruction_evidence=evidence,
-        defer_attached_split_until_fight_activation_completion=False,
     )
 
     assert destruction.status is not None
@@ -2549,9 +2296,9 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
     )
 
 
-def test_applied_fight_on_death_continues_active_attached_activation_then_splits() -> None:
+def test_applied_fight_on_death_continues_and_retains_attached_activation_identity() -> None:
     state, _runtime, decisions, bodyguard, leader, _enemy, attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False, enemy_x=30.0)
+        attached_selected_to_fight_risk_fixture(enemy_x=30.0)
     )
     model = bodyguard.own_models[0]
     fight_state = state.fight_phase_state
@@ -2623,7 +2370,6 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
         completion_event_type="phase12a_applied_active_fight_completed",
         completion_event_payload={"activation_result_id": activation.result_id},
         destruction_evidence=evidence,
-        defer_attached_split_until_fight_activation_completion=True,
     )
     assert destruction.status is not None
     request = decisions.queue.peek_next()
@@ -2679,12 +2425,13 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
     )
     assert state.battlefield_state is not None
     assert model.model_instance_id not in state.battlefield_state.placed_model_ids()
-    assert all(
-        formation.attached_unit_instance_id != attached_id
+    assert any(
+        formation.attached_unit_instance_id == attached_id
         for army in state.army_definitions
         for formation in army.attached_units
     )
-    assert leader.unit_instance_id in {
+    assert attached_id in {record.unit_instance_id for record in state.starting_strength_records}
+    assert leader.unit_instance_id not in {
         record.unit_instance_id for record in state.starting_strength_records
     }
     removed = _last_event_payload(decisions, "fight_on_death_models_removed")
@@ -2692,19 +2439,9 @@ def test_applied_fight_on_death_continues_active_attached_activation_then_splits
     assert removed["reason"] == "unit_fight_completed"
 
 
-@pytest.mark.parametrize(
-    ("attacking_unit_kind", "expected_candidate_kind"),
-    [("attached", None), ("bodyguard", "leader")],
-)
-def test_selected_to_fight_risk_split_preserves_exact_attack_lineage(
-    attacking_unit_kind: str,
-    expected_candidate_kind: str | None,
-) -> None:
-    state, runtime, decisions, bodyguard, leader, enemy, attached_id = (
+def test_selected_to_fight_risk_preserves_attached_attack_lineage() -> None:
+    state, runtime, decisions, bodyguard, _leader, enemy, attached_id = (
         attached_selected_to_fight_risk_fixture()
-    )
-    attacking_unit_id = (
-        attached_id if attacking_unit_kind == "attached" else bodyguard.unit_instance_id
     )
     melee_profile = next(
         profile
@@ -2721,7 +2458,7 @@ def test_selected_to_fight_risk_split_preserves_exact_attack_lineage(
             "phase": BattlePhase.FIGHT.value,
             **ModelDestructionAttribution.for_attack(
                 destroying_player_id="player-source",
-                attacking_unit_instance_id=attacking_unit_id,
+                attacking_unit_instance_id=attached_id,
                 attacking_model_instance_id=bodyguard.own_models[0].model_instance_id,
                 weapon_profile=melee_profile,
                 attack_context_id="attack-context:selected-to-fight-lineage",
@@ -2733,13 +2470,7 @@ def test_selected_to_fight_risk_split_preserves_exact_attack_lineage(
     request = runtime.next_fight_phase_end_request(
         FightPhaseEndRequestContext(state=state, decisions=decisions)
     )
-    if expected_candidate_kind is None:
-        assert request is None
-        return
-    assert request is not None
-    assert cast(dict[str, JsonValue], request.payload)["rules_unit_instance_id"] == (
-        leader.unit_instance_id
-    )
+    assert request is None
 
 
 def test_persisting_effects_expire_at_deterministic_lifecycle_boundaries() -> None:
@@ -2997,13 +2728,6 @@ def test_effect_and_timing_fail_fast_validation_branches() -> None:
     )
 
     assert EffectExpiration.from_payload(effect.expiration.to_payload()) == effect.expiration
-    assert (
-        effect.with_attached_unit_split(
-            attached_unit_instance_id="army-alpha:intercessor-unit-2",
-            surviving_unit_instance_ids=("army-alpha:intercessor-unit-1",),
-        )
-        is effect
-    )
     with pytest.raises(EffectError, match="requires round, phase, and player"):
         EffectExpiration(expiration_kind=cast(EffectExpirationKind, "end_phase"))
     with pytest.raises(EffectError, match="must not include a phase"):
@@ -3633,30 +3357,6 @@ def test_self_mortal_wound_progress_accepts_canonical_routing_context() -> None:
     )
 
 
-def test_applied_damage_attached_split_context_is_fail_closed() -> None:
-    assert defer_attached_split_from_rule_destruction_context({}) is False
-    with pytest.raises(
-        GameLifecycleError,
-        match="split deferral requires applied mortal-wound destruction",
-    ):
-        defer_attached_split_from_rule_destruction_context({DEFER_ATTACHED_SPLIT_FIELD: True})
-    with pytest.raises(GameLifecycleError, match="split context is invalid"):
-        defer_attached_split_from_rule_destruction_context(
-            {
-                "completion_kind": RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
-            }
-        )
-    assert (
-        defer_attached_split_from_rule_destruction_context(
-            {
-                "completion_kind": RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
-                DEFER_ATTACHED_SPLIT_FIELD: True,
-            }
-        )
-        is True
-    )
-
-
 def test_rule_destruction_source_liabilities_reject_missing_and_wrong_target_effects() -> None:
     state = _battle_state(unit_selection_ids=("intercessor-unit-1",))
     alpha_unit = state.army_definitions[0].units[0]
@@ -3900,7 +3600,6 @@ def test_applied_mortal_wound_destruction_entrypoint_rejects_invalid_types() -> 
             decisions=decisions,
             damage=damage,
             evidence=evidence,
-            defer_attached_split=False,
         )
     with pytest.raises(GameLifecycleError, match="requires DecisionController"):
         _continue_applied_destruction_type_guard(
@@ -3908,7 +3607,6 @@ def test_applied_mortal_wound_destruction_entrypoint_rejects_invalid_types() -> 
             decisions=cast(DecisionController, object()),
             damage=damage,
             evidence=evidence,
-            defer_attached_split=False,
         )
     with pytest.raises(GameLifecycleError, match="requires DamageApplication"):
         _continue_applied_destruction_type_guard(
@@ -3916,7 +3614,6 @@ def test_applied_mortal_wound_destruction_entrypoint_rejects_invalid_types() -> 
             decisions=decisions,
             damage=cast(DamageApplication, object()),
             evidence=evidence,
-            defer_attached_split=False,
         )
     with pytest.raises(GameLifecycleError, match="requires typed destruction evidence"):
         _continue_applied_destruction_type_guard(
@@ -3924,15 +3621,6 @@ def test_applied_mortal_wound_destruction_entrypoint_rejects_invalid_types() -> 
             decisions=decisions,
             damage=damage,
             evidence=cast(MortalWoundDestructionEvidence, object()),
-            defer_attached_split=False,
-        )
-    with pytest.raises(GameLifecycleError, match="split deferral must be a bool"):
-        _continue_applied_destruction_type_guard(
-            state=state,
-            decisions=decisions,
-            damage=damage,
-            evidence=evidence,
-            defer_attached_split=cast(bool, 1),
         )
 
 
@@ -3943,7 +3631,6 @@ def test_applied_mortal_wound_destruction_context_and_damage_validation_fail_clo
             state=state,
             context={
                 "completion_kind": RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
-                DEFER_ATTACHED_SPLIT_FIELD: False,
             },
         )
     with pytest.raises(GameLifecycleError, match="requires mortal damage"):
@@ -4050,7 +3737,6 @@ def _continue_applied_destruction_type_guard(
     decisions: DecisionController,
     damage: DamageApplication,
     evidence: MortalWoundDestructionEvidence,
-    defer_attached_split: bool,
 ) -> object:
     return continue_applied_mortal_wound_destruction_with_rule_reactions(
         state=state,
@@ -4062,7 +3748,6 @@ def _continue_applied_destruction_type_guard(
         completion_event_type="phase12a_applied_destruction_completed",
         completion_event_payload={},
         destruction_evidence=evidence,
-        defer_attached_split_until_fight_activation_completion=defer_attached_split,
     )
 
 

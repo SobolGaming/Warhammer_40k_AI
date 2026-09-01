@@ -1437,7 +1437,7 @@ def test_attached_enemy_fight_move_removes_marker_by_historical_canonical_endpoi
         ),
     )
 
-    _split_attached_test_unit_and_move_components_away(
+    _move_attached_test_unit_components_away(
         state=state,
         component_ids=component_ids,
     )
@@ -2799,15 +2799,11 @@ def _attach_enemy_test_leader(
     return attached_id, component_ids
 
 
-def _split_attached_test_unit_and_move_components_away(
+def _move_attached_test_unit_components_away(
     *,
     state: GameState,
     component_ids: tuple[str, ...],
 ) -> None:
-    state.army_definitions = [
-        replace(army, attached_units=()) if army.player_id == ENEMY_PLAYER_ID else army
-        for army in state.army_definitions
-    ]
     assert state.battlefield_state is not None
     for component_index, component_id in enumerate(component_ids):
         placement = state.battlefield_state.unit_placement_by_id(component_id)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
@@ -355,38 +355,6 @@ class PersistingEffect:
 
     def expires_at(self, boundary: EffectExpirationBoundary) -> bool:
         return self.expiration.matches_boundary(boundary)
-
-    def with_attached_unit_split(
-        self,
-        *,
-        attached_unit_instance_id: str,
-        surviving_unit_instance_ids: tuple[str, ...],
-    ) -> Self:
-        requested_attached_id = _validate_identifier(
-            "attached_unit_instance_id",
-            attached_unit_instance_id,
-        )
-        survivor_ids = _validate_identifier_tuple(
-            "surviving_unit_instance_ids",
-            surviving_unit_instance_ids,
-            min_length=1,
-            sort_values=True,
-        )
-        if requested_attached_id not in self.target_unit_instance_ids:
-            return self
-        replacement_targets = tuple(
-            sorted(
-                (
-                    *(
-                        unit_id
-                        for unit_id in self.target_unit_instance_ids
-                        if unit_id != requested_attached_id
-                    ),
-                    *survivor_ids,
-                )
-            )
-        )
-        return replace(self, target_unit_instance_ids=replacement_targets)
 
     def to_payload(self) -> PersistingEffectPayload:
         return {

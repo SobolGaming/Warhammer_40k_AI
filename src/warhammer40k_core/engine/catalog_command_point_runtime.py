@@ -1132,7 +1132,9 @@ def _resolve_phase_command_point_gain(
             "source_rule_id": source.record.definition.source_id,
             "source_record_id": source.record.record_id,
             "source_clause_id": source.clause.clause_id,
-            "source_unit_instance_id": unit.unit_instance_id,
+            "source_unit_instance_id": (
+                rules_unit_id if rules_unit_id is not None else unit.unit_instance_id
+            ),
             "source_model_instance_id": source_model_instance_id,
             "test_kind": test_kind,
             "success_threshold": success_threshold,

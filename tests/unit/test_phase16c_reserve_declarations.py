@@ -1103,7 +1103,7 @@ def test_phase16c_reserve_declaration_payloads_round_trip_through_lifecycle_payl
     missing_source_event["event_type"] = "phase16c_removed_reserve_declaration"
     with pytest.raises(
         GameLifecycleError,
-        match="Initial ReserveState requires exactly one declaration evidence route",
+        match="Initial reserve declaration evidence drift",
     ):
         GameLifecycle.from_payload(missing_source_payload)
 

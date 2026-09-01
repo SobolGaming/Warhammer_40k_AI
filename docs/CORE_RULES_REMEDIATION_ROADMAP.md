@@ -459,9 +459,8 @@ canonical-rules-unit eligibility snapshot → typed eligible-off-battlefield uns
 bounded select-next sequencing choice → one live in-flight Battle-shock request/result and optional-reroll path →
 success-only clearing of carried phase-start Battle-shock → exact
 `battle_shock_modifier_applications_recorded` producer/source/operand authority → universal
-`attached_rules_unit_split_reconciled` lineage authority whenever an Attached Unit splits → exact
-immediate `battle_shock_state_transferred_after_attached_unit_split` authority when that historical
-rules unit was shocked → `battle_shock_step_completed` →
+retained Attached Unit identity and immutable battle-start component lineage validation after
+component destruction → `battle_shock_step_completed` →
 serialized game state, event log, replay, adapter projection, and event delta. No adapter validates
 the predicate, constructs the snapshot, rolls the test, or mutates Battle-shock state.
 
@@ -486,12 +485,9 @@ Command-start selection events precede both Core CP gains and `command_step_star
 `battle_shock_step_completed` events expose only the same Battle-shock information already visible
 to both players. The public `battle_shock_modifier_applications_recorded` event exposes the exact
 loaded producer, actual source, and modifiers applied to that public test; adapters audit or display
-it but never apply it. Every Attached Unit split emits public
-`attached_rules_unit_split_reconciled` with immutable starting lineage and exact survivors. A
-shocked Attached Unit split additionally emits public
-`battle_shock_state_transferred_after_attached_unit_split` with the historical source state,
-complete survivor IDs, and successor states; adapters may display but never apply that transition.
-No hidden-information type or redaction set is added.
+it but never apply it. P19 supersedes the former split events: the canonical Attached Unit and its
+Battle-shock row remain stable through component loss, while immutable starting lineage remains
+serialized authority. No hidden-information type or redaction set is added.
 
 Regression scenarios and same-bug-class search: Required coverage includes synchronous, effect, and
 finite Command-start work before CP; nested decision pause/resume without duplicated work; a
@@ -702,8 +698,7 @@ PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/4
 
 ### P09B — C09-02
 
-Status: Implementation and required validation are complete; PR #409 is open pending review and
-merge.
+Status: Merged in PR #409 at `a4a8c1d3`.
 
 Finding IDs: `C09-02`.
 
@@ -901,13 +896,12 @@ Validation results:
   equivalent pinned `node`, `tsc`, and `tsx` entrypoints ran directly; `npm ci` and the npm wrapper
   commands could not be executed.
 
-PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/409`; merge commit
-pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/409`;
+`a4a8c1d3`.
 
 ### P06A — C06-01
 
-Status: Implementation and required validation are complete; PR #410 is open pending review and
-merge.
+Status: Merged in PR #410 at `dab7d128`.
 
 Finding IDs: `C06-01`.
 
@@ -1019,13 +1013,12 @@ Validation results:
   equivalent pinned `node`, `tsc`, and `tsx` entrypoints ran directly; `npm ci` and the npm wrapper
   commands could not be executed.
 
-PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/410`; merge commit
-pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/410`;
+`dab7d128`.
 
 ### P06B — C06-02
 
-Status: Implementation, required local validation, and remote PR publication are complete; review
-and merge are pending.
+Status: Merged in PR #411 at `eae5b7f1`.
 
 Finding IDs: `C06-02`.
 
@@ -1065,17 +1058,17 @@ prevalidation reconstruct the occurrence, parent closure, child request, and exa
 queue pop, recording, RNG, damage, or completion. Damage application separately requires the
 supplied model to belong to the retained target rules unit. Each application also freezes the
 target's owner, exact physical component-unit inventory, and Character-component classification.
-Freeze and validation share one state-derived Character-component owner: an active formation uses
-its actual Leader/Support roles plus authoritative Character keywords, while a dissolved formation
-uses the exact matching `StartingAttachedUnitRecord` roles plus those keywords. The retained set
+Freeze and validation share one state-derived Character-component owner: the retained formation
+uses its actual Leader/Support roles plus authoritative Character keywords, cross-checked against
+the exact matching `StartingAttachedUnitRecord`. The retained set
 must equal that reconstruction, so a coordinated rewrite of progress, application-started event,
 allocation occurrence, parent closure, child request, and request events cannot reclassify a
 Character as a non-Character or bypass living Bodyguards.
-If destruction reconciles an Attached Unit into multiple current descendants before the packet
-finishes, the allocator continues across every living, placed model in that frozen lineage and
-recomputes the four tiers over that packet-wide population. Restore, Feel No Pain authority,
-logical-death validation, and final destruction evidence consume the same lineage; they neither
-choose an arbitrary descendant nor terminate a packet while a frozen descendant survives. Shared
+If destruction removes an Attached Unit component before the packet finishes, the allocator keeps
+the original canonical target, continues across every living placed model in that frozen lineage,
+and recomputes the four tiers over that packet-wide population. Restore, Feel No Pain authority,
+logical-death validation, and final destruction evidence consume the same lineage; they do not
+terminate a packet while any model from the retained rules unit survives. Shared
 attack-sequence ownership now classifies the complete decision family once; Fight-owned deferred
 mortal wounds, including active reaction frames, keep their Fight host across model selection,
 Feel No Pain, serialization, and replay.
@@ -1115,9 +1108,9 @@ eligibility or dice rules, damage spill semantics, Character keyword ownership, 
 damage allocation, out-of-scope content, or hidden-information policy.
 
 Regression coverage includes facade submission and replay after the last Bodyguard is destroyed
-mid-packet and normal reconciliation splits the original Attached Unit. One case leaves Leader and
-Support Character descendants and exercises the Character-tier model decision plus Feel No Pain
-across serialized checkpoints; a second leaves one Character descendant and proves deterministic
+mid-packet while the original Attached Unit identity remains. One case leaves Leader and Support
+Character models and exercises the Character-tier model decision plus Feel No Pain across
+serialized checkpoints; a second leaves one Character model and proves deterministic
 automatic continuation rather than an erroneous unit-destroyed termination. Coordinated
 classification-drift regressions modify every retained authority copy at both the pending model
 choice and pending Feel No Pain boundaries and prove restore and lifecycle submission reject before
@@ -1174,8 +1167,142 @@ Validation results:
   TypeScript client drift and type checks pass, and the two-server HTTP conformance scenario passes
   all `342` assertions for contract version `11.1.0`.
 
-PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/411`; merge commit
-pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/411`;
+`eae5b7f1`.
+
+### P19 — C19-01
+
+Status: Implementation, required local validation, and source/contract regeneration are complete;
+remote PR publication is the remaining step.
+
+Finding IDs: `C19-01`.
+
+Dependencies and evidence gate: P09B, P06A, and P06B are merged. The exact 19.01.01 statement is
+retained as a reviewed transcription and a separately classified, project-authoritative 40k.app
+mirror observation linked to the recorded non-affiliation and source-authority policy. This
+satisfies `APP-AUTHORITY`; no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: Models that began as one Attached Unit remain one rules unit for the stated
+duration. Bodyguard, Leader, or Support component loss must not retire the original rules-unit ID,
+mint singleton successor rules units, or transfer authoritative state to component IDs while any
+model that started in the Attached Unit remains.
+
+How it was done before P19: Shared destruction reconciliation dissolved an Attached Unit whenever
+only Bodyguard models or only Leader/Support models remained. It removed the formation and original
+Starting Strength row, generated component Starting Strength rows, expanded historical identity
+lookups into successor units, and transferred Battle-shock, ReserveState, persisting effects,
+Mission Action, Fight, selected-target, and replay-visible state through bespoke split events.
+Several history validators and scoring snapshots accepted either the root or a reconstructed set of
+singleton component rows.
+
+How it is done after P19: The original `AttachedUnitFormation`, canonical rules-unit ID,
+`StartingStrengthRecord`, and `StartingAttachedUnitRecord` remain authoritative through every
+component loss. The immutable starting record supplies explicit Bodyguard, Leader, Support,
+component, and starting-model lineage. Dead components remain in that lineage but contribute no
+living models, keywords, abilities, or required battlefield placement. Shared destruction hosts
+validate that the retained formation, owner, source, component inventory, and root-only Starting
+Strength still match battle-start authority. Rules-unit identity lookup returns exactly one current
+root for either the canonical ID or a physical component alias; historical successor expansion and
+split-state mutation are removed.
+
+Battle-shock, ReserveState, persisting effects, Mission Actions, Fight activation consumption,
+selected-target chains, healing, scoring witnesses, and adapter-visible unit identities stay on the
+canonical root. Exact physical model and component IDs remain in placement, attack attribution,
+departure evidence, and component lineage where physical ownership matters. Turn-start snapshots
+fail closed unless the retained root owns the exact frozen component set. The obsolete
+`attached_rules_unit_split_reconciled`,
+`battle_shock_state_transferred_after_attached_unit_split`, and
+`reserve_state_transferred_after_attached_unit_split` routes are no longer emitted; restore owners
+reject those legacy events instead of reconstructing successor state.
+
+Specific authoritative 40k.app rule/statement and source ID: 19.01.01, `ATTACHED UNITS AFTER THEIR
+BODYGUARD UNIT IS DESTROYED`, states that when a rule would separate attached Leader/Support units
+after Bodyguard destruction, all of those Leader/Support units remain one unit for all rules
+purposes. Its stable source ID is
+`gw-11e-core-rules:attached-units:bodyguard-unit-destroyed`. Runtime behavior binds to the typed
+retained-identity validator and this source-backed execution record, never a display name or
+source-text token.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/19-attached-units`, observed
+`2026-09-01T09:02:35-04:00`; transcription
+`cb8ea6a1b9633420c8a2c59989edf8bfd97987ce1847faca6820f08b99931bbe`;
+reviewed-transcription observation
+`29c65f1de8ddfd855323b8d0ef6f99b5ce6d28e322034ca2e68097398e408aec`;
+authoritative-mirror observation
+`ee513960052396784786dee07ff736c25c0c120f06e56d6940b020fdf71f2d5d`;
+category-audit source observation
+`9328cc0ae8f0c22dc52418c3238a105d7031cdfdb5daf78bd377c56f36c795bd`.
+The generated package hash is
+`3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570` and its canonical artifact
+byte SHA-256 is `748cf1bc4cbd2749655abab43e97c7e04acfa4e63e79b9f84b565001b9c17b66`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:0a2001a8f524d323f4bf4faf5e42dd217a39be90bb19869d55b250b79dc46807`.
+
+Load and execution support: The Attached Units rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked mirror observation carries project
+authority. The fail-fast typed loader pins schema, document identity, rule identity, text hash,
+both evidence fingerprints, package hash, and canonical artifact byte hash.
+
+Scope and explicit exclusions: P19 owns retained Attached Unit identity after component loss,
+explicit component/start-model lineage, root Starting Strength, placement treatment for dead
+components, cross-cutting authoritative state identity, history/restore rejection of obsolete
+split routes, source identity, adapter-contract documentation, regressions, and static bypass
+audit. It does not change legal attachment declarations, Bodyguard allocation priority, Leader or
+Support eligibility, model-return limits, reserve eligibility, scoring rules, hidden-information
+policy, or any out-of-scope content.
+
+Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed loader
+→ stable Attached Units source ID → `AttachedUnitFormation` plus battle-start
+`StartingAttachedUnitRecord`/root `StartingStrengthRecord` → shared destruction mutation → retained
+identity validation → current rules-unit/placement/Battle-shock/ReserveState/effect/Action/Fight and
+scoring consumers → deterministic events, projections, serialization, and replay. The engine alone
+mutates model state; adapters continue to submit existing decisions and never derive successor
+units or transfer state.
+
+Decision and viewer-visibility impact: P19 adds no decision type, finite option family,
+parameterized proposal kind, payload field, visibility rule, or replay schema. Existing unit-ID
+fields now consistently retain the canonical Attached Unit ID after component loss while existing
+physical model/component fields continue to report exact ownership. No hidden-information type or
+redaction set is added. `docs/ADAPTER_DECISION_CONTRACT.md` records that existing contract.
+
+Regression scenarios and same-bug-class search: Real destruction covers Bodyguard-only loss,
+Leader-only loss, Leader-plus-Support survivors, Feel No Pain continuations, Battle-shock,
+selected-target effects, persisting effects, Mission Actions, Fight on Death, activation
+consumption, reserve arrival, later healing, primary departure/scoring evidence, adapter viewer
+projections and deltas, serialization, and replay. Horror Split materialization still performs its
+source-backed datasheet/model handoff while preserving the Attached Unit root. Static audit scans
+all engine calls for the removed split/recovery/transfer APIs and requires every shared model-loss
+host to invoke retained-identity validation. The obsolete split-history and reserve-transfer
+modules are absent.
+
+Generated artifacts/documentation: P19 adds
+`core_attached_units_2026_09/artifacts/package.json`, its typed loader/source package, and the
+offline builder; regenerates the engine build manifest and external-contract identity examples;
+updates generated Emperor's Children support documentation, the adapter contract, decision
+catalog, source-audit instructions, and this finding record. No behavioral test file was added,
+removed, moved, or renamed, so the committed four-shard inventory does not change.
+
+Validation results:
+
+- Focused source, identity, component-loss, Battle-shock, ReserveState, effect, Action, Fight,
+  healing, scoring, adapter, replay, Horror materialization, and static-audit regressions pass;
+  every failure from the first aggregate run was rerun as one clean `46`-test cluster.
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2646` source files;
+  Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
+  four-shard inventory check and all-files pre-commit gate pass.
+- The required final xdist work-stealing suite passes (`6347 passed` in `483.75s`), including the
+  complete code-quality suite.
+- The Attached Units source artifact, final engine build identity, and regenerated external
+  contract pass fail-closed checks, including the `origin/main` compatibility comparison.
+- Installed-wheel smoke passes with `2476` packaged engine resources and `27` schemas. The host has
+  no `npm` executable, so `npm ci` and npm wrapper commands could not run; the already locked
+  dependencies were exercised directly with the bundled Node runtime. Generated-client drift,
+  TypeScript type checks, and all `5` client unit tests pass, and the two-server HTTP conformance
+  scenario passes all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: remote PR publication pending.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all

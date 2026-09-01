@@ -1092,7 +1092,7 @@ def test_post_shoot_order_survives_target_set_change_after_feel_no_pain() -> Non
 
 
 @pytest.mark.parametrize("use_feel_no_pain", [False, True])
-def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
+def test_post_shoot_order_retains_attached_target_identity_after_bodyguard_loss(
     use_feel_no_pain: bool,
 ) -> None:
     (
@@ -1110,7 +1110,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
     )
     survivor_id = _leave_one_wound_on_unit(state=state, unit=target_noise_marines)
     feel_no_pain_source = FeelNoPainSource(
-        source_id="attached-target-split-fnp-a",
+        source_id="attached-target-component-loss-fnp-a",
         threshold=5,
     )
     if use_feel_no_pain:
@@ -1119,7 +1119,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
             sources=(
                 feel_no_pain_source,
                 FeelNoPainSource(
-                    source_id="attached-target-split-fnp-b",
+                    source_id="attached-target-component-loss-fnp-b",
                     threshold=6,
                 ),
             ),
@@ -1138,7 +1138,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
         source_noise_marines=source_noise_marines,
         source_rules_unit_id=source_attached_id,
         targets=((target_noise_marines, target_attached_id),),
-        sequence_suffix="attached-target-splits",
+        sequence_suffix="attached-target-retained",
     )
 
     assert runtime.post_shoot_hit_target_request(context) is not None
@@ -1146,7 +1146,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
         decisions=decisions,
         request=decisions.queue.peek_next(),
         ability_order=("Doom Siren", "Terrifying Crescendo"),
-        result_id="attached-target-splits-sequencing-result",
+        result_id="attached-target-retained-sequencing-result",
     )
     assert runtime.post_shoot_hit_target_request(context) is not None
     status = _submit_catalog_post_shoot_target(
@@ -1154,7 +1154,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
         decisions=decisions,
         request=decisions.queue.peek_next(),
         target_unit_instance_id=target_attached_id,
-        result_id="attached-target-splits-doom-siren-result",
+        result_id="attached-target-retained-doom-siren-result",
         battle_shock_hooks=battle_shock_hooks,
         indexes=indexes,
     )
@@ -1166,7 +1166,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
         decisions=decisions,
         indexes=indexes,
         battle_shock_hooks=battle_shock_hooks,
-        result_id_prefix="attached-target-splits-fnp",
+        result_id_prefix="attached-target-retained-fnp",
         selected_feel_no_pain_source_id=(
             feel_no_pain_source.source_id if use_feel_no_pain else None
         ),
@@ -1179,20 +1179,18 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
     assert any(
         model.is_alive for model in _unit_from_state(state, target_lord.unit_instance_id).own_models
     )
-    assert all(
-        formation.attached_unit_instance_id != target_attached_id
+    target_formation = next(
+        formation
         for army in state.army_definitions
         for formation in army.attached_units
+        if formation.attached_unit_instance_id == target_attached_id
     )
-    assert target_attached_id not in {
-        record.unit_instance_id for record in state.starting_strength_records
-    }
-    assert state.starting_strength_record_for_unit(
-        target_noise_marines.unit_instance_id
-    ).starting_model_count == len(target_noise_marines.own_models)
-    assert state.starting_strength_record_for_unit(
-        target_lord.unit_instance_id
-    ).starting_model_count == len(target_lord.own_models)
+    assert target_formation.component_unit_instance_ids == tuple(
+        sorted((target_noise_marines.unit_instance_id, target_lord.unit_instance_id))
+    )
+    assert state.starting_strength_record_for_unit(target_attached_id).starting_model_count == len(
+        target_noise_marines.own_models
+    ) + len(target_lord.own_models)
     battle_shock_payload = cast(
         dict[str, Any],
         next(
@@ -1209,14 +1207,13 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
     )
     assert battle_shock_request["unit_instance_id"] == target_attached_id
     assert battle_shock_payload["target_identity_resolution"] == "unchanged"
-    assert target_attached_id not in state.battle_shocked_unit_ids
+    assert set(state.battle_shocked_unit_ids) <= {target_attached_id}
 
     assert runtime.post_shoot_hit_target_request(context) is not None
     crescendo_request = decisions.queue.peek_next()
     crescendo_payload = cast(dict[str, Any], crescendo_request.payload)
     assert crescendo_payload["ability_name"] == "Terrifying Crescendo"
-    assert crescendo_payload["available_target_unit_instance_ids"] == [target_lord.unit_instance_id]
-    assert target_attached_id not in crescendo_payload["available_target_unit_instance_ids"]
+    assert crescendo_payload["available_target_unit_instance_ids"] == [target_attached_id]
     assert (
         GameState.from_payload(
             cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
@@ -1235,7 +1232,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
 
 
 @pytest.mark.parametrize("use_feel_no_pain", [False, True])
-def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_chain(
+def test_doom_siren_retains_leader_support_attached_identity_after_bodyguard_loss(
     use_feel_no_pain: bool,
 ) -> None:
     (
@@ -1253,8 +1250,7 @@ def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_cha
         game_id="kakophonist-leader-support-split-fnp-destruction",
     )
     final_bodyguard_model_id = _leave_one_wound_on_unit(state=state, unit=target_bodyguard)
-    survivor_ids = tuple(sorted((target_leader.unit_instance_id, target_support.unit_instance_id)))
-    _record_attached_split_authoritative_state(
+    _record_attached_rules_unit_authoritative_state(
         state=state,
         target_attached_id=target_attached_id,
     )
@@ -1338,41 +1334,35 @@ def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_cha
     battle_shock_request = cast(dict[str, Any], battle_shock_result["request"])
     assert battle_shock_request["unit_instance_id"] == target_attached_id
     assert battle_shock_payload["target_identity_resolution"] == "unchanged"
-    expected_shocked_ids = () if battle_shock_result["passed"] else survivor_ids
+    expected_shocked_ids = () if battle_shock_result["passed"] else (target_attached_id,)
     assert (
-        tuple(unit_id for unit_id in state.battle_shocked_unit_ids if unit_id in survivor_ids)
+        tuple(unit_id for unit_id in state.battle_shocked_unit_ids if unit_id == target_attached_id)
         == expected_shocked_ids
     )
-    assert target_attached_id not in state.battle_shocked_unit_ids
     if expected_shocked_ids:
-        shocked_states = tuple(
+        shocked_state = next(
             shocked_state
             for shocked_state in state.battle_shocked_unit_states
-            if shocked_state.unit_instance_id in survivor_ids
+            if shocked_state.unit_instance_id == target_attached_id
         )
-        assert tuple(shocked_state.unit_instance_id for shocked_state in shocked_states) == (
-            survivor_ids
-        )
-        assert tuple(shocked_state.model_instance_ids for shocked_state in shocked_states) == tuple(
-            tuple(model.model_instance_id for model in unit.own_models)
-            for unit in sorted(
-                (target_leader, target_support),
-                key=lambda unit: unit.unit_instance_id,
+        assert shocked_state.model_instance_ids == tuple(
+            sorted(
+                model.model_instance_id
+                for unit in (target_leader, target_support)
+                for model in unit.own_models
             )
         )
-    _assert_attached_split_authoritative_state(
+    _assert_attached_rules_unit_authoritative_state(
         state=state,
         decisions=decisions,
         target_attached_id=target_attached_id,
         component_units=(target_bodyguard, target_leader, target_support),
-        survivor_ids=survivor_ids,
     )
 
     assert runtime.post_shoot_hit_target_request(context) is not None
     crescendo_payload = cast(dict[str, Any], decisions.queue.peek_next().payload)
     assert crescendo_payload["ability_name"] == "Terrifying Crescendo"
-    assert crescendo_payload["available_target_unit_instance_ids"] == list(survivor_ids)
-    assert target_attached_id not in crescendo_payload["available_target_unit_instance_ids"]
+    assert crescendo_payload["available_target_unit_instance_ids"] == [target_attached_id]
     state_payload = cast(
         GameStatePayload,
         json.loads(json.dumps(state.to_payload(), sort_keys=True)),
@@ -1385,7 +1375,7 @@ def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_cha
     assert DecisionController.from_payload(decision_payload).to_payload() == decisions.to_payload()
 
 
-def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> None:
+def test_selected_target_retains_attached_identity_in_lifecycle_replay_round_trip() -> None:
     (
         config,
         armies,
@@ -1414,7 +1404,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
         source_noise_marines=source_noise_marines,
         source_rules_unit_id=source_attached_id,
         targets=((target_noise_marines, target_attached_id),),
-        sequence_suffix="attached-split-replay",
+        sequence_suffix="attached-retained-replay",
         authenticated_history=True,
     )
 
@@ -1423,7 +1413,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
         decisions=decisions,
         request=decisions.queue.peek_next(),
         ability_order=("Doom Siren", "Terrifying Crescendo"),
-        result_id="attached-split-replay-sequencing-result",
+        result_id="attached-retained-replay-sequencing-result",
     )
     assert runtime.post_shoot_hit_target_request(context) is not None
     doom_request = decisions.queue.peek_next()
@@ -1456,7 +1446,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
     submitted = session.submit_option(
         request_id=doom_request.request_id,
         option_id=doom_option.option_id,
-        result_id="attached-split-replay-doom-result",
+        result_id="attached-retained-replay-doom-result",
     )
     assert submitted.status_kind not in {
         LifecycleStatusKind.INVALID,
@@ -1464,22 +1454,17 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
     }
     final_state = session.lifecycle.state
     assert final_state is not None
-    assert all(
-        formation.attached_unit_instance_id != target_attached_id
+    target_formation = next(
+        formation
         for army in final_state.army_definitions
         for formation in army.attached_units
+        if formation.attached_unit_instance_id == target_attached_id
+    )
+    assert target_formation.component_unit_instance_ids == tuple(
+        sorted((target_noise_marines.unit_instance_id, target_lord.unit_instance_id))
     )
     assert (
-        final_state.starting_strength_record_for_unit(
-            target_noise_marines.unit_instance_id
-        ).starting_model_count
-        == 1
-    )
-    assert (
-        final_state.starting_strength_record_for_unit(
-            target_lord.unit_instance_id
-        ).starting_model_count
-        == 1
+        final_state.starting_strength_record_for_unit(target_attached_id).starting_model_count == 2
     )
     battle_shock_request_payload = cast(
         dict[str, Any],
@@ -1499,7 +1484,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
         json.loads(
             json.dumps(
                 ReplayArtifact.capture(
-                    artifact_id="selected-target-attached-unit-split",
+                    artifact_id="selected-target-attached-unit-retained",
                     initial_lifecycle_payload=initial_lifecycle_payload,
                     final_lifecycle=session.lifecycle,
                 ).to_payload(),
@@ -1512,7 +1497,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
 
 
 @pytest.mark.parametrize("use_feel_no_pain", [False, True])
-def test_leader_support_split_lifecycle_and_replay_round_trip(
+def test_leader_support_retained_identity_lifecycle_and_replay_round_trip(
     use_feel_no_pain: bool,
 ) -> None:
     explicit_game_id = "kakophonist-leader-support-replay-explicit-0" if use_feel_no_pain else None
@@ -1533,8 +1518,7 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
     )
     assert len(target_bodyguard.own_models) == 1
     assert target_bodyguard.own_models[0].wounds_remaining == 1
-    survivor_ids = tuple(sorted((target_leader.unit_instance_id, target_support.unit_instance_id)))
-    _record_attached_split_authoritative_state(
+    _record_attached_rules_unit_authoritative_state(
         state=state,
         target_attached_id=target_attached_id,
     )
@@ -1639,12 +1623,11 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
             target_bodyguard.unit_instance_id,
         ).own_models
     )
-    _assert_attached_split_authoritative_state(
+    _assert_attached_rules_unit_authoritative_state(
         state=final_state,
         decisions=session.lifecycle.decision_controller,
         target_attached_id=target_attached_id,
         component_units=(target_bodyguard, target_leader, target_support),
-        survivor_ids=survivor_ids,
     )
     battle_shock_payload = cast(
         dict[str, Any],
@@ -1659,9 +1642,13 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
         cast(dict[str, Any], battle_shock_result["request"])["unit_instance_id"]
         == target_attached_id
     )
-    expected_shocked_ids = () if battle_shock_result["passed"] else survivor_ids
+    expected_shocked_ids = () if battle_shock_result["passed"] else (target_attached_id,)
     assert (
-        tuple(unit_id for unit_id in final_state.battle_shocked_unit_ids if unit_id in survivor_ids)
+        tuple(
+            unit_id
+            for unit_id in final_state.battle_shocked_unit_ids
+            if unit_id == target_attached_id
+        )
         == expected_shocked_ids
     )
     final_payload = session.lifecycle.to_payload()
@@ -1671,7 +1658,7 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
         json.loads(
             json.dumps(
                 ReplayArtifact.capture(
-                    artifact_id=f"selected-target-leader-support-split-{use_feel_no_pain}",
+                    artifact_id=f"selected-target-leader-support-retained-{use_feel_no_pain}",
                     initial_lifecycle_payload=initial_lifecycle_payload,
                     final_lifecycle=session.lifecycle,
                 ).to_payload(),
@@ -2026,7 +2013,7 @@ def test_lord_kakophonist_doom_siren_targets_intact_attached_rules_unit() -> Non
     )
 
 
-def test_attached_battle_shock_state_transfers_to_split_survivor() -> None:
+def test_attached_battle_shock_state_remains_on_root_after_component_loss() -> None:
     (
         _armies,
         state,
@@ -2048,7 +2035,7 @@ def test_attached_battle_shock_state_transfers_to_split_survivor() -> None:
         current_model_ids=current_model_ids,
     )
     request = BattleShockTestRequest.for_unit(
-        request_id="attached-battle-shock-before-split",
+        request_id="attached-battle-shock-before-component-loss",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id="player-b",
@@ -2058,7 +2045,7 @@ def test_attached_battle_shock_state_transfers_to_split_survivor() -> None:
         below_half_strength_context=below_half_context,
     )
     failed = BattleShockResult.from_roll_state(
-        result_id="attached-battle-shock-before-split-result",
+        result_id="attached-battle-shock-before-component-loss-result",
         request=request,
         roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, (1, 1)),
     )
@@ -2067,20 +2054,10 @@ def test_attached_battle_shock_state_transfers_to_split_survivor() -> None:
 
     for model in target_noise_marines.own_models:
         destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=target_attached_id,
-        surviving_unit_instance_ids=(target_lord.unit_instance_id,),
-        event_log=DecisionController().event_log,
-    )
-
-    assert state.battle_shocked_unit_ids == [target_lord.unit_instance_id]
+    assert state.battle_shocked_unit_ids == [target_attached_id]
     assert [record.unit_instance_id for record in state.battle_shocked_unit_states] == [
-        target_lord.unit_instance_id
+        target_attached_id
     ]
-    assert state.battle_shocked_unit_states[0].model_instance_ids == (
-        target_lord.own_models[0].model_instance_id,
-    )
     assert (
         GameState.from_payload(
             cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
@@ -2090,30 +2067,24 @@ def test_attached_battle_shock_state_transfers_to_split_survivor() -> None:
     assert clear_battle_shock_for_rules_unit(
         state=state,
         unit_instance_id=target_lord.unit_instance_id,
-    ) == (target_lord.unit_instance_id,)
+    ) == (target_attached_id,)
 
 
-def test_lord_kakophonist_doom_siren_resolves_stale_attached_target_to_survivor() -> None:
+def test_lord_kakophonist_doom_siren_retains_attached_target_identity() -> None:
     (
         armies,
         state,
         indexes,
         source_noise_marines,
         target_noise_marines,
-        target_lord,
+        _target_lord,
         source_attached_id,
         target_attached_id,
     ) = _kakophonist_attached_target_runtime_fixture()
-    state.game_id = "kakophonist-split-target-0"
+    state.game_id = "kakophonist-retained-target-0"
     decisions = DecisionController()
     for model in target_noise_marines.own_models:
         destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=target_attached_id,
-        surviving_unit_instance_ids=(target_lord.unit_instance_id,),
-        event_log=decisions.event_log,
-    )
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
     battle_shock_hooks = BattleShockHookRegistry.from_bindings(
         catalog_battle_shock_hook_bindings(
@@ -2131,7 +2102,7 @@ def test_lord_kakophonist_doom_siren_resolves_stale_attached_target_to_survivor(
         source_rules_unit_id=source_attached_id,
         target=target_noise_marines,
         target_rules_unit_id=target_attached_id,
-        sequence_suffix="split-attached-target",
+        sequence_suffix="retained-attached-target",
         battle_shock_hooks=battle_shock_hooks,
         ability_order=("Doom Siren", "Terrifying Crescendo"),
     )
@@ -2147,11 +2118,11 @@ def test_lord_kakophonist_doom_siren_resolves_stale_attached_target_to_survivor(
     )
     result_payload = cast(dict[str, Any], resolved_payload["battle_shock_result"])
     request_payload = cast(dict[str, Any], result_payload["request"])
-    assert resolved_payload["selected_target_unit_instance_id"] == target_lord.unit_instance_id
-    assert resolved_payload["target_unit_instance_id"] == target_lord.unit_instance_id
+    assert resolved_payload["selected_target_unit_instance_id"] == target_attached_id
+    assert resolved_payload["target_unit_instance_id"] == target_attached_id
     assert resolved_payload["target_identity_resolution"] == "unchanged"
-    assert request_payload["unit_instance_id"] == target_lord.unit_instance_id
-    assert target_attached_id not in state.battle_shocked_unit_ids
+    assert request_payload["unit_instance_id"] == target_attached_id
+    assert (target_attached_id in state.battle_shocked_unit_ids) is (not result_payload["passed"])
     assert (
         GameState.from_payload(
             cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
@@ -4455,7 +4426,7 @@ def test_icon_of_excess_uses_attached_rules_unit_identity_and_leadership() -> No
         for record in session.lifecycle.decision_controller.event_log.records
         if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
     )
-    assert leadership_payload["source_unit_instance_id"] == tormentors.unit_instance_id
+    assert leadership_payload["source_unit_instance_id"] == attached_view.unit_instance_id
     assert leadership_payload["leadership_target"] == 5
     replay_payload = cast(
         ReplayArtifactPayload,
@@ -4546,12 +4517,12 @@ def test_icon_of_excess_ignores_rule_destruction_through_phase_end_lifecycle() -
     )
 
 
-def test_icon_of_excess_matches_historical_attached_attack_identity_after_split() -> None:
+def test_icon_of_excess_matches_retained_attached_attack_identity_after_component_loss() -> None:
     session, tormentors, target = _battleline_lifecycle_session(
         source_datasheet_id="000004079",
         phase=BattlePhase.SHOOTING,
         with_icon=True,
-        game_id="icon-of-excess-attached-split",
+        game_id="icon-of-excess-attached-component-loss",
         attached_source=True,
         extra_target=True,
     )
@@ -4579,7 +4550,7 @@ def test_icon_of_excess_matches_historical_attached_attack_identity_after_split(
         assert battlefield is not None
         destroyed_model_placement = battlefield.model_placement_or_none(model.model_instance_id)
         assert destroyed_model_placement is not None
-        attack_context_id = f"attack-context:icon-attached-split:{index}"
+        attack_context_id = f"attack-context:icon-attached-component-loss:{index}"
         attribution = ModelDestructionAttribution.for_attack(
             destroying_player_id="player-a",
             attacking_unit_instance_id=attached_view.unit_instance_id,
@@ -4620,7 +4591,7 @@ def test_icon_of_excess_matches_historical_attached_attack_identity_after_split(
                 "destroyed_rules_unit_objective_proximity_witness": (
                     destroyed_witness.to_payload()
                 ),
-                "sequence_id": "attack-sequence:icon-attached-split",
+                "sequence_id": "attack-sequence:icon-attached-component-loss",
                 "attack_context_id": attack_context_id,
                 "target_unit_instance_id": target.unit_instance_id,
                 "model_instance_id": model.model_instance_id,
@@ -4634,18 +4605,12 @@ def test_icon_of_excess_matches_historical_attached_attack_identity_after_split(
         )
     for model in leader.own_models:
         destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_view.unit_instance_id,
-        surviving_unit_instance_ids=(tormentors.unit_instance_id,),
-        event_log=decisions.event_log,
-    )
     assert (
         rules_unit_view_by_id(
             state=state,
             unit_instance_id=tormentors.unit_instance_id,
         ).unit_instance_id
-        == tormentors.unit_instance_id
+        == attached_view.unit_instance_id
     )
 
     _advance_battleline_without_actions_to_phase(
@@ -4659,7 +4624,7 @@ def test_icon_of_excess_matches_historical_attached_attack_identity_after_split(
         for record in decisions.event_log.records
         if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
     )
-    assert leadership_payload["source_unit_instance_id"] == tormentors.unit_instance_id
+    assert leadership_payload["source_unit_instance_id"] == attached_view.unit_instance_id
     assert leadership_payload["leadership_target"] == 6
 
 
@@ -5404,7 +5369,7 @@ def test_fulgrim_opponent_turn_fight_poison_uses_lifecycle_dispatch_and_replays(
     assert replay_result.reproduced_exactly, replay_result.to_payload()
 
 
-def test_fulgrim_poison_survives_attached_unit_split_and_deduplicates_each_survivor() -> None:
+def test_fulgrim_poison_remains_on_attached_root_after_component_loss() -> None:
     package = _catalog_package()
     factory = UnitFactory(
         catalog=package.army_catalog,
@@ -5490,15 +5455,8 @@ def test_fulgrim_poison_survives_attached_unit_split_and_deduplicates_each_survi
     assert {effect.target_unit_instance_ids for effect in state.persisting_effects} == {
         (attached_id,)
     }
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
-        event_log=decisions.event_log,
-    )
-    expected_survivor_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
     assert {effect.target_unit_instance_ids for effect in state.persisting_effects} == {
-        expected_survivor_ids
+        (attached_id,)
     }
     for effect in state.persisting_effects:
         effect_payload = cast(dict[str, Any], effect.effect_payload)
@@ -5531,10 +5489,8 @@ def test_fulgrim_poison_survives_attached_unit_split_and_deduplicates_each_survi
         for event in resolved_decisions.event_log.records
         if event.event_type == CATALOG_POISONED_COMMAND_RESOLVED_EVENT
     )
-    assert {payload["target_unit_instance_id"] for payload in resolved_events} == set(
-        expected_survivor_ids
-    )
-    assert len(resolved_events) == 2
+    assert {payload["target_unit_instance_id"] for payload in resolved_events} == {attached_id}
+    assert len(resolved_events) == 1
     expected_effect_ids = sorted(effect.effect_id for effect in state.persisting_effects)
     assert all(payload["poison_effect_ids"] == expected_effect_ids for payload in resolved_events)
     assert replayed_state.to_payload() == resolved_state.to_payload()
@@ -6212,7 +6168,7 @@ def _configured_kakophonist_leader_support_target_fixture(
     )
 
 
-def _record_attached_split_authoritative_state(
+def _record_attached_rules_unit_authoritative_state(
     *,
     state: GameState,
     target_attached_id: str,
@@ -6252,46 +6208,39 @@ def _record_attached_split_authoritative_state(
     )
 
 
-def _assert_attached_split_authoritative_state(
+def _assert_attached_rules_unit_authoritative_state(
     *,
     state: GameState,
     decisions: DecisionController,
     target_attached_id: str,
     component_units: tuple[UnitInstance, ...],
-    survivor_ids: tuple[str, ...],
 ) -> None:
-    assert all(
-        formation.attached_unit_instance_id != target_attached_id
+    formation = next(
+        formation
         for army in state.army_definitions
         for formation in army.attached_units
+        if formation.attached_unit_instance_id == target_attached_id
     )
-    assert target_attached_id not in {
-        record.unit_instance_id for record in state.starting_strength_records
-    }
-    assert tuple(
-        state.starting_strength_record_for_unit(unit.unit_instance_id).starting_model_count
-        for unit in component_units
-    ) == tuple(len(unit.own_models) for unit in component_units)
+    assert formation.component_unit_instance_ids == tuple(
+        sorted(unit.unit_instance_id for unit in component_units)
+    )
+    assert state.starting_strength_record_for_unit(target_attached_id).starting_model_count == sum(
+        len(unit.own_models) for unit in component_units
+    )
     persisting_effect = next(
         effect
         for effect in state.persisting_effects
         if effect.effect_id == "test:leader-support-split:persisting-effect"
     )
-    assert persisting_effect.target_unit_instance_ids == survivor_ids
+    assert persisting_effect.target_unit_instance_ids == (target_attached_id,)
     action_state = state.mission_action_state_by_id("test:leader-support-split:mission-action")
-    assert action_state.status is MissionActionStatus.INTERRUPTED
-    assert action_state.interrupted_reason == MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON
-    interrupted_payload = cast(
-        dict[str, Any],
-        next(
-            event.payload
-            for event in decisions.event_log.records
-            if event.event_type == "mission_action_interrupted"
-            and cast(dict[str, Any], event.payload).get("action_id") == action_state.action_id
-        ),
+    assert action_state.status is MissionActionStatus.STARTED
+    assert action_state.interrupted_reason is None
+    assert not any(
+        event.event_type == "mission_action_interrupted"
+        and cast(dict[str, Any], event.payload).get("action_id") == action_state.action_id
+        for event in decisions.event_log.records
     )
-    assert interrupted_payload["unit_instance_id"] == target_attached_id
-    assert interrupted_payload["surviving_unit_instance_ids"] == list(survivor_ids)
 
 
 def _configured_kakophonist_fixture(

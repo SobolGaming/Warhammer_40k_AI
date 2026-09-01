@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
+    validate_attached_rules_unit_identity_after_destruction,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     payload_string,
@@ -38,9 +38,8 @@ def append_selected_target_event(
             selected_payload(payload),
             key="target_unit_instance_id",
         )
-        split_attached_rules_unit_if_required(
+        validate_attached_rules_unit_identity_after_destruction(
             state=state,
-            event_log=decisions.event_log,
             rules_unit_instance_id=selected_target_id,
         )
     decisions.event_log.append(

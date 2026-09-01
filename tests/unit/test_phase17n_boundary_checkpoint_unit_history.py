@@ -144,13 +144,10 @@ def test_phase17n_restore_rejects_coordinated_battle_shock_history_erasure() -> 
         GameLifecycle.from_payload(forged_payload)
 
 
-def test_phase17n_primary_boundary_accepts_split_before_attached_root_failure() -> None:
-    state, decisions, checkpoint = _split_before_attached_root_failure_checkpoint()
+def test_phase17n_primary_boundary_retains_attached_root_through_component_loss() -> None:
+    state, decisions, checkpoint = _attached_root_failure_checkpoint()
 
-    assert checkpoint.battle_shocked_unit_instance_ids == (
-        _HISTORY_LEADER_UNIT_ID,
-        _HISTORY_UNIT_ID,
-    )
+    assert checkpoint.battle_shocked_unit_instance_ids == (_ATTACHED_HISTORY_UNIT_ID,)
     validate_primary_mission_boundary_unit_history_authority(
         state=state,
         event_records=decisions.event_log.records,
@@ -160,45 +157,27 @@ def test_phase17n_primary_boundary_accepts_split_before_attached_root_failure() 
     )
 
 
-@pytest.mark.parametrize("tamper_kind", ["delete", "omit_survivor"])
-def test_phase17n_primary_boundary_rejects_unshocked_attached_split_event_tamper(
-    tamper_kind: str,
-) -> None:
-    state, decisions, checkpoint = _split_before_attached_root_failure_checkpoint()
-    controller_payload = deepcopy(decisions.to_payload())
-    events = controller_payload["event_log"]
-    split_index = next(
-        index
-        for index, event in enumerate(events)
-        if event["event_type"] == "attached_rules_unit_split_reconciled"
-    )
-    if tamper_kind == "delete":
-        events.pop(split_index)
-        for event_index, event in enumerate(events, start=1):
-            event["event_id"] = f"event-{event_index:06d}"
-    else:
-        split_payload = events[split_index]["payload"]
-        assert isinstance(split_payload, dict)
-        split_payload["surviving_unit_instance_ids"] = [_HISTORY_UNIT_ID]
-    forged = DecisionController.from_payload(controller_payload)
+def test_phase17n_primary_boundary_rejects_obsolete_attached_split_event() -> None:
+    state, decisions, checkpoint = _attached_root_failure_checkpoint()
+    decisions.event_log.append("attached_rules_unit_split_reconciled", {})
 
-    with pytest.raises(GameLifecycleError, match=r"Attached rules-unit split|Battle-shock"):
+    with pytest.raises(GameLifecycleError, match="retained identity semantics"):
         validate_primary_mission_boundary_unit_history_authority(
             state=state,
-            event_records=forged.event_log.records,
-            decision_records=forged.records,
-            checkpoint_index=len(forged.event_log.records),
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            checkpoint_index=len(decisions.event_log.records),
             checkpoint=checkpoint,
         )
 
 
-def _split_before_attached_root_failure_checkpoint() -> tuple[
+def _attached_root_failure_checkpoint() -> tuple[
     GameState,
     DecisionController,
     PrimaryMissionBoundaryCheckpoint,
 ]:
     state, _config = _phase17n_attached_history_state(
-        game_id="phase17n-attached-split-before-failed-result"
+        game_id="phase17n-attached-component-loss-before-failed-result"
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
     bodyguard = next(
@@ -225,7 +204,7 @@ def _split_before_attached_root_failure_checkpoint() -> tuple[
         current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
     )
     request = BattleShockTestRequest.for_unit(
-        request_id="phase17n-attached-split-before-failed-result:request",
+        request_id="phase17n-attached-component-loss-before-failed-result:request",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id="player-b",
@@ -272,12 +251,6 @@ def _split_before_attached_root_failure_checkpoint() -> tuple[
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll_fixed(request.spec, [1, 1])
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=_ATTACHED_HISTORY_UNIT_ID,
-        surviving_unit_instance_ids=(_HISTORY_LEADER_UNIT_ID, _HISTORY_UNIT_ID),
-        event_log=decisions.event_log,
-    )
     record_battle_shock_result_and_outcome_events(
         state=state,
         decisions=decisions,

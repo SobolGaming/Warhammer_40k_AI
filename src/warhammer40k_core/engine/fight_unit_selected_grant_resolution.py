@@ -413,10 +413,6 @@ def _resolve_routed_self_mortal_wounds(
             "unit_instance_id",
             source_context.get("unit_instance_id"),
         )
-        rules_unit = rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=rules_unit_id,
-        )
         destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
             state=state,
             decisions=decisions,
@@ -427,9 +423,6 @@ def _resolve_routed_self_mortal_wounds(
             completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
             completion_event_payload=validate_json_value(resolved_payload),
             destruction_evidence=_self_mortal_wound_destruction_evidence(source_context),
-            defer_attached_split_until_fight_activation_completion=(
-                rules_unit.is_attached_rules_unit
-            ),
         )
         return destruction.status
     decisions.event_log.append(

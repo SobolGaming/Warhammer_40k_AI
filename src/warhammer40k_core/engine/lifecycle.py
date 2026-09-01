@@ -34,7 +34,6 @@ from warhammer40k_core.engine import primary_mission_pending_request_integrity a
 from warhammer40k_core.engine import primary_mission_restore_integrity as _pmri
 from warhammer40k_core.engine import primary_mission_state_validation as _pmsv
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
-from warhammer40k_core.engine import primary_reserve_entry_state_integrity as _presi
 from warhammer40k_core.engine import reserve_state_integrity as _rsi
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine import transport_state_integrity as _tsi
@@ -3556,10 +3555,6 @@ def _validate_payload_consistency(
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
     _rsi.validate_reserve_state_consistency(state=state)
-    _presi.validate_reserve_state_attached_split_integrity(
-        state=state,
-        event_records=event_records,
-    )
     _tsi.validate_transport_cargo_state_consistency(state=state)
     _mdcp.validate_model_destruction_cause_restore(
         state=state,

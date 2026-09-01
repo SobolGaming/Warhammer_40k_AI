@@ -141,8 +141,8 @@ _DATASHEET_REVIEW_ROWS = (
             "if every current successor of the marked enemy is not a legal target, coalesces "
             "repeated uses into one Charge-roll re-roll while preserving all source effects, "
             "and requires a PathWitness ending the Charge Move engaged with every current marked "
-            "successor. Historical source and target identities reconcile deterministically "
-            "across Attached Unit splits and replay round-trips."
+            "successor. Historical source and target identities remain canonical across "
+            "Attached Unit component loss and replay round-trips."
         ),
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
@@ -229,7 +229,7 @@ _DATASHEET_REVIEW_ROWS = (
             "Daemonic Patrons uses an optional selected-to-fight decision, persists a Critical "
             "Wound 3+ threshold through the Fight phase, groups repeated uses into one liability "
             "per current rules unit, attributes enemy model destruction only to that unit's "
-            "attacks in the current player's Fight phase, preserves pre-split Attached Unit "
+            "attacks in the current player's Fight phase, preserves Attached Unit component "
             "lineage, and destroys one controller-selected model through the shared "
             "destruction-reaction path if no qualifying enemy model was destroyed. The Thrill "
             "Seekers army-rule handler and the updated Blissblade Attacks characteristic are "

@@ -1993,7 +1993,7 @@ def test_realm_of_chaos_occurrence_requires_persisted_reserve_state() -> None:
 
     with pytest.raises(
         GameLifecycleError,
-        match="occurrence lacks its persisted ReserveState",
+        match="occurrence lacks its canonical ReserveState",
     ):
         validate_primary_reserve_entry_lifecycle_integrity(
             state=state,

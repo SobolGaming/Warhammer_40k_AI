@@ -8,7 +8,7 @@ from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import rule_deadly_demise_mortal_wound_routing as _r
 from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
+    validate_attached_rules_unit_identity_after_destruction,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
@@ -92,8 +92,6 @@ from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
     RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
 )
 from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
-    DEFER_ATTACHED_SPLIT_FIELD,
-    defer_attached_split_from_rule_destruction_context,
     validate_applied_damage_rule_destruction_context,
 )
 from warhammer40k_core.engine.rule_model_destruction_fight_on_death import (
@@ -410,10 +408,7 @@ def finalize_rule_model_destruction(
     decisions: DecisionController,
     context: dict[str, JsonValue],
     resume_completion_continuation: bool = True,
-    defer_attached_split_until_return: bool = False,
 ) -> LifecycleStatus | None:
-    if type(defer_attached_split_until_return) is not bool:
-        raise GameLifecycleError("Rule destruction split deferral must be a bool.")
     _validate_post_removal_context_matches_state(state=state, decisions=decisions, context=context)
     rules_unit_id = _payload_string(context, "rules_unit_instance_id")
     source_effect_ids = _payload_identifier_list(context, "source_effect_ids")
@@ -431,13 +426,10 @@ def finalize_rule_model_destruction(
         raise GameLifecycleError("Rule destruction completion kind is unsupported.")
     elif source_effect_ids:
         raise GameLifecycleError("Applied rule destruction cannot consume source liabilities.")
-    defer_split = defer_attached_split_from_rule_destruction_context(context)
-    if not defer_split and not defer_attached_split_until_return:
-        split_attached_rules_unit_if_required(
-            state=state,
-            event_log=decisions.event_log,
-            rules_unit_instance_id=rules_unit_id,
-        )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=rules_unit_id,
+    )
     if completion_kind in {
         RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
         RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND,
@@ -471,7 +463,6 @@ def finalize_rule_model_destruction(
                     ),
                     "rules_unit_instance_id": rules_unit_id,
                     "completion_kind": completion_kind,
-                    DEFER_ATTACHED_SPLIT_FIELD: defer_split,
                 }
             ),
         )

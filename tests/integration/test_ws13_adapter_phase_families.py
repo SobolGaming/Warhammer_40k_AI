@@ -50,7 +50,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.weapon_profiles import AbilityDescriptor, WeaponKeyword
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
+    validate_attached_rules_unit_identity_after_destruction,
 )
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
@@ -1065,8 +1065,8 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
 
 
 @pytest.mark.integration
-def test_mortal_wound_packet_survives_attached_split_into_two_character_units() -> None:
-    session, request, units, attached_id = _split_attached_mortal_wound_session(
+def test_mortal_wound_packet_retains_attached_identity_with_two_character_components() -> None:
+    session, request, units, attached_id = _retained_attached_mortal_wound_session(
         game_id="ws13-mortal-lineage-two-characters",
         include_support_character=True,
     )
@@ -1096,15 +1096,7 @@ def test_mortal_wound_packet_survives_attached_split_into_two_character_units() 
             state=cast(GameState, session.lifecycle.state),
             unit_instance_id=attached_id,
         )
-    ) == tuple(
-        sorted(
-            (
-                units["bodyguard-unit"].unit_instance_id,
-                units["leader-unit"].unit_instance_id,
-                units["support-unit"].unit_instance_id,
-            )
-        )
-    )
+    ) == (attached_id,)
 
     fnp_status = session.submit_option(
         request_id=request.request_id,
@@ -1138,8 +1130,8 @@ def test_mortal_wound_packet_survives_attached_split_into_two_character_units() 
 
 
 @pytest.mark.integration
-def test_mortal_wound_packet_survives_attached_split_with_one_character_unit() -> None:
-    session, request, units, _attached_id = _split_attached_mortal_wound_session(
+def test_mortal_wound_packet_retains_attached_identity_with_one_character_component() -> None:
+    session, request, units, _attached_id = _retained_attached_mortal_wound_session(
         game_id="ws13-mortal-lineage-one-character",
         include_support_character=False,
     )
@@ -1182,7 +1174,7 @@ def test_mortal_wound_character_component_drift_is_rejected_before_mutation(
             game_id="ws13-mortal-character-authority-model-choice"
         )
     else:
-        session, model_request, units, _attached_id = _split_attached_mortal_wound_session(
+        session, model_request, units, _attached_id = _retained_attached_mortal_wound_session(
             game_id="ws13-mortal-character-authority-feel-no-pain",
             include_support_character=True,
         )
@@ -1365,7 +1357,7 @@ def _tamper_mortal_wound_character_component_authority(
     tamper(payload)
 
 
-def _split_attached_mortal_wound_session(
+def _retained_attached_mortal_wound_session(
     *,
     game_id: str,
     include_support_character: bool,
@@ -1494,24 +1486,10 @@ def _split_attached_mortal_wound_session(
         attack_sequence=sequence,
         allocated_model_ids_this_phase=(),
     )
-    split_survivor_ids = split_attached_rules_unit_if_required(
+    validate_attached_rules_unit_identity_after_destruction(
         state=state,
-        event_log=lifecycle.decision_controller.event_log,
         rules_unit_instance_id=attached_id,
     )
-    expected_survivor_ids = (
-        (units["leader-unit"].unit_instance_id,)
-        if not include_support_character
-        else tuple(
-            sorted(
-                (
-                    units["leader-unit"].unit_instance_id,
-                    units["support-unit"].unit_instance_id,
-                )
-            )
-        )
-    )
-    assert split_survivor_ids == expected_survivor_ids
     restored = GameLifecycle.from_payload(lifecycle.to_payload())
     session = LocalGameSession(lifecycle=restored)
     restored_request = _assert_request(

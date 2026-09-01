@@ -266,13 +266,9 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
     assert {placement.source_phase for placement in placements} == {source_phase.value}
 
     assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is None
-    assert (
-        reconcile_after_attack_sequence(
-            scenario.state,
-            scenario.decisions.event_log,
-            scenario.attack_sequence,
-        )
-        == ()
+    reconcile_after_attack_sequence(
+        scenario.state,
+        scenario.attack_sequence,
     )
     updated_bodyguard = _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id)
     assert updated_bodyguard.datasheet_id == blue_datasheet_id
@@ -659,7 +655,7 @@ def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() ->
     )
 
 
-def test_split_failed_attached_wipe_skips_handoff_then_reconciles_attachment() -> None:
+def test_split_failed_attached_wipe_skips_handoff_and_retains_attachment() -> None:
     scenario = _split_scenario(
         pink_datasheet_id="000002584",
         blue_datasheet_id="000002583",
@@ -672,18 +668,22 @@ def test_split_failed_attached_wipe_skips_handoff_then_reconciles_attachment() -
         record.event_type != CATALOG_UNIT_DATASHEET_REPLACED_EVENT
         for record in scenario.decisions.event_log.records
     )
-    surviving_ids = reconcile_after_attack_sequence(
+    reconcile_after_attack_sequence(
         scenario.state,
-        scenario.decisions.event_log,
         scenario.attack_sequence,
     )
-    assert surviving_ids == (scenario.leader.unit_instance_id,)
     bodyguard = _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id)
     assert bodyguard.own_models
     assert not any(model.is_alive for model in bodyguard.own_models)
+    retained_view = rules_unit_view_by_id(
+        state=scenario.state,
+        unit_instance_id=scenario.leader.unit_instance_id,
+    )
+    assert retained_view.is_attached_rules_unit
+    assert retained_view.unit_instance_id == scenario.attached_unit_instance_id
 
 
-def test_attack_reconciliation_defers_canonical_attacker_split_until_activation_end() -> None:
+def test_attack_reconciliation_retains_canonical_attached_identity() -> None:
     scenario = _split_scenario(
         pink_datasheet_id="000002584",
         blue_datasheet_id="000002583",
@@ -691,59 +691,16 @@ def test_attack_reconciliation_defers_canonical_attacker_split_until_activation_
         roll_values=(1,),
     )
 
-    with pytest.raises(GameLifecycleError, match="ids must be a tuple"):
-        reconcile_after_attack_sequence(
-            scenario.state,
-            scenario.decisions.event_log,
-            scenario.attack_sequence,
-            deferred_rules_unit_instance_ids=cast(
-                tuple[str, ...], [scenario.attached_unit_instance_id]
-            ),
-        )
-    with pytest.raises(GameLifecycleError, match="canonical rules-unit ids"):
-        reconcile_after_attack_sequence(
-            scenario.state,
-            scenario.decisions.event_log,
-            scenario.attack_sequence,
-            deferred_rules_unit_instance_ids=(scenario.bodyguard.unit_instance_id,),
-        )
-    with pytest.raises(GameLifecycleError, match="ids must be unique"):
-        reconcile_after_attack_sequence(
-            scenario.state,
-            scenario.decisions.event_log,
-            scenario.attack_sequence,
-            deferred_rules_unit_instance_ids=(
-                scenario.attached_unit_instance_id,
-                scenario.attached_unit_instance_id,
-            ),
-        )
-
-    assert (
-        reconcile_after_attack_sequence(
-            scenario.state,
-            scenario.decisions.event_log,
-            scenario.attack_sequence,
-            deferred_rules_unit_instance_ids=(scenario.attached_unit_instance_id,),
-        )
-        == ()
-    )
-    deferred_view = rules_unit_view_by_id(
-        state=scenario.state,
-        unit_instance_id=scenario.bodyguard.unit_instance_id,
-    )
-    assert deferred_view.is_attached_rules_unit
-    assert deferred_view.unit_instance_id == scenario.attached_unit_instance_id
-
-    assert reconcile_after_attack_sequence(
+    reconcile_after_attack_sequence(
         scenario.state,
-        scenario.decisions.event_log,
         scenario.attack_sequence,
-    ) == (scenario.leader.unit_instance_id,)
-    split_view = rules_unit_view_by_id(
+    )
+    retained_view = rules_unit_view_by_id(
         state=scenario.state,
         unit_instance_id=scenario.leader.unit_instance_id,
     )
-    assert not split_view.is_attached_rules_unit
+    assert retained_view.is_attached_rules_unit
+    assert retained_view.unit_instance_id == scenario.attached_unit_instance_id
 
 
 def test_split_multiple_failed_rolls_do_not_construct_empty_replacement_unit() -> None:

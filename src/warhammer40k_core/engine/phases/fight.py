@@ -89,7 +89,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
 from warhammer40k_core.engine.fight_activation_units import (
     active_fight_activation_rules_unit,
     finalize_rule_destructions_after_fight_activation,
-    split_attached_rules_unit_after_fight_activation,
+    validate_attached_rules_unit_after_fight_activation,
 )
 from warhammer40k_core.engine.fight_attack_completion import (
     advance_fight_attack_sequence_until_completion,
@@ -980,9 +980,8 @@ def _complete_active_fight_activation(
         activation=activation,
     )
     if not fight_on_death_completions:
-        split_attached_rules_unit_after_fight_activation(
+        validate_attached_rules_unit_after_fight_activation(
             state=state,
-            event_log=decisions.event_log,
             rules_unit_instance_id=activation_rules_unit_instance_id,
         )
     event = decisions.event_log.append(

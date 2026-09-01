@@ -230,7 +230,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert '"runtime-attached-unit:{role}"' in army_mustering_source
     assert "def _starting_strength_records_for_army(" in game_state_source
     assert "def _starting_strength_record_for_attached_unit(" in game_state_source
-    assert "def _remove_attached_unit_formation(" in game_state_source
+    assert "def _remove_attached_unit_formation(" not in game_state_source
     assert "attached_unit.component_unit_instance_ids" in stratagems_source
 
 

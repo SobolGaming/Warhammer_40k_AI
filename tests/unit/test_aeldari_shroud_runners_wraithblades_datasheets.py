@@ -901,12 +901,9 @@ def test_malevolent_souls_rejects_descendant_of_attached_unit_that_already_fough
         )
         assert damage.destroyed
     decisions = DecisionController()
-    fixture.state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(fixture.wraith_shields.unit_instance_id,),
-        event_log=decisions.event_log,
-    )
+    current_army = fixture.state.army_definition_for_player("player-a")
+    assert current_army is not None
+    assert current_army.attached_units == (formation,)
     checkpoint = battle_lifecycle_payload(
         state=fixture.state,
         decisions=decisions,

@@ -17,9 +17,6 @@ MOVEMENT_PHASE_FILES = (
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 DEADLY_DEMISE = ROOT / "src" / "warhammer40k_core" / "engine" / "deadly_demise.py"
 RULE_MODEL_DESTRUCTION = ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction.py"
-ATTACHED_UNIT_RECONCILIATION = (
-    ROOT / "src" / "warhammer40k_core" / "engine" / "attached_unit_reconciliation.py"
-)
 CATALOG_SELECTED_TARGET_MORTAL_WOUNDS = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_selected_target_mortal_wounds.py"
 )
@@ -381,26 +378,41 @@ def test_model_loss_hosts_share_attached_unit_reconciliation() -> None:
                 for node in ast.walk(function)
                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
             }
-            assert "split_attached_rules_unit_if_required" in call_names
+            assert "validate_attached_rules_unit_identity_after_destruction" in call_names
 
     mortal_wound_source = CATALOG_SELECTED_TARGET_MORTAL_WOUNDS.read_text(encoding="utf-8")
-    assert "split_attached_rules_unit_if_required" not in mortal_wound_source
+    assert "recover_starting_strength_after_attached_unit_split" not in mortal_wound_source
 
+    forbidden_calls = {
+        "recover_starting_strength_after_attached_unit_split",
+        "replace_arrived_reserve_state_after_attached_unit_split",
+        "split_attached_rules_unit_if_required",
+        "transfer_arrived_reserve_state_after_attached_unit_split",
+        "transfer_battle_shock_after_attached_unit_split",
+    }
     for path in sorted((ROOT / "src" / "warhammer40k_core" / "engine").rglob("*.py")):
-        if path in {
-            ATTACHED_UNIT_RECONCILIATION,
-            ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py",
-        }:
-            continue
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        assert not any(
-            isinstance(node, ast.Attribute)
-            and node.attr == "recover_starting_strength_after_attached_unit_split"
+        called_names = {
+            node.func.id
             for node in ast.walk(tree)
-        ), f"{path.relative_to(ROOT)} bypasses shared Attached Unit reconciliation."
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        }
+        called_names.update(
+            node.func.attr
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+        )
+        violations = forbidden_calls.intersection(called_names)
+        assert not violations, (
+            f"{path.relative_to(ROOT)} contains obsolete Attached Unit split calls: "
+            f"{sorted(violations)}"
+        )
+
+    assert not (ENGINE / "attached_unit_split_history.py").exists()
+    assert not (ENGINE / "reserve_state_attached_split.py").exists()
 
 
-def test_selected_target_canonical_identity_expands_all_current_survivors() -> None:
+def test_selected_target_canonical_identity_resolves_one_retained_rules_unit() -> None:
     function = _function_node(
         path=CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT,
         function_name="canonical_rules_unit_ids",

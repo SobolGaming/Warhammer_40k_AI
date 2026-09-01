@@ -7683,7 +7683,7 @@ def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() ->
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
-def test_attached_action_history_survives_split_payload_round_trip_and_terminal_replay() -> None:
+def test_attached_action_history_retains_identity_through_round_trip_and_terminal_replay() -> None:
     config = _config_with_player_a_attached_unit(include_independent_unit=True)
     lifecycle = GameLifecycle()
     lifecycle.start(config)
@@ -7711,7 +7711,9 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
             x_inches=x_inches,
             y_inches=y_inches,
         )
-    action = _attached_cleanse_action(state=state, action_id="phase11e-attached-before-split")
+    action = _attached_cleanse_action(
+        state=state, action_id="phase11e-attached-before-component-loss"
+    )
     state.record_mission_action_state(action)
     bodyguard_model_ids = state.army_definitions[0].unit_by_id(bodyguard_id).own_model_ids()
     for model_instance_id in bodyguard_model_ids:
@@ -7719,16 +7721,10 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     source_session = LocalGameSession(lifecycle=lifecycle)
     event_cursor = EventStreamCursor(source_session.event_record_count())
 
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id,),
-        event_log=lifecycle.decision_controller.event_log,
-    )
-
-    interrupted = state.mission_action_state_by_id(action.action_id)
-    assert interrupted.status is MissionActionStatus.INTERRUPTED
-    assert interrupted.interrupted_reason == "unit_destroyed"
+    retained = state.mission_action_state_by_id(action.action_id)
+    assert retained.status is MissionActionStatus.STARTED
+    assert retained.unit_instance_id == attached_id
+    assert state.army_definitions[0].attached_units[0].attached_unit_instance_id == attached_id
     assert rules_unit_started_mission_action_this_turn(
         state=state,
         player_id="player-a",
@@ -7739,19 +7735,7 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
             event_cursor,
             viewer_player_id=viewer_player_id,
         )
-        assert tuple(event["event_type"] for event in event_delta["events"]) == (
-            "attached_rules_unit_split_reconciled",
-            "mission_action_interrupted",
-        )
-        interruption_event = event_delta["events"][1]
-        assert interruption_event["event_type"] == "mission_action_interrupted"
-        event_payload = cast(dict[str, JsonValue], interruption_event["payload"])
-        assert event_payload["action_id"] == action.action_id
-        assert event_payload["unit_instance_id"] == attached_id
-        assert event_payload["surviving_unit_instance_ids"] == [leader_id]
-        assert event_payload["interrupted_reason"] == "unit_destroyed"
-        assert event_payload["battle_round"] == state.battle_round
-        assert event_payload["phase"] == BattlePhase.COMMAND.value
+        assert tuple(event_delta["events"]) == ()
 
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
     lifecycle_payload = cast(
@@ -7778,10 +7762,10 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     session.submit_option(
         request_id=charge_request.request_id,
         option_id="complete_charge_phase",
-        result_id="phase11e-complete-charge-after-attached-split",
+        result_id="phase11e-complete-charge-after-attached-component-loss",
     )
     replay_result = ReplayRunner.from_payload(
-        session.replay_artifact(artifact_id="phase11e-attached-split-action-history")
+        session.replay_artifact(artifact_id="phase11e-attached-retained-action-history")
     ).run()
     assert replay_result.status is ReplayRunStatus.REPRODUCED
 
@@ -7801,7 +7785,7 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     terminal_session = LocalGameSession(lifecycle=terminal_lifecycle)
     terminal_artifact = ReplayArtifact.from_payload(
         terminal_session.replay_artifact(
-            artifact_id="phase11e-terminal-attached-split-action-history"
+            artifact_id="phase11e-terminal-attached-retained-action-history"
         )
     )
     assert terminal_artifact.schema_version == "replay-artifact-v8-phase17n-step5a"
@@ -7815,8 +7799,7 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
         for event in replay_snapshot.decision_controller.event_log.records
         if event.event_type == "mission_action_interrupted"
     )
-    assert len(replay_events) == 1
-    assert cast(dict[str, JsonValue], replay_events[0].payload)["action_id"] == action.action_id
+    assert replay_events == ()
     terminal_replay_result = ReplayRunner(terminal_artifact).run()
     assert terminal_replay_result.status is ReplayRunStatus.REPRODUCED
     assert terminal_replay_result.reproduced_event_count == len(

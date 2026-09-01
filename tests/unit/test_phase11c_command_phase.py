@@ -78,6 +78,9 @@ from warhammer40k_core.engine import command_points as command_points_module
 from warhammer40k_core.engine import sequencing as sequencing_module
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attached_unit_reconciliation import (
+    validate_attached_rules_unit_identity_after_destruction,
+)
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,
@@ -248,7 +251,6 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SetupFlow
-from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemCatalogIndex,
@@ -498,25 +500,6 @@ def test_remaining_p08_battle_shock_contract_edges_fail_closed() -> None:
             state=state,
             unit_instance_id=unit_id,
         )
-    with pytest.raises(GameLifecycleError, match="requires EventLog"):
-        battle_state.transfer_battle_shock_after_attached_unit_split(
-            state=state,
-            event_log=cast(EventLog, object()),
-            attached_unit_instance_id="missing-attached-unit",
-            surviving_unit_instance_ids=(),
-        )
-    battle_state.transfer_battle_shock_after_attached_unit_split(
-        state=state,
-        event_log=EventLog(),
-        attached_unit_instance_id="missing-attached-unit",
-        surviving_unit_instance_ids=(),
-    )
-    with pytest.raises(GameLifecycleError, match="survivor unit is unknown"):
-        battle_state._physical_unit_model_ids(
-            state=state,
-            unit_instance_id="missing-unit",
-        )
-
     modifier = RollModifier(
         modifier_id="phase11c:p08-contract-modifier",
         source_id="phase11c:p08-contract-source",
@@ -3505,28 +3488,6 @@ def test_command_forced_provider_authority_helpers_fail_closed() -> None:
             validate_json_value(invalid_rule_payload)
         )
 
-    split_event = EventRecord(
-        event_id="event-forced-provider-split",
-        event_type="attached_rules_unit_split_reconciled",
-        payload={
-            "attached_unit_instance_id": "attached-unit-a",
-            "surviving_unit_instance_ids": ["unit-a", "unit-b"],
-        },
-    )
-    attached_effect = replace(
-        forced_effect,
-        target_unit_instance_ids=("attached-unit-a",),
-    )
-    assert forced_provider_authority._effect_after_splits(
-        effect=attached_effect,
-        event_records=(
-            EventRecord(event_id="event-ignored", event_type="ignored", payload=None),
-            split_event,
-        ),
-        start_index=0,
-        end_index=2,
-    ).target_unit_instance_ids == ("unit-a", "unit-b")
-
     expirations = (
         EffectExpiration.end_of_battle(),
         EffectExpiration.start_phase(
@@ -3703,17 +3664,6 @@ def test_command_forced_provider_authority_helpers_fail_closed() -> None:
                 cast(Any, required_string_value),
                 field="field",
             )
-    assert forced_provider_authority._sorted_identifier_list(
-        ["a", "b"],
-        field="identifiers",
-    ) == ("a", "b")
-    for sorted_identifier_value in (None, [], [1], ["b", "a"], ["a", "a"]):
-        with pytest.raises(GameLifecycleError, match="identifiers"):
-            forced_provider_authority._sorted_identifier_list(
-                cast(Any, sorted_identifier_value),
-                field="identifiers",
-            )
-
     snapshot = EventRecord(
         event_id="event-forced-provider-snapshot",
         event_type="battle_shock_step_snapshot_created",
@@ -3933,25 +3883,6 @@ def test_command_forced_provider_authority_helpers_fail_closed() -> None:
             )
             is None
         )
-
-    for invalid_split in (
-        EventRecord("invalid-split-payload", "attached_rules_unit_split_reconciled", None),
-        EventRecord(
-            "invalid-split-survivors",
-            "attached_rules_unit_split_reconciled",
-            {
-                "attached_unit_instance_id": "attached-unit-a",
-                "surviving_unit_instance_ids": None,
-            },
-        ),
-    ):
-        with pytest.raises(GameLifecycleError):
-            forced_provider_authority._effect_after_splits(
-                effect=attached_effect,
-                event_records=(invalid_split,),
-                start_index=0,
-                end_index=1,
-            )
 
     missing_model_row = replace(
         context.physical_models[0],
@@ -7405,25 +7336,6 @@ def test_battle_shock_resolution_and_state_history_helpers_fail_closed() -> None
         == ()
     )
 
-    battle_shock_state_history._validate_split_occurrence(
-        state=state,
-        payload={"battle_round": 1, "phase": None, "active_player_id": None},
-    )
-    split_occurrence_cases: tuple[tuple[dict[str, JsonValue], str], ...] = (
-        ({"battle_round": -1}, "round drifted"),
-        ({"battle_round": 1, "phase": "unsupported"}, "phase drifted"),
-        (
-            {"battle_round": 1, "phase": None, "active_player_id": "missing"},
-            "active player drifted",
-        ),
-    )
-    for split_occurrence_payload, message in split_occurrence_cases:
-        with pytest.raises(GameLifecycleError, match=message):
-            battle_shock_state_history._validate_split_occurrence(
-                state=state,
-                payload=split_occurrence_payload,
-            )
-
     assert battle_shock_state_history._cleared_unit_ids(
         {"cleared_battle_shocked_unit_ids": [unit_id]}
     ) == (unit_id,)
@@ -7440,300 +7352,6 @@ def test_battle_shock_resolution_and_state_history_helpers_fail_closed() -> None
     assert battle_shock_state_history._event_payload(event) == {"value": "ok"}
     with pytest.raises(GameLifecycleError, match="payload is invalid"):
         battle_shock_state_history._event_payload(replace(event, payload=None))
-    assert (
-        battle_shock_state_history._payload_string(
-            {"field": "value"},
-            "field",
-        )
-        == "value"
-    )
-    with pytest.raises(GameLifecycleError, match="field is invalid"):
-        battle_shock_state_history._payload_string(
-            {"field": ""},
-            "field",
-        )
-
-
-def test_battle_shock_state_history_attached_split_authority_fail_closed() -> None:
-    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
-    attached = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
-    context = BelowHalfStrengthContext.from_rules_unit(
-        rules_unit=attached,
-        starting_strength=state.starting_strength_record_for_unit(attached_id),
-        current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
-    )
-    request = BattleShockTestRequest.for_unit(
-        request_id="phase11c:state-history-split:request",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id="player-a",
-        unit_instance_id=attached_id,
-        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
-        leadership_target=6,
-        below_half_strength_context=context,
-    )
-    failed = BattleShockResult.from_roll_state(
-        result_id="phase11c:state-history-split:request:result",
-        request=request,
-        roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
-    )
-    source_state = BattleShockedUnitState.from_rules_unit(
-        result=failed,
-        rules_unit=attached,
-    )
-    state.record_battle_shock_result(failed)
-    split_events = EventLog()
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id, bodyguard_id),
-        event_log=split_events,
-    )
-    assert len(split_events.records) == 2
-    split_payload = cast(dict[str, Any], split_events.records[0].payload)
-    transfer_payload = cast(dict[str, Any], split_events.records[1].payload)
-
-    authority_state, _, _, _ = _attached_battle_state_for_split()
-    owner_by_id, model_ids_by_id = battle_shock_state_history._historical_unit_inventory(
-        state=authority_state
-    )
-    attached_by_id = battle_shock_state_history._starting_attached_records_by_identity(
-        state=authority_state
-    )
-    starting_attached_records = list(authority_state.starting_attached_unit_records)
-    collision_record = replace(starting_attached_records[0])
-    object.__setattr__(collision_record, "attached_unit_instance_id", bodyguard_id)
-    authority_state.starting_attached_unit_records = [collision_record]
-    with pytest.raises(GameLifecycleError, match="attached identity collides"):
-        battle_shock_state_history._historical_unit_inventory(state=authority_state)
-    authority_state.starting_attached_unit_records = [
-        starting_attached_records[0],
-        starting_attached_records[0],
-    ]
-    with pytest.raises(GameLifecycleError, match="attached lineage is ambiguous"):
-        battle_shock_state_history._starting_attached_records_by_identity(state=authority_state)
-    authority_state.starting_attached_unit_records = starting_attached_records
-    assert attached_by_id[attached_id] == attached_by_id[bodyguard_id]
-    assert attached_by_id[attached_id] == attached_by_id[leader_id]
-    assert battle_shock_state_history._active_state_ids_for_request(
-        unit_instance_id=bodyguard_id,
-        replayed_states={attached_id: source_state},
-        attached_by_identity=attached_by_id,
-        active_attached_ids={attached_id},
-    ) == {attached_id}
-    split_replayed = {
-        bodyguard_id: replace(
-            source_state,
-            unit_instance_id=bodyguard_id,
-            model_instance_ids=model_ids_by_id[bodyguard_id],
-        ),
-        leader_id: replace(
-            source_state,
-            unit_instance_id=leader_id,
-            model_instance_ids=model_ids_by_id[leader_id],
-        ),
-    }
-    assert battle_shock_state_history._active_state_ids_for_request(
-        unit_instance_id=attached_id,
-        replayed_states=split_replayed,
-        attached_by_identity=attached_by_id,
-        active_attached_ids=set(),
-    ) == {bodyguard_id, leader_id}
-    assert battle_shock_state_history._active_state_ids_for_request(
-        unit_instance_id=bodyguard_id,
-        replayed_states=split_replayed,
-        attached_by_identity=attached_by_id,
-        active_attached_ids=set(),
-    ) == {bodyguard_id}
-    alive_ids = {
-        model.model_instance_id
-        for army in authority_state.army_definitions
-        for unit in army.units
-        for model in unit.own_models
-        if model.is_alive
-    }
-    assert battle_shock_state_history._current_state_target_ids_for_request(
-        unit_instance_id=attached_id,
-        attached_by_identity=attached_by_id,
-        active_attached_ids={attached_id},
-        model_ids_by_unit_id=model_ids_by_id,
-        alive_model_ids=alive_ids,
-    ) == (attached_id,)
-    assert set(
-        battle_shock_state_history._current_state_target_ids_for_request(
-            unit_instance_id=attached_id,
-            attached_by_identity=attached_by_id,
-            active_attached_ids=set(),
-            model_ids_by_unit_id=model_ids_by_id,
-            alive_model_ids=alive_ids,
-        )
-    ) == {bodyguard_id, leader_id}
-
-    active_attached_ids = {attached_id}
-    split_identity = battle_shock_state_history._apply_rules_unit_split_event(
-        state=authority_state,
-        payload=split_payload,
-        active_attached_ids=active_attached_ids,
-        final_active_attached_ids=set(),
-        alive_model_ids=alive_ids,
-    )
-    assert split_identity == (
-        attached_id,
-        tuple(split_payload["surviving_unit_instance_ids"]),
-    )
-    assert not active_attached_ids
-    replayed_states = {attached_id: source_state}
-    battle_shock_state_history._apply_split_transfer_event(
-        state=authority_state,
-        payload=transfer_payload,
-        replayed_states=replayed_states,
-        owner_by_unit_id=owner_by_id,
-        model_ids_by_unit_id=model_ids_by_id,
-        expected_split=(split_identity[0], split_identity[1], split_payload),
-    )
-    assert set(replayed_states) == {bodyguard_id, leader_id}
-
-    split_invalid_cases = (
-        ({**split_payload, "unexpected": True}, {attached_id}, "payload drifted"),
-        ({**split_payload, "player_id": "player-b"}, {attached_id}, "identity drifted"),
-        (
-            {
-                **split_payload,
-                "surviving_unit_instance_ids": [bodyguard_id, bodyguard_id],
-            },
-            {attached_id},
-            "survivors drifted",
-        ),
-    )
-    for invalid_payload, active_ids, message in split_invalid_cases:
-        with pytest.raises(GameLifecycleError, match=message):
-            battle_shock_state_history._apply_rules_unit_split_event(
-                state=authority_state,
-                payload=cast(dict[str, JsonValue], invalid_payload),
-                active_attached_ids=active_ids,
-                final_active_attached_ids=set(),
-                alive_model_ids=alive_ids,
-            )
-
-    expected_split = (split_identity[0], split_identity[1], split_payload)
-    transfer_invalid_cases: tuple[
-        tuple[
-            dict[str, Any],
-            dict[str, BattleShockedUnitState],
-            Any,
-            str,
-        ],
-        ...,
-    ] = (
-        (
-            {**transfer_payload, "unexpected": True},
-            {attached_id: source_state},
-            expected_split,
-            "payload drifted",
-        ),
-        (
-            {**transfer_payload, "player_id": "player-b"},
-            {attached_id: source_state},
-            expected_split,
-            "identity drifted",
-        ),
-        (
-            {**transfer_payload, "successor_battle_shocked_unit_states": None},
-            {attached_id: source_state},
-            expected_split,
-            "state is invalid",
-        ),
-        (
-            transfer_payload,
-            {},
-            expected_split,
-            "source authority drifted",
-        ),
-        (
-            {**transfer_payload, "successor_battle_shocked_unit_states": []},
-            {attached_id: source_state},
-            expected_split,
-            "successor authority drifted",
-        ),
-    )
-    for invalid_payload, replayed, invalid_expected, message in transfer_invalid_cases:
-        with pytest.raises(GameLifecycleError, match=message):
-            battle_shock_state_history._apply_split_transfer_event(
-                state=authority_state,
-                payload=invalid_payload,
-                replayed_states=replayed,
-                owner_by_unit_id=owner_by_id,
-                model_ids_by_unit_id=model_ids_by_id,
-                expected_split=invalid_expected,
-            )
-
-    command_state = _battle_state(game_id="phase11c:clear-authority")
-    command_unit_id = "army-alpha:intercessor-unit-1"
-    command_candidate = replace(
-        command_candidates.command_battle_shock_candidate_inventory(
-            command_state,
-            "player-a",
-            (),
-        )[0],
-        is_battle_shocked=True,
-        eligibility_reasons=(
-            command_candidates.CommandBattleShockEligibilityReason.CURRENTLY_BATTLE_SHOCKED,
-        ),
-    )
-    command_request = BattleShockTestRequest.for_unit(
-        request_id="phase11c:clear-authority:request",
-        game_id=command_state.game_id,
-        battle_round=command_state.battle_round,
-        player_id="player-a",
-        unit_instance_id=command_unit_id,
-        reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
-        leadership_target=6,
-        below_half_strength_context=command_candidate.below_half_strength_context,
-    )
-    command_result = BattleShockResult.from_roll_state(
-        result_id="phase11c:clear-authority:request:result",
-        request=command_request,
-        roll_state=DiceRollManager(command_state.game_id).roll_fixed(command_request.spec, [6, 6]),
-    )
-    clear_snapshot = EventRecord(
-        "phase11c:clear-authority:snapshot",
-        "battle_shock_step_snapshot_created",
-        {
-            "game_id": command_state.game_id,
-            "battle_round": command_state.battle_round,
-            "active_player_id": "player-a",
-            "phase": BattlePhase.COMMAND.value,
-            "battle_shock_phase_start_unit_ids": [command_unit_id],
-            "battle_shock_candidate_inventory": [
-                validate_json_value(command_candidate.to_payload())
-            ],
-        },
-    )
-    assert battle_shock_state_history._has_command_required_clear_authority(
-        event_records=(EventRecord("ignored", "ignored", {}), clear_snapshot),
-        resolved_index=2,
-        result=command_result,
-    )
-    with pytest.raises(GameLifecycleError, match="snapshot payload is invalid"):
-        battle_shock_state_history._has_command_required_clear_authority(
-            event_records=(replace(clear_snapshot, payload=None),),
-            resolved_index=1,
-            result=command_result,
-        )
-    with pytest.raises(GameLifecycleError, match="clear authority is invalid"):
-        battle_shock_state_history._has_command_required_clear_authority(
-            event_records=(
-                replace(
-                    clear_snapshot,
-                    payload={
-                        **cast(dict[str, Any], clear_snapshot.payload),
-                        "battle_shock_candidate_inventory": None,
-                    },
-                ),
-            ),
-            resolved_index=1,
-            result=command_result,
-        )
 
 
 @pytest.mark.parametrize(
@@ -9524,90 +9142,7 @@ def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
         )
 
 
-def test_attached_unit_split_recovers_original_starting_strength_records() -> None:
-    bodyguard_id = "army-alpha:intercessor-unit-1"
-    leader_id = "army-alpha:captain-unit"
-    attached_id = "attached-unit:army-alpha:captain-intercessors"
-    state = _battle_state(
-        player_a_units=(
-            _default_unit_selection("intercessor-unit-1"),
-            _unit_selection(
-                unit_selection_id="captain-unit",
-                datasheet_id="core-character-leader",
-                model_profile_id="core-character-leader",
-                model_count=1,
-            ),
-        )
-    )
-    state.starting_strength_records = [
-        record
-        for record in state.starting_strength_records
-        if record.unit_instance_id not in {bodyguard_id, leader_id}
-    ]
-    state.starting_strength_records.extend(
-        (
-            StartingStrengthRecord(
-                player_id="player-a",
-                unit_instance_id=attached_id,
-                starting_model_count=6,
-                single_model_starting_wounds=None,
-                source_id="attached-unit-join:captain-intercessors",
-            ),
-            StartingStrengthRecord(
-                player_id="player-a",
-                unit_instance_id=bodyguard_id,
-                starting_model_count=6,
-                single_model_starting_wounds=None,
-                source_id="attached-unit-join:captain-intercessors",
-            ),
-            StartingStrengthRecord(
-                player_id="player-a",
-                unit_instance_id=leader_id,
-                starting_model_count=2,
-                single_model_starting_wounds=None,
-                source_id="attached-unit-join:captain-intercessors",
-            ),
-        )
-    )
-    unit_by_id = {
-        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
-    }
-    state.starting_attached_unit_records = [
-        StartingAttachedUnitRecord(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            bodyguard_unit_instance_id=bodyguard_id,
-            leader_unit_instance_ids=(leader_id,),
-            support_unit_instance_ids=(),
-            component_unit_instance_ids=(leader_id, bodyguard_id),
-            starting_model_instance_ids_by_component=(
-                (leader_id, unit_by_id[leader_id].own_model_ids()),
-                (bodyguard_id, unit_by_id[bodyguard_id].own_model_ids()),
-            ),
-            starting_model_count=6,
-            source_id="attached-unit-join:captain-intercessors",
-        )
-    ]
-
-    recovered = state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id, bodyguard_id),
-        event_log=EventLog(),
-    )
-
-    assert tuple(record.unit_instance_id for record in recovered) == (leader_id, bodyguard_id)
-    assert state.starting_strength_record_for_unit(bodyguard_id).starting_model_count == 5
-    leader_record = state.starting_strength_record_for_unit(leader_id)
-    assert leader_record.starting_model_count == 1
-    assert leader_record.single_model_starting_wounds == 5
-    assert attached_id not in {
-        record.unit_instance_id for record in state.starting_strength_records
-    }
-    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
-
-
-def test_mustered_attached_unit_uses_attached_starting_strength_until_split() -> None:
+def test_mustered_attached_unit_uses_original_attached_starting_strength() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     state = GameState.from_config(_config())
     army = muster_army(
@@ -9665,50 +9200,9 @@ def test_mustered_attached_unit_uses_attached_starting_strength_until_split() ->
     ) == (attached_id,)
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
-    recovered = state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id, support_id, bodyguard_id),
-        event_log=EventLog(),
-    )
 
-    assert tuple(record.unit_instance_id for record in recovered) == (
-        bodyguard_id,
-        leader_id,
-        support_id,
-    )
-    assert not state.army_definitions[0].attached_units
-    assert state.unit_started_battle_as_attached_leader_or_support(leader_id)
-    assert state.unit_started_battle_as_attached_leader_or_support(support_id)
-    assert not state.unit_started_battle_as_attached_leader_or_support(bodyguard_id)
-    assert state.starting_strength_record_for_unit(bodyguard_id).starting_model_count == 5
-    assert state.starting_strength_record_for_unit(leader_id).single_model_starting_wounds == 5
-    assert state.starting_strength_record_for_unit(support_id).single_model_starting_wounds == 4
-    assert attached_id not in {
-        record.unit_instance_id for record in state.starting_strength_records
-    }
-    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
-
-
-def test_attached_unit_split_rejects_omitted_living_component() -> None:
-    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
-    events = EventLog()
-
-    with pytest.raises(GameLifecycleError, match="exact alive components"):
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=(leader_id,),
-            event_log=events,
-        )
-
-    assert events.records == ()
-    assert state.army_definitions[0].attached_units
-    assert any(model.is_alive for model in _unit_by_id(state, bodyguard_id).own_models)
-
-
-def test_attached_unit_split_rejects_destroyed_component_as_survivor() -> None:
-    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+def test_bodyguard_loss_preserves_original_attached_rules_unit_identity() -> None:
+    state, attached_id, bodyguard_id, leader_id = _attached_battle_state()
     for model in _unit_by_id(state, bodyguard_id).own_models:
         apply_damage_to_model(
             state=state,
@@ -9717,18 +9211,29 @@ def test_attached_unit_split_rejects_destroyed_component_as_survivor() -> None:
             damage=model.wounds_remaining,
             damage_kind=DamageKind.NORMAL,
         )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
+    )
 
-    with pytest.raises(GameLifecycleError, match="exact alive components"):
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=(bodyguard_id, leader_id),
-            event_log=EventLog(),
-        )
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
+    assert rules_unit.is_attached_rules_unit
+    assert rules_unit.component_unit_instance_ids == tuple(sorted((bodyguard_id, leader_id)))
+    assert tuple(model.model_instance_id for model in rules_unit.alive_models()) == (
+        _unit_by_id(state, leader_id).own_model_ids()
+    )
+    assert state.starting_strength_record_for_unit(attached_id).starting_model_count == 6
+    lineage = state.starting_attached_unit_records[0]
+    assert lineage.component_unit_instance_ids == tuple(sorted((bodyguard_id, leader_id)))
+    assert dict(lineage.starting_model_instance_ids_by_component) == {
+        bodyguard_id: _unit_by_id(state, bodyguard_id).own_model_ids(),
+        leader_id: _unit_by_id(state, leader_id).own_model_ids(),
+    }
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
 
 def test_battle_shock_result_rejects_attached_component_target_identity() -> None:
-    state, _attached_id, bodyguard_id, _leader_id = _attached_battle_state_for_split()
+    state, _attached_id, bodyguard_id, _leader_id = _attached_battle_state()
     bodyguard = _unit_by_id(state, bodyguard_id)
     context = BelowHalfStrengthContext.from_unit(
         player_id="player-a",
@@ -9765,11 +9270,8 @@ def test_battle_shock_result_rejects_attached_component_target_identity() -> Non
     assert state.battle_shocked_unit_ids == []
 
 
-@pytest.mark.parametrize("passed", [False, True])
-def test_attached_root_battle_shock_result_reconciles_split_before_resolution(
-    passed: bool,
-) -> None:
-    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
+def test_battle_shock_state_remains_bound_to_original_attached_rules_unit() -> None:
+    state, attached_id, bodyguard_id, _leader_id = _attached_battle_state()
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
     context = BelowHalfStrengthContext.from_rules_unit(
         rules_unit=rules_unit,
@@ -9777,157 +9279,7 @@ def test_attached_root_battle_shock_result_reconciles_split_before_resolution(
         current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
     )
     request = BattleShockTestRequest.for_unit(
-        request_id=f"phase11c-split-before-result:{passed}",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id="player-a",
-        unit_instance_id=attached_id,
-        reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
-        leadership_target=6,
-        below_half_strength_context=context,
-    )
-    if passed:
-        prior_failed = BattleShockResult.from_roll_state(
-            result_id="phase11c-split-before-result:prior-failed",
-            request=request,
-            roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
-        )
-        state.record_battle_shock_result(prior_failed)
-    decisions = DecisionController()
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    roll_state = manager.roll_fixed(request.spec, [3, 3] if passed else [1, 1])
-
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id, bodyguard_id),
-        event_log=decisions.event_log,
-    )
-    record_battle_shock_result_and_outcome_events(
-        state=state,
-        decisions=decisions,
-        manager=manager,
-        battle_shock_hooks=BattleShockHookRegistry.empty(),
-        request=request,
-        roll_state=roll_state,
-        active_player_id="player-a",
-        phase=BattlePhase.COMMAND,
-        auto_passed=False,
-        phase_start_battle_shocked_unit_ids=((attached_id,) if passed else ()),
-        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
-        base_payload={
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": "player-a",
-            "phase": BattlePhase.COMMAND.value,
-            "source_kind": "command_battle_shock",
-        },
-        resolved_event_types=("battle_shock_test_resolved",),
-    )
-
-    expected_ids = () if passed else tuple(sorted((bodyguard_id, leader_id)))
-    assert tuple(state.battle_shocked_unit_ids) == expected_ids
-    assert (
-        tuple(shocked_state.unit_instance_id for shocked_state in state.battle_shocked_unit_states)
-        == expected_ids
-    )
-
-
-def test_attached_root_failure_records_descendant_missing_from_partial_shock_state() -> None:
-    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
-    attached = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
-    attached_context = BelowHalfStrengthContext.from_rules_unit(
-        rules_unit=attached,
-        starting_strength=state.starting_strength_record_for_unit(attached_id),
-        current_model_ids=tuple(model.model_instance_id for model in attached.alive_models()),
-    )
-    attached_request = BattleShockTestRequest.for_unit(
-        request_id="phase11c-partial-successors:attached",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id="player-a",
-        unit_instance_id=attached_id,
-        reason=BattleShockTestReason.COMMAND_PHASE_REQUIRED,
-        leadership_target=6,
-        below_half_strength_context=attached_context,
-    )
-    decisions = DecisionController()
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id, bodyguard_id),
-        event_log=decisions.event_log,
-    )
-    leader = _unit_by_id(state, leader_id)
-    leader_context = BelowHalfStrengthContext.from_unit(
-        player_id="player-a",
-        unit=leader,
-        starting_strength=state.starting_strength_record_for_unit(leader_id),
-        current_model_ids=leader.own_model_ids(),
-    )
-    leader_request = BattleShockTestRequest.for_unit(
-        request_id="phase11c-partial-successors:leader",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id="player-a",
-        unit_instance_id=leader_id,
-        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
-        leadership_target=6,
-        below_half_strength_context=leader_context,
-    )
-    leader_failed = BattleShockResult.from_roll_state(
-        result_id="phase11c-partial-successors:leader:result",
-        request=leader_request,
-        roll_state=DiceRollManager(state.game_id).roll_fixed(leader_request.spec, [1, 1]),
-    )
-    state.record_battle_shock_result(leader_failed)
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    resolution = record_battle_shock_result_and_outcome_events(
-        state=state,
-        decisions=decisions,
-        manager=manager,
-        battle_shock_hooks=BattleShockHookRegistry.empty(),
-        request=attached_request,
-        roll_state=manager.roll_fixed(attached_request.spec, [1, 1]),
-        active_player_id="player-a",
-        phase=BattlePhase.COMMAND,
-        auto_passed=False,
-        phase_start_battle_shocked_unit_ids=(),
-        passed_state_policy=BattleShockPassedStatePolicy.CLEAR_IF_STEP_START_SHOCKED,
-        base_payload={
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": "player-a",
-            "phase": BattlePhase.COMMAND.value,
-            "source_kind": "command_battle_shock",
-        },
-        resolved_event_types=("battle_shock_test_resolved",),
-    )
-
-    assert resolution.pending_status is None
-    resolved_payload = resolution.resolved_payload
-    assert isinstance(resolved_payload, dict)
-    assert resolved_payload["state_update"] == "recorded_missing_battle_shocked_descendants"
-    assert tuple(state.battle_shocked_unit_ids) == tuple(sorted((bodyguard_id, leader_id)))
-    assert {
-        shocked_state.unit_instance_id: shocked_state.source_result_id
-        for shocked_state in state.battle_shocked_unit_states
-    } == {
-        bodyguard_id: "phase11c-partial-successors:attached:result",
-        leader_id: "phase11c-partial-successors:leader:result",
-    }
-
-
-def test_attached_split_and_battle_shock_transfer_events_are_public_to_both_viewers() -> None:
-    state, attached_id, bodyguard_id, leader_id = _attached_battle_state_for_split()
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=attached_id)
-    context = BelowHalfStrengthContext.from_rules_unit(
-        rules_unit=rules_unit,
-        starting_strength=state.starting_strength_record_for_unit(attached_id),
-        current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
-    )
-    request = BattleShockTestRequest.for_unit(
-        request_id="phase11c-public-split-events",
+        request_id="phase11c-attached-identity-retained",
         game_id=state.game_id,
         battle_round=state.battle_round,
         player_id="player-a",
@@ -9937,42 +9289,35 @@ def test_attached_split_and_battle_shock_transfer_events_are_public_to_both_view
         below_half_strength_context=context,
     )
     failed = BattleShockResult.from_roll_state(
-        result_id="phase11c-public-split-events:result",
+        result_id="phase11c-attached-identity-retained:result",
         request=request,
         roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
     )
     state.record_battle_shock_result(failed)
-    decisions = DecisionController()
-    cursor = EventStreamCursor(len(decisions.event_log.records))
 
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(leader_id, bodyguard_id),
-        event_log=decisions.event_log,
-    )
-    session = LocalGameSession(lifecycle=GameLifecycle(state=state, decision_controller=decisions))
-    player_a = session.events_since(cursor, viewer_player_id="player-a")
-    player_b = session.events_since(cursor, viewer_player_id="player-b")
-    public_types = {
-        "attached_rules_unit_split_reconciled",
-        "battle_shock_state_transferred_after_attached_unit_split",
-    }
-    player_a_events = tuple(
-        event for event in player_a["events"] if event["event_type"] in public_types
-    )
-    player_b_events = tuple(
-        event for event in player_b["events"] if event["event_type"] in public_types
+    for model in _unit_by_id(state, bodyguard_id).own_models:
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=attached_id,
+            model_instance_id=model.model_instance_id,
+            damage=model.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
     )
 
-    assert tuple(event["event_type"] for event in player_a_events) == (
-        "attached_rules_unit_split_reconciled",
-        "battle_shock_state_transferred_after_attached_unit_split",
+    assert state.battle_shocked_unit_ids == [attached_id]
+    assert state.battle_shocked_unit_states[0].unit_instance_id == attached_id
+    assert (
+        rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=bodyguard_id,
+        ).unit_instance_id
+        == attached_id
     )
-    assert player_a_events == player_b_events
-    public_json = json.dumps(player_a_events, sort_keys=True).lower()
-    assert "reserve" not in public_json
-    assert "embark" not in public_json
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
 
 def test_command_battle_shock_public_event_chain_is_identical_for_both_viewers() -> None:
@@ -10014,40 +9359,6 @@ def test_command_battle_shock_public_event_chain_is_identical_for_both_viewers()
         "battle_shock_step_completed",
     )
     assert player_a_events == player_b_events
-
-
-def test_attached_unit_split_recovery_rejects_invalid_survivors() -> None:
-    state, attached_id, _bodyguard_id, _leader_id = _attached_battle_state_for_split()
-    with pytest.raises(GameLifecycleError, match="must not include attached_unit_instance_id"):
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=(attached_id,),
-            event_log=EventLog(),
-        )
-    payload_before_missing_attached = state.to_payload()
-    with pytest.raises(GameLifecycleError, match="existing StartingStrengthRecord"):
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-a",
-            attached_unit_instance_id="attached-unit:typo",
-            surviving_unit_instance_ids=("army-alpha:intercessor-unit-1",),
-            event_log=EventLog(),
-        )
-    assert state.to_payload() == payload_before_missing_attached
-    with pytest.raises(GameLifecycleError, match="exact alive components"):
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=("missing-unit",),
-            event_log=EventLog(),
-        )
-    with pytest.raises(GameLifecycleError, match="exact alive components"):
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id="player-a",
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=("army-beta:intercessor-unit-3",),
-            event_log=EventLog(),
-        )
 
 
 def test_phase11c_payloads_round_trip_without_object_reprs() -> None:
@@ -11789,7 +11100,7 @@ def _battle_state(
     return state
 
 
-def _attached_battle_state_for_split() -> tuple[GameState, str, str, str]:
+def _attached_battle_state() -> tuple[GameState, str, str, str]:
     bodyguard_id = "army-alpha:bodyguard-unit"
     leader_id = "army-alpha:leader-unit"
     attached_id = "attached-unit:army-alpha:bodyguard-unit"

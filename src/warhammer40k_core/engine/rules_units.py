@@ -324,7 +324,7 @@ def current_rules_unit_views_for_identity(
     state: GameState,
     unit_instance_id: str,
 ) -> tuple[RulesUnitView, ...]:
-    """Resolve a current rules-unit identity, including a historical attached-unit ID."""
+    """Resolve one current rules-unit identity, including a component alias."""
     requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
     current_views = rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     direct_matches = tuple(
@@ -332,32 +332,11 @@ def current_rules_unit_views_for_identity(
         for view in current_views
         if requested_id == view.unit_instance_id or requested_id in view.component_unit_instance_ids
     )
-    if direct_matches:
-        if len(direct_matches) != 1:
-            raise GameLifecycleError("Current rules-unit identity is ambiguous.")
-        return direct_matches
-
-    historical_matches = tuple(
-        record
-        for record in state.starting_attached_unit_records
-        if requested_id == record.attached_unit_instance_id
-        or requested_id in record.component_unit_instance_ids
-    )
-    if not historical_matches:
+    if not direct_matches:
         raise GameLifecycleError("Rules unit_instance_id is unknown.")
-    if len(historical_matches) != 1:
-        raise GameLifecycleError("Historical attached rules-unit identity is ambiguous.")
-    historical = historical_matches[0]
-    component_ids = set(historical.component_unit_instance_ids)
-    descendants = tuple(
-        view
-        for view in current_views
-        if view.owner_player_id == historical.player_id
-        and component_ids.intersection(view.component_unit_instance_ids)
-    )
-    if not descendants:
-        raise GameLifecycleError("Historical attached rules-unit has no current descendants.")
-    return tuple(sorted(descendants, key=lambda view: view.unit_instance_id))
+    if len(direct_matches) != 1:
+        raise GameLifecycleError("Current rules-unit identity is ambiguous.")
+    return direct_matches
 
 
 def current_rules_unit_views_for_canonical_identity(
@@ -365,7 +344,7 @@ def current_rules_unit_views_for_canonical_identity(
     state: GameState,
     unit_instance_id: str,
 ) -> tuple[RulesUnitView, ...]:
-    """Resolve one canonical current or historical attached rules-unit identity."""
+    """Resolve one canonical current rules-unit identity."""
     requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
     current_views = current_rules_unit_views_for_identity(
         state=state,
@@ -389,12 +368,7 @@ def rules_unit_identities_share_lineage(
     first_unit_instance_id: str,
     second_unit_instance_id: str,
 ) -> bool:
-    """Return whether two identities resolve to an overlapping current rules unit.
-
-    A historical attached identity overlaps each of its current descendants.  Two
-    descendants that split apart do not overlap one another merely because they
-    shared a starting formation.
-    """
+    """Return whether two identities resolve to one overlapping current rules unit."""
     first_views = current_rules_unit_views_for_identity(
         state=state,
         unit_instance_id=first_unit_instance_id,
@@ -445,7 +419,7 @@ def reconcile_rules_unit_identity(
     state: GameState,
     unit_instance_id: str,
 ) -> RulesUnitIdentityReconciliation:
-    """Resolve historical identity into deterministic current, living, and placed successors."""
+    """Resolve identity into its deterministic current, living, and placed view."""
     requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
     current_views = current_rules_unit_views_for_identity(
         state=state,

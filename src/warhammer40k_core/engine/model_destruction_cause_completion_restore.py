@@ -1045,10 +1045,6 @@ def validate_rule_effect_completion_or_pending_window(
     event_records: tuple[EventRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
-    from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
-        DEFER_ATTACHED_SPLIT_FIELD,
-    )
-
     destroyed_event = _mdcpv.required_destroyed_event(authority)
     context = authority.producer_context
     finalization_events = tuple(
@@ -1092,7 +1088,6 @@ def validate_rule_effect_completion_or_pending_window(
             "physical_unit_instance_id": authority.physical_unit_instance_id,
             "rules_unit_instance_id": authority.rules_unit_instance_id,
             "completion_kind": context.get("completion_kind"),
-            DEFER_ATTACHED_SPLIT_FIELD: context.get(DEFER_ATTACHED_SPLIT_FIELD),
         }
         if (
             _mdcpv.event_index(event_records, event)

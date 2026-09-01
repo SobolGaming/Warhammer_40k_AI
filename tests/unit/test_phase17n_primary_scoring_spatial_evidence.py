@@ -1115,9 +1115,8 @@ def test_primary_restore_rejects_departure_relabelled_without_route_provider(
             "Primary rules-unit turn-start snapshot has invalid attached-unit grouping",
         ),
         (
-            "snapshot_attached_split_missing",
-            "Primary rules-unit turn-start snapshot must preserve an attached group or its "
-            "complete split component set",
+            "snapshot_attached_identity_missing",
+            "Primary rules-unit turn-start snapshot must preserve its attached identity",
         ),
         (
             "snapshot_independent_grouping",
@@ -1303,7 +1302,7 @@ def _corrupt_primary_turn_start_evidence(
             attached_components[0],
         )
         return
-    if corruption == "snapshot_attached_split_missing":
+    if corruption == "snapshot_attached_identity_missing":
         attached = next(
             membership
             for membership in memberships

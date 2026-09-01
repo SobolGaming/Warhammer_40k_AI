@@ -52,7 +52,6 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 
 def attached_selected_to_fight_risk_fixture(
     *,
-    pre_split: bool = True,
     bodyguard_model_count: int = 1,
     enemy_x: float = 16.0,
 ) -> tuple[
@@ -203,13 +202,6 @@ def attached_selected_to_fight_risk_fixture(
             )
         )
     decisions = DecisionController()
-    if pre_split:
-        state.recover_starting_strength_after_attached_unit_split(
-            player_id=source_army.player_id,
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
-            event_log=decisions.event_log,
-        )
     for model in (*bodyguard.own_models, *leader.own_models):
         state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
     return state, runtime, decisions, bodyguard, leader, enemy, attached_id

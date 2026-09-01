@@ -344,23 +344,19 @@ def validate_starting_attached_unit_records(
             value.attached_unit_instance_id
         )
         if authoritative_starting_count is None:
-            component_counts = tuple(
-                starting_strength_by_unit_id.get(component_id)
-                for component_id in value.component_unit_instance_ids
+            raise GameLifecycleError(
+                "StartingAttachedUnitRecord requires its original attached-unit "
+                "Starting Strength identity."
             )
-            if any(count is None for count in component_counts):
-                raise GameLifecycleError(
-                    "StartingAttachedUnitRecord has no starting-strength lineage."
-                )
-            current_component_starting_count = sum(cast(tuple[int, ...], component_counts))
-            if value.starting_model_count > current_component_starting_count:
-                raise GameLifecycleError(
-                    "StartingAttachedUnitRecord starting model count exceeds its descendants."
-                )
-        elif value.starting_model_count != authoritative_starting_count:
+        if value.starting_model_count != authoritative_starting_count:
             raise GameLifecycleError("StartingAttachedUnitRecord starting model count drift.")
         validated.append(value)
     by_id = {record.attached_unit_instance_id: record for record in validated}
+    if set(by_id) != set(expected_by_id):
+        raise GameLifecycleError(
+            "GameState starting_attached_unit_records must match every original "
+            "attached-unit formation."
+        )
     for expected_id, expected_record in expected_by_id.items():
         record = by_id.get(expected_id)
         if record is None:

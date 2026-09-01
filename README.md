@@ -441,6 +441,10 @@ Current status:
   owner check and prefers a retained capture when mirror equivalence is itself
   disputed. This audit excludes factions, faction detachments, and faction
   datasheet content.
+- P19's reviewed 19.01.01 Attached Units wording is pinned in
+  `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
+  offline with `uv run python tools/build_core_attached_units_source.py` and
+  the same command plus `--check`.
 - The dependency-ordered
   [Core Rules remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md)
   tracks the itemized implementation findings from the accompanying
