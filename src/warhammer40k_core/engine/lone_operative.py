@@ -18,7 +18,7 @@ def lone_operative_profile_for_rules_unit(
 ) -> LoneOperativeAbilityProfile | None:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Lone Operative resolver requires a RulesUnitView.")
-    alive_components = rules_unit.keyword_contributing_components
+    alive_components = rules_unit.living_components
     if not alive_components:
         return None
     profiles: list[LoneOperativeAbilityProfile] = []

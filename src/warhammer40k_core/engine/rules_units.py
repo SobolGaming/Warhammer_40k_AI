@@ -76,9 +76,7 @@ class RulesUnitView:
     @property
     def keywords(self) -> tuple[str, ...]:
         keywords = {
-            keyword
-            for component in self.keyword_contributing_components
-            for keyword in component.unit.keywords
+            keyword for component in self.living_components for keyword in component.unit.keywords
         }
         return tuple(sorted(keywords))
 
@@ -86,13 +84,14 @@ class RulesUnitView:
     def faction_keywords(self) -> tuple[str, ...]:
         keywords = {
             keyword
-            for component in self.keyword_contributing_components
+            for component in self.living_components
             for keyword in component.unit.faction_keywords
         }
         return tuple(sorted(keywords))
 
     @property
-    def keyword_contributing_components(self) -> tuple[RulesUnitComponent, ...]:
+    def living_components(self) -> tuple[RulesUnitComponent, ...]:
+        """Return lineage components that still contain at least one living model."""
         return tuple(
             component
             for component in self.components

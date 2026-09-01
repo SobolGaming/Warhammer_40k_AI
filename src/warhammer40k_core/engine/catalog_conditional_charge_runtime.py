@@ -477,7 +477,7 @@ def _component_is_canonical_anchor(
     matching_component_ids = tuple(
         sorted(
             component.unit.unit_instance_id
-            for component in view.keyword_contributing_components
+            for component in view.living_components
             if required_keyword
             in {
                 canonical_keyword(value)

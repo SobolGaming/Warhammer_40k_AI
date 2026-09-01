@@ -64,6 +64,7 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     muster_army,
 )
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
@@ -169,7 +170,11 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitComponent,
+    RulesUnitView,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -2927,6 +2932,56 @@ def test_warp_rifts_requires_greater_daemon_shadow_aura_source_anchor() -> None:
     )
 
     assert grants == ()
+
+
+def test_warp_rifts_ignores_destroyed_component_keywords() -> None:
+    state, _reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    anchor_unit = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    living_bodyguard = _as_daemon_unit(
+        reserve_unit,
+        name="Living Khorne Bodyguard",
+        keywords=("INFANTRY", "KHORNE"),
+    )
+    destroyed_leader = replace(
+        _as_daemon_unit(
+            anchor_unit,
+            name="Destroyed Nurgle Leader",
+            keywords=("MONSTER", "NURGLE"),
+        ),
+        faction_keywords=(),
+        own_models=tuple(replace(model, wounds_remaining=0) for model in anchor_unit.own_models),
+    )
+    attached_id = "attached-unit:army-alpha:daemon-keyword-test"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=living_bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(destroyed_leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted(
+                (
+                    living_bodyguard.unit_instance_id,
+                    destroyed_leader.unit_instance_id,
+                )
+            )
+        ),
+        source_id="phase17g:daemonic-incursion:attached-keyword-test",
+        attachment_source_ids=("phase17g:daemonic-incursion:attachment",),
+    )
+    view = RulesUnitView(
+        unit_instance_id=attached_id,
+        owner_player_id="player-a",
+        components=(
+            RulesUnitComponent(unit=living_bodyguard, role="bodyguard"),
+            RulesUnitComponent(unit=destroyed_leader, role="leader"),
+        ),
+        attached_unit=formation,
+    )
+
+    assert tuple(component.unit.unit_instance_id for component in view.living_components) == (
+        living_bodyguard.unit_instance_id,
+    )
+    assert rule._god_keywords_for_rules_unit(view) == frozenset({"KHORNE"})
+    assert rule._rules_unit_has_faction_keyword(view, rule.LEGIONES_DAEMONICA)
 
 
 def test_warp_rifts_requires_every_arriving_model_within_anchor_range() -> None:

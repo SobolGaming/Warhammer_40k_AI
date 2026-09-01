@@ -2018,7 +2018,7 @@ def resolve_embark(
         )
     if any(
         not active_cargo.capacity_profile.allows_unit(component.unit)
-        for component in rules_unit.components
+        for component in rules_unit.living_components
     ):
         violations.append(
             TransportOperationViolation(

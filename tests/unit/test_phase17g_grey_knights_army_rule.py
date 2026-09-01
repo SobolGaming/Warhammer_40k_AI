@@ -405,6 +405,78 @@ def test_gate_of_infinity_attached_rules_unit_missing_ability_is_not_eligible() 
     )
 
 
+@pytest.mark.parametrize("destroyed_role", ["bodyguard", "leader"])
+def test_gate_of_infinity_can_be_used_after_attached_component_loss(
+    destroyed_role: str,
+) -> None:
+    attached_id = "attached-unit:army-grey:terminator-command"
+    bodyguard = _unit(
+        "army-grey:bodyguard",
+        "Brotherhood Terminators",
+        has_gate=destroyed_role != "bodyguard",
+    )
+    leader = _unit(
+        "army-grey:leader",
+        "Brotherhood Captain",
+        has_gate=destroyed_role != "leader",
+    )
+    destroyed = bodyguard if destroyed_role == "bodyguard" else leader
+    living = leader if destroyed_role == "bodyguard" else bodyguard
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="phase17g:grey-knights:test-attached-unit",
+        attachment_source_ids=("phase17g:grey-knights:test-attachment-eligibility",),
+    )
+    state = _grey_knights_state(
+        battle_size=BattleSize.STRIKE_FORCE,
+        grey_knights_units=(bodyguard, leader),
+        active_player_id="player-opponent",
+        grey_xs=(12.0, 15.0),
+        opponent_xs=(42.0,),
+        attached_units=(formation,),
+    )
+    _destroy_test_unit_model(
+        state=state,
+        unit_instance_id=destroyed.unit_instance_id,
+    )
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        destroyed.unit_instance_id
+    )
+    validate_attached_rules_unit_identity_after_destruction(
+        state=state,
+        rules_unit_instance_id=attached_id,
+    )
+    decisions = DecisionController()
+
+    request = _request_for(state=state, decisions=decisions)
+    assert f"grey-knights:gate-of-infinity:{attached_id}:use" in {
+        option.option_id for option in request.options
+    }
+    _apply_result(
+        state=state,
+        decisions=decisions,
+        request=request,
+        option_id=f"grey-knights:gate-of-infinity:{attached_id}:use",
+        result_id=f"result-gate-of-infinity-after-{destroyed_role}-loss",
+    )
+
+    reserve_state = state.reserve_state_for_unit(attached_id)
+    assert reserve_state is not None
+    assert reserve_state.unit_instance_id == attached_id
+    assert state.battlefield_state.unit_placement_or_none(living.unit_instance_id) is None
+    used_payload = _last_event_payload(decisions, army_rule.GATE_OF_INFINITY_USED_EVENT)
+    assert used_payload["target_rules_unit_instance_id"] == attached_id
+    assert used_payload["component_unit_instance_ids"] == list(
+        formation.component_unit_instance_ids
+    )
+
+
 def test_gate_of_infinity_arrival_retains_attached_identity_and_replay() -> None:
     attached_id = "attached-unit:army-grey:terminator-command"
     bodyguard = _unit("army-grey:bodyguard", "Brotherhood Terminators", has_gate=True)

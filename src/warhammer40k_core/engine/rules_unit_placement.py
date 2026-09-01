@@ -128,11 +128,7 @@ class RulesUnitPlacement:
         if self.player_id != view.owner_player_id:
             raise GameLifecycleError("RulesUnitPlacement owner drift.")
         expected_component_ids = tuple(
-            sorted(
-                component.unit.unit_instance_id
-                for component in view.components
-                if any(model.is_alive for model in component.unit.own_models)
-            )
+            sorted(component.unit.unit_instance_id for component in view.living_components)
         )
         if self.component_unit_instance_ids != expected_component_ids:
             raise GameLifecycleError("RulesUnitPlacement component identity drift.")
@@ -157,9 +153,7 @@ class RulesUnitPlacement:
         if type(battlefield_state) is not BattlefieldRuntimeState:
             raise GameLifecycleError("Rules-unit placement requires BattlefieldRuntimeState.")
         placements: list[UnitPlacement] = []
-        for component in view.components:
-            if not any(model.is_alive for model in component.unit.own_models):
-                continue
+        for component in view.living_components:
             placement = battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
             if placement is None:
                 raise GameLifecycleError(

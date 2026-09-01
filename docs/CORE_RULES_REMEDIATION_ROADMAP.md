@@ -1205,6 +1205,13 @@ Strength still match battle-start authority. Rules-unit identity lookup returns 
 root for either the canonical ID or a physical component alias; historical successor expansion and
 split-state mutation are removed.
 
+`RulesUnitView.living_components` is the single authority for semantic component contribution.
+Rules-unit keyword aggregation, grouped battlefield placement, Embark capacity profiles, Gate of
+Infinity ability/presence/engagement checks, Datasheet/RuleIR/Enhancement reserve-entry authority,
+and Daemonic Incursion keyword checks all consume that view. Immutable
+`component_unit_instance_ids` remain the lineage and replay identity surface; they are not a proxy
+for current semantic or physical presence.
+
 Battle-shock, ReserveState, persisting effects, Mission Actions, Fight activation consumption,
 selected-target chains, healing, scoring witnesses, and adapter-visible unit identities stay on the
 canonical root. Exact physical model and component IDs remain in placement, attack attribution,
@@ -1237,7 +1244,7 @@ The generated package hash is
 `3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570` and its canonical artifact
 byte SHA-256 is `748cf1bc4cbd2749655abab43e97c7e04acfa4e63e79b9f84b565001b9c17b66`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:0a2001a8f524d323f4bf4faf5e42dd217a39be90bb19869d55b250b79dc46807`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:067c680a617dbae85543d77c8558bf984a5625b9a99788a8ef9f4ef7683750ba`.
 
 Load and execution support: The Attached Units rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1250,8 +1257,9 @@ explicit component/start-model lineage, root Starting Strength, placement treatm
 components, cross-cutting authoritative state identity, history/restore rejection of obsolete
 split routes, source identity, adapter-contract documentation, regressions, and static bypass
 audit. It does not change legal attachment declarations, Bodyguard allocation priority, Leader or
-Support eligibility, model-return limits, reserve eligibility, scoring rules, hidden-information
-policy, or any out-of-scope content.
+Support eligibility, model-return limits, the source rules that grant reserve entry, scoring rules,
+hidden-information policy, or any out-of-scope content. Existing reserve and transport eligibility
+checks now correctly ignore wholly destroyed lineage components.
 
 Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed loader
 → stable Attached Units source ID → `AttachedUnitFormation` plus battle-start
@@ -1274,8 +1282,13 @@ consumption, reserve arrival, later healing, primary departure/scoring evidence,
 projections and deltas, serialization, and replay. Horror Split materialization still performs its
 source-backed datasheet/model handoff while preserving the Attached Unit root. Static audit scans
 all engine calls for the removed split/recovery/transfer APIs and requires every shared model-loss
-host to invoke retained-identity validation. The obsolete split-history and reserve-transfer
-modules are absent.
+host to invoke retained-identity validation. Follow-up regressions cover Embark after either Leader
+or Bodyguard loss, including capacity exclusion and transition-model precision; Gate of Infinity
+after either loss, with the destroyed component lacking the ability and battlefield placement;
+Daemonic Incursion keyword aggregation; and complete affected-file behavior. Static audit also
+requires grouped Embark placement and every identified ability, keyword, reserve-authority, and
+capacity consumer to use `living_components` instead of directly scanning immutable lineage. The
+obsolete split-history and reserve-transfer modules are absent.
 
 Generated artifacts/documentation: P19 adds
 `core_attached_units_2026_09/artifacts/package.json`, its typed loader/source package, and the
@@ -1287,12 +1300,14 @@ removed, moved, or renamed, so the committed four-shard inventory does not chang
 Validation results:
 
 - Focused source, identity, component-loss, Battle-shock, ReserveState, effect, Action, Fight,
-  healing, scoring, adapter, replay, Horror materialization, and static-audit regressions pass;
-  every failure from the first aggregate run was rerun as one clean `46`-test cluster.
+  healing, scoring, adapter, replay, Horror materialization, and static-audit regressions pass. The
+  review follow-up's complete affected-file cluster passes all `227` tests, including Embark and
+  Gate of Infinity after either Leader or Bodyguard loss and Daemonic Incursion keyword authority;
+  the complete code-quality suite passes all `340` tests.
 - Repository-wide Ruff check and Ruff format check pass; mypy passes across `2646` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6347 passed` in `483.75s`), including the
+- The required final xdist work-stealing suite passes (`6353 passed` in `491.84s`), including the
   complete code-quality suite.
 - The Attached Units source artifact, final engine build identity, and regenerated external
   contract pass fail-closed checks, including the `origin/main` compatibility comparison.

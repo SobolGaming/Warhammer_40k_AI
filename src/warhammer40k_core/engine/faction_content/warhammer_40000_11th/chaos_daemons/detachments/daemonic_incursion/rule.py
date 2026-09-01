@@ -398,7 +398,7 @@ def _god_keywords_for_rules_unit(view: RulesUnitView) -> frozenset[str]:
         raise GameLifecycleError("Warp Rifts god-keyword lookup requires RulesUnitView.")
     return frozenset(
         keyword
-        for component in view.components
+        for component in view.living_components
         for keyword in _god_keywords_for_unit(component.unit)
     )
 
@@ -416,7 +416,10 @@ def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
 def _rules_unit_has_faction_keyword(view: RulesUnitView, keyword: str) -> bool:
     if type(view) is not RulesUnitView:
         raise GameLifecycleError("Warp Rifts faction-keyword lookup requires RulesUnitView.")
-    return all(_unit_has_faction_keyword(component.unit, keyword) for component in view.components)
+    living_components = view.living_components
+    return bool(living_components) and all(
+        _unit_has_faction_keyword(component.unit, keyword) for component in living_components
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

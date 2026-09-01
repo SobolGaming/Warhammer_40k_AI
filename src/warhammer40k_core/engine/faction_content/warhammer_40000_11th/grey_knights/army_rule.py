@@ -381,8 +381,9 @@ def _eligible_gate_of_infinity_rules_units(
 
 
 def _rules_unit_has_gate_of_infinity(rules_unit_view: RulesUnitView) -> bool:
-    return all(
-        _unit_has_gate_of_infinity(component.unit) for component in rules_unit_view.components
+    living_components = rules_unit_view.living_components
+    return bool(living_components) and all(
+        _unit_has_gate_of_infinity(component.unit) for component in living_components
     )
 
 
@@ -402,7 +403,7 @@ def _rules_unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Grey Knights Gate of Infinity requires battlefield_state.")
     if _rules_unit_within_enemy_engagement_range(state=state, rules_unit_view=rules_unit_view):
         return False
-    for component in rules_unit_view.components:
+    for component in rules_unit_view.living_components:
         unit_instance_id = component.unit.unit_instance_id
         reserve_state = state.reserve_state_for_unit(unit_instance_id)
         if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
@@ -426,7 +427,7 @@ def _assert_rules_unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Grey Knights Gate of Infinity requires battlefield_state.")
     if _rules_unit_within_enemy_engagement_range(state=state, rules_unit_view=rules_unit_view):
         raise GameLifecycleError("Grey Knights Gate of Infinity unit is within Engagement Range.")
-    for component in rules_unit_view.components:
+    for component in rules_unit_view.living_components:
         unit_instance_id = component.unit.unit_instance_id
         reserve_state = state.reserve_state_for_unit(unit_instance_id)
         if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
@@ -450,7 +451,7 @@ def _rules_unit_within_enemy_engagement_range(
     state: GameState,
     rules_unit_view: RulesUnitView,
 ) -> bool:
-    for component in rules_unit_view.components:
+    for component in rules_unit_view.living_components:
         if unit_within_enemy_engagement_range(
             state=state,
             unit_instance_id=component.unit.unit_instance_id,

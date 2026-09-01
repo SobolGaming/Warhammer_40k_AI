@@ -309,6 +309,45 @@ def test_embark_validates_distance_for_every_attached_rules_unit_model() -> None
     }
 
 
+@pytest.mark.parametrize("destroyed_role", ["leader", "bodyguard"])
+def test_embark_ignores_wholly_destroyed_attached_component(
+    destroyed_role: str,
+) -> None:
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    destroyed = leader if destroyed_role == "leader" else bodyguard
+    living = bodyguard if destroyed_role == "leader" else leader
+    scenario = _with_destroyed_attached_component(
+        scenario,
+        unit_instance_id=destroyed.unit_instance_id,
+    )
+
+    resolution = resolve_embark(
+        scenario=scenario,
+        cargo_state=_cargo_state(transport=transport, max_model_count=6),
+        selection=EmbarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=living.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            movement_phase_action=TransportMovementStatus.NORMAL_MOVE,
+        ),
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(living.unit_instance_id),
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+
+    assert resolution.is_valid
+    assert resolution.updated_cargo_state is not None
+    assert resolution.updated_cargo_state.embarked_unit_instance_ids == tuple(
+        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+    )
+    assert resolution.transition_batch is not None
+    assert {removal.model_instance_id for removal in resolution.transition_batch.removals} == {
+        model.model_instance_id for model in living.own_models
+    }
+
+
 def test_embarked_units_are_available_for_unified_movement_selection() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
     cargo_state = _cargo_state(
@@ -5538,6 +5577,37 @@ def _cargo_state(
 def _without_unit(scenario: BattlefieldScenario, unit_instance_id: str) -> BattlefieldScenario:
     return BattlefieldScenario(
         armies=scenario.armies,
+        battlefield_state=scenario.battlefield_state.without_unit_placement(unit_instance_id),
+    )
+
+
+def _with_destroyed_attached_component(
+    scenario: BattlefieldScenario,
+    *,
+    unit_instance_id: str,
+) -> BattlefieldScenario:
+    updated_armies = tuple(
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    keywords=("MONSTER",),
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == unit_instance_id
+                else unit
+                for unit in army.units
+            ),
+        )
+        if any(unit.unit_instance_id == unit_instance_id for unit in army.units)
+        else army
+        for army in scenario.armies
+    )
+    return BattlefieldScenario(
+        armies=updated_armies,
         battlefield_state=scenario.battlefield_state.without_unit_placement(unit_instance_id),
     )
 

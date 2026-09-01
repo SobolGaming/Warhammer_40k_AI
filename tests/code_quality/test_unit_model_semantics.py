@@ -115,6 +115,35 @@ TRIGGERED_MOVEMENT_PHYSICAL_AUTHORITY = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement_physical_authority.py"
 )
 TRANSPORTS = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
+TRANSPORT_EMBARK_GROUPS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "transport_embark_groups.py"
+)
+RULES_UNIT_PLACEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "rules_unit_placement.py"
+PRIMARY_RESERVE_ENTRY_PROVIDER = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "primary_reserve_entry_provider.py"
+)
+GREY_KNIGHTS_ARMY_RULE = (
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "engine"
+    / "faction_content"
+    / "warhammer_40000_11th"
+    / "grey_knights"
+    / "army_rule.py"
+)
+DAEMONIC_INCURSION_RULE = (
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "engine"
+    / "faction_content"
+    / "warhammer_40000_11th"
+    / "chaos_daemons"
+    / "detachments"
+    / "daemonic_incursion"
+    / "rule.py"
+)
 TURN_START_ENGAGEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "turn_start_engagement.py"
 UNIT_PROXIMITY = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_proximity.py"
 UNIT_MODULES = (
@@ -410,6 +439,80 @@ def test_model_loss_hosts_share_attached_unit_reconciliation() -> None:
 
     assert not (ENGINE / "attached_unit_split_history.py").exists()
     assert not (ENGINE / "reserve_state_attached_split.py").exists()
+
+
+def test_p19_semantic_consumers_use_central_living_component_authority() -> None:
+    embark_group = _function_node(
+        path=TRANSPORT_EMBARK_GROUPS,
+        function_name="embarking_rules_unit_placement",
+    )
+    embark_group_attributes = {
+        node.attr for node in ast.walk(embark_group) if isinstance(node, ast.Attribute)
+    }
+    assert "from_battlefield" in embark_group_attributes
+    assert "unit_placement_by_id" not in embark_group_attributes
+
+    placement_tree = ast.parse(
+        RULES_UNIT_PLACEMENT.read_text(encoding="utf-8"),
+        filename=str(RULES_UNIT_PLACEMENT),
+    )
+    placement_classes = tuple(
+        node
+        for node in placement_tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "RulesUnitPlacement"
+    )
+    assert len(placement_classes) == 1
+    placement_methods = {
+        node.name: node for node in placement_classes[0].body if isinstance(node, ast.FunctionDef)
+    }
+    for method_name in ("validate_for_view", "from_battlefield"):
+        method = placement_methods[method_name]
+        attribute_names = {
+            node.attr for node in ast.walk(method) if isinstance(node, ast.Attribute)
+        }
+        assert "living_components" in attribute_names
+        assert "components" not in attribute_names
+
+    for path, function_names in (
+        (TRANSPORTS, ("resolve_embark",)),
+        (
+            GREY_KNIGHTS_ARMY_RULE,
+            (
+                "_rules_unit_has_gate_of_infinity",
+                "_rules_unit_can_enter_strategic_reserves",
+                "_assert_rules_unit_can_enter_strategic_reserves",
+                "_rules_unit_within_enemy_engagement_range",
+            ),
+        ),
+        (
+            PRIMARY_RESERVE_ENTRY_PROVIDER,
+            (
+                "validate_primary_reserve_entry_provider_registration",
+                "validate_primary_reserve_entry_source_terminal_identity",
+                "_validate_catalog_rule_ir_authority",
+            ),
+        ),
+        (
+            DAEMONIC_INCURSION_RULE,
+            ("_god_keywords_for_rules_unit", "_rules_unit_has_faction_keyword"),
+        ),
+    ):
+        for function_name in function_names:
+            function = _function_node(path=path, function_name=function_name)
+            attribute_names = {
+                node.attr for node in ast.walk(function) if isinstance(node, ast.Attribute)
+            }
+            assert "living_components" in attribute_names, (
+                f"{path.relative_to(ROOT)}:{function_name} bypasses living-component authority."
+            )
+            assert "components" not in attribute_names, (
+                f"{path.relative_to(ROOT)}:{function_name} scans immutable lineage components."
+            )
+
+    for path in sorted(ENGINE.rglob("*.py")):
+        assert "keyword_contributing_components" not in path.read_text(encoding="utf-8"), (
+            f"{path.relative_to(ROOT)} retains the superseded keyword-only component view."
+        )
 
 
 def test_selected_target_canonical_identity_resolves_one_retained_rules_unit() -> None:
