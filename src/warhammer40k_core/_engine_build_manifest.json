@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:21d28df6fb6ade1c53a0edacf4372492e6121c36805492f5b32800aeef45523f",
-  "fingerprint": "21d28df6fb6ade1c53a0edacf4372492e6121c36805492f5b32800aeef45523f",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a037e6022153168221c9b30efd361c333ed14ee93ea1e762196524ac08a64760",
+  "fingerprint": "a037e6022153168221c9b30efd361c333ed14ee93ea1e762196524ac08a64760",
   "resource_count": 2475,
   "resources": [
     {
@@ -9595,9 +9595,9 @@
       "sha256": "4b56be05c4cba4729589d45f756159ef76b2ab7a87b8b9967ea26100f7e9226f"
     },
     {
-      "byte_length": 10180,
+      "byte_length": 12397,
       "path": "warhammer40k_core/engine/mortal_wound_target_lineage.py",
-      "sha256": "cd930ef0306b1bdbe80137d5d3d3a044b09b81d0e078c012d273f4131b3f211a"
+      "sha256": "f22249080fac267bfcc277a393ab40a1c71b69c4c43e23b69ee7a13d23ea53d5"
     },
     {
       "byte_length": 7894,

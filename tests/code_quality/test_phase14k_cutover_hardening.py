@@ -150,6 +150,10 @@ def test_p06b_in_flight_mortal_wounds_preserve_split_target_lineage() -> None:
     assert "target_lineage=lineage" in allocation_source
     assert "FROZEN_RULES_UNIT_COMPONENTS_POLICY" in lineage_source
     assert "current_rules_unit_views_for_canonical_identity" in lineage_source
+    assert "_authoritative_character_component_unit_instance_ids" in lineage_source
+    assert "state.starting_attached_unit_records" in lineage_source
+    assert "leader_or_support_unit_instance_ids" in lineage_source
+    assert "Character component classification drift" in lineage_source
     assert "target_lineage.assert_contains_model" in damage_source
     assert "logical_death.rules_unit_instance_id" in destruction_source
     assert "record.physical_unit_instance_id" in restore_source

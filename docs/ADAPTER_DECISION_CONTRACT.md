@@ -1884,8 +1884,14 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   `mortal_wound_progress`. That private progress includes a `target_lineage`
   object with policy `frozen_rules_unit_components`, the canonical packet
   target and owner, exact component-unit IDs, and the components classified as
-  Character when the packet began; each option repeats its `selected_model_id`
-  and `priority_tier`. The four tier tokens are `wounded_non_character`,
+  Character when the packet began. That Character-component set is not
+  self-authenticating: restore and pre-submission validation reconstruct it
+  from current attached Leader/Support roles plus authoritative Character
+  keywords, or, after dissolution, from the exact matching
+  `StartingAttachedUnitRecord` Leader/Support roles plus those keywords. Any
+  persisted classification drift rejects before queue pop or mutation. Each
+  option repeats its `selected_model_id` and `priority_tier`. The four tier
+  tokens are `wounded_non_character`,
   `non_character`, `wounded_character`, and `character`, in that exact order.
   The engine auto-selects only when the active tier contains exactly one legal
   model. Accepted submissions resolve exactly one mortal wound on the selected
@@ -3508,8 +3514,17 @@ the packet is paused, restore and pre-submission validation expand all placed,
 living descendants represented by those exact frozen components and recompute
 the four priority tiers across that packet-wide population. They do not select
 one descendant, terminate the packet, or admit a component that joined later.
-The frozen Character-component classification survives the split. This lineage
-is engine authority and remains inside the redacted mortal-wound context.
+The frozen Character-component classification survives the split, but its
+serialized value is never trusted by itself. Before allocation authority is
+accepted, the engine reconstructs the exact set from active attached
+Leader/Support component roles or the canonical target's exact historical
+`StartingAttachedUnitRecord`, unions any independently Character-keyworded
+component, and requires equality with the retained set. Coordinated drift of
+the application-started event, model request, allocation occurrence, Feel No
+Pain request, parent decision closure, or their request events therefore still
+rejects before queue pop, decision recording, RNG, wound mutation, destruction,
+or packet completion. This lineage is engine authority and remains inside the
+redacted mortal-wound context.
 
 The engine records one private `mortal_wound_application_started` authority
 event before any shared mortal-wound packet applies damage. It freezes the

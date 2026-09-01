@@ -18,6 +18,7 @@ from tests.phase11c_command_phase_helpers import (
 )
 from tests.phase13b_shooting_declaration_helpers import (
     _attached_enemy_declarations,
+    _attached_enemy_unit_specs,
     _attached_formation_for_player,
     _attack_pool_for_test,
     _first_weapon_profile,
@@ -108,7 +109,12 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     ProposalKind,
 )
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.charge import (
     COMPLETE_CHARGE_PHASE_OPTION_ID,
     SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -1164,6 +1170,199 @@ def test_mortal_wound_packet_survives_attached_split_with_one_character_unit() -
         session.replay_artifact(artifact_id="replay:ws13:mortal-lineage-one-character")
     ).run()
     assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("boundary", ["model_choice", "feel_no_pain"])
+def test_mortal_wound_character_component_drift_is_rejected_before_mutation(
+    boundary: str,
+) -> None:
+    if boundary == "model_choice":
+        session, model_request, units = _attached_mortal_wound_model_choice_session(
+            game_id="ws13-mortal-character-authority-model-choice"
+        )
+    else:
+        session, model_request, units, _attached_id = _split_attached_mortal_wound_session(
+            game_id="ws13-mortal-character-authority-feel-no-pain",
+            include_support_character=True,
+        )
+    option_id = units["leader-unit"].own_models[0].model_instance_id
+    if boundary == "feel_no_pain":
+        _assert_request(
+            session.submit_option(
+                request_id=model_request.request_id,
+                option_id=option_id,
+                result_id="ws13-mortal-character-authority-model-result",
+            ),
+            SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        )
+        option_id = "decline"
+
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    _tamper_mortal_wound_character_component_authority(
+        checkpoint,
+        false_character_component_id=units["bodyguard-unit"].unit_instance_id,
+        false_legal_model_ids=(
+            tuple(
+                sorted(
+                    (
+                        units["leader-unit"].own_models[0].model_instance_id,
+                        units["support-unit"].own_models[0].model_instance_id,
+                    )
+                )
+            )
+            if boundary == "model_choice"
+            else None
+        ),
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Mortal-wound target lineage Character component classification drift",
+    ):
+        GameLifecycle.from_payload(checkpoint)
+
+    decisions_payload = checkpoint["decisions"]
+    tampered_controller = DecisionController.from_payload(decisions_payload)
+    live_controller = session.lifecycle.decision_controller
+    live_controller.queue._pending_requests[:] = (  # pyright: ignore[reportPrivateUsage]
+        tampered_controller.queue.pending_requests
+    )
+    live_controller.event_log.replace_records(tampered_controller.event_log.records)
+    live_controller._records[:] = tampered_controller.records  # pyright: ignore[reportPrivateUsage]
+    tampered_request = live_controller.queue.peek_next()
+    before_submission = session.lifecycle.to_payload()
+
+    status = session.submit_option(
+        request_id=tampered_request.request_id,
+        option_id=option_id,
+        result_id=f"ws13-mortal-character-authority-{boundary}-tampered-result",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert status.message == (
+        "Mortal-wound target lineage Character component classification drift."
+    )
+    assert status.payload == {
+        "invalid_reason": (
+            "invalid_mortal_wound_model_result"
+            if boundary == "model_choice"
+            else "invalid_mortal_wound_feel_no_pain_result"
+        ),
+        "field": (
+            "mortal_wound_context" if boundary == "model_choice" else "allocation_occurrence"
+        ),
+    }
+    assert session.lifecycle.to_payload() == before_submission
+
+
+def _attached_mortal_wound_model_choice_session(
+    *,
+    game_id: str,
+) -> tuple[LocalGameSession, DecisionRequest, dict[str, UnitInstance]]:
+    lifecycle, units = shooting_lifecycle(
+        alpha_unit_ids=("attacker",),
+        game_id=game_id,
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    attached_id = _attached_formation_for_player(
+        state=state,
+        player_id="player-b",
+    ).attached_unit_instance_id
+    attacker = units["attacker"]
+    attack_context_id = f"{game_id}:pool-001:attack-001"
+    attack_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=units["bodyguard-unit"],
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        attacks=1,
+        target_unit_instance_id=attached_id,
+    )
+    routed = continue_mortal_wound_application(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request_id=state.next_decision_request_id(),
+        progress=MortalWoundApplicationProgress.start(
+            application_id=f"{game_id}:mortal-wounds",
+            source_rule_id="ws13:mortal-character-authority",
+            source_context={"source_kind": "ws13_mortal_character_authority"},
+            target_unit_instance_id=attached_id,
+            defender_player_id="player-b",
+            mortal_wounds=1,
+            spill_over=True,
+            destruction_evidence=MortalWoundDestructionEvidence.for_attack_state(
+                state=state,
+                destroying_player_id="player-a",
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacking_model_instance_id=attack_pool.attacker_model_instance_id,
+                weapon_profile=attack_pool.weapon_profile,
+                attack_context_id=attack_context_id,
+                action_phase=BattlePhase.SHOOTING,
+                source_step="ws13_mortal_character_authority",
+            ),
+        ),
+    )
+    request = routed.request
+    assert request is not None
+    assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        model.model_instance_id for model in units["bodyguard-unit"].own_models
+    }
+    lifecycle.decision_controller.request_decision(request)
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    restored_request = session.lifecycle.pending_decision_request()
+    assert restored_request is not None
+    assert restored_request.to_payload() == request.to_payload()
+    return session, restored_request, units
+
+
+def _tamper_mortal_wound_character_component_authority(
+    payload: GameLifecyclePayload,
+    *,
+    false_character_component_id: str,
+    false_legal_model_ids: tuple[str, ...] | None,
+) -> None:
+    def tamper(value: object) -> None:
+        if isinstance(value, dict):
+            mapping = cast(dict[str, object], value)
+            if "character_component_unit_instance_ids" in mapping:
+                mapping["character_component_unit_instance_ids"] = [false_character_component_id]
+            if mapping.get("priority_tier") == "character":
+                mapping["priority_tier"] = "non_character"
+            if (
+                false_legal_model_ids is not None
+                and mapping.get("decision_type") == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+            ):
+                request_payload = mapping.get("payload")
+                if not isinstance(request_payload, dict):
+                    raise AssertionError("mortal-wound model request payload is invalid")
+                typed_request_payload = cast(dict[str, object], request_payload)
+                typed_request_payload["legal_model_ids"] = list(false_legal_model_ids)
+                typed_request_payload["priority_tier"] = "non_character"
+                mapping["options"] = [
+                    {
+                        "option_id": model_id,
+                        "label": model_id,
+                        "payload": {
+                            "submission_kind": SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+                            "selected_model_id": model_id,
+                            "priority_tier": "non_character",
+                        },
+                    }
+                    for model_id in false_legal_model_ids
+                ]
+            for child in mapping.values():
+                tamper(child)
+        elif isinstance(value, list):
+            for child in cast(list[object], value):
+                tamper(child)
+
+    tamper(payload)
 
 
 def _split_attached_mortal_wound_session(

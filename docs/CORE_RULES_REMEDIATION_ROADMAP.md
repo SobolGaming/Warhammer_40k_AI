@@ -1065,6 +1065,12 @@ prevalidation reconstruct the occurrence, parent closure, child request, and exa
 queue pop, recording, RNG, damage, or completion. Damage application separately requires the
 supplied model to belong to the retained target rules unit. Each application also freezes the
 target's owner, exact physical component-unit inventory, and Character-component classification.
+Freeze and validation share one state-derived Character-component owner: an active formation uses
+its actual Leader/Support roles plus authoritative Character keywords, while a dissolved formation
+uses the exact matching `StartingAttachedUnitRecord` roles plus those keywords. The retained set
+must equal that reconstruction, so a coordinated rewrite of progress, application-started event,
+allocation occurrence, parent closure, child request, and request events cannot reclassify a
+Character as a non-Character or bypass living Bodyguards.
 If destruction reconciles an Attached Unit into multiple current descendants before the packet
 finishes, the allocator continues across every living, placed model in that frozen lineage and
 recomputes the four tiers over that packet-wide population. Restore, Feel No Pain authority,
@@ -1093,7 +1099,7 @@ The generated package hash is
 `3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a` and its canonical artifact
 byte SHA-256 is `d2ed90878ed9b54bee86c89432e0c9a452705da959b7bc7cf4934ada1e1cf16d`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:21d28df6fb6ade1c53a0edacf4372492e6121c36805492f5b32800aeef45523f`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a037e6022153168221c9b30efd361c333ed14ee93ea1e762196524ac08a64760`.
 
 Load and execution support: The Mortal Wounds rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1112,7 +1118,10 @@ Regression coverage includes facade submission and replay after the last Bodygua
 mid-packet and normal reconciliation splits the original Attached Unit. One case leaves Leader and
 Support Character descendants and exercises the Character-tier model decision plus Feel No Pain
 across serialized checkpoints; a second leaves one Character descendant and proves deterministic
-automatic continuation rather than an erroneous unit-destroyed termination.
+automatic continuation rather than an erroneous unit-destroyed termination. Coordinated
+classification-drift regressions modify every retained authority copy at both the pending model
+choice and pending Feel No Pain boundaries and prove restore and lifecycle submission reject before
+any queue, decision, RNG, wound, destruction, or completion mutation.
 
 Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed
 loader → stable Mortal Wounds source ID and executable consumer inventory → producer-owned
@@ -1157,7 +1166,7 @@ Validation results:
 - Repository-wide Ruff check and Ruff format check pass; mypy passes across `2646` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required xdist work-stealing suite passes (`6362 passed` in `400.60s`), including the
+- The required xdist work-stealing suite passes (`6364 passed` in `402.70s`), including the
   complete code-quality suite.
 - The Other Concepts source artifact, final engine build identity, and external contract all pass
   fail-closed drift checks, including the `origin/main` compatibility comparison.

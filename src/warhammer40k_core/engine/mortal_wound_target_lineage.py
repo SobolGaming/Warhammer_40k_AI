@@ -101,15 +101,10 @@ class MortalWoundTargetLineage:
         )
         if target.owner_player_id != requested_owner_id:
             raise GameLifecycleError("Mortal-wound target lineage owner drift.")
-        character_component_ids = tuple(
-            sorted(
-                component.unit.unit_instance_id
-                for component in target.components
-                if (
-                    (target.is_attached_rules_unit and component.role in {"leader", "support"})
-                    or unit_has_keyword(component.unit, "CHARACTER")
-                )
-            )
+        character_component_ids = _authoritative_character_component_unit_instance_ids(
+            state=state,
+            canonical_target_unit_instance_id=target_id,
+            views=(target,),
         )
         lineage = cls(
             policy=FROZEN_RULES_UNIT_COMPONENTS_POLICY,
@@ -135,6 +130,15 @@ class MortalWoundTargetLineage:
         )
         if current_component_ids != self.component_unit_instance_ids:
             raise GameLifecycleError("Mortal-wound target lineage component inventory drift.")
+        expected_character_component_ids = _authoritative_character_component_unit_instance_ids(
+            state=state,
+            canonical_target_unit_instance_id=self.canonical_target_unit_instance_id,
+            views=views,
+        )
+        if expected_character_component_ids != self.character_component_unit_instance_ids:
+            raise GameLifecycleError(
+                "Mortal-wound target lineage Character component classification drift."
+            )
         return views
 
     def alive_placed_models(
@@ -237,6 +241,56 @@ def _identifier_tuple(label: str, values: object) -> tuple[str, ...]:
     if validated != tuple(sorted(set(validated))):
         raise GameLifecycleError(f"{label} must be unique and sorted.")
     return validated
+
+
+def _authoritative_character_component_unit_instance_ids(
+    *,
+    state: GameState,
+    canonical_target_unit_instance_id: str,
+    views: tuple[RulesUnitView, ...],
+) -> tuple[str, ...]:
+    current_target_views = tuple(
+        view for view in views if view.unit_instance_id == canonical_target_unit_instance_id
+    )
+    if current_target_views:
+        if len(current_target_views) != 1:
+            raise GameLifecycleError("Mortal-wound target lineage current target is ambiguous.")
+        current_target = current_target_views[0]
+        role_character_component_ids = {
+            component.unit.unit_instance_id
+            for component in current_target.components
+            if current_target.is_attached_rules_unit and component.role in {"leader", "support"}
+        }
+    else:
+        starting_records = tuple(
+            record
+            for record in state.starting_attached_unit_records
+            if record.attached_unit_instance_id == canonical_target_unit_instance_id
+        )
+        if len(starting_records) != 1:
+            raise GameLifecycleError(
+                "Mortal-wound target lineage historical Attached Unit authority is invalid."
+            )
+        role_character_component_ids = set(
+            starting_records[0].leader_or_support_unit_instance_ids()
+        )
+    components_by_id = {
+        component.unit.unit_instance_id: component.unit
+        for view in views
+        for component in view.components
+    }
+    if len(components_by_id) != sum(len(view.components) for view in views):
+        raise GameLifecycleError("Mortal-wound target lineage component authority is duplicated.")
+    return tuple(
+        sorted(
+            role_character_component_ids
+            | {
+                component_id
+                for component_id, unit in components_by_id.items()
+                if unit_has_keyword(unit, "CHARACTER")
+            }
+        )
+    )
 
 
 def _payload_identifier(payload: dict[str, object], key: str) -> str:
