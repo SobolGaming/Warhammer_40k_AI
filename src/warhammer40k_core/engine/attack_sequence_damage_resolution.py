@@ -5,6 +5,21 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine import attack_sequence_destruction_authority as _asda
+from warhammer40k_core.engine.attack_sequence_deadly_demise_continuation import (
+    deadly_demise_secondary_continuation_after_mandatory_reaction as _deadly_demise_secondary_continuation_after_mandatory_reaction,
+)
+from warhammer40k_core.engine.attack_sequence_deadly_demise_continuation import (
+    deadly_demise_secondary_continuation_payload as _deadly_demise_secondary_continuation_payload,
+)
+from warhammer40k_core.engine.attack_sequence_deadly_demise_continuation import (
+    deadly_demise_secondary_pending_completion_payload as _deadly_demise_secondary_pending_completion_payload,
+)
+from warhammer40k_core.engine.attack_sequence_deadly_demise_continuation import (
+    deadly_demise_source_context_payload as _deadly_demise_source_context_payload,
+)
+from warhammer40k_core.engine.attack_sequence_deadly_demise_continuation import (
+    is_deadly_demise_continuation as _is_deadly_demise_continuation,
+)
 from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     no_save_damage_order_roll_spec as _no_save_damage_order_roll_spec,
     record_deadly_demise_secondary_destruction_finalization as _record_deadly_demise_secondary_destruction_finalization,
@@ -65,6 +80,7 @@ __all__ = (
     "_destruction_reaction_trigger_threshold",
     "_emit_deadly_demise_mortal_wounds_applied",
     "_emit_mandatory_destruction_reaction_record",
+    "_finish_resumed_deadly_demise_source_damage",
     "_is_deadly_demise_continuation",
     "_no_save_damage_order_roll_spec",
     "_optional_destruction_reaction_active_effect_requirement_is_met",
@@ -80,7 +96,6 @@ __all__ = (
     "_resolve_mandatory_destruction_reactions_before_removal",
     "_route_deadly_demise_mortal_wounds",
     "_save_options_for_allocation",
-    "_unit_has_model_within_deadly_demise_range",
 )
 
 
@@ -248,7 +263,7 @@ def _resolve_lost_wound_stage(
             decision_request=request,
             payload={
                 "phase": attack_sequence.source_phase.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": request.decision_type,
                 "attack_context_id": attack_sequence.attack_context_id(),
             },
         ),
@@ -600,6 +615,7 @@ def _resolve_mandatory_destruction_reactions_before_removal(
     destroyed_model_controller_player_id: str | None = None,
     sources: tuple[DestructionReactionSource, ...] | None = None,
     parent_cause_ids: tuple[str, ...] = (),
+    source_damage_completion: JsonValue = None,
 ) -> LifecycleStatus | None:
     if damage is None or not damage.destroyed:
         return None
@@ -641,6 +657,7 @@ def _resolve_mandatory_destruction_reactions_before_removal(
                 source=source,
                 destroyed_model_controller_player_id=controller_player_id,
                 pending_sources=mandatory_sources[source_index + 1 :],
+                source_damage_completion=source_damage_completion,
             )
             if status is not None:
                 return status
@@ -714,6 +731,7 @@ def _resolve_deadly_demise_before_removal(
     source: DestructionReactionSource,
     destroyed_model_controller_player_id: str,
     pending_sources: tuple[DestructionReactionSource, ...],
+    source_damage_completion: JsonValue = None,
 ) -> LifecycleStatus | None:
     descriptor, trigger_roll_payload, triggered = resolve_deadly_demise_trigger(
         state=state,
@@ -764,6 +782,7 @@ def _resolve_deadly_demise_before_removal(
         trigger_roll_payload=trigger_roll_payload,
         target_unit_ids=target_unit_ids,
         pending_sources=pending_sources,
+        source_damage_completion=source_damage_completion,
     )
     if status is not None:
         return status
@@ -805,6 +824,7 @@ def _route_deadly_demise_mortal_wounds(
     trigger_roll_payload: JsonValue,
     target_unit_ids: tuple[str, ...],
     pending_sources: tuple[DestructionReactionSource, ...],
+    source_damage_completion: JsonValue = None,
 ) -> LifecycleStatus | None:
     for target_index, target_unit_id in enumerate(target_unit_ids):
         mortal_wounds, wound_roll_payload = _deadly_demise_mortal_wounds_for_target(
@@ -822,7 +842,7 @@ def _route_deadly_demise_mortal_wounds(
             ),
             source_rule_id=source.source_rule_id,
             source_context=_deadly_demise_source_context_payload(
-                attack_sequence=attack_sequence,
+                sequence_id=attack_sequence.sequence_id,
                 attack_context=attack_context,
                 damage=damage,
                 saving_throw_payload=saving_throw_payload,
@@ -835,6 +855,7 @@ def _route_deadly_demise_mortal_wounds(
                 pending_target_unit_ids=target_unit_ids[target_index + 1 :],
                 pending_sources=pending_sources,
                 wound_roll_payload=wound_roll_payload,
+                source_damage_completion=source_damage_completion,
             ),
             target_unit_instance_id=target_unit_id,
             defender_player_id=unit_owner_player_id(
@@ -866,7 +887,7 @@ def _route_deadly_demise_mortal_wounds(
                 decision_request=routed.request,
                 payload={
                     "phase": attack_sequence.source_phase.value,
-                    "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                    "decision_type": routed.request.decision_type,
                     "sequence_id": attack_sequence.sequence_id,
                     "source_rule_id": source.source_rule_id,
                     "source_kind": DEADLY_DEMISE_SOURCE_KIND,
@@ -899,6 +920,7 @@ def _route_deadly_demise_mortal_wounds(
             affected_target_unit_ids=target_unit_ids,
             pending_target_unit_ids=target_unit_ids[target_index + 1 :],
             pending_sources=pending_sources,
+            source_damage_completion=source_damage_completion,
             secondary_damage_applications=_destroyed_damage_applications(
                 routed.application.applications
             ),
@@ -926,6 +948,7 @@ def _resolve_deadly_demise_secondary_destroyed_models(
     pending_target_unit_ids: tuple[str, ...],
     pending_sources: tuple[DestructionReactionSource, ...],
     secondary_damage_applications: tuple[DamageApplication, ...],
+    source_damage_completion: JsonValue = None,
 ) -> LifecycleStatus | None:
     parent_cause_ids = _asda.reserve_attack_deadly_demise_secondary_authorities(
         state=state,
@@ -953,6 +976,24 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             feel_no_pain=secondary_feel_no_pain,
             destroyed_model_controller_player_id=secondary_controller_player_id,
             parent_cause_ids=parent_cause_ids,
+            source_damage_completion=_deadly_demise_secondary_pending_completion_payload(
+                attack_context=attack_context,
+                source_damage=source_damage,
+                resolved_secondary_damage_application=secondary_damage,
+                saving_throw_payload=saving_throw_payload,
+                feel_no_pain=feel_no_pain,
+                source=source,
+                descriptor=descriptor,
+                destroyed_model_controller_player_id=destroyed_model_controller_player_id,
+                trigger_roll_payload=trigger_roll_payload,
+                affected_target_unit_ids=affected_target_unit_ids,
+                pending_target_unit_ids=pending_target_unit_ids,
+                pending_sources=pending_sources,
+                pending_secondary_damage_applications=secondary_damage_applications[
+                    damage_index + 1 :
+                ],
+                source_damage_completion=source_damage_completion,
+            ),
         )
         if mandatory_status is not None:
             return mandatory_status
@@ -1021,6 +1062,7 @@ def _resolve_deadly_demise_secondary_destroyed_models(
                 pending_secondary_damage_applications=secondary_damage_applications[
                     damage_index + 1 :
                 ],
+                source_damage_completion=source_damage_completion,
             ),
         )
         if reaction_status is not None:
@@ -1037,6 +1079,92 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             destroying_player_id=destroyed_model_controller_player_id,
         )
     return None
+
+
+def _finish_resumed_deadly_demise_source_damage(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    hooks: AttackSequenceHooks,
+    attack_sequence: AttackSequence,
+    already_allocated_model_ids: tuple[str, ...],
+    attack_context: AttackResolutionContextPayload,
+    damage: DamageApplication,
+    saving_throw_payload: JsonValue,
+    feel_no_pain: FeelNoPainResolution,
+    destroyed_model_controller_player_id: str,
+    source_damage_completion: JsonValue,
+) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
+    destruction_attribution = _asda.reserved_attack_damage_destruction_attribution(
+        state=state,
+        attack_sequence=attack_sequence,
+        damage=damage,
+    )
+    destroyed_model_placement = _destroyed_model_placement_payload(
+        state=state,
+        model_instance_id=damage.model_instance_id,
+    )
+    remove_destroyed_model_from_battlefield(
+        state=state,
+        model_instance_id=damage.model_instance_id,
+    )
+    destroyed_emission = _emit_damage_event(
+        state=state,
+        decisions=decisions,
+        hooks=hooks,
+        attack_sequence=attack_sequence,
+        damage=damage,
+        saving_throw=None,
+        saving_throw_payload=saving_throw_payload,
+        feel_no_pain=feel_no_pain,
+        destroyed_model_placement=destroyed_model_placement,
+        destruction_attribution=destruction_attribution,
+    )
+    if destroyed_emission is None:
+        raise GameLifecycleError("Resumed Deadly Demise destruction did not emit evidence.")
+    continuation = (
+        None
+        if source_damage_completion is None
+        else _deadly_demise_secondary_continuation_after_mandatory_reaction(
+            pending_completion=source_damage_completion,
+            resolved_secondary_model_destroyed_event_id=(
+                destroyed_emission.model_destroyed_event_id
+            ),
+        )
+    )
+    reaction_status = _destruction_reaction_status_if_needed(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        destruction_provenance=destruction_attribution.destruction_provenance,
+        damage=damage,
+        destroyed_emission=destroyed_emission,
+        destroyed_model_controller_player_id=destroyed_model_controller_player_id,
+        continuation=continuation,
+    )
+    if reaction_status is not None:
+        return attack_sequence, already_allocated_model_ids, reaction_status
+    if continuation is not None:
+        return _continue_deadly_demise_after_secondary_destruction_reaction(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            hooks=hooks,
+            attack_sequence=attack_sequence,
+            already_allocated_model_ids=already_allocated_model_ids,
+            continuation=continuation,
+        )
+    return (
+        _advance_after_resolved_hit(
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+        ),
+        already_allocated_model_ids,
+        None,
+    )
 
 
 def _continue_deadly_demise_after_secondary_destruction_reaction(
@@ -1096,6 +1224,7 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         DamageApplication.from_payload(cast(DamageApplicationPayload, payload))
         for payload in pending_secondary_payloads
     )
+    source_damage_completion = validate_json_value(source_context.get("source_damage_completion"))
     _record_deadly_demise_secondary_destruction_finalization(
         state=state,
         decisions=decisions,
@@ -1127,6 +1256,7 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         pending_target_unit_ids=pending_target_unit_ids,
         pending_sources=pending_sources,
         secondary_damage_applications=pending_secondary_damage,
+        source_damage_completion=source_damage_completion,
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
@@ -1145,6 +1275,7 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         trigger_roll_payload=trigger_roll_payload,
         target_unit_ids=pending_target_unit_ids,
         pending_sources=pending_sources,
+        source_damage_completion=source_damage_completion,
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
@@ -1178,118 +1309,28 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         feel_no_pain=feel_no_pain,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
         sources=pending_sources,
+        parent_cause_ids=_asda.reserved_attack_damage_parent_cause_ids(
+            state=state,
+            attack_sequence=attack_sequence,
+            damage=damage,
+        ),
+        source_damage_completion=source_damage_completion,
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
-    destroyed_model_placement = _destroyed_model_placement_payload(
-        state=state,
-        model_instance_id=damage.model_instance_id,
-    )
-    remove_destroyed_model_from_battlefield(
-        state=state,
-        model_instance_id=damage.model_instance_id,
-    )
-    destroyed_emission = _emit_damage_event(
-        state=state,
-        decisions=decisions,
-        hooks=hooks,
-        attack_sequence=attack_sequence,
-        damage=damage,
-        saving_throw=None,
-        saving_throw_payload=validate_json_value(source_context["saving_throw"]),
-        feel_no_pain=feel_no_pain,
-        destroyed_model_placement=destroyed_model_placement,
-        destruction_attribution=ModelDestructionAttribution.for_attack(
-            destroying_player_id=attack_sequence.attacker_player_id,
-            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-            attacking_model_instance_id=(attack_sequence.current_pool().attacker_model_instance_id),
-            weapon_profile=attack_sequence.current_pool().weapon_profile,
-            attack_context_id=attack_context["attack_context_id"],
-        ),
-    )
-    reaction_status = _destruction_reaction_status_if_needed(
+    return _finish_resumed_deadly_demise_source_damage(
         state=state,
         decisions=decisions,
         manager=manager,
+        hooks=hooks,
         attack_sequence=attack_sequence,
+        already_allocated_model_ids=already_allocated_model_ids,
         attack_context=attack_context,
-        destruction_provenance=DestructionProvenance.for_attack(
-            weapon_profile=attack_sequence.current_pool().weapon_profile,
-            attack_context_id=attack_context["attack_context_id"],
-        ),
         damage=damage,
-        destroyed_emission=destroyed_emission,
+        saving_throw_payload=validate_json_value(source_context["saving_throw"]),
+        feel_no_pain=feel_no_pain,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
-    )
-    if reaction_status is not None:
-        return attack_sequence, already_allocated_model_ids, reaction_status
-    return (
-        _advance_after_resolved_hit(
-            attack_sequence=attack_sequence,
-            attack_context=attack_context,
-        ),
-        already_allocated_model_ids,
-        None,
-    )
-
-
-def _deadly_demise_secondary_continuation_payload(
-    *,
-    attack_context: AttackResolutionContextPayload,
-    source_damage: DamageApplication,
-    resolved_secondary_damage_application: DamageApplication,
-    resolved_secondary_model_destroyed_event_id: str,
-    saving_throw_payload: JsonValue,
-    feel_no_pain: FeelNoPainResolution,
-    source: DestructionReactionSource,
-    descriptor: dict[str, JsonValue],
-    destroyed_model_controller_player_id: str,
-    trigger_roll_payload: JsonValue,
-    affected_target_unit_ids: tuple[str, ...],
-    pending_target_unit_ids: tuple[str, ...],
-    pending_sources: tuple[DestructionReactionSource, ...],
-    pending_secondary_damage_applications: tuple[DamageApplication, ...],
-) -> JsonValue:
-    return validate_json_value(
-        {
-            "source_kind": DEADLY_DEMISE_SOURCE_KIND,
-            "continuation_kind": "secondary_destroyed_model_reaction",
-            "attack_context": attack_context,
-            "damage_application": source_damage.to_payload(),
-            "resolved_secondary_damage_application": (
-                resolved_secondary_damage_application.to_payload()
-            ),
-            "resolved_secondary_model_destroyed_event_id": _validate_identifier(
-                "resolved_secondary_model_destroyed_event_id",
-                resolved_secondary_model_destroyed_event_id,
-            ),
-            "saving_throw": validate_json_value(saving_throw_payload),
-            "feel_no_pain": feel_no_pain.to_payload(),
-            "source": source.to_payload(),
-            "descriptor": validate_json_value(descriptor),
-            "destroyed_model_controller_player_id": _validate_identifier(
-                "destroyed_model_controller_player_id",
-                destroyed_model_controller_player_id,
-            ),
-            "trigger_roll": validate_json_value(trigger_roll_payload),
-            "affected_target_unit_ids": list(affected_target_unit_ids),
-            "pending_target_unit_ids": list(pending_target_unit_ids),
-            "pending_sources": [pending_source.to_payload() for pending_source in pending_sources],
-            "pending_secondary_damage_applications": [
-                application.to_payload() for application in pending_secondary_damage_applications
-            ],
-        }
-    )
-
-
-def _is_deadly_demise_continuation(payload: JsonValue) -> bool:
-    if payload is None:
-        return False
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Destruction reaction continuation must be an object.")
-    return (
-        payload.get("source_kind") == DEADLY_DEMISE_SOURCE_KIND
-        and payload.get("continuation_kind") == "secondary_destroyed_model_reaction"
+        source_damage_completion=source_damage_completion,
     )
 
 
@@ -1354,75 +1395,8 @@ def _deadly_demise_target_unit_ids(
     )
 
 
-def _unit_has_model_within_deadly_demise_range(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-    source_model_id: str,
-    source_model: GeometryModel,
-    placed_model_ids: set[str],
-    range_inches: float,
-) -> bool:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Deadly Demise requires battlefield_state.")
-    for model in unit.own_models:
-        if model.model_instance_id == source_model_id:
-            continue
-        if not model.is_alive or model.model_instance_id not in placed_model_ids:
-            continue
-        try:
-            placement = battlefield.model_placement_by_id(model.model_instance_id)
-        except PlacementError as exc:
-            raise GameLifecycleError("Deadly Demise target model placement drift.") from exc
-        target_model = geometry_model_for_placement(model=model, placement=placement)
-        distance = DistanceMeasurementContext.from_models(source_model, target_model)
-        if distance.closest_distance_inches() <= range_inches:
-            return True
-    return False
-
-
 def _deadly_demise_descriptor(source: DestructionReactionSource) -> dict[str, JsonValue]:
     return _shared_deadly_demise_descriptor(source)
-
-
-def _deadly_demise_source_context_payload(
-    *,
-    attack_sequence: AttackSequence,
-    attack_context: AttackResolutionContextPayload,
-    damage: DamageApplication,
-    saving_throw_payload: JsonValue,
-    feel_no_pain: FeelNoPainResolution,
-    source: DestructionReactionSource,
-    descriptor: dict[str, JsonValue],
-    destroyed_model_controller_player_id: str,
-    trigger_roll_payload: JsonValue,
-    affected_target_unit_ids: tuple[str, ...],
-    pending_target_unit_ids: tuple[str, ...],
-    pending_sources: tuple[DestructionReactionSource, ...],
-    wound_roll_payload: JsonValue,
-) -> JsonValue:
-    return validate_json_value(
-        {
-            "source_kind": DEADLY_DEMISE_SOURCE_KIND,
-            "sequence_id": attack_sequence.sequence_id,
-            "attack_context": attack_context,
-            "damage_application": damage.to_payload(),
-            "saving_throw": validate_json_value(saving_throw_payload),
-            "feel_no_pain": feel_no_pain.to_payload(),
-            "source": source.to_payload(),
-            "descriptor": validate_json_value(descriptor),
-            "destroyed_model_controller_player_id": _validate_identifier(
-                "destroyed_model_controller_player_id",
-                destroyed_model_controller_player_id,
-            ),
-            "trigger_roll": validate_json_value(trigger_roll_payload),
-            "affected_target_unit_ids": list(affected_target_unit_ids),
-            "pending_target_unit_ids": list(pending_target_unit_ids),
-            "pending_sources": [pending_source.to_payload() for pending_source in pending_sources],
-            "mortal_wound_roll": validate_json_value(wound_roll_payload),
-        }
-    )
 
 
 def _deadly_demise_attack_context_from_source_context(

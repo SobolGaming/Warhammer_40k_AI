@@ -271,6 +271,13 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    MortalWoundAllocationPriority,
+    mortal_wound_priority_selection,
+    resolve_mortal_wound_decision,
+)
+from warhammer40k_core.engine.mortal_wound_target_lineage import MortalWoundTargetLineage
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -424,6 +431,26 @@ def _test_mortal_wound_destruction_evidence(
         destruction_source_kind=DestructionSourceKind.ABILITY,
         action_phase=phase,
         source_step="test_mortal_wounds",
+    )
+
+
+def _retain_only_placed_model(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    model_instance_id: str,
+) -> None:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("single-model fixture requires battlefield state")
+    state.replace_battlefield_state(
+        battlefield.with_removed_models(
+            tuple(
+                model.model_instance_id
+                for model in unit.own_models
+                if model.model_instance_id != model_instance_id
+            )
+        )
     )
 
 
@@ -2117,7 +2144,7 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_feel_no_pain_choice()
     assert not _event_payloads(lifecycle, "devastating_wounds_mortal_wounds_applied")
 
 
-def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -> None:
+def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_specs=(
@@ -2193,8 +2220,10 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
 
     assert remaining_sequence is not None
     assert allocated_ids == ()
-    assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-    assert request.options[0].option_id == "decline"
+    assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        model.model_instance_id for model in target_a.own_models
+    }
     assert tuple(
         deferred.target_unit_instance_id for deferred in remaining_sequence.deferred_mortal_wounds
     ) == (target_b.unit_instance_id,)
@@ -2219,11 +2248,60 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
     assert len(restored.decision_controller.queue.pending_requests) == 1
     restored_request = restored.decision_controller.queue.pending_requests[0]
 
-    restored.submit_decision(
+    drifted = GameLifecycle.from_payload(lifecycle.to_payload())
+    drifted_state = _state(drifted)
+    apply_damage_to_model(
+        state=drifted_state,
+        target_unit_instance_id=target_a.unit_instance_id,
+        model_instance_id=target_a.own_models[0].model_instance_id,
+        damage=1,
+        damage_kind=DamageKind.NORMAL,
+    )
+    drift_checkpoint = drifted.to_payload()
+    drifted_request = drifted.decision_controller.queue.peek_next()
+    drift_status = drifted.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-dev-queue-stale-model-choice",
+            request=drifted_request,
+            selected_option_id=target_a.own_models[1].model_instance_id,
+        )
+    )
+    assert drift_status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], drift_status.payload) == {
+        "invalid_reason": "invalid_mortal_wound_model_result",
+        "field": "legal_model_ids",
+    }
+    assert drifted.to_payload() == drift_checkpoint
+
+    fnp_status = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-dev-queue-select-target-a-model",
+            request=restored_request,
+            selected_option_id=target_a.own_models[0].model_instance_id,
+        )
+    )
+    fnp_request = _decision_request(fnp_status)
+    assert fnp_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    assert fnp_request.options[0].option_id == "decline"
+
+    target_b_status = restored.submit_decision(
         DecisionResult.for_request(
             result_id="phase13d-dev-queue-decline-fnp",
-            request=restored_request,
+            request=fnp_request,
             selected_option_id="decline",
+        )
+    )
+    target_b_request = _decision_request(target_b_status)
+    assert target_b_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    assert {option.option_id for option in target_b_request.options} == {
+        model.model_instance_id for model in target_b.own_models
+    }
+
+    restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-dev-queue-select-target-b-model",
+            request=target_b_request,
+            selected_option_id=target_b.own_models[-1].model_instance_id,
         )
     )
     applied_events = _event_payloads(restored, "devastating_wounds_mortal_wounds_applied")
@@ -2232,6 +2310,460 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
     assert target_a.unit_instance_id in applied_target_ids
     assert target_b.unit_instance_id in applied_target_ids
     assert _state(restored).shooting_phase_state is None
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "alternate_legal_model",
+        "foreign_unit_model",
+        "source_added",
+        "source_removed",
+        "threshold",
+        "decline_policy",
+        "parent_selection_closure",
+        "parent_result_closure",
+    ],
+)
+def test_phase13d_pending_mortal_fnp_allocation_authority_rejects_tampering(
+    tamper_kind: str,
+) -> None:
+    lifecycle, selected_model_id, alternate_model_id, foreign_model_id = (
+        _pending_tied_mortal_fnp_lifecycle()
+    )
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    decisions_payload = cast(dict[str, Any], checkpoint["decisions"])
+    pending_request = cast(
+        list[dict[str, Any]],
+        cast(dict[str, Any], decisions_payload["queue"])["pending_requests"],
+    )[0]
+    request_payload = cast(dict[str, Any], pending_request["payload"])
+    context = cast(dict[str, Any], request_payload["lost_wound_context"])
+    occurrence = cast(dict[str, Any], context["allocation_occurrence"])
+    sources = cast(list[dict[str, Any]], request_payload["sources"])
+    if tamper_kind == "alternate_legal_model":
+        context["model_instance_id"] = alternate_model_id
+    elif tamper_kind == "foreign_unit_model":
+        context["model_instance_id"] = foreign_model_id
+    elif tamper_kind == "source_added":
+        sources.append(
+            cast(
+                dict[str, Any],
+                FeelNoPainSource(
+                    source_id="phase13d-authority-injected-source",
+                    threshold=4,
+                ).to_payload(),
+            )
+        )
+    elif tamper_kind == "source_removed":
+        sources.clear()
+    elif tamper_kind == "threshold":
+        sources[0]["threshold"] = 2
+    elif tamper_kind == "decline_policy":
+        request_payload["decline_allowed"] = False
+    elif tamper_kind == "parent_selection_closure":
+        context["model_instance_id"] = alternate_model_id
+        occurrence["selected_model_id"] = alternate_model_id
+    elif tamper_kind == "parent_result_closure":
+        occurrence["parent_result_id"] = "phase13d-forged-parent-result"
+    else:
+        raise AssertionError(f"Unsupported test tamper: {tamper_kind}")
+    event_log = cast(list[dict[str, Any]], decisions_payload["event_log"])
+    if tamper_kind in {"parent_selection_closure", "parent_result_closure"}:
+        occurrence_event = next(
+            event
+            for event in event_log
+            if event["event_type"] == "mortal_wound_model_allocated"
+            and cast(dict[str, Any], event["payload"])["occurrence_id"]
+            == occurrence["occurrence_id"]
+        )
+        occurrence_event["payload"] = json.loads(json.dumps(occurrence, sort_keys=True))
+    request_event = next(
+        event
+        for event in event_log
+        if event["event_type"] == "decision_requested"
+        and cast(dict[str, Any], event["payload"])["request_id"] == pending_request["request_id"]
+    )
+    request_event["payload"] = json.loads(json.dumps(pending_request, sort_keys=True))
+
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"allocation|Feel No Pain|request authority|Mutation decision|parent decision",
+    ):
+        GameLifecycle.from_payload(checkpoint)
+
+    tampered_controller = DecisionController.from_payload(
+        cast(DecisionControllerPayload, decisions_payload)
+    )
+    lifecycle.decision_controller.queue._pending_requests[0] = (  # pyright: ignore[reportPrivateUsage]
+        tampered_controller.queue.peek_next()
+    )
+    lifecycle.decision_controller.event_log.replace_records(tampered_controller.event_log.records)
+    tampered_request = lifecycle.decision_controller.queue.peek_next()
+    before = lifecycle.to_payload()
+    selected_before = model_by_id(
+        state=_state(lifecycle),
+        model_instance_id=selected_model_id,
+    ).wounds_remaining
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id=f"phase13d-authority-{tamper_kind}-decline",
+            request=tampered_request,
+            selected_option_id="decline",
+        )
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], status.payload) == {
+        "invalid_reason": "invalid_mortal_wound_feel_no_pain_result",
+        "field": "allocation_occurrence",
+    }
+    assert lifecycle.to_payload() == before
+    assert (
+        model_by_id(
+            state=_state(lifecycle),
+            model_instance_id=selected_model_id,
+        ).wounds_remaining
+        == selected_before
+    )
+
+
+def test_phase13d_pending_mortal_fnp_rejects_protected_character_substitution() -> None:
+    lifecycle, _selected_model_id, character_model_id = _pending_attached_mortal_fnp_lifecycle()
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    decisions_payload = cast(dict[str, Any], checkpoint["decisions"])
+    pending_request = cast(
+        list[dict[str, Any]],
+        cast(dict[str, Any], decisions_payload["queue"])["pending_requests"],
+    )[0]
+    request_payload = cast(dict[str, Any], pending_request["payload"])
+    context = cast(dict[str, Any], request_payload["lost_wound_context"])
+    context["model_instance_id"] = character_model_id
+    request_event = next(
+        event
+        for event in cast(list[dict[str, Any]], decisions_payload["event_log"])
+        if event["event_type"] == "decision_requested"
+        and cast(dict[str, Any], event["payload"])["request_id"] == pending_request["request_id"]
+    )
+    request_event["payload"] = json.loads(json.dumps(pending_request, sort_keys=True))
+
+    with pytest.raises(GameLifecycleError, match="allocation occurrence context drift"):
+        GameLifecycle.from_payload(checkpoint)
+
+    tampered_controller = DecisionController.from_payload(
+        cast(DecisionControllerPayload, decisions_payload)
+    )
+    lifecycle.decision_controller.queue._pending_requests[0] = (  # pyright: ignore[reportPrivateUsage]
+        tampered_controller.queue.peek_next()
+    )
+    lifecycle.decision_controller.event_log.replace_records(tampered_controller.event_log.records)
+    tampered_request = lifecycle.decision_controller.queue.peek_next()
+    before = lifecycle.to_payload()
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13d-authority-character-decline",
+            request=tampered_request,
+            selected_option_id="decline",
+        )
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert lifecycle.to_payload() == before
+
+
+def test_phase13d_singleton_mortal_fnp_allocation_authority_round_trips() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    selected_model = defender.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=selected_model.model_instance_id,
+    )
+    source = FeelNoPainSource(source_id="phase13d-singleton-authority-fnp", threshold=5)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=selected_model.model_instance_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    progress = MortalWoundApplicationProgress.start(
+        application_id="phase13d-singleton-authority",
+        source_rule_id="phase13d:singleton-authority",
+        source_context={"source_kind": "phase13d_singleton_authority"},
+        target_unit_instance_id=defender.unit_instance_id,
+        defender_player_id="player-b",
+        mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
+    )
+    routing = continue_mortal_wound_application(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request_id="phase13d-singleton-authority-fnp-request",
+        progress=progress,
+    )
+    assert routing.request is not None
+    lifecycle.decision_controller.request_decision(routing.request)
+
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    restored_request = restored.decision_controller.queue.peek_next()
+    request_payload = cast(dict[str, JsonValue], restored_request.payload)
+    context = cast(dict[str, JsonValue], request_payload["lost_wound_context"])
+    occurrence = cast(dict[str, JsonValue], context["allocation_occurrence"])
+    assert occurrence["selection_disposition"] == "sole_legal_model"
+    assert occurrence["legal_model_ids"] == [selected_model.model_instance_id]
+    assert occurrence["parent_request_id"] is None
+    assert occurrence["parent_result_id"] is None
+
+    result = DecisionResult.for_request(
+        result_id="phase13d-singleton-authority-decline",
+        request=restored_request,
+        selected_option_id="decline",
+    )
+    restored.decision_controller.submit_result(result)
+    completed = resolve_mortal_wound_feel_no_pain_decision(
+        state=_state(restored),
+        decisions=restored.decision_controller,
+        request=restored_request,
+        result=result,
+        next_request_id="phase13d-singleton-authority-next",
+    )
+    assert completed.application is not None
+    assert completed.application.applications[0].model_instance_id == (
+        selected_model.model_instance_id
+    )
+
+
+def test_phase13d_mortal_progress_rejects_cross_unit_model_before_damage() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    foreign_model = units["intercessor-1"].own_models[0]
+    progress = MortalWoundApplicationProgress.start(
+        application_id="phase13d-cross-unit-defense",
+        source_rule_id="phase13d:cross-unit-defense",
+        source_context={"source_kind": "phase13d_cross_unit_defense"},
+        target_unit_instance_id=defender.unit_instance_id,
+        defender_player_id="player-b",
+        mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
+    )
+    checkpoint = lifecycle.to_payload()
+    foreign_wounds = foreign_model.wounds_remaining
+
+    with pytest.raises(GameLifecycleError, match="not in the rules unit"):
+        progress.after_wound_resolution(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            model_instance_id=foreign_model.model_instance_id,
+            resolution=FeelNoPainResolution.declined(requested_wounds=1),
+        )
+
+    assert lifecycle.to_payload() == checkpoint
+    assert foreign_model.wounds_remaining == foreign_wounds
+
+
+def _pending_tied_mortal_fnp_lifecycle() -> tuple[GameLifecycle, str, str, str]:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    selected_model, alternate_model = defender.own_models[:2]
+    source = FeelNoPainSource(source_id="phase13d-authority-fnp", threshold=5)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=selected_model.model_instance_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=alternate_model.model_instance_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    progress = MortalWoundApplicationProgress.start(
+        application_id="phase13d-tied-authority",
+        source_rule_id="phase13d:tied-authority",
+        source_context={"source_kind": "phase13d_tied_authority"},
+        target_unit_instance_id=defender.unit_instance_id,
+        defender_player_id="player-b",
+        mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
+    )
+    routing = continue_mortal_wound_application(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request_id="phase13d-tied-authority-model-request",
+        progress=progress,
+    )
+    assert routing.request is not None
+    model_request = lifecycle.decision_controller.request_decision(routing.request)
+    model_result = DecisionResult.for_request(
+        result_id="phase13d-tied-authority-model-result",
+        request=model_request,
+        selected_option_id=selected_model.model_instance_id,
+    )
+    lifecycle.decision_controller.submit_result(model_result)
+    routed_fnp = resolve_mortal_wound_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request=model_request,
+        result=model_result,
+        next_request_id="phase13d-tied-authority-fnp-request",
+    )
+    assert routed_fnp.request is not None
+    lifecycle.decision_controller.request_decision(routed_fnp.request)
+    return (
+        lifecycle,
+        selected_model.model_instance_id,
+        alternate_model.model_instance_id,
+        units["intercessor-1"].own_models[0].model_instance_id,
+    )
+
+
+def _pending_attached_mortal_fnp_lifecycle() -> tuple[GameLifecycle, str, str]:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    attached_id = _attached_formation_for_player(
+        state=state,
+        player_id="player-b",
+    ).attached_unit_instance_id
+    selected_model = units["bodyguard-unit"].own_models[0]
+    character_model = units["leader-unit"].own_models[0]
+    source = FeelNoPainSource(source_id="phase13d-attached-authority-fnp", threshold=5)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=selected_model.model_instance_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    progress = MortalWoundApplicationProgress.start(
+        application_id="phase13d-attached-authority",
+        source_rule_id="phase13d:attached-authority",
+        source_context={"source_kind": "phase13d_attached_authority"},
+        target_unit_instance_id=attached_id,
+        defender_player_id="player-b",
+        mortal_wounds=1,
+        spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
+    )
+    routing = continue_mortal_wound_application(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request_id="phase13d-attached-authority-model-request",
+        progress=progress,
+    )
+    assert routing.request is not None
+    model_request = lifecycle.decision_controller.request_decision(routing.request)
+    model_result = DecisionResult.for_request(
+        result_id="phase13d-attached-authority-model-result",
+        request=model_request,
+        selected_option_id=selected_model.model_instance_id,
+    )
+    lifecycle.decision_controller.submit_result(model_result)
+    routed_fnp = resolve_mortal_wound_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request=model_request,
+        result=model_result,
+        next_request_id="phase13d-attached-authority-fnp-request",
+    )
+    assert routed_fnp.request is not None
+    lifecycle.decision_controller.request_decision(routed_fnp.request)
+    return lifecycle, selected_model.model_instance_id, character_model.model_instance_id
+
+
+def test_phase13d_mortal_wound_priority_tiers_cover_attached_characters() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    bodyguard = units["bodyguard-unit"]
+    leader = units["leader-unit"]
+    support = units["support-unit"]
+    attached_id = _attached_formation_for_player(
+        state=state,
+        player_id="player-b",
+    ).attached_unit_instance_id
+
+    legal_model_ids, tier = mortal_wound_priority_selection(
+        state=state,
+        target_unit_instance_id=attached_id,
+    )
+    assert legal_model_ids == tuple(
+        sorted(model.model_instance_id for model in bodyguard.own_models)
+    )
+    assert tier is MortalWoundAllocationPriority.NON_CHARACTER
+
+    wounded_bodyguard = bodyguard.own_models[-1]
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=attached_id,
+        model_instance_id=wounded_bodyguard.model_instance_id,
+        damage=1,
+        damage_kind=DamageKind.NORMAL,
+    )
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=attached_id,
+        model_instance_id=leader.own_models[0].model_instance_id,
+        damage=1,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert mortal_wound_priority_selection(
+        state=state,
+        target_unit_instance_id=attached_id,
+    ) == (
+        (wounded_bodyguard.model_instance_id,),
+        MortalWoundAllocationPriority.WOUNDED_NON_CHARACTER,
+    )
+
+    for model in bodyguard.own_models:
+        current = model_by_id(state=state, model_instance_id=model.model_instance_id)
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=attached_id,
+            model_instance_id=current.model_instance_id,
+            damage=current.wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+        )
+    assert mortal_wound_priority_selection(
+        state=state,
+        target_unit_instance_id=attached_id,
+    ) == (
+        (leader.own_models[0].model_instance_id,),
+        MortalWoundAllocationPriority.WOUNDED_CHARACTER,
+    )
+
+    current_leader = model_by_id(
+        state=state,
+        model_instance_id=leader.own_models[0].model_instance_id,
+    )
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=attached_id,
+        model_instance_id=current_leader.model_instance_id,
+        damage=current_leader.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert mortal_wound_priority_selection(
+        state=state,
+        target_unit_instance_id=attached_id,
+    ) == (
+        (support.own_models[0].model_instance_id,),
+        MortalWoundAllocationPriority.CHARACTER,
+    )
 
 
 def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
@@ -5002,6 +5534,13 @@ def test_phase14e_grouped_devastating_wounds_cap_each_critical_wound() -> None:
             ),
         ),
     )
+    remaining_sequence, status = _continue_damage_model_choices(
+        lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=_allocated_ids,
+        status=status,
+        result_id_prefix="phase14e-grouped-devastating-model",
+    )
     deferred_events = _event_payloads(lifecycle, "devastating_wounds_deferred")
     applied_events = _event_payloads(lifecycle, "devastating_wounds_mortal_wounds_applied")
     attack_events = _event_payloads(lifecycle, "attack_sequence_step")
@@ -5013,7 +5552,7 @@ def test_phase14e_grouped_devastating_wounds_cap_each_critical_wound() -> None:
     ]
 
     assert remaining_sequence is None
-    assert status is None
+    assert status is not None
     assert [event["attack_context_id"] for event in deferred_events] == [
         first_context_id,
         second_context_id,
@@ -7038,6 +7577,14 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
         already_allocated_model_ids=(),
         dice_manager=dice_manager,
     )
+    remaining_sequence, _allocated_ids, status = _drain_damage_model_choices_with_manager(
+        lifecycle=lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=_allocated_ids,
+        status=status,
+        dice_manager=dice_manager,
+        result_id_prefix="phase13d-hazardous-model",
+    )
 
     hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
     assert remaining_sequence is None
@@ -7051,18 +7598,14 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
         assert not _event_payloads(lifecycle, "hazardous_mortal_wounds_applied")
         return
 
-    mortal_wound_application = cast(
-        dict[str, object],
-        hazardous_payload["mortal_wound_application"],
-    )
-    applications = cast(list[dict[str, object]], mortal_wound_application["applications"])
     applied_payload = _last_event_payload(lifecycle, "hazardous_mortal_wounds_applied")
-    applied_application = cast(dict[str, object], applied_payload["mortal_wound_application"])
-    assert hazardous_payload["pending_mortal_wound_request_id"] is None
+    mortal_wound_application = cast(dict[str, object], applied_payload["mortal_wound_application"])
+    applications = cast(list[dict[str, object]], mortal_wound_application["applications"])
+    assert hazardous_payload["mortal_wound_application"] is None
+    assert hazardous_payload["pending_mortal_wound_request_id"] is not None
     assert mortal_wound_application["target_unit_instance_id"] == attacker.unit_instance_id
     assert mortal_wound_application["mortal_wounds"] == expected_mortal_wounds
     assert applied_payload["mortal_wounds"] == expected_mortal_wounds
-    assert applied_application == mortal_wound_application
     assert sum(cast(int, application["wounds_lost"]) for application in applications) == (
         expected_mortal_wounds
     )
@@ -7076,6 +7619,11 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     attacker = units["intercessor-1"]
     defender = units["enemy"]
     attacker_model = attacker.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=attacker,
+        model_instance_id=attacker_model.model_instance_id,
+    )
     source = FeelNoPainSource(source_id="phase14c-hazardous-fnp", threshold=5)
     state.record_model_feel_no_pain_sources(
         model_instance_id=attacker_model.model_instance_id,
@@ -10761,6 +11309,11 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
     assert DamageApplication.from_payload(damage.to_payload()) == damage
     assert damage.wounds_lost == 1
     assert damage.destroyed is False
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
 
     mortal_application = apply_mortal_wounds_to_unit(
         state=state,
@@ -10780,6 +11333,11 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
     no_spill_lifecycle, no_spill_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     no_spill_state = _state(no_spill_lifecycle)
     no_spill_defender = no_spill_units["enemy"]
+    _retain_only_placed_model(
+        state=no_spill_state,
+        unit=no_spill_defender,
+        model_instance_id=no_spill_defender.own_models[0].model_instance_id,
+    )
     no_spill_application = apply_mortal_wounds_to_unit(
         state=no_spill_state,
         decisions=no_spill_lifecycle.decision_controller,
@@ -10796,6 +11354,11 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
     overkill_lifecycle, overkill_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     overkill_state = _state(overkill_lifecycle)
     overkill_defender = overkill_units["enemy"]
+    _retain_only_placed_model(
+        state=overkill_state,
+        unit=overkill_defender,
+        model_instance_id=overkill_defender.own_models[0].model_instance_id,
+    )
     overkill_application = apply_mortal_wounds_to_unit(
         state=overkill_state,
         decisions=overkill_lifecycle.decision_controller,
@@ -12303,6 +12866,12 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         payload=placement_payload,
         result_id="phase14h-destroyed-transport-emergency-placement",
     )
+    post_disembark_request = _decision_request(post_disembark_status)
+    if post_disembark_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE:
+        post_disembark_status = _submit_all_pending_fnp_declines(
+            lifecycle,
+            request=post_disembark_request,
+        )
     updated_battlefield = state.battlefield_state
     assert updated_battlefield is not None
     disembarked_state = state.disembarked_unit_state_for_unit(
@@ -13417,6 +13986,11 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     defender = units["enemy"]
     attacker_model = attacker.own_models[0]
     defender_model = defender.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=attacker,
+        model_instance_id=attacker_model.model_instance_id,
+    )
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.with_removed_models(
@@ -13792,6 +14366,15 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
     )
+    assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13e-fnp-deadly-demise-select-model",
+            request=request,
+            selected_option_id=attacker_model.model_instance_id,
+        )
+    )
+    request = _decision_request(status)
 
     assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
     assert request.actor_id == "player-a"
@@ -13978,6 +14561,26 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         ),
     )
     request = _decision_request(cast(LifecycleStatus, status))
+    assert remaining_sequence is not None
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=remaining_sequence,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    assert request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+    status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase13e-secondary-casualty-select-model",
+            request=request,
+            selected_option_id=collateral_model.model_instance_id,
+        )
+    )
+    request = _decision_request(status)
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    remaining_sequence = shooting_state.attack_sequence
+    allocated_ids = shooting_state.allocated_model_ids_this_phase
     destroyed_payloads = _event_payloads(lifecycle, "model_destroyed")
     secondary_destroyed_payloads = tuple(
         payload
@@ -14025,12 +14628,6 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         )
     )
 
-    shooting_state = state.shooting_phase_state
-    assert shooting_state is not None
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
-        attack_sequence=remaining_sequence,
-        allocated_model_ids_this_phase=allocated_ids,
-    )
     pending_checkpoint = lifecycle.to_payload()
     _validate_model_destruction_restore_payloads(
         state_payload=pending_checkpoint["state"],
@@ -14458,31 +15055,40 @@ def test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal() 
         model_instance_id=attacker_model.model_instance_id,
     )
 
+    dice_manager = DiceRollManager(
+        "phase13e-secondary-chain",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id="phase13e-chain-hit", spec=hit_spec, value=6),
+            _fixed_roll_result(roll_id="phase13e-chain-wound", spec=wound_spec, value=6),
+            _fixed_roll_result(roll_id="phase13e-chain-save", spec=save_spec, value=1),
+            _fixed_roll_result(
+                roll_id="phase13e-chain-primary-deadly-demise",
+                spec=primary_deadly_demise_spec,
+                value=6,
+            ),
+            _fixed_roll_result(
+                roll_id="phase13e-chain-secondary-deadly-demise",
+                spec=secondary_deadly_demise_spec,
+                value=6,
+            ),
+        ),
+    )
     remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=_ruleset(),
         attack_sequence=sequence,
         already_allocated_model_ids=(),
-        dice_manager=DiceRollManager(
-            "phase13e-secondary-chain",
-            event_log=lifecycle.decision_controller.event_log,
-            injected_results=(
-                _fixed_roll_result(roll_id="phase13e-chain-hit", spec=hit_spec, value=6),
-                _fixed_roll_result(roll_id="phase13e-chain-wound", spec=wound_spec, value=6),
-                _fixed_roll_result(roll_id="phase13e-chain-save", spec=save_spec, value=1),
-                _fixed_roll_result(
-                    roll_id="phase13e-chain-primary-deadly-demise",
-                    spec=primary_deadly_demise_spec,
-                    value=6,
-                ),
-                _fixed_roll_result(
-                    roll_id="phase13e-chain-secondary-deadly-demise",
-                    spec=secondary_deadly_demise_spec,
-                    value=6,
-                ),
-            ),
-        ),
+        dice_manager=dice_manager,
+    )
+    remaining_sequence, allocated_ids, status = _drain_damage_model_choices_with_manager(
+        lifecycle=lifecycle,
+        attack_sequence=remaining_sequence,
+        allocated_ids=allocated_ids,
+        status=status,
+        dice_manager=dice_manager,
+        result_id_prefix="phase13e-secondary-chain-model",
     )
     event_records = lifecycle.decision_controller.event_log.records
     reaction_events = tuple(
@@ -14821,6 +15427,11 @@ def test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound() -> None:
     state = _state(lifecycle)
     defender = units["enemy"]
     defender_model = defender.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
     source = FeelNoPainSource(source_id="phase13c-mortal-fnp", threshold=5)
     state.record_model_feel_no_pain_sources(
         model_instance_id=defender_model.model_instance_id,
@@ -14867,6 +15478,11 @@ def test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scop
     state = _state(lifecycle)
     defender = units["enemy"]
     defender_model = defender.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
     source = FeelNoPainSource(
         source_id="phase13c-psychic-mortal-fnp",
         threshold=5,
@@ -14917,6 +15533,11 @@ def test_phase13c_mortal_wounds_ignore_psychic_attack_source_without_mortal_woun
     state = _state(lifecycle)
     defender = units["enemy"]
     defender_model = defender.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
     source = FeelNoPainSource(
         source_id="phase13c-psychic-only-mortal-fnp",
         threshold=5,
@@ -15040,6 +15661,30 @@ def test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts() -
         invalid_route_checkpoint
     )
 
+    model_choice_checkpoint = (
+        state.to_payload(),
+        lifecycle.decision_controller.to_payload(),
+    )
+    with pytest.raises(GameLifecycleError, match="model choices require lifecycle routing"):
+        apply_mortal_wounds_to_unit(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            application_id="phase13d-model-choice-direct-mortal",
+            source_rule_id="phase13d:test-mortal-wounds",
+            source_context={"source_kind": "phase13d_model_choice_test"},
+            destruction_evidence=_test_mortal_wound_destruction_evidence(state),
+            target_unit_instance_id=defender.unit_instance_id,
+            mortal_wounds=1,
+        )
+    assert (state.to_payload(), lifecycle.decision_controller.to_payload()) == (
+        model_choice_checkpoint
+    )
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
+
     state.record_model_feel_no_pain_sources(
         model_instance_id=defender_model.model_instance_id,
         sources=(source_a,),
@@ -15122,6 +15767,11 @@ def test_phase13d_multi_wound_mortal_destruction_round_trips_repeated_model_rows
     defender = units["enemy"]
     defender_model = defender.own_models[0]
     assert defender_model.wounds_remaining > 1
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
 
     application = apply_mortal_wounds_to_unit(
         state=state,
@@ -15200,6 +15850,23 @@ def test_phase13d_multi_model_mortal_fnp_pause_persists_first_logical_death_boun
 
     assert routing.request is not None
     assert routing.application is None
+    lifecycle.decision_controller.request_decision(routing.request)
+    model_request = routing.request
+    model_result = DecisionResult.for_request(
+        result_id="phase13d-multi-model-mortal-select-second",
+        request=model_request,
+        selected_option_id=second_model.model_instance_id,
+    )
+    lifecycle.decision_controller.submit_result(model_result)
+    routing = resolve_mortal_wound_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request=model_request,
+        result=model_result,
+        next_request_id="phase13d-multi-model-mortal-fnp-request",
+    )
+    assert routing.request is not None
+    assert is_mortal_wound_feel_no_pain_request(routing.request)
     lifecycle.decision_controller.request_decision(routing.request)
     assert (
         model_by_id(
@@ -15315,7 +15982,7 @@ def test_phase13d_multi_model_mortal_fnp_pause_persists_first_logical_death_boun
         reordered_request["payload"],
         reordered_authority["payload"],
     )
-    with pytest.raises(GameLifecycleError, match="must precede its request"):
+    with pytest.raises(GameLifecycleError, match="must precede logical death"):
         GameLifecycle.from_payload(cast(GameLifecyclePayload, reordered_start))
 
     def _rewrite_pending_logical_death(
@@ -15581,6 +16248,11 @@ def test_phase13d_mortal_wound_lifecycle_progress_round_trip() -> None:
     state = _state(lifecycle)
     defender = units["enemy"]
     defender_model = defender.own_models[0]
+    _retain_only_placed_model(
+        state=state,
+        unit=defender,
+        model_instance_id=defender_model.model_instance_id,
+    )
     source_a = FeelNoPainSource(source_id="phase13d-mortal-progress-a", threshold=5)
     source_b = FeelNoPainSource(source_id="phase13d-mortal-progress-b", threshold=6)
     state.record_model_feel_no_pain_sources(
@@ -15626,15 +16298,18 @@ def test_phase13d_mortal_wound_lifecycle_progress_round_trip() -> None:
         model_instance_id=defender_model.model_instance_id,
         wound_index=1,
     )
+    lifecycle.decision_controller.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="phase13d-mortal-progress-source-a",
+        request=request,
+        selected_option_id=source_a.source_id,
+    )
+    lifecycle.decision_controller.submit_result(result)
     completed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
         decisions=lifecycle.decision_controller,
         request=request,
-        result=DecisionResult.for_request(
-            result_id="phase13d-mortal-progress-source-a",
-            request=request,
-            selected_option_id=source_a.source_id,
-        ),
+        result=result,
         next_request_id="phase13d-mortal-progress-next",
         dice_manager=DiceRollManager(
             "phase13d-mortal-progress",
@@ -15650,7 +16325,14 @@ def test_phase13d_mortal_wound_lifecycle_progress_round_trip() -> None:
     )
     application = completed.application
 
-    assert restored_progress == progress
+    assert restored_progress == replace(
+        progress,
+        target_lineage=MortalWoundTargetLineage.freeze(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+            owner_player_id="player-b",
+        ),
+    )
     assert application is not None
     assert completed.request is None
     assert MortalWoundApplication.from_payload(application.to_payload()) == application
@@ -15792,9 +16474,22 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             producer_id="phase13d-validation-progress",
         ),
     )
+    progress = replace(
+        progress,
+        target_lineage=MortalWoundTargetLineage.freeze(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+            owner_player_id="player-b",
+        ),
+    )
     context_payload = cast(
         dict[str, JsonValue],
-        dict(progress.to_feel_no_pain_context(model_instance_id=target_model_id)),
+        dict(
+            progress.to_feel_no_pain_context(
+                model_instance_id=target_model_id,
+                allocation_occurrence={},
+            )
+        ),
     )
     context_payload["applications"] = {}
     with pytest.raises(GameLifecycleError, match="applications must be a list"):
@@ -15985,6 +16680,11 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     routed_state = _state(routed_lifecycle)
     routed_defender = routed_units["enemy"]
     routed_model = routed_defender.own_models[0]
+    _retain_only_placed_model(
+        state=routed_state,
+        unit=routed_defender,
+        model_instance_id=routed_model.model_instance_id,
+    )
     routed_state.record_model_feel_no_pain_sources(
         model_instance_id=routed_model.model_instance_id,
         sources=(source,),
@@ -16042,16 +16742,19 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
             next_request_id="phase13d-source-choice-next",
             remove_destroyed_models=cast(bool, "yes"),
         )
+    routed_lifecycle.decision_controller.request_decision(request)
+    no_dice_result = DecisionResult.for_request(
+        result_id="phase13d-source-choice-no-dice",
+        request=request,
+        selected_option_id=source.source_id,
+    )
+    routed_lifecycle.decision_controller.submit_result(no_dice_result)
     with pytest.raises(GameLifecycleError, match="decision requires dice manager"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
             decisions=routed_lifecycle.decision_controller,
             request=request,
-            result=DecisionResult.for_request(
-                result_id="phase13d-source-choice-no-dice",
-                request=request,
-                selected_option_id=source.source_id,
-            ),
+            result=no_dice_result,
             next_request_id="phase13d-source-choice-next",
         )
 
@@ -16065,7 +16768,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
         payload=validate_json_value(inconsistent_request_payload),
         options=request.options,
     )
-    with pytest.raises(GameLifecycleError, match="not in the request"):
+    with pytest.raises(GameLifecycleError, match="request authority drift"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
             decisions=routed_lifecycle.decision_controller,
@@ -16086,7 +16789,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
         payload=validate_json_value(broken_request_payload),
         options=request.options,
     )
-    with pytest.raises(GameLifecycleError, match="sources must be a list"):
+    with pytest.raises(GameLifecycleError, match="request authority drift"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
             decisions=routed_lifecycle.decision_controller,

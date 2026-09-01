@@ -49,6 +49,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
@@ -79,6 +80,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_source_context,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -545,6 +549,33 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
         result=result,
         decisions=decisions,
     )
+
+    for decision_index in range(128):
+        if resolved_status is None:
+            break
+        mortal_request = _decision_request(resolved_status.decision_request)
+        mortal_result = DecisionResult.for_request(
+            result_id=f"result-relentless-carnage-model-{decision_index}",
+            request=mortal_request,
+            selected_option_id=mortal_request.options[0].option_id,
+        )
+        decisions.submit_result(mortal_result)
+        resolved_status = datasheets.apply_relentless_carnage_mortal_wound_feel_no_pain_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=mortal_request,
+                result=mortal_result,
+                source_context=mortal_wound_resolution_source_context(mortal_request),
+                dice_manager=DiceRollManager(
+                    state.game_id,
+                    event_log=decisions.event_log,
+                ),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+        )
+    else:
+        raise AssertionError("Relentless Carnage model choices did not drain.")
 
     assert resolved_status is None
     payload = _event_payload(decisions, datasheets.RELENTLESS_CARNAGE_RESOLVED_EVENT)

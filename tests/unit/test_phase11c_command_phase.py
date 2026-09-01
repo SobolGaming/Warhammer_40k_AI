@@ -190,6 +190,9 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -1214,6 +1217,7 @@ def test_attached_rules_unit_uses_one_canonical_required_test_and_clear_identity
 
 def test_off_battlefield_singleton_returns_restorable_typed_command_unsupported() -> None:
     state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
+    decisions.queue.remove_by_id(request.request_id)
     prewound = continue_mortal_wound_application(
         state=state,
         decisions=decisions,
@@ -1238,8 +1242,30 @@ def test_off_battlefield_singleton_returns_restorable_typed_command_unsupported(
         ),
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
     )
-    assert prewound.request is None
+    for decision_index in range(128):
+        if prewound.request is None:
+            break
+        decisions.request_decision(prewound.request)
+        prewound_result = DecisionResult.for_request(
+            result_id=f"phase11c-off-battlefield-restore:prewound:{decision_index}",
+            request=prewound.request,
+            selected_option_id=prewound.request.options[0].option_id,
+        )
+        decisions.submit_result(prewound_result)
+        prewound = resolve_mortal_wound_decision(
+            state=state,
+            decisions=decisions,
+            request=prewound.request,
+            result=prewound_result,
+            next_request_id=(
+                f"phase11c-off-battlefield-restore:prewound-request:{decision_index + 1}"
+            ),
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        )
+    else:
+        raise AssertionError("Pre-wound model choices did not drain.")
     assert prewound.application is not None
+    decisions.queue.append(request)
     result, _provider = _accept_gate_of_infinity_decision(
         state=state,
         decisions=decisions,

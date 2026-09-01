@@ -110,12 +110,10 @@ from warhammer40k_core.engine.damage_allocation import (
     build_feel_no_pain_request,
     continue_mortal_wound_application,
     damage_kind_from_token,
-    is_mortal_wound_feel_no_pain_request,
     legal_allocation_group_orders,
     model_by_id,
     remove_destroyed_model_from_battlefield,
     resolve_feel_no_pain_rolls,
-    resolve_mortal_wound_feel_no_pain_decision,
     unit_by_id,
     unit_owner_player_id,
 )
@@ -151,6 +149,12 @@ from warhammer40k_core.engine.hazard import (
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
     record_finalized_mortal_wound_model_destructions,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_progress,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -416,6 +420,7 @@ __all__ = (
     "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE",
     "SELECT_DESTRUCTION_REACTION_DECISION_TYPE",
     "SELECT_FEEL_NO_PAIN_DECISION_TYPE",
+    "SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE",
     "SELECT_PRECISION_ALLOCATION_DECISION_TYPE",
     "SNAP_SHOOTING_RULE_ID",
     "SUSTAINED_HITS_D3_VALUE",
@@ -474,13 +479,14 @@ __all__ = (
     "hazard_mortal_wounds_per_failed_roll",
     "hazard_roll_failed",
     "hazard_roll_spec",
-    "is_mortal_wound_feel_no_pain_request",
+    "is_mortal_wound_resolution_request",
     "is_psychic_weapon_profile",
     "legal_allocation_group_orders",
     "lethal_hits_applies",
     "mandatory_save_option",
     "melta_damage_bonus",
     "model_by_id",
+    "mortal_wound_resolution_progress",
     "model_visibility_keywords_for_rules_unit",
     "objective_marker_controls_model",
     "opportunity_boundary_game_state_payload",
@@ -489,7 +495,7 @@ __all__ = (
     "replace",
     "resolve_destroyed_transport_disembark",
     "resolve_feel_no_pain_rolls",
-    "resolve_mortal_wound_feel_no_pain_decision",
+    "resolve_mortal_wound_decision",
     "resolve_saving_throw",
     "restore_selected_model_awaiting_fight_on_death",
     "rules_unit_view_by_id",

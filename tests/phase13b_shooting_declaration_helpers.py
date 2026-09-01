@@ -82,7 +82,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     FeelNoPainResolution,
     FeelNoPainSource,
-    apply_mortal_wounds_to_unit,
+    MortalWoundApplicationProgress,
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -111,6 +111,11 @@ from warhammer40k_core.engine.mission_setup import (
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    continue_mortal_wound_application,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -276,6 +281,7 @@ __all__ = (
     "_weapon_payload_to_declaration_payload",
     "_weapon_profile_by_wargear",
     "catalog_with_replaced_bolt_profiles",
+    "compact_intercessor_catalog",
     "lifecycle_decisions_payload",
     "proposal_from_request",
     "shooting_lifecycle",
@@ -351,6 +357,7 @@ def _submit_phase13f_pending_attack_choices(
 ) -> LifecycleStatus:
     attack_decision_types = {
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -2197,7 +2204,10 @@ def _continue_damage_model_choices(
         if current_status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
             return _stored_shooting_attack_sequence(lifecycle), current_status
         request = _decision_request(current_status)
-        if request.decision_type != SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+        if request.decision_type not in {
+            SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+            SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+        }:
             return _stored_shooting_attack_sequence(lifecycle), current_status
         current_status = lifecycle.submit_decision(
             DecisionResult.for_request(
@@ -2241,7 +2251,10 @@ def _drain_damage_model_choices_with_manager(
         if current_status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
             return current_sequence, current_allocated_ids, current_status
         request = _decision_request(current_status)
-        if request.decision_type != SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+        if request.decision_type not in {
+            SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+            SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+        }:
             return current_sequence, current_allocated_ids, current_status
         if current_sequence is None:
             raise AssertionError("Damage allocation decision requires an attack sequence.")
@@ -2251,17 +2264,30 @@ def _drain_damage_model_choices_with_manager(
             selected_option_id=request.options[0].option_id,
         )
         lifecycle.decision_controller.submit_result(result)
-        current_sequence, current_allocated_ids, current_status = (
-            apply_damage_allocation_model_decision(
-                state=state,
-                decisions=lifecycle.decision_controller,
-                ruleset_descriptor=_ruleset(),
-                attack_sequence=current_sequence,
-                result=result,
-                already_allocated_model_ids=current_allocated_ids,
-                dice_manager=dice_manager,
+        if request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+            current_sequence, current_allocated_ids, current_status = (
+                apply_damage_allocation_model_decision(
+                    state=state,
+                    decisions=lifecycle.decision_controller,
+                    ruleset_descriptor=_ruleset(),
+                    attack_sequence=current_sequence,
+                    result=result,
+                    already_allocated_model_ids=current_allocated_ids,
+                    dice_manager=dice_manager,
+                )
             )
-        )
+        else:
+            current_sequence, current_allocated_ids, current_status = (
+                attack_sequence_module.apply_feel_no_pain_decision(
+                    state=state,
+                    decisions=lifecycle.decision_controller,
+                    ruleset_descriptor=_ruleset(),
+                    attack_sequence=current_sequence,
+                    result=result,
+                    already_allocated_model_ids=current_allocated_ids,
+                    dice_manager=dice_manager,
+                )
+            )
     raise AssertionError("Attack sequence damage allocation choices did not drain.")
 
 
@@ -2469,9 +2495,7 @@ def _reduce_unit_to_last_model_with_mortal_wounds(
         state=state,
         unit_instance_id=source_unit.unit_instance_id,
     )
-    application = apply_mortal_wounds_to_unit(
-        state=state,
-        decisions=lifecycle.decision_controller,
+    progress = MortalWoundApplicationProgress.start(
         application_id=application_id,
         source_rule_id=f"{application_id}:fixture-rule",
         source_context={
@@ -2489,8 +2513,43 @@ def _reduce_unit_to_last_model_with_mortal_wounds(
             source_step="fixture_preexisting_casualties",
         ),
         target_unit_instance_id=target_unit.unit_instance_id,
+        defender_player_id=unit_owner_player_id(
+            state=state,
+            unit_instance_id=target_unit.unit_instance_id,
+        ),
         mortal_wounds=sum(model.wounds_remaining for model in casualty_models),
+        spill_over=True,
     )
+    routing = continue_mortal_wound_application(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request_id=f"{application_id}:select-model",
+        progress=progress,
+    )
+    casualty_ids = {model.model_instance_id for model in casualty_models}
+    result_index = 1
+    while routing.request is not None:
+        request = lifecycle.decision_controller.request_decision(routing.request)
+        selected_option_id = next(
+            option.option_id for option in request.options if option.option_id in casualty_ids
+        )
+        result = DecisionResult.for_request(
+            result_id=f"{application_id}:select-model:{result_index}",
+            request=request,
+            selected_option_id=selected_option_id,
+        )
+        lifecycle.decision_controller.submit_result(result)
+        routing = resolve_mortal_wound_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            request=request,
+            result=result,
+            next_request_id=f"{application_id}:select-model",
+        )
+        result_index += 1
+    application = routing.application
+    if application is None:
+        raise AssertionError("pre-existing casualty fixture did not complete mortal wounds")
     expected_destroyed_ids = tuple(model.model_instance_id for model in casualty_models)
     destroyed_ids = tuple(
         damage.model_instance_id for damage in application.applications if damage.destroyed
@@ -2630,22 +2689,30 @@ def _submit_all_pending_fnp_declines(
     lifecycle: GameLifecycle,
     *,
     request: DecisionRequest,
-) -> None:
+) -> LifecycleStatus:
     current_request = request
     result_index = 1
     while True:
+        selected_option_id = (
+            current_request.options[0].option_id
+            if current_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE
+            else "decline"
+        )
         status = lifecycle.submit_decision(
             DecisionResult.for_request(
                 result_id=f"phase14h-fnp-decline-{result_index}",
                 request=current_request,
-                selected_option_id="decline",
+                selected_option_id=selected_option_id,
             )
         )
         if status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
-            return
+            return status
         current_request = _decision_request(status)
-        if current_request.decision_type != SELECT_FEEL_NO_PAIN_DECISION_TYPE:
-            return
+        if current_request.decision_type not in {
+            SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+            SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        }:
+            return status
         result_index += 1
 
 
@@ -2999,5 +3066,6 @@ def _attack_step_payload(
 
 shooting_lifecycle = _shooting_lifecycle
 catalog_with_replaced_bolt_profiles = _catalog_with_replaced_bolt_profiles
+compact_intercessor_catalog = _compact_intercessor_catalog
 proposal_from_request = _proposal_from_request
 weapon_profile_by_wargear = _weapon_profile_by_wargear

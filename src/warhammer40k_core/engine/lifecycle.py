@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.engine import attack_sequence_decision_family as _asdf
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
 from warhammer40k_core.engine import battle_shock_continuation_restore as _bs_restore
@@ -19,11 +20,13 @@ from warhammer40k_core.engine import (
 )
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
+from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_activation_history_integrity as _fahi
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import model_destruction_cause_producers as _mdcp
+from warhammer40k_core.engine import mortal_wound_model_allocation as _mw_model
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_historical_event_integrity as _phei
@@ -103,8 +106,6 @@ from warhammer40k_core.engine.damage_allocation import (
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
@@ -344,7 +345,6 @@ from warhammer40k_core.engine.stratagems import (
     StratagemCatalogRecord,
     StratagemEligibilityContext,
     StratagemTargetBinding,
-    apply_explosives_mortal_wound_feel_no_pain_decision,
     apply_stratagem_decision,
     apply_stratagem_placement_proposal,
     apply_stratagem_target_proposal,
@@ -426,35 +426,12 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
-        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
-        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-        SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
-        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        *_asdf.ATTACK_SEQUENCE_DECISION_TYPES,
         DICE_REROLL_DECISION_TYPE,
     )
 )
-_ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
-    (
-        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
-        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-        SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
-        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        DICE_RESULT_OVERRIDE_DECISION_TYPE,
-    )
-)
 _SHOOTING_PHASE_DISPATCH_DECISION_TYPES = _SHOOTING_DECISION_TYPES - (
-    _ATTACK_SEQUENCE_DECISION_TYPES | frozenset((DICE_REROLL_DECISION_TYPE,))
+    _asdf.ATTACK_SEQUENCE_DECISION_TYPES | frozenset((DICE_REROLL_DECISION_TYPE,))
 )
 _CHARGE_DECISION_TYPES = frozenset(
     (
@@ -485,22 +462,13 @@ _FIGHT_DECISION_TYPES = frozenset(
         _fa.FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
         SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
-        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
-        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-        SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
-        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        *_asdf.ATTACK_SEQUENCE_DECISION_TYPES,
         DICE_REROLL_DECISION_TYPE,
         SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
     )
 )
 _FIGHT_PHASE_DISPATCH_DECISION_TYPES = _FIGHT_DECISION_TYPES - (
-    _ATTACK_SEQUENCE_DECISION_TYPES
+    _asdf.ATTACK_SEQUENCE_DECISION_TYPES
     | frozenset(
         (
             MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -525,6 +493,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        _mw_model.SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
@@ -1099,7 +1068,7 @@ class GameLifecycle:
                         pre_validator=self._pre_validate_attack_sequence_decision,
                         applier=self._apply_attack_sequence_decision,
                     )
-                    for decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
+                    for decision_type in _asdf.ATTACK_SEQUENCE_DECISION_TYPES
                 ),
                 *(
                     DecisionDispatchHandler(
@@ -1801,15 +1770,29 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
-        if (
-            request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-            and is_mortal_wound_feel_no_pain_request(request)
-        ):
-            invalid_status = _invalid_finite_decision_status(
+        if request.decision_type == _mw_model.SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE:
+            invalid_status = _mw_model.invalid_mortal_wound_model_status(
                 state=state,
                 request=request,
                 result=result,
-                invalid_reason="invalid_mortal_wound_feel_no_pain_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+            and _mw_model.is_mortal_wound_resolution_request(request)
+        ):
+            _bsa.validate_pre_submission_outcome_request(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                runtime_content_bundle=self._runtime_content_bundle,
+            )
+            invalid_status = _mw_model.invalid_mortal_wound_feel_no_pain_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1863,11 +1846,8 @@ class GameLifecycle:
                     if handled_status is not None:
                         return handled_status
             return advanced_status
-        if (
-            record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-            and is_mortal_wound_feel_no_pain_request(record.request)
-        ):
-            return self._apply_mortal_wound_feel_no_pain_decision(record=record, result=result)
+        if _mw_model.is_mortal_wound_resolution_request(record.request):
+            return self._apply_mortal_wound_resolution_decision(record=record, result=result)
         if rule_model_destruction.is_rule_model_destruction_reaction_request(record.request):
             destruction_phase = rule_model_destruction.rule_model_destruction_phase(record.request)
             if destruction_phase is BattlePhase.FIGHT:
@@ -1886,7 +1866,7 @@ class GameLifecycle:
             return self._apply_fight_phase_decision(record, result)
         raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
 
-    def _apply_mortal_wound_feel_no_pain_decision(
+    def _apply_mortal_wound_resolution_decision(
         self,
         record: DecisionRecord,
         result: DecisionResult,
@@ -1911,15 +1891,16 @@ class GameLifecycle:
             if movement_fnp_status is not None:
                 return movement_fnp_status
             return self.advance_until_decision_or_terminal()
-        source_context = mortal_wound_feel_no_pain_source_context(record.request)
-        if isinstance(source_context, dict) and source_context.get("source_kind") == "explosives":
-            explosives_status = apply_explosives_mortal_wound_feel_no_pain_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if explosives_status is not None:
-                return explosives_status
+        source_context = _mw_model.mortal_wound_resolution_source_context(record.request)
+        stratagem_status = _stratagem_mw.apply_core_stratagem_mortal_wound_decision_if_applicable(
+            state=state,
+            decisions=self.decision_controller,
+            result=result,
+            source_context=source_context,
+        )
+        if stratagem_status is not False:
+            if stratagem_status is not None:
+                return stratagem_status
             return self.advance_until_decision_or_terminal()
         if (
             isinstance(source_context, dict)
@@ -3399,30 +3380,30 @@ def _fight_attack_sequence_is_active_for_request(
     state: GameState,
     request: DecisionRequest,
 ) -> bool:
-    if request.decision_type not in (
-        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
-        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-        SELECT_POST_ROLL_ATTACK_POOL_DECISION_TYPE,
-        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-    ):
+    if request.decision_type not in _asdf.ATTACK_SEQUENCE_DECISION_TYPES:
         return False
     fight_state = state.fight_phase_state
     if fight_state is None or fight_state.attack_sequence is None:
         return False
-    if request.decision_type in (
-        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
-        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
-        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-    ):
+    if _mw_model.is_mortal_wound_resolution_request(request):
+        source_context = _mw_model.mortal_wound_resolution_source_context(request)
+        return (
+            isinstance(source_context, dict)
+            and source_context.get("sequence_id") == fight_state.attack_sequence.sequence_id
+        )
+    if request.decision_type in _asdf.ATTACK_SEQUENCE_ACTIVE_CONTINUATION_DECISION_TYPES:
         return True
     payload = request.payload
     if not isinstance(payload, dict):
+        return False
+    if request.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
+        return payload.get("source_phase") == BattlePhase.FIGHT.value
+    if request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE:
+        return (
+            payload.get("source_phase") == BattlePhase.FIGHT.value
+            and payload.get("sequence_id") == fight_state.attack_sequence.sequence_id
+        )
+    if request.decision_type not in _asdf.ATTACK_SEQUENCE_CONTEXT_BOUND_DECISION_TYPES:
         return False
     sequence_id = payload.get("sequence_id")
     return type(sequence_id) is str and sequence_id == fight_state.attack_sequence.sequence_id

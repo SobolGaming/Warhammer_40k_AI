@@ -112,6 +112,9 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     append_mortal_wound_damage_logical_death_event,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_model_request,
+)
 from warhammer40k_core.engine.opportunity_windows import (
     OpportunityActionKind,
     OpportunityLegalAction,
@@ -1625,6 +1628,33 @@ def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() 
     restored_decisions = DecisionController.from_payload(decisions.to_payload())
     fnp_request = restored_decisions.queue.peek_next()
     assert rule_model_destruction.is_rule_model_destruction_mortal_wound_request(fnp_request)
+    for decision_index in range(128):
+        if not is_mortal_wound_model_request(fnp_request):
+            break
+        legal_option_ids = {option.option_id for option in fnp_request.options}
+        selected_model_id = (
+            bodyguard_model_id
+            if bodyguard_model_id in legal_option_ids
+            else fnp_request.options[0].option_id
+        )
+        model_record = restored_decisions.submit_result(
+            DecisionResult.for_request(
+                result_id=f"test:rule-deadly-demise:model:{decision_index}",
+                request=fnp_request,
+                selected_option_id=selected_model_id,
+            )
+        )
+        model_status = rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+            state=restored_state,
+            decisions=restored_decisions,
+            result=model_record.result,
+        )
+        assert model_status is not None
+        assert model_status.decision_request is not None
+        fnp_request = model_status.decision_request
+    else:
+        raise AssertionError("Rule Deadly Demise model choices did not drain.")
+    assert not is_mortal_wound_model_request(fnp_request)
     fnp_record = restored_decisions.submit_result(
         DecisionResult.for_request(
             result_id="test:rule-deadly-demise:nested-fnp-declined",
@@ -1741,6 +1771,22 @@ def test_rule_destruction_resume_rejects_source_unit_drift_without_source_model(
 
     assert destruction.status is not None
     assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    model_request = decisions.queue.peek_next()
+    assert is_mortal_wound_model_request(model_request)
+    model_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="test:rule-destruction:source-unit-drift-model",
+            request=model_request,
+            selected_option_id=target_model_id,
+        )
+    )
+    model_status = rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+        state=state,
+        decisions=decisions,
+        result=model_record.result,
+    )
+    assert model_status is not None
+    assert model_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     restored_state = GameState.from_payload(state.to_payload())
     controller_payload = decisions.to_payload()
     pending_payload = controller_payload["queue"]["pending_requests"][0]["payload"]
@@ -1852,6 +1898,22 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
 
     assert destruction.status is not None
     assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    model_request = decisions.queue.peek_next()
+    assert is_mortal_wound_model_request(model_request)
+    model_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id=f"{source_id}:first-casualty-model",
+            request=model_request,
+            selected_option_id=first_casualty_id,
+        )
+    )
+    pause_status = rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+        state=state,
+        decisions=decisions,
+        result=model_record.result,
+    )
+    assert pause_status is not None
+    assert pause_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert state.battlefield_state is not None
     assert first_casualty_id not in state.battlefield_state.placed_model_ids()
     assert pending_casualty_id in state.battlefield_state.placed_model_ids()
@@ -1972,6 +2034,21 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     )
 
     assert destruction.status is not None
+    model_request = decisions.queue.peek_next()
+    assert is_mortal_wound_model_request(model_request)
+    model_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="test:rule-deadly-demise:collateral-fod-model",
+            request=model_request,
+            selected_option_id=bodyguard_model_id,
+        )
+    )
+    model_status = rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+        state=state,
+        decisions=decisions,
+        result=model_record.result,
+    )
+    assert model_status is not None
     reaction_request = decisions.queue.peek_next()
     reaction_option = next(
         option

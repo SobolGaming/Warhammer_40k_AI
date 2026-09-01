@@ -92,8 +92,9 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
     FeelNoPainSource,
+    MortalWoundApplicationProgress,
     apply_damage_to_model,
-    apply_mortal_wounds_to_unit,
+    continue_mortal_wound_application,
     mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.deadly_demise import (
@@ -172,6 +173,9 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -3658,28 +3662,57 @@ def _apply_blood_tainted_fixture_mortal_wounds(
     if not source_unit.own_models:
         raise AssertionError("Blood Tainted fixture source unit requires a model")
     source_model = source_unit.own_models[0]
-    application = apply_mortal_wounds_to_unit(
+    routed = continue_mortal_wound_application(
         state=state,
         decisions=decisions,
-        application_id=application_id,
-        source_rule_id=f"{application_id}:fixture-rule",
-        source_context={
-            "source_kind": "blood_tainted_fixture_mortal_wounds",
-            "source_unit_instance_id": source_unit_instance_id,
-            "source_model_instance_id": source_model.model_instance_id,
-        },
-        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
-            state=state,
-            destroying_player_id="player-a",
-            source_rules_unit_instance_id=source_unit_instance_id,
-            source_model_instance_id=source_model.model_instance_id,
-            destruction_source_kind=DestructionSourceKind.ABILITY,
-            action_phase=phase,
-            source_step="blood_tainted_fixture_mortal_wounds",
+        request_id=f"{application_id}:model-request:0",
+        progress=MortalWoundApplicationProgress.start(
+            application_id=application_id,
+            source_rule_id=f"{application_id}:fixture-rule",
+            source_context={
+                "source_kind": "blood_tainted_fixture_mortal_wounds",
+                "source_unit_instance_id": source_unit_instance_id,
+                "source_model_instance_id": source_model.model_instance_id,
+            },
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+                state=state,
+                destroying_player_id="player-a",
+                source_rules_unit_instance_id=source_unit_instance_id,
+                source_model_instance_id=source_model.model_instance_id,
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=phase,
+                source_step="blood_tainted_fixture_mortal_wounds",
+            ),
+            target_unit_instance_id=_ENEMY_UNIT_ID,
+            defender_player_id="player-b",
+            mortal_wounds=mortal_wounds,
+            spill_over=True,
         ),
-        target_unit_instance_id=_ENEMY_UNIT_ID,
-        mortal_wounds=mortal_wounds,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
     )
+    for decision_index in range(128):
+        if routed.request is None:
+            break
+        decisions.request_decision(routed.request)
+        result = DecisionResult.for_request(
+            result_id=f"{application_id}:model-result:{decision_index}",
+            request=routed.request,
+            selected_option_id=routed.request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        routed = resolve_mortal_wound_decision(
+            state=state,
+            decisions=decisions,
+            request=routed.request,
+            result=result,
+            next_request_id=f"{application_id}:model-request:{decision_index + 1}",
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        )
+    else:
+        raise AssertionError("Blood Tainted mortal wound model choices did not drain")
+    application = routed.application
+    if application is None:
+        raise AssertionError("Blood Tainted fixture mortal wounds did not resolve")
     return tuple(
         damage.model_instance_id for damage in application.applications if damage.destroyed
     )

@@ -2,11 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
-)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.model_destruction_cause_authority import (
     ModelDestructionCauseKind,
@@ -16,6 +11,10 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     MortalWoundLogicalDeathRecorder,
     append_mortal_wound_damage_logical_death_event,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_source_context,
 )
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
@@ -43,16 +42,16 @@ RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND = "rule_model_destruction_deadl
 
 
 def is_rule_model_destruction_mortal_wound_request(request: DecisionRequest) -> bool:
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         return False
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     return isinstance(source_context, dict) and source_context.get("source_kind") == (
         RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND
     )
 
 
 def rule_deadly_demise_source_context(request: DecisionRequest) -> dict[str, JsonValue]:
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     if not isinstance(source_context, dict):
         raise GameLifecycleError("Rule destruction mortal-wound source context must be an object.")
     if source_context.get("source_kind") != RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND:
@@ -122,7 +121,7 @@ def rule_deadly_demise_mortal_wound_waiting_status(
         payload=validate_json_value(
             {
                 "phase": phase.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": request.decision_type,
                 "source_kind": RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
             }
         ),

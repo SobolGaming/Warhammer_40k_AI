@@ -45,7 +45,6 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
     destruction_source_objective_proximity_witness,
     rules_unit_objective_proximity_witness,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.damage_allocation import (
@@ -294,10 +293,15 @@ def record_finalized_mortal_wound_model_destructions(
     canonical_model_destroyed_event_ids: list[str] = []
     for model_id in model_ids:
         physical_unit_id = state.unit_instance_id_for_model(model_id)
-        rules_unit_id = rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=physical_unit_id,
-        ).unit_instance_id
+        logical_death = model_logical_death_record_from_event(
+            logical_death_events_by_model[model_id]
+        )
+        if (
+            logical_death.physical_unit_instance_id != physical_unit_id
+            or logical_death.rules_unit_instance_id != requested_target_id
+        ):
+            raise GameLifecycleError("Mortal wound logical-death target lineage drift.")
+        rules_unit_id = logical_death.rules_unit_instance_id
         physical_unit_ids.add(physical_unit_id)
         rules_unit_ids.add(rules_unit_id)
         _validate_finalized_model_battlefield_state(

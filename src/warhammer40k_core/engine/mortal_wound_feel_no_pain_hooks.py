@@ -5,17 +5,17 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.damage_allocation import (
-    MortalWoundApplicationProgress,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
-)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_progress,
+    mortal_wound_resolution_source_context,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
@@ -141,7 +141,7 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
         source_rule_id = self.source_rule_id_for_request(request)
         if source_rule_id is None:
             return None
-        source_context = mortal_wound_feel_no_pain_source_context(request)
+        source_context = mortal_wound_resolution_source_context(request)
         binding = self.binding_for_source_context(source_context)
         source_identifies_provider = source_rule_id in required_source_ids
         binding_identifies_provider = (
@@ -158,13 +158,9 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
         return binding
 
     def source_rule_id_for_request(self, request: DecisionRequest) -> str | None:
-        if not is_mortal_wound_feel_no_pain_request(request):
+        if not is_mortal_wound_resolution_request(request):
             return None
-        request_payload = cast(dict[str, JsonValue], request.payload)
-        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-            request_payload["lost_wound_context"]
-        )
-        return progress.source_rule_id
+        return mortal_wound_resolution_progress(request).source_rule_id
 
     def apply_decision(
         self,
@@ -181,7 +177,7 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
         else:
             required_source_ids = context.battle_shock_hooks.pending_outcome_authority_source_ids()
         if binding.source_id in required_source_ids:
-            request_source_context = mortal_wound_feel_no_pain_source_context(context.request)
+            request_source_context = mortal_wound_resolution_source_context(context.request)
             if context.source_context != request_source_context:
                 raise GameLifecycleError("Mortal wound FNP continuation source context drifted.")
             if (

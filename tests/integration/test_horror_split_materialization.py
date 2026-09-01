@@ -32,6 +32,7 @@ from warhammer40k_core.engine.attached_unit_reconciliation import (
 )
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
+    apply_feel_no_pain_decision,
     attack_sequence_wound_roll_spec,
     deadly_demise_trigger_roll_spec,
     resolve_attack_sequence_until_blocked,
@@ -73,7 +74,6 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     FeelNoPainSource,
     feel_no_pain_roll_spec,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
@@ -106,6 +106,10 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_model_request,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.movement_proposals import PlacementProposalPayload, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
@@ -1147,44 +1151,60 @@ def test_selected_target_mortal_wounds_finalize_horror_composition_handoff(
         remaining_effect_records_after_mortal_wounds=(),
         remaining_effect_start_index=1,
     )
-    if use_feel_no_pain:
-        pending_status = resolution.pending_status
-        assert pending_status is not None
-        request = scenario.decisions.queue.peek_next()
-        fnp_result = DecisionResult.for_request(
-            result_id="result:horrors:selected-target:fnp",
-            request=request,
-            selected_option_id=fnp_source.source_id,
-        )
-        scenario.decisions.submit_result(fnp_result)
-        fnp_spec = feel_no_pain_roll_spec(
-            source=fnp_source,
-            player_id=scenario.source_army.player_id,
-            model_instance_id=pink_model_id,
-            wound_index=1,
-        )
-        routed = resolve_mortal_wound_feel_no_pain_decision(
-            state=scenario.state,
-            decisions=scenario.decisions,
-            request=request,
-            result=fnp_result,
-            next_request_id="request:horrors:selected-target:fnp:next",
-            dice_manager=DiceRollManager(
-                scenario.state.game_id,
-                event_log=scenario.decisions.event_log,
-                injected_results=(
-                    DiceRollResult.from_values(
-                        roll_id="roll:horrors:selected-target:fnp",
-                        spec=fnp_spec,
-                        values=(1,),
-                        source="fixed",
-                    ),
-                ),
-            ),
-        )
-        assert routed.application is not None
-    else:
+    if resolution.pending_status is None:
         assert resolution.resolved_payload is not None
+    else:
+        routed = None
+        decision_index = 0
+        while routed is None or routed.request is not None:
+            request = scenario.decisions.queue.peek_next()
+            is_model_choice = is_mortal_wound_model_request(request)
+            selected_option_id = (
+                pink_model_id
+                if is_model_choice
+                and pink_model_id in {option.option_id for option in request.options}
+                else request.options[0].option_id
+            )
+            if not is_model_choice and use_feel_no_pain:
+                selected_option_id = fnp_source.source_id
+            decision_index += 1
+            mortal_result = DecisionResult.for_request(
+                result_id=f"result:horrors:selected-target:mortal:{decision_index}",
+                request=request,
+                selected_option_id=selected_option_id,
+            )
+            scenario.decisions.submit_result(mortal_result)
+            dice_manager = None
+            if not is_model_choice and use_feel_no_pain:
+                fnp_spec = feel_no_pain_roll_spec(
+                    source=fnp_source,
+                    player_id=scenario.source_army.player_id,
+                    model_instance_id=pink_model_id,
+                    wound_index=1,
+                )
+                dice_manager = DiceRollManager(
+                    scenario.state.game_id,
+                    event_log=scenario.decisions.event_log,
+                    injected_results=(
+                        DiceRollResult.from_values(
+                            roll_id="roll:horrors:selected-target:fnp",
+                            spec=fnp_spec,
+                            values=(1,),
+                            source="fixed",
+                        ),
+                    ),
+                )
+            routed = resolve_mortal_wound_decision(
+                state=scenario.state,
+                decisions=scenario.decisions,
+                request=request,
+                result=mortal_result,
+                next_request_id=f"request:horrors:selected-target:mortal:{decision_index + 1}",
+                dice_manager=dice_manager,
+            )
+            if routed.request is not None:
+                scenario.decisions.request_decision(routed.request)
+        assert routed.application is not None
 
     lifecycle = GameLifecycle(
         state=scenario.state,
@@ -1353,37 +1373,78 @@ def test_deadly_demise_collateral_finalizes_horror_composition_handoff() -> None
         model_instance_id=enemy_model.model_instance_id,
     )
 
-    remaining, _allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+    dice_manager = DiceRollManager(
+        scenario.state.game_id,
+        event_log=scenario.decisions.event_log,
+        injected_results=(
+            DiceRollResult.from_values(
+                roll_id="roll:horrors:deadly-demise:wound",
+                spec=wound_spec,
+                values=(6,),
+                source="fixed",
+            ),
+            DiceRollResult.from_values(
+                roll_id="roll:horrors:deadly-demise:save",
+                spec=save_spec,
+                values=(1,),
+                source="fixed",
+            ),
+            DiceRollResult.from_values(
+                roll_id="roll:horrors:deadly-demise:trigger",
+                spec=deadly_demise_spec,
+                values=(6,),
+                source="fixed",
+            ),
+        ),
+    )
+    remaining, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
         state=scenario.state,
         decisions=scenario.decisions,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         attack_sequence=attack_sequence,
         already_allocated_model_ids=(),
-        dice_manager=DiceRollManager(
-            scenario.state.game_id,
-            event_log=scenario.decisions.event_log,
-            injected_results=(
-                DiceRollResult.from_values(
-                    roll_id="roll:horrors:deadly-demise:wound",
-                    spec=wound_spec,
-                    values=(6,),
-                    source="fixed",
-                ),
-                DiceRollResult.from_values(
-                    roll_id="roll:horrors:deadly-demise:save",
-                    spec=save_spec,
-                    values=(1,),
-                    source="fixed",
-                ),
-                DiceRollResult.from_values(
-                    roll_id="roll:horrors:deadly-demise:trigger",
-                    spec=deadly_demise_spec,
-                    values=(6,),
-                    source="fixed",
-                ),
-            ),
-        ),
+        dice_manager=dice_manager,
     )
+
+    for decision_index in range(128):
+        if status is None:
+            if remaining is None:
+                break
+            remaining, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+                state=scenario.state,
+                decisions=scenario.decisions,
+                ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+                attack_sequence=remaining,
+                already_allocated_model_ids=allocated_model_ids,
+                dice_manager=dice_manager,
+            )
+            continue
+        request = status.decision_request
+        assert request is not None
+        assert is_mortal_wound_model_request(request)
+        selected_model_id = (
+            pink_model.model_instance_id
+            if pink_model.model_instance_id in {option.option_id for option in request.options}
+            else request.options[0].option_id
+        )
+        mortal_result = DecisionResult.for_request(
+            result_id=f"result:horrors:deadly-demise:model:{decision_index}",
+            request=request,
+            selected_option_id=selected_model_id,
+        )
+        scenario.decisions.submit_result(mortal_result)
+        assert remaining is not None
+        remaining, allocated_model_ids, status = apply_feel_no_pain_decision(
+            state=scenario.state,
+            decisions=scenario.decisions,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            attack_sequence=remaining,
+            result=mortal_result,
+            already_allocated_model_ids=allocated_model_ids,
+            dice_manager=dice_manager,
+        )
+    else:
+        raise AssertionError("Deadly Demise mortal wound model choices did not drain.")
 
     assert remaining is None
     assert status is None

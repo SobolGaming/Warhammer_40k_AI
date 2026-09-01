@@ -1213,26 +1213,18 @@ def _has_pending_continuation_for_request(
     source_request: DecisionRequest,
     recorded_index: int,
 ) -> bool:
-    from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        is_mortal_wound_feel_no_pain_request,
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
     )
 
-    if not is_mortal_wound_feel_no_pain_request(source_request):
+    if not is_mortal_wound_resolution_request(source_request):
         return False
     pending = decisions.queue.pending_requests
-    if len(pending) != 1 or not is_mortal_wound_feel_no_pain_request(pending[0]):
+    if len(pending) != 1 or not is_mortal_wound_resolution_request(pending[0]):
         return False
-    source_payload = source_request.payload
-    pending_payload = pending[0].payload
-    if not isinstance(source_payload, dict) or not isinstance(pending_payload, dict):
-        return False
-    source_progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        source_payload.get("lost_wound_context")
-    )
-    pending_progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        pending_payload.get("lost_wound_context")
-    )
+    source_progress = mortal_wound_resolution_progress(source_request)
+    pending_progress = mortal_wound_resolution_progress(pending[0])
     if (
         source_progress.application_id != pending_progress.application_id
         or source_progress.source_rule_id != pending_progress.source_rule_id

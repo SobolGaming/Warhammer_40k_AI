@@ -34,11 +34,9 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
     selected_target_test_roll_modifiers,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -58,6 +56,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -595,7 +596,7 @@ def apply_dark_pact_mortal_wound_feel_no_pain_decision(
 ) -> LifecycleStatus | None:
     if type(context) is not MortalWoundFeelNoPainContinuationContext:
         raise GameLifecycleError("Dark Pacts FNP continuation requires context.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -649,7 +650,7 @@ def _resolve_routed_dark_pact_mortal_wounds(
             decision_request=routed_request,
             payload={
                 "phase": source_phase.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed_request.decision_type,
                 "source_rule_id": resolution_payload["source_rule_id"],
                 "source_kind": source_context["source_kind"],
                 "unit_instance_id": resolution_payload["unit_instance_id"],

@@ -132,10 +132,14 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_source_context,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
+    LifecycleStatus,
     LifecycleStatusKind,
     SetupStep,
 )
@@ -666,6 +670,26 @@ def test_shadow_legion_spiteful_demise_rolls_for_each_engaged_enemy_unit() -> No
             ],
         },
     )
+    bundle = _shadow_legion_runtime_bundle(state)
+    while decisions.queue.pending_requests:
+        request = decisions.queue.pending_requests[0]
+        result = DecisionResult.for_request(
+            result_id=f"spiteful-demise:{request.request_id}",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                source_context=mortal_wound_resolution_source_context(request),
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+        )
 
     payload = _last_event_payload(
         decisions,
@@ -2019,7 +2043,29 @@ def test_malice_made_manifest_fight_start_applies_three_mortal_wounds_on_six() -
         )
     )
 
-    assert handled is True
+    assert type(handled) is not bool
+    bundle = _shadow_legion_runtime_bundle(state)
+    handled_status: LifecycleStatus | None = handled
+    while handled_status is not None:
+        mortal_request = _decision_request(handled_status.decision_request)
+        assert mortal_request.decision_type == "select_mortal_wound_model"
+        mortal_result = DecisionResult.for_request(
+            result_id=f"result-malice-model:{mortal_request.request_id}",
+            request=mortal_request,
+            selected_option_id=mortal_request.options[0].option_id,
+        )
+        decisions.submit_result(mortal_result)
+        handled_status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=mortal_request,
+                result=mortal_result,
+                source_context=mortal_wound_resolution_source_context(mortal_request),
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+        )
     payload = _last_event_payload(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT)
     assert payload["source_rule_id"] == enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
     assert payload["hook_id"] == enhancements.MALICE_MADE_MANIFEST_HOOK_ID
@@ -2080,7 +2126,28 @@ def test_malice_made_manifest_routes_mortal_wound_feel_no_pain_choice() -> None:
 
     assert type(status) is not bool
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    fnp_request = _decision_request(status.decision_request)
+    model_request = _decision_request(status.decision_request)
+    assert model_request.decision_type == "select_mortal_wound_model"
+    model_result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-model",
+        request=model_request,
+        selected_option_id=target.own_models[0].model_instance_id,
+    )
+    decisions.submit_result(model_result)
+    bundle = _shadow_legion_runtime_bundle(state)
+    model_continuation_status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=model_request,
+            result=model_result,
+            source_context=mortal_wound_resolution_source_context(model_request),
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    assert model_continuation_status is not None
+    fnp_request = _decision_request(model_continuation_status.decision_request)
     assert is_mortal_wound_feel_no_pain_request(fnp_request)
     source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
     assert isinstance(source_context, dict)
@@ -2102,7 +2169,7 @@ def test_malice_made_manifest_routes_mortal_wound_feel_no_pain_choice() -> None:
     )
     decisions.submit_result(fnp_result)
     continuation_status = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
-        _shadow_legion_runtime_bundle(state).mortal_wound_feel_no_pain_hook_registry.all_bindings()
+        bundle.mortal_wound_feel_no_pain_hook_registry.all_bindings()
     ).apply_decision(
         MortalWoundFeelNoPainContinuationContext(
             state=state,
@@ -2152,9 +2219,10 @@ def test_malice_made_manifest_fight_handler_requests_and_resolves_start_choice()
     _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     decisions = DecisionController()
+    bundle = _shadow_legion_runtime_bundle(state)
     handler = FightPhaseHandler(
         fight_phase_start_hooks=FightPhaseStartHookRegistry.from_bindings(
-            _shadow_legion_runtime_bundle(state).fight_phase_start_hook_registry.all_bindings()
+            bundle.fight_phase_start_hook_registry.all_bindings()
         ),
     )
 
@@ -2184,8 +2252,31 @@ def test_malice_made_manifest_fight_handler_requests_and_resolves_start_choice()
         decisions=decisions,
     )
 
+    request_index = 0
+    while resolved_status is not None:
+        model_request = _decision_request(resolved_status.decision_request)
+        assert model_request.decision_type == "select_mortal_wound_model"
+        model_result = DecisionResult.for_request(
+            result_id=f"result-malice-made-manifest-model-{request_index}",
+            request=model_request,
+            selected_option_id=model_request.options[0].option_id,
+        )
+        decisions.submit_result(model_result)
+        resolved_status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=model_request,
+                result=model_result,
+                source_context=mortal_wound_resolution_source_context(model_request),
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            )
+        )
+        request_index += 1
+
     assert resolved_status is None
-    assert decisions.records[-1].result == result
+    assert decisions.records[0].result == result
     payload = _last_event_payload(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT)
     assert payload["target_enemy_unit_instance_id"] == target.unit_instance_id
     assert payload["mortal_wounds"] == 3
@@ -2836,6 +2927,24 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
 
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    model_result = DecisionResult.for_request(
+        result_id="shadow-legion-fnp-model",
+        request=request,
+        selected_option_id=unit.own_models[0].model_instance_id,
+    )
+    decisions.submit_result(model_result)
+    status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=model_result,
+            source_context=mortal_wound_resolution_source_context(request),
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    request = _decision_request(None if status is None else status.decision_request)
     assert is_mortal_wound_feel_no_pain_request(request)
     source_context = mortal_wound_feel_no_pain_source_context(request)
     assert isinstance(source_context, dict)

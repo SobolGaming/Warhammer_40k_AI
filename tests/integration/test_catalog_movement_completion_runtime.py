@@ -56,6 +56,7 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT,
     UnitMoveCompletedContext,
     UnitMoveCompletedMortalWoundHookRegistry,
+    apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
     resolve_unit_move_completed_mortal_wound_hooks,
 )
 from warhammer40k_core.rules.rule_ir import (
@@ -442,8 +443,8 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
     selected_payload = cast(dict[str, JsonValue], selected_events[0].payload)
     assert selected_payload["target_unit_instance_id"] == target_unit.unit_instance_id
 
-    assert (
-        resolve_unit_move_completed_mortal_wound_hooks(
+    while True:
+        mortal_wound_status = resolve_unit_move_completed_mortal_wound_hooks(
             state=state,
             decisions=decisions,
             registry=registry,
@@ -453,8 +454,22 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
             event_type="charge_move_completed",
             movement_actions=("charge_move",),
         )
-        is None
-    )
+        if mortal_wound_status is None:
+            break
+        while mortal_wound_status is not None:
+            mortal_wound_request = mortal_wound_status.decision_request
+            assert mortal_wound_request is not None
+            mortal_wound_result = DecisionResult.for_request(
+                result_id=f"phase17k-charge-mw-model-{len(decisions.records) + 1}",
+                request=mortal_wound_request,
+                selected_option_id=mortal_wound_request.options[0].option_id,
+            )
+            decisions.submit_result(mortal_wound_result)
+            mortal_wound_status = apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
+                state=state,
+                result=mortal_wound_result,
+                decisions=decisions,
+            )
     rolled_events = tuple(
         event
         for event in decisions.event_log.records

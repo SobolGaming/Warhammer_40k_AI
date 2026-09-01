@@ -32,7 +32,13 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     HistoricalBattleShockContribution,
     battle_shock_modifier_applications_from_modifiers,
 )
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.damage_allocation import (
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -45,6 +51,13 @@ from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_unti
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -52,7 +65,12 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
     resolve_objective_control,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionResult,
@@ -88,6 +106,10 @@ JULY_HOOK_ID = "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:jul
 JULY_SOURCE_RULE_ID = (
     "gw-11e-faction-packs-2026-07:phase17f:army-rule:chaos-daemons:daemonic-manifestation"
 )
+DAEMONIC_TERROR_MORTAL_WOUNDS_SOURCE_KIND = "chaos_daemons_daemonic_terror"
+DAEMONIC_TERROR_MORTAL_WOUND_HOOK_ID = (
+    "warhammer_40000_11th:chaos_daemons:army_rule:daemonic-terror:mortal-wounds"
+)
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
 CORRUPTED_REALSPACE_STICKY_EFFECT_KIND = "chaos_daemons_corrupted_realspace_objective"
@@ -118,6 +140,7 @@ def runtime_contribution() -> RuntimeContentContribution:
         modifier_handler=battle_shock_modifiers,
         modifier_application_validator=validate_battle_shock_modifier_application,
         outcome_handler=resolve_battle_shock_outcome,
+        pending_outcome_authority_validator=(validate_daemonic_terror_pending_outcome),
         historical_handler=historical_battle_shock_contribution,
     )
 
@@ -130,7 +153,7 @@ def staged_july_runtime_contribution() -> RuntimeContentContribution:
         modifier_handler=july_battle_shock_modifiers,
         modifier_application_validator=validate_july_battle_shock_modifier_application,
         outcome_handler=resolve_july_battle_shock_outcome,
-        pending_outcome_authority_validator=(validate_july_daemonic_manifestation_pending_outcome),
+        pending_outcome_authority_validator=(validate_july_pending_outcome),
         historical_handler=historical_july_battle_shock_contribution,
     )
 
@@ -163,6 +186,14 @@ def _runtime_contribution(
                 historical_contribution_handler=historical_handler,
             ),
         ),
+        mortal_wound_feel_no_pain_hook_bindings=(
+            MortalWoundFeelNoPainContinuationHookBinding(
+                hook_id=DAEMONIC_TERROR_MORTAL_WOUND_HOOK_ID,
+                source_id=source_rule_id,
+                source_kind=DAEMONIC_TERROR_MORTAL_WOUNDS_SOURCE_KIND,
+                handler=apply_daemonic_terror_mortal_wound_decision,
+            ),
+        ),
     )
 
 
@@ -178,6 +209,42 @@ def validate_july_daemonic_manifestation_pending_outcome(
         hook_id=JULY_HOOK_ID,
         source_rule_id=JULY_SOURCE_RULE_ID,
     )
+
+
+def validate_daemonic_terror_pending_outcome(
+    context: BattleShockPendingOutcomeAuthorityContext,
+) -> BattleShockPendingOutcomeAuthority | None:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        battle_shock_outcome_authority,
+    )
+
+    return battle_shock_outcome_authority.validate_daemonic_terror_pending_outcome(
+        context,
+        source_rule_id=SOURCE_RULE_ID,
+    )
+
+
+def validate_july_pending_outcome(
+    context: BattleShockPendingOutcomeAuthorityContext,
+) -> BattleShockPendingOutcomeAuthority | None:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        battle_shock_outcome_authority,
+    )
+
+    terror = battle_shock_outcome_authority.validate_daemonic_terror_pending_outcome(
+        context,
+        source_rule_id=JULY_SOURCE_RULE_ID,
+    )
+    manifestation = (
+        battle_shock_outcome_authority.validate_july_daemonic_manifestation_pending_outcome(
+            context,
+            hook_id=JULY_HOOK_ID,
+            source_rule_id=JULY_SOURCE_RULE_ID,
+        )
+    )
+    if terror is not None and manifestation is not None:
+        raise GameLifecycleError("Chaos Daemons pending outcome authority is ambiguous.")
+    return terror or manifestation
 
 
 def battle_shock_modifiers(
@@ -279,6 +346,19 @@ def historical_daemonic_manifestation_applies(
             daemon_army=daemon_army,
             target=target,
         )
+    )
+
+
+def historical_daemonic_terror_applies(
+    *,
+    context: HistoricalBattleShockAuthorityContext,
+    daemon_army: ArmyDefinition,
+    target: RulesUnitView,
+) -> bool:
+    return _historical_daemonic_terror_applies(
+        context=context,
+        daemon_army=daemon_army,
+        target=target,
     )
 
 
@@ -528,12 +608,18 @@ def _resolve_battle_shock_outcome(
                     )
                 pending_status = status
             continue
-        _resolve_daemonic_terror(
+        status = _resolve_daemonic_terror(
             context=context,
             daemon_army=daemon_army,
             target_rules_unit=target_rules_unit,
             source_rule_id=source_rule_id,
         )
+        if status is not None:
+            if pending_status is not None:
+                raise GameLifecycleError(
+                    "Chaos Daemons Battle-shock outcome queued multiple decisions."
+                )
+            pending_status = status
     return pending_status
 
 
@@ -756,52 +842,45 @@ def _resolve_daemonic_terror(
     daemon_army: ArmyDefinition,
     target_rules_unit: RulesUnitView,
     source_rule_id: str,
-) -> None:
+) -> LifecycleStatus | None:
     result = context.result
     if result.passed:
-        return
+        return None
     if not _daemonic_terror_applies(
         state=context.state,
         daemon_army=daemon_army,
         target_rules_unit=target_rules_unit,
         battle_shocked_unit_ids=context.phase_start_battle_shocked_unit_ids,
     ):
-        return
+        return None
     d3_result = _roll_d3(
         context=context,
         reason="Daemonic Terror mortal wounds",
         roll_type="chaos_daemons.daemonic_terror_mortal_wounds_d3",
         actor_id=target_rules_unit.unit_instance_id,
     )
-    if _rules_unit_has_feel_no_pain_choice(context.state, target_rules_unit):
-        context.decisions.event_log.append(
-            "chaos_daemons_daemonic_terror_unsupported",
-            {
-                "game_id": context.state.game_id,
-                "battle_round": context.state.battle_round,
-                "phase": context.phase.value,
-                "source_rule_id": source_rule_id,
-                "battle_shock_result_id": result.result_id,
-                "player_id": daemon_army.player_id,
-                "target_unit_instance_id": target_rules_unit.unit_instance_id,
-                "unsupported_reason": "mortal_wound_feel_no_pain_requires_decision",
-                "d3_result": validate_json_value(d3_result.to_payload()),
-            },
-        )
-        return
-    source_context = validate_json_value(
+    resolution_payload = validate_json_value(
         {
-            "battle_shock_result": result.to_payload(),
-            "d3_result": d3_result.to_payload(),
+            "game_id": context.state.game_id,
+            "battle_round": context.state.battle_round,
+            "phase": context.phase.value,
+            "source_rule_id": source_rule_id,
+            "battle_shock_result_id": result.result_id,
+            "player_id": daemon_army.player_id,
             "target_unit_instance_id": target_rules_unit.unit_instance_id,
+            "d3_result": d3_result.to_payload(),
         }
     )
-    application = apply_mortal_wounds_to_unit(
-        state=context.state,
-        decisions=context.decisions,
+    progress = MortalWoundApplicationProgress.start(
         application_id=(f"{result.result_id}:daemonic-terror:{target_rules_unit.unit_instance_id}"),
         source_rule_id=source_rule_id,
-        source_context=source_context,
+        source_context=validate_json_value(
+            {
+                "source_kind": DAEMONIC_TERROR_MORTAL_WOUNDS_SOURCE_KIND,
+                "battle_shock_result": result.to_payload(),
+                "resolution_payload": resolution_payload,
+            }
+        ),
         destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=context.state,
             destroying_player_id=daemon_army.player_id,
@@ -814,23 +893,103 @@ def _resolve_daemonic_terror(
         target_unit_instance_id=target_rules_unit.unit_instance_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
-        dice_manager=context.dice_manager,
         defender_player_id=result.request.player_id,
     )
-    context.decisions.event_log.append(
-        "chaos_daemons_daemonic_terror_mortal_wounds_applied",
-        {
-            "game_id": context.state.game_id,
-            "battle_round": context.state.battle_round,
-            "phase": context.phase.value,
-            "source_rule_id": source_rule_id,
-            "battle_shock_result_id": result.result_id,
-            "player_id": daemon_army.player_id,
-            "target_unit_instance_id": target_rules_unit.unit_instance_id,
-            "d3_result": validate_json_value(d3_result.to_payload()),
-            "mortal_wound_application": validate_json_value(application.to_payload()),
-        },
+    routed = continue_mortal_wound_application(
+        state=context.state,
+        decisions=context.decisions,
+        request_id=context.state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=context.dice_manager,
     )
+    return _resolve_routed_daemonic_terror_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        result_id=None,
+    )
+
+
+def apply_daemonic_terror_mortal_wound_decision(
+    context: MortalWoundFeelNoPainContinuationContext,
+) -> LifecycleStatus | None:
+    if type(context) is not MortalWoundFeelNoPainContinuationContext:
+        raise GameLifecycleError("Daemonic Terror mortal wound continuation requires context.")
+    routed = resolve_mortal_wound_decision(
+        state=context.state,
+        decisions=context.decisions,
+        request=context.request,
+        result=context.result,
+        next_request_id=context.state.next_decision_request_id(),
+        dice_manager=context.dice_manager,
+    )
+    return _resolve_routed_daemonic_terror_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        result_id=context.result.result_id,
+    )
+
+
+def _resolve_routed_daemonic_terror_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    routed_request: DecisionRequest | None,
+    routed_application: MortalWoundApplication | None,
+    routed_progress: MortalWoundApplicationProgress,
+    result_id: str | None,
+) -> LifecycleStatus | None:
+    source_context = routed_progress.source_context
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Daemonic Terror mortal wound source context is invalid.")
+    if source_context.get("source_kind") != DAEMONIC_TERROR_MORTAL_WOUNDS_SOURCE_KIND:
+        raise GameLifecycleError("Daemonic Terror mortal wound source kind drifted.")
+    resolution_payload = source_context.get("resolution_payload")
+    if not isinstance(resolution_payload, dict):
+        raise GameLifecycleError("Daemonic Terror resolution payload is invalid.")
+    phase = BattlePhase(cast(str, resolution_payload.get("phase")))
+    if routed_request is not None:
+        decisions.request_decision(routed_request)
+        decisions.event_log.append(
+            "chaos_daemons_daemonic_terror_mortal_wounds_pending",
+            validate_json_value(
+                {
+                    **resolution_payload,
+                    "decision_request_id": routed_request.request_id,
+                    "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed_request,
+            payload={
+                "phase": phase.value,
+                "decision_type": routed_request.decision_type,
+                "source_rule_id": routed_progress.source_rule_id,
+                "source_kind": DAEMONIC_TERROR_MORTAL_WOUNDS_SOURCE_KIND,
+                "target_unit_instance_id": routed_progress.target_unit_instance_id,
+                "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+            },
+        )
+    if routed_application is None:
+        raise GameLifecycleError("Daemonic Terror mortal wound routing did not complete.")
+    applied_payload: dict[str, JsonValue] = {
+        **resolution_payload,
+        "mortal_wound_application": validate_json_value(routed_application.to_payload()),
+    }
+    if result_id is not None:
+        applied_payload["decision_result_id"] = result_id
+    decisions.event_log.append(
+        "chaos_daemons_daemonic_terror_mortal_wounds_applied",
+        validate_json_value(applied_payload),
+    )
+    return None
 
 
 def shadow_regions_for_player(
@@ -1561,18 +1720,6 @@ def _emit_daemonic_manifestation_no_effect(
             "no_effect_reason": _validate_identifier("no_effect_reason", no_effect_reason),
             "d3_result": validate_json_value(d3_result.to_payload()),
         },
-    )
-
-
-def _rules_unit_has_feel_no_pain_choice(
-    state: GameState,
-    rules_unit: RulesUnitView,
-) -> bool:
-    return any(
-        state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id)
-        or state.feel_no_pain_decline_allowed_for_model(model_instance_id=model.model_instance_id)
-        for model in rules_unit.own_models
-        if model.is_alive
     )
 
 

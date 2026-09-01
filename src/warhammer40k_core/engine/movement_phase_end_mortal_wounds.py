@@ -4,12 +4,8 @@ from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -20,6 +16,11 @@ from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_source_context,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -110,15 +111,15 @@ def apply_movement_phase_end_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Movement phase-end Feel No Pain requires DecisionController.")
     record = decisions.record_for_result(result)
     request = record.request
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         raise GameLifecycleError("Movement phase-end Feel No Pain requires mortal wound context.")
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     if not isinstance(source_context, dict) or source_context.get("source_kind") != (
         MOVEMENT_PHASE_END_MORTAL_WOUNDS_SOURCE_KIND
     ):
         raise GameLifecycleError("Movement phase-end Feel No Pain source context is invalid.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,
@@ -133,7 +134,7 @@ def apply_movement_phase_end_mortal_wound_feel_no_pain_decision(
             decision_request=routed.request,
             payload={
                 "phase": BattlePhase.MOVEMENT.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": source_context["source_rule_id"],
                 "effect_id": source_context["effect_id"],
             },
@@ -154,9 +155,9 @@ def apply_movement_phase_end_mortal_wound_feel_no_pain_decision(
 def is_movement_phase_end_mortal_wound_feel_no_pain_request(request: object) -> bool:
     if type(request) is not DecisionRequest:
         return False
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         return False
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     return isinstance(source_context, dict) and source_context.get("source_kind") == (
         MOVEMENT_PHASE_END_MORTAL_WOUNDS_SOURCE_KIND
     )
@@ -279,7 +280,7 @@ def _resolve_effect(
             decision_request=routed.request,
             payload={
                 "phase": BattlePhase.MOVEMENT.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": effect.source_rule_id,
                 "effect_id": effect.effect_id,
                 "target_unit_instance_id": rules_unit.unit_instance_id,

@@ -48,6 +48,13 @@ from warhammer40k_core.engine.mortal_wound_application_authority import (
 from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
+)
+from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    FROZEN_RULES_UNIT_COMPONENTS_POLICY,
+    MortalWoundTargetLineage,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
@@ -108,6 +115,29 @@ def test_phase17n_mortal_wound_start_authority_is_private_for_every_adapter_view
         )
 
 
+def test_phase17n_mortal_wound_allocation_authority_is_private_for_every_viewer() -> None:
+    payload: dict[str, JsonValue] = {
+        "occurrence_id": "phase17n-private-allocation:allocation:000001",
+        "selected_model_id": "phase17n-private-model",
+        "feel_no_pain_sources": [{"source_id": "phase17n-private-fnp"}],
+    }
+
+    for viewer in (
+        ViewerContext.for_player("player-a"),
+        ViewerContext.for_player("player-b"),
+        _administrator_viewer(),
+    ):
+        assert (
+            public_event_record_payload(
+                event_id="event-000001",
+                event_type=MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
+                payload=payload,
+                viewer=viewer,
+            )
+            is None
+        )
+
+
 def test_phase17n_pending_fnp_logical_death_authority_is_private_on_every_public_path() -> None:
     request, cause_id, boundary_id = _pending_fnp_request_with_logical_death_authority()
     result = DecisionResult.for_request(
@@ -126,6 +156,7 @@ def test_phase17n_pending_fnp_logical_death_authority_is_private_on_every_public
     assert isinstance(raw_record_value, dict)
     raw_request = raw_request_value
     raw_record = raw_record_value
+    assert '"allocation_occurrence"' in canonical_json(raw_request)
     assert '"logical_death_events"' in canonical_json(raw_request)
     assert cause_id in canonical_json(raw_request)
     assert boundary_id in canonical_json(raw_request)
@@ -894,13 +925,26 @@ def _pending_fnp_request_with_logical_death_authority() -> tuple[DecisionRequest
             producer_id=application_id,
         ),
         applications=(damage,),
+        target_lineage=MortalWoundTargetLineage(
+            policy=FROZEN_RULES_UNIT_COMPONENTS_POLICY,
+            canonical_target_unit_instance_id=physical_unit_id,
+            owner_player_id="player-a",
+            component_unit_instance_ids=(physical_unit_id,),
+            character_component_unit_instance_ids=(),
+        ),
     )
     return (
         build_feel_no_pain_request(
             request_id="phase17n-private-fnp-request",
             defender_player_id="player-a",
             lost_wound_context=validate_json_value(
-                progress.to_feel_no_pain_context(model_instance_id=next_model_id)
+                progress.to_feel_no_pain_context(
+                    model_instance_id=next_model_id,
+                    allocation_occurrence={
+                        "private_selected_model_id": next_model_id,
+                        "private_fnp_source_id": "phase17n-private-fnp-source-a",
+                    },
+                )
             ),
             sources=(
                 FeelNoPainSource(
@@ -927,6 +971,7 @@ def _assert_internal_model_destruction_authority_absent(
 ) -> None:
     encoded = canonical_json(validate_json_value(payload))
     for key in (
+        "allocation_occurrence",
         "logical_death_cause_binding",
         "logical_death_event",
         "logical_death_events",

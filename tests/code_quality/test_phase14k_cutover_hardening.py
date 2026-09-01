@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from tests.code_quality.source_index import combined_source_for, python_files, source_for
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -8,6 +9,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
     ReserveDestructionTimingKind,
     RulesetDescriptor,
+)
+from warhammer40k_core.engine import lifecycle as lifecycle_module
+from warhammer40k_core.engine.attack_sequence_decision_family import (
+    ATTACK_SEQUENCE_ACTIVE_CONTINUATION_DECISION_TYPES,
+    ATTACK_SEQUENCE_AUTHORITY_BOUND_DECISION_TYPES,
+    ATTACK_SEQUENCE_CONTEXT_BOUND_DECISION_TYPES,
+    ATTACK_SEQUENCE_DECISION_TYPES,
 )
 from warhammer40k_core.engine.reserves import StrategicReserveRule
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_stratagems import (
@@ -18,6 +26,16 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = SRC_ROOT / "engine" / "attack_sequence.py"
 DAMAGE_ALLOCATION_PATH = SRC_ROOT / "engine" / "damage_allocation.py"
+DECISION_PATH = SRC_ROOT / "engine" / "decision.py"
+DIRECT_MORTAL_WOUND_PATH = SRC_ROOT / "engine" / "direct_mortal_wound_application.py"
+MORTAL_WOUND_MODEL_ALLOCATION_PATH = SRC_ROOT / "engine" / "mortal_wound_model_allocation.py"
+MORTAL_WOUND_TARGET_LINEAGE_PATH = SRC_ROOT / "engine" / "mortal_wound_target_lineage.py"
+MORTAL_WOUND_DESTRUCTION_EVIDENCE_PATH = (
+    SRC_ROOT / "engine" / "mortal_wound_destruction_evidence.py"
+)
+MODEL_DESTRUCTION_COMPLETION_RESTORE_PATH = (
+    SRC_ROOT / "engine" / "model_destruction_cause_completion_restore.py"
+)
 SHOOTING_PHASE_PATH = SRC_ROOT / "engine" / "phases" / "shooting.py"
 SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 LIFECYCLE_PATH = SRC_ROOT / "engine" / "lifecycle.py"
@@ -91,6 +109,74 @@ def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registe
     assert not missing, (
         "Phase 14K damage model allocation choice must be registered in runtime "
         "and the adapter contract:\n" + "\n".join(missing)
+    )
+
+
+def test_p06b_mortal_wound_model_ties_cannot_use_sorted_first_fallback() -> None:
+    damage_source = source_for(DAMAGE_ALLOCATION_PATH)
+    mortal_wound_model_source = source_for(MORTAL_WOUND_MODEL_ALLOCATION_PATH)
+    direct_source = source_for(DIRECT_MORTAL_WOUND_PATH)
+    lifecycle_source = source_for(LIFECYCLE_PATH)
+    contract_source = source_for(ADAPTER_CONTRACT_PATH)
+
+    assert "SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE" in mortal_wound_model_source
+    assert "MortalWoundAllocationPriority" in mortal_wound_model_source
+    assert "build_mortal_wound_model_request" in mortal_wound_model_source
+    assert "if len(legal_model_ids) > 1:" in mortal_wound_model_source
+    assert "continue_mortal_wound_application as _continue_mortal_wound_application" in (
+        damage_source
+    )
+    assert "Mortal wound model choices require lifecycle routing." in direct_source
+    assert direct_source.index("if len(legal_model_ids) > 1:") < direct_source.index(
+        "model_id = next(iter(legal_model_ids))"
+    )
+    assert "invalid_mortal_wound_model_status" in mortal_wound_model_source
+    assert "_mw_model.invalid_mortal_wound_model_status" in lifecycle_source
+    assert "select_mortal_wound_model" in contract_source
+    assert "tuple(sorted(alive_model_ids))[0]" not in mortal_wound_model_source
+    assert "tuple(sorted(alive_model_ids))[0]" not in direct_source
+
+
+def test_p06b_in_flight_mortal_wounds_preserve_split_target_lineage() -> None:
+    allocation_source = source_for(MORTAL_WOUND_MODEL_ALLOCATION_PATH)
+    lineage_source = source_for(MORTAL_WOUND_TARGET_LINEAGE_PATH)
+    damage_source = source_for(DAMAGE_ALLOCATION_PATH)
+    destruction_source = source_for(MORTAL_WOUND_DESTRUCTION_EVIDENCE_PATH)
+    restore_source = source_for(MODEL_DESTRUCTION_COMPLETION_RESTORE_PATH)
+    decision_source = source_for(DECISION_PATH)
+
+    assert "current_placed_alive_rules_unit_view_for_identity" not in allocation_source
+    assert "_progress_with_target_lineage" in allocation_source
+    assert "target_lineage=lineage" in allocation_source
+    assert "FROZEN_RULES_UNIT_COMPONENTS_POLICY" in lineage_source
+    assert "current_rules_unit_views_for_canonical_identity" in lineage_source
+    assert "_authoritative_character_component_unit_instance_ids" in lineage_source
+    assert "state.starting_attached_unit_records" in lineage_source
+    assert "leader_or_support_unit_instance_ids" in lineage_source
+    assert "Character component classification drift" in lineage_source
+    assert "target_lineage.assert_contains_model" in damage_source
+    assert "logical_death.rules_unit_instance_id" in destruction_source
+    assert "record.physical_unit_instance_id" in restore_source
+    assert "target_lineage.component_unit_instance_ids" in restore_source
+    assert '"target_lineage",' in decision_source
+
+
+def test_p06b_shared_attack_sequence_phase_ownership_cannot_drift() -> None:
+    def decision_types(name: str) -> frozenset[str]:
+        value = cast(object, getattr(lifecycle_module, name))
+        assert type(value) is frozenset
+        items = cast(frozenset[object], value)
+        assert all(type(item) is str for item in items)
+        return cast(frozenset[str], items)
+
+    shooting_types = decision_types("_SHOOTING_DECISION_TYPES")
+    fight_types = decision_types("_FIGHT_DECISION_TYPES")
+    assert shooting_types >= ATTACK_SEQUENCE_DECISION_TYPES
+    assert fight_types >= ATTACK_SEQUENCE_DECISION_TYPES
+    assert ATTACK_SEQUENCE_DECISION_TYPES == (
+        ATTACK_SEQUENCE_CONTEXT_BOUND_DECISION_TYPES
+        | ATTACK_SEQUENCE_ACTIVE_CONTINUATION_DECISION_TYPES
+        | ATTACK_SEQUENCE_AUTHORITY_BOUND_DECISION_TYPES
     )
 
 

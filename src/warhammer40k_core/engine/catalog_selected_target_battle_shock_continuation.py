@@ -1067,12 +1067,12 @@ def _validate_remaining_mortal_wound_pending_request(
     from warhammer40k_core.engine.catalog_selected_target_mortal_wounds import (
         CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND,
     )
-    from warhammer40k_core.engine.damage_allocation import (
-        is_mortal_wound_feel_no_pain_request,
-        mortal_wound_feel_no_pain_source_context,
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_source_context,
     )
 
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         raise GameLifecycleError(
             "Catalog selected-target remaining-effects request is not a supported continuation."
         )
@@ -1091,7 +1091,7 @@ def _validate_remaining_mortal_wound_pending_request(
         )
     source_context = _json_object(
         "remaining_effect_source_context",
-        mortal_wound_feel_no_pain_source_context(request),
+        mortal_wound_resolution_source_context(request),
     )
     if source_context.get("source_kind") != CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND:
         raise GameLifecycleError(

@@ -592,7 +592,10 @@ def _apply_attack_sequence_decision_to_sequence(
             stratagem_index=stratagem_index,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-    elif result.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
+    elif result.decision_type in (
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    ):
         updated_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(
             state=state,
             decisions=decisions,

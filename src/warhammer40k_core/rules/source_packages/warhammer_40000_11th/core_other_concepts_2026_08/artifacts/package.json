@@ -70,9 +70,75 @@
       "source_url": "https://www.40k.app/rules/06-other-concepts",
       "transcription_sha256": "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883",
       "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-other-concepts-source-review:mortal-wounds",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "57b9542afdef85452b316c1bf695591d5d66165a01bf2b0a6fc0b9104890516d",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:other-concepts:mortal-wounds",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.mortal_wound_model_allocation:mortal_wound_priority_selection",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:build_mortal_wound_model_request",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:continue_mortal_wound_application",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:resolve_mortal_wound_model_decision",
+        "warhammer40k_core.engine.lifecycle:GameLifecycle.submit_decision"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 06.02 Mortal Wounds",
+      "source_url": null,
+      "transcription_sha256": "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-other-concepts-2026-08-31:mortal-wounds",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "faa8f4b08ebb8663e2ae5f84373465d5691b58ca56d67e461b9e81fdea4abc8a",
+      "observed_at": "2026-08-31T13:01:46-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:06",
+      "review_audit_source_observation_sha256": "646b405724eb9f1a7f441fed3b3af0cae62925c72fb4b069fc17118fbab13b73",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:mortal-wounds",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.mortal_wound_model_allocation:mortal_wound_priority_selection",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:build_mortal_wound_model_request",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:continue_mortal_wound_application",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:resolve_mortal_wound_model_decision",
+        "warhammer40k_core.engine.lifecycle:GameLifecycle.submit_decision"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 06.02 Mortal Wounds",
+      "source_url": "https://www.40k.app/rules/06-other-concepts",
+      "transcription_sha256": "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831",
+      "verification_status": "authoritative_app_mirror"
     }
   ],
-  "package_hash": "409c0bd79aa7e8f70495f714ecb05b45bff971520c3cac52360fcbdcf42fca99",
+  "package_hash": "3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a",
   "rules": [
     {
       "load_support_status": "loaded",
@@ -92,11 +158,28 @@
       "source_id": "gw-11e-core-rules:other-concepts:visibility",
       "source_text": "VISIBILITY\nLine of sight is used to determine visibility between models. For an observing model to have line of sight, it must be possible to draw an imaginary straight line, 1 mm wide, from any part of that model to any part of the model being observed. This line is the line of sight. While doing so, other models in the observing model\u2019s unit and in the observed model\u2019s unit are ignored. Other models and units can be either visible or fully visible to the observing model, as shown in the example. Note that terrain applies additional rules to visibility (13.07).",
       "transcription_sha256": "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883"
+    },
+    {
+      "load_support_status": "loaded",
+      "rule_id": "mortal-wounds",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.mortal_wound_model_allocation:mortal_wound_priority_selection",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:build_mortal_wound_model_request",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:continue_mortal_wound_application",
+        "warhammer40k_core.engine.mortal_wound_model_allocation:resolve_mortal_wound_model_decision",
+        "warhammer40k_core.engine.lifecycle:GameLifecycle.submit_decision"
+      ],
+      "section_heading": "MORTAL WOUNDS",
+      "section_id": "06.02",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:other-concepts:mortal-wounds",
+      "source_text": "MORTAL WOUNDS\nSome attacks or rules inflict mortal wounds on units. Each time a unit suffers one or more mortal wounds, its controlling player must resolve the following sequence for each of those mortal wounds, until either all of them have been inflicted or that unit is destroyed:\n1. Select Model: Select one model in that unit by following the first instruction below that applies:\n- If a non\u2011CHARACTER model in that unit has lost one or more wounds, you must select that model.\n- Otherwise, if that unit contains one or more non\u2011CHARACTER models, you must select one of those models.\n- Otherwise, if one or more CHARACTER models in that unit have lost one or more wounds, you must select one of those models.\n- Otherwise, you must select one CHARACTER model in that unit.\n2. Resolve Damage: The selected model loses 1 wound. If this reduces that model\u2019s remaining wounds to 0, it is destroyed.",
+      "transcription_sha256": "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831"
     }
   ],
   "source_document": {
     "document_id": "40k-app-other-concepts-2026-08-31",
-    "observed_at": "2026-08-31T11:41:03-04:00",
+    "observed_at": "2026-08-31T13:01:46-04:00",
     "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
     "source_title": "40k.app Core Rules Other Concepts",
     "source_url": "https://www.40k.app/rules/06-other-concepts"

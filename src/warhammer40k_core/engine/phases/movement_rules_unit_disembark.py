@@ -695,12 +695,12 @@ def apply_rules_unit_combat_disembark_feel_no_pain_decision(
     result: DecisionResult,
     decisions: DecisionController,
 ) -> DecisionRequest | None:
-    from warhammer40k_core.engine.damage_allocation import (
-        is_mortal_wound_feel_no_pain_request,
-        mortal_wound_feel_no_pain_source_context,
-        resolve_mortal_wound_feel_no_pain_decision,
-    )
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_source_context,
+        resolve_mortal_wound_decision,
+    )
 
     if type(state) is not GameState:
         raise GameLifecycleError("Rules-unit Combat Disembark FNP requires GameState.")
@@ -710,11 +710,11 @@ def apply_rules_unit_combat_disembark_feel_no_pain_decision(
         raise GameLifecycleError("Rules-unit Combat Disembark FNP requires DecisionController.")
     record = decisions.record_for_result(result)
     request = record.request
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         raise GameLifecycleError("Rules-unit Combat Disembark FNP requires mortal wound context.")
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     combat_payload, mortal_wounds = _rules_unit_combat_hazard_context(source_context)
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,

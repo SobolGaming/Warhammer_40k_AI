@@ -61,9 +61,6 @@ from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
-    resolve_mortal_wound_feel_no_pain_decision,
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.decision import (
@@ -90,6 +87,11 @@ from warhammer40k_core.engine.fight_order import (
 )
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_source_context,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -281,16 +283,16 @@ __all__ = (
     "fire_overwatch_forbidden_by_effects",
     "friendly_stratagem_target_permission",
     "geometry_model_for_placement",
-    "is_mortal_wound_feel_no_pain_request",
+    "is_mortal_wound_resolution_request",
     "legal_fight_types_for_context",
-    "mortal_wound_feel_no_pain_source_context",
+    "mortal_wound_resolution_source_context",
     "parameterized_decision_option",
     "replace",
     "request_out_of_phase_shooting_declaration",
     "reserve_state_is_cult_ambush",
     "reserve_arrival_restriction_violations",
     "resolve_charge_move",
-    "resolve_mortal_wound_feel_no_pain_decision",
+    "resolve_mortal_wound_decision",
     "resolve_objective_control",
     "resolve_reserve_arrival",
     "shooting_target_candidate_for_model",

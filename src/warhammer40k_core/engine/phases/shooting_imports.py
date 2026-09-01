@@ -122,6 +122,9 @@ from warhammer40k_core.engine.faction_resources import (
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_prevents_rules_unit_from_shooting_this_phase,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+)
 from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -331,6 +334,7 @@ __all__ = (
     "SELECT_DESTRUCTION_REACTION_DECISION_TYPE",
     "SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE",
     "SELECT_FEEL_NO_PAIN_DECISION_TYPE",
+    "SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE",
     "SELECT_PRECISION_ALLOCATION_DECISION_TYPE",
     "SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE",
     "SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE",

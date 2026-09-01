@@ -1561,10 +1561,10 @@ class TransportHazardMortalWounds:
     pending_mortal_wound_request: DecisionRequest | None = None
 
     def __post_init__(self) -> None:
-        from warhammer40k_core.engine.damage_allocation import (
-            MortalWoundApplication,
-            is_mortal_wound_feel_no_pain_request,
-            mortal_wound_feel_no_pain_source_context,
+        from warhammer40k_core.engine.damage_allocation import MortalWoundApplication
+        from warhammer40k_core.engine.mortal_wound_model_allocation import (
+            is_mortal_wound_resolution_request,
+            mortal_wound_resolution_source_context,
         )
 
         object.__setattr__(
@@ -1615,11 +1615,11 @@ class TransportHazardMortalWounds:
                     "TransportHazardMortalWounds application mortal wound drift."
                 )
         if request is not None:
-            if not is_mortal_wound_feel_no_pain_request(request):
+            if not is_mortal_wound_resolution_request(request):
                 raise GameLifecycleError(
                     "TransportHazardMortalWounds request must use mortal wound Feel No Pain."
                 )
-            source_context = mortal_wound_feel_no_pain_source_context(request)
+            source_context = mortal_wound_resolution_source_context(request)
             if not isinstance(source_context, dict):
                 raise GameLifecycleError(
                     "TransportHazardMortalWounds request source context is invalid."
@@ -2425,13 +2425,12 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
     result: DecisionResult,
     decisions: DecisionController,
 ) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.damage_allocation import (
-        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-        is_mortal_wound_feel_no_pain_request,
-        mortal_wound_feel_no_pain_source_context,
-        resolve_mortal_wound_feel_no_pain_decision,
-    )
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_source_context,
+        resolve_mortal_wound_decision,
+    )
 
     if type(state) is not GameState:
         raise GameLifecycleError("Transport hazard Feel No Pain requires GameState.")
@@ -2441,12 +2440,12 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Transport hazard Feel No Pain requires DecisionController.")
     record = decisions.record_for_result(result)
     request = record.request
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         raise GameLifecycleError("Transport hazard Feel No Pain requires mortal wound context.")
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    source_context = mortal_wound_resolution_source_context(request)
     disembark = _transport_hazard_disembark_from_source_context(source_context)
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,
@@ -2463,7 +2462,7 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
                 "phase": state.current_battle_phase.value
                 if state.current_battle_phase is not None
                 else None,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": CORE_HAZARD_ROLLS_RULE_ID,
                 "source_kind": TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
             },

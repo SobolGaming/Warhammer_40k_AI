@@ -21,7 +21,12 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.damage_allocation import (
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -38,8 +43,16 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_selected_to_fight_this_phase,
 )
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -48,7 +61,12 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
     resolve_objective_control,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.phases.charge import CHARGE_AFTER_FALL_BACK_EFFECT_KIND
 from warhammer40k_core.engine.physical_engagement import (
     current_rules_unit_is_physically_engaged,
@@ -140,6 +158,8 @@ VENGEFUL_SORROW_RECORD_ID = f"{SOURCE_RULE_ID}:{VENGEFUL_SORROW_STRATAGEM_ID}"
 
 PIRATES_DUE_EFFECT_KIND = "aeldari_corsair_coterie_pirates_due"
 LETHAL_RUSE_EFFECT_KIND = "aeldari_corsair_coterie_lethal_ruse"
+LETHAL_RUSE_MORTAL_WOUNDS_SOURCE_KIND = "aeldari_corsair_coterie_lethal_ruse_mortal_wounds"
+LETHAL_RUSE_MORTAL_WOUNDS_HOOK_ID = f"{LETHAL_RUSE_HANDLER_ID}:mortal-wounds"
 OUTCAST_AMBUSH_EFFECT_KIND = "aeldari_corsair_coterie_outcast_ambush"
 CLOAK_AND_SHADOW_EFFECT_KIND = "aeldari_corsair_coterie_cloak_and_shadow"
 
@@ -157,6 +177,14 @@ def runtime_contribution() -> RuntimeContentContribution:
             _into_the_breach_record(),
             _cloak_and_shadow_record(),
             _vengeful_sorrow_record(),
+        ),
+        mortal_wound_feel_no_pain_hook_bindings=(
+            MortalWoundFeelNoPainContinuationHookBinding(
+                hook_id=LETHAL_RUSE_MORTAL_WOUNDS_HOOK_ID,
+                source_id=LETHAL_RUSE_RECORD_ID,
+                source_kind=LETHAL_RUSE_MORTAL_WOUNDS_SOURCE_KIND,
+                handler=apply_lethal_ruse_mortal_wound_decision,
+            ),
         ),
     )
 
@@ -920,19 +948,27 @@ def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonVa
     )
     application_payload: JsonValue = None
     if applied_mortal_wounds:
-        source_context = validate_json_value(
+        resolution_payload = validate_json_value(
             {
+                "effect_kind": f"{LETHAL_RUSE_EFFECT_KIND}_mortal_wounds",
                 "stratagem_use": context.use_record.to_payload(),
                 "source_unit_instance_id": unit.unit_instance_id,
-                "target_unit_instance_id": enemy_unit_id,
+                "enemy_unit_instance_id": enemy_unit_id,
+                "rolls": [roll.to_payload() for roll in rolls],
+                "mortal_wounds": mortal_wounds,
+                "applied_mortal_wounds": applied_mortal_wounds,
             }
         )
-        application = apply_mortal_wounds_to_unit(
-            state=context.state,
-            decisions=context.decisions,
+        progress = MortalWoundApplicationProgress.start(
             application_id=f"{context.use_record.use_id}:mortal-wounds:{enemy_unit_id}",
             source_rule_id=LETHAL_RUSE_RECORD_ID,
-            source_context=source_context,
+            source_context=validate_json_value(
+                {
+                    "source_kind": LETHAL_RUSE_MORTAL_WOUNDS_SOURCE_KIND,
+                    "phase": context.use_record.phase.value,
+                    "resolution_payload": resolution_payload,
+                }
+            ),
             destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
                 state=context.state,
                 destroying_player_id=context.use_record.player_id,
@@ -948,10 +984,24 @@ def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonVa
             target_unit_instance_id=enemy_unit_id,
             mortal_wounds=applied_mortal_wounds,
             spill_over=True,
-            dice_manager=manager,
             defender_player_id=_unit_owner(context, unit_instance_id=enemy_unit_id),
         )
-        application_payload = validate_json_value(application.to_payload())
+        routed = continue_mortal_wound_application(
+            state=context.state,
+            decisions=context.decisions,
+            request_id=context.state.next_decision_request_id(),
+            progress=progress,
+            dice_manager=manager,
+        )
+        routed_payload, _status = _resolve_routed_lethal_ruse_mortal_wounds(
+            state=context.state,
+            decisions=context.decisions,
+            routed_request=routed.request,
+            routed_application=routed.application,
+            routed_progress=routed.progress,
+            emit_terminal_event=False,
+        )
+        return routed_payload
     return validate_json_value(
         {
             "effect_kind": f"{LETHAL_RUSE_EFFECT_KIND}_mortal_wounds",
@@ -962,6 +1012,89 @@ def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonVa
             "mortal_wound_application": application_payload,
         }
     )
+
+
+def apply_lethal_ruse_mortal_wound_decision(
+    context: MortalWoundFeelNoPainContinuationContext,
+) -> LifecycleStatus | None:
+    if type(context) is not MortalWoundFeelNoPainContinuationContext:
+        raise GameLifecycleError("Lethal Ruse mortal wound continuation requires context.")
+    routed = resolve_mortal_wound_decision(
+        state=context.state,
+        decisions=context.decisions,
+        request=context.request,
+        result=context.result,
+        next_request_id=context.state.next_decision_request_id(),
+        dice_manager=context.dice_manager,
+    )
+    _payload, status = _resolve_routed_lethal_ruse_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+        emit_terminal_event=True,
+    )
+    return status
+
+
+def _resolve_routed_lethal_ruse_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    routed_request: DecisionRequest | None,
+    routed_application: MortalWoundApplication | None,
+    routed_progress: MortalWoundApplicationProgress,
+    emit_terminal_event: bool,
+) -> tuple[JsonValue, LifecycleStatus | None]:
+    source_context = routed_progress.source_context
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Lethal Ruse mortal wound source context is invalid.")
+    if source_context.get("source_kind") != LETHAL_RUSE_MORTAL_WOUNDS_SOURCE_KIND:
+        raise GameLifecycleError("Lethal Ruse mortal wound source kind drifted.")
+    resolution_payload = source_context.get("resolution_payload")
+    if not isinstance(resolution_payload, dict):
+        raise GameLifecycleError("Lethal Ruse mortal wound resolution payload is invalid.")
+    if routed_request is not None:
+        decisions.request_decision(routed_request)
+        pending_payload = validate_json_value(
+            {
+                **resolution_payload,
+                "mortal_wound_application": None,
+                "decision_request_id": routed_request.request_id,
+                "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+            }
+        )
+        decisions.event_log.append(
+            "aeldari_corsair_coterie_lethal_ruse_mortal_wounds_pending",
+            pending_payload,
+        )
+        return pending_payload, LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed_request,
+            payload={
+                "phase": source_context.get("phase"),
+                "decision_type": routed_request.decision_type,
+                "source_rule_id": LETHAL_RUSE_RECORD_ID,
+                "source_kind": LETHAL_RUSE_MORTAL_WOUNDS_SOURCE_KIND,
+                "target_unit_instance_id": routed_progress.target_unit_instance_id,
+                "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+            },
+        )
+    if routed_application is None:
+        raise GameLifecycleError("Lethal Ruse mortal wound routing did not complete.")
+    terminal_payload = validate_json_value(
+        {
+            **resolution_payload,
+            "mortal_wound_application": validate_json_value(routed_application.to_payload()),
+        }
+    )
+    if emit_terminal_event:
+        decisions.event_log.append(
+            "aeldari_corsair_coterie_lethal_ruse_mortal_wounds_resolved",
+            terminal_payload,
+        )
+    return terminal_payload, None
 
 
 def _request_triggered_move(

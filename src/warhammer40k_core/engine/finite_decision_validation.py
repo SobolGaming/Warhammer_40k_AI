@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import LifecycleStatus
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 
 def invalid_finite_decision_status(

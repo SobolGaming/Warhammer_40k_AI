@@ -186,7 +186,6 @@ from warhammer40k_core.engine.damage_allocation import (
     apply_damage_to_model,
     destroy_model_by_rule,
     is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.damaged_effects import CatalogDamagedEffectRuntime
 from warhammer40k_core.engine.decision_controller import (
@@ -248,6 +247,10 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_source_context,
 )
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
@@ -1057,33 +1060,16 @@ def test_post_shoot_order_survives_target_set_change_after_feel_no_pain() -> Non
         indexes=indexes,
     )
     assert status is not None
-    continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
-        catalog_selected_target_mortal_wound_feel_no_pain_bindings(
-            ability_indexes_by_player_id=indexes,
-        )
+    status = _drain_catalog_selected_target_mortal_wounds(
+        status=status,
+        state=state,
+        decisions=decisions,
+        indexes=indexes,
+        battle_shock_hooks=battle_shock_hooks,
+        result_id_prefix="mutable-target-set-fnp",
+        selected_feel_no_pain_source_id=source_a.source_id,
     )
-    while status is not None:
-        fnp_request = cast(DecisionRequest, status.decision_request)
-        source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
-        fnp_result = DecisionResult.for_request(
-            result_id=f"mutable-target-set-fnp-{fnp_request.request_id}",
-            request=fnp_request,
-            selected_option_id=source_a.source_id,
-        )
-        decisions.submit_result(fnp_result)
-        status = continuation_registry.apply_decision(
-            MortalWoundFeelNoPainContinuationContext(
-                state=state,
-                decisions=decisions,
-                request=fnp_request,
-                result=fnp_result,
-                source_context=source_context,
-                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
-                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-                battle_shock_hooks=battle_shock_hooks,
-                ability_indexes_by_player_id=indexes,
-            )
-        )
+    assert status is None
     assert all(
         not model.is_alive
         for model in _unit_from_state(state, target_a.unit_instance_id).own_models
@@ -1174,39 +1160,18 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
     )
     if use_feel_no_pain:
         assert status is not None
-        continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
-            catalog_selected_target_mortal_wound_feel_no_pain_bindings(
-                ability_indexes_by_player_id=indexes,
-            )
-        )
-        while status is not None:
-            fnp_request = cast(DecisionRequest, status.decision_request)
-            assert is_mortal_wound_feel_no_pain_request(fnp_request)
-            source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
-            fnp_result = DecisionResult.for_request(
-                result_id=f"attached-target-splits-fnp-{fnp_request.request_id}",
-                request=fnp_request,
-                selected_option_id=feel_no_pain_source.source_id,
-            )
-            decisions.submit_result(fnp_result)
-            status = continuation_registry.apply_decision(
-                MortalWoundFeelNoPainContinuationContext(
-                    state=state,
-                    decisions=decisions,
-                    request=fnp_request,
-                    result=fnp_result,
-                    source_context=source_context,
-                    dice_manager=DiceRollManager(
-                        state.game_id,
-                        event_log=decisions.event_log,
-                    ),
-                    runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-                    battle_shock_hooks=battle_shock_hooks,
-                    ability_indexes_by_player_id=indexes,
-                )
-            )
-    else:
-        assert status is None
+    status = _drain_catalog_selected_target_mortal_wounds(
+        status=status,
+        state=state,
+        decisions=decisions,
+        indexes=indexes,
+        battle_shock_hooks=battle_shock_hooks,
+        result_id_prefix="attached-target-splits-fnp",
+        selected_feel_no_pain_source_id=(
+            feel_no_pain_source.source_id if use_feel_no_pain else None
+        ),
+    )
+    assert status is None
     assert all(
         not model.is_alive
         for model in _unit_from_state(state, target_noise_marines.unit_instance_id).own_models
@@ -1344,39 +1309,18 @@ def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_cha
     )
     if use_feel_no_pain:
         assert status is not None
-        continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
-            catalog_selected_target_mortal_wound_feel_no_pain_bindings(
-                ability_indexes_by_player_id=indexes,
-            )
-        )
-        while status is not None:
-            fnp_request = cast(DecisionRequest, status.decision_request)
-            assert is_mortal_wound_feel_no_pain_request(fnp_request)
-            source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
-            fnp_result = DecisionResult.for_request(
-                result_id=f"leader-support-split-fnp-{fnp_request.request_id}",
-                request=fnp_request,
-                selected_option_id=feel_no_pain_source.source_id,
-            )
-            decisions.submit_result(fnp_result)
-            status = continuation_registry.apply_decision(
-                MortalWoundFeelNoPainContinuationContext(
-                    state=state,
-                    decisions=decisions,
-                    request=fnp_request,
-                    result=fnp_result,
-                    source_context=source_context,
-                    dice_manager=DiceRollManager(
-                        state.game_id,
-                        event_log=decisions.event_log,
-                    ),
-                    runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-                    battle_shock_hooks=battle_shock_hooks,
-                    ability_indexes_by_player_id=indexes,
-                )
-            )
-    else:
-        assert status is None
+    status = _drain_catalog_selected_target_mortal_wounds(
+        status=status,
+        state=state,
+        decisions=decisions,
+        indexes=indexes,
+        battle_shock_hooks=battle_shock_hooks,
+        result_id_prefix="leader-support-split-fnp",
+        selected_feel_no_pain_source_id=(
+            feel_no_pain_source.source_id if use_feel_no_pain else None
+        ),
+    )
+    assert status is None
 
     assert all(
         not model.is_alive
@@ -1666,18 +1610,22 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
         option_id=doom_option.option_id,
         result_id=f"leader-support-replay-doom-{use_feel_no_pain}",
     )
-    if use_feel_no_pain:
-        while (
-            status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-            and status.decision_request is not None
-            and is_mortal_wound_feel_no_pain_request(status.decision_request)
-        ):
-            fnp_request = status.decision_request
-            status = session.submit_option(
-                request_id=fnp_request.request_id,
-                option_id=feel_no_pain_source.source_id,
-                result_id=f"leader-support-replay-fnp-{fnp_request.request_id}",
-            )
+    while (
+        status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        and status.decision_request is not None
+        and is_mortal_wound_resolution_request(status.decision_request)
+    ):
+        mortal_request = status.decision_request
+        option_ids = {option.option_id for option in mortal_request.options}
+        status = session.submit_option(
+            request_id=mortal_request.request_id,
+            option_id=(
+                feel_no_pain_source.source_id
+                if use_feel_no_pain and feel_no_pain_source.source_id in option_ids
+                else mortal_request.options[0].option_id
+            ),
+            result_id=f"leader-support-replay-mortal-{mortal_request.request_id}",
+        )
     assert status.status_kind not in {
         LifecycleStatusKind.INVALID,
         LifecycleStatusKind.UNSUPPORTED,
@@ -1936,32 +1884,17 @@ def test_lord_kakophonist_doom_siren_resumes_after_feel_no_pain_choice(
             ability_indexes_by_player_id=indexes,
         )
     )
-    while status is not None:
-        fnp_request = cast(DecisionRequest, status.decision_request)
-        assert is_mortal_wound_feel_no_pain_request(fnp_request)
-        source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
-        fnp_result = DecisionResult.for_request(
-            result_id=f"doom-siren-fnp-result-{fnp_request.request_id}",
-            request=fnp_request,
-            selected_option_id=source_a.source_id,
-        )
-        decisions.submit_result(fnp_result)
-        status = continuation_registry.apply_decision(
-            MortalWoundFeelNoPainContinuationContext(
-                state=state,
-                decisions=decisions,
-                request=fnp_request,
-                result=fnp_result,
-                source_context=source_context,
-                dice_manager=DiceRollManager(
-                    state.game_id,
-                    event_log=decisions.event_log,
-                ),
-                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-                battle_shock_hooks=battle_shock_hooks,
-                ability_indexes_by_player_id=indexes,
-            )
-        )
+    status = _drain_catalog_selected_target_mortal_wounds(
+        status=status,
+        state=state,
+        decisions=decisions,
+        indexes=indexes,
+        battle_shock_hooks=battle_shock_hooks,
+        result_id_prefix="doom-siren-fnp-result",
+        selected_feel_no_pain_source_id=source_a.source_id,
+        continuation_registry=continuation_registry,
+    )
+    assert status is None
 
     assert any(
         event.event_type == CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_RESOLVED_EVENT
@@ -6882,6 +6815,60 @@ def _submit_catalog_post_shoot_target(
     )
 
 
+def _drain_catalog_selected_target_mortal_wounds(
+    *,
+    status: LifecycleStatus | None,
+    state: GameState,
+    decisions: DecisionController,
+    indexes: dict[str, AbilityCatalogIndex],
+    battle_shock_hooks: BattleShockHookRegistry,
+    result_id_prefix: str,
+    selected_feel_no_pain_source_id: str | None = None,
+    continuation_registry: MortalWoundFeelNoPainContinuationHookRegistry | None = None,
+) -> LifecycleStatus | None:
+    registry = (
+        MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+            catalog_selected_target_mortal_wound_feel_no_pain_bindings(
+                ability_indexes_by_player_id=indexes,
+            )
+        )
+        if continuation_registry is None
+        else continuation_registry
+    )
+    current_status = status
+    while current_status is not None:
+        request = cast(DecisionRequest, current_status.decision_request)
+        option_ids = {option.option_id for option in request.options}
+        selected_option_id = (
+            selected_feel_no_pain_source_id
+            if selected_feel_no_pain_source_id in option_ids
+            else request.options[0].option_id
+        )
+        result = DecisionResult.for_request(
+            result_id=f"{result_id_prefix}-{request.request_id}",
+            request=request,
+            selected_option_id=selected_option_id,
+        )
+        decisions.submit_result(result)
+        current_status = registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                source_context=mortal_wound_resolution_source_context(request),
+                dice_manager=DiceRollManager(
+                    state.game_id,
+                    event_log=decisions.event_log,
+                ),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                battle_shock_hooks=battle_shock_hooks,
+                ability_indexes_by_player_id=indexes,
+            )
+        )
+    return None
+
+
 def _resolve_kakophonist_post_shoot_effects(
     *,
     runtime: CatalogSelectedTargetEffectRuntime,
@@ -6929,6 +6916,11 @@ def _resolve_kakophonist_post_shoot_effects(
         attack_sequence_completed_event_id=f"kakophonist-completed-{sequence_suffix}",
     )
     resolved_names: list[str] = []
+    continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        catalog_selected_target_mortal_wound_feel_no_pain_bindings(
+            ability_indexes_by_player_id=indexes,
+        )
+    )
     while runtime.post_shoot_hit_target_request(context) is not None:
         request = decisions.queue.peek_next()
         if request.decision_type == SEQUENCING_DECISION_TYPE:
@@ -6957,7 +6949,30 @@ def _resolve_kakophonist_post_shoot_effects(
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
             ability_indexes_by_player_id=indexes,
         )
-        assert pending_status is None
+        while pending_status is not None:
+            mortal_request = cast(DecisionRequest, pending_status.decision_request)
+            mortal_result = DecisionResult.for_request(
+                result_id=f"kakophonist-{sequence_suffix}-mortal:{mortal_request.request_id}",
+                request=mortal_request,
+                selected_option_id=mortal_request.options[0].option_id,
+            )
+            decisions.submit_result(mortal_result)
+            pending_status = continuation_registry.apply_decision(
+                MortalWoundFeelNoPainContinuationContext(
+                    state=state,
+                    decisions=decisions,
+                    request=mortal_request,
+                    result=mortal_result,
+                    source_context=mortal_wound_resolution_source_context(mortal_request),
+                    dice_manager=DiceRollManager(
+                        state.game_id,
+                        event_log=decisions.event_log,
+                    ),
+                    runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                    battle_shock_hooks=battle_shock_hooks,
+                    ability_indexes_by_player_id=indexes,
+                )
+            )
         resolved_names.append(ability_name)
     return tuple(resolved_names)
 

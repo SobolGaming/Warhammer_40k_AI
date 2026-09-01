@@ -63,6 +63,10 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_model_request,
+    mortal_wound_resolution_source_context,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -133,6 +137,7 @@ from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
     TransportHazardMortalWounds,
+    TransportHazardMortalWoundsPayload,
     TransportMovementStatus,
     TransportOperationViolation,
     TransportOperationViolationCode,
@@ -1403,8 +1408,25 @@ def test_attached_rules_unit_combat_disembark_is_atomic_and_group_hazardous() ->
         disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
         result_id="phase10q-attached-combat-disembark-placement",
     )
+    mortal_wound_request = _decision_request(status)
+    for decision_index in range(128):
+        mortal_wound_result = DecisionResult.for_request(
+            result_id=f"phase10q-attached-combat-disembark-model-{decision_index}",
+            request=mortal_wound_request,
+            selected_option_id=mortal_wound_request.options[0].option_id,
+        )
+        decisions.submit_result(mortal_wound_result)
+        next_request = apply_rules_unit_combat_disembark_feel_no_pain_decision(
+            state=state,
+            result=mortal_wound_result,
+            decisions=decisions,
+        )
+        if next_request is None:
+            break
+        mortal_wound_request = next_request
+    else:
+        raise AssertionError("Combat disembark mortal wound model choices did not drain.")
 
-    assert status is None
     assert set(component_ids) <= _placed_unit_ids(state)
     cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
     assert cargo is not None
@@ -1576,8 +1598,8 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     )
 
     assert request is not None
-    assert is_mortal_wound_feel_no_pain_request(request)
-    source_context = mortal_wound_feel_no_pain_source_context(request)
+    assert is_mortal_wound_model_request(request)
+    source_context = mortal_wound_resolution_source_context(request)
     assert isinstance(source_context, dict)
     assert source_context["disembark_payload_kind"] == (RULES_UNIT_COMBAT_DISEMBARK_PAYLOAD_KIND)
     assert source_context["unit_instance_id"] == attached_id
@@ -1586,6 +1608,16 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     assert restored_request.to_payload() == request.to_payload()
     restored_state = restored.state
     assert restored_state is not None
+    status = restored.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase10q-attached-combat-fnp-model",
+            request=restored_request,
+            selected_option_id=restored_request.options[0].option_id,
+        )
+    )
+    fnp_request = _decision_request(status)
+    assert is_mortal_wound_feel_no_pain_request(fnp_request)
+    assert mortal_wound_feel_no_pain_source_context(fnp_request) == source_context
     before_wounds = sum(
         int(model.wounds_remaining)
         for army in restored_state.army_definitions
@@ -1597,7 +1629,7 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     status = restored.submit_decision(
         DecisionResult.for_request(
             result_id="phase10q-attached-combat-fnp-decline",
-            request=restored_request,
+            request=fnp_request,
             selected_option_id="decline",
         )
     )
@@ -2174,6 +2206,25 @@ def test_movement_phase_combat_disembark_requires_tactical_impossible_evidence()
         poses=tuple(Pose.at(pose.position.x + 3.0, pose.position.y) for pose in _disembark_poses()),
         result_id="phase14h-place-combat-disembark-fallback",
     )
+    mortal_wound_request = _decision_request(status)
+    for decision_index in range(128):
+        mortal_wound_result = DecisionResult.for_request(
+            result_id=f"phase14h-combat-disembark-model-{decision_index}",
+            request=mortal_wound_request,
+            selected_option_id=mortal_wound_request.options[0].option_id,
+        )
+        decisions.submit_result(mortal_wound_result)
+        next_request = apply_rules_unit_combat_disembark_feel_no_pain_decision(
+            state=state,
+            result=mortal_wound_result,
+            decisions=decisions,
+        )
+        if next_request is None:
+            status = None
+            break
+        mortal_wound_request = next_request
+    else:
+        raise AssertionError("Combat disembark mortal wound model choices did not drain.")
 
     assert status is None
     stored_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
@@ -3259,19 +3310,39 @@ def test_combat_disembark_hazard_mortal_wounds_use_shared_damage_service() -> No
     )
 
     assert routed.mortal_wounds == 1
-    assert routed.pending_mortal_wound_request is None
-    assert routed.mortal_wound_application is not None
-    assert routed.mortal_wound_application.target_unit_instance_id == passenger.unit_instance_id
+    request = routed.pending_mortal_wound_request
+    assert request is not None
+    assert is_mortal_wound_model_request(request)
+    model_result = DecisionResult.for_request(
+        result_id="phase14h-transport-hazard-model",
+        request=request,
+        selected_option_id=target_model.model_instance_id,
+    )
+    decisions.submit_result(model_result)
+    assert (
+        apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+            state=state,
+            result=model_result,
+            decisions=decisions,
+        )
+        is None
+    )
     assert (
         model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
         == target_model.wounds_remaining - 1
     )
-    assert TransportHazardMortalWounds.from_payload(routed.to_payload()) == routed
-    assert [
+    event_payloads = [
         record.payload
         for record in decisions.event_log.records
         if record.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
-    ] == [routed.to_payload()]
+    ]
+    assert len(event_payloads) == 1
+    resolved = TransportHazardMortalWounds.from_payload(
+        cast(TransportHazardMortalWoundsPayload, event_payloads[0])
+    )
+    assert resolved.mortal_wound_application is not None
+    assert resolved.mortal_wound_application.target_unit_instance_id == (passenger.unit_instance_id)
+    assert TransportHazardMortalWounds.from_payload(resolved.to_payload()) == resolved
 
 
 def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() -> None:
@@ -3341,6 +3412,19 @@ def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() ->
 
     assert request is not None
     assert routed.mortal_wound_application is None
+    assert is_mortal_wound_model_request(request)
+    model_result = DecisionResult.for_request(
+        result_id="phase14h-transport-fnp-model",
+        request=request,
+        selected_option_id=target_model.model_instance_id,
+    )
+    decisions.submit_result(model_result)
+    model_status = apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+        state=state,
+        result=model_result,
+        decisions=decisions,
+    )
+    request = _decision_request(model_status)
     assert is_mortal_wound_feel_no_pain_request(request)
     assert {option.option_id for option in request.options} == {
         "decline",
@@ -3377,7 +3461,7 @@ def test_transport_hazard_mortal_wounds_resume_decline_allowed_feel_no_pain() ->
         == target_model.wounds_remaining - 1
     )
     assert len(event_payloads) == 1
-    final_payload = cast(dict[str, JsonValue], event_payloads[0])
+    final_payload = cast(TransportHazardMortalWoundsPayload, event_payloads[0])
     assert final_payload["source_kind"] == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
     assert final_payload["pending_mortal_wound_request_id"] is None
     assert final_payload["mortal_wounds"] == 1
@@ -3462,12 +3546,13 @@ def test_lifecycle_transport_hazard_fnp_continues_reaction_frame() -> None:
         payload=seed_request.payload,
     )
     reaction_request = lifecycle.decision_controller.queue.peek_next()
+    assert is_mortal_wound_model_request(reaction_request)
 
     status = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase14h-transport-hazard-reaction-fnp-decline",
+            result_id="phase14h-transport-hazard-reaction-model",
             request=reaction_request,
-            selected_option_id="decline",
+            selected_option_id=target_model.model_instance_id,
         )
     )
     follow_up_request = lifecycle.decision_controller.queue.peek_next()
@@ -3546,29 +3631,45 @@ def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() ->
         disembark=emergency_result,
         dice_manager=DiceRollManager("phase14h-emergency-hazard", event_log=decisions.event_log),
     )
+    assert emergency_result.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+    assert emergency_result.roll_threshold == HAZARD_ROLL_FAILURE_THRESHOLD
+    assert emergency_result.mortal_wound_count == 1
+    assert routed.mortal_wounds == 1
+    request = routed.pending_mortal_wound_request
+    assert request is not None
+    assert is_mortal_wound_model_request(request)
+    model_result = DecisionResult.for_request(
+        result_id="phase14h-emergency-hazard-model",
+        request=request,
+        selected_option_id=target_model.model_instance_id,
+    )
+    decisions.submit_result(model_result)
+    assert (
+        apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+            state=state,
+            result=model_result,
+            decisions=decisions,
+        )
+        is None
+    )
+    assert (
+        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
+        == target_model.wounds_remaining - 1
+    )
     event_payloads = [
         record.payload
         for record in decisions.event_log.records
         if record.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
     ]
-
-    assert emergency_result.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
-    assert emergency_result.roll_threshold == HAZARD_ROLL_FAILURE_THRESHOLD
-    assert emergency_result.mortal_wound_count == 1
-    assert routed.mortal_wounds == 1
-    assert routed.pending_mortal_wound_request is None
-    assert routed.mortal_wound_application is not None
-    assert routed.mortal_wound_application.target_unit_instance_id == passenger.unit_instance_id
-    assert (
-        model_by_id(state=state, model_instance_id=target_model.model_instance_id).wounds_remaining
-        == target_model.wounds_remaining - 1
-    )
-    assert TransportHazardMortalWounds.from_payload(routed.to_payload()) == routed
     assert len(event_payloads) == 1
-    final_payload = cast(dict[str, JsonValue], event_payloads[0])
+    final_payload = cast(TransportHazardMortalWoundsPayload, event_payloads[0])
+    resolved = TransportHazardMortalWounds.from_payload(final_payload)
+    assert resolved.mortal_wound_application is not None
+    assert resolved.mortal_wound_application.target_unit_instance_id == (passenger.unit_instance_id)
+    assert TransportHazardMortalWounds.from_payload(resolved.to_payload()) == resolved
     assert final_payload["source_kind"] == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
     assert final_payload["disembark_mode"] == DisembarkModeKind.EMERGENCY_DISEMBARK.value
-    assert final_payload == routed.to_payload()
+    assert final_payload == resolved.to_payload()
 
 
 def test_combat_disembark_can_only_set_up_engaged_with_transport_engagement() -> None:

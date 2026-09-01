@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 from pathlib import Path
 from typing import cast
@@ -139,6 +140,70 @@ def test_p06a_visibility_source_artifact_is_pinned_typed_and_executable() -> Non
     assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
         package.source_catalog.to_payload()
     )
+
+
+def test_p06b_mortal_wounds_source_artifact_is_pinned_typed_and_executable() -> None:
+    package = core_other_concepts_2026_08.source_package()
+    rule = core_other_concepts_2026_08.source_rule_record_by_id("mortal-wounds")
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert rule.section_id == "06.02"
+    assert rule.source_id == core_other_concepts_2026_08.MORTAL_WOUNDS_SOURCE_ID
+    assert rule.transcription_sha256 == (
+        core_other_concepts_2026_08.MORTAL_WOUNDS_TRANSCRIPTION_SHA256
+    )
+    assert "for each of those mortal wounds" in rule.source_text
+    assert "If a non‑CHARACTER model in that unit has lost one or more wounds" in (  # noqa: RUF001
+        rule.source_text
+    )
+    assert "Otherwise, if that unit contains one or more non‑CHARACTER models" in (  # noqa: RUF001
+        rule.source_text
+    )
+    assert "one or more CHARACTER models in that unit have lost one or more wounds" in (
+        rule.source_text
+    )
+    assert "Otherwise, you must select one CHARACTER model" in rule.source_text
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert {record.semantic_execution_status for record in evidence} == {
+        "executable_engine_runtime"
+    }
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert package.evidence_required_source_ids == tuple(
+        sorted(
+            (
+                core_other_concepts_2026_08.VISIBILITY_SOURCE_ID,
+                core_other_concepts_2026_08.MORTAL_WOUNDS_SOURCE_ID,
+            )
+        )
+    )
+
+
+def test_p06_other_concepts_runtime_consumer_ids_resolve() -> None:
+    package = core_other_concepts_2026_08.source_package()
+    rules = (
+        core_other_concepts_2026_08.source_rule_record(),
+        core_other_concepts_2026_08.source_rule_record_by_id("mortal-wounds"),
+    )
+    consumer_ids = {consumer_id for rule in rules for consumer_id in rule.runtime_consumer_ids} | {
+        consumer_id
+        for evidence in package.source_evidence_catalog.records
+        for consumer_id in evidence.runtime_consumer_ids
+    }
+
+    for consumer_id in sorted(consumer_ids):
+        module_name, separator, qualified_name = consumer_id.partition(":")
+        assert separator, consumer_id
+        assert module_name, consumer_id
+        assert qualified_name, consumer_id
+        resolved: object = importlib.import_module(module_name)
+        for attribute in qualified_name.split("."):
+            resolved = getattr(resolved, attribute)
+        assert resolved is not None, consumer_id
 
 
 def test_p06a_visibility_source_artifact_rejects_text_and_byte_drift() -> None:

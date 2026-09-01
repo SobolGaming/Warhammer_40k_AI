@@ -16,10 +16,8 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     effect_is_immediate_selected_target_mortal_wounds,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -32,6 +30,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import (
@@ -207,7 +208,7 @@ def resolve_selected_target_mortal_wound_effect(
                 decision_request=routed.request,
                 payload={
                     "phase": BattlePhase.SHOOTING.value,
-                    "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                    "decision_type": routed.request.decision_type,
                     "source_rule_id": _required_string(record, "source_rule_id"),
                     "target_unit_instance_id": target_unit_id,
                 },
@@ -239,7 +240,7 @@ def apply_catalog_selected_target_mortal_wound_feel_no_pain_decision(
     source_context = _payload_object(context.source_context)
     if source_context.get("source_kind") != CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND:
         raise GameLifecycleError("Selected-target mortal wound source kind drifted.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -254,7 +255,7 @@ def apply_catalog_selected_target_mortal_wound_feel_no_pain_decision(
             decision_request=routed.request,
             payload={
                 "phase": BattlePhase.SHOOTING.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": _required_string(source_context, "source_rule_id"),
                 "target_unit_instance_id": _required_string(
                     source_context,

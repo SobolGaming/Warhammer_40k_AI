@@ -1022,6 +1022,161 @@ Validation results:
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/410`; merge commit
 pending review and merge.
 
+### P06B — C06-02
+
+Status: Implementation, required local validation, and remote PR publication are complete; review
+and merge are pending.
+
+Finding IDs: `C06-02`.
+
+Dependencies and evidence gate: P00 is merged. P06B has no gameplay prerequisite. The exact
+06.02 Mortal Wounds statement is retained as a reviewed transcription and a separately
+classified, project-authoritative 40k.app mirror observation linked to the recorded
+non-affiliation and source-authority policy. This satisfies `APP-AUTHORITY`; no
+`EXCEPTION-PAUSE` applies.
+
+Violated invariant: Mortal wounds are resolved individually and the target unit's controlling
+player selects the model for each wound under a mandatory four-tier priority. When multiple
+models share the active tier, silently selecting the first sorted model bypasses the decision
+contract and lets iteration order mutate authoritative wounds, destruction state, events, and
+replay.
+
+How it was done before P06B: The shared mortal-wound continuation reused ordinary attack damage
+allocation and selected `legal_model_ids[0]`. The direct helper likewise selected the first
+sorted legal model. Neither path represented an active-tier tie as a player choice, and several
+generic and faction producer continuations recognized only Feel No Pain requests, so a model
+choice could not pause and resume through one common engine-owned route.
+
+How it is done after P06B: The typed mortal-wound model allocator recomputes the legal tier before
+every individual wound in this exact order: wounded non-Character, other non-Character, wounded
+Character, then other Character. A sole legal model is selected automatically. A tie emits the
+finite public `select_mortal_wound_model` request to the target unit's controlling player with
+deterministic model IDs and complete serialized progress. Lifecycle validation recomputes the
+current tier before queue pop or mutation and rejects stale, drifted, malformed, wrong-actor, or
+wrong-context submissions. The selected model then resumes the same per-wound route, including
+Feel No Pain, destruction authority, event recording, producer continuation, and replay.
+
+The model-selection-to-Feel-No-Pain continuation is independently authenticated. Before a child
+Feel No Pain request is emitted, the engine records a private per-wound allocation occurrence that
+binds the application and ordinal wound, canonical target, exact 06.02 tier and legal inventory,
+selected model, automatic-or-player disposition, exact parent request/result closure when chosen,
+and the selected model's loaded Feel No Pain sources and decline policy. Restore and lifecycle
+prevalidation reconstruct the occurrence, parent closure, child request, and exact events before
+queue pop, recording, RNG, damage, or completion. Damage application separately requires the
+supplied model to belong to the retained target rules unit. Each application also freezes the
+target's owner, exact physical component-unit inventory, and Character-component classification.
+Freeze and validation share one state-derived Character-component owner: an active formation uses
+its actual Leader/Support roles plus authoritative Character keywords, while a dissolved formation
+uses the exact matching `StartingAttachedUnitRecord` roles plus those keywords. The retained set
+must equal that reconstruction, so a coordinated rewrite of progress, application-started event,
+allocation occurrence, parent closure, child request, and request events cannot reclassify a
+Character as a non-Character or bypass living Bodyguards.
+If destruction reconciles an Attached Unit into multiple current descendants before the packet
+finishes, the allocator continues across every living, placed model in that frozen lineage and
+recomputes the four tiers over that packet-wide population. Restore, Feel No Pain authority,
+logical-death validation, and final destruction evidence consume the same lineage; they neither
+choose an arbitrary descendant nor terminate a packet while a frozen descendant survives. Shared
+attack-sequence ownership now classifies the complete decision family once; Fight-owned deferred
+mortal wounds, including active reaction frames, keep their Fight host across model selection,
+Feel No Pain, serialization, and replay.
+
+Specific authoritative 40k.app rule/statement and source ID: 06.02, `MORTAL WOUNDS`, states that
+the controlling player resolves each mortal wound one at a time and must select, in order, a
+wounded non-Character model, another non-Character model, a wounded Character model, or another
+Character model; the selected model loses one wound. Its stable source ID is
+`gw-11e-core-rules:other-concepts:mortal-wounds`. Runtime behavior binds to the typed allocator
+and this source-backed execution record, never a display name or source-text token.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/06-other-concepts`, observed
+`2026-08-31T13:01:46-04:00`; transcription
+`9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831`;
+reviewed-transcription observation
+`57b9542afdef85452b316c1bf695591d5d66165a01bf2b0a6fc0b9104890516d`;
+authoritative-mirror observation
+`faa8f4b08ebb8663e2ae5f84373465d5691b58ca56d67e461b9e81fdea4abc8a`.
+The generated package hash is
+`3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a` and its canonical artifact
+byte SHA-256 is `d2ed90878ed9b54bee86c89432e0c9a452705da959b7bc7cf4934ada1e1cf16d`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a037e6022153168221c9b30efd361c333ed14ee93ea1e762196524ac08a64760`.
+
+Load and execution support: The Mortal Wounds rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked mirror observation carries project
+authority. The fail-fast typed loader pins schema, document identity, rule identity, text hash,
+both evidence fingerprints, package hash, and canonical artifact byte hash.
+
+Scope and explicit exclusions: P06B owns the four priority tiers, per-wound recomputation, finite
+tie choice, sole-model auto-selection, serialized progress, lifecycle validation and dispatch,
+producer continuation migration, public adapter projection/event behavior, source identity,
+regressions, and static bypass audit. It does not change Mortal Wounds generation, Feel No Pain
+eligibility or dice rules, damage spill semantics, Character keyword ownership, ordinary attack
+damage allocation, out-of-scope content, or hidden-information policy.
+
+Regression coverage includes facade submission and replay after the last Bodyguard is destroyed
+mid-packet and normal reconciliation splits the original Attached Unit. One case leaves Leader and
+Support Character descendants and exercises the Character-tier model decision plus Feel No Pain
+across serialized checkpoints; a second leaves one Character descendant and proves deterministic
+automatic continuation rather than an erroneous unit-destroyed termination. Coordinated
+classification-drift regressions modify every retained authority copy at both the pending model
+choice and pending Feel No Pain boundaries and prove restore and lifecycle submission reject before
+any queue, decision, RNG, wound, destruction, or completion mutation.
+
+Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed
+loader → stable Mortal Wounds source ID and executable consumer inventory → producer-owned
+`MortalWoundApplicationProgress` → typed mortal-wound model allocator → deterministic finite
+`DecisionRequest`/`DecisionResult` → lifecycle prevalidation and shared decision dispatch →
+engine-owned one-wound mutation and optional Feel No Pain → destruction authority, producer
+continuation, events, projections, and replay. Adapters only submit an option ID and never select
+or mutate the model independently.
+
+Decision and viewer-visibility impact: P06B adds one finite decision family,
+`select_mortal_wound_model`, with deterministic model-instance option IDs. Its public request
+payload includes target unit, source rule, remaining wounds, active priority tier, legal model
+IDs, and replay-safe serialized progress; the selected option payload identifies the model and
+tier. The target unit's controlling player is the actor, while both viewers receive the same
+public pending request and public event delta. Shared adapter redaction remains the sole
+projection/event owner. `docs/ADAPTER_DECISION_CONTRACT.md` and
+`docs/DECISION_SUBMISSION_CATALOG.md` record the new family and stale-context behavior.
+
+Regression scenarios and same-bug-class search: Real attached-unit regressions walk all four
+tiers, prove serialization/restore, reject priority drift without queue pop or mutation, and
+prove model choice → Feel No Pain → later model choice continuation. Adapter coverage submits
+the option through `LocalGameSession` and verifies both public viewer projections and public event
+deltas. Producer regressions cover shooting/fight damage, Hazardous, Deadly Demise, transport and
+movement hazards, generic RuleIR mortal wounds, Explosives, Corsair Lethal Ruse, Daemonic Terror,
+Malice Made Manifest, Spiteful Demise, and existing faction army-rule continuations. The bug-class
+search migrated every production caller to the shared resolution request; the only remaining
+`apply_mortal_wounds_to_unit` production occurrence is its fail-closed wrapper definition. A
+static audit pins the allocator, lifecycle validator, direct-helper tie guard, adapter contract,
+and absence of the sorted-first fallback.
+
+Generated artifacts/documentation: P06B extends
+`core_other_concepts_2026_08/artifacts/package.json`, its typed loader/source catalog, and its
+offline builder; adds the typed allocator and shared attack-sequence decision-family modules;
+regenerates the engine build manifest and affected external-contract fixtures; and updates both
+decision-contract documents and this finding record. No behavioral test file was added, removed,
+moved, or renamed, so the committed four-shard inventory does not change.
+
+Validation results:
+
+- Focused allocation-authority, source, tier-order, stale-decision, Fight-host, reaction-frame,
+  replay, adapter, redaction, producer, faction-continuation, and static-audit regressions pass.
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2646` source files;
+  Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
+  four-shard inventory check and all-files pre-commit gate pass.
+- The required xdist work-stealing suite passes (`6364 passed` in `402.70s`), including the
+  complete code-quality suite.
+- The Other Concepts source artifact, final engine build identity, and external contract all pass
+  fail-closed drift checks, including the `origin/main` compatibility comparison.
+- Installed-wheel smoke passes with `2475` packaged engine resources and `27` schemas. Generated
+  TypeScript client drift and type checks pass, and the two-server HTTP conformance scenario passes
+  all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/411`; merge commit
+pending review and merge.
+
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
 25 categories before opening PFINAL. The audit must select one maintained-App

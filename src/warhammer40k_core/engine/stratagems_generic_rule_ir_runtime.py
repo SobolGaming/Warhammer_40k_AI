@@ -16,9 +16,14 @@ from warhammer40k_core.engine.battle_shock_test_service import (
     BattleShockTestRuntime,
     resolve_battle_shock_test,
 )
-from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.damage_allocation import (
+    MortalWoundApplication,
+    MortalWoundApplicationProgress,
+    continue_mortal_wound_application,
+)
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -29,7 +34,18 @@ from warhammer40k_core.engine.healing_geometry import (
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
+)
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.primary_historical_events import (
     primary_reserve_entry_source_terminal_bindings_payload,
     record_primary_reserve_entry_provider_terminal_event,
@@ -64,6 +80,11 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.healing import HealingEffect
 
 GENERIC_RULE_IR_CHARGE_ROLL_MODIFIER_EFFECT_KIND = "generic_rule_ir_charge_roll_modifier"
+GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND = "generic_rule_ir_stratagem_mortal_wounds"
+GENERIC_RULE_IR_MORTAL_WOUNDS_HOOK_ID = (
+    "core-v2:generic-rule-ir:stratagem-mortal-wounds:continuation"
+)
+GENERIC_RULE_IR_MORTAL_WOUNDS_HOOK_SOURCE_ID = "core-v2:generic-rule-ir:stratagem-mortal-wounds"
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -513,40 +534,7 @@ def _resolve_generic_roll_pool_mortal_wounds(
         for index in range(1, quantity + 1)
     )
     mortal_wounds = sum(wounds_per_success for roll in rolls if roll.current_total >= threshold)
-    application_payload: JsonValue = None
-    if mortal_wounds:
-        source_rule_id = _rule_effect_source_id(effect_payload)
-        source_context = validate_json_value(
-            {
-                "stratagem_use": use_record.to_payload(),
-                "generic_rule_effect": effect_payload,
-                "target_unit_instance_id": target_unit_id,
-            }
-        )
-        application = apply_mortal_wounds_to_unit(
-            state=state,
-            decisions=decisions,
-            application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
-            source_rule_id=source_rule_id,
-            source_context=source_context,
-            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
-                state=state,
-                destroying_player_id=use_record.player_id,
-                source_rules_unit_instance_id=None,
-                source_model_instance_id=None,
-                destruction_source_kind=DestructionSourceKind.ABILITY,
-                action_phase=BattlePhase(use_record.phase.value),
-                source_step="generic_stratagem_mortal_wounds",
-            ),
-            target_unit_instance_id=target_unit_id,
-            mortal_wounds=mortal_wounds,
-            spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),
-            dice_manager=manager,
-            defender_player_id=_unit_owner_player_id(state=state, unit_instance_id=target_unit_id),
-        )
-        application_payload = validate_json_value(application.to_payload())
-    decisions.event_log.append(
-        "generic_stratagem_roll_pool_mortal_wounds_resolved",
+    resolution_payload = validate_json_value(
         {
             "game_id": state.game_id,
             "player_id": use_record.player_id,
@@ -560,9 +548,57 @@ def _resolve_generic_roll_pool_mortal_wounds(
             "target_unit_instance_id": target_unit_id,
             "rolls": [roll.to_payload() for roll in rolls],
             "mortal_wounds": mortal_wounds,
-            "mortal_wound_application": application_payload,
             "generic_rule_effect": validate_json_value(effect_payload),
-        },
+        }
+    )
+    if not mortal_wounds:
+        _emit_generic_roll_pool_mortal_wounds_resolved(
+            decisions=decisions,
+            resolution_payload=_json_object(
+                resolution_payload,
+                "generic roll-pool resolution",
+            ),
+            application=None,
+        )
+        return
+    progress = MortalWoundApplicationProgress.start(
+        application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
+        source_rule_id=_rule_effect_source_id(effect_payload),
+        source_context=validate_json_value(
+            {
+                "source_kind": GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND,
+                "resolution_kind": "roll_pool",
+                "phase": use_record.phase.value,
+                "resolution_payload": resolution_payload,
+            }
+        ),
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id=use_record.player_id,
+            source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase(use_record.phase.value),
+            source_step="generic_stratagem_mortal_wounds",
+        ),
+        target_unit_instance_id=target_unit_id,
+        mortal_wounds=mortal_wounds,
+        spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),
+        defender_player_id=_unit_owner_player_id(state=state, unit_instance_id=target_unit_id),
+    )
+    routed = continue_mortal_wound_application(
+        state=state,
+        decisions=decisions,
+        request_id=state.next_decision_request_id(),
+        progress=progress,
+        dice_manager=manager,
+    )
+    _resolve_routed_generic_rule_ir_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
     )
 
 
@@ -584,7 +620,7 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
     )
     bonus = _source_keyword_bonus(source_unit=source_unit, effect_payload=effect_payload)
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    target_results: list[JsonValue] = []
+    target_plans: list[JsonValue] = []
     for target_unit_id in target_unit_ids:
         roll = manager.roll(
             DiceRollSpec(
@@ -605,51 +641,14 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
             modified_total=roll.current_total,
             effect_payload=effect_payload,
         )
-        application_payload: JsonValue = None
-        if mortal_wounds:
-            source_rule_id = _rule_effect_source_id(effect_payload)
-            source_context = validate_json_value(
-                {
-                    "stratagem_use": use_record.to_payload(),
-                    "generic_rule_effect": effect_payload,
-                    "target_unit_instance_id": target_unit_id,
-                }
-            )
-            application = apply_mortal_wounds_to_unit(
-                state=state,
-                decisions=decisions,
-                application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
-                source_rule_id=source_rule_id,
-                source_context=source_context,
-                destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
-                    state=state,
-                    destroying_player_id=use_record.player_id,
-                    source_rules_unit_instance_id=None,
-                    source_model_instance_id=None,
-                    destruction_source_kind=DestructionSourceKind.ABILITY,
-                    action_phase=BattlePhase(use_record.phase.value),
-                    source_step="generic_stratagem_mortal_wounds",
-                ),
-                target_unit_instance_id=target_unit_id,
-                mortal_wounds=mortal_wounds,
-                spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),
-                dice_manager=manager,
-                defender_player_id=_unit_owner_player_id(
-                    state=state,
-                    unit_instance_id=target_unit_id,
-                ),
-            )
-            application_payload = validate_json_value(application.to_payload())
-        target_results.append(
+        target_plans.append(
             {
                 "target_unit_instance_id": target_unit_id,
                 "roll": validate_json_value(roll.to_payload()),
                 "mortal_wounds": mortal_wounds,
-                "mortal_wound_application": application_payload,
             }
         )
-    decisions.event_log.append(
-        "generic_stratagem_roll_per_target_mortal_wounds_resolved",
+    batch_payload = validate_json_value(
         {
             "game_id": state.game_id,
             "player_id": use_record.player_id,
@@ -660,9 +659,257 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
                 effect_payload,
                 "replay_effect_kind",
             ),
-            "target_results": target_results,
             "generic_rule_effect": validate_json_value(effect_payload),
-        },
+            "use_id": use_record.use_id,
+        }
+    )
+    _continue_generic_rule_ir_per_target_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        batch_payload=_json_object(batch_payload, "generic mortal-wound batch"),
+        remaining_plans=tuple(
+            _json_object(plan, "generic mortal-wound target plan") for plan in target_plans
+        ),
+        completed_results=(),
+    )
+
+
+def apply_generic_rule_ir_mortal_wound_decision(
+    context: MortalWoundFeelNoPainContinuationContext,
+) -> LifecycleStatus | None:
+    if type(context) is not MortalWoundFeelNoPainContinuationContext:
+        raise GameLifecycleError("Generic RuleIR mortal wound continuation requires context.")
+    routed = resolve_mortal_wound_decision(
+        state=context.state,
+        decisions=context.decisions,
+        request=context.request,
+        result=context.result,
+        next_request_id=context.state.next_decision_request_id(),
+        dice_manager=context.dice_manager,
+    )
+    return _resolve_routed_generic_rule_ir_mortal_wounds(
+        state=context.state,
+        decisions=context.decisions,
+        routed_request=routed.request,
+        routed_application=routed.application,
+        routed_progress=routed.progress,
+    )
+
+
+def _resolve_routed_generic_rule_ir_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    routed_request: DecisionRequest | None,
+    routed_application: MortalWoundApplication | None,
+    routed_progress: MortalWoundApplicationProgress,
+) -> LifecycleStatus | None:
+    source_context = _json_object(
+        routed_progress.source_context,
+        "generic RuleIR mortal-wound source context",
+    )
+    if source_context.get("source_kind") != GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND:
+        raise GameLifecycleError("Generic RuleIR mortal-wound source kind drifted.")
+    resolution_kind = _required_payload_string(source_context, "resolution_kind")
+    if routed_request is not None:
+        decisions.request_decision(routed_request)
+        decisions.event_log.append(
+            "generic_stratagem_mortal_wounds_pending",
+            validate_json_value(
+                {
+                    "source_rule_id": routed_progress.source_rule_id,
+                    "resolution_kind": resolution_kind,
+                    "target_unit_instance_id": routed_progress.target_unit_instance_id,
+                    "decision_request_id": routed_request.request_id,
+                    "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=routed_request,
+            payload={
+                "phase": _required_payload_string(source_context, "phase"),
+                "decision_type": routed_request.decision_type,
+                "source_rule_id": routed_progress.source_rule_id,
+                "source_kind": GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND,
+                "target_unit_instance_id": routed_progress.target_unit_instance_id,
+                "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
+            },
+        )
+    if routed_application is None:
+        raise GameLifecycleError("Generic RuleIR mortal-wound routing did not complete.")
+    if resolution_kind == "roll_pool":
+        _emit_generic_roll_pool_mortal_wounds_resolved(
+            decisions=decisions,
+            resolution_payload=_json_object(
+                source_context.get("resolution_payload"),
+                "generic roll-pool resolution",
+            ),
+            application=routed_application,
+        )
+        return None
+    if resolution_kind != "roll_per_context_target":
+        raise GameLifecycleError("Generic RuleIR mortal-wound resolution kind drifted.")
+    current_plan = _json_object(
+        source_context.get("current_plan"),
+        "generic mortal-wound current target plan",
+    )
+    completed_results = tuple(
+        _json_object(result, "generic mortal-wound completed result")
+        for result in _json_array(
+            source_context.get("completed_results"),
+            "generic mortal-wound completed results",
+        )
+    )
+    completed_results = (
+        *completed_results,
+        _completed_generic_target_result(
+            plan=current_plan,
+            application=routed_application,
+        ),
+    )
+    return _continue_generic_rule_ir_per_target_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        batch_payload=_json_object(
+            source_context.get("batch_payload"),
+            "generic mortal-wound batch",
+        ),
+        remaining_plans=tuple(
+            _json_object(plan, "generic mortal-wound target plan")
+            for plan in _json_array(
+                source_context.get("remaining_plans"),
+                "generic mortal-wound remaining plans",
+            )
+        ),
+        completed_results=completed_results,
+    )
+
+
+def _continue_generic_rule_ir_per_target_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    batch_payload: dict[str, JsonValue],
+    remaining_plans: tuple[dict[str, JsonValue], ...],
+    completed_results: tuple[dict[str, JsonValue], ...],
+) -> LifecycleStatus | None:
+    pending_plans = remaining_plans
+    resolved_results = completed_results
+    while pending_plans:
+        current_plan = next(iter(pending_plans))
+        pending_plans = pending_plans[1:]
+        mortal_wounds = _required_payload_int(current_plan, "mortal_wounds")
+        if mortal_wounds == 0:
+            resolved_results = (
+                *resolved_results,
+                _completed_generic_target_result(plan=current_plan, application=None),
+            )
+            continue
+        target_unit_id = _required_payload_string(current_plan, "target_unit_instance_id")
+        phase = BattlePhase(_required_payload_string(batch_payload, "phase"))
+        effect_payload = _json_object(
+            batch_payload.get("generic_rule_effect"),
+            "generic RuleIR mortal-wound effect",
+        )
+        progress = MortalWoundApplicationProgress.start(
+            application_id=(
+                f"{_required_payload_string(batch_payload, 'use_id')}:mortal-wounds:"
+                f"{target_unit_id}"
+            ),
+            source_rule_id=_rule_effect_source_id(effect_payload),
+            source_context=validate_json_value(
+                {
+                    "source_kind": GENERIC_RULE_IR_MORTAL_WOUNDS_SOURCE_KIND,
+                    "resolution_kind": "roll_per_context_target",
+                    "phase": phase.value,
+                    "batch_payload": batch_payload,
+                    "current_plan": current_plan,
+                    "remaining_plans": list(pending_plans),
+                    "completed_results": list(resolved_results),
+                }
+            ),
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+                state=state,
+                destroying_player_id=_required_payload_string(batch_payload, "player_id"),
+                source_rules_unit_instance_id=None,
+                source_model_instance_id=None,
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=phase,
+                source_step="generic_stratagem_mortal_wounds",
+            ),
+            target_unit_instance_id=target_unit_id,
+            mortal_wounds=mortal_wounds,
+            spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),
+            defender_player_id=_unit_owner_player_id(
+                state=state,
+                unit_instance_id=target_unit_id,
+            ),
+        )
+        routed = continue_mortal_wound_application(
+            state=state,
+            decisions=decisions,
+            request_id=state.next_decision_request_id(),
+            progress=progress,
+            dice_manager=manager,
+        )
+        status = _resolve_routed_generic_rule_ir_mortal_wounds(
+            state=state,
+            decisions=decisions,
+            routed_request=routed.request,
+            routed_application=routed.application,
+            routed_progress=routed.progress,
+        )
+        if status is not None:
+            return status
+        return None
+    decisions.event_log.append(
+        "generic_stratagem_roll_per_target_mortal_wounds_resolved",
+        validate_json_value(
+            {
+                **{key: value for key, value in batch_payload.items() if key != "use_id"},
+                "target_results": list(resolved_results),
+            }
+        ),
+    )
+    return None
+
+
+def _completed_generic_target_result(
+    *,
+    plan: dict[str, JsonValue],
+    application: MortalWoundApplication | None,
+) -> dict[str, JsonValue]:
+    return {
+        **plan,
+        "mortal_wound_application": (
+            validate_json_value(application.to_payload()) if application is not None else None
+        ),
+    }
+
+
+def _emit_generic_roll_pool_mortal_wounds_resolved(
+    *,
+    decisions: DecisionController,
+    resolution_payload: dict[str, JsonValue],
+    application: MortalWoundApplication | None,
+) -> None:
+    decisions.event_log.append(
+        "generic_stratagem_roll_pool_mortal_wounds_resolved",
+        validate_json_value(
+            {
+                **resolution_payload,
+                "mortal_wound_application": (
+                    validate_json_value(application.to_payload())
+                    if application is not None
+                    else None
+                ),
+            }
+        ),
     )
 
 
@@ -897,6 +1144,32 @@ def _opposing_player_id(*, state: GameState, player_id: str) -> str:
 
 def _unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> str:
     return rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id).owner_player_id
+
+
+def _json_object(value: JsonValue, label: str) -> dict[str, JsonValue]:
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"{label} must be an object.")
+    return value
+
+
+def _json_array(value: JsonValue, label: str) -> list[JsonValue]:
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"{label} must be an array.")
+    return value
+
+
+def _required_payload_string(payload: dict[str, JsonValue], key: str) -> str:
+    value = payload.get(key)
+    if type(value) is not str:
+        raise GameLifecycleError(f"Generic mortal-wound payload {key} must be a string.")
+    return _validate_identifier(key, value)
+
+
+def _required_payload_int(payload: dict[str, JsonValue], key: str) -> int:
+    value = payload.get(key)
+    if type(value) is not int or value < 0:
+        raise GameLifecycleError(f"Generic mortal-wound payload {key} must be a non-negative int.")
+    return value
 
 
 def _event_payload(

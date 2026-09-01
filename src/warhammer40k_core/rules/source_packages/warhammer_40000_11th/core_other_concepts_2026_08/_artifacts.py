@@ -20,18 +20,30 @@ ARTIFACT_SCHEMA: Final = "core-v2-other-concepts-source-v1"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-other-concepts"
 EXPECTED_SOURCE_VERSION: Final = "40k-app-other-concepts-observed-2026-08-31"
 EXPECTED_SOURCE_URL: Final = "https://www.40k.app/rules/06-other-concepts"
-EXPECTED_OBSERVED_AT: Final = "2026-08-31T11:41:03-04:00"
-EXPECTED_RULE_IDENTITY: Final = (
-    "gw-11e-core-rules:other-concepts:visibility",
-    "06.01",
-    "VISIBILITY",
-    "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883",
+EXPECTED_OBSERVED_AT: Final = "2026-08-31T13:01:46-04:00"
+EXPECTED_RULE_IDENTITIES: Final = (
+    (
+        "visibility",
+        "gw-11e-core-rules:other-concepts:visibility",
+        "06.01",
+        "VISIBILITY",
+        "eefe89c9c39b6d8560ba274d414567faebfad2aa17f2b84b5745eb714ffd9883",
+    ),
+    (
+        "mortal-wounds",
+        "gw-11e-core-rules:other-concepts:mortal-wounds",
+        "06.02",
+        "MORTAL WOUNDS",
+        "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831",
+    ),
 )
 EXPECTED_OBSERVATION_SHA256S: Final = (
     "7c9700d51718a74421b3a992336fef7ed34ba40e77c1f3ad6f70a4c91e2f7a30",
     "cf12c5ecc2b7fdc082246161fcbab2e301df0a1eb8134f4b69175f0884a35a9a",
+    "57b9542afdef85452b316c1bf695591d5d66165a01bf2b0a6fc0b9104890516d",
+    "faa8f4b08ebb8663e2ae5f84373465d5691b58ca56d67e461b9e81fdea4abc8a",
 )
-EXPECTED_PACKAGE_HASH: Final = "409c0bd79aa7e8f70495f714ecb05b45bff971520c3cac52360fcbdcf42fca99"
+EXPECTED_PACKAGE_HASH: Final = "3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a"
 
 
 class CoreOtherConceptsSourceArtifactError(ValueError):
@@ -155,29 +167,40 @@ def core_other_concepts_source_artifact_from_json_bytes(
         raise CoreOtherConceptsSourceArtifactError(
             "Other Concepts source artifact schema is invalid."
         ) from exc
-    if len(artifact.rules) != 1:
+    if len(artifact.rules) != len(EXPECTED_RULE_IDENTITIES):
         raise CoreOtherConceptsSourceArtifactError(
             "Other Concepts source artifact drifted from its reviewed identity."
         )
-    rule = artifact.rules[0]
-    actual_rule_identity = (
-        rule.source_id,
-        rule.section_id,
-        rule.section_heading,
-        rule.transcription_sha256,
+    actual_rule_identities = tuple(
+        (
+            rule.rule_id,
+            rule.source_id,
+            rule.section_id,
+            rule.section_heading,
+            rule.transcription_sha256,
+        )
+        for rule in artifact.rules
     )
+    expected_transcriptions = {
+        source_id: transcription_sha256
+        for _, source_id, _, _, transcription_sha256 in EXPECTED_RULE_IDENTITIES
+    }
     if (
         artifact.artifact_schema != ARTIFACT_SCHEMA
         or artifact.source_package_id != EXPECTED_SOURCE_PACKAGE_ID
         or artifact.source_version != EXPECTED_SOURCE_VERSION
         or artifact.source_document.source_url != EXPECTED_SOURCE_URL
         or artifact.source_document.observed_at != EXPECTED_OBSERVED_AT
-        or actual_rule_identity != EXPECTED_RULE_IDENTITY
-        or rule.rule_id != "visibility"
-        or hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
-        or len(artifact.evidence) != 2
-        or any(row.rule_source_id != EXPECTED_RULE_IDENTITY[0] for row in artifact.evidence)
-        or any(row.transcription_sha256 != EXPECTED_RULE_IDENTITY[3] for row in artifact.evidence)
+        or actual_rule_identities != EXPECTED_RULE_IDENTITIES
+        or any(
+            hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
+            for rule in artifact.rules
+        )
+        or len(artifact.evidence) != len(EXPECTED_RULE_IDENTITIES) * 2
+        or any(
+            expected_transcriptions.get(row.rule_source_id) != row.transcription_sha256
+            for row in artifact.evidence
+        )
         or tuple(row.observation_sha256 for row in artifact.evidence)
         != EXPECTED_OBSERVATION_SHA256S
         or artifact.package_hash != EXPECTED_PACKAGE_HASH
@@ -210,7 +233,7 @@ __all__ = (
     "EXPECTED_OBSERVATION_SHA256S",
     "EXPECTED_OBSERVED_AT",
     "EXPECTED_PACKAGE_HASH",
-    "EXPECTED_RULE_IDENTITY",
+    "EXPECTED_RULE_IDENTITIES",
     "EXPECTED_SOURCE_URL",
     "CoreOtherConceptsSourceArtifactError",
     "CoreOtherConceptsSourcePackageArtifact",

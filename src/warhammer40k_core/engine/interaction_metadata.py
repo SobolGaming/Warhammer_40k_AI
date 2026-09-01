@@ -188,6 +188,10 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.ENTITY_SELECTION,
             ("model",),
         ),
+        "select_mortal_wound_model": InteractionSpec(
+            InteractionKind.ENTITY_SELECTION,
+            ("model",),
+        ),
         "select_deployment_unit": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("unit",),

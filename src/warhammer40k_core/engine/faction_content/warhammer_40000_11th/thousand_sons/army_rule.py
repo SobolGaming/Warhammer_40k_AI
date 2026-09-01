@@ -26,11 +26,9 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplication,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -65,6 +63,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -354,7 +355,7 @@ def apply_cabal_mortal_wound_feel_no_pain_decision(
 ) -> LifecycleStatus | None:
     if type(context) is not MortalWoundFeelNoPainContinuationContext:
         raise GameLifecycleError("Cabal of Sorcerers FNP continuation requires context.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -534,7 +535,7 @@ def _resolve_routed_cabal_mortal_wounds(
             payload=validate_json_value(
                 {
                     "phase": BattlePhase.SHOOTING.value,
-                    "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                    "decision_type": routed_request.decision_type,
                     "source_rule_id": SOURCE_RULE_ID,
                     "source_kind": CABAL_MORTAL_WOUND_SOURCE_KIND,
                     "mortal_wound_kind": source_context["mortal_wound_kind"],

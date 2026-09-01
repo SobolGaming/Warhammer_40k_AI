@@ -1874,6 +1874,38 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   submissions reject before queue pop and before mutation. Accepted selections
   resume the same grouped save/damage resolver, and the save and damage events
   for that die carry the selected model ID.
+- `select_mortal_wound_model`: finite controlling-player choice emitted before
+  each mortal wound is resolved when more than one living model shares the
+  first applicable 06.02 priority tier. Option IDs are the sorted current legal
+  model IDs. The request payload includes `selection_kind:
+  "mortal_wound_model"`, `target_unit_instance_id`, `source_rule_id`,
+  replay-safe `source_context`, `remaining_mortal_wounds`,
+  `legal_model_ids`, `priority_tier`, and the complete
+  `mortal_wound_progress`. That private progress includes a `target_lineage`
+  object with policy `frozen_rules_unit_components`, the canonical packet
+  target and owner, exact component-unit IDs, and the components classified as
+  Character when the packet began. That Character-component set is not
+  self-authenticating: restore and pre-submission validation reconstruct it
+  from current attached Leader/Support roles plus authoritative Character
+  keywords, or, after dissolution, from the exact matching
+  `StartingAttachedUnitRecord` Leader/Support roles plus those keywords. Any
+  persisted classification drift rejects before queue pop or mutation. Each
+  option repeats its `selected_model_id` and `priority_tier`. The four tier
+  tokens are `wounded_non_character`,
+  `non_character`, `wounded_character`, and `character`, in that exact order.
+  The engine auto-selects only when the active tier contains exactly one legal
+  model. Accepted submissions resolve exactly one mortal wound on the selected
+  model, then recompute the priority tiers before the next mortal wound; any
+  resulting Feel No Pain choice remains a separate `select_feel_no_pain`
+  request. Stale, drifted, malformed, wrong-actor, wrong-option,
+  payload-mismatched, dead-model, or priority-tier-drift submissions return
+  `invalid_mortal_wound_model_result` before queue pop or authoritative
+  mutation. Shooting, Fight, Hazardous, Explosives, Deadly Demise, movement,
+  Transport, and registered runtime-content continuations all resume through
+  the same producer-owned mortal-wound path. Public projections expose the
+  request to both viewers with `entity_selection` interaction metadata and
+  `model` as the primary assignment; adapters must submit one pending option ID
+  and must never select a model or apply a wound locally.
 - `select_feel_no_pain`: reserved finite defending-player choice for optional or competing Feel No Pain sources. Option IDs are source IDs, plus `decline` when the rules allow declining. `payload.lost_wound_context` and `payload.sources` are replay-safe and must be submitted through the same finite decision path. Normal lost wounds use `lost_wound_context.context_kind: "lost_wound"`; deferred mortal wounds, Explosives mortal wounds, Hazardous mortal wounds, and other routed mortal-wound packets use `lost_wound_context.context_kind: "mortal_wound"` and keep the pending mortal-wound application state in that replay-safe context until the choice resolves. Sources may carry `attack_condition: "psychic_attack"`; those sources are eligible only for lost wounds whose attack context has `is_psychic_attack: true`. Sources may also carry `mortal_wounds: true`; those sources are eligible for ordinary mortal-wound routing with no attack context.
 
 Phase 13E implements this destroyed-model attack-resolution decision:
@@ -3464,11 +3496,41 @@ nested cause, boundary, producer, placement, and transition evidence, from
 public pending-request projections, decision-requested/recorded events, and
 lifecycle status payloads for every viewer role.
 
+The private mortal-wound Feel No Pain context also retains one exact
+`allocation_occurrence` for the current wound. It binds the application and
+wound index, target canonical rules-unit ID, active 06.02 priority tier, exact
+legal model inventory, selected model, automatic-or-player selection
+disposition, parent request/result IDs when selected by a player, and the exact
+selected-model Feel No Pain source inventory and decline policy. Restore and
+pre-submission validation reconstruct that occurrence, its parent decision
+closure, the child request, and both private events before queue pop, recording,
+RNG, damage, or completion. The shared redaction owner removes the occurrence
+with the rest of the private lost-wound context; adapters must not create,
+modify, or interpret it.
+
+The same private context retains the packet's frozen target lineage. If model
+destruction reconciles an Attached Unit into multiple current descendants while
+the packet is paused, restore and pre-submission validation expand all placed,
+living descendants represented by those exact frozen components and recompute
+the four priority tiers across that packet-wide population. They do not select
+one descendant, terminate the packet, or admit a component that joined later.
+The frozen Character-component classification survives the split, but its
+serialized value is never trusted by itself. Before allocation authority is
+accepted, the engine reconstructs the exact set from active attached
+Leader/Support component roles or the canonical target's exact historical
+`StartingAttachedUnitRecord`, unions any independently Character-keyworded
+component, and requires equality with the retained set. Coordinated drift of
+the application-started event, model request, allocation occurrence, Feel No
+Pain request, parent decision closure, or their request events therefore still
+rejects before queue pop, decision recording, RNG, wound mutation, destruction,
+or packet completion. This lineage is engine authority and remains inside the
+redacted mortal-wound context.
+
 The engine records one private `mortal_wound_application_started` authority
 event before any shared mortal-wound packet applies damage. It freezes the
 game/application ID, exact source rule/context, target and defender, packet size,
-spillover, destruction evidence, priority models, and initial logical-death
-binding mode. Restore requires it to precede and bind exactly one pending Feel
+spillover, destruction evidence, priority models, frozen target lineage, and
+initial logical-death binding mode. Restore requires it to precede and bind exactly one pending Feel
 No Pain request or supported packet terminal, and also validates terminals back
 to exactly one root. Auxiliary Deadly Demise collateral-cause finalization is a
 separate typed finalization kind, not a packet terminal; restore binds each such

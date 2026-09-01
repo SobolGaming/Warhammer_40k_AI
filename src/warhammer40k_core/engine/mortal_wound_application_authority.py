@@ -23,6 +23,10 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     MortalWoundLogicalDeathCauseBindingPayload,
 )
+from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    MortalWoundTargetLineage,
+    MortalWoundTargetLineagePayload,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
@@ -50,6 +54,7 @@ class MortalWoundApplicationAuthorityPayload(TypedDict):
     spill_over: bool
     destruction_evidence: JsonValue
     priority_model_ids: list[str]
+    target_lineage: MortalWoundTargetLineagePayload
     initial_logical_death_cause_binding: MortalWoundLogicalDeathCauseBindingPayload
 
 
@@ -65,6 +70,7 @@ class MortalWoundApplicationAuthority:
     spill_over: bool
     destruction_evidence: MortalWoundDestructionEvidence | None
     priority_model_ids: tuple[str, ...]
+    target_lineage: MortalWoundTargetLineage
     initial_logical_death_cause_binding: MortalWoundLogicalDeathCauseBinding
 
     def __post_init__(self) -> None:
@@ -107,6 +113,13 @@ class MortalWoundApplicationAuthority:
             self.priority_model_ids,
         )
         object.__setattr__(self, "priority_model_ids", priority_model_ids)
+        if type(self.target_lineage) is not MortalWoundTargetLineage:
+            raise GameLifecycleError("Mortal-wound application target lineage is invalid.")
+        if (
+            self.target_lineage.canonical_target_unit_instance_id != self.target_unit_instance_id
+            or self.target_lineage.owner_player_id != self.defender_player_id
+        ):
+            raise GameLifecycleError("Mortal-wound application target lineage drift.")
         binding = _initial_binding(self.initial_logical_death_cause_binding)
         object.__setattr__(self, "initial_logical_death_cause_binding", binding)
 
@@ -129,6 +142,7 @@ class MortalWoundApplicationAuthority:
                 evidence_to_json(self.destruction_evidence),
             ),
             "priority_model_ids": list(self.priority_model_ids),
+            "target_lineage": self.target_lineage.to_payload(),
             "initial_logical_death_cause_binding": (
                 self.initial_logical_death_cause_binding.to_payload()
             ),
@@ -138,9 +152,6 @@ class MortalWoundApplicationAuthority:
         """Bind the serialized packet root to authoritative game ownership."""
 
         from warhammer40k_core.engine.game_state import GameState
-        from warhammer40k_core.engine.rules_units import (
-            current_rules_unit_views_for_canonical_identity,
-        )
 
         if type(state) is not GameState:
             raise GameLifecycleError(
@@ -148,23 +159,12 @@ class MortalWoundApplicationAuthority:
             )
         if self.game_id != state.game_id:
             raise GameLifecycleError("Mortal-wound application authority game drift.")
-        target_rules_units = current_rules_unit_views_for_canonical_identity(
-            state=state,
-            unit_instance_id=self.target_unit_instance_id,
-        )
-        if {rules_unit.owner_player_id for rules_unit in target_rules_units} != {
-            self.defender_player_id
-        }:
-            raise GameLifecycleError("Mortal-wound application defender owner drift.")
+        self.target_lineage.validate_for_state(state)
         if self.destruction_evidence is not None:
             self.destruction_evidence.validate_for_state(state)
-        target_component_unit_ids = {
-            component_unit_id
-            for rules_unit in target_rules_units
-            for component_unit_id in rules_unit.component_unit_instance_ids
-        }
         if any(
-            state.unit_instance_id_for_model(model_id) not in target_component_unit_ids
+            state.unit_instance_id_for_model(model_id)
+            not in set(self.target_lineage.component_unit_instance_ids)
             for model_id in self.priority_model_ids
         ):
             raise GameLifecycleError(
@@ -190,6 +190,7 @@ class MortalWoundApplicationAuthority:
                 "spill_over",
                 "destruction_evidence",
                 "priority_model_ids",
+                "target_lineage",
                 "initial_logical_death_cause_binding",
             },
         )
@@ -217,6 +218,7 @@ class MortalWoundApplicationAuthority:
             spill_over=spill_over,
             destruction_evidence=evidence_from_json(raw["destruction_evidence"]),
             priority_model_ids=tuple(cast(list[str], priority_model_ids)),
+            target_lineage=MortalWoundTargetLineage.from_payload(raw["target_lineage"]),
             initial_logical_death_cause_binding=MortalWoundLogicalDeathCauseBinding.from_payload(
                 raw["initial_logical_death_cause_binding"]
             ),
@@ -305,6 +307,11 @@ def append_direct_mortal_wound_application_started(
         spill_over=spill_over,
         destruction_evidence=destruction_evidence,
         priority_model_ids=(),
+        target_lineage=MortalWoundTargetLineage.freeze(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            owner_player_id=defender_player_id,
+        ),
         initial_logical_death_cause_binding=MortalWoundLogicalDeathCauseBinding.fixed(
             cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
             producer_id=application_id,
@@ -384,11 +391,11 @@ def validate_mortal_wound_application_authority_closure(
 ) -> None:
     """Require each packet root to have one pending request or terminal continuation."""
 
-    from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        is_mortal_wound_feel_no_pain_request,
-    )
     from warhammer40k_core.engine.decision_request import DecisionRequest
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
+    )
 
     if type(pending_decision_requests) is not tuple or any(
         type(request) is not DecisionRequest for request in pending_decision_requests
@@ -398,14 +405,9 @@ def validate_mortal_wound_application_authority_closure(
         )
     pending_application_ids: list[str] = []
     for request in cast(tuple[DecisionRequest, ...], pending_decision_requests):
-        if not is_mortal_wound_feel_no_pain_request(request):
+        if not is_mortal_wound_resolution_request(request):
             continue
-        request_payload = request.payload
-        if not isinstance(request_payload, dict):
-            raise GameLifecycleError("Pending mortal-wound request payload is invalid.")
-        progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-            request_payload.get("lost_wound_context")
-        )
+        progress = mortal_wound_resolution_progress(request)
         pending_application_ids.append(progress.application_id)
     event_indexes = {event.event_id: index for index, event in enumerate(event_records)}
     if len(event_indexes) != len(event_records):
@@ -609,14 +611,14 @@ def direct_mortal_wound_damage_snapshot_from_event(
 def _direct_mortal_wound_progress_from_event(
     event: EventRecord,
 ) -> MortalWoundApplicationProgress | None:
-    from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        is_mortal_wound_feel_no_pain_request,
-    )
     from warhammer40k_core.engine.decision_request import (
         DecisionError,
         DecisionRequest,
         DecisionRequestPayload,
+    )
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_progress,
     )
 
     if event.event_type != "decision_requested" or not isinstance(event.payload, dict):
@@ -625,14 +627,9 @@ def _direct_mortal_wound_progress_from_event(
         request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
     except (DecisionError, KeyError, TypeError) as exc:
         raise GameLifecycleError("Direct mortal-wound request event is invalid.") from exc
-    if not is_mortal_wound_feel_no_pain_request(request):
+    if not is_mortal_wound_resolution_request(request):
         return None
-    request_payload = request.payload
-    if not isinstance(request_payload, dict):
-        raise GameLifecycleError("Direct mortal-wound request payload is invalid.")
-    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        request_payload.get("lost_wound_context")
-    )
+    progress = mortal_wound_resolution_progress(request)
     return progress if progress.destruction_evidence is not None else None
 
 
@@ -1185,6 +1182,7 @@ def _authority_for_progress(
         spill_over=progress.spill_over,
         destruction_evidence=progress.destruction_evidence,
         priority_model_ids=progress.priority_model_ids,
+        target_lineage=_required_progress_target_lineage(progress),
         initial_logical_death_cause_binding=initial_binding,
     )
     authority.validate_for_state(state)
@@ -1296,6 +1294,15 @@ def _initial_binding(
     if binding.binding_kind is MortalWoundLogicalDeathBindingKind.FIXED_PRODUCER:
         return binding
     return MortalWoundLogicalDeathCauseBinding.per_model(cause_kind=binding.cause_kind)
+
+
+def _required_progress_target_lineage(
+    progress: MortalWoundApplicationProgress,
+) -> MortalWoundTargetLineage:
+    lineage = progress.target_lineage
+    if type(lineage) is not MortalWoundTargetLineage:
+        raise GameLifecycleError("Mortal-wound application lacks frozen target lineage.")
+    return lineage
 
 
 def _require_pristine_progress(progress: MortalWoundApplicationProgress) -> None:

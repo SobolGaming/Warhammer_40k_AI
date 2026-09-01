@@ -21,12 +21,8 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartNestedPendingAuthorityContext,
 )
 from warhammer40k_core.engine.damage_allocation import (
-    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplicationProgress,
     continue_mortal_wound_application,
-    is_mortal_wound_feel_no_pain_request,
-    mortal_wound_feel_no_pain_source_context,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -38,6 +34,11 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    is_mortal_wound_resolution_request,
+    mortal_wound_resolution_source_context,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
@@ -112,7 +113,7 @@ def apply_catalog_poisoned_mortal_wound_feel_no_pain_decision(
     source_context = _payload_object(context.source_context)
     if source_context.get("source_kind") != CATALOG_POISONED_COMMAND_MORTAL_WOUNDS_SOURCE_KIND:
         raise GameLifecycleError("Catalog poisoned Feel No Pain source kind drifted.")
-    routed = resolve_mortal_wound_feel_no_pain_decision(
+    routed = resolve_mortal_wound_decision(
         state=context.state,
         decisions=context.decisions,
         request=context.request,
@@ -127,7 +128,7 @@ def apply_catalog_poisoned_mortal_wound_feel_no_pain_decision(
             decision_request=routed.request,
             payload={
                 "phase": BattlePhase.COMMAND.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": _payload_string(source_context, "source_rule_id"),
                 "target_unit_instance_id": _payload_string(
                     source_context,
@@ -157,9 +158,9 @@ def validate_catalog_poisoned_command_nested_pending_authority(
         raise GameLifecycleError(
             "Catalog poisoned status requires nested pending authority context."
         )
-    if not is_mortal_wound_feel_no_pain_request(context.request):
+    if not is_mortal_wound_resolution_request(context.request):
         return False
-    source_context = mortal_wound_feel_no_pain_source_context(context.request)
+    source_context = mortal_wound_resolution_source_context(context.request)
     if not isinstance(source_context, dict) or source_context.get("source_kind") != (
         CATALOG_POISONED_COMMAND_MORTAL_WOUNDS_SOURCE_KIND
     ):
@@ -281,7 +282,7 @@ def _resolve_poisoned_target(
             decision_request=routed.request,
             payload={
                 "phase": BattlePhase.COMMAND.value,
-                "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                "decision_type": routed.request.decision_type,
                 "source_rule_id": source_effect.source_rule_id,
                 "target_unit_instance_id": target.unit_instance_id,
             },

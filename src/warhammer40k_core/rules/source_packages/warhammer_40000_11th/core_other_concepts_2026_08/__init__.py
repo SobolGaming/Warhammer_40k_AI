@@ -26,7 +26,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 from ._artifacts import (
     EXPECTED_OBSERVED_AT,
     EXPECTED_PACKAGE_HASH,
-    EXPECTED_RULE_IDENTITY,
+    EXPECTED_RULE_IDENTITIES,
     EXPECTED_SOURCE_URL,
     CoreOtherConceptsSourceArtifactError,
     CoreOtherConceptsSourcePackageArtifact,
@@ -35,7 +35,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "bd3efb8e43386a951343915595b7d7eb5e189380f0e0e85a83c731baac44423b"
+EXPECTED_ARTIFACT_SHA256: Final = "d2ed90878ed9b54bee86c89432e0c9a452705da959b7bc7cf4934ada1e1cf16d"
 
 
 def _load_artifact() -> CoreOtherConceptsSourcePackageArtifact:
@@ -63,12 +63,23 @@ SOURCE_VERSION: Final = _ARTIFACT.source_version
 SOURCE_URL: Final = EXPECTED_SOURCE_URL
 OBSERVED_AT: Final = EXPECTED_OBSERVED_AT
 PACKAGE_HASH: Final = EXPECTED_PACKAGE_HASH
-VISIBILITY_SOURCE_ID: Final = EXPECTED_RULE_IDENTITY[0]
-TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITY[3]
+VISIBILITY_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[0][1]
+TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[0][4]
+MORTAL_WOUNDS_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[1][1]
+MORTAL_WOUNDS_TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[1][4]
 
 
 def source_rule_record() -> CoreOtherConceptsSourceRuleArtifact:
     return _ARTIFACT.rules[0]
+
+
+def source_rule_record_by_id(rule_id: str) -> CoreOtherConceptsSourceRuleArtifact:
+    if type(rule_id) is not str or not rule_id:
+        raise CoreOtherConceptsSourceArtifactError("Other Concepts rule_id must be a string.")
+    for rule in _ARTIFACT.rules:
+        if rule.rule_id == rule_id:
+            return rule
+    raise CoreOtherConceptsSourceArtifactError("Other Concepts rule_id is unknown.")
 
 
 def source_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
@@ -96,11 +107,12 @@ def source_package() -> RuleSourcePackage:
             SourceDocument(
                 document_id=document_id,
                 title=_ARTIFACT.source_document.source_title,
-                source_texts=(
+                source_texts=tuple(
                     RuleSourceText.from_raw(
-                        source_id=_ARTIFACT.rules[0].source_id,
-                        raw_text=_ARTIFACT.rules[0].source_text,
-                    ),
+                        source_id=rule.source_id,
+                        raw_text=rule.source_text,
+                    )
+                    for rule in _ARTIFACT.rules
                 ),
             ),
         ),
@@ -119,12 +131,14 @@ def source_package() -> RuleSourcePackage:
     return RuleSourcePackage(
         source_catalog=source_catalog,
         source_evidence_catalog=SourceEvidenceCatalog(records=source_evidence_records()),
-        evidence_required_source_ids=(VISIBILITY_SOURCE_ID,),
+        evidence_required_source_ids=(MORTAL_WOUNDS_SOURCE_ID, VISIBILITY_SOURCE_ID),
     )
 
 
 __all__ = (
     "EXPECTED_ARTIFACT_SHA256",
+    "MORTAL_WOUNDS_SOURCE_ID",
+    "MORTAL_WOUNDS_TRANSCRIPTION_SHA256",
     "OBSERVED_AT",
     "PACKAGE_HASH",
     "SOURCE_PACKAGE_ID",
@@ -137,5 +151,6 @@ __all__ = (
     "source_evidence_records",
     "source_package",
     "source_rule_record",
+    "source_rule_record_by_id",
     "validate_core_other_concepts_source_artifact_bytes",
 )

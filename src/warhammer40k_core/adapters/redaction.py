@@ -24,6 +24,9 @@ from warhammer40k_core.engine.model_logical_death import (
 from warhammer40k_core.engine.mortal_wound_application_authority import (
     MORTAL_WOUND_APPLICATION_STARTED_EVENT,
 )
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
@@ -70,6 +73,7 @@ _INTERNAL_SECONDARY_AUTHORITY_COMMITMENT_KEYS = frozenset(
 )
 _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
     {
+        "allocation_occurrence",
         "logical_death_cause_binding",
         "logical_death_event",
         "logical_death_events",
@@ -439,6 +443,7 @@ def _event_record_hidden_from_context(
     if event_type in {
         MODEL_LOGICAL_DEATH_RECORDED_EVENT,
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+        MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
     }:
         return True
     if _player_owned_secret_event_hidden_from_context(payload=payload, viewer=viewer):

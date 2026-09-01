@@ -6,7 +6,6 @@ from warhammer40k_core.engine.attack_sequence_model import DEADLY_DEMISE_SOURCE_
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplicationProgress,
     MortalWoundRoutingResult,
-    resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.model_destruction_cause_authority import (
     ModelDestructionCauseKind,
@@ -18,6 +17,10 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     MortalWoundLogicalDeathRecorder,
     fixed_mortal_wound_logical_death_recorder,
+)
+from warhammer40k_core.engine.mortal_wound_model_allocation import (
+    mortal_wound_resolution_progress,
+    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -66,12 +69,7 @@ def resolve_attack_sequence_mortal_wound_feel_no_pain(
     next_request_id: str,
     dice_manager: DiceRollManager,
 ) -> MortalWoundRoutingResult:
-    request_payload = request.payload
-    if not isinstance(request_payload, dict):
-        raise GameLifecycleError("Mortal-wound request payload must be an object.")
-    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
-        request_payload.get("lost_wound_context")
-    )
+    progress = mortal_wound_resolution_progress(request)
     source_context = progress.source_context
     if not isinstance(source_context, dict):
         raise GameLifecycleError("Mortal-wound source context must be an object.")
@@ -86,7 +84,7 @@ def resolve_attack_sequence_mortal_wound_feel_no_pain(
         if is_deadly_demise
         else None
     )
-    return resolve_mortal_wound_feel_no_pain_decision(
+    return resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
         request=request,
