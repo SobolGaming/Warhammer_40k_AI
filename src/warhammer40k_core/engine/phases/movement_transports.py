@@ -61,7 +61,9 @@ def _disembark_candidate_for_movement_unit(
     )
     if rules_unit.unit_instance_id != unit_id:
         raise GameLifecycleError("Disembark candidate requires canonical rules-unit identity.")
-    component_ids = rules_unit.component_unit_instance_ids
+    component_ids = tuple(
+        component.unit.unit_instance_id for component in rules_unit.living_components
+    )
     if not all(active_cargo.contains_unit(component_id) for component_id in component_ids):
         return None
     if not all(
@@ -163,7 +165,9 @@ def _request_disembark_placement(
         placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
         context={
             "transport_unit_instance_id": selection.transport_unit_instance_id,
-            "component_unit_instance_ids": list(rules_unit.component_unit_instance_ids),
+            "component_unit_instance_ids": [
+                component.unit.unit_instance_id for component in rules_unit.living_components
+            ],
             "model_instance_ids": validate_json_value(
                 sorted(model.model_instance_id for model in rules_unit.alive_models())
             ),

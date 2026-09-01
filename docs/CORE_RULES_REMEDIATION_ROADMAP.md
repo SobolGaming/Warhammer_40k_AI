@@ -1208,9 +1208,20 @@ split-state mutation are removed.
 `RulesUnitView.living_components` is the single authority for semantic component contribution.
 Rules-unit keyword aggregation, grouped battlefield placement, Embark capacity profiles, Gate of
 Infinity ability/presence/engagement checks, Datasheet/RuleIR/Enhancement reserve-entry authority,
-and Daemonic Incursion keyword checks all consume that view. Immutable
+Daemonic Incursion keyword checks, movement-location enumeration, and Disembark eligibility and
+proposal authority all consume that view. Immutable
 `component_unit_instance_ids` remain the lineage and replay identity surface; they are not a proxy
 for current semantic or physical presence.
+
+Transport cargo is current physical authority rather than Attached Unit lineage. Embark records
+only the living component IDs present in its accepted `RulesUnitPlacement`; Disembark removes that
+same physical set; and primary departure evidence retains the complete canonical lineage while
+recording only components and models that actually departed. Both damage-based and rule-based
+model destruction converge on shared cargo reconciliation: when the last model in an embarked
+physical component is destroyed, its ID is removed from current cargo without rewriting
+start-of-phase history or treating destruction as a Disembark. An unarrived Transport's current
+ReserveState cargo manifest is updated with that cleanup, and transport-state integrity
+rejects any payload that retains a wholly destroyed component as current cargo.
 
 Battle-shock, ReserveState, persisting effects, Mission Actions, Fight activation consumption,
 selected-target chains, healing, scoring witnesses, and adapter-visible unit identities stay on the
@@ -1244,7 +1255,7 @@ The generated package hash is
 `3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570` and its canonical artifact
 byte SHA-256 is `748cf1bc4cbd2749655abab43e97c7e04acfa4e63e79b9f84b565001b9c17b66`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:067c680a617dbae85543d77c8558bf984a5625b9a99788a8ef9f4ef7683750ba`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:4433f20483de37b564727acb8eb3c6fc0f8bb1330851bc49f42122a5b3f826a0`.
 
 Load and execution support: The Attached Units rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1288,7 +1299,10 @@ after either loss, with the destroyed component lacking the ability and battlefi
 Daemonic Incursion keyword aggregation; and complete affected-file behavior. Static audit also
 requires grouped Embark placement and every identified ability, keyword, reserve-authority, and
 capacity consumer to use `living_components` instead of directly scanning immutable lineage. The
-obsolete split-history and reserve-transfer modules are absent.
+post-loss Embark-to-Disembark regression proves cargo drains completely and the retained root is
+enumerated on the battlefield again. Damage and direct-rule destruction regressions prove shared
+cleanup for components destroyed while already embarked, including current unarrived-Reserve
+manifest reconciliation. The obsolete split-history and reserve-transfer modules are absent.
 
 Generated artifacts/documentation: P19 adds
 `core_attached_units_2026_09/artifacts/package.json`, its typed loader/source package, and the
@@ -1303,15 +1317,17 @@ Validation results:
   healing, scoring, adapter, replay, Horror materialization, and static-audit regressions pass. The
   review follow-up's complete affected-file cluster passes all `227` tests, including Embark and
   Gate of Infinity after either Leader or Bodyguard loss and Daemonic Incursion keyword authority;
-  the complete code-quality suite passes all `340` tests.
-- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2646` source files;
+  the remaining-blocker transport/static cluster passes all `118` tests, including post-loss
+  Embark-to-Disembark, already-embarked destruction cleanup, unarrived-Reserve synchronization,
+  and stale-cargo rejection; the complete code-quality suite passes all `341` tests.
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2647` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6353 passed` in `491.84s`), including the
+- The required final xdist work-stealing suite passes (`6359 passed` in `438.14s`), including the
   complete code-quality suite.
 - The Attached Units source artifact, final engine build identity, and regenerated external
   contract pass fail-closed checks, including the `origin/main` compatibility comparison.
-- Installed-wheel smoke passes with `2476` packaged engine resources and `27` schemas. The host has
+- Installed-wheel smoke passes with `2477` packaged engine resources and `27` schemas. The host has
   no `npm` executable, so `npm ci` and npm wrapper commands could not run; the already locked
   dependencies were exercised directly with the bundled Node runtime. Generated-client drift,
   TypeScript type checks, and all `5` client unit tests pass, and the two-server HTTP conformance

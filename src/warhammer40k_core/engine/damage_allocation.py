@@ -96,6 +96,9 @@ from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_owner_player_id,
 )
+from warhammer40k_core.engine.transport_cargo_destruction import (
+    reconcile_transport_cargo_after_model_destruction,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 if TYPE_CHECKING:
@@ -2796,6 +2799,11 @@ def _replace_model_wounds(
     if not did_update:
         raise GameLifecycleError("Cannot update wounds for unknown model.")
     state.replace_army_definitions(updated_armies)
+    if wounds_remaining == 0:
+        reconcile_transport_cargo_after_model_destruction(
+            state=state,
+            model_instance_id=model_instance_id,
+        )
 
 
 def _remove_destroyed_model(*, state: GameState, model_instance_id: str) -> None:

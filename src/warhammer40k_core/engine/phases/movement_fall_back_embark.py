@@ -883,14 +883,22 @@ def _apply_valid_embark(
         armies=tuple(state.army_definitions),
         unit_instance_id=embark.selection.unit_instance_id,
     )
+    departed_component_ids = tuple(
+        sorted(
+            {
+                embarked_rules_unit.component_unit_id_for_model(removal.model_instance_id)
+                for removal in embark.transition_batch.removals
+            }
+        )
+    )
     departure_ids_before = tuple(
         value.departure_id for value in state.primary_battlefield_departure_states
     )
     record_primary_battlefield_departure(
         state=state,
         rules_unit_instance_id=embarked_rules_unit.unit_instance_id,
-        affected_component_unit_instance_ids=(embarked_rules_unit.component_unit_instance_ids),
-        departed_component_unit_instance_ids=(embarked_rules_unit.component_unit_instance_ids),
+        affected_component_unit_instance_ids=departed_component_ids,
+        departed_component_unit_instance_ids=departed_component_ids,
         removed_model_instance_ids=tuple(
             removal.model_instance_id for removal in embark.transition_batch.removals
         ),

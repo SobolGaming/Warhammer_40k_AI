@@ -118,6 +118,22 @@ TRANSPORTS = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
 TRANSPORT_EMBARK_GROUPS = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "transport_embark_groups.py"
 )
+TRANSPORT_CARGO_DESTRUCTION = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "transport_cargo_destruction.py"
+)
+MOVEMENT_TRANSPORTS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_transports.py"
+)
+MOVEMENT_VALIDATION = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_validation.py"
+)
+MOVEMENT_FALL_BACK_EMBARK = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_fall_back_embark.py"
+)
+PRIMARY_BATTLEFIELD_DEPARTURE_INTEGRITY = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "primary_battlefield_departure_integrity.py"
+)
+DAMAGE_ALLOCATION = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
 RULES_UNIT_PLACEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "rules_unit_placement.py"
 PRIMARY_RESERVE_ENTRY_PROVIDER = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "primary_reserve_entry_provider.py"
@@ -476,6 +492,14 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
     for path, function_names in (
         (TRANSPORTS, ("resolve_embark",)),
         (
+            MOVEMENT_TRANSPORTS,
+            (
+                "_disembark_candidate_for_movement_unit",
+                "_request_disembark_placement",
+            ),
+        ),
+        (MOVEMENT_VALIDATION, ("_movement_unit_candidates",)),
+        (
             GREY_KNIGHTS_ARMY_RULE,
             (
                 "_rules_unit_has_gate_of_infinity",
@@ -513,6 +537,65 @@ def test_p19_semantic_consumers_use_central_living_component_authority() -> None
         assert "keyword_contributing_components" not in path.read_text(encoding="utf-8"), (
             f"{path.relative_to(ROOT)} retains the superseded keyword-only component view."
         )
+
+
+def test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cleanup() -> None:
+    resolve_embark = _function_node(path=TRANSPORTS, function_name="resolve_embark")
+    cargo_additions = tuple(
+        node
+        for node in ast.walk(resolve_embark)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "with_embarked_unit"
+    )
+    assert len(cargo_additions) == 1
+    assert ast.unparse(cargo_additions[0].args[0]) == "component_id"
+    cargo_loop = next(
+        node
+        for node in ast.walk(resolve_embark)
+        if isinstance(node, (ast.For, ast.comprehension))
+        and cargo_additions[0] in tuple(ast.walk(node))
+    )
+    assert ast.unparse(cargo_loop.iter) == ("rules_unit_placement.component_unit_instance_ids")
+
+    wound_mutation = _function_node(path=DAMAGE_ALLOCATION, function_name="_replace_model_wounds")
+    wound_mutation_calls = {
+        node.func.id
+        for node in ast.walk(wound_mutation)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "reconcile_transport_cargo_after_model_destruction" in wound_mutation_calls
+
+    cargo_cleanup = _function_node(
+        path=TRANSPORT_CARGO_DESTRUCTION,
+        function_name="reconcile_transport_cargo_after_model_destruction",
+    )
+    cleanup_attributes = {
+        node.attr for node in ast.walk(cargo_cleanup) if isinstance(node, ast.Attribute)
+    }
+    assert {
+        "replace_transport_cargo_state",
+        "replace_reserve_state",
+        "transport_cargo_state_for_embarked_unit",
+    }.issubset(cleanup_attributes)
+
+    embark_mutation = _function_node(
+        path=MOVEMENT_FALL_BACK_EMBARK,
+        function_name="_apply_valid_embark",
+    )
+    embark_mutation_attributes = {
+        node.attr for node in ast.walk(embark_mutation) if isinstance(node, ast.Attribute)
+    }
+    assert "component_unit_id_for_model" in embark_mutation_attributes
+    assert "component_unit_instance_ids" not in embark_mutation_attributes
+
+    cargo_integrity = _function_node(
+        path=PRIMARY_BATTLEFIELD_DEPARTURE_INTEGRITY,
+        function_name="_validate_embark_cargo",
+    )
+    cargo_integrity_source = ast.unparse(cargo_integrity)
+    assert "departure.departed_component_unit_instance_ids" in cargo_integrity_source
+    assert "departure.component_unit_instance_ids" not in cargo_integrity_source
 
 
 def test_selected_target_canonical_identity_resolves_one_retained_rules_unit() -> None:
