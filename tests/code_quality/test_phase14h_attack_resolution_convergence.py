@@ -31,6 +31,9 @@ ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH = (
 ATTACK_DESTRUCTION_BOUNDARY_PATH = (
     "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py"
 )
+ATTACK_DESTRUCTION_RESTORE_PATH = (
+    "src/warhammer40k_core/engine/model_destruction_cause_attack_restore.py"
+)
 PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS = {
     "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py",
     "src/warhammer40k_core/engine/game_state.py",
@@ -161,11 +164,17 @@ def test_phase14h_retired_attack_allocation_surface_is_absent() -> None:
 def test_p05a_attack_destruction_reactions_share_one_end_of_attacks_boundary() -> None:
     damage_source = source_for(ROOT / ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH)
     boundary_source = source_for(ROOT / ATTACK_DESTRUCTION_BOUNDARY_PATH)
+    restore_source = source_for(ROOT / ATTACK_DESTRUCTION_RESTORE_PATH)
     dispatch_source = source_for(SRC_ROOT / "engine" / "attack_sequence_dispatch.py")
 
     assert "defer_destroyed_attack_damage_if_required(" in damage_source
     assert "attack_destruction_requires_end_of_attacks_boundary(" in boundary_source
     assert boundary_source.count('"attack_model_destruction_deferred"') == 1
+    assert '"attack_pool_sha256"' in boundary_source
+    assert 'deferred_payload.get("attack_pool_sha256")' in restore_source
+    assert "pending.attack_pool_evidence_sha256" in restore_source
+    assert "if attack_sequence.attacks_resolved_event_id is None:" in restore_source
+    assert "if not attack_sequence.is_complete:" in restore_source
     assert "remove_destroyed_model_from_battlefield(" in boundary_source
     assert "resolve_pending_attack_destruction_until_blocked(" in dispatch_source
     assert (

@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4a5313b24e04363f9a21d2012352531c4a42a3d317643a3ae3be98088a62cd9",
-  "fingerprint": "b4a5313b24e04363f9a21d2012352531c4a42a3d317643a3ae3be98088a62cd9",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:921c8f30ca56876ea2dcab86b2c8edf78cd580892ddbda9591eea497b1dd2942",
+  "fingerprint": "921c8f30ca56876ea2dcab86b2c8edf78cd580892ddbda9591eea497b1dd2942",
   "resource_count": 2484,
   "resources": [
     {
@@ -660,14 +660,14 @@
       "sha256": "a7dfa492c9faccaaad21a10b8fd39c582b3247c3b40c937f3d2a2c3eeaa6bcf9"
     },
     {
-      "byte_length": 13068,
+      "byte_length": 13139,
       "path": "warhammer40k_core/engine/attack_sequence_destruction_boundary.py",
-      "sha256": "196ccfb7984ed92037187186c4284c979e7468aa3e5b88b6ad91804f50eccfcf"
+      "sha256": "cdc817f43467c545b59bc8ed73df69c4864436a4be1740bd08580fae9b5b6fbf"
     },
     {
-      "byte_length": 5768,
+      "byte_length": 6096,
       "path": "warhammer40k_core/engine/attack_sequence_destruction_model.py",
-      "sha256": "cbff90f847146787bf66c7f495d6608499c0a2fe10c1cec2affde02efa4f218b"
+      "sha256": "f6bef97eb658ca613228c742dd3d425e08ca815f468f20f17b50095dd0cfe60d"
     },
     {
       "byte_length": 71641,
@@ -9530,9 +9530,9 @@
       "sha256": "a8403755b9941d4cef8a5f8196eb1143f42c8e5489c282c1c94d633487152a52"
     },
     {
-      "byte_length": 10129,
+      "byte_length": 13305,
       "path": "warhammer40k_core/engine/model_destruction_cause_attack_restore.py",
-      "sha256": "bcf7fdc75f782a46f372ea39b7faaa946df8dbba183c81022b671243fad0b47a"
+      "sha256": "29dbc600df6be1c48425e0c41d72e3b47b9383ded8f081a56cff48f87d65231b"
     },
     {
       "byte_length": 43765,
@@ -9540,9 +9540,9 @@
       "sha256": "1bba0475dcdd9858e2d7c820ce2c2e8df07e7dcca95b99af12045ecbb8831efd"
     },
     {
-      "byte_length": 62996,
+      "byte_length": 63065,
       "path": "warhammer40k_core/engine/model_destruction_cause_completion_restore.py",
-      "sha256": "4dbc11d02886b5fe31d99bf63f65f1ebf83143cc872f3c603ce0d5c099432ce7"
+      "sha256": "54ad3114c209b4015feed83f66497f3fbc5888c2ca833a7c79e55069876d72c7"
     },
     {
       "byte_length": 6519,

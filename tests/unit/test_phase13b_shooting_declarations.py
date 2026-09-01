@@ -143,6 +143,7 @@ from warhammer40k_core.engine.attack_sequence import (
     SaveDieEntryPayload,
     WoundRoll,
     apply_allocation_order_decision,
+    apply_damage_allocation_model_decision,
     apply_destroyed_transport_disembark_proposal_decision,
     apply_destruction_reaction_decision,
     attack_sequence_hit_roll_spec,
@@ -12126,6 +12127,81 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         already_allocated_model_ids=(),
         dice_manager=manager,
     )
+    for allocation_index in range(8):
+        assert remaining is not None
+        if remaining.pending_attack_destructions:
+            break
+        allocation_request = _decision_request(cast(LifecycleStatus, status))
+        assert allocation_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+        allocation_result = DecisionResult.for_request(
+            result_id=f"order-9-p05a-pre-boundary-allocation-{allocation_index:03d}",
+            request=allocation_request,
+            selected_option_id=allocation_request.options[0].option_id,
+        )
+        lifecycle.decision_controller.submit_result(allocation_result)
+        remaining, allocated_ids, status = apply_damage_allocation_model_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=remaining,
+            result=allocation_result,
+            already_allocated_model_ids=allocated_ids,
+            dice_manager=manager,
+        )
+    else:
+        raise AssertionError("Order 9 fixture did not reach pre-boundary destruction state.")
+
+    assert remaining is not None
+    assert remaining.pending_attack_destructions
+    assert remaining.attacks_resolved_event_id is None
+    pre_boundary_request = _decision_request(cast(LifecycleStatus, status))
+    assert pre_boundary_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining.attack_pools,
+        attack_sequence=remaining,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    pre_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    pre_boundary_restored = GameLifecycle.from_payload(pre_boundary_checkpoint)
+    assert pre_boundary_restored.state is not None
+    pre_boundary_shooting = pre_boundary_restored.state.shooting_phase_state
+    assert pre_boundary_shooting is not None
+    assert pre_boundary_shooting.attack_sequence == remaining
+    assert (
+        pre_boundary_restored.decision_controller.queue.peek_next().request_id
+        == pre_boundary_request.request_id
+    )
+    forged_pre_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(pre_boundary_checkpoint, sort_keys=True)),
+    )
+    forged_pre_boundary_events = forged_pre_boundary_checkpoint["decisions"]["event_log"]
+    forged_pre_boundary_events.append(
+        {
+            "event_id": f"event-{len(forged_pre_boundary_events) + 1:06d}",
+            "event_type": "attack_sequence_attacks_resolved",
+            "payload": {
+                "sequence_id": sequence_id,
+                "attacker_player_id": "player-a",
+                "attacking_unit_instance_id": attacker.unit_instance_id,
+                "timing_rule_id": CORE_DESTROYED_TIMING_RULE_ID,
+                "pending_destruction_count": 1,
+            },
+        }
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction boundary evidence drift",
+    ):
+        GameLifecycle.from_payload(forged_pre_boundary_checkpoint)
+
     remaining, _allocated_ids, status = _drain_damage_model_choices_with_manager(
         lifecycle=lifecycle,
         attack_sequence=remaining,
@@ -12304,6 +12380,79 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         match="Pending attack destruction boundary evidence drift",
     ):
         GameLifecycle.from_payload(drifted_boundary_checkpoint)
+    missing_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    missing_boundary_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], missing_boundary_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    missing_boundary_sequence["attacks_resolved_event_id"] = None
+    missing_boundary_event = next(
+        event
+        for event in missing_boundary_checkpoint["decisions"]["event_log"]
+        if event["event_type"] == "attack_sequence_attacks_resolved"
+    )
+    cast(dict[str, object], missing_boundary_event["payload"])["timing_rule_id"] = (
+        "forged-order-9-boundary"
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction lacks attacks-resolved evidence",
+    ):
+        GameLifecycle.from_payload(missing_boundary_checkpoint)
+    drifted_attacker_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_attacker_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], drifted_attacker_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    drifted_attacker_pending = cast(
+        list[dict[str, object]],
+        drifted_attacker_sequence["pending_attack_destructions"],
+    )[0]
+    cast(dict[str, object], drifted_attacker_pending["attack_pool"])[
+        "attacker_model_instance_id"
+    ] = attacker.own_models[1].model_instance_id
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction attack pool evidence drift",
+    ):
+        GameLifecycle.from_payload(drifted_attacker_checkpoint)
+    drifted_profile_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_profile_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], drifted_profile_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    drifted_profile_pending = cast(
+        list[dict[str, object]],
+        drifted_profile_sequence["pending_attack_destructions"],
+    )[0]
+    drifted_profile_pool = cast(dict[str, object], drifted_profile_pending["attack_pool"])
+    cast(dict[str, object], drifted_profile_pool["weapon_profile"])["range_profile"] = {
+        "kind": "melee",
+        "distance_inches": None,
+    }
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction attack pool evidence drift",
+    ):
+        GameLifecycle.from_payload(drifted_profile_checkpoint)
 
 
 def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywords() -> None:

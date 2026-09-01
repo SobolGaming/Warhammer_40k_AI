@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     )
     from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.damage_allocation import DamageApplication
+    from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.event_log import EventRecord
     from warhammer40k_core.engine.game_state import GameState
 
@@ -46,6 +47,7 @@ def validate_pending_attack_destruction_boundary(
     attack_sequence: AttackSequence,
     pending: PendingAttackDestruction,
     event_records: tuple[EventRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
     from warhammer40k_core.engine.attack_sequence_destruction_model import (
         PendingAttackDestruction,
@@ -53,12 +55,9 @@ def validate_pending_attack_destruction_boundary(
 
     if type(pending) is not PendingAttackDestruction:
         raise GameLifecycleError("Pending attack destruction boundary record is invalid.")
-    if attack_sequence.attacks_resolved_event_id is None:
-        raise GameLifecycleError("Pending attack destruction lacks attacks-resolved evidence.")
     by_id = {event.event_id: event for event in event_records}
     indexes = {event.event_id: index for index, event in enumerate(event_records)}
     damage_event = by_id.get(pending.damage_event_id)
-    attacks_resolved_event = by_id.get(attack_sequence.attacks_resolved_event_id)
     if (
         damage_event is None
         or damage_event.event_type != "attack_sequence_step"
@@ -88,6 +87,9 @@ def validate_pending_attack_destruction_boundary(
     )
     if len(deferred_matches) != 1:
         raise GameLifecycleError("Pending attack destruction deferral evidence drift.")
+    deferred_payload = cast(dict[str, JsonValue], deferred_matches[0].payload)
+    if deferred_payload.get("attack_pool_sha256") != pending.attack_pool_evidence_sha256:
+        raise GameLifecycleError("Pending attack destruction attack pool evidence drift.")
     sequence_deferrals = tuple(
         event
         for event in event_records
@@ -96,6 +98,40 @@ def validate_pending_attack_destruction_boundary(
         and event.payload.get("sequence_id") == attack_sequence.sequence_id
         and event.payload.get("timing_rule_id") == CORE_DESTROYED_TIMING_RULE_ID
     )
+    boundary_matches = tuple(
+        event
+        for event in event_records
+        if event.event_type == "attack_sequence_attacks_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == attack_sequence.sequence_id
+        and event.payload.get("timing_rule_id") == CORE_DESTROYED_TIMING_RULE_ID
+    )
+    if attack_sequence.attacks_resolved_event_id is None:
+        if boundary_matches:
+            raise GameLifecycleError("Pending attack destruction boundary evidence drift.")
+        if not attack_sequence.is_complete:
+            _validate_pre_boundary_attack_destruction_evidence(
+                attack_sequence=attack_sequence,
+                damage_event=damage_event,
+                deferred_event=deferred_matches[0],
+                sequence_deferrals=sequence_deferrals,
+                indexes=indexes,
+            )
+            return
+        if not _has_pending_devastating_wounds_continuation(
+            sequence_id=attack_sequence.sequence_id,
+            pending_decision_requests=pending_decision_requests,
+        ):
+            raise GameLifecycleError("Pending attack destruction lacks attacks-resolved evidence.")
+        _validate_pre_boundary_attack_destruction_evidence(
+            attack_sequence=attack_sequence,
+            damage_event=damage_event,
+            deferred_event=deferred_matches[0],
+            sequence_deferrals=sequence_deferrals,
+            indexes=indexes,
+        )
+        return
+    attacks_resolved_event = by_id.get(attack_sequence.attacks_resolved_event_id)
     if (
         attacks_resolved_event is None
         or attacks_resolved_event.event_type != "attack_sequence_attacks_resolved"
@@ -109,6 +145,8 @@ def validate_pending_attack_destruction_boundary(
         or attacks_resolved_event.payload.get("pending_destruction_count")
         != len(sequence_deferrals)
         or not sequence_deferrals
+        or len(boundary_matches) != 1
+        or boundary_matches[0].event_id != attacks_resolved_event.event_id
         or any(
             indexes[event.event_id] >= indexes[attacks_resolved_event.event_id]
             for event in sequence_deferrals
@@ -117,6 +155,45 @@ def validate_pending_attack_destruction_boundary(
         or indexes[deferred_matches[0].event_id] >= indexes[attacks_resolved_event.event_id]
     ):
         raise GameLifecycleError("Pending attack destruction boundary evidence drift.")
+
+
+def _validate_pre_boundary_attack_destruction_evidence(
+    *,
+    attack_sequence: AttackSequence,
+    damage_event: EventRecord,
+    deferred_event: EventRecord,
+    sequence_deferrals: tuple[EventRecord, ...],
+    indexes: dict[str, int],
+) -> None:
+    if (
+        not sequence_deferrals
+        or len(sequence_deferrals) != len(attack_sequence.pending_attack_destructions)
+        or indexes[damage_event.event_id] >= indexes[deferred_event.event_id]
+    ):
+        raise GameLifecycleError("Pending attack destruction pre-boundary evidence drift.")
+
+
+def _has_pending_devastating_wounds_continuation(
+    *,
+    sequence_id: str,
+    pending_decision_requests: tuple[DecisionRequest, ...],
+) -> bool:
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        is_mortal_wound_resolution_request,
+        mortal_wound_resolution_source_context,
+    )
+
+    for request in pending_decision_requests:
+        if not is_mortal_wound_resolution_request(request):
+            continue
+        source_context = mortal_wound_resolution_source_context(request)
+        if (
+            isinstance(source_context, dict)
+            and source_context.get("source_kind") == "devastating_wounds"
+            and source_context.get("sequence_id") == sequence_id
+        ):
+            return True
+    return False
 
 
 def require_pending_attack_continuation(

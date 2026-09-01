@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from typing import Self, cast
 
@@ -16,7 +17,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     FeelNoPainResolution,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 
@@ -109,6 +110,13 @@ class PendingAttackDestruction:
             "damage_event_id": self.damage_event_id,
             "destroyed_model_placement": self.destroyed_model_placement,
         }
+
+    @property
+    def attack_pool_evidence_sha256(self) -> str:
+        """Commit every authoritative attack-pool field captured at deferral time."""
+
+        canonical_pool = canonical_json(self.attack_pool.to_payload()).encode("utf-8")
+        return hashlib.sha256(canonical_pool).hexdigest()
 
     @classmethod
     def from_payload(cls, payload: PendingAttackDestructionPayload) -> Self:

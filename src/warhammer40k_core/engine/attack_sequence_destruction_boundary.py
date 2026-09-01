@@ -141,6 +141,7 @@ def defer_attack_destruction_until_attacks_resolved(
             "target_unit_instance_id": damage.target_unit_instance_id,
             "damage_event_id": damage_event.event_id,
             "timing_rule_id": CORE_DESTROYED_TIMING_RULE_ID,
+            "attack_pool_sha256": pending.attack_pool_evidence_sha256,
             "destruction_sources": [source.to_payload() for source in destruction_sources],
             "destroyed_model_placement": destroyed_model_placement,
         },

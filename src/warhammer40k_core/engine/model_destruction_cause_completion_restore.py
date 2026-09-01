@@ -78,6 +78,7 @@ def validate_pending_model_destruction_cause_inventory(
                 attack_sequence=active_attack_sequence,
                 pending=pending,
                 event_records=event_records,
+                pending_decision_requests=pending_decision_requests,
             )
             cause_id = attack_damage_model_destruction_cause_id_for_context(
                 state=state,
