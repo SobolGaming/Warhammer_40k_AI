@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 from pathlib import Path
 from typing import cast
@@ -180,6 +181,29 @@ def test_p06b_mortal_wounds_source_artifact_is_pinned_typed_and_executable() -> 
             )
         )
     )
+
+
+def test_p06_other_concepts_runtime_consumer_ids_resolve() -> None:
+    package = core_other_concepts_2026_08.source_package()
+    rules = (
+        core_other_concepts_2026_08.source_rule_record(),
+        core_other_concepts_2026_08.source_rule_record_by_id("mortal-wounds"),
+    )
+    consumer_ids = {consumer_id for rule in rules for consumer_id in rule.runtime_consumer_ids} | {
+        consumer_id
+        for evidence in package.source_evidence_catalog.records
+        for consumer_id in evidence.runtime_consumer_ids
+    }
+
+    for consumer_id in sorted(consumer_ids):
+        module_name, separator, qualified_name = consumer_id.partition(":")
+        assert separator, consumer_id
+        assert module_name, consumer_id
+        assert qualified_name, consumer_id
+        resolved: object = importlib.import_module(module_name)
+        for attribute in qualified_name.split("."):
+            resolved = getattr(resolved, attribute)
+        assert resolved is not None, consumer_id
 
 
 def test_p06a_visibility_source_artifact_rejects_text_and_byte_drift() -> None:

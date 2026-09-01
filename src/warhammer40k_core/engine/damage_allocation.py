@@ -94,6 +94,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_owner_player_id,
+    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -1405,6 +1406,7 @@ class MortalWoundApplicationProgress:
         self,
         *,
         model_instance_id: str,
+        allocation_occurrence: JsonValue,
     ) -> MortalWoundFeelNoPainContextPayload:
         binding = self.logical_death_cause_binding
         if binding is None:
@@ -1420,6 +1422,7 @@ class MortalWoundApplicationProgress:
                 "MortalWoundApplicationProgress model_instance_id",
                 model_instance_id,
             ),
+            "allocation_occurrence": validate_json_value(allocation_occurrence),
             "mortal_wounds": self.mortal_wounds,
             "remaining_mortal_wounds": self.remaining_mortal_wounds,
             "spill_over": self.spill_over,
@@ -1469,6 +1472,10 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError("remove_destroyed_model must be a bool.")
         if type(decisions) is not DecisionController:
             raise GameLifecycleError("Mortal wound progress requires DecisionController.")
+        rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=self.target_unit_instance_id,
+        ).component_unit_for_model(model_instance_id)
         binding = self.logical_death_cause_binding
         if remove_destroyed_model:
             expected_binding = MortalWoundLogicalDeathCauseBinding.fixed(
@@ -2406,6 +2413,16 @@ def resolve_mortal_wound_feel_no_pain_decision(
 ) -> MortalWoundRoutingResult:
     if type(remove_destroyed_models) is not bool:
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        validate_mortal_wound_feel_no_pain_request_authority,
+    )
+
+    validate_mortal_wound_feel_no_pain_request_authority(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        request=request,
+    )
     decision = FeelNoPainDecision.from_result(request=request, result=result)
     context = _mortal_wound_context_from_payload(decision.lost_wound_context)
     progress = MortalWoundApplicationProgress.from_feel_no_pain_context(decision.lost_wound_context)

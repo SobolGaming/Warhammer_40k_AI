@@ -31,6 +31,7 @@ class MortalWoundFeelNoPainContextPayload(TypedDict):
     target_unit_instance_id: str
     defender_player_id: str
     model_instance_id: str
+    allocation_occurrence: JsonValue
     mortal_wounds: int
     remaining_mortal_wounds: int
     spill_over: bool
@@ -63,6 +64,7 @@ def parse_mortal_wound_feel_no_pain_context(
         "target_unit_instance_id",
         "defender_player_id",
         "model_instance_id",
+        "allocation_occurrence",
         "mortal_wounds",
         "remaining_mortal_wounds",
         "spill_over",
@@ -115,6 +117,7 @@ def parse_mortal_wound_feel_no_pain_context(
         "target_unit_instance_id": _string(payload, "target_unit_instance_id"),
         "defender_player_id": _string(payload, "defender_player_id"),
         "model_instance_id": _string(payload, "model_instance_id"),
+        "allocation_occurrence": validate_json_value(payload.get("allocation_occurrence")),
         "mortal_wounds": _int(payload, "mortal_wounds", positive=True),
         "remaining_mortal_wounds": _int(payload, "remaining_mortal_wounds"),
         "spill_over": _bool(payload, "spill_over"),

@@ -53,10 +53,10 @@ VISIBILITY_RUNTIME_CONSUMER_IDS = [
 ]
 
 MORTAL_WOUNDS_RUNTIME_CONSUMER_IDS = [
-    "warhammer40k_core.engine.damage_allocation:mortal_wound_priority_model_ids",
-    "warhammer40k_core.engine.damage_allocation:build_mortal_wound_model_request",
-    "warhammer40k_core.engine.damage_allocation:continue_mortal_wound_application",
-    "warhammer40k_core.engine.damage_allocation:resolve_mortal_wound_model_decision",
+    "warhammer40k_core.engine.mortal_wound_model_allocation:mortal_wound_priority_selection",
+    "warhammer40k_core.engine.mortal_wound_model_allocation:build_mortal_wound_model_request",
+    "warhammer40k_core.engine.mortal_wound_model_allocation:continue_mortal_wound_application",
+    "warhammer40k_core.engine.mortal_wound_model_allocation:resolve_mortal_wound_model_decision",
     "warhammer40k_core.engine.lifecycle:GameLifecycle.submit_decision",
 ]
 

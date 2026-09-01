@@ -23,6 +23,7 @@ if TYPE_CHECKING:
         DamageApplication,
         MortalWoundApplication,
     )
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
     from warhammer40k_core.engine.effects import PersistingEffect
@@ -234,11 +235,13 @@ def validate_model_logical_death_inventory(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
     """Bind every private logical-death boundary to one authority or pending router."""
 
     from warhammer40k_core.engine.damage_allocation import (
+        is_mortal_wound_feel_no_pain_request,
         model_by_id,
     )
     from warhammer40k_core.engine.model_logical_death import (
@@ -248,6 +251,7 @@ def validate_model_logical_death_inventory(
     from warhammer40k_core.engine.mortal_wound_model_allocation import (
         is_mortal_wound_resolution_request,
         mortal_wound_resolution_progress,
+        validate_mortal_wound_feel_no_pain_request_authority,
     )
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
@@ -297,6 +301,14 @@ def validate_model_logical_death_inventory(
             request_event=request_events[0],
             inventory=application_authorities,
         )
+        if is_mortal_wound_feel_no_pain_request(request):
+            validate_mortal_wound_feel_no_pain_request_authority(
+                state=state,
+                event_records=event_records,
+                decision_records=decision_records,
+                request=request,
+                request_event=request_events[0],
+            )
         for event in progress.logical_death_events:
             _claim_logical_death_event(
                 event=event,

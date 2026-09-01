@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from tests.code_quality.source_index import combined_source_for, python_files, source_for
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -8,6 +9,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
     ReserveDestructionTimingKind,
     RulesetDescriptor,
+)
+from warhammer40k_core.engine import lifecycle as lifecycle_module
+from warhammer40k_core.engine.attack_sequence_decision_family import (
+    ATTACK_SEQUENCE_ACTIVE_CONTINUATION_DECISION_TYPES,
+    ATTACK_SEQUENCE_AUTHORITY_BOUND_DECISION_TYPES,
+    ATTACK_SEQUENCE_CONTEXT_BOUND_DECISION_TYPES,
+    ATTACK_SEQUENCE_DECISION_TYPES,
 )
 from warhammer40k_core.engine.reserves import StrategicReserveRule
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_stratagems import (
@@ -119,6 +127,25 @@ def test_p06b_mortal_wound_model_ties_cannot_use_sorted_first_fallback() -> None
     assert "select_mortal_wound_model" in contract_source
     assert "tuple(sorted(alive_model_ids))[0]" not in mortal_wound_model_source
     assert "tuple(sorted(alive_model_ids))[0]" not in direct_source
+
+
+def test_p06b_shared_attack_sequence_phase_ownership_cannot_drift() -> None:
+    def decision_types(name: str) -> frozenset[str]:
+        value = cast(object, getattr(lifecycle_module, name))
+        assert type(value) is frozenset
+        items = cast(frozenset[object], value)
+        assert all(type(item) is str for item in items)
+        return cast(frozenset[str], items)
+
+    shooting_types = decision_types("_SHOOTING_DECISION_TYPES")
+    fight_types = decision_types("_FIGHT_DECISION_TYPES")
+    assert shooting_types >= ATTACK_SEQUENCE_DECISION_TYPES
+    assert fight_types >= ATTACK_SEQUENCE_DECISION_TYPES
+    assert ATTACK_SEQUENCE_DECISION_TYPES == (
+        ATTACK_SEQUENCE_CONTEXT_BOUND_DECISION_TYPES
+        | ATTACK_SEQUENCE_ACTIVE_CONTINUATION_DECISION_TYPES
+        | ATTACK_SEQUENCE_AUTHORITY_BOUND_DECISION_TYPES
+    )
 
 
 def test_phase14k_retired_aircraft_minimum_move_policy_absent_from_runtime_and_docs() -> None:

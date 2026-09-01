@@ -13,6 +13,7 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainResolution,
     FeelNoPainResolutionPayload,
     FeelNoPainSource,
+    FeelNoPainSourcePayload,
     MortalWoundApplicationProgress,
     MortalWoundRoutingResult,
     alive_placed_models_for_rules_unit,
@@ -26,6 +27,7 @@ from warhammer40k_core.engine.damage_allocation_validation import (
     validate_unique_sorted_exact_type_tuple,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -38,6 +40,9 @@ from warhammer40k_core.engine.event_log import (
 from warhammer40k_core.engine.finite_decision_validation import (
     invalid_finite_decision_status as _invalid_finite_decision_status,
 )
+from warhammer40k_core.engine.mortal_wound_context import (
+    parse_mortal_wound_feel_no_pain_context,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     evidence_from_json,
     evidence_to_json,
@@ -48,9 +53,13 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     MortalWoundLogicalDeathRecorder,
 )
+from warhammer40k_core.engine.mutation_decision_authority import (
+    validate_mutation_decision_closure,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import (
     current_placed_alive_rules_unit_view_for_identity,
+    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 
@@ -58,6 +67,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE = "select_mortal_wound_model"
+MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE = "mortal_wound_model_allocated"
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -67,6 +77,200 @@ class MortalWoundAllocationPriority(StrEnum):
     NON_CHARACTER = "non_character"
     WOUNDED_CHARACTER = "wounded_character"
     CHARACTER = "character"
+
+
+class MortalWoundSelectionDisposition(StrEnum):
+    SOLE_LEGAL_MODEL = "sole_legal_model"
+    PLAYER_DECISION = "player_decision"
+
+
+class MortalWoundAllocationOccurrencePayload(TypedDict):
+    occurrence_id: str
+    application_id: str
+    wound_index: int
+    target_unit_instance_id: str
+    priority_tier: str
+    legal_model_ids: list[str]
+    selected_model_id: str
+    selection_disposition: str
+    parent_request_id: str | None
+    parent_result_id: str | None
+    feel_no_pain_sources: list[FeelNoPainSourcePayload]
+    feel_no_pain_decline_allowed: bool
+
+
+@dataclass(frozen=True, slots=True)
+class MortalWoundAllocationOccurrence:
+    occurrence_id: str
+    application_id: str
+    wound_index: int
+    target_unit_instance_id: str
+    priority_tier: MortalWoundAllocationPriority
+    legal_model_ids: tuple[str, ...]
+    selected_model_id: str
+    selection_disposition: MortalWoundSelectionDisposition
+    parent_request_id: str | None
+    parent_result_id: str | None
+    feel_no_pain_sources: tuple[FeelNoPainSource, ...]
+    feel_no_pain_decline_allowed: bool
+
+    def __post_init__(self) -> None:
+        application_id = _validate_identifier(
+            "MortalWoundAllocationOccurrence application_id",
+            self.application_id,
+        )
+        object.__setattr__(self, "application_id", application_id)
+        if type(self.wound_index) is not int or self.wound_index < 1:
+            raise GameLifecycleError(
+                "MortalWoundAllocationOccurrence wound_index must be positive."
+            )
+        expected_occurrence_id = _mortal_wound_allocation_occurrence_id(
+            application_id=application_id,
+            wound_index=self.wound_index,
+        )
+        if self.occurrence_id != expected_occurrence_id:
+            raise GameLifecycleError("Mortal-wound allocation occurrence ID drift.")
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier(
+                "MortalWoundAllocationOccurrence target_unit_instance_id",
+                self.target_unit_instance_id,
+            ),
+        )
+        if type(self.priority_tier) is not MortalWoundAllocationPriority:
+            raise GameLifecycleError("Mortal-wound allocation occurrence tier is invalid.")
+        legal_model_ids = _validate_ordered_identifier_tuple(
+            "MortalWoundAllocationOccurrence legal_model_ids",
+            self.legal_model_ids,
+        )
+        if not legal_model_ids:
+            raise GameLifecycleError("Mortal-wound allocation occurrence requires legal models.")
+        object.__setattr__(self, "legal_model_ids", legal_model_ids)
+        selected_model_id = _validate_identifier(
+            "MortalWoundAllocationOccurrence selected_model_id",
+            self.selected_model_id,
+        )
+        if selected_model_id not in legal_model_ids:
+            raise GameLifecycleError("Mortal-wound allocation selected model is not legal.")
+        object.__setattr__(self, "selected_model_id", selected_model_id)
+        if type(self.selection_disposition) is not MortalWoundSelectionDisposition:
+            raise GameLifecycleError("Mortal-wound allocation occurrence disposition is invalid.")
+        parent_request_id = _optional_identifier(
+            "MortalWoundAllocationOccurrence parent_request_id",
+            self.parent_request_id,
+        )
+        parent_result_id = _optional_identifier(
+            "MortalWoundAllocationOccurrence parent_result_id",
+            self.parent_result_id,
+        )
+        object.__setattr__(self, "parent_request_id", parent_request_id)
+        object.__setattr__(self, "parent_result_id", parent_result_id)
+        if self.selection_disposition is MortalWoundSelectionDisposition.SOLE_LEGAL_MODEL:
+            if (
+                len(legal_model_ids) != 1
+                or parent_request_id is not None
+                or parent_result_id is not None
+            ):
+                raise GameLifecycleError("Sole mortal-wound allocation disposition drift.")
+        elif len(legal_model_ids) < 2 or parent_request_id is None or parent_result_id is None:
+            raise GameLifecycleError("Player mortal-wound allocation disposition drift.")
+        sources = validate_unique_sorted_exact_type_tuple(
+            self.feel_no_pain_sources,
+            item_type=FeelNoPainSource,
+            collection_label="Mortal-wound allocation Feel No Pain sources",
+            identity=lambda source: source.source_id,
+            duplicate_message=(
+                "Mortal-wound allocation Feel No Pain sources must not duplicate IDs."
+            ),
+        )
+        object.__setattr__(self, "feel_no_pain_sources", sources)
+        if type(self.feel_no_pain_decline_allowed) is not bool:
+            raise GameLifecycleError(
+                "Mortal-wound allocation Feel No Pain decline policy must be a bool."
+            )
+        if len(sources) < 2 and not self.feel_no_pain_decline_allowed:
+            raise GameLifecycleError(
+                "Mortal-wound allocation occurrence must authorize a Feel No Pain choice."
+            )
+
+    def to_payload(self) -> MortalWoundAllocationOccurrencePayload:
+        return {
+            "occurrence_id": self.occurrence_id,
+            "application_id": self.application_id,
+            "wound_index": self.wound_index,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "priority_tier": self.priority_tier.value,
+            "legal_model_ids": list(self.legal_model_ids),
+            "selected_model_id": self.selected_model_id,
+            "selection_disposition": self.selection_disposition.value,
+            "parent_request_id": self.parent_request_id,
+            "parent_result_id": self.parent_result_id,
+            "feel_no_pain_sources": [source.to_payload() for source in self.feel_no_pain_sources],
+            "feel_no_pain_decline_allowed": self.feel_no_pain_decline_allowed,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> MortalWoundAllocationOccurrence:
+        raw = _exact_payload_object(
+            payload,
+            expected_fields={
+                "occurrence_id",
+                "application_id",
+                "wound_index",
+                "target_unit_instance_id",
+                "priority_tier",
+                "legal_model_ids",
+                "selected_model_id",
+                "selection_disposition",
+                "parent_request_id",
+                "parent_result_id",
+                "feel_no_pain_sources",
+                "feel_no_pain_decline_allowed",
+            },
+        )
+        wound_index = raw["wound_index"]
+        decline_allowed = raw["feel_no_pain_decline_allowed"]
+        source_payloads = raw["feel_no_pain_sources"]
+        if type(wound_index) is not int or type(decline_allowed) is not bool:
+            raise GameLifecycleError("Mortal-wound allocation occurrence scalars are invalid.")
+        if not isinstance(source_payloads, list) or any(
+            not isinstance(source, dict) for source in source_payloads
+        ):
+            raise GameLifecycleError(
+                "Mortal-wound allocation occurrence sources must contain objects."
+            )
+        try:
+            priority_tier = MortalWoundAllocationPriority(
+                _payload_identifier(raw, key="priority_tier")
+            )
+            disposition = MortalWoundSelectionDisposition(
+                _payload_identifier(raw, key="selection_disposition")
+            )
+        except (TypeError, ValueError) as exc:
+            raise GameLifecycleError(
+                "Mortal-wound allocation occurrence contains an unsupported token."
+            ) from exc
+        return cls(
+            occurrence_id=_payload_identifier(raw, key="occurrence_id"),
+            application_id=_payload_identifier(raw, key="application_id"),
+            wound_index=wound_index,
+            target_unit_instance_id=_payload_identifier(
+                raw,
+                key="target_unit_instance_id",
+            ),
+            priority_tier=priority_tier,
+            legal_model_ids=_payload_identifier_list(raw, key="legal_model_ids"),
+            selected_model_id=_payload_identifier(raw, key="selected_model_id"),
+            selection_disposition=disposition,
+            parent_request_id=_payload_optional_identifier(raw, key="parent_request_id"),
+            parent_result_id=_payload_optional_identifier(raw, key="parent_result_id"),
+            feel_no_pain_sources=tuple(
+                FeelNoPainSource.from_payload(cast(FeelNoPainSourcePayload, source))
+                for source in source_payloads
+            ),
+            feel_no_pain_decline_allowed=decline_allowed,
+        )
 
 
 class MortalWoundApplicationProgressPayload(TypedDict):
@@ -496,6 +700,9 @@ def continue_mortal_wound_application(
             request_id=request_id,
             progress=current,
             model_instance_id=model_instance_id,
+            legal_model_ids=legal_model_ids,
+            priority_tier=priority_tier,
+            model_decision=None,
             dice_manager=dice_manager,
             remove_destroyed_models=remove_destroyed_models,
             logical_death_recorder=logical_death_recorder,
@@ -516,6 +723,9 @@ def _continue_mortal_wound_application_for_model(
     request_id: str,
     progress: MortalWoundApplicationProgress,
     model_instance_id: str,
+    legal_model_ids: tuple[str, ...],
+    priority_tier: MortalWoundAllocationPriority,
+    model_decision: MortalWoundModelDecision | None,
     dice_manager: DiceRollManager | None,
     remove_destroyed_models: bool,
     logical_death_recorder: MortalWoundLogicalDeathRecorder | None,
@@ -529,11 +739,24 @@ def _continue_mortal_wound_application_for_model(
         model_instance_id=model_instance_id,
     )
     if len(sources) > 1 or (sources and decline_allowed):
+        occurrence = _record_mortal_wound_allocation_occurrence(
+            decisions=decisions,
+            progress=progress,
+            legal_model_ids=legal_model_ids,
+            priority_tier=priority_tier,
+            selected_model_id=model_instance_id,
+            model_decision=model_decision,
+            sources=sources,
+            decline_allowed=decline_allowed,
+        )
         request = build_feel_no_pain_request(
             request_id=request_id,
             defender_player_id=progress.defender_player_id,
             lost_wound_context=validate_json_value(
-                progress.to_feel_no_pain_context(model_instance_id=model_instance_id)
+                progress.to_feel_no_pain_context(
+                    model_instance_id=model_instance_id,
+                    allocation_occurrence=validate_json_value(occurrence.to_payload()),
+                )
             ),
             sources=sources,
             decline_allowed=decline_allowed,
@@ -570,6 +793,55 @@ def _continue_mortal_wound_application_for_model(
     )
 
 
+def _record_mortal_wound_allocation_occurrence(
+    *,
+    decisions: DecisionController,
+    progress: MortalWoundApplicationProgress,
+    legal_model_ids: tuple[str, ...],
+    priority_tier: MortalWoundAllocationPriority,
+    selected_model_id: str,
+    model_decision: MortalWoundModelDecision | None,
+    sources: tuple[FeelNoPainSource, ...],
+    decline_allowed: bool,
+) -> MortalWoundAllocationOccurrence:
+    wound_index = progress.mortal_wounds - progress.remaining_mortal_wounds + 1
+    occurrence = MortalWoundAllocationOccurrence(
+        occurrence_id=_mortal_wound_allocation_occurrence_id(
+            application_id=progress.application_id,
+            wound_index=wound_index,
+        ),
+        application_id=progress.application_id,
+        wound_index=wound_index,
+        target_unit_instance_id=progress.target_unit_instance_id,
+        priority_tier=priority_tier,
+        legal_model_ids=legal_model_ids,
+        selected_model_id=selected_model_id,
+        selection_disposition=(
+            MortalWoundSelectionDisposition.SOLE_LEGAL_MODEL
+            if model_decision is None
+            else MortalWoundSelectionDisposition.PLAYER_DECISION
+        ),
+        parent_request_id=None if model_decision is None else model_decision.request_id,
+        parent_result_id=None if model_decision is None else model_decision.result_id,
+        feel_no_pain_sources=sources,
+        feel_no_pain_decline_allowed=decline_allowed,
+    )
+    existing = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE
+        and isinstance(event.payload, dict)
+        and event.payload.get("occurrence_id") == occurrence.occurrence_id
+    )
+    if existing:
+        raise GameLifecycleError("Mortal-wound allocation occurrence already exists.")
+    decisions.event_log.append(
+        MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
+        occurrence.to_payload(),
+    )
+    return occurrence
+
+
 def resolve_mortal_wound_model_decision(
     *,
     state: GameState,
@@ -600,6 +872,9 @@ def resolve_mortal_wound_model_decision(
         request_id=next_request_id,
         progress=progress,
         model_instance_id=decision.selected_model_id,
+        legal_model_ids=legal_model_ids,
+        priority_tier=priority_tier,
+        model_decision=decision,
         dice_manager=dice_manager,
         remove_destroyed_models=remove_destroyed_models,
         logical_death_recorder=logical_death_recorder,
@@ -652,6 +927,203 @@ def invalid_mortal_wound_model_status(
             stage=state.stage,
             message="Mortal wound model priority tier no longer matches state.",
             payload={"invalid_reason": invalid_reason, "field": "priority_tier"},
+        )
+    return None
+
+
+def validate_mortal_wound_feel_no_pain_request_authority(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    request: DecisionRequest,
+    request_event: EventRecord | None = None,
+) -> MortalWoundAllocationOccurrence:
+    from warhammer40k_core.engine.damage_allocation import (
+        is_mortal_wound_feel_no_pain_request,
+    )
+
+    if not is_mortal_wound_feel_no_pain_request(request):
+        raise GameLifecycleError(
+            "Mortal-wound allocation authority requires a Feel No Pain request."
+        )
+    if type(event_records) is not tuple or any(
+        type(event) is not EventRecord for event in event_records
+    ):
+        raise GameLifecycleError("Mortal-wound allocation event history is invalid.")
+    if type(decision_records) is not tuple or any(
+        type(record) is not DecisionRecord for record in decision_records
+    ):
+        raise GameLifecycleError("Mortal-wound allocation decision history is invalid.")
+    request_payload = _payload_object(request.payload)
+    context = parse_mortal_wound_feel_no_pain_context(request_payload.get("lost_wound_context"))
+    progress = MortalWoundApplicationProgress.from_feel_no_pain_context(
+        validate_json_value(context)
+    )
+    occurrence = MortalWoundAllocationOccurrence.from_payload(context["allocation_occurrence"])
+    expected_wound_index = progress.mortal_wounds - progress.remaining_mortal_wounds + 1
+    if (
+        occurrence.application_id != progress.application_id
+        or occurrence.wound_index != expected_wound_index
+        or occurrence.target_unit_instance_id != progress.target_unit_instance_id
+        or occurrence.selected_model_id != context["model_instance_id"]
+    ):
+        raise GameLifecycleError("Mortal-wound allocation occurrence context drift.")
+
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=progress.target_unit_instance_id,
+    )
+    if rules_unit.unit_instance_id != occurrence.target_unit_instance_id:
+        raise GameLifecycleError("Mortal-wound allocation target rules-unit drift.")
+    rules_unit.component_unit_for_model(occurrence.selected_model_id)
+    legal_model_ids, priority_tier = mortal_wound_priority_selection(
+        state=state,
+        target_unit_instance_id=progress.target_unit_instance_id,
+        priority_model_ids=progress.priority_model_ids,
+    )
+    if (
+        legal_model_ids != occurrence.legal_model_ids
+        or priority_tier is not occurrence.priority_tier
+    ):
+        raise GameLifecycleError("Mortal-wound allocation priority boundary drift.")
+
+    loaded_sources = mortal_wound_feel_no_pain_sources(
+        state=state,
+        model_instance_id=occurrence.selected_model_id,
+    )
+    loaded_decline_allowed = mortal_wound_feel_no_pain_decline_allowed(
+        state=state,
+        model_instance_id=occurrence.selected_model_id,
+    )
+    if (
+        loaded_sources != occurrence.feel_no_pain_sources
+        or loaded_decline_allowed != occurrence.feel_no_pain_decline_allowed
+    ):
+        raise GameLifecycleError("Mortal-wound allocation Feel No Pain inventory drift.")
+    expected_request = build_feel_no_pain_request(
+        request_id=request.request_id,
+        defender_player_id=progress.defender_player_id,
+        lost_wound_context=validate_json_value(
+            progress.to_feel_no_pain_context(
+                model_instance_id=occurrence.selected_model_id,
+                allocation_occurrence=validate_json_value(occurrence.to_payload()),
+            )
+        ),
+        sources=loaded_sources,
+        decline_allowed=loaded_decline_allowed,
+    )
+    if request != expected_request:
+        raise GameLifecycleError("Mortal-wound Feel No Pain request authority drift.")
+
+    parsed_occurrences = tuple(
+        (
+            event,
+            MortalWoundAllocationOccurrence.from_payload(event.payload),
+        )
+        for event in event_records
+        if event.event_type == MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE
+    )
+    matching_occurrences = tuple(
+        (event, candidate)
+        for event, candidate in parsed_occurrences
+        if candidate.application_id == occurrence.application_id
+        and candidate.wound_index == occurrence.wound_index
+    )
+    if len(matching_occurrences) != 1 or matching_occurrences[0][1] != occurrence:
+        raise GameLifecycleError(
+            "Pending mortal-wound Feel No Pain lacks one exact allocation occurrence."
+        )
+    occurrence_event = matching_occurrences[0][0]
+    event_indexes = {event.event_id: index for index, event in enumerate(event_records)}
+    if len(event_indexes) != len(event_records):
+        raise GameLifecycleError("Mortal-wound allocation event history is duplicated.")
+    occurrence_index = event_indexes[occurrence_event.event_id]
+
+    request_events = tuple(
+        event
+        for event in event_records
+        if event.event_type == "decision_requested" and event.payload == request.to_payload()
+    )
+    if len(request_events) != 1:
+        raise GameLifecycleError("Pending mortal-wound Feel No Pain lacks one exact request event.")
+    exact_request_event = request_events[0]
+    if request_event is not None and request_event != exact_request_event:
+        raise GameLifecycleError("Pending mortal-wound Feel No Pain request event drift.")
+    if occurrence_index >= event_indexes[exact_request_event.event_id]:
+        raise GameLifecycleError(
+            "Mortal-wound allocation occurrence must precede its Feel No Pain request."
+        )
+    application_authorities = _mwaa.mortal_wound_application_authority_inventory(
+        event_records=event_records,
+        game_id=state.game_id,
+    )
+    _mwaa.validate_pending_mortal_wound_application_authority(
+        state=state,
+        event_records=event_records,
+        progress=progress,
+        request_event=exact_request_event,
+        inventory=application_authorities,
+    )
+
+    if occurrence.selection_disposition is MortalWoundSelectionDisposition.PLAYER_DECISION:
+        parent_request_id = cast(str, occurrence.parent_request_id)
+        parent_result_id = cast(str, occurrence.parent_result_id)
+        parent_record = validate_mutation_decision_closure(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=occurrence_index,
+            request_id=parent_request_id,
+            result_id=parent_result_id,
+        )
+        parent_decision = MortalWoundModelDecision.from_result(
+            request=parent_record.request,
+            result=parent_record.result,
+        )
+        if (
+            parent_decision.progress != progress
+            or parent_decision.player_id != progress.defender_player_id
+            or parent_decision.legal_model_ids != occurrence.legal_model_ids
+            or parent_decision.priority_tier is not occurrence.priority_tier
+            or parent_decision.selected_model_id != occurrence.selected_model_id
+        ):
+            raise GameLifecycleError("Mortal-wound allocation parent decision drift.")
+    elif legal_model_ids != (occurrence.selected_model_id,):
+        raise GameLifecycleError("Automatic mortal-wound allocation is no longer sole.")
+    return occurrence
+
+
+def invalid_mortal_wound_feel_no_pain_status(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    invalid_reason = "invalid_mortal_wound_feel_no_pain_result"
+    invalid_status = _invalid_finite_decision_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason=invalid_reason,
+    )
+    if invalid_status is not None:
+        return invalid_status
+    try:
+        validate_mortal_wound_feel_no_pain_request_authority(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            request=request,
+        )
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message=str(exc),
+            payload={
+                "invalid_reason": invalid_reason,
+                "field": "allocation_occurrence",
+            },
         )
     return None
 
@@ -749,6 +1221,59 @@ def _payload_string_tuple(
     if any(type(item) is not str for item in value):
         raise GameLifecycleError(f"Decision payload {key} must contain strings.")
     return _validate_ordered_identifier_tuple(key, cast(tuple[str, ...], tuple(value)))
+
+
+def _exact_payload_object(
+    value: object,
+    *,
+    expected_fields: set[str],
+) -> dict[str, JsonValue]:
+    if not isinstance(value, dict):
+        raise GameLifecycleError("Mortal-wound allocation occurrence fields are invalid.")
+    raw = cast(dict[str, object], value)
+    if set(raw) != expected_fields:
+        raise GameLifecycleError("Mortal-wound allocation occurrence fields are invalid.")
+    return cast(dict[str, JsonValue], raw)
+
+
+def _payload_identifier(payload: dict[str, JsonValue], *, key: str) -> str:
+    return _validate_identifier(key, payload.get(key))
+
+
+def _payload_optional_identifier(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> str | None:
+    return _optional_identifier(key, payload.get(key))
+
+
+def _payload_identifier_list(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> tuple[str, ...]:
+    values = payload.get(key)
+    if not isinstance(values, list) or any(type(value) is not str for value in values):
+        raise GameLifecycleError(f"{key} must contain strings.")
+    return tuple(cast(list[str], values))
+
+
+def _optional_identifier(label: str, value: object) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(label, value)
+
+
+def _mortal_wound_allocation_occurrence_id(
+    *,
+    application_id: str,
+    wound_index: int,
+) -> str:
+    requested_application_id = _validate_identifier("application_id", application_id)
+    if type(wound_index) is not int or wound_index < 1:
+        raise GameLifecycleError("Mortal-wound allocation wound index must be positive.")
+    return f"{requested_application_id}:allocation:{wound_index:06d}"
 
 
 def _validate_identifier_tuple(label: str, value: object) -> tuple[str, ...]:

@@ -3487,6 +3487,18 @@ nested cause, boundary, producer, placement, and transition evidence, from
 public pending-request projections, decision-requested/recorded events, and
 lifecycle status payloads for every viewer role.
 
+The private mortal-wound Feel No Pain context also retains one exact
+`allocation_occurrence` for the current wound. It binds the application and
+wound index, target canonical rules-unit ID, active 06.02 priority tier, exact
+legal model inventory, selected model, automatic-or-player selection
+disposition, parent request/result IDs when selected by a player, and the exact
+selected-model Feel No Pain source inventory and decline policy. Restore and
+pre-submission validation reconstruct that occurrence, its parent decision
+closure, the child request, and both private events before queue pop, recording,
+RNG, damage, or completion. The shared redaction owner removes the occurrence
+with the rest of the private lost-wound context; adapters must not create,
+modify, or interpret it.
+
 The engine records one private `mortal_wound_application_started` authority
 event before any shared mortal-wound packet applies damage. It freezes the
 game/application ID, exact source rule/context, target and defender, packet size,

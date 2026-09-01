@@ -38,6 +38,8 @@ from warhammer40k_core.core.datasheet import DatasheetKeywordSet
 from warhammer40k_core.core.detachment import DetachmentDefinition, StratagemDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
+    FightEligibilityKind,
+    FightPhaseStepKind,
     MovementMode,
     RulesetDescriptor,
 )
@@ -49,6 +51,8 @@ from warhammer40k_core.engine.attack_sequence import (
 )
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    FeelNoPainSource,
     model_by_id,
 )
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -64,6 +68,9 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_order import (
     ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
     FIGHT_ACTIVATION_DECISION_TYPE,
+    FightActivationSelection,
+    FightPhaseState,
+    FightsFirstRegistry,
 )
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ACTION,
@@ -110,6 +117,7 @@ from warhammer40k_core.engine.primary_mission_choices import (
     SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
     punishment_choice_request,
 )
+from warhammer40k_core.engine.reaction_queue import ReactionQueue, ReactionQueueFrame
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -118,6 +126,12 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     stratagem_decline_payload,
+)
+from warhammer40k_core.engine.timing_windows import (
+    ReactionWindow,
+    TimingTriggerKind,
+    TimingWindow,
+    TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -965,7 +979,22 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
         attack_sequence=remaining,
         allocated_model_ids_this_phase=allocated_ids,
     )
+    selected_model_id = defender.own_models[-1].model_instance_id
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=selected_model_id,
+        sources=(
+            FeelNoPainSource(
+                source_id="ws13-mortal-wound-model-choice-fnp",
+                threshold=5,
+            ),
+        ),
+        decline_allowed=True,
+    )
     session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    request = _assert_request(
+        session.advance_until_decision_or_terminal(),
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
 
     player_a_pending = session.view(viewer_player_id="player-a")["pending_decision"]
     player_b_pending = session.view(viewer_player_id="player-b")["pending_decision"]
@@ -977,13 +1006,22 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
     assert interaction is not None
     assert interaction["interaction_kind"] == "entity_selection"
     assert interaction["submission_kind"] == "finite"
-    selected_model_id = defender.own_models[-1].model_instance_id
     cursor = _cursor_after(session, viewer_player_id="player-b")
 
-    session.submit_option(
+    status = session.submit_option(
         request_id=request.request_id,
         option_id=selected_model_id,
         result_id="ws13-mortal-wound-model-choice-result",
+    )
+    fnp_request = _assert_request(status, SELECT_FEEL_NO_PAIN_DECISION_TYPE)
+    session = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    restored_fnp_request = session.lifecycle.pending_decision_request()
+    assert restored_fnp_request is not None
+    assert restored_fnp_request.to_payload() == fnp_request.to_payload()
+    session.submit_option(
+        request_id=restored_fnp_request.request_id,
+        option_id="decline",
+        result_id="ws13-mortal-wound-model-choice-fnp-decline",
     )
 
     selected_model = model_by_id(
@@ -996,6 +1034,182 @@ def test_local_session_projects_and_submits_mortal_wound_model_choice() -> None:
         "decision_recorded",
         "devastating_wounds_mortal_wounds_applied",
     )
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:ws13:mortal-wound-model-fnp-choice")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+def test_local_session_routes_fight_devastating_mortal_model_and_fnp_choices() -> None:
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("defender",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "defender": Pose.at(12.0, 20.0),
+        },
+        game_id="ws13-fight-mortal-wound-model-fnp",
+    )
+    state = _state(lifecycle)
+    attacker = units["attacker"]
+    defender = units["defender"]
+    selected_model_id = defender.own_models[-1].model_instance_id
+    source = FeelNoPainSource(
+        source_id="ws13-fight-mortal-wound-model-fnp-source",
+        threshold=5,
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=selected_model_id,
+        sources=(source,),
+        decline_allowed=True,
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="ws13-fight-mortal-wound-model-fnp-profile",
+        keywords=(WeaponKeyword.DEVASTATING_WOUNDS,),
+        abilities=(AbilityDescriptor.devastating_wounds(),),
+    )
+    attack_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    deferred = DeferredMortalWounds(
+        source_rule_id="weapon-ability:devastating-wounds",
+        source_model_instance_id=attack_pool.attacker_model_instance_id,
+        source_weapon_profile=attack_pool.weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        attack_context_id="ws13-fight-mortal-wound-model-fnp:pool-001:attack-001",
+        mortal_wounds=1,
+    )
+    sequence = AttackSequence(
+        sequence_id="ws13-fight-mortal-wound-model-fnp",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(attack_pool,),
+        source_phase=BattlePhase.FIGHT,
+        pool_index=1,
+        deferred_mortal_wounds=(deferred,),
+    )
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+    )
+    request = _assert_request(
+        cast(LifecycleStatus, status),
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
+    assert remaining is not None
+    policy = lifecycle.config.ruleset_descriptor.fight_policy
+    fight_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(
+            attacker.unit_instance_id,
+            defender.unit_instance_id,
+        ),
+        fights_first_registry=FightsFirstRegistry.from_state(state),
+    ).with_current_step(
+        current_step=FightPhaseStepKind.FIGHT,
+        policy=policy,
+    )
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=attacker.unit_instance_id,
+        ordering_band=fight_state.current_ordering_band,
+        fight_type=policy.fight_types[0],
+        eligibility_reasons=(FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,),
+        request_id="ws13-fight-mortal-wound-activation-request",
+        result_id="ws13-fight-mortal-wound-activation-result",
+        interrupt_id="ws13-fight-mortal-wound-interrupt",
+    )
+    state.fight_phase_state = (
+        fight_state.with_activation(activation)
+        .with_active_activation(activation)
+        .with_attack_sequence_update(
+            attack_sequence=remaining,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
+    )
+    reaction_window = ReactionWindow(
+        timing_window=TimingWindow(
+            window_id="ws13-fight-mortal-wound-reaction-window",
+            descriptor=TimingWindowDescriptor(
+                descriptor_id="ws13-fight-mortal-wound-reaction-descriptor",
+                trigger_kind=TimingTriggerKind.DURING_PHASE,
+                source_rule_id="ws13:fight-mortal-wound-reaction",
+                phase=BattlePhase.FIGHT,
+                source_step="fight",
+            ),
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            active_player_id=state.active_player_id,
+            phase=BattlePhase.FIGHT,
+        ),
+        eligible_player_ids=("player-a",),
+    )
+    lifecycle.reaction_queue = ReactionQueue.from_payload(
+        {
+            "frames": [
+                ReactionQueueFrame(
+                    reaction_window=reaction_window,
+                    parent_phase=BattlePhase.FIGHT,
+                    parent_step="fight",
+                    resume_token="ws13-fight-mortal-wound-resume",
+                    request_id=request.request_id,
+                ).to_payload()
+            ]
+        }
+    )
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload()))
+    restored_model_request = _assert_request(
+        session.advance_until_decision_or_terminal(),
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
+    assert restored_model_request.to_payload() == request.to_payload()
+
+    fnp_status = session.submit_option(
+        request_id=restored_model_request.request_id,
+        option_id=selected_model_id,
+        result_id="ws13-fight-mortal-wound-model-result",
+    )
+    fnp_request = _assert_request(fnp_status, SELECT_FEEL_NO_PAIN_DECISION_TYPE)
+    assert session.lifecycle.reaction_queue.frames[-1].request_id == fnp_request.request_id
+    session = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    restored_fnp_request = session.lifecycle.pending_decision_request()
+    assert restored_fnp_request is not None
+    assert restored_fnp_request.to_payload() == fnp_request.to_payload()
+    session.submit_option(
+        request_id=restored_fnp_request.request_id,
+        option_id="decline",
+        result_id="ws13-fight-mortal-wound-fnp-decline",
+    )
+    assert not session.lifecycle.reaction_queue.frames
+
+    selected_model = model_by_id(
+        state=cast(GameState, session.lifecycle.state),
+        model_instance_id=selected_model_id,
+    )
+    assert selected_model.wounds_remaining == selected_model.starting_wounds - 1
+    assert any(
+        event.event_type == "devastating_wounds_mortal_wounds_applied"
+        for event in session.lifecycle.decision_controller.event_log.records
+    )
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:ws13:fight-mortal-wound-model-fnp-choice")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
 
 
 @pytest.mark.integration

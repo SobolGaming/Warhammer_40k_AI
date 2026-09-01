@@ -673,6 +673,7 @@ def validate_model_destruction_cause_restore(
     _mdccr.validate_model_logical_death_inventory(
         state=state,
         event_records=event_records,
+        decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
     )
 
