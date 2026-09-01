@@ -5,13 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.attack_sequence_destruction_model import PendingAttackDestruction
 from warhammer40k_core.engine.post_roll_attack_profiles import PostRollAttackPoolSet
 
 # fmt: off
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
-    from warhammer40k_core.engine.attack_sequence_model import ATTACK_ALLOCATION_DECISION_TYPES, SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE, SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE, SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE, KEEP_ALL_MODIFIERS_OPTION_ID, IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID, IGNORE_BENEFICIAL_MODIFIERS_OPTION_ID, IGNORE_ALL_MODIFIERS_OPTION_ID, ATTACK_RESOLUTION_SELECTION_DECISION_TYPES, SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS, DAMAGE_ALLOCATION_RULE_ID, DEADLY_DEMISE_SOURCE_KIND, HAZARDOUS_SOURCE_KIND, _PRECISION_CHARACTER_GROUP_ROLES, attack_sequence_hit_roll_spec, attack_sequence_wound_roll_spec, deadly_demise_trigger_roll_spec, deadly_demise_mortal_wounds_roll_spec, AttackSequenceStep, AttackSequenceEventPayload, HitRollPayload, WoundRollPayload, PsychicAttackModifierIgnoreSelection, AttackSequencePayload, AttackResolutionContextPayload, SaveDieEntryPayload, PendingGroupedDamagePayload, PendingDestroyedTransportDisembarkPayload, LostWoundContextPayload, DestructionReactionContextPayload, DeferredMortalWoundsPayload, HazardousMortalWoundSourceContextPayload, FastDiceGroupPayload, AttackModifierStackSetPayload, IdenticalAttackSignaturePayload, GatheredAttackContributionPayload, GatheredAttackGroupPayload, HitRoll, WoundRoll, AttackSequenceEvent, AttackSequenceEventHandler, AttackSequenceHooks, DestroyedModelEmission, PrecisionPoolSelection, PendingGroupedDamage, PendingDestroyedTransportDisembark, AttackModifierStackSet, DeferredMortalWounds, IdenticalAttackSignature, GatheredAttackContribution, GatheredAttackGroup
+    from warhammer40k_core.engine.attack_sequence_model import ATTACK_ALLOCATION_DECISION_TYPES, SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE, SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE, SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE, KEEP_ALL_MODIFIERS_OPTION_ID, IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID, IGNORE_BENEFICIAL_MODIFIERS_OPTION_ID, IGNORE_ALL_MODIFIERS_OPTION_ID, ATTACK_RESOLUTION_SELECTION_DECISION_TYPES, SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS, DAMAGE_ALLOCATION_RULE_ID, DEADLY_DEMISE_SOURCE_KIND, HAZARDOUS_SOURCE_KIND, _PRECISION_CHARACTER_GROUP_ROLES, attack_sequence_hit_roll_spec, attack_sequence_wound_roll_spec, deadly_demise_trigger_roll_spec, deadly_demise_mortal_wounds_roll_spec, AttackSequenceStep, AttackSequenceEventPayload, HitRollPayload, WoundRollPayload, PsychicAttackModifierIgnoreSelection, AttackSequencePayload, AttackResolutionContextPayload, SaveDieEntryPayload, PendingGroupedDamagePayload, PendingDestroyedTransportDisembarkPayload, PendingAttackDestructionPayload, LostWoundContextPayload, DestructionReactionContextPayload, DeferredMortalWoundsPayload, HazardousMortalWoundSourceContextPayload, FastDiceGroupPayload, AttackModifierStackSetPayload, IdenticalAttackSignaturePayload, GatheredAttackContributionPayload, GatheredAttackGroupPayload, HitRoll, WoundRoll, AttackSequenceEvent, AttackSequenceEventHandler, AttackSequenceHooks, DestroyedModelEmission, PrecisionPoolSelection, PendingGroupedDamage, PendingDestroyedTransportDisembark, AttackModifierStackSet, DeferredMortalWounds, IdenticalAttackSignature, GatheredAttackContribution, GatheredAttackGroup
     from warhammer40k_core.engine.attack_sequence_dispatch import apply_resolve_target_unit_decision, apply_attack_weapon_group_decision, resolve_attack_sequence_until_blocked
     from warhammer40k_core.engine.attack_sequence_destroyed_transport import is_destroyed_transport_disembark_proposal_request, invalid_destroyed_transport_disembark_proposal_status, apply_destroyed_transport_disembark_proposal_decision, _continue_pending_destroyed_transport_disembark, _remove_resolved_destroyed_transport_cargo_state, _begin_destroyed_transport_disembark_if_needed, _request_destroyed_transport_disembark_placement, _parse_destroyed_transport_disembark_submission_or_invalid, _destroyed_transport_proposal_parse_failure, _key_error_field, _missing_destroyed_transport_disembark_field, _destroyed_transport_proposal_invalid_status, _destroyed_transport_placement_invalid_status, _request_destroyed_transport_disembark_placement_retry, _resolve_destroyed_transport_disembark_submission, _apply_valid_destroyed_transport_disembark, _destroyed_transport_cargo_state_for_damage, _destroyed_transport_placement, _battlefield_scenario_for_attack_sequence, _objective_markers_for_attack_sequence
     from warhammer40k_core.engine.attack_sequence_group_selection import _select_or_request_next_gathered_group, _record_auto_attack_sequence_selection, apply_allocation_order_decision, apply_damage_allocation_model_decision, current_legal_damage_allocation_model_ids, apply_precision_allocation_decision, apply_feel_no_pain_decision, apply_destruction_reaction_decision, _continue_grouped_damage_after_interruption, _apply_deferred_mortal_wounds, _emit_deferred_mortal_wounds_applied, _apply_deferred_mortal_wound_feel_no_pain_decision, _continue_hazardous_after_mortal_wound_feel_no_pain, _continue_deadly_demise_after_mortal_wound_feel_no_pain, _grouped_precision_request_if_available, _precision_grouped_allocation_context_and_groups, _build_precision_allocation_request, _precision_pool_selection, _resolve_grouped_current_pool, _grouped_wounded_contexts_for_pool, _defer_grouped_devastating_wounds
@@ -50,6 +51,8 @@ class AttackSequence:
     generated_hit_index: int = 0
     current_hit_roll: HitRoll | None = None
     deferred_mortal_wounds: tuple[DeferredMortalWounds, ...] = ()
+    pending_attack_destructions: tuple[PendingAttackDestruction, ...] = ()
+    attacks_resolved_event_id: str | None = None
     pending_grouped_damage: PendingGroupedDamage | None = None
     pending_destroyed_transport_disembark: PendingDestroyedTransportDisembark | None = None
     post_roll_attack_pools: PostRollAttackPoolSet | None = None
@@ -142,6 +145,43 @@ class AttackSequence:
             "deferred_mortal_wounds",
             _validate_deferred_mortal_wounds(self.deferred_mortal_wounds),
         )
+        if type(self.pending_attack_destructions) is not tuple or any(
+            type(pending) is not PendingAttackDestruction
+            for pending in self.pending_attack_destructions
+        ):
+            raise GameLifecycleError(
+                "AttackSequence pending_attack_destructions must contain typed records."
+            )
+        pending_model_ids = tuple(
+            pending.damage_application.model_instance_id
+            for pending in self.pending_attack_destructions
+        )
+        if len(set(pending_model_ids)) != len(pending_model_ids):
+            raise GameLifecycleError(
+                "AttackSequence pending attack destruction model IDs must be unique."
+            )
+        for pending in self.pending_attack_destructions:
+            if (
+                pending.attack_context["sequence_id"] != self.sequence_id
+                or battle_phase_kind_from_token(pending.attack_context["source_phase"])
+                is not self.source_phase
+                or pending.attack_context["attacker_player_id"] != self.attacker_player_id
+                or pending.attack_context["attacking_unit_instance_id"]
+                != self.attacking_unit_instance_id
+            ):
+                raise GameLifecycleError("AttackSequence pending destruction identity drift.")
+        object.__setattr__(
+            self,
+            "attacks_resolved_event_id",
+            _validate_optional_identifier(
+                "AttackSequence attacks_resolved_event_id",
+                self.attacks_resolved_event_id,
+            ),
+        )
+        if self.attacks_resolved_event_id is not None and not self.is_complete:
+            raise GameLifecycleError(
+                "AttackSequence attacks-resolved evidence requires all attacks resolved."
+            )
         if self.pending_grouped_damage is not None:
             if type(self.pending_grouped_damage) is not PendingGroupedDamage:
                 raise GameLifecycleError(
@@ -217,7 +257,10 @@ class AttackSequence:
                 raise GameLifecycleError(
                     "Completed AttackSequence cannot have pending_grouped_damage."
                 )
-            if self.pending_destroyed_transport_disembark is not None:
+            if (
+                self.pending_destroyed_transport_disembark is not None
+                and not self.pending_attack_destructions
+            ):
                 raise GameLifecycleError(
                     "Completed AttackSequence cannot have pending destroyed Transport state."
                 )
@@ -292,7 +335,9 @@ class AttackSequence:
 
     def current_pool(self) -> RangedAttackPool:
         if self.is_complete:
-            raise GameLifecycleError("Completed AttackSequence has no current pool.")
+            if not self.pending_attack_destructions:
+                raise GameLifecycleError("Completed AttackSequence has no current pool.")
+            return self.pending_attack_destructions[0].attack_pool
         if self.current_gathered_group is not None:
             pool = _synthetic_pool_for_gathered_group(
                 attack_pools=self.attack_pools,
@@ -350,7 +395,9 @@ class AttackSequence:
 
     def attack_context_id(self) -> str:
         if self.is_complete:
-            raise GameLifecycleError("Completed AttackSequence has no attack context.")
+            if not self.pending_attack_destructions:
+                raise GameLifecycleError("Completed AttackSequence has no attack context.")
+            return self.pending_attack_destructions[0].attack_context["attack_context_id"]
         context_id = (
             f"{self.sequence_id}:pool-{self.pool_index + 1:03d}:attack-{self.attack_index + 1:03d}"
         )
@@ -380,6 +427,8 @@ class AttackSequence:
                 pool_index=self.pool_index,
                 attack_index=next_attack_index,
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
+                pending_attack_destructions=self.pending_attack_destructions,
+                attacks_resolved_event_id=self.attacks_resolved_event_id,
                 pending_grouped_damage=self.pending_grouped_damage,
                 pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
                 post_roll_attack_pools=self.post_roll_attack_pools,
@@ -398,6 +447,8 @@ class AttackSequence:
             pool_index=next_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
@@ -429,6 +480,8 @@ class AttackSequence:
                 pool_index=self.pool_index,
                 attack_index=self.attack_index,
                 deferred_mortal_wounds=self.deferred_mortal_wounds,
+                pending_attack_destructions=self.pending_attack_destructions,
+                attacks_resolved_event_id=self.attacks_resolved_event_id,
                 pending_grouped_damage=self.pending_grouped_damage,
                 pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
                 post_roll_attack_pools=self.post_roll_attack_pools,
@@ -448,6 +501,8 @@ class AttackSequence:
             generated_hit_index=next_generated_hit_index,
             current_hit_roll=hit_roll,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=(self.pending_destroyed_transport_disembark),
             post_roll_attack_pools=self.post_roll_attack_pools,
@@ -471,6 +526,8 @@ class AttackSequence:
             generated_hit_index=self.generated_hit_index,
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=(*self.deferred_mortal_wounds, deferred),
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
@@ -479,6 +536,48 @@ class AttackSequence:
 
     def without_deferred_mortal_wounds(self) -> Self:
         return self.with_pending_deferred_mortal_wounds(())
+
+    @property
+    def current_pending_attack_destruction(self) -> PendingAttackDestruction | None:
+        if not self.pending_attack_destructions:
+            return None
+        return self.pending_attack_destructions[0]
+
+    def with_pending_attack_destruction(
+        self,
+        pending: PendingAttackDestruction,
+    ) -> Self:
+        if type(pending) is not PendingAttackDestruction:
+            raise GameLifecycleError("AttackSequence pending destruction is invalid.")
+        return replace(
+            self,
+            pending_attack_destructions=(*self.pending_attack_destructions, pending),
+        )
+
+    def without_current_pending_attack_destruction(self) -> Self:
+        if not self.pending_attack_destructions:
+            raise GameLifecycleError("AttackSequence has no pending destruction to complete.")
+        if self.pending_destroyed_transport_disembark is not None:
+            raise GameLifecycleError(
+                "AttackSequence cannot complete destruction with pending Transport state."
+            )
+        return replace(
+            self,
+            pending_attack_destructions=self.pending_attack_destructions[1:],
+        )
+
+    def with_attacks_resolved_event_id(self, event_id: str) -> Self:
+        if not self.is_complete:
+            raise GameLifecycleError("AttackSequence attacks are not all resolved.")
+        if self.attacks_resolved_event_id is not None:
+            raise GameLifecycleError("AttackSequence attacks-resolved event is already recorded.")
+        return replace(
+            self,
+            attacks_resolved_event_id=_validate_identifier(
+                "AttackSequence attacks_resolved_event_id",
+                event_id,
+            ),
+        )
 
     def with_pending_deferred_mortal_wounds(
         self,
@@ -498,6 +597,8 @@ class AttackSequence:
             generated_hit_index=self.generated_hit_index,
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
@@ -519,6 +620,8 @@ class AttackSequence:
             pool_index=self.pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=pending,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
@@ -538,6 +641,8 @@ class AttackSequence:
             pool_index=self.pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             post_roll_attack_pools=self.post_roll_attack_pools,
             post_roll_attack_contexts=self.post_roll_attack_contexts,
         )
@@ -562,6 +667,8 @@ class AttackSequence:
             generated_hit_index=self.generated_hit_index,
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=self.pending_grouped_damage,
             pending_destroyed_transport_disembark=pending,
             post_roll_attack_pools=self.post_roll_attack_pools,
@@ -583,6 +690,8 @@ class AttackSequence:
             generated_hit_index=self.generated_hit_index,
             current_hit_roll=self.current_hit_roll,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_grouped_damage=self.pending_grouped_damage,
             post_roll_attack_pools=self.post_roll_attack_pools,
             post_roll_attack_contexts=self.post_roll_attack_contexts,
@@ -606,6 +715,8 @@ class AttackSequence:
             ),
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
             post_roll_attack_contexts=self.post_roll_attack_contexts,
@@ -624,6 +735,8 @@ class AttackSequence:
             pool_index=next_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
             post_roll_attack_contexts=self.post_roll_attack_contexts,
@@ -646,6 +759,8 @@ class AttackSequence:
             pool_index=gathered_group.primary_pool_index,
             attack_index=0,
             deferred_mortal_wounds=self.deferred_mortal_wounds,
+            pending_attack_destructions=self.pending_attack_destructions,
+            attacks_resolved_event_id=self.attacks_resolved_event_id,
             pending_destroyed_transport_disembark=self.pending_destroyed_transport_disembark,
             post_roll_attack_pools=self.post_roll_attack_pools,
             post_roll_attack_contexts=self.post_roll_attack_contexts,
@@ -674,6 +789,10 @@ class AttackSequence:
             "deferred_mortal_wounds": [
                 deferred.to_payload() for deferred in self.deferred_mortal_wounds
             ],
+            "pending_attack_destructions": [
+                pending.to_payload() for pending in self.pending_attack_destructions
+            ],
+            "attacks_resolved_event_id": self.attacks_resolved_event_id,
             "pending_grouped_damage": (
                 None
                 if self.pending_grouped_damage is None
@@ -724,6 +843,11 @@ class AttackSequence:
                 DeferredMortalWounds.from_payload(deferred)
                 for deferred in payload["deferred_mortal_wounds"]
             ),
+            pending_attack_destructions=tuple(
+                PendingAttackDestruction.from_payload(pending)
+                for pending in payload["pending_attack_destructions"]
+            ),
+            attacks_resolved_event_id=payload["attacks_resolved_event_id"],
             pending_grouped_damage=(
                 None
                 if payload["pending_grouped_damage"] is None

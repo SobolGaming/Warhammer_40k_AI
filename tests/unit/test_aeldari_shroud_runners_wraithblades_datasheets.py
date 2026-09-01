@@ -69,6 +69,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
     DamageKind,
     DestructionReactionKind,
@@ -615,15 +616,32 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         request=replayed_request,
         selected_option_id=selected_source,
     )
-    accepted = replayed.submit_decision(result)
-    assert accepted.status_kind is not LifecycleStatusKind.INVALID
     handler = FightPhaseHandler(
         ruleset_descriptor=replayed_state.runtime_ruleset_descriptor(),
         army_catalog=_package().army_catalog,
     )
+    replayed.decision_controller.submit_result(result)
+    accepted = handler.apply_decision(
+        state=replayed_state,
+        decisions=replayed.decision_controller,
+        result=result,
+    )
+    assert accepted is None or accepted.status_kind is not LifecycleStatusKind.INVALID
+    pending_status = accepted
     for decision_index in range(16):
         if not replayed.decision_controller.queue.pending_requests:
-            break
+            fight_state = replayed_state.fight_phase_state
+            if (
+                pending_status is not None
+                or fight_state is None
+                or fight_state.attack_sequence is None
+                or not fight_state.attack_sequence.pending_attack_destructions
+            ):
+                break
+            pending_status = handler.begin_phase(
+                state=replayed_state,
+                decisions=replayed.decision_controller,
+            )
         pending = replayed.decision_controller.queue.peek_next()
         assert pending.options
         selected_option_id = next(
@@ -760,6 +778,23 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     assert target_model.model_instance_id in available_model_ids
     assert living_model_ids
     assert present_model_ids == available_model_ids
+    assert all(
+        authority.source_authority_finalized
+        for authority in replayed_state.model_destruction_cause_authorities
+    ), [
+        (
+            authority.cause_kind.value,
+            authority.model_instance_id,
+            authority.producer_id,
+            authority.producer_context,
+            authority.parent_cause_ids,
+            None
+            if authority.model_destroyed_event is None
+            else authority.model_destroyed_event.event_id,
+        )
+        for authority in replayed_state.model_destruction_cause_authorities
+        if not authority.source_authority_finalized
+    ]
     replayed_payload = replayed.to_payload()
     assert GameLifecycle.from_payload(replayed_payload).to_payload() == replayed_payload
 
@@ -787,7 +822,8 @@ def test_destruction_reaction_rejects_authoritative_context_or_weapon_profile_dr
         sustained_hits=drift_kind == "generated_hit_context",
     )
     assert remaining is not None
-    assert remaining.pending_grouped_damage is not None
+    assert remaining.pending_grouped_damage is None
+    assert remaining.pending_attack_destructions
     lifecycle_payload = cast(
         dict[str, Any],
         battle_lifecycle_payload(
@@ -1595,17 +1631,43 @@ def _resolve_malevolent_attack(
         already_allocated_model_ids=(),
         dice_manager=manager,
     )
-    if placed_model_count > 1:
-        remaining, allocated_ids, status = apply_pending_damage_allocation(
+    for _continuation_index in range(16):
+        if remaining is None:
+            break
+        request = None if status is None else status.decision_request
+        if (
+            request is not None
+            and request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+        ):
+            option_ids = tuple(option.option_id for option in request.options)
+            selected_model_id = (
+                target_model.model_instance_id
+                if target_model.model_instance_id in option_ids
+                else option_ids[0]
+            )
+            remaining, allocated_ids, status = apply_pending_damage_allocation(
+                state=fixture.state,
+                decisions=decisions,
+                ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+                attack_sequence=remaining,
+                status=status,
+                already_allocated_model_ids=allocated_ids,
+                dice_manager=manager,
+                selected_model_id=selected_model_id,
+            )
+            continue
+        if status is not None:
+            break
+        remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
             state=fixture.state,
             decisions=decisions,
             ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
             attack_sequence=remaining,
-            status=status,
             already_allocated_model_ids=allocated_ids,
             dice_manager=manager,
-            selected_model_id=target_model.model_instance_id,
         )
+    else:
+        raise AssertionError("Malevolent Souls attack continuation did not settle.")
     if source_phase is BattlePhase.FIGHT:
         fight_state = fixture.state.fight_phase_state
         assert fight_state is not None

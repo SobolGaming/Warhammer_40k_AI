@@ -1,0 +1,100 @@
+{
+  "artifact_schema": "core-v2-attack-sequence-source-v1",
+  "evidence": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-attack-sequence-source-review:destroyed",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "0f588f6a3973735c0afee2936b0c6e7950274a0b8606e986b7c254e251c5942e",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "core_rules_05_04_04_destroyed",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:attack_destruction_requires_end_of_attacks_boundary",
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:defer_destroyed_attack_damage_if_required",
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:resolve_pending_attack_destruction_until_blocked",
+        "warhammer40k_core.engine.attack_sequence_dispatch:resolve_attack_sequence_until_blocked",
+        "warhammer40k_core.engine.model_destruction_cause_attack_restore:validate_pending_attack_destruction_boundary"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 05.04.04 Destroyed",
+      "source_url": null,
+      "transcription_sha256": "0f3cb2ce7fb896aa9d2404eafdf6bde0d701e89ff895dc680a7ca6d56780e9f2",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-attack-sequence-2026-09-01:destroyed",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "ceb8fca60471aea370514c919ea7bf991f9a1d84b8c43f3fb560793fd0569bef",
+      "observed_at": "2026-09-01T14:18:39-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:05",
+      "review_audit_source_observation_sha256": "c771b8acbb62f912cc21c649a6a1ec0cac5d5a1f02e5454747b9427a8571892e",
+      "rule_source_id": "core_rules_05_04_04_destroyed",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:attack_destruction_requires_end_of_attacks_boundary",
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:defer_destroyed_attack_damage_if_required",
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:resolve_pending_attack_destruction_until_blocked",
+        "warhammer40k_core.engine.attack_sequence_dispatch:resolve_attack_sequence_until_blocked",
+        "warhammer40k_core.engine.model_destruction_cause_attack_restore:validate_pending_attack_destruction_boundary"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 05.04.04 Destroyed",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "transcription_sha256": "0f3cb2ce7fb896aa9d2404eafdf6bde0d701e89ff895dc680a7ca6d56780e9f2",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "ec4bf56033c8c90db0a2870051a5ea472a42f7767ed48299bc0352a2b1092a5f",
+  "rules": [
+    {
+      "load_support_status": "loaded",
+      "rule_id": "destroyed",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:attack_destruction_requires_end_of_attacks_boundary",
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:defer_destroyed_attack_damage_if_required",
+        "warhammer40k_core.engine.attack_sequence_destruction_boundary:resolve_pending_attack_destruction_until_blocked",
+        "warhammer40k_core.engine.attack_sequence_dispatch:resolve_attack_sequence_until_blocked",
+        "warhammer40k_core.engine.model_destruction_cause_attack_restore:validate_pending_attack_destruction_boundary"
+      ],
+      "section_heading": "DESTROYED",
+      "section_id": "05.04.04",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "core_rules_05_04_04_destroyed",
+      "source_text": "DESTROYED\nThroughout a battle, models will suffer damage, lose wounds and be destroyed. When every model in a unit has been destroyed, that unit is destroyed.\n\nWhen a model is destroyed, first resolve any rules that are triggered when it is destroyed, then it is removed from the battlefield. If any such rules apply, and if the model was destroyed as the result of an attack, unless otherwise stated, those rules are only resolved and that model is only removed after the attacking unit\u2019s attacks have been resolved. Unless otherwise stated, destroyed models and units cannot use abilities or be selected or targeted by rules.\n\nSome rules only trigger if an enemy model or unit was destroyed by you, or by a model or unit from your army. This means that the enemy model or unit was destroyed by an attack made by a model from your army, or by a player rule you have. Enemy models or units that are destroyed by any other means are not destroyed by you, or by a model or unit from your army.",
+      "transcription_sha256": "0f3cb2ce7fb896aa9d2404eafdf6bde0d701e89ff895dc680a7ca6d56780e9f2"
+    }
+  ],
+  "source_document": {
+    "document_id": "40k-app-attack-sequence-2026-09-01",
+    "observed_at": "2026-09-01T14:18:39-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    "source_title": "40k.app Core Rules Attack Sequence",
+    "source_url": "https://www.40k.app/rules/05-attack-sequence"
+  },
+  "source_package_id": "gw-11e-core-attack-sequence",
+  "source_version": "40k-app-attack-sequence-observed-2026-09-01"
+}

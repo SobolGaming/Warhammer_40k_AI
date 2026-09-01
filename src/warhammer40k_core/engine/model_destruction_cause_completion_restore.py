@@ -8,6 +8,12 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_on_death import (
     FIGHT_ON_DEATH_AWAITING_EFFECT_KIND,
 )
+from warhammer40k_core.engine.model_destruction_cause_attack_restore import (
+    active_attack_destruction_context_ids,
+    mortal_application_contains_damage,
+    require_pending_attack_continuation,
+    validate_pending_attack_destruction_boundary,
+)
 from warhammer40k_core.engine.model_destruction_cause_authority import (
     MODEL_DESTROYED_EVENT_TYPE,
     MODEL_DESTRUCTION_CAUSE_ID_FIELD,
@@ -18,7 +24,6 @@ from warhammer40k_core.engine.model_destruction_cause_authority import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.damage_allocation import (
         DamageApplication,
         MortalWoundApplication,
@@ -63,17 +68,70 @@ def validate_pending_model_destruction_cause_inventory(
 
     active_attack_sequence = active_attack_sequence_for_state(state)
     expected_cause_ids: set[str] = set()
+    if active_attack_sequence is not None:
+        from warhammer40k_core.engine.model_destruction_cause_producers import (
+            attack_damage_model_destruction_cause_id_for_context,
+        )
+
+        for pending in active_attack_sequence.pending_attack_destructions:
+            validate_pending_attack_destruction_boundary(
+                attack_sequence=active_attack_sequence,
+                pending=pending,
+                event_records=event_records,
+            )
+            cause_id = attack_damage_model_destruction_cause_id_for_context(
+                state=state,
+                sequence_id=active_attack_sequence.sequence_id,
+                attack_context_id=pending.attack_context["attack_context_id"],
+                model_instance_id=pending.damage_application.model_instance_id,
+            )
+            authority = model_destruction_cause_authority_by_id_or_none(
+                state=state,
+                cause_id=cause_id,
+            )
+            if authority is None:
+                raise GameLifecycleError("Pending attack destruction cause is missing.")
+            if authority.source_authority_finalized:
+                if authority.model_destroyed_event is None or not any(
+                    request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+                    and isinstance(request.payload, dict)
+                    and isinstance(request.payload.get("destruction_context"), dict)
+                    and cast(
+                        dict[str, JsonValue],
+                        request.payload["destruction_context"],
+                    ).get("model_destroyed_event_id")
+                    == authority.model_destroyed_event.event_id
+                    for request in pending_decision_requests
+                ):
+                    raise GameLifecycleError(
+                        "Finalized pending attack destruction lacks its reaction request."
+                    )
+            else:
+                expected_cause_ids.add(
+                    require_pending_attack_continuation(
+                        state=state,
+                        attack_sequence=active_attack_sequence,
+                        event_records=event_records,
+                        damage_payload=validate_json_value(pending.damage_application.to_payload()),
+                        attack_context_id=pending.attack_context["attack_context_id"],
+                    )
+                )
     if (
         active_attack_sequence is not None
         and active_attack_sequence.pending_destroyed_transport_disembark is not None
     ):
         expected_cause_ids.add(
-            _require_pending_attack_continuation(
+            require_pending_attack_continuation(
                 state=state,
                 attack_sequence=active_attack_sequence,
                 event_records=event_records,
                 damage_payload=validate_json_value(
                     active_attack_sequence.pending_destroyed_transport_disembark.damage_application.to_payload()
+                ),
+                attack_context_id=(
+                    active_attack_sequence.pending_destroyed_transport_disembark.attack_context[
+                        "attack_context_id"
+                    ]
                 ),
             )
         )
@@ -115,7 +173,7 @@ def validate_pending_model_destruction_cause_inventory(
             ):
                 raise GameLifecycleError("Pending attack destruction continuation drift.")
             expected_cause_ids.add(
-                _require_pending_attack_continuation(
+                require_pending_attack_continuation(
                     state=state,
                     attack_sequence=active_attack_sequence,
                     event_records=event_records,
@@ -218,7 +276,8 @@ def validate_pending_model_destruction_cause_inventory(
         context = authority.producer_context
         if active_attack_sequence is None or (
             context.get("sequence_id") != active_attack_sequence.sequence_id
-            or context.get("attack_context_id") != active_attack_sequence.attack_context_id()
+            or context.get("attack_context_id")
+            not in active_attack_destruction_context_ids(active_attack_sequence)
             or context.get("attacker_player_id") != active_attack_sequence.attacker_player_id
             or context.get("attacking_unit_instance_id")
             != active_attack_sequence.attacking_unit_instance_id
@@ -1005,7 +1064,7 @@ def _attack_deadly_demise_parent_and_application(
             damage_payload,
             "attack Deadly Demise collateral damage",
         ).get("target_unit_instance_id")
-        and _mortal_application_contains_damage(
+        and mortal_application_contains_damage(
             event.payload.get("mortal_wound_application"),
             damage_payload=damage_payload,
         )
@@ -1328,114 +1387,6 @@ def _rule_mode_completion_identity(
     if not isinstance(payload, dict):
         raise GameLifecycleError("Rule destruction completion event payload is invalid.")
     return event_type, payload
-
-
-def _require_pending_attack_continuation(
-    *,
-    state: GameState,
-    attack_sequence: AttackSequence,
-    event_records: tuple[EventRecord, ...],
-    damage_payload: JsonValue,
-) -> str:
-    from warhammer40k_core.engine.model_destruction_cause_producers import (
-        attack_damage_model_destruction_cause_id,
-    )
-
-    damage = _mdcpv.parse_damage_application(damage_payload)
-    cause_id = attack_damage_model_destruction_cause_id(
-        state=state,
-        attack_sequence=attack_sequence,
-        model_instance_id=damage.model_instance_id,
-    )
-    authority = model_destruction_cause_authority_by_id_or_none(
-        state=state,
-        cause_id=cause_id,
-    )
-    if authority is None or authority.source_authority_finalized:
-        raise GameLifecycleError("Attack continuation lacks its pending destruction cause.")
-    expected_parent_ids = _pending_attack_parent_cause_ids(
-        state=state,
-        authority=authority,
-        damage=damage,
-        event_records=event_records,
-    )
-    expected_context = {
-        "context_kind": "attack_damage_model_destruction",
-        "sequence_id": attack_sequence.sequence_id,
-        "attack_context_id": attack_sequence.attack_context_id(),
-        "attacker_player_id": attack_sequence.attacker_player_id,
-        "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-        "source_phase": attack_sequence.source_phase.value,
-        "damage_application": validate_json_value(damage.to_payload()),
-        "parent_cause_ids": validate_json_value(list(expected_parent_ids)),
-    }
-    if (
-        authority.parent_cause_ids != expected_parent_ids
-        or authority.producer_context != expected_context
-    ):
-        raise GameLifecycleError("Pending attack destruction continuation context drift.")
-    return cause_id
-
-
-def _pending_attack_parent_cause_ids(
-    *,
-    state: GameState,
-    authority: ModelDestructionCauseAuthority,
-    damage: DamageApplication,
-    event_records: tuple[EventRecord, ...],
-) -> tuple[str, ...]:
-    damage_payload = damage.to_payload()
-    matches = tuple(
-        event
-        for event in event_records
-        if event.event_type == "deadly_demise_mortal_wounds_applied"
-        and isinstance(event.payload, dict)
-        and event.payload.get("sequence_id") == authority.producer_context.get("sequence_id")
-        and event.payload.get("attack_context_id")
-        == authority.producer_context.get("attack_context_id")
-        and _mortal_application_contains_damage(
-            event.payload.get("mortal_wound_application"),
-            damage_payload=damage_payload,
-        )
-    )
-    if not matches:
-        return ()
-    if len(matches) != 1:
-        raise GameLifecycleError("Pending attack destruction parent evidence is ambiguous.")
-    applied_payload = _mdcpv.json_object_value(
-        matches[0].payload,
-        "pending attack Deadly Demise application",
-    )
-    source_payload = applied_payload.get("source")
-    if not isinstance(source_payload, dict):
-        raise GameLifecycleError("Pending attack destruction parent source is invalid.")
-    candidates = tuple(
-        candidate
-        for candidate in state.model_destruction_cause_authorities
-        if candidate.sequence_number < authority.sequence_number
-        and candidate.cause_kind is ModelDestructionCauseKind.ATTACK_DAMAGE
-        and candidate.producer_id == authority.producer_id
-        and any(
-            source.to_payload() == source_payload
-            for source in state.destruction_reaction_sources_for_model(
-                model_instance_id=candidate.model_instance_id
-            )
-        )
-    )
-    if len(candidates) != 1:
-        raise GameLifecycleError("Pending attack destruction parent identity drift.")
-    return (candidates[0].cause_id,)
-
-
-def _mortal_application_contains_damage(
-    value: JsonValue,
-    *,
-    damage_payload: object,
-) -> bool:
-    if not isinstance(value, dict):
-        return False
-    applications = value.get("applications")
-    return isinstance(applications, list) and damage_payload in applications
 
 
 __all__ = (

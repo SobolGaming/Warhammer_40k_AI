@@ -85,6 +85,8 @@ def _select_or_request_next_gathered_group(
                     pool_index=len(current.attack_pools),
                     attack_index=0,
                     deferred_mortal_wounds=current.deferred_mortal_wounds,
+                    pending_attack_destructions=current.pending_attack_destructions,
+                    attacks_resolved_event_id=current.attacks_resolved_event_id,
                 ),
                 None,
             )
@@ -626,7 +628,11 @@ def apply_destruction_reaction_decision(
             dice_manager=dice_manager,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-    updated_sequence = _advance_after_resolved_hit(
+    from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
+        complete_current_attack_destruction_or_advance,
+    )
+
+    updated_sequence = complete_current_attack_destruction_or_advance(
         attack_sequence=attack_sequence,
         attack_context=context["attack_context"],
     )

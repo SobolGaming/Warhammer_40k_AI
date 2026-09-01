@@ -1351,6 +1351,131 @@ Validation results:
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/412`; merge commit
 pending review and merge.
 
+### P05A — C05-01
+
+Status: Implementation, source/contract updates, and required local validation are complete;
+remote PR publication, review, and merge are pending.
+
+Finding IDs: `C05-01`.
+
+Dependencies and evidence gate: P19 is merged. The exact 05.04.04 statement is retained as a
+reviewed transcription and a separately classified, project-authoritative 40k.app mirror
+observation linked to the recorded non-affiliation and source-authority policy. This satisfies
+`APP-AUTHORITY`; no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: A model destroyed by an attack that has a destruction-triggered rule must
+become logically dead and non-targetable at damage resolution, but its trigger resolution and
+battlefield removal must wait until every attack made by the attacking rules unit has resolved.
+Shooting and Fight must use one persisted, replay-safe boundary.
+
+How it was done before P05A: Ordinary and grouped damage removed a destroyed model, emitted
+`model_destroyed`, ran mandatory reactions, and requested optional reactions inline with the
+current attack. An accepted or declined decision then resumed the remaining attack pool. A first
+casualty's Deadly Demise or optional reaction could therefore occur before a later attack rolled or
+applied damage. Destroyed Transport continuation inherited the same early timing. The sequence had
+no explicit attacks-resolved evidence or serialized destruction queue for checkpoint validation.
+
+How it is done after P05A: Damage still reserves the authoritative attack-destruction cause and
+records logical death immediately. When the destroyed model has a registered destruction reaction,
+or a destroyed Transport has embarked cargo requiring its destruction continuation, the engine
+captures the exact attack context and pool, damage/FNP result, controller, reaction sources,
+original damage event ID, and pre-removal placement in an ordered
+`PendingAttackDestruction`. The fixed placement remains solely as pending-destruction evidence;
+alive/group/selection/targeting queries continue to exclude the logically dead model. Damage then
+advances through every remaining attack and gathered pool from the attacking rules unit.
+
+After deferred Devastating Wounds routing and all ordinary attacks have completed, a sequence with
+deferred destructions emits one `attack_sequence_attacks_resolved` event carrying the stable
+05.04.04 source ID and persists that event ID on `AttackSequence`. It drains pending destructions
+in attack order:
+destroyed-Transport cargo continuation, mandatory destruction reactions, placement validation,
+battlefield removal and the canonical `model_destroyed` event, then any optional reaction request.
+The original damage step is reused rather than emitted twice. Shooting and Fight already converge
+on this resolver, so no adapter or phase-local timing path is introduced.
+
+Checkpoint restore validates each pending record against one logical-death authority, original
+damage event, deferral event, captured sources and placement, attacks-resolved event, and event
+ordering. A queued record may remain while its post-removal optional decision is pending, but a
+pre-removal record cannot be restored without its retained placement and unfinalized cause. Damage,
+deferral, boundary, removal, optional decision, and cause identities reject missing, duplicate,
+forged, or reordered evidence.
+
+Specific authoritative 40k.app rule/statement and source ID: 05.04.04, `DESTROYED`, states that if
+a destruction-triggered rule applies to a model destroyed as the result of an attack, unless
+otherwise stated that rule is resolved and the model is removed only after the attacking unit's
+attacks have resolved. Its stable source ID is `core_rules_05_04_04_destroyed`. Runtime behavior
+binds to the typed source package constant and never a display name or source-text token.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/05-attack-sequence`, observed
+`2026-09-01T14:18:39-04:00`; transcription
+`0f3cb2ce7fb896aa9d2404eafdf6bde0d701e89ff895dc680a7ca6d56780e9f2`;
+reviewed-transcription observation
+`0f588f6a3973735c0afee2936b0c6e7950274a0b8606e986b7c254e251c5942e`;
+authoritative-mirror observation
+`ceb8fca60471aea370514c919ea7bf991f9a1d84b8c43f3fb560793fd0569bef`;
+category-audit source observation
+`c771b8acbb62f912cc21c649a6a1ec0cac5d5a1f02e5454747b9427a8571892e`.
+The generated package hash is
+`ec4bf56033c8c90db0a2870051a5ea472a42f7767ed48299bc0352a2b1092a5f` and its canonical artifact
+byte SHA-256 is `161c67830d5976033e04f9ab64830e0ddc4ddca93e95e270945839b60d53bdd9`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:b4a5313b24e04363f9a21d2012352531c4a42a3d317643a3ae3be98088a62cd9`.
+
+Load and execution support: The Destroyed rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked mirror observation carries project
+authority. The fail-fast typed loader pins schema, document identity, rule identity, text hash,
+both evidence fingerprints, package hash, and canonical artifact byte hash.
+
+Scope and explicit exclusions: P05A owns attack-caused destruction deferral, ordered persisted
+queueing, the shared attacks-resolved boundary, destroyed-Transport entry into that boundary,
+mandatory/optional destruction-reaction timing, restore integrity, source identity, adapter
+documentation, regressions, and a static convergence audit. Models without an applicable
+destruction-triggered continuation retain the existing immediate removal path. P05A does not alter
+reaction eligibility or effects, Hazardous timing, mortal-wound allocation order, Emergency
+Disembark hazard/placement order, or the Fight On Death remove/re-add behavior assigned to P05B.
+
+Decision and viewer-visibility impact: P05A adds no decision type, option family, proposal kind, or
+viewer-visibility rule. It changes the timing of existing `select_destruction_reaction` requests and
+adds replay-safe sequence/event payload fields. Retained models are already excluded from living
+projections and legal target sets. Existing shared adapter redaction remains authoritative.
+
+Regression scenarios and same-bug-class search: The Order 9 regression uses real domain objects
+and multiple attacks from one rules unit. Its first casualty owns mandatory Deadly Demise and an
+optional Shoot on Death source; it proves the later attack's damage precedes the attacks-resolved
+event, both reaction classes and removal follow that event, and the queue survives JSON and full
+lifecycle round trips. A forged damage-event binding fails restore. Existing grouped damage,
+Destroyed Transport, Deadly Demise secondary casualty, Fight On Death, optional reaction, and
+invalid-submission suites exercise the shared changes. Static audit requires attack damage to use
+the boundary owner, requires boundary ordering before completion, and requires Shooting and Fight
+to consume the same attack resolver. No behavioral test file was added, removed, moved, or renamed,
+so the committed four-shard inventory does not change.
+
+Generated artifacts/documentation: P05A adds
+`core_attack_sequence_2026_09/artifacts/package.json`, its typed loader/source package, and the
+offline builder; regenerates the engine build manifest and external contract; and updates both
+decision-contract documents and this finding record.
+
+Validation results:
+
+- The complete affected mission, Emperor's Children, Aeldari destruction-reaction, replay, and
+  lifecycle cluster passes all `115` tests after adopting the end-of-attacks boundary; the focused
+  Order 9 regression additionally rejects forged damage and boundary-count evidence. The complete
+  serial code-quality suite passes all `344` tests.
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2653` source files;
+  Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
+  four-shard inventory check and all-files pre-commit gate pass.
+- The required final xdist work-stealing suite passes (`6366 passed` in `483.43s`), including the
+  complete code-quality suite.
+- The Attack Sequence source artifact, final engine build identity, and regenerated external
+  contract pass fail-closed checks, including the `origin/main` compatibility comparison.
+- Installed-wheel smoke passes with `2484` packaged engine resources and `27` schemas. The host has
+  no `npm` executable, so npm wrapper commands could not run; the existing locked dependencies were
+  exercised with the bundled Node runtime and `pnpm`. Generated-client drift, TypeScript type
+  checks, and all `5` client unit tests pass, and the two-server HTTP conformance scenario passes
+  all `342` assertions for contract version `11.1.0`.
+
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
 25 categories before opening PFINAL. The audit must select one maintained-App

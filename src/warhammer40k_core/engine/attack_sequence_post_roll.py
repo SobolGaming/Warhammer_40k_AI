@@ -314,6 +314,8 @@ def _attack_sequence_for_post_roll_context(
             else HitRoll.from_payload(attack_context["hit_roll"])
         ),
         deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
+        pending_attack_destructions=attack_sequence.pending_attack_destructions,
+        attacks_resolved_event_id=attack_sequence.attacks_resolved_event_id,
         post_roll_attack_pools=attack_sequence.post_roll_attack_pools,
         post_roll_attack_contexts=attack_sequence.post_roll_attack_contexts,
     )

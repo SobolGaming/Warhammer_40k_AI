@@ -671,6 +671,11 @@ def _resolve_grouped_damage_from(
             hooks=hooks,
             manager=manager,
         )
+        if _next_sequence is not None:
+            attack_sequence = replace(
+                attack_sequence,
+                pending_attack_destructions=(_next_sequence.pending_attack_destructions),
+            )
         pending_for_die = pending_for_die.with_allocated_model_ids(resolved_allocated_ids)
         if status is not None:
             interrupted_sequence = attack_sequence.with_pending_grouped_damage(pending_for_die)
@@ -825,6 +830,8 @@ def _advance_after_current_pool(*, attack_sequence: AttackSequence) -> AttackSeq
         pool_index=next_pool_index,
         attack_index=0,
         deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
+        pending_attack_destructions=attack_sequence.pending_attack_destructions,
+        attacks_resolved_event_id=attack_sequence.attacks_resolved_event_id,
     )
 
 
@@ -855,6 +862,8 @@ def _attack_sequence_for_context(
             else HitRoll.from_payload(attack_context["hit_roll"])
         ),
         deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
+        pending_attack_destructions=attack_sequence.pending_attack_destructions,
+        attacks_resolved_event_id=attack_sequence.attacks_resolved_event_id,
         post_roll_attack_pools=attack_sequence.post_roll_attack_pools,
         post_roll_attack_contexts=attack_sequence.post_roll_attack_contexts,
     )
@@ -1099,6 +1108,8 @@ def grouped_wounded_contexts_for_pool(
             pool_index=attack_sequence.pool_index,
             attack_index=attack_index,
             deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
+            pending_attack_destructions=attack_sequence.pending_attack_destructions,
+            attacks_resolved_event_id=attack_sequence.attacks_resolved_event_id,
         )
         while True:
             attack_context, status = _roll_hit_and_wound(

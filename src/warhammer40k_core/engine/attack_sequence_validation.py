@@ -485,6 +485,13 @@ def _validate_attack_context_matches_sequence(
     attack_context: AttackResolutionContextPayload,
     context_name: str,
 ) -> None:
+    pending_destruction = attack_sequence.current_pending_attack_destruction
+    if pending_destruction is not None and attack_sequence.is_complete:
+        if pending_destruction.attack_context != attack_context:
+            raise GameLifecycleError(
+                f"{context_name} does not match the pending destruction context."
+            )
+        return
     if attack_sequence.pending_grouped_damage is not None:
         if not _attack_context_matches_pending_grouped_damage(
             attack_sequence=attack_sequence,
@@ -607,13 +614,19 @@ def validate_destruction_reaction_context_matches_sequence(
     )
     provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
     if provenance.destruction_source_kind is DestructionSourceKind.ATTACK:
-        context_sequence = _attack_sequence_for_context(
-            attack_sequence=attack_sequence,
-            attack_context=attack_context,
-        )
-        provenance.validate_authoritative_weapon_profile(
-            context_sequence.current_pool().weapon_profile
-        )
+        pending_destruction = attack_sequence.current_pending_attack_destruction
+        if pending_destruction is not None and attack_sequence.is_complete:
+            provenance.validate_authoritative_weapon_profile(
+                pending_destruction.attack_pool.weapon_profile
+            )
+        else:
+            context_sequence = _attack_sequence_for_context(
+                attack_sequence=attack_sequence,
+                attack_context=attack_context,
+            )
+            provenance.validate_authoritative_weapon_profile(
+                context_sequence.current_pool().weapon_profile
+            )
     return context
 
 

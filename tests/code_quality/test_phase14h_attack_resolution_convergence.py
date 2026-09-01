@@ -28,6 +28,9 @@ ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH = (
 ATTACK_DESTRUCTION_CAUSE_SHARED_OWNER_PATH = (
     "src/warhammer40k_core/engine/attack_sequence_destruction_authority.py"
 )
+ATTACK_DESTRUCTION_BOUNDARY_PATH = (
+    "src/warhammer40k_core/engine/attack_sequence_destruction_boundary.py"
+)
 PRIMARY_UNIT_DESTRUCTION_TRACKING_CALLERS = {
     "src/warhammer40k_core/engine/attack_sequence_destroyed_transport.py",
     "src/warhammer40k_core/engine/game_state.py",
@@ -153,6 +156,32 @@ def test_phase14h_retired_attack_allocation_surface_is_absent() -> None:
             offenders.append(str(path.relative_to(ROOT)))
 
     assert offenders == []
+
+
+def test_p05a_attack_destruction_reactions_share_one_end_of_attacks_boundary() -> None:
+    damage_source = source_for(ROOT / ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH)
+    boundary_source = source_for(ROOT / ATTACK_DESTRUCTION_BOUNDARY_PATH)
+    dispatch_source = source_for(SRC_ROOT / "engine" / "attack_sequence_dispatch.py")
+
+    assert "defer_destroyed_attack_damage_if_required(" in damage_source
+    assert "attack_destruction_requires_end_of_attacks_boundary(" in boundary_source
+    assert boundary_source.count('"attack_model_destruction_deferred"') == 1
+    assert "remove_destroyed_model_from_battlefield(" in boundary_source
+    assert "resolve_pending_attack_destruction_until_blocked(" in dispatch_source
+    assert (
+        dispatch_source.index("_apply_deferred_mortal_wounds(")
+        < dispatch_source.index('"attack_sequence_attacks_resolved"')
+        < dispatch_source.index("resolve_pending_attack_destruction_until_blocked(")
+    )
+    assert dispatch_source.index(
+        "resolve_pending_attack_destruction_until_blocked("
+    ) < dispatch_source.index('"attack_sequence_completed"')
+
+    for host_path in (
+        SRC_ROOT / "engine" / "fight_attack_completion.py",
+        SRC_ROOT / "engine" / "phases" / "shooting_handler.py",
+    ):
+        assert "resolve_attack_sequence_until_blocked(" in source_for(host_path)
 
 
 def test_model_destruction_emitters_remain_converged_on_typed_evidence() -> None:
