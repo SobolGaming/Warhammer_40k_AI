@@ -819,7 +819,7 @@ def test_attached_target_identity_preserves_model_scoped_melee_evidence() -> Non
     assert leader_model_id not in pool.target_visible_model_ids
 
 
-def test_attached_rules_unit_split_components_remain_consumed_after_canonical_selection() -> None:
+def test_attached_rules_unit_components_remain_consumed_after_canonical_selection() -> None:
     lifecycle, _units = _fight_lifecycle(
         alpha_unit_ids=("bodyguard", "leader"),
         enemy_unit_ids=("enemy",),
@@ -828,7 +828,7 @@ def test_attached_rules_unit_split_components_remain_consumed_after_canonical_se
             "leader": Pose.at(10.0, 22.0),
             "enemy": Pose.at(13.0, 20.0),
         },
-        game_id="phase15c-attached-split-consumed",
+        game_id="phase15c-attached-identity-consumed",
         fights_first_unit_keys=("leader",),
         alpha_unit_specs={
             "leader": ("core-character-leader", "core-character-leader", 1),
@@ -854,7 +854,7 @@ def test_attached_rules_unit_split_components_remain_consumed_after_canonical_se
         fight_type=FightTypeKind.NORMAL,
     )
     result = DecisionResult.for_request(
-        result_id="phase15c-attached-split-selection",
+        result_id="phase15c-attached-identity-selection",
         request=request,
         selected_option_id=option_id,
     )
@@ -866,12 +866,6 @@ def test_attached_rules_unit_split_components_remain_consumed_after_canonical_se
     selected_state = fight_state.with_activation(selection)
     state.replace_fight_phase_state(selected_state)
 
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=component_ids,
-        event_log=lifecycle.decision_controller.event_log,
-    )
     contexts = eligible_fight_contexts_for_player(
         state=state,
         fight_state=selected_state,
@@ -881,9 +875,9 @@ def test_attached_rules_unit_split_components_remain_consumed_after_canonical_se
 
     assert selected_state.fight_order_state.selected_to_fight_unit_ids == (attached_id,)
     assert selected_state.fight_order_state.activation_selections == (selection,)
-    split_army = state.army_definition_for_player("player-a")
-    assert split_army is not None
-    assert split_army.attached_units == ()
+    retained_army = state.army_definition_for_player("player-a")
+    assert retained_army is not None
+    assert retained_army.attached_units == (attached_unit,)
     assert contexts == ()
     assert all(
         unit_was_selected_to_fight_this_phase(

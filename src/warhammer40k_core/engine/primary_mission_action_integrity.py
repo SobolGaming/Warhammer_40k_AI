@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.missions import MissionActionDefinition, ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import (
     MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON,
-    MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON,
     MissionActionState,
     MissionActionStatus,
 )
@@ -104,20 +103,6 @@ _SENSOR_EFFECTS = frozenset(
 _PRIMARY_MISSION_CHOICE_RESOLVED_EVENT = "primary_mission_choice_resolved"
 _SENSOR_SWEEP_CHOICE_KIND = "sensor_sweep_marker_removal"
 _OPERATION_MARKER_KIND = "operation"
-_ATTACHED_SPLIT_INTERRUPTION_EVENT_KEYS = frozenset(
-    {
-        "game_id",
-        "battle_round",
-        "active_player_id",
-        "player_id",
-        "phase",
-        "action_id",
-        "unit_instance_id",
-        "surviving_unit_instance_ids",
-        "mission_action_state",
-        "interrupted_reason",
-    }
-)
 
 
 def validate_primary_mission_action_integrity(
@@ -847,13 +832,6 @@ def _validate_interruption_evidence_reference(
 ) -> None:
     evidence_id = terminal_payload.get("source_evidence_event_id")
     evidence_type = terminal_payload.get("source_evidence_event_type")
-    if evidence_id is None and evidence_type is None:
-        _validate_attached_split_interruption(
-            state=state,
-            action=action,
-            terminal_payload=terminal_payload,
-        )
-        return
     if type(evidence_id) is not str or type(evidence_type) is not str:
         raise GameLifecycleError("Primary Mission Action interruption evidence is incomplete.")
     matches = tuple(record for record in event_records if record.event_id == evidence_id)
@@ -871,53 +849,6 @@ def _validate_interruption_evidence_reference(
         action=action,
         evidence_event=evidence,
     )
-
-
-def _validate_attached_split_interruption(
-    *,
-    state: GameState,
-    action: MissionActionState,
-    terminal_payload: dict[str, JsonValue],
-) -> None:
-    if frozenset(terminal_payload) != _ATTACHED_SPLIT_INTERRUPTION_EVENT_KEYS:
-        raise GameLifecycleError(
-            "Primary Mission Action interruption without causal evidence is not an "
-            "attached-unit split."
-        )
-    raw_survivor_ids = terminal_payload.get("surviving_unit_instance_ids")
-    if type(raw_survivor_ids) is not list or any(
-        type(unit_id) is not str for unit_id in raw_survivor_ids
-    ):
-        raise GameLifecycleError("Attached-unit split interruption survivor IDs are invalid.")
-    survivor_ids = tuple(cast(list[str], raw_survivor_ids))
-    if not survivor_ids or survivor_ids != tuple(sorted(set(survivor_ids))):
-        raise GameLifecycleError("Attached-unit split interruption survivor IDs drifted.")
-    attached_records = tuple(
-        record
-        for record in state.starting_attached_unit_records
-        if record.attached_unit_instance_id == action.unit_instance_id
-    )
-    if len(attached_records) != 1:
-        raise GameLifecycleError(
-            "Evidence-less Primary Mission Action interruption requires one historical "
-            "attached-unit identity."
-        )
-    attached = attached_records[0]
-    component_ids = frozenset(attached.component_unit_instance_ids)
-    survivor_set = frozenset(survivor_ids)
-    leader_or_support_ids = frozenset(
-        (*attached.leader_unit_instance_ids, *attached.support_unit_instance_ids)
-    )
-    if (
-        action.interrupted_reason != MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON
-        or terminal_payload.get("unit_instance_id") != action.unit_instance_id
-        or attached.player_id != action.player_id
-        or terminal_payload.get("active_player_id") not in state.player_ids
-        or not survivor_set < component_ids
-        or (attached.bodyguard_unit_instance_id in survivor_set)
-        == bool(survivor_set.intersection(leader_or_support_ids))
-    ):
-        raise GameLifecycleError("Attached-unit split interruption provenance drifted.")
 
 
 def _validate_event_context(

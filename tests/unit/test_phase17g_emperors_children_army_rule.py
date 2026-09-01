@@ -966,7 +966,7 @@ def test_turn_start_engagement_snapshot_uses_fight_on_death_physical_presence() 
     )
 
 
-def test_turn_start_engagement_snapshot_reconciles_attached_unit_split() -> None:
+def test_turn_start_engagement_snapshot_preserves_attached_unit_identity() -> None:
     lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("bodyguard", "leader"),
         enemy_unit_ids=("enemy",),
@@ -1001,13 +1001,6 @@ def test_turn_start_engagement_snapshot_reconciles_attached_unit_split() -> None
         battle_round=state.battle_round,
         friendly_unit_instance_id=attached.attached_unit_instance_id,
     ) == (enemy_id,)
-
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-a",
-        attached_unit_instance_id=attached.attached_unit_instance_id,
-        surviving_unit_instance_ids=attached.component_unit_instance_ids,
-        event_log=lifecycle.decision_controller.event_log,
-    )
 
     assert all(
         turn_start_enemy_unit_ids_for_friendly_unit(

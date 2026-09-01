@@ -1,0 +1,97 @@
+{
+  "artifact_schema": "core-v2-attached-units-source-v1",
+  "evidence": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-attached-units-source-review:bodyguard-unit-destroyed",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "29c65f1de8ddfd855323b8d0ef6f99b5ce6d28e322034ca2e68097398e408aec",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attached_unit_reconciliation:validate_attached_rules_unit_identity_after_destruction",
+        "warhammer40k_core.engine.rules_unit_placement:RulesUnitPlacement.from_battlefield",
+        "warhammer40k_core.engine.rules_units:current_rules_unit_views_for_identity",
+        "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 19.01.01 Attached Units After Their Bodyguard Unit Is Destroyed",
+      "source_url": null,
+      "transcription_sha256": "cb8ea6a1b9633420c8a2c59989edf8bfd97987ce1847faca6820f08b99931bbe",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-attached-units-2026-09-01:bodyguard-unit-destroyed",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "ee513960052396784786dee07ff736c25c0c120f06e56d6940b020fdf71f2d5d",
+      "observed_at": "2026-09-01T09:02:35-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:19",
+      "review_audit_source_observation_sha256": "9328cc0ae8f0c22dc52418c3238a105d7031cdfdb5daf78bd377c56f36c795bd",
+      "rule_source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attached_unit_reconciliation:validate_attached_rules_unit_identity_after_destruction",
+        "warhammer40k_core.engine.rules_unit_placement:RulesUnitPlacement.from_battlefield",
+        "warhammer40k_core.engine.rules_units:current_rules_unit_views_for_identity",
+        "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 19.01.01 Attached Units After Their Bodyguard Unit Is Destroyed",
+      "source_url": "https://www.40k.app/rules/19-attached-units",
+      "transcription_sha256": "cb8ea6a1b9633420c8a2c59989edf8bfd97987ce1847faca6820f08b99931bbe",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "3f6e0c6b6c3b9a96d19967e2ef5c8ab0429fd7fc8b025304b84e3dc5cb243570",
+  "rules": [
+    {
+      "load_support_status": "loaded",
+      "rule_id": "bodyguard-unit-destroyed",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attached_unit_reconciliation:validate_attached_rules_unit_identity_after_destruction",
+        "warhammer40k_core.engine.rules_unit_placement:RulesUnitPlacement.from_battlefield",
+        "warhammer40k_core.engine.rules_units:current_rules_unit_views_for_identity",
+        "warhammer40k_core.engine.starting_attached_units:starting_attached_unit_records_from_armies"
+      ],
+      "section_heading": "ATTACHED UNITS AFTER THEIR BODYGUARD UNIT IS DESTROYED",
+      "section_id": "19.01.01",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed",
+      "source_text": "ATTACHED UNITS AFTER THEIR BODYGUARD UNIT IS DESTROYED\nSome units have rules stating that when the bodyguard unit in an attached unit is destroyed, leader/support units that were attached to them become separate units with their original starting strengths. When the bodyguard unit in an attached unit affected by such a rule is destroyed, all of those leader/support units remain a single unit for all rules purposes.",
+      "transcription_sha256": "cb8ea6a1b9633420c8a2c59989edf8bfd97987ce1847faca6820f08b99931bbe"
+    }
+  ],
+  "source_document": {
+    "document_id": "40k-app-attached-units-2026-09-01",
+    "observed_at": "2026-09-01T09:02:35-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    "source_title": "40k.app Core Rules Attached Units",
+    "source_url": "https://www.40k.app/rules/19-attached-units"
+  },
+  "source_package_id": "gw-11e-core-attached-units",
+  "source_version": "40k-app-attached-units-observed-2026-09-01"
+}

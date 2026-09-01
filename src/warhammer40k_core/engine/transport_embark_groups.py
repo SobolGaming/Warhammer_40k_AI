@@ -27,15 +27,23 @@ def embarking_rules_unit_placement(
         armies=scenario.armies,
         unit_instance_id=selected_unit_placement.unit_instance_id,
     )
-    component_placements = tuple(
-        selected_unit_placement
-        if component_id == selected_unit_placement.unit_instance_id
-        else scenario.battlefield_state.unit_placement_by_id(component_id)
-        for component_id in rules_unit.component_unit_instance_ids
+    battlefield_grouped = RulesUnitPlacement.from_battlefield(
+        view=rules_unit,
+        battlefield_state=scenario.battlefield_state,
     )
+    if (
+        selected_unit_placement.unit_instance_id
+        not in battlefield_grouped.component_unit_instance_ids
+    ):
+        raise GameLifecycleError("Embark selection must identify a living rules-unit component.")
     grouped = RulesUnitPlacement(
-        rules_unit_instance_id=rules_unit.unit_instance_id,
-        component_unit_placements=component_placements,
+        rules_unit_instance_id=battlefield_grouped.rules_unit_instance_id,
+        component_unit_placements=tuple(
+            selected_unit_placement
+            if placement.unit_instance_id == selected_unit_placement.unit_instance_id
+            else placement
+            for placement in battlefield_grouped.component_unit_placements
+        ),
     )
     grouped.validate_for_view(rules_unit)
     return rules_unit, grouped

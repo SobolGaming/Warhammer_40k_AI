@@ -1029,7 +1029,7 @@ def _validate_embark_cargo(
     if (
         cargo.get("player_id") != departure.owner_player_id
         or cargo.get("transport_unit_instance_id") != transport_id
-        or not set(departure.component_unit_instance_ids) <= embarked_ids
+        or not set(departure.departed_component_unit_instance_ids) <= embarked_ids
     ):
         raise GameLifecycleError("Primary EMBARK cargo mutation identity drift.")
 

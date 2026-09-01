@@ -66,13 +66,12 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
+    validate_attached_rules_unit_identity_after_destruction,
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.game_state import (
     GameState,
     SecondaryMissionChoice,
@@ -1081,9 +1080,9 @@ def test_a_grievous_blow_when_drawn_excludes_off_battlefield_attached_units(
 
 @pytest.mark.parametrize(
     ("bodyguard_model_count", "discard_available"),
-    [(12, True), (13, False)],
+    [(11, True), (12, False)],
 )
-def test_a_grievous_blow_when_drawn_uses_post_split_descendant_starting_strength(
+def test_a_grievous_blow_when_drawn_retains_original_attached_starting_strength(
     bodyguard_model_count: int,
     discard_available: bool,
 ) -> None:
@@ -1097,16 +1096,15 @@ def test_a_grievous_blow_when_drawn_uses_post_split_descendant_starting_strength
     formation = state.army_definitions[1].attached_units[0]
     leader_id = formation.leader_unit_instance_ids[0]
     _zero_and_remove_unit(state, leader_id)
-    assert split_attached_rules_unit_if_required(
+    validate_attached_rules_unit_identity_after_destruction(
         state=state,
-        event_log=EventLog(),
         rules_unit_instance_id=formation.attached_unit_instance_id,
-    ) == (formation.bodyguard_unit_instance_id,)
+    )
     assert (
         state.starting_strength_record_for_unit(
-            formation.bodyguard_unit_instance_id
+            formation.attached_unit_instance_id
         ).starting_model_count
-        == bodyguard_model_count
+        == bodyguard_model_count + 1
     )
     record_unresolved_when_drawn_card(
         state,
@@ -1149,7 +1147,7 @@ def test_bring_it_down_when_drawn_sees_w10_model_inside_attached_unit() -> None:
     )
 
 
-def test_burden_of_trust_still_scores_after_attached_unit_split() -> None:
+def test_burden_of_trust_still_scores_after_bodyguard_destruction() -> None:
     state = _attached_burden_state()
     formation = state.army_definitions[0].attached_units[0]
     attached_id = formation.attached_unit_instance_id
@@ -1178,12 +1176,10 @@ def test_burden_of_trust_still_scores_after_attached_unit_split() -> None:
     )
     bodyguard = _unit_by_id(state, bodyguard_id)
     _zero_and_remove_unit(state, bodyguard.unit_instance_id)
-    surviving = split_attached_rules_unit_if_required(
+    validate_attached_rules_unit_identity_after_destruction(
         state=state,
-        event_log=EventLog(),
         rules_unit_instance_id=attached_id,
     )
-    assert leader_id in surviving
     _place_unit(state, leader_id, home.x_inches, home.y_inches)
     decisions = record_primary_turn_start_evidence_for_fixture(state)
     state.score_secondary_mission_from_state(

@@ -578,7 +578,6 @@ def test_furys_cage_lethal_self_wounds_complete_the_active_fight_activation() ->
         finalized_payload["completion_kind"]
         == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
     )
-    assert finalized_payload["defer_attached_split_until_fight_activation_completion"] is False
     checkpoint = json.loads(json.dumps(session.to_persistence_payload(), sort_keys=True))
     restored_session = LocalGameSession.from_persistence_payload(checkpoint)
     assert restored_session.to_persistence_payload() == checkpoint
@@ -664,9 +663,9 @@ def test_furys_cage_declined_fight_on_death_continues_with_surviving_bodyguard()
         == _ATTACHED_UNIT_ID
     )
     assert state.fight_phase_state.fight_order_state.selected_to_fight_unit_ids == (
-        bodyguard.unit_instance_id,
+        _ATTACHED_UNIT_ID,
     )
-    assert not any(
+    assert any(
         formation.attached_unit_instance_id == _ATTACHED_UNIT_ID
         for army in state.army_definitions
         for formation in army.attached_units
@@ -680,14 +679,13 @@ def test_furys_cage_declined_fight_on_death_continues_with_surviving_bodyguard()
             bodyguard.unit_instance_id,
         },
     )
-    finalized_payload = _event_payload(
+    _event_payload(
         lifecycle.decision_controller,
         RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
     )
-    assert finalized_payload["defer_attached_split_until_fight_activation_completion"] is True
 
 
-def test_furys_cage_fight_on_death_uses_same_activation_then_removes_and_splits() -> None:
+def test_furys_cage_fight_on_death_uses_same_activation_and_retains_identity() -> None:
     game_id = "phase17g-furys-cage-fight-on-death"
     lifecycle = _furys_cage_fight_lifecycle(
         game_id=game_id,
@@ -793,8 +791,8 @@ def test_furys_cage_fight_on_death_uses_same_activation_then_removes_and_splits(
     )
     assert restored_state.battlefield_state is not None
     assert bearer_model_id not in restored_state.battlefield_state.placed_model_ids()
-    assert all(
-        attached.attached_unit_instance_id != _ATTACHED_UNIT_ID
+    assert any(
+        attached.attached_unit_instance_id == _ATTACHED_UNIT_ID
         for army in restored_state.army_definitions
         for attached in army.attached_units
     )
@@ -810,11 +808,10 @@ def test_furys_cage_fight_on_death_uses_same_activation_then_removes_and_splits(
     removed_payload = _event_payload(decisions, "fight_on_death_models_removed")
     assert removed_payload["model_instance_ids"] == [bearer_model_id]
     assert removed_payload["reason"] == "unit_fight_completed"
-    finalized_payload = _event_payload(
+    _event_payload(
         decisions,
         RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
     )
-    assert finalized_payload["defer_attached_split_until_fight_activation_completion"] is True
     resolved_payload = _event_payload(
         decisions,
         SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
@@ -981,7 +978,6 @@ def test_applied_mortal_wound_destruction_entry_fails_closed_on_state_and_proven
             completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
             completion_event_payload={},
             destruction_evidence=evidence,
-            defer_attached_split_until_fight_activation_completion=False,
         )
 
     assert state.to_payload() == state_before
@@ -1010,22 +1006,7 @@ def test_applied_mortal_wound_destruction_entry_fails_closed_on_state_and_proven
             completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
             completion_event_payload={},
             destruction_evidence=drifted_evidence,
-            defer_attached_split_until_fight_activation_completion=False,
         )
-    with pytest.raises(GameLifecycleError, match="requires an attached rules unit"):
-        continue_applied_mortal_wound_destruction_with_rule_reactions(
-            state=state,
-            decisions=lifecycle.decision_controller,
-            damage_application=lethal,
-            rules_unit_instance_id=bearer.unit_instance_id,
-            source_rule_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
-            source_result_id="phase17g-furys-cage-applied-damage-invalid:split-drift",
-            completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
-            completion_event_payload={},
-            destruction_evidence=evidence,
-            defer_attached_split_until_fight_activation_completion=True,
-        )
-
     assert state.to_payload() == state_before
     assert lifecycle.decision_controller.to_payload() == decisions_before
     assert state.battlefield_state is not None
@@ -1339,7 +1320,6 @@ def test_furys_cage_lethal_damage_routes_deadly_demise_through_nested_fnp_and_re
     assert source_context["source_kind"] == RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND
     root_context = cast(dict[str, JsonValue], source_context["root_context"])
     assert root_context["completion_kind"] == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
-    assert root_context["defer_attached_split_until_fight_activation_completion"] is False
 
     restored_lifecycle = replace(
         lifecycle,

@@ -229,19 +229,13 @@ def _catalog_forced_target_ids(
             if effect.effect_id in seen_effect_ids:
                 raise GameLifecycleError("Catalog forced-test source effect is duplicated.")
             seen_effect_ids.add(effect.effect_id)
-            transferred = _effect_after_splits(
-                effect=effect,
-                event_records=event_records,
-                start_index=event_index + 1,
-                end_index=snapshot_index,
-            )
             if _effect_is_active_at_command_snapshot(
                 state=state,
-                effect=transferred,
+                effect=effect,
                 battle_round=battle_round,
                 active_player_id=active_player_id,
             ):
-                active_effects.append(transferred)
+                active_effects.append(effect)
     forced_ids = {
         unit_id
         for effect in active_effects
@@ -447,31 +441,6 @@ def _forced_persisting_effect_or_none(value: JsonValue) -> PersistingEffect | No
     if CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID not in hook_ids_for_effect(rule_effect):
         return None
     return effect
-
-
-def _effect_after_splits(
-    *,
-    effect: PersistingEffect,
-    event_records: tuple[EventRecord, ...],
-    start_index: int,
-    end_index: int,
-) -> PersistingEffect:
-    current = effect
-    for event in event_records[start_index:end_index]:
-        if event.event_type != "attached_rules_unit_split_reconciled":
-            continue
-        payload = _object(event.payload, context="attached rules-unit split")
-        attached_id = _string(
-            payload.get("attached_unit_instance_id"), field="attached_unit_instance_id"
-        )
-        survivor_ids = _sorted_identifier_list(
-            payload.get("surviving_unit_instance_ids"), field="surviving_unit_instance_ids"
-        )
-        current = current.with_attached_unit_split(
-            attached_unit_instance_id=attached_id,
-            surviving_unit_instance_ids=survivor_ids,
-        )
-    return current
 
 
 def _effect_is_active_at_command_snapshot(
@@ -1026,15 +995,6 @@ def _string(value: JsonValue, *, field: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Command forced-test {field} is invalid.")
     return value
-
-
-def _sorted_identifier_list(value: JsonValue, *, field: str) -> tuple[str, ...]:
-    if not isinstance(value, list) or any(type(item) is not str or not item for item in value):
-        raise GameLifecycleError(f"Command forced-test {field} is invalid.")
-    values = tuple(cast(list[str], value))
-    if values != tuple(sorted(set(values))) or not values:
-        raise GameLifecycleError(f"Command forced-test {field} must be sorted and unique.")
-    return values
 
 
 __all__ = ("validate_command_forced_test_applications",)

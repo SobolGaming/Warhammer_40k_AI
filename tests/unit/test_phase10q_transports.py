@@ -30,6 +30,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
     apply_damage_to_model,
+    destroy_model_by_rule,
     is_mortal_wound_feel_no_pain_request,
     model_by_id,
     mortal_wound_feel_no_pain_source_context,
@@ -110,7 +111,10 @@ from warhammer40k_core.engine.reserve_arrival_requirements import (
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
-from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.starting_attached_units import (
     starting_attached_unit_records_for_army,
 )
@@ -119,6 +123,9 @@ from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     TimingWindow,
     TimingWindowDescriptor,
+)
+from warhammer40k_core.engine.transport_state_integrity import (
+    validate_transport_cargo_state_consistency,
 )
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
@@ -307,6 +314,300 @@ def test_embark_validates_distance_for_every_attached_rules_unit_model() -> None
             leader.own_models[0].model_instance_id,
         )
     }
+
+
+@pytest.mark.parametrize("destroyed_role", ["leader", "bodyguard"])
+def test_embark_ignores_wholly_destroyed_attached_component(
+    destroyed_role: str,
+) -> None:
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    destroyed = leader if destroyed_role == "leader" else bodyguard
+    living = bodyguard if destroyed_role == "leader" else leader
+    scenario = _with_destroyed_attached_component(
+        scenario,
+        unit_instance_id=destroyed.unit_instance_id,
+    )
+
+    resolution = resolve_embark(
+        scenario=scenario,
+        cargo_state=_cargo_state(transport=transport, max_model_count=6),
+        selection=EmbarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=living.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            movement_phase_action=TransportMovementStatus.NORMAL_MOVE,
+        ),
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(living.unit_instance_id),
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+
+    assert resolution.is_valid
+    assert resolution.updated_cargo_state is not None
+    assert resolution.updated_cargo_state.embarked_unit_instance_ids == (living.unit_instance_id,)
+    assert resolution.transition_batch is not None
+    assert {removal.model_instance_id for removal in resolution.transition_batch.removals} == {
+        model.model_instance_id for model in living.own_models
+    }
+
+
+def test_post_loss_embark_then_disembark_restores_retained_rules_unit_presence() -> None:
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    scenario = _with_destroyed_attached_component(
+        scenario,
+        unit_instance_id=leader.unit_instance_id,
+    )
+    state = _battle_state(scenario, game_id="phase10q-post-loss-embark-disembark")
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unplaced_models_marked_removed(
+            tuple(model.model_instance_id for model in leader.own_models)
+        )
+    )
+    state.record_transport_cargo_state(_cargo_state(transport=transport, max_model_count=6))
+    handler, decisions, action_request = _movement_action_request_for_unit(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    embark_request = _decision_request(
+        _submit_action_and_movement_payload(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=action_request,
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            unit=bodyguard,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+            movement_mode=MovementMode.NORMAL,
+            dx=0.5,
+            result_id="phase10q-post-loss-normal-move",
+        )
+    )
+    assert (
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=embark_request,
+            option_id=transport.unit_instance_id,
+            result_id="phase10q-post-loss-embark",
+        )
+        is None
+    )
+
+    cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert cargo is not None
+    assert cargo.embarked_unit_instance_ids == (bodyguard.unit_instance_id,)
+
+    attached_id = "attached-unit:army-alpha:attached-transport-passengers"
+    state.battle_round = 2
+    state.replace_movement_phase_state(
+        MovementPhaseState(battle_round=2, active_player_id="player-a")
+    )
+    selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    assert attached_id in {option.option_id for option in selection_request.options}
+    assert (
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=attached_id,
+            result_id="phase10q-post-loss-select-passengers",
+        )
+        is None
+    )
+    disembark_action_request = _decision_request(
+        handler.begin_phase(state=state, decisions=decisions)
+    )
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_action_request,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            result_id="phase10q-post-loss-disembark-action",
+        )
+    )
+    status = _submit_rules_unit_disembark_placement_payload(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        placement=RulesUnitPlacement(
+            rules_unit_instance_id=attached_id,
+            component_unit_placements=(
+                _unit_placement_at(
+                    bodyguard,
+                    army_id="army-alpha",
+                    player_id="player-a",
+                    poses=(
+                        Pose.at(8.6, 13.0),
+                        Pose.at(10.0, 13.0),
+                        Pose.at(11.4, 13.0),
+                        Pose.at(9.3, 14.2),
+                        Pose.at(10.7, 14.2),
+                    ),
+                ),
+            ),
+        ),
+        transport=transport,
+        result_id="phase10q-post-loss-disembark-placement",
+    )
+
+    assert status is None
+    cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert cargo is not None
+    assert cargo.embarked_unit_instance_ids == ()
+    present_views = {
+        view.unit_instance_id: view for view in placed_alive_rules_unit_views(state=state)
+    }
+    assert attached_id in present_views
+    assert present_views[attached_id].component_unit_instance_ids == tuple(
+        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+    )
+    assert tuple(
+        component.unit.unit_instance_id
+        for component in present_views[attached_id].living_components
+    ) == (bodyguard.unit_instance_id,)
+
+
+@pytest.mark.parametrize("destruction_kind", ["damage", "rule"])
+def test_destroying_last_model_of_embarked_component_reconciles_current_cargo(
+    destruction_kind: str,
+) -> None:
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    state = _battle_state(scenario, game_id=f"phase10q-embarked-destruction-{destruction_kind}")
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.without_unit_placement(
+            bodyguard.unit_instance_id
+        ).without_unit_placement(leader.unit_instance_id)
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=component_ids,
+            started_unit_ids=component_ids,
+            battle_round=1,
+            max_model_count=6,
+        )
+    )
+    leader_model = leader.own_models[0]
+
+    if destruction_kind == "damage":
+        apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=leader.unit_instance_id,
+            model_instance_id=leader_model.model_instance_id,
+            damage=leader_model.wounds_remaining,
+            damage_kind=DamageKind.MORTAL,
+            remove_destroyed_model=False,
+        )
+    else:
+        destroy_model_by_rule(
+            state=state,
+            model_instance_id=leader_model.model_instance_id,
+            remove_from_battlefield=False,
+        )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unplaced_models_marked_removed(
+            (leader_model.model_instance_id,)
+        )
+    )
+
+    cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert cargo is not None
+    assert cargo.embarked_unit_instance_ids == (bodyguard.unit_instance_id,)
+    assert cargo.started_phase_embarked_unit_instance_ids == component_ids
+    assert cargo.disembarked_this_phase_unit_instance_ids == ()
+    validate_transport_cargo_state_consistency(state=state)
+
+
+def test_destroyed_embarked_component_reconciles_unarrived_transport_reserve_manifest() -> None:
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    state = _battle_state(scenario, game_id="phase10q-reserve-embarked-destruction")
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.without_unit_placement(bodyguard.unit_instance_id)
+        .without_unit_placement(leader.unit_instance_id)
+        .without_unit_placement(transport.unit_instance_id)
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=component_ids,
+            max_model_count=6,
+        )
+    )
+    state.record_reserve_state(
+        ReserveState.declared_before_battle(
+            player_id="player-a",
+            unit_instance_id=transport.unit_instance_id,
+            reserve_kind=ReserveKind.RESERVES,
+            embarked_unit_instance_ids=component_ids,
+        )
+    )
+
+    leader_model = leader.own_models[0]
+    destroy_model_by_rule(
+        state=state,
+        model_instance_id=leader_model.model_instance_id,
+        remove_from_battlefield=False,
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unplaced_models_marked_removed(
+            (leader_model.model_instance_id,)
+        )
+    )
+
+    cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    reserve = state.reserve_state_for_unit(transport.unit_instance_id)
+    assert cargo is not None
+    assert reserve is not None
+    assert cargo.embarked_unit_instance_ids == (bodyguard.unit_instance_id,)
+    assert reserve.embarked_unit_instance_ids == cargo.embarked_unit_instance_ids
+    validate_transport_cargo_state_consistency(state=state)
+
+
+def test_transport_integrity_rejects_destroyed_component_retained_as_current_cargo() -> None:
+    scenario, _bodyguard, leader, transport = _attached_embark_ready_scenario()
+    scenario = _with_destroyed_attached_component(
+        scenario,
+        unit_instance_id=leader.unit_instance_id,
+    )
+    state = _battle_state(scenario, game_id="phase10q-stale-destroyed-cargo")
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unplaced_models_marked_removed(
+            tuple(model.model_instance_id for model in leader.own_models)
+        )
+    )
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=6,
+                allowed_keywords=("INFANTRY", "MONSTER"),
+            ),
+            embarked_unit_instance_ids=(leader.unit_instance_id,),
+        )
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="must not retain a wholly destroyed component",
+    ):
+        validate_transport_cargo_state_consistency(state=state)
 
 
 def test_embarked_units_are_available_for_unified_movement_selection() -> None:
@@ -5538,6 +5839,37 @@ def _cargo_state(
 def _without_unit(scenario: BattlefieldScenario, unit_instance_id: str) -> BattlefieldScenario:
     return BattlefieldScenario(
         armies=scenario.armies,
+        battlefield_state=scenario.battlefield_state.without_unit_placement(unit_instance_id),
+    )
+
+
+def _with_destroyed_attached_component(
+    scenario: BattlefieldScenario,
+    *,
+    unit_instance_id: str,
+) -> BattlefieldScenario:
+    updated_armies = tuple(
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    keywords=("MONSTER",),
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+                if unit.unit_instance_id == unit_instance_id
+                else unit
+                for unit in army.units
+            ),
+        )
+        if any(unit.unit_instance_id == unit_instance_id for unit in army.units)
+        else army
+        for army in scenario.armies
+    )
+    return BattlefieldScenario(
+        armies=updated_armies,
         battlefield_state=scenario.battlefield_state.without_unit_placement(unit_instance_id),
     )
 

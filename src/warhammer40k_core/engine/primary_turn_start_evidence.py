@@ -601,13 +601,7 @@ def current_primary_rules_unit_turn_start_membership_for_lineage(
     rules_unit_instance_id: str,
     component_unit_instance_ids: tuple[str, ...],
 ) -> PrimaryRulesUnitTurnStartMembership:
-    """Resolve one current or historical rules-unit lineage at this turn's start.
-
-    A starting Attached Unit can split before a later player turn.  That later
-    snapshot correctly contains singleton descendants, so historical scoring
-    must reassemble the frozen component memberships instead of requiring the
-    retired Attached Unit ID to remain current.
-    """
+    """Resolve one retained rules-unit identity at this turn's start."""
     snapshot = _current_primary_rules_unit_turn_start_snapshot(state=state)
     return primary_rules_unit_turn_start_membership_for_lineage(
         snapshot=snapshot,
@@ -636,32 +630,18 @@ def primary_rules_unit_turn_start_membership_for_lineage(
         raise GameLifecycleError(
             "Primary turn-start lineage lookup requires at least one component."
         )
-    direct = tuple(
+    matches = tuple(
         membership
         for membership in snapshot.rules_unit_memberships
         if membership.rules_unit_instance_id == requested_rules_unit_id
     )
-    if direct:
-        if len(direct) != 1 or direct[0].component_unit_instance_ids != requested_component_ids:
-            raise GameLifecycleError("Primary turn-start lineage component identity drift.")
-        return direct[0]
-    component_memberships: list[PrimaryComponentTurnStartMembership] = []
-    for component_id in requested_component_ids:
-        matches = tuple(
-            membership.component_membership_for_unit(component_id)
-            for membership in snapshot.rules_unit_memberships
-            if component_id in membership.component_unit_instance_ids
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "Primary turn-start retained identity requires exactly one membership."
         )
-        if len(matches) != 1:
-            raise GameLifecycleError(
-                "Primary turn-start historical lineage requires exactly one membership "
-                "per component."
-            )
-        component_memberships.append(matches[0])
-    return PrimaryRulesUnitTurnStartMembership(
-        rules_unit_instance_id=requested_rules_unit_id,
-        component_memberships=tuple(component_memberships),
-    )
+    if matches[0].component_unit_instance_ids != requested_component_ids:
+        raise GameLifecycleError("Primary turn-start lineage component identity drift.")
+    return matches[0]
 
 
 def current_primary_component_turn_start_membership(
@@ -1077,21 +1057,13 @@ def _validate_snapshot_membership_references(
     for attached_rules_unit_id, component_ids in attached_components_by_rules_unit.items():
         attached_component_ids.update(component_ids)
         attached_membership = membership_by_rules_unit_id.get(attached_rules_unit_id)
-        if attached_membership is not None:
-            if attached_membership.component_unit_instance_ids != component_ids:
-                raise GameLifecycleError(
-                    "Primary rules-unit turn-start snapshot has invalid attached-unit grouping."
-                )
-            continue
-        if any(
-            membership_by_rules_unit_id.get(component_id) is None
-            or membership_by_rules_unit_id[component_id].component_unit_instance_ids
-            != (component_id,)
-            for component_id in component_ids
-        ):
+        if attached_membership is None:
             raise GameLifecycleError(
-                "Primary rules-unit turn-start snapshot must preserve an attached group "
-                "or its complete split component set."
+                "Primary rules-unit turn-start snapshot must preserve its attached identity."
+            )
+        if attached_membership.component_unit_instance_ids != component_ids:
+            raise GameLifecycleError(
+                "Primary rules-unit turn-start snapshot has invalid attached-unit grouping."
             )
     if any(
         membership_by_rules_unit_id.get(unit_id) is None

@@ -83,10 +83,12 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryComponentTurnStartMembership,
     PrimaryObjectiveMarkerWitness,
     PrimaryRulesUnitTurnStartMembership,
+    build_primary_rules_unit_turn_start_snapshot,
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_destroyed_model_departures,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import VictoryPointSourceKind
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
@@ -316,7 +318,7 @@ def test_phase17n_step5f_missing_witness_is_not_in_marked_objective_range() -> N
     ]
 
 
-def test_phase17n_step5f_attached_split_survivor_in_marked_range_is_excepted() -> None:
+def test_phase17n_step5f_attached_component_loss_survivor_in_marked_range_is_excepted() -> None:
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -326,7 +328,7 @@ def test_phase17n_step5f_attached_split_survivor_in_marked_range_is_excepted() -
         mission_setup=setup,
         player_id="player-a",
         battle_round=1,
-        departures=(_attached_split_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
+        departures=(_attached_component_loss_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
         position_witnesses=(
             _position_witness(
                 unit_instance_id=_ATTACHED_LEADER,
@@ -346,7 +348,9 @@ def test_phase17n_step5f_attached_split_survivor_in_marked_range_is_excepted() -
     ]
 
 
-def test_phase17n_step5f_attached_split_leader_destroyed_bodyguard_survives_in_range() -> None:
+def test_phase17n_step5f_attached_component_loss_leader_destroyed_bodyguard_survives_in_range() -> (
+    None
+):
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -356,7 +360,7 @@ def test_phase17n_step5f_attached_split_leader_destroyed_bodyguard_survives_in_r
         mission_setup=setup,
         player_id="player-a",
         battle_round=1,
-        departures=(_attached_split_departure(departed_ids=(_ATTACHED_LEADER,)),),
+        departures=(_attached_component_loss_departure(departed_ids=(_ATTACHED_LEADER,)),),
         position_witnesses=(
             _position_witness(
                 unit_instance_id=_ATTACHED_BODYGUARD,
@@ -369,7 +373,7 @@ def test_phase17n_step5f_attached_split_leader_destroyed_bodyguard_survives_in_r
     assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [_ATTACHED_BODYGUARD]
 
 
-def test_phase17n_step5f_attached_split_survivor_outside_marked_range_scores() -> None:
+def test_phase17n_step5f_attached_component_loss_survivor_outside_marked_range_scores() -> None:
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -379,7 +383,7 @@ def test_phase17n_step5f_attached_split_survivor_outside_marked_range_scores() -
         mission_setup=setup,
         player_id="player-a",
         battle_round=1,
-        departures=(_attached_split_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
+        departures=(_attached_component_loss_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
         position_witnesses=(_position_witness(unit_instance_id=_ATTACHED_LEADER),),
     )
     assert evidence["score_count"] == 1
@@ -387,7 +391,7 @@ def test_phase17n_step5f_attached_split_survivor_outside_marked_range_scores() -
     assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [_ATTACHED_LEADER]
 
 
-def test_phase17n_step5f_attached_split_without_operation_marker_scores() -> None:
+def test_phase17n_step5f_attached_component_loss_without_operation_marker_scores() -> None:
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -397,7 +401,7 @@ def test_phase17n_step5f_attached_split_without_operation_marker_scores() -> Non
         mission_setup=setup,
         player_id="player-a",
         battle_round=1,
-        departures=(_attached_split_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
+        departures=(_attached_component_loss_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
         position_witnesses=(
             _position_witness(
                 unit_instance_id=_ATTACHED_LEADER,
@@ -410,7 +414,7 @@ def test_phase17n_step5f_attached_split_without_operation_marker_scores() -> Non
     assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [_ATTACHED_LEADER]
 
 
-def test_phase17n_step5f_attached_split_without_placed_survivor_scores() -> None:
+def test_phase17n_step5f_attached_component_loss_without_placed_survivor_scores() -> None:
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -420,7 +424,7 @@ def test_phase17n_step5f_attached_split_without_placed_survivor_scores() -> None
         mission_setup=setup,
         player_id="player-a",
         battle_round=1,
-        departures=(_attached_split_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
+        departures=(_attached_component_loss_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
         position_witnesses=(),
     )
     assert evidence["score_count"] == 1
@@ -434,7 +438,9 @@ def test_phase17n_step5f_attached_split_without_placed_survivor_scores() -> None
     ]
 
 
-def test_phase17n_step5f_attached_split_all_survivors_in_marked_range_are_excepted() -> None:
+def test_phase17n_step5f_attached_component_loss_all_survivors_in_marked_range_are_excepted() -> (
+    None
+):
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -445,7 +451,7 @@ def test_phase17n_step5f_attached_split_all_survivors_in_marked_range_are_except
         player_id="player-a",
         battle_round=1,
         departures=(
-            _attached_split_departure(
+            _attached_component_loss_departure(
                 component_ids=(_ATTACHED_BODYGUARD, _ATTACHED_LEADER, _ATTACHED_SECOND_LEADER),
                 departed_ids=(_ATTACHED_BODYGUARD,),
             ),
@@ -469,7 +475,7 @@ def test_phase17n_step5f_attached_split_all_survivors_in_marked_range_are_except
     ]
 
 
-def test_phase17n_step5f_attached_split_partial_survivor_range_still_scores() -> None:
+def test_phase17n_step5f_attached_component_loss_partial_survivor_range_still_scores() -> None:
     setup = _surveil_setup()
     objective_id = _central_objective_id(setup)
     evidence = evaluate_surveil_scoring_condition(
@@ -480,7 +486,7 @@ def test_phase17n_step5f_attached_split_partial_survivor_range_still_scores() ->
         player_id="player-a",
         battle_round=1,
         departures=(
-            _attached_split_departure(
+            _attached_component_loss_departure(
                 component_ids=(_ATTACHED_BODYGUARD, _ATTACHED_LEADER, _ATTACHED_SECOND_LEADER),
                 departed_ids=(_ATTACHED_BODYGUARD,),
             ),
@@ -511,7 +517,7 @@ def test_phase17n_step5f_rejects_conflicting_descendant_component_mapping() -> N
             mission_setup=setup,
             player_id="player-a",
             battle_round=1,
-            departures=(_attached_split_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
+            departures=(_attached_component_loss_departure(departed_ids=(_ATTACHED_BODYGUARD,)),),
             position_witnesses=(
                 _position_witness(
                     unit_instance_id=_ATTACHED_LEADER,
@@ -576,12 +582,14 @@ def test_phase17n_step5f_scores_surveil_through_shared_boundary() -> None:
 
 
 @pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
-def test_phase17n_step5f_attached_split_survivor_on_objective_uses_lineage(
+def test_phase17n_step5f_attached_component_loss_survivor_on_objective_uses_lineage(
     destroyed_component: str,
 ) -> None:
-    state, record, attached_id, survivor_id, objective_id = _resolved_surveil_attached_split(
-        destroyed_component=destroyed_component,
-        place_on_objective=True,
+    state, record, attached_id, _survivor_id, objective_id = (
+        _resolved_surveil_attached_component_loss(
+            destroyed_component=destroyed_component,
+            place_on_objective=True,
+        )
     )
     _assert_surveil_boundary_path(
         state=state,
@@ -595,7 +603,7 @@ def test_phase17n_step5f_attached_split_survivor_on_objective_uses_lineage(
     assert evidence["surveilled_unit_instance_ids"] == [attached_id]
     assert evidence["excepted_unit_instance_ids"] == []
     assert _resolved_lineage(evidence)["historical_unit_instance_id"] == attached_id
-    assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [survivor_id]
+    assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [attached_id]
     setup = state.mission_setup
     if setup is None:
         raise AssertionError("Step 5F attached fixture requires MissionSetup.")
@@ -609,16 +617,18 @@ def test_phase17n_step5f_attached_split_survivor_on_objective_uses_lineage(
     )
     assert excepted["score_count"] == 0
     assert excepted["excepted_unit_instance_ids"] == [attached_id]
-    assert _resolved_lineage(excepted)["current_witness_unit_instance_ids"] == [survivor_id]
+    assert _resolved_lineage(excepted)["current_witness_unit_instance_ids"] == [attached_id]
 
 
 @pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
-def test_phase17n_step5f_attached_split_survivor_off_objective_still_scores(
+def test_phase17n_step5f_attached_component_loss_survivor_off_objective_still_scores(
     destroyed_component: str,
 ) -> None:
-    state, record, attached_id, survivor_id, _objective_id = _resolved_surveil_attached_split(
-        destroyed_component=destroyed_component,
-        place_on_objective=False,
+    state, record, attached_id, _survivor_id, _objective_id = (
+        _resolved_surveil_attached_component_loss(
+            destroyed_component=destroyed_component,
+            place_on_objective=False,
+        )
     )
     _assert_surveil_boundary_path(
         state=state,
@@ -641,14 +651,16 @@ def test_phase17n_step5f_attached_split_survivor_off_objective_still_scores(
     assert evidence["score_count"] == 1
     assert evidence["excepted_unit_instance_ids"] == []
     assert _resolved_lineage(evidence)["historical_unit_instance_id"] == attached_id
-    assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [survivor_id]
+    assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [attached_id]
 
 
-def test_phase17n_step5f_attached_split_without_survivor_scores_through_boundary() -> None:
-    state, record, attached_id, _survivor_id, _objective_id = _resolved_surveil_attached_split(
-        destroyed_component="bodyguard",
-        place_on_objective=True,
-        depart_survivor=True,
+def test_phase17n_step5f_attached_component_loss_without_survivor_scores_through_boundary() -> None:
+    state, record, attached_id, _survivor_id, _objective_id = (
+        _resolved_surveil_attached_component_loss(
+            destroyed_component="bodyguard",
+            place_on_objective=True,
+            depart_survivor=True,
+        )
     )
     _assert_surveil_boundary_path(
         state=state,
@@ -671,7 +683,7 @@ def test_phase17n_step5f_attached_split_without_survivor_scores_through_boundary
     assert evidence["score_count"] == 1
     assert evidence["excepted_unit_instance_ids"] == []
     assert _resolved_lineage(evidence)["historical_unit_instance_id"] == attached_id
-    assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == []
+    assert _resolved_lineage(evidence)["current_witness_unit_instance_ids"] == [attached_id]
 
 
 def test_phase17n_step5f_no_enemy_operation_markers_still_score_from_battle_round_two() -> None:
@@ -734,16 +746,18 @@ def _started_surveil_lifecycle_state() -> tuple[GameState, MissionActionState, s
     return state, action, target_id
 
 
-def _resolved_surveil_attached_split(
+def _resolved_surveil_attached_component_loss(
     *,
     destroyed_component: str,
     place_on_objective: bool,
     depart_survivor: bool = False,
 ) -> tuple[GameState, ObjectiveControlRecord, str, str, str]:
-    state, _decisions, attached_id, survivor_id, objective_id = _started_surveil_attached_split(
-        destroyed_component=destroyed_component,
-        place_on_objective=place_on_objective,
-        depart_survivor=depart_survivor,
+    state, _decisions, attached_id, survivor_id, objective_id = (
+        _started_surveil_attached_component_loss(
+            destroyed_component=destroyed_component,
+            place_on_objective=place_on_objective,
+            depart_survivor=depart_survivor,
+        )
     )
     _bind_force_dispositions(state)
     record = state.record_objective_control_boundary(
@@ -754,7 +768,7 @@ def _resolved_surveil_attached_split(
     return state, record, attached_id, survivor_id, objective_id
 
 
-def _started_surveil_attached_split(
+def _started_surveil_attached_component_loss(
     *,
     destroyed_component: str,
     place_on_objective: bool,
@@ -810,6 +824,9 @@ def _started_surveil_attached_split(
             y_inches=6.0,
         )
     _place_friendly_within_surveil_range(state, target_unit_id=bodyguard_id)
+    state.primary_rules_unit_turn_start_snapshots = [
+        build_primary_rules_unit_turn_start_snapshot(state=state)
+    ]
     decisions, action = _complete_surveil_against_target(state, target_id=attached_id)
     if action.status is not MissionActionStatus.COMPLETED:
         raise AssertionError("Step 5F attached Surveil Action must complete immediately.")
@@ -821,17 +838,11 @@ def _started_surveil_attached_split(
         component_id=destroyed_id,
         attached_id=attached_id,
     )
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(survivor_id,),
-        event_log=decisions.event_log,
-    )
     if depart_survivor:
         _depart_rules_unit(
             state=state,
             decisions=decisions,
-            rules_unit_instance_id=survivor_id,
+            rules_unit_instance_id=attached_id,
         )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     return state, decisions, attached_id, survivor_id, objective.objective_marker_id
@@ -1062,16 +1073,29 @@ def _depart_rules_unit(
 ) -> None:
     if state.battlefield_state is None:
         raise AssertionError("Step 5F attached fixture requires battlefield state.")
-    placement = state.battlefield_state.unit_placement_by_id(rules_unit_instance_id)
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit_instance_id,
+    )
+    component_placements = tuple(
+        (component_id, state.battlefield_state.unit_placement_or_none(component_id))
+        for component_id in rules_unit.component_unit_instance_ids
+    )
+    affected_component_ids = tuple(
+        component_id for component_id, placement in component_placements if placement is not None
+    )
     removed_model_ids = tuple(
-        model_placement.model_instance_id for model_placement in placement.model_placements
+        model_placement.model_instance_id
+        for _component_id, placement in component_placements
+        if placement is not None
+        for model_placement in placement.model_placements
     )
     state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
     departure = record_primary_battlefield_departure(
         state=state,
         rules_unit_instance_id=rules_unit_instance_id,
-        affected_component_unit_instance_ids=(rules_unit_instance_id,),
-        departed_component_unit_instance_ids=(rules_unit_instance_id,),
+        affected_component_unit_instance_ids=affected_component_ids,
+        departed_component_unit_instance_ids=affected_component_ids,
         removed_model_instance_ids=removed_model_ids,
         removal_kind=BattlefieldRemovalKind.DESTROYED,
         occurrence_id=f"step5f-attached-survivor-destroyed:{rules_unit_instance_id}",
@@ -1312,11 +1336,11 @@ def _operation_marker_progress(
     return progress
 
 
-def _attached_split_departure(
+def _attached_component_loss_departure(
     *,
     departed_ids: tuple[str, ...],
     component_ids: tuple[str, ...] = (_ATTACHED_BODYGUARD, _ATTACHED_LEADER),
-    occurrence_id: str = "step5f-attached-split",
+    occurrence_id: str = "step5f-attached-component-loss",
 ) -> PrimaryBattlefieldDepartureState:
     components = tuple(sorted(component_ids))
     departed = tuple(sorted(departed_ids))

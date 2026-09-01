@@ -26,7 +26,7 @@ from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, Objective
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
+    validate_attached_rules_unit_identity_after_destruction,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
@@ -1108,7 +1108,7 @@ def test_replay_v6_accepts_attached_target_historical_rules_unit_destruction() -
     final_event_payload = cast(dict[str, JsonValue], model_destroyed_events[-1]["payload"])
 
     assert destruction["destroyed_unit_instance_id"] == "attached-unit:army-beta:target"
-    assert final_event_payload["target_unit_instance_id"] == "army-beta:target-leader"
+    assert final_event_payload["target_unit_instance_id"] == ("attached-unit:army-beta:target")
     assert len(cast(list[JsonValue], destruction["source_battlefield_departure_ids"])) == 6
     assert ReplayArtifact.from_payload(payload).to_payload() == payload
 
@@ -2452,19 +2452,17 @@ def _populated_primary_destruction_lifecycle(
         )
         assert bodyguard_destructions == ()
         assert len(state.primary_battlefield_departure_states) == len(target.own_model_ids())
-        surviving_ids = split_attached_rules_unit_if_required(
+        validate_attached_rules_unit_identity_after_destruction(
             state=state,
-            event_log=lifecycle.decision_controller.event_log,
             rules_unit_instance_id=attached_unit_id,
         )
         leader = units["target-leader"]
-        assert surviving_ids == (leader.unit_instance_id,)
         if not complete_attached_target:
             return lifecycle
         destructions = _record_primary_destruction_test_step(
             lifecycle=lifecycle,
             unit=leader,
-            target_rules_unit_id=leader.unit_instance_id,
+            target_rules_unit_id=attached_unit_id,
             attribution=attribution,
             source_witness=source_witness,
             tracking_rule_id=tracking_rule_id,

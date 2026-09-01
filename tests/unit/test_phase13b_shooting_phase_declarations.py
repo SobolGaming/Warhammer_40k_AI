@@ -69,7 +69,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfilePayload,
 )
 from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
+    validate_attached_rules_unit_identity_after_destruction,
 )
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
@@ -1369,7 +1369,7 @@ def test_ranged_attack_history_tracks_current_and_previous_player_turns() -> Non
     )
 
 
-def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibling_leak() -> None:
+def test_phase17n_attached_ranged_history_retains_one_rules_unit_identity() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_specs=_attached_enemy_unit_specs(),
@@ -1406,13 +1406,11 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
         )
     )
 
-    surviving_unit_ids = split_attached_rules_unit_if_required(
+    validate_attached_rules_unit_identity_after_destruction(
         state=state,
-        event_log=lifecycle.decision_controller.event_log,
         rules_unit_instance_id=attached_unit_id,
     )
-
-    assert surviving_unit_ids == tuple(sorted((leader.unit_instance_id, support.unit_instance_id)))
+    retained_identity_ids = (attached_unit_id,)
     setup = _phase17n_exact_meatgrinder_setup()
     state.mission_setup = setup
     assert state.battlefield_state is not None
@@ -1441,7 +1439,11 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
     )
     state.battlefield_state = scenario.battlefield_state
 
-    for surviving_unit_id in surviving_unit_ids:
+    for surviving_unit_id in (
+        attached_unit_id,
+        leader.unit_instance_id,
+        support.unit_instance_id,
+    ):
         assert state.unit_made_ranged_attacks_current_or_previous_turn(
             unit_instance_id=surviving_unit_id
         )
@@ -1449,7 +1451,7 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
         _hidden_target_model_ids(
             state=state,
             ruleset_descriptor=_ruleset(),
-            target_unit_ids=surviving_unit_ids,
+            target_unit_ids=retained_identity_ids,
         )
         == ()
     )
@@ -1459,7 +1461,11 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
         json.loads(json.dumps(state.to_payload(), sort_keys=True)),
     )
     restored_state = GameState.from_payload(payload)
-    for surviving_unit_id in surviving_unit_ids:
+    for surviving_unit_id in (
+        attached_unit_id,
+        leader.unit_instance_id,
+        support.unit_instance_id,
+    ):
         assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
             unit_instance_id=surviving_unit_id
         )
@@ -1479,14 +1485,18 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
 
     restored_state.battle_round = 2
     restored_state.active_player_id = "player-a"
-    for surviving_unit_id in surviving_unit_ids:
+    for surviving_unit_id in (
+        attached_unit_id,
+        leader.unit_instance_id,
+        support.unit_instance_id,
+    ):
         assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
             unit_instance_id=surviving_unit_id
         )
     restored_state.record_ranged_attack_history(
         RangedAttackHistoryRecord(
             player_id="player-b",
-            unit_instance_id=leader.unit_instance_id,
+            unit_instance_id=attached_unit_id,
             battle_round=2,
             active_player_id="player-a",
             phase=BattlePhase.SHOOTING,
@@ -1498,14 +1508,17 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
     assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
         unit_instance_id=leader.unit_instance_id
     )
-    assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+    assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
         unit_instance_id=support.unit_instance_id
     )
-    assert _hidden_target_model_ids(
-        state=restored_state,
-        ruleset_descriptor=_ruleset(),
-        target_unit_ids=surviving_unit_ids,
-    ) == (support.own_models[0].model_instance_id,)
+    assert (
+        _hidden_target_model_ids(
+            state=restored_state,
+            ruleset_descriptor=_ruleset(),
+            target_unit_ids=retained_identity_ids,
+        )
+        == ()
+    )
 
 
 def test_phase17n_terrain_areas_participate_in_shooting_visibility_cache_key() -> None:

@@ -735,6 +735,10 @@ def _request_generic_rule_ir_strategic_reserves_placement(
         raise GameLifecycleError("Generic RuleIR placement must allow start-of-battle use.")
     if _rule_effect_parameter(effect_payload, "placement_scope") != "strategic_reserves_only":
         raise GameLifecycleError("Generic RuleIR placement must be Strategic Reserves only.")
+    unit = _unit_for_reserve_state(
+        state=state,
+        reserve_state=reserve_state,
+    )
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
         decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -755,18 +759,11 @@ def _request_generic_rule_ir_strategic_reserves_placement(
                     "stratagem_handler_id": GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
-                    "component_unit_instance_ids": list(
-                        _unit_for_reserve_state(
-                            state=state,
-                            reserve_state=reserve_state,
-                        ).component_unit_instance_ids
-                    ),
+                    "component_unit_instance_ids": [
+                        component.unit.unit_instance_id for component in unit.living_components
+                    ],
                     "model_instance_ids": sorted(
-                        model.model_instance_id
-                        for model in _unit_for_reserve_state(
-                            state=state,
-                            reserve_state=reserve_state,
-                        ).alive_models()
+                        model.model_instance_id for model in unit.alive_models()
                     ),
                     "from_start_of_battle": True,
                     "mark_movement_phase_reinforcement_arrival": (

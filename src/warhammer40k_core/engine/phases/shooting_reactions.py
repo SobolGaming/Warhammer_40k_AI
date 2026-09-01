@@ -306,7 +306,7 @@ def _resolve_completed_shooting_attack_sequence_continuation(
     )
     if completion_hook_status is not None:
         return completion_hook_status
-    _aur.reconcile_after_attack_sequence(state, decisions.event_log, completed_sequence)
+    _aur.reconcile_after_attack_sequence(state, completed_sequence)
     stratagem_status = _request_friendly_unit_has_shot_stratagem_if_available(
         state=state,
         decisions=decisions,

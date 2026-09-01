@@ -2018,7 +2018,7 @@ def resolve_embark(
         )
     if any(
         not active_cargo.capacity_profile.allows_unit(component.unit)
-        for component in rules_unit.components
+        for component in rules_unit.living_components
     ):
         violations.append(
             TransportOperationViolation(
@@ -2072,7 +2072,7 @@ def resolve_embark(
             transition_batch=None,
         )
     updated_cargo = active_cargo
-    for component_id in rules_unit.component_unit_instance_ids:
+    for component_id in rules_unit_placement.component_unit_instance_ids:
         updated_cargo = updated_cargo.with_embarked_unit(component_id)
     return EmbarkResolution(
         selection=selection,

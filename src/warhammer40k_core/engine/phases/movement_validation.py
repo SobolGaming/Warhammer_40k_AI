@@ -370,11 +370,7 @@ def _movement_unit_candidates(
             unit_instance_id=rules_unit.unit_instance_id,
         ):
             continue
-        alive_components = tuple(
-            component
-            for component in rules_unit.components
-            if any(model.is_alive for model in component.unit.own_models)
-        )
+        alive_components = rules_unit.living_components
         if not alive_components:
             continue
         component_ids = tuple(component.unit.unit_instance_id for component in alive_components)

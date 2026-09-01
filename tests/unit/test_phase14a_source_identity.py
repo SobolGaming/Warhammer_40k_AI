@@ -7,6 +7,9 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.build_core_attached_units_source import (
+    build_payload as build_attached_units_source_payload,
+)
 from tools.build_core_command_phase_source import (
     CoreCommandPhaseSourceBuildError,
     build_core_command_phase_source_payload,
@@ -33,6 +36,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     app_core_rules_hidden_2026_08_09,
     chapter_approved_2026_27,
     core_abilities,
+    core_attached_units_2026_09,
     core_command_phase_2026_08,
     core_movement_phase_2026_08,
     core_other_concepts_2026_08,
@@ -109,6 +113,57 @@ def test_p09a_move_units_source_artifact_is_pinned_typed_and_executable() -> Non
     assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
         package.source_catalog.to_payload()
     )
+
+
+def test_p19_attached_units_source_artifact_is_pinned_typed_and_executable() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_attached_units_2026_09/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    package = core_attached_units_2026_09.source_package()
+    rule = core_attached_units_2026_09.source_rule_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert hashlib.sha256(raw).hexdigest() == (core_attached_units_2026_09.EXPECTED_ARTIFACT_SHA256)
+    assert json.loads(raw) == build_attached_units_source_payload()
+    assert rule.section_id == "19.01.01"
+    assert rule.source_id == core_attached_units_2026_09.BODYGUARD_UNIT_DESTROYED_SOURCE_ID
+    assert rule.transcription_sha256 == core_attached_units_2026_09.TRANSCRIPTION_SHA256
+    assert "remain a single unit for all rules purposes" in rule.source_text
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
+        package.source_catalog.to_payload()
+    )
+
+
+def test_p19_attached_units_source_loader_rejects_schema_and_byte_drift() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_attached_units_2026_09/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    payload = json.loads(raw)
+    payload["rules"][0]["section_id"] = "19.01"
+
+    with pytest.raises(
+        core_attached_units_2026_09.CoreAttachedUnitsSourceArtifactError,
+        match="reviewed identity",
+    ):
+        core_attached_units_2026_09.core_attached_units_source_artifact_from_json_bytes(
+            json.dumps(payload).encode()
+        )
+    with pytest.raises(
+        core_attached_units_2026_09.CoreAttachedUnitsSourceArtifactError,
+        match="bytes drifted",
+    ):
+        core_attached_units_2026_09.validate_core_attached_units_source_artifact_bytes(raw + b"\n")
 
 
 def test_p06a_visibility_source_artifact_is_pinned_typed_and_executable() -> None:

@@ -42,6 +42,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementRecord,
     UnitPlacement,
 )
+from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -2854,12 +2855,12 @@ def test_phase17n_punishment_restore_uses_turn_start_presence_after_candidate_de
     )
 
 
-def test_phase17n_punishment_pending_choice_rejects_attached_unit_split() -> None:
+def test_phase17n_punishment_pending_choice_retains_attached_identity() -> None:
     state, decisions, attached_id, component_ids = _phase17n_punishment_attached_choice_state()
     request = punishment_choice_request(
         state=state,
         decisions=decisions,
-        request_id="phase17n-punishment-attached-split-request",
+        request_id="phase17n-punishment-attached-identity-request",
     )
     assert request is not None
     choice = PrimaryMissionChoiceData.from_payload(request.payload)
@@ -2867,22 +2868,30 @@ def test_phase17n_punishment_pending_choice_rejects_attached_unit_split() -> Non
     assert not set(component_ids).intersection(choice.legal_target_ids)
     progress_before = state.primary_mission_progress_state
 
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id="player-b",
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=component_ids,
-        event_log=decisions.event_log,
+    formation = next(
+        formation
+        for army in state.army_definitions
+        for formation in army.attached_units
+        if formation.attached_unit_instance_id == attached_id
     )
+    bodyguard = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == formation.bodyguard_unit_instance_id
+    )
+    for model in bodyguard.own_models:
+        destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
     invalid = invalid_primary_mission_choice_request_status(
         state=state,
         decisions=decisions,
         request=request,
     )
 
-    assert invalid is not None
-    assert cast(dict[str, JsonValue], invalid.payload)["invalid_reason"] == (
-        "primary_mission_choice_request_drift"
-    )
+    assert invalid is None
+    enemy_army = state.army_definition_for_player("player-b")
+    assert enemy_army is not None
+    assert enemy_army.attached_units[0].attached_unit_instance_id == attached_id
     assert state.primary_mission_progress_state == progress_before
 
 
@@ -3647,7 +3656,7 @@ def test_phase17n_surveil_uses_standalone_fight_event_time_endpoint() -> None:
     assert removed.removal_event_id == trigger.event_id
 
 
-def test_phase17n_surveil_uses_historical_attached_fight_move_endpoint() -> None:
+def test_phase17n_surveil_uses_attached_fight_endpoint_after_component_movement() -> None:
     state, bodyguard_id, objective_id = _phase17n_surveil_move_marker_state()
     attached_id, component_ids = _phase17n_attach_test_leader(
         state=state,
@@ -3681,7 +3690,7 @@ def test_phase17n_surveil_uses_historical_attached_fight_move_endpoint() -> None
             }
         ),
     )
-    _phase17n_split_attached_test_unit_and_move_components_away(
+    _phase17n_move_attached_components_away(
         state=state,
         component_ids=component_ids,
     )
@@ -5896,7 +5905,7 @@ def test_phase17n_reconciliation_interrupts_post_start_triggered_move_once() -> 
         terminal,
         payload=validate_json_value(forged_payload),
     )
-    with pytest.raises(GameLifecycleError, match="without causal evidence"):
+    with pytest.raises(GameLifecycleError, match="interruption evidence is incomplete"):
         validate_primary_mission_action_integrity(
             state=state,
             event_records=(*decisions.event_log.records[:-1], forged_terminal),
@@ -6722,6 +6731,21 @@ def _phase17n_attach_test_leader(
         else candidate
         for candidate in state.army_definitions
     ]
+    state.starting_strength_records = [
+        record
+        for record in state.starting_strength_records
+        if record.unit_instance_id not in component_ids
+    ]
+    state.starting_strength_records.append(
+        StartingStrengthRecord(
+            player_id="player-b",
+            unit_instance_id=attached_id,
+            starting_model_count=len(bodyguard.own_models) + len(leader.own_models),
+            single_model_starting_wounds=None,
+            source_id=formation.source_id,
+        )
+    )
+    state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
     state.starting_attached_unit_records = [
         *state.starting_attached_unit_records,
         StartingAttachedUnitRecord.from_formation(
@@ -6751,18 +6775,15 @@ def _phase17n_attach_test_leader(
         ),
     )
     state.battlefield_state = state.battlefield_state.with_added_unit_placement(leader_placement)
+    _phase17n_refresh_turn_start_snapshot(state)
     return attached_id, component_ids
 
 
-def _phase17n_split_attached_test_unit_and_move_components_away(
+def _phase17n_move_attached_components_away(
     *,
     state: GameState,
     component_ids: tuple[str, ...],
 ) -> None:
-    state.army_definitions = [
-        replace(army, attached_units=()) if army.player_id == "player-b" else army
-        for army in state.army_definitions
-    ]
     assert state.battlefield_state is not None
     for component_index, component_id in enumerate(component_ids):
         placement = state.battlefield_state.unit_placement_by_id(component_id)

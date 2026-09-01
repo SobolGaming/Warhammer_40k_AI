@@ -72,7 +72,7 @@ def validate_mustered_army_consistency(
     )
     if _state_requires_mustered_armies(state) and not state_armies:
         raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
-    if state_armies and not _armies_match_muster_with_runtime_attached_unit_splits(
+    if state_armies and not _armies_match_muster_runtime_state(
         state=state,
         state_armies=state_armies,
         expected_armies=expected_armies,
@@ -113,7 +113,7 @@ def _starting_attached_frozen_mapping(
     return record.starting_model_instance_ids_by_component
 
 
-def _armies_match_muster_with_runtime_attached_unit_splits(
+def _armies_match_muster_runtime_state(
     *,
     state: GameState,
     state_armies: tuple[ArmyDefinition, ...],
@@ -130,18 +130,10 @@ def _armies_match_muster_with_runtime_attached_unit_splits(
             if state_army != expected_army:
                 return False
             continue
-        expected_attached_units_by_id = {
-            formation.attached_unit_instance_id: formation
-            for formation in expected_army.attached_units
-        }
-        if any(
-            expected_attached_units_by_id.get(formation.attached_unit_instance_id) != formation
-            for formation in state_army.attached_units
-        ):
+        if state_army.attached_units != expected_army.attached_units:
             return False
         normalized_state_army = replace(
             state_army,
-            attached_units=expected_army.attached_units,
             units=_units_with_expected_muster_wounds(
                 state_army=state_army,
                 expected_army=expected_army,

@@ -665,10 +665,10 @@ def validate_primary_reserve_entry_provider_registration(
                 for ability in component.unit.datasheet_abilities
             )
             for rules_unit_view in rules_unit_views
-            for component in rules_unit_view.components
+            for component in rules_unit_view.living_components
         )
         authority_matches = (
-            all(component_matches)
+            bool(component_matches) and all(component_matches)
             if definition.component_match_policy
             is PrimaryReserveEntryComponentMatchPolicy.ALL_COMPONENTS
             else any(component_matches)
@@ -691,7 +691,7 @@ def validate_primary_reserve_entry_provider_registration(
     component_unit_ids = {
         component.unit.unit_instance_id
         for rules_unit_view in rules_unit_views
-        for component in rules_unit_view.components
+        for component in rules_unit_view.living_components
     }
     if not any(
         assignment.enhancement_id == definition.content_id
@@ -759,7 +759,7 @@ def validate_primary_reserve_entry_source_terminal_identity(
         abilities = tuple(
             ability
             for rules_unit in rules_units
-            for component in rules_unit.components
+            for component in rules_unit.living_components
             for ability in component.unit.datasheet_abilities
             if ability.source_id == provider.source_rule_id
         )
@@ -800,7 +800,7 @@ def _validate_catalog_rule_ir_authority(
     matching_abilities = tuple(
         ability
         for rules_unit_view in typed_views
-        for component in rules_unit_view.components
+        for component in rules_unit_view.living_components
         for ability in component.unit.datasheet_abilities
         if ability.source_id == provider.source_rule_id
         and ability.support is CatalogAbilitySupport.GENERIC_RULE_IR

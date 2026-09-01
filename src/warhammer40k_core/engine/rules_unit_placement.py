@@ -24,7 +24,7 @@ class RulesUnitPlacementPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class RulesUnitPlacement:
-    """One physical placement for every component of a rules unit."""
+    """Physical placements for the living components of one rules unit."""
 
     rules_unit_instance_id: str
     component_unit_placements: tuple[UnitPlacement, ...]
@@ -77,9 +77,13 @@ class RulesUnitPlacement:
             sorted(component_placements, key=lambda placement: placement.unit_instance_id)
         )
         if len(sorted_placements) == 1:
-            if sorted_placements[0].unit_instance_id != self.rules_unit_instance_id:
+            if (
+                sorted_placements[0].unit_instance_id != self.rules_unit_instance_id
+                and not self.rules_unit_instance_id.startswith("attached-unit:")
+            ):
                 raise GameLifecycleError(
-                    "Single-component RulesUnitPlacement identity must match its component."
+                    "Single-component RulesUnitPlacement requires its component or "
+                    "retained attached-unit identity."
                 )
         elif not self.rules_unit_instance_id.startswith("attached-unit:"):
             raise GameLifecycleError(
@@ -123,7 +127,10 @@ class RulesUnitPlacement:
             raise GameLifecycleError("RulesUnitPlacement rules-unit identity drift.")
         if self.player_id != view.owner_player_id:
             raise GameLifecycleError("RulesUnitPlacement owner drift.")
-        if self.component_unit_instance_ids != view.component_unit_instance_ids:
+        expected_component_ids = tuple(
+            sorted(component.unit.unit_instance_id for component in view.living_components)
+        )
+        if self.component_unit_instance_ids != expected_component_ids:
             raise GameLifecycleError("RulesUnitPlacement component identity drift.")
         expected_model_ids = tuple(sorted(model.model_instance_id for model in view.alive_models()))
         submitted_model_ids = tuple(
@@ -146,10 +153,12 @@ class RulesUnitPlacement:
         if type(battlefield_state) is not BattlefieldRuntimeState:
             raise GameLifecycleError("Rules-unit placement requires BattlefieldRuntimeState.")
         placements: list[UnitPlacement] = []
-        for component_unit_id in view.component_unit_instance_ids:
-            placement = battlefield_state.unit_placement_or_none(component_unit_id)
+        for component in view.living_components:
+            placement = battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
             if placement is None:
-                raise GameLifecycleError("Every rules-unit component must be on the battlefield.")
+                raise GameLifecycleError(
+                    "Every living rules-unit component must be on the battlefield."
+                )
             placements.append(placement)
         grouped = cls(
             rules_unit_instance_id=view.unit_instance_id,

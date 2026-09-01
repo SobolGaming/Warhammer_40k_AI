@@ -83,5 +83,19 @@ uv run python tools/build_core_movement_phase_source.py --check
 
 The typed loader's reviewed artifact-byte pin must be updated in the same change.
 
+P19's exact reviewed 19.01.01 Attached Units row lives in
+`core_attached_units_2026_09/artifacts/package.json`. The artifact pins the reviewed URL,
+observation timestamp, complete operative transcription, evidence observation hashes, execution
+status, and runtime consumers. The older category-19 audit row remains locator metadata and does
+not authenticate the exact excerpt. After an intentional reviewed edit, refresh its derived hashes
+offline with:
+
+```text
+uv run python tools/build_core_attached_units_source.py
+uv run python tools/build_core_attached_units_source.py --check
+```
+
+The typed loader's reviewed artifact-byte pin must be updated in the same change.
+
 The current scope is exactly the 25 core-rules categories. Factions, faction detachments, and
 faction datasheet content is explicitly excluded.

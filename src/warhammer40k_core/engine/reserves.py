@@ -2091,7 +2091,7 @@ def _append_reserve_state_violations(
                 )
             )
     if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE and not all(
-        unit_has_deep_strike(component.unit) for component in view.components
+        unit_has_deep_strike(component.unit) for component in view.living_components
     ):
         violations.append(
             ReservePlacementViolation(
@@ -2132,14 +2132,14 @@ def _append_unit_placement_drift_violations(
             )
         )
         return
-    if (
-        attempted_rules_unit_placement.component_unit_instance_ids
-        != view.component_unit_instance_ids
-    ):
+    expected_component_ids = tuple(
+        component.unit.unit_instance_id for component in view.living_components
+    )
+    if attempted_rules_unit_placement.component_unit_instance_ids != expected_component_ids:
         violations.append(
             ReservePlacementViolation(
                 violation_code=ReservePlacementViolationCode.UNIT_PLACEMENT_DRIFT,
-                message="Reserve placement must include every component in the rules unit.",
+                message="Reserve placement must include every living component in the rules unit.",
             )
         )
         return

@@ -1141,7 +1141,7 @@ def test_phase17n_catalog_objective_evidence_rejects_invalid_destroyed_model_con
 
 def test_phase17n_objective_evidence_requires_canonical_attached_rules_unit_id() -> None:
     state, _runtime, _controller, bodyguard, _leader, _enemy, _attached_id = (
-        attached_selected_to_fight_risk_fixture(pre_split=False)
+        attached_selected_to_fight_risk_fixture()
     )
 
     with pytest.raises(GameLifecycleError, match="canonical rules-unit identity"):
@@ -1301,7 +1301,7 @@ def test_phase17n_turn_start_snapshot_round_trip_and_exact_identity_lookups() ->
         snapshot.membership_for_unit_identity("unit-missing")
 
 
-def test_phase17n_turn_start_lineage_lookup_reassembles_split_components() -> None:
+def test_phase17n_turn_start_lineage_lookup_requires_retained_identity() -> None:
     component_a = _turn_start_component("unit-a", "model-a")
     component_b = _turn_start_component("unit-b", "model-b")
     attached_membership = PrimaryRulesUnitTurnStartMembership(
@@ -1337,13 +1337,12 @@ def test_phase17n_turn_start_lineage_lookup_reassembles_split_components() -> No
             ),
         )
     )
-    reconstructed = primary_rules_unit_turn_start_membership_for_lineage(
-        snapshot=split_snapshot,
-        rules_unit_instance_id="attached-ab",
-        component_unit_instance_ids=("unit-a", "unit-b"),
-    )
-    assert reconstructed.rules_unit_instance_id == "attached-ab"
-    assert reconstructed.component_unit_instance_ids == ("unit-a", "unit-b")
+    with pytest.raises(GameLifecycleError, match="requires exactly one membership"):
+        primary_rules_unit_turn_start_membership_for_lineage(
+            snapshot=split_snapshot,
+            rules_unit_instance_id="attached-ab",
+            component_unit_instance_ids=("unit-a", "unit-b"),
+        )
 
     with pytest.raises(GameLifecycleError, match="requires a snapshot"):
         primary_rules_unit_turn_start_membership_for_lineage(
@@ -1357,7 +1356,7 @@ def test_phase17n_turn_start_lineage_lookup_reassembles_split_components() -> No
             rules_unit_instance_id="attached-ab",
             component_unit_instance_ids=(),
         )
-    with pytest.raises(GameLifecycleError, match="exactly one membership per component"):
+    with pytest.raises(GameLifecycleError, match="requires exactly one membership"):
         primary_rules_unit_turn_start_membership_for_lineage(
             snapshot=split_snapshot,
             rules_unit_instance_id="attached-ab",

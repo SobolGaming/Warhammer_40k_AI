@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,
 )
-from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     current_rules_unit_views_for_canonical_identity,
@@ -17,12 +15,8 @@ from warhammer40k_core.engine.rules_units import (
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
-BATTLE_SHOCK_ATTACHED_SPLIT_TRANSFER_EVENT = (
-    "battle_shock_state_transferred_after_attached_unit_split"
-)
 BATTLE_SHOCK_STATE_ALREADY = "already_battle_shocked"
 BATTLE_SHOCK_STATE_RECORDED = "recorded_battle_shocked"
-BATTLE_SHOCK_STATE_RECORDED_MISSING_DESCENDANTS = "recorded_missing_battle_shocked_descendants"
 BATTLE_SHOCK_STATE_NOT_REQUIRED = "not_required"
 
 
@@ -33,7 +27,7 @@ def record_battle_shock_result(*, state: GameState, result: BattleShockResult) -
 
 
 def apply_battle_shock_result_state(*, state: GameState, result: BattleShockResult) -> str:
-    """Apply one result across every current successor of its canonical target."""
+    """Apply one result to its canonical current rules-unit identity."""
     if type(result) is not BattleShockResult:
         raise GameLifecycleError("GameState battle_shock_result must be a BattleShockResult.")
     if result.request.game_id != state.game_id:
@@ -87,7 +81,7 @@ def apply_battle_shock_result_state(*, state: GameState, result: BattleShockResu
     )
     state.replace_battle_shock_state((shocked_unit_ids, shocked_unit_states))
     if already_ids:
-        return BATTLE_SHOCK_STATE_RECORDED_MISSING_DESCENDANTS
+        raise GameLifecycleError("Battle-shock state is partially duplicated.")
     return BATTLE_SHOCK_STATE_RECORDED
 
 
@@ -119,81 +113,3 @@ def clear_battle_shock_for_rules_unit(
         )
     )
     return cleared_ids
-
-
-def transfer_battle_shock_after_attached_unit_split(
-    *,
-    state: GameState,
-    event_log: EventLog,
-    attached_unit_instance_id: str,
-    surviving_unit_instance_ids: tuple[str, ...],
-) -> None:
-    if type(event_log) is not EventLog:
-        raise GameLifecycleError("Attached-unit Battle-shock transfer requires EventLog.")
-    if attached_unit_instance_id not in state.battle_shocked_unit_ids:
-        return
-    matching_states = tuple(
-        value
-        for value in state.battle_shocked_unit_states
-        if value.unit_instance_id == attached_unit_instance_id
-    )
-    if len(matching_states) != 1:
-        raise GameLifecycleError("Attached-unit Battle-shock state is inconsistent.")
-    if any(unit_id in state.battle_shocked_unit_ids for unit_id in surviving_unit_instance_ids):
-        raise GameLifecycleError("Attached-unit Battle-shock survivor is already marked.")
-    source_state = matching_states[0]
-    shocked_unit_ids = sorted(
-        unit_id for unit_id in state.battle_shocked_unit_ids if unit_id != attached_unit_instance_id
-    )
-    shocked_unit_ids = sorted((*shocked_unit_ids, *surviving_unit_instance_ids))
-    shocked_unit_states = [
-        value
-        for value in state.battle_shocked_unit_states
-        if value.unit_instance_id != attached_unit_instance_id
-    ]
-    successor_states = tuple(
-        replace(
-            source_state,
-            unit_instance_id=unit_id,
-            model_instance_ids=_physical_unit_model_ids(
-                state=state,
-                unit_instance_id=unit_id,
-            ),
-        )
-        for unit_id in surviving_unit_instance_ids
-    )
-    shocked_unit_states = sorted(
-        (*shocked_unit_states, *successor_states),
-        key=lambda value: value.unit_instance_id,
-    )
-    state.replace_battle_shock_state((shocked_unit_ids, shocked_unit_states))
-    event_log.append(
-        BATTLE_SHOCK_ATTACHED_SPLIT_TRANSFER_EVENT,
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": (
-                None if state.current_battle_phase is None else state.current_battle_phase.value
-            ),
-            "player_id": source_state.player_id,
-            "attached_unit_instance_id": attached_unit_instance_id,
-            "surviving_unit_instance_ids": list(surviving_unit_instance_ids),
-            "source_battle_shocked_unit_state": source_state.to_payload(),
-            "successor_battle_shocked_unit_states": [
-                successor.to_payload() for successor in successor_states
-            ],
-        },
-    )
-
-
-def _physical_unit_model_ids(*, state: GameState, unit_instance_id: str) -> tuple[str, ...]:
-    matching_units = tuple(
-        unit
-        for army in state.army_definitions
-        for unit in army.units
-        if unit.unit_instance_id == unit_instance_id
-    )
-    if len(matching_units) != 1:
-        raise GameLifecycleError("Attached-unit Battle-shock survivor unit is unknown.")
-    return tuple(model.model_instance_id for model in matching_units[0].own_models)

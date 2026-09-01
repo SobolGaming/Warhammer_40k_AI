@@ -1954,7 +1954,7 @@ def test_phase17n_hunters_provider_source_and_state_integrity_fail_closed() -> N
         )
     missing_state = deepcopy(state)
     missing_state.reserve_states.clear()
-    with pytest.raises(GameLifecycleError, match="requires an attached split transfer"):
+    with pytest.raises(GameLifecycleError, match="lacks its canonical ReserveState"):
         validate_latest_primary_reserve_entry_states(
             state=missing_state,
             occurrences=(occurrence,),

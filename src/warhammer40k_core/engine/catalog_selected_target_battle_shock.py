@@ -256,12 +256,7 @@ def _selected_target_battle_shock_base_payload(
                     key="selected_target_unit_instance_id",
                 ),
                 "target_unit_instance_id": target_unit_id,
-                "target_identity_resolution": (
-                    "unchanged"
-                    if target_unit_id
-                    == _payload_string(record, key="selected_target_unit_instance_id")
-                    else "attached_unit_split_survivor"
-                ),
+                "target_identity_resolution": "unchanged",
                 "target_player_id": target_player_id,
                 "effect_payload": validate_json_value(effect_payload),
                 "selected_target_decision_request": validate_json_value(

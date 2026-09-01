@@ -8,18 +8,22 @@ ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_PACKAGE = ROOT / "src" / "warhammer40k_core"
 CORE = ROOT / "src" / "warhammer40k_core" / "core"
 ENGINE = ROOT / "src" / "warhammer40k_core" / "engine"
+GAME_STATE = ENGINE / "game_state.py"
+RESERVES = ENGINE / "reserves.py"
+PRIMARY_BATTLEFIELD_DEPARTURE = ENGINE / "primary_battlefield_departure.py"
+PRIMARY_RESERVE_ARRIVAL_INTEGRITY = ENGINE / "primary_reserve_arrival_integrity.py"
+STRATAGEMS_CORE_HANDLERS = ENGINE / "stratagems_core_handlers.py"
+STRATAGEMS_GENERIC_RULE_IR = ENGINE / "stratagems_generic_rule_ir.py"
 MOVEMENT_LEGALITY = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_legality.py"
 MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
 MOVEMENT_PHASE_FILES = (
     MOVEMENT_PHASE,
     *sorted(MOVEMENT_PHASE.parent.glob("movement_*.py")),
 )
+MOVEMENT_REINFORCEMENTS = MOVEMENT_PHASE.parent / "movement_reinforcements.py"
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 DEADLY_DEMISE = ROOT / "src" / "warhammer40k_core" / "engine" / "deadly_demise.py"
 RULE_MODEL_DESTRUCTION = ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction.py"
-ATTACHED_UNIT_RECONCILIATION = (
-    ROOT / "src" / "warhammer40k_core" / "engine" / "attached_unit_reconciliation.py"
-)
 CATALOG_SELECTED_TARGET_MORTAL_WOUNDS = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_selected_target_mortal_wounds.py"
 )
@@ -118,6 +122,51 @@ TRIGGERED_MOVEMENT_PHYSICAL_AUTHORITY = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement_physical_authority.py"
 )
 TRANSPORTS = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
+TRANSPORT_EMBARK_GROUPS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "transport_embark_groups.py"
+)
+TRANSPORT_CARGO_DESTRUCTION = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "transport_cargo_destruction.py"
+)
+MOVEMENT_TRANSPORTS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_transports.py"
+)
+MOVEMENT_VALIDATION = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_validation.py"
+)
+MOVEMENT_FALL_BACK_EMBARK = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_fall_back_embark.py"
+)
+PRIMARY_BATTLEFIELD_DEPARTURE_INTEGRITY = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "primary_battlefield_departure_integrity.py"
+)
+DAMAGE_ALLOCATION = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
+RULES_UNIT_PLACEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "rules_unit_placement.py"
+PRIMARY_RESERVE_ENTRY_PROVIDER = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "primary_reserve_entry_provider.py"
+)
+GREY_KNIGHTS_ARMY_RULE = (
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "engine"
+    / "faction_content"
+    / "warhammer_40000_11th"
+    / "grey_knights"
+    / "army_rule.py"
+)
+DAEMONIC_INCURSION_RULE = (
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "engine"
+    / "faction_content"
+    / "warhammer_40000_11th"
+    / "chaos_daemons"
+    / "detachments"
+    / "daemonic_incursion"
+    / "rule.py"
+)
 TURN_START_ENGAGEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "turn_start_engagement.py"
 UNIT_PROXIMITY = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_proximity.py"
 UNIT_MODULES = (
@@ -381,26 +430,245 @@ def test_model_loss_hosts_share_attached_unit_reconciliation() -> None:
                 for node in ast.walk(function)
                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
             }
-            assert "split_attached_rules_unit_if_required" in call_names
+            assert "validate_attached_rules_unit_identity_after_destruction" in call_names
 
     mortal_wound_source = CATALOG_SELECTED_TARGET_MORTAL_WOUNDS.read_text(encoding="utf-8")
-    assert "split_attached_rules_unit_if_required" not in mortal_wound_source
+    assert "recover_starting_strength_after_attached_unit_split" not in mortal_wound_source
 
+    forbidden_calls = {
+        "recover_starting_strength_after_attached_unit_split",
+        "replace_arrived_reserve_state_after_attached_unit_split",
+        "split_attached_rules_unit_if_required",
+        "transfer_arrived_reserve_state_after_attached_unit_split",
+        "transfer_battle_shock_after_attached_unit_split",
+    }
     for path in sorted((ROOT / "src" / "warhammer40k_core" / "engine").rglob("*.py")):
-        if path in {
-            ATTACHED_UNIT_RECONCILIATION,
-            ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py",
-        }:
-            continue
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        assert not any(
-            isinstance(node, ast.Attribute)
-            and node.attr == "recover_starting_strength_after_attached_unit_split"
+        called_names = {
+            node.func.id
             for node in ast.walk(tree)
-        ), f"{path.relative_to(ROOT)} bypasses shared Attached Unit reconciliation."
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        }
+        called_names.update(
+            node.func.attr
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+        )
+        violations = forbidden_calls.intersection(called_names)
+        assert not violations, (
+            f"{path.relative_to(ROOT)} contains obsolete Attached Unit split calls: "
+            f"{sorted(violations)}"
+        )
+
+    assert not (ENGINE / "attached_unit_split_history.py").exists()
+    assert not (ENGINE / "reserve_state_attached_split.py").exists()
 
 
-def test_selected_target_canonical_identity_expands_all_current_survivors() -> None:
+def test_p19_semantic_consumers_use_central_living_component_authority() -> None:
+    embark_group = _function_node(
+        path=TRANSPORT_EMBARK_GROUPS,
+        function_name="embarking_rules_unit_placement",
+    )
+    embark_group_attributes = {
+        node.attr for node in ast.walk(embark_group) if isinstance(node, ast.Attribute)
+    }
+    assert "from_battlefield" in embark_group_attributes
+    assert "unit_placement_by_id" not in embark_group_attributes
+
+    placement_tree = ast.parse(
+        RULES_UNIT_PLACEMENT.read_text(encoding="utf-8"),
+        filename=str(RULES_UNIT_PLACEMENT),
+    )
+    placement_classes = tuple(
+        node
+        for node in placement_tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "RulesUnitPlacement"
+    )
+    assert len(placement_classes) == 1
+    placement_methods = {
+        node.name: node for node in placement_classes[0].body if isinstance(node, ast.FunctionDef)
+    }
+    for method_name in ("validate_for_view", "from_battlefield"):
+        method = placement_methods[method_name]
+        attribute_names = {
+            node.attr for node in ast.walk(method) if isinstance(node, ast.Attribute)
+        }
+        assert "living_components" in attribute_names
+        assert "components" not in attribute_names
+
+    for path, function_names in (
+        (TRANSPORTS, ("resolve_embark",)),
+        (
+            MOVEMENT_TRANSPORTS,
+            (
+                "_disembark_candidate_for_movement_unit",
+                "_request_disembark_placement",
+            ),
+        ),
+        (MOVEMENT_VALIDATION, ("_movement_unit_candidates",)),
+        (
+            GREY_KNIGHTS_ARMY_RULE,
+            (
+                "_rules_unit_has_gate_of_infinity",
+                "_rules_unit_can_enter_strategic_reserves",
+                "_assert_rules_unit_can_enter_strategic_reserves",
+                "_rules_unit_within_enemy_engagement_range",
+            ),
+        ),
+        (
+            PRIMARY_RESERVE_ENTRY_PROVIDER,
+            (
+                "validate_primary_reserve_entry_provider_registration",
+                "validate_primary_reserve_entry_source_terminal_identity",
+                "_validate_catalog_rule_ir_authority",
+            ),
+        ),
+        (
+            DAEMONIC_INCURSION_RULE,
+            ("_god_keywords_for_rules_unit", "_rules_unit_has_faction_keyword"),
+        ),
+        (
+            MOVEMENT_REINFORCEMENTS,
+            ("_request_reinforcement_placement", "_reserve_placement_kinds_for_unit"),
+        ),
+        (
+            RESERVES,
+            ("_append_reserve_state_violations", "_append_unit_placement_drift_violations"),
+        ),
+        (STRATAGEMS_GEOMETRY, ("_reserve_placement_kinds_for_unit",)),
+        (
+            STRATAGEMS_CORE_HANDLERS,
+            ("_apply_rapid_ingress_handler", "_apply_ingress_move_handler"),
+        ),
+        (
+            STRATAGEMS_GENERIC_RULE_IR,
+            ("_request_generic_rule_ir_strategic_reserves_placement",),
+        ),
+        (
+            PRIMARY_RESERVE_ARRIVAL_INTEGRITY,
+            ("validate_primary_reserve_arrival_placement_authority",),
+        ),
+    ):
+        for function_name in function_names:
+            function = _function_node(path=path, function_name=function_name)
+            attribute_names = {
+                node.attr for node in ast.walk(function) if isinstance(node, ast.Attribute)
+            }
+            assert "living_components" in attribute_names, (
+                f"{path.relative_to(ROOT)}:{function_name} bypasses living-component authority."
+            )
+            assert "components" not in attribute_names, (
+                f"{path.relative_to(ROOT)}:{function_name} scans immutable lineage components."
+            )
+
+    for path in sorted(ENGINE.rglob("*.py")):
+        assert "keyword_contributing_components" not in path.read_text(encoding="utf-8"), (
+            f"{path.relative_to(ROOT)} retains the superseded keyword-only component view."
+        )
+
+
+def test_p19_reserve_departure_is_prepared_before_authoritative_mutation() -> None:
+    game_state_tree = ast.parse(
+        GAME_STATE.read_text(encoding="utf-8"),
+        filename=str(GAME_STATE),
+    )
+    reposition_matches = tuple(
+        node
+        for node in ast.walk(game_state_tree)
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "reposition_unit_to_strategic_reserves"
+    )
+    assert len(reposition_matches) == 1
+    reposition = reposition_matches[0]
+    source = ast.unparse(reposition)
+
+    assert "rules_unit_placement.component_unit_instance_ids" in source
+    assert "rules_unit_view.component_unit_instance_ids" not in source
+    assert source.index("prepare_primary_battlefield_departure") < source.index(
+        "self.record_reserve_state"
+    )
+    assert source.index("prepare_primary_battlefield_departure") < source.index(
+        "self.battlefield_state = updated_battlefield"
+    )
+    assert source.index("self.battlefield_state = updated_battlefield") < source.index(
+        "record_prepared_primary_battlefield_departure"
+    )
+
+    recorder = _function_node(
+        path=PRIMARY_BATTLEFIELD_DEPARTURE,
+        function_name="record_primary_battlefield_departure",
+    )
+    call_names = {
+        node.func.id
+        for node in ast.walk(recorder)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert {
+        "prepare_primary_battlefield_departure",
+        "record_prepared_primary_battlefield_departure",
+    }.issubset(call_names)
+
+
+def test_p19_transport_cargo_uses_physical_components_and_shared_destruction_cleanup() -> None:
+    resolve_embark = _function_node(path=TRANSPORTS, function_name="resolve_embark")
+    cargo_additions = tuple(
+        node
+        for node in ast.walk(resolve_embark)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "with_embarked_unit"
+    )
+    assert len(cargo_additions) == 1
+    assert ast.unparse(cargo_additions[0].args[0]) == "component_id"
+    cargo_loop = next(
+        node
+        for node in ast.walk(resolve_embark)
+        if isinstance(node, (ast.For, ast.comprehension))
+        and cargo_additions[0] in tuple(ast.walk(node))
+    )
+    assert ast.unparse(cargo_loop.iter) == ("rules_unit_placement.component_unit_instance_ids")
+
+    wound_mutation = _function_node(path=DAMAGE_ALLOCATION, function_name="_replace_model_wounds")
+    wound_mutation_calls = {
+        node.func.id
+        for node in ast.walk(wound_mutation)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "reconcile_transport_cargo_after_model_destruction" in wound_mutation_calls
+
+    cargo_cleanup = _function_node(
+        path=TRANSPORT_CARGO_DESTRUCTION,
+        function_name="reconcile_transport_cargo_after_model_destruction",
+    )
+    cleanup_attributes = {
+        node.attr for node in ast.walk(cargo_cleanup) if isinstance(node, ast.Attribute)
+    }
+    assert {
+        "replace_transport_cargo_state",
+        "replace_reserve_state",
+        "transport_cargo_state_for_embarked_unit",
+    }.issubset(cleanup_attributes)
+
+    embark_mutation = _function_node(
+        path=MOVEMENT_FALL_BACK_EMBARK,
+        function_name="_apply_valid_embark",
+    )
+    embark_mutation_attributes = {
+        node.attr for node in ast.walk(embark_mutation) if isinstance(node, ast.Attribute)
+    }
+    assert "component_unit_id_for_model" in embark_mutation_attributes
+    assert "component_unit_instance_ids" not in embark_mutation_attributes
+
+    cargo_integrity = _function_node(
+        path=PRIMARY_BATTLEFIELD_DEPARTURE_INTEGRITY,
+        function_name="_validate_embark_cargo",
+    )
+    cargo_integrity_source = ast.unparse(cargo_integrity)
+    assert "departure.departed_component_unit_instance_ids" in cargo_integrity_source
+    assert "departure.component_unit_instance_ids" not in cargo_integrity_source
+
+
+def test_selected_target_canonical_identity_resolves_one_retained_rules_unit() -> None:
     function = _function_node(
         path=CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT,
         function_name="canonical_rules_unit_ids",

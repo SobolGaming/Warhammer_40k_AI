@@ -535,10 +535,6 @@ def rule_effect_model_destruction_authority_context(
         damage_application_from_rule_context,
         destruction_provenance_from_rule_context,
     )
-    from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
-        DEFER_ATTACHED_SPLIT_FIELD,
-        defer_attached_split_from_rule_destruction_context,
-    )
 
     source_effect_ids = _mdcpv.json_identifier_list(
         root_context.get("source_effect_ids"),
@@ -557,7 +553,6 @@ def rule_effect_model_destruction_authority_context(
     ):
         raise GameLifecycleError("Rule destruction source rules-unit ID is invalid.")
     completion_kind = _context_identifier(root_context, "completion_kind")
-    defer_attached_split = defer_attached_split_from_rule_destruction_context(root_context)
     parent_cause_ids = tuple(sorted(_parent_cause_ids_from_context(root_context)))
     damage = damage_application_from_rule_context(root_context)
     provenance = destruction_provenance_from_rule_context(root_context)
@@ -627,7 +622,6 @@ def rule_effect_model_destruction_authority_context(
             "source_effect_ids": list(source_effect_ids),
             "source_phase": _context_identifier(root_context, "phase"),
             "source_step": _context_identifier(root_context, "source_step"),
-            DEFER_ATTACHED_SPLIT_FIELD: defer_attached_split,
             "destroying_player_id": attribution.destroying_player_id,
             "source_rules_unit_instance_id": source_rules_unit_id,
             "source_model_instance_id": source_model_id,
@@ -1075,10 +1069,6 @@ def _validate_rule_effect_cause_restore(
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
-    from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
-        DEFER_ATTACHED_SPLIT_FIELD,
-    )
-
     context = authority.producer_context
     base_fields = {
         "context_kind",
@@ -1093,7 +1083,6 @@ def _validate_rule_effect_cause_restore(
         "source_effect_ids",
         "source_phase",
         "source_step",
-        DEFER_ATTACHED_SPLIT_FIELD,
         "destroying_player_id",
         "source_rules_unit_instance_id",
         "source_model_instance_id",
@@ -1253,17 +1242,8 @@ def _validate_rule_effect_mode(
         RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
         RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND,
     )
-    from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
-        DEFER_ATTACHED_SPLIT_FIELD,
-    )
 
     completion_kind = _context_identifier(context, "completion_kind")
-    defer_attached_split = context.get(DEFER_ATTACHED_SPLIT_FIELD)
-    if type(defer_attached_split) is not bool or (
-        completion_kind != RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
-        and defer_attached_split
-    ):
-        raise GameLifecycleError("Rule destruction attached split context drift.")
     physical_unit_id = state.unit_instance_id_for_model(authority.model_instance_id)
     authority_views = current_rules_unit_views_for_canonical_identity(
         state=state,

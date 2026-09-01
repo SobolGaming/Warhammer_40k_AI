@@ -757,21 +757,10 @@ def validate_primary_reserve_arrival_placement_authority(
         unit_instance_id=proposal_request.unit_instance_id,
     )
     owner_ids = {view.owner_player_id for view in current_views}
-    components = {
+    living_components = {
         component.unit.unit_instance_id: component.unit
         for view in current_views
-        for component in view.components
-    }
-    expected_placement_kinds = placement_kinds_for_reserve_state(
-        reserve_state,
-        all_components_have_deep_strike=all(
-            unit_has_deep_strike(unit) for unit in components.values()
-        ),
-    )
-    expected_proposal_kind = proposal_kind_for_reserve_state(reserve_state)
-    submitted_rules_unit = submitted.resolved_rules_unit_placement()
-    submitted_model_ids = {
-        placement.model_instance_id for placement in submitted_rules_unit.model_placements
+        for component in view.living_components
     }
     context_component_ids = _identifier_list(
         proposal_context.get("component_unit_instance_ids"),
@@ -781,23 +770,49 @@ def validate_primary_reserve_arrival_placement_authority(
         proposal_context.get("model_instance_ids"),
         field_name="Reserve arrival request model IDs",
     )
+    lineage_component_ids = {
+        component_id for view in current_views for component_id in view.component_unit_instance_ids
+    }
+    physical_units_by_id = {
+        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
+    }
+    request_components = {
+        component_id: physical_units_by_id[component_id]
+        for component_id in context_component_ids
+        if component_id in lineage_component_ids
+    }
+    expected_placement_kinds = placement_kinds_for_reserve_state(
+        reserve_state,
+        all_components_have_deep_strike=all(
+            unit_has_deep_strike(unit) for unit in request_components.values()
+        ),
+    )
+    expected_proposal_kind = proposal_kind_for_reserve_state(reserve_state)
+    submitted_rules_unit = submitted.resolved_rules_unit_placement()
+    submitted_model_ids = {
+        placement.model_instance_id for placement in submitted_rules_unit.model_placements
+    }
     authoritative_model_ids = {
-        model.model_instance_id for unit in components.values() for model in unit.own_models
+        model.model_instance_id
+        for component_id in lineage_component_ids
+        for model in physical_units_by_id[component_id].own_models
     }
     authoritative_model_ids_by_component = {
-        unit_instance_id: {model.model_instance_id for model in unit.own_models}
-        for unit_instance_id, unit in components.items()
+        component_id: {
+            model.model_instance_id for model in physical_units_by_id[component_id].own_models
+        }
+        for component_id in lineage_component_ids
     }
     authoritative_army_id_by_component = {
         unit.unit_instance_id: army.army_id
         for army in state.army_definitions
         if army.player_id == expected_owner_id
         for unit in army.units
-        if unit.unit_instance_id in components
+        if unit.unit_instance_id in lineage_component_ids
     }
     currently_alive_model_ids = {
         model.model_instance_id
-        for unit in components.values()
+        for unit in living_components.values()
         for model in unit.own_models
         if model.is_alive
     }
@@ -825,7 +840,11 @@ def validate_primary_reserve_arrival_placement_authority(
         if handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
             expected_context_keys.update(("generic_rule_effect", "generic_rule_execution_result"))
     expected_transition_source_rule_id = source_rule_id_for_placement_kind(submitted.placement_kind)
-    expected_component_ids = tuple(sorted(components))
+    expected_component_ids = tuple(sorted(request_components))
+    arrival_window_is_current = (
+        state.battle_round == proposal_request.battle_round
+        and state.current_battle_phase is BattlePhase.MOVEMENT
+    )
     submitted_component_authority = all(
         placement.army_id == authoritative_army_id_by_component.get(placement.unit_instance_id)
         and placement.player_id == expected_owner_id
@@ -842,7 +861,15 @@ def validate_primary_reserve_arrival_placement_authority(
             reserve_state.unit_instance_id == proposal_request.unit_instance_id,
         ),
         ("current owner", owner_ids == {expected_owner_id}),
-        ("current components", bool(components)),
+        ("current components", bool(request_components)),
+        (
+            "request component authority",
+            bool(request_components)
+            and set(context_component_ids) == set(request_components)
+            and (
+                not arrival_window_is_current or set(living_components) == set(request_components)
+            ),
+        ),
         ("rules-unit owner", submitted_rules_unit.player_id == expected_owner_id),
         (
             "rules-unit identity",
@@ -871,7 +898,8 @@ def validate_primary_reserve_arrival_placement_authority(
         ),
         (
             "alive model coverage",
-            currently_alive_model_ids.issubset(submitted_model_ids),
+            not arrival_window_is_current
+            or currently_alive_model_ids.issubset(submitted_model_ids),
         ),
         (
             "required arrival timing",

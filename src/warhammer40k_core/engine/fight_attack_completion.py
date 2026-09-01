@@ -100,9 +100,7 @@ def continue_completed_fight_attack_sequence(
         return hook_status
     _aur.reconcile_after_attack_sequence(
         state,
-        decisions.event_log,
         completed_sequence,
-        deferred_rules_unit_instance_ids=(activation.unit_instance_id,),
     )
     fight_state = state.fight_phase_state
     if fight_state is None:
