@@ -1808,6 +1808,20 @@ Defender shooting decisions include:
 - mandatory destruction reactions such as Deadly Demise are engine-triggered resolutions, not decline-capable adapter choices;
 - shooting-coupled reactive Stratagem choices such as Smokescreen through the existing `use_stratagem` or Stratagem target-proposal contract.
 
+For a model destroyed by an attack, registered mandatory or optional destruction reactions use the
+shared `05.04.04 Destroyed` end-of-attacks boundary. The engine records logical death immediately,
+retains the model's fixed battlefield placement while excluding it from living-model selection and
+targeting, finishes every attack from the attacking rules unit, and emits
+`attack_sequence_attacks_resolved`. It then resolves mandatory reactions, removes the model and
+emits `model_destroyed`, and only then emits any optional `select_destruction_reaction` request.
+`AttackSequence` persists the ordered pending-destruction records, original damage event IDs,
+pre-removal placements, captured reaction sources, and the attacks-resolved event ID. Restore
+validation binds that state to the original damage, deferral, boundary, removal, and pending
+decision records. Shooting and Fight use this same sequence owner. Adapters must not remove the
+retained model, expose it as alive or targetable, advance a reaction before the boundary, reorder
+queued destructions, or synthesize boundary evidence. Fight On Death's later remove/re-add behavior
+remains owned by P05B and is not changed by this boundary.
+
 Saving throw kind is not an adapter choice in the 11th Edition contract. The
 engine rolls one saving throw die for the current allocation group, retains both
 armour and Invulnerable Save options when both exist, and checks that die in

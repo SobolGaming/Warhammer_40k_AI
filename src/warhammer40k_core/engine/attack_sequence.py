@@ -6,6 +6,7 @@ from warhammer40k_core.engine import (
     attack_sequence_damage_resolution as attack_sequence_damage_resolution,
     attack_sequence_damage_rerolls as attack_sequence_damage_rerolls,
     attack_sequence_destroyed_transport as attack_sequence_destroyed_transport,
+    attack_sequence_destruction_model as attack_sequence_destruction_model,
     attack_sequence_dice_rerolls as attack_sequence_dice_rerolls,
     attack_sequence_dispatch as attack_sequence_dispatch,
     attack_sequence_geometry_targets as attack_sequence_geometry_targets,
@@ -24,6 +25,7 @@ from warhammer40k_core.engine.attack_sequence_bindings import bind_attack_sequen
 from warhammer40k_core.engine.attack_sequence_damage_resolution import *
 from warhammer40k_core.engine.attack_sequence_damage_rerolls import *
 from warhammer40k_core.engine.attack_sequence_destroyed_transport import *
+from warhammer40k_core.engine.attack_sequence_destruction_model import *
 from warhammer40k_core.engine.attack_sequence_dice_rerolls import *
 from warhammer40k_core.engine.attack_sequence_dispatch import *
 from warhammer40k_core.engine.attack_sequence_geometry_targets import *
@@ -82,6 +84,8 @@ __all__ = (
     "IdenticalAttackSignature",
     "IdenticalAttackSignaturePayload",
     "LostWoundContextPayload",
+    "PendingAttackDestruction",
+    "PendingAttackDestructionPayload",
     "PendingDestroyedTransportDisembark",
     "PendingDestroyedTransportDisembarkPayload",
     "PendingGroupedDamage",

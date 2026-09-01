@@ -70,6 +70,7 @@ __all__ = (
     "IdenticalAttackSignature",
     "IdenticalAttackSignaturePayload",
     "LostWoundContextPayload",
+    "PendingAttackDestructionPayload",
     "PendingDestroyedTransportDisembark",
     "PendingDestroyedTransportDisembarkPayload",
     "PendingGroupedDamage",
@@ -310,6 +311,8 @@ class AttackSequencePayload(TypedDict):
     generated_hit_index: int
     current_hit_roll: HitRollPayload | None
     deferred_mortal_wounds: list[DeferredMortalWoundsPayload]
+    pending_attack_destructions: list[PendingAttackDestructionPayload]
+    attacks_resolved_event_id: str | None
     pending_grouped_damage: PendingGroupedDamagePayload | None
     pending_destroyed_transport_disembark: PendingDestroyedTransportDisembarkPayload | None
     post_roll_attack_pools: PostRollAttackPoolSetPayload | None
@@ -363,6 +366,18 @@ class PendingDestroyedTransportDisembarkPayload(TypedDict):
     pending_unit_instance_ids: list[str]
     resolved_disembarks: list[DestroyedTransportDisembarkPayload]
     pending_sources: list[DestructionReactionSourcePayload]
+
+
+class PendingAttackDestructionPayload(TypedDict):
+    attack_context: AttackResolutionContextPayload
+    attack_pool: RangedAttackPoolPayload
+    damage_application: DamageApplicationPayload
+    saving_throw: JsonValue
+    feel_no_pain: FeelNoPainResolutionPayload
+    destroyed_model_controller_player_id: str
+    destruction_sources: list[DestructionReactionSourcePayload]
+    damage_event_id: str
+    destroyed_model_placement: JsonValue
 
 
 class LostWoundContextPayload(TypedDict):

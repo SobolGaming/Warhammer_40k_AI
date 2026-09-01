@@ -1218,21 +1218,37 @@ def _validate_initial_binding_source(
     )
 
     if source_kind == DEADLY_DEMISE_SOURCE_KIND:
-        from warhammer40k_core.engine.attack_sequence_mortal_wound_logical_death import (
-            attack_deadly_demise_logical_death_binding,
-        )
         from warhammer40k_core.engine.lifecycle_state_queries import (
             active_attack_sequence_for_state,
+        )
+        from warhammer40k_core.engine.model_destruction_cause_attack_identity import (
+            attack_damage_model_destruction_producer_id_for_context,
         )
 
         active_attack_sequence = active_attack_sequence_for_state(state)
         attack_context = source_context.get("attack_context")
+        sequence_id = source_context.get("sequence_id")
+        attack_context_id = (
+            None
+            if not isinstance(attack_context, dict)
+            else attack_context.get("attack_context_id")
+        )
+        expected_binding = (
+            None
+            if not isinstance(sequence_id, str) or not isinstance(attack_context_id, str)
+            else MortalWoundLogicalDeathCauseBinding.fixed(
+                cause_kind=ModelDestructionCauseKind.ATTACK_DAMAGE,
+                producer_id=attack_damage_model_destruction_producer_id_for_context(
+                    sequence_id=sequence_id,
+                    attack_context_id=attack_context_id,
+                ),
+            )
+        )
         if (
             active_attack_sequence is None
-            or source_context.get("sequence_id") != active_attack_sequence.sequence_id
-            or not isinstance(attack_context, dict)
-            or attack_context.get("attack_context_id") != active_attack_sequence.attack_context_id()
-            or binding != attack_deadly_demise_logical_death_binding(active_attack_sequence)
+            or sequence_id != active_attack_sequence.sequence_id
+            or expected_binding is None
+            or binding != expected_binding
         ):
             raise GameLifecycleError("Attack Deadly Demise application start binding drift.")
         return

@@ -163,9 +163,9 @@ def drift_pending_destruction_reaction_payload(
     attack_sequence: AttackSequence,
     drift_kind: str,
 ) -> None:
-    pending = attack_sequence.pending_grouped_damage
-    if pending is None or pending.next_index != 1:
-        raise AssertionError("Drift regression requires the second grouped save die.")
+    pending = attack_sequence.current_pending_attack_destruction
+    if pending is None:
+        raise AssertionError("Drift regression requires a pending attack destruction.")
     request_payload = lifecycle_payload["decisions"]["queue"]["pending_requests"][0]
     destruction_context = request_payload["payload"]["destruction_context"]
     provenance_payload = destruction_context["destruction_provenance"]
@@ -174,16 +174,9 @@ def drift_pending_destruction_reaction_payload(
     if profile is None:
         raise AssertionError("Drift regression requires attack provenance.")
     if drift_kind in {"attack_context", "generated_hit_context"}:
-        current_context = pending.sorted_save_dice[pending.next_index]["attack_context"]
-        stale_context = pending.sorted_save_dice[0]["attack_context"]
-        expected_current = (1, 0) if drift_kind == "attack_context" else (0, 1)
-        if (
-            current_context["attack_index"],
-            current_context["generated_hit_index"],
-        ) != expected_current:
-            raise AssertionError("Drift regression current context is not the expected die.")
-        if (stale_context["attack_index"], stale_context["generated_hit_index"]) != (0, 0):
-            raise AssertionError("Drift regression stale context is not the initial hit.")
+        current_context = pending.attack_context
+        stale_context = dict(current_context)
+        stale_context["attack_context_id"] = f"{current_context['attack_context_id']}:drift"
         destruction_context["attack_context"] = stale_context
         provenance_payload["attack_context_id"] = stale_context["attack_context_id"]
         return

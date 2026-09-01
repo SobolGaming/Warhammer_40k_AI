@@ -12,6 +12,10 @@ from warhammer40k_core.engine.destruction_source_attribution import (
     validate_destruction_source_identity,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.model_destruction_cause_attack_identity import (
+    attack_damage_model_destruction_cause_id_for_context,
+    attack_damage_model_destruction_producer_id_for_context,
+)
 from warhammer40k_core.engine.model_destruction_cause_authority import (
     MODEL_DESTROYED_EVENT_TYPE,
     MODEL_DESTRUCTION_CAUSE_ID_FIELD,
@@ -389,7 +393,10 @@ def append_rule_effect_model_destroyed_event(
 def attack_damage_model_destruction_producer_id(
     attack_sequence: AttackSequence,
 ) -> str:
-    return f"{attack_sequence.sequence_id}:damage:{attack_sequence.attack_context_id()}"
+    return attack_damage_model_destruction_producer_id_for_context(
+        sequence_id=attack_sequence.sequence_id,
+        attack_context_id=attack_sequence.attack_context_id(),
+    )
 
 
 def _attack_parent_cause_ids(
@@ -1460,7 +1467,9 @@ __all__ = (
     "PARENT_MODEL_DESTRUCTION_CAUSE_ID_FIELD",
     "append_rule_effect_model_destroyed_event",
     "attack_damage_model_destruction_cause_id",
+    "attack_damage_model_destruction_cause_id_for_context",
     "attack_damage_model_destruction_producer_id",
+    "attack_damage_model_destruction_producer_id_for_context",
     "consume_attack_damage_model_destruction_cause",
     "consume_mortal_wound_model_destruction_cause",
     "consume_rule_effect_model_destruction_cause",

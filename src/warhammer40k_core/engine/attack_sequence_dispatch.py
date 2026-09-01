@@ -147,6 +147,60 @@ def resolve_attack_sequence_until_blocked(
     )
     if status is not None:
         return current, allocated_model_ids, status
+    if current.pending_attack_destructions and current.attacks_resolved_event_id is None:
+        from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
+            CORE_DESTROYED_TIMING_RULE_ID,
+        )
+
+        attacks_resolved_event = decisions.event_log.append(
+            "attack_sequence_attacks_resolved",
+            {
+                "sequence_id": current.sequence_id,
+                "attacker_player_id": current.attacker_player_id,
+                "attacking_unit_instance_id": current.attacking_unit_instance_id,
+                "timing_rule_id": CORE_DESTROYED_TIMING_RULE_ID,
+                "pending_destruction_count": len(current.pending_attack_destructions),
+            },
+        )
+        current = current.with_attacks_resolved_event_id(attacks_resolved_event.event_id)
+    from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
+        resolve_pending_attack_destruction_until_blocked,
+    )
+
+    while current.pending_attack_destructions:
+        if current.pending_destroyed_transport_disembark is not None:
+            next_current, allocated_model_ids, status = (
+                _continue_pending_destroyed_transport_disembark(
+                    state=state,
+                    decisions=decisions,
+                    ruleset_descriptor=ruleset_descriptor,
+                    manager=manager,
+                    attack_sequence=current,
+                    allocated_model_ids=allocated_model_ids,
+                    hooks=active_hooks,
+                )
+            )
+            if status is not None:
+                if next_current is None:
+                    raise GameLifecycleError(
+                        "Pending destruction Transport continuation lost its sequence."
+                    )
+                return next_current, allocated_model_ids, status
+            if next_current is None:
+                raise GameLifecycleError(
+                    "Pending destruction Transport continuation lost its sequence."
+                )
+            current = next_current
+            continue
+        current, status = resolve_pending_attack_destruction_until_blocked(
+            state=state,
+            decisions=decisions,
+            manager=manager,
+            attack_sequence=current,
+            hooks=active_hooks,
+        )
+        if status is not None:
+            return current, allocated_model_ids, status
     decisions.event_log.append(
         "attack_sequence_completed",
         {

@@ -45,6 +45,7 @@ __all__ = (
     "_destroyed_model_removal_record",
     "_devastating_wounds_resolution_for_attack",
     "_emit_damage_event",
+    "_emit_damage_step_event",
     "_emit_event",
     "_hit_reroll_forbidden_rule_ids",
     "_hit_roll_modifier",
@@ -419,33 +420,29 @@ def _emit_damage_event(
             )
     elif destruction_attribution is None:
         raise GameLifecycleError("Destroyed-model emission requires typed attribution.")
-    resolved_saving_throw: JsonValue
-    if saving_throw_payload is not None:
-        resolved_saving_throw = saving_throw_payload
-    elif saving_throw is not None:
-        resolved_saving_throw = validate_json_value(saving_throw.to_payload())
-    else:
-        resolved_saving_throw = None
-    payload = validate_json_value(
-        {
-            "saving_throw": resolved_saving_throw,
-            "damage_application": None if damage is None else damage.to_payload(),
-            "feel_no_pain": None if feel_no_pain is None else feel_no_pain.to_payload(),
-            "weapon_profile_id": attack_sequence.current_pool().weapon_profile_id,
-        }
+    from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
+        pending_attack_destruction_damage_event,
     )
-    damage_event = _emit_event(
-        decisions=decisions,
-        hooks=hooks,
-        event=AttackSequenceEvent(
-            step=AttackSequenceStep.DAMAGE,
-            sequence_id=attack_sequence.sequence_id,
-            attack_context_id=attack_sequence.attack_context_id(),
-            pool_index=attack_sequence.pool_index,
-            attack_index=attack_sequence.attack_index,
-            payload=payload,
-        ),
+
+    damage_event = (
+        None
+        if damage is None or not damage.destroyed
+        else pending_attack_destruction_damage_event(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            damage=damage,
+        )
     )
+    if damage_event is None:
+        damage_event = _emit_damage_step_event(
+            decisions=decisions,
+            hooks=hooks,
+            attack_sequence=attack_sequence,
+            damage=damage,
+            saving_throw=saving_throw,
+            saving_throw_payload=saving_throw_payload,
+            feel_no_pain=feel_no_pain,
+        )
     if damage is None or not damage.destroyed:
         return None
     if destruction_attribution is None:
@@ -528,6 +525,58 @@ def _emit_damage_event(
         model_destroyed_event_id=destroyed_event.event_id,
         removal_record=removal_record,
         transition_batch=transition_batch,
+    )
+
+
+def _emit_damage_step_event(
+    *,
+    decisions: DecisionController,
+    hooks: AttackSequenceHooks,
+    attack_sequence: AttackSequence,
+    damage: DamageApplication | None,
+    saving_throw: SavingThrow | None,
+    saving_throw_payload: JsonValue | None = None,
+    feel_no_pain: FeelNoPainResolution | None = None,
+) -> EventRecord:
+    if saving_throw is not None and saving_throw_payload is not None:
+        raise GameLifecycleError("Damage event saving throw payload is ambiguous.")
+    resolved_saving_throw: JsonValue
+    if saving_throw_payload is not None:
+        resolved_saving_throw = saving_throw_payload
+    elif saving_throw is not None:
+        resolved_saving_throw = validate_json_value(saving_throw.to_payload())
+    else:
+        resolved_saving_throw = None
+    payload = validate_json_value(
+        {
+            "saving_throw": resolved_saving_throw,
+            "damage_application": None if damage is None else damage.to_payload(),
+            "feel_no_pain": None if feel_no_pain is None else feel_no_pain.to_payload(),
+            "weapon_profile_id": attack_sequence.current_pool().weapon_profile_id,
+        }
+    )
+    pending_destruction = attack_sequence.current_pending_attack_destruction
+    pool_index = (
+        attack_sequence.pool_index
+        if pending_destruction is None or not attack_sequence.is_complete
+        else pending_destruction.attack_context["pool_index"]
+    )
+    attack_index = (
+        attack_sequence.attack_index
+        if pending_destruction is None or not attack_sequence.is_complete
+        else pending_destruction.attack_context["attack_index"]
+    )
+    return _emit_event(
+        decisions=decisions,
+        hooks=hooks,
+        event=AttackSequenceEvent(
+            step=AttackSequenceStep.DAMAGE,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=attack_sequence.attack_context_id(),
+            pool_index=pool_index,
+            attack_index=attack_index,
+            payload=payload,
+        ),
     )
 
 

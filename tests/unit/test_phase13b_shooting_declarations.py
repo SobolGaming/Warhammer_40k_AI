@@ -131,6 +131,7 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequenceEvent,
     AttackSequenceEventHandler,
     AttackSequenceHooks,
+    AttackSequencePayload,
     AttackSequenceStep,
     DeferredMortalWounds,
     FastDiceGroup,
@@ -142,6 +143,7 @@ from warhammer40k_core.engine.attack_sequence import (
     SaveDieEntryPayload,
     WoundRoll,
     apply_allocation_order_decision,
+    apply_damage_allocation_model_decision,
     apply_destroyed_transport_disembark_proposal_decision,
     apply_destruction_reaction_decision,
     attack_sequence_hit_roll_spec,
@@ -155,6 +157,9 @@ from warhammer40k_core.engine.attack_sequence import (
     is_destroyed_transport_disembark_proposal_request,
     resolve_attack_sequence_until_blocked,
     wound_roll_target_number,
+)
+from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
+    CORE_DESTROYED_TIMING_RULE_ID,
 )
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
@@ -12018,6 +12023,534 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
         assert awaiting_events == ()
 
 
+def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    first_target = defender.own_models[0]
+    second_target = defender.own_models[1]
+    third_target = defender.own_models[2]
+    deadly_demise_source = DestructionReactionSource(
+        source_id="order-9-p05a-deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id="order-9-p05a-deadly-demise-rule",
+        payload={
+            "trigger_roll_threshold": 6,
+            "range_inches": 0.1,
+            "mortal_wounds": {"kind": "fixed", "value": 1},
+        },
+        optional=False,
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=first_target.model_instance_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="order-9-p05a-shoot-on-death",
+                reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+                source_rule_id="order-9-p05a-shoot-on-death-rule",
+            ),
+            deadly_demise_source,
+        ),
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=second_target.model_instance_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="order-9-p05a-second-shoot-on-death",
+                reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+                source_rule_id="order-9-p05a-second-shoot-on-death-rule",
+            ),
+        ),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="order-9-p05a-rifle",
+        armor_penetration=CharacteristicValue.from_raw(
+            Characteristic.ARMOR_PENETRATION,
+            -10,
+        ),
+        damage_profile=DamageProfile.fixed(first_target.wounds_remaining),
+        keywords=(WeaponKeyword.TORRENT,),
+    )
+    sequence_id = "order-9-p05a-destruction-boundary"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=3,
+            ),
+        ),
+    )
+    wound_results = tuple(
+        _fixed_roll_result(
+            roll_id=f"{sequence_id}:wound-{attack_number:03d}",
+            spec=attack_sequence_wound_roll_spec(
+                weapon_profile_id=weapon_profile.profile_id,
+                attack_context_id=(f"{sequence_id}:pool-001:attack-{attack_number:03d}"),
+                attacker_player_id="player-a",
+            ),
+            value=6,
+        )
+        for attack_number in (1, 2, 3)
+    )
+    save_results = tuple(
+        _fixed_roll_result(
+            roll_id=f"{sequence_id}:save-{attack_number:03d}",
+            spec=saving_throw_roll_spec(
+                save_kind=SaveKind.ARMOUR,
+                player_id="player-b",
+                allocated_model_id=first_target.model_instance_id,
+                attack_context_id=(f"{sequence_id}:pool-001:attack-{attack_number:03d}"),
+            ),
+            value=1,
+        )
+        for attack_number in (1, 2, 3)
+    )
+    injected_results = (
+        *wound_results,
+        *save_results,
+        _fixed_roll_result(
+            roll_id=f"{sequence_id}:deadly-demise-trigger",
+            spec=deadly_demise_trigger_roll_spec(
+                source=deadly_demise_source,
+                player_id="player-b",
+                model_instance_id=first_target.model_instance_id,
+            ),
+            value=1,
+        ),
+    )
+
+    manager = DiceRollManager(
+        sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=injected_results,
+    )
+    remaining, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=manager,
+    )
+    for allocation_index in range(8):
+        assert remaining is not None
+        if len(remaining.pending_attack_destructions) >= 2:
+            break
+        allocation_request = _decision_request(cast(LifecycleStatus, status))
+        assert allocation_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+        allocation_result = DecisionResult.for_request(
+            result_id=f"order-9-p05a-pre-boundary-allocation-{allocation_index:03d}",
+            request=allocation_request,
+            selected_option_id=allocation_request.options[0].option_id,
+        )
+        lifecycle.decision_controller.submit_result(allocation_result)
+        remaining, allocated_ids, status = apply_damage_allocation_model_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=remaining,
+            result=allocation_result,
+            already_allocated_model_ids=allocated_ids,
+            dice_manager=manager,
+        )
+    else:
+        raise AssertionError("Order 9 fixture did not reach pre-boundary destruction state.")
+
+    assert remaining is not None
+    assert len(remaining.pending_attack_destructions) == 2
+    assert remaining.attacks_resolved_event_id is None
+    pre_boundary_request = _decision_request(cast(LifecycleStatus, status))
+    assert pre_boundary_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining.attack_pools,
+        attack_sequence=remaining,
+        allocated_model_ids_this_phase=allocated_ids,
+    )
+    pre_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    pre_boundary_restored = GameLifecycle.from_payload(pre_boundary_checkpoint)
+    assert pre_boundary_restored.state is not None
+    pre_boundary_shooting = pre_boundary_restored.state.shooting_phase_state
+    assert pre_boundary_shooting is not None
+    assert pre_boundary_shooting.attack_sequence == remaining
+    assert (
+        pre_boundary_restored.decision_controller.queue.peek_next().request_id
+        == pre_boundary_request.request_id
+    )
+    reordered_pre_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(pre_boundary_checkpoint, sort_keys=True)),
+    )
+    reordered_pre_boundary_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], reordered_pre_boundary_checkpoint["state"])[
+                "shooting_phase_state"
+            ],
+        )["attack_sequence"],
+    )
+    cast(
+        list[dict[str, object]],
+        reordered_pre_boundary_sequence["pending_attack_destructions"],
+    ).reverse()
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction queue order drift",
+    ):
+        GameLifecycle.from_payload(reordered_pre_boundary_checkpoint)
+    forged_pre_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(pre_boundary_checkpoint, sort_keys=True)),
+    )
+    forged_pre_boundary_events = forged_pre_boundary_checkpoint["decisions"]["event_log"]
+    forged_pre_boundary_events.append(
+        {
+            "event_id": f"event-{len(forged_pre_boundary_events) + 1:06d}",
+            "event_type": "attack_sequence_attacks_resolved",
+            "payload": {
+                "sequence_id": sequence_id,
+                "attacker_player_id": "player-a",
+                "attacking_unit_instance_id": attacker.unit_instance_id,
+                "timing_rule_id": CORE_DESTROYED_TIMING_RULE_ID,
+                "pending_destruction_count": 1,
+            },
+        }
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction boundary evidence drift",
+    ):
+        GameLifecycle.from_payload(forged_pre_boundary_checkpoint)
+
+    remaining, _allocated_ids, status = _drain_damage_model_choices_with_manager(
+        lifecycle=lifecycle,
+        attack_sequence=remaining,
+        allocated_ids=allocated_ids,
+        status=status,
+        dice_manager=manager,
+        result_id_prefix="order-9-p05a-allocation",
+    )
+
+    request = _decision_request(cast(LifecycleStatus, status))
+    assert remaining is not None
+    assert remaining.attacks_resolved_event_id is not None
+    assert len(remaining.pending_attack_destructions) == 2
+    assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    events = lifecycle.decision_controller.event_log.records
+    event_index_by_id = {event.event_id: index for index, event in enumerate(events)}
+    damage_events = tuple(
+        event
+        for event in events
+        if event.event_type == "attack_sequence_step"
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == sequence_id
+        and event.payload.get("step") == AttackSequenceStep.DAMAGE.value
+    )
+    deferred_event = next(
+        event
+        for event in events
+        if event.event_type == "attack_model_destruction_deferred"
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == sequence_id
+    )
+    attacks_resolved_event = next(
+        event
+        for event in events
+        if event.event_type == "attack_sequence_attacks_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == sequence_id
+    )
+    reaction_window_event = next(
+        event
+        for event in events
+        if event.event_type == "destruction_reaction_window_opened"
+        and isinstance(event.payload, dict)
+        and event.payload.get("sequence_id") == sequence_id
+    )
+    mandatory_reaction_event = next(
+        event
+        for event in events
+        if event.event_type == "destruction_reaction_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("model_instance_id") == first_target.model_instance_id
+        and isinstance(event.payload.get("selected_source"), dict)
+        and cast(dict[str, object], event.payload["selected_source"]).get("source_id")
+        == deadly_demise_source.source_id
+    )
+    destroyed_event = next(
+        event
+        for event in events
+        if event.event_type == "model_destroyed"
+        and isinstance(event.payload, dict)
+        and event.payload.get("model_instance_id") == first_target.model_instance_id
+        and event.payload.get("sequence_id") == sequence_id
+    )
+
+    assert len(damage_events) == 3
+    assert {
+        cast(dict[str, object], event.payload)["attack_context_id"] for event in damage_events
+    } == {
+        f"{sequence_id}:pool-001:attack-001",
+        f"{sequence_id}:pool-001:attack-002",
+        f"{sequence_id}:pool-001:attack-003",
+    }
+    damage_applications = tuple(
+        cast(
+            dict[str, object],
+            cast(dict[str, object], event.payload)["payload"],
+        )["damage_application"]
+        for event in damage_events
+    )
+    assert all(isinstance(application, dict) for application in damage_applications)
+    assert {
+        cast(dict[str, object], application)["model_instance_id"]
+        for application in damage_applications
+    } == {
+        first_target.model_instance_id,
+        second_target.model_instance_id,
+        third_target.model_instance_id,
+    }
+    deferred_damage_event_id = cast(dict[str, object], deferred_event.payload)["damage_event_id"]
+    later_damage_event = next(
+        event for event in damage_events if event.event_id != deferred_damage_event_id
+    )
+    assert cast(dict[str, object], deferred_event.payload)["timing_rule_id"] == (
+        CORE_DESTROYED_TIMING_RULE_ID
+    )
+    assert cast(dict[str, object], attacks_resolved_event.payload)["pending_destruction_count"] == 2
+    assert (
+        event_index_by_id[deferred_event.event_id] < event_index_by_id[later_damage_event.event_id]
+    )
+    assert (
+        event_index_by_id[later_damage_event.event_id]
+        < event_index_by_id[attacks_resolved_event.event_id]
+    )
+    assert (
+        event_index_by_id[attacks_resolved_event.event_id]
+        < event_index_by_id[mandatory_reaction_event.event_id]
+    )
+    assert (
+        event_index_by_id[mandatory_reaction_event.event_id]
+        < event_index_by_id[destroyed_event.event_id]
+    )
+    assert (
+        event_index_by_id[attacks_resolved_event.event_id]
+        < event_index_by_id[destroyed_event.event_id]
+    )
+    assert (
+        event_index_by_id[destroyed_event.event_id]
+        < event_index_by_id[reaction_window_event.event_id]
+    )
+
+    assert (
+        AttackSequence.from_payload(
+            cast(
+                AttackSequencePayload,
+                json.loads(json.dumps(remaining.to_payload(), sort_keys=True)),
+            )
+        )
+        == remaining
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining.attack_pools,
+        attack_sequence=remaining,
+        allocated_model_ids_this_phase=_allocated_ids,
+    )
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(checkpoint)
+    assert restored.state is not None
+    restored_shooting = restored.state.shooting_phase_state
+    assert restored_shooting is not None
+    assert restored_shooting.attack_sequence == remaining
+    assert restored.decision_controller.queue.peek_next().request_id == request.request_id
+    reordered_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    reordered_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], reordered_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    reordered_pending = cast(
+        list[dict[str, object]],
+        reordered_sequence["pending_attack_destructions"],
+    )
+    reordered_pending.reverse()
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction queue order drift",
+    ):
+        GameLifecycle.from_payload(reordered_checkpoint)
+    drifted_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_attack_sequence = cast(
+        dict[str, object],
+        cast(dict[str, object], drifted_checkpoint["state"])["shooting_phase_state"],
+    )["attack_sequence"]
+    cast(
+        list[dict[str, object]],
+        cast(dict[str, object], drifted_attack_sequence)["pending_attack_destructions"],
+    )[0]["damage_event_id"] = "event-999999"
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction damage event drift",
+    ):
+        GameLifecycle.from_payload(drifted_checkpoint)
+    drifted_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    boundary_event = next(
+        event
+        for event in drifted_boundary_checkpoint["decisions"]["event_log"]
+        if event["event_type"] == "attack_sequence_attacks_resolved"
+    )
+    cast(dict[str, object], boundary_event["payload"])["pending_destruction_count"] = 3
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction boundary evidence drift",
+    ):
+        GameLifecycle.from_payload(drifted_boundary_checkpoint)
+    missing_boundary_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    missing_boundary_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], missing_boundary_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    missing_boundary_sequence["attacks_resolved_event_id"] = None
+    missing_boundary_event = next(
+        event
+        for event in missing_boundary_checkpoint["decisions"]["event_log"]
+        if event["event_type"] == "attack_sequence_attacks_resolved"
+    )
+    cast(dict[str, object], missing_boundary_event["payload"])["timing_rule_id"] = (
+        "forged-order-9-boundary"
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction lacks attacks-resolved evidence",
+    ):
+        GameLifecycle.from_payload(missing_boundary_checkpoint)
+    drifted_attacker_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_attacker_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], drifted_attacker_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    drifted_attacker_pending = cast(
+        list[dict[str, object]],
+        drifted_attacker_sequence["pending_attack_destructions"],
+    )[0]
+    cast(dict[str, object], drifted_attacker_pending["attack_pool"])[
+        "attacker_model_instance_id"
+    ] = attacker.own_models[1].model_instance_id
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction attack pool evidence drift",
+    ):
+        GameLifecycle.from_payload(drifted_attacker_checkpoint)
+    drifted_profile_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    drifted_profile_sequence = cast(
+        dict[str, object],
+        cast(
+            dict[str, object],
+            cast(dict[str, object], drifted_profile_checkpoint["state"])["shooting_phase_state"],
+        )["attack_sequence"],
+    )
+    drifted_profile_pending = cast(
+        list[dict[str, object]],
+        drifted_profile_sequence["pending_attack_destructions"],
+    )[0]
+    drifted_profile_pool = cast(dict[str, object], drifted_profile_pending["attack_pool"])
+    cast(dict[str, object], drifted_profile_pool["weapon_profile"])["range_profile"] = {
+        "kind": "melee",
+        "distance_inches": None,
+    }
+    with pytest.raises(
+        GameLifecycleError,
+        match="Pending attack destruction attack pool evidence drift",
+    ):
+        GameLifecycle.from_payload(drifted_profile_checkpoint)
+
+    declined_record = lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="order-9-p05a-first-reaction-declined",
+            request=request,
+            selected_option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        )
+    )
+    suffix_sequence, suffix_allocated_ids, suffix_status = apply_destruction_reaction_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=remaining,
+        result=declined_record.result,
+        already_allocated_model_ids=_allocated_ids,
+    )
+    assert suffix_sequence is not None
+    assert len(suffix_sequence.pending_attack_destructions) == 1
+    assert (
+        suffix_sequence.pending_attack_destructions[0].damage_application.model_instance_id
+        == second_target.model_instance_id
+    )
+    assert suffix_status is None
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
+        attack_sequence=suffix_sequence,
+        allocated_model_ids_this_phase=suffix_allocated_ids,
+    )
+    suffix_restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    assert suffix_restored.state is not None
+    suffix_shooting = suffix_restored.state.shooting_phase_state
+    assert suffix_shooting is not None
+    assert suffix_shooting.attack_sequence == suffix_sequence
+
+
 def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywords() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -14591,7 +15124,8 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     assert updated_battlefield is not None
 
     assert remaining_sequence is not None
-    assert remaining_sequence.pending_grouped_damage is not None
+    assert remaining_sequence.pending_grouped_damage is None
+    assert remaining_sequence.attacks_resolved_event_id is not None
     assert allocated_ids == (defender_model.model_instance_id,)
     assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
     assert request.actor_id == "player-a"
@@ -14657,7 +15191,10 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         )
 
         assert continued_status is None
-        assert continued_sequence is None
+        assert continued_sequence is not None
+        assert continued_sequence.is_complete
+        assert continued_sequence.pending_attack_destructions == ()
+        assert continued_sequence.attacks_resolved_event_id is not None
         assert continued_allocated_ids == allocated_ids
         assert state.battlefield_state is not None
         assert collateral_model.model_instance_id in state.battlefield_state.placed_model_ids()

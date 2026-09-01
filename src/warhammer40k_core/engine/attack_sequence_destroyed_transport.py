@@ -414,6 +414,7 @@ def _continue_pending_destroyed_transport_disembark(
         damage=pending.damage_application,
         destroyed_emission=destroyed_emission,
         destroyed_model_controller_player_id=pending.destroyed_model_controller_player_id,
+        sources=pending.pending_sources,
     )
     if reaction_status is not None:
         return sequence_without_pending, allocated_model_ids, reaction_status
@@ -428,8 +429,12 @@ def _continue_pending_destroyed_transport_disembark(
             hooks=hooks,
             dice_manager=manager,
         )
+    from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
+        complete_current_attack_destruction_or_advance,
+    )
+
     return (
-        _advance_after_resolved_hit(
+        complete_current_attack_destruction_or_advance(
             attack_sequence=sequence_without_pending,
             attack_context=pending.attack_context,
         ),

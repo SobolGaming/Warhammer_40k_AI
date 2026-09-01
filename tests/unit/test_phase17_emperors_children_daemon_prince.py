@@ -73,6 +73,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
@@ -491,7 +495,7 @@ def test_ecstatic_death_registers_idempotent_serializable_two_plus_model_source(
 
 
 def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() -> None:
-    session, attacker, target = _ecstatic_death_fight_session(game_id="ecstatic-integrity-002")
+    session, attacker, target = _ecstatic_death_fight_session(game_id="ecstatic-full-p05a-001")
     state = session.lifecycle.state
     assert state is not None
     target_model_id = target.own_models[0].model_instance_id
@@ -678,7 +682,7 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
     corruption: str,
     expected_message: str,
 ) -> None:
-    session, attacker, _target = _ecstatic_death_fight_session(game_id="ecstatic-integrity-002")
+    session, attacker, _target = _ecstatic_death_fight_session(game_id="ecstatic-p05a-seed-009")
     status = _advance_ecstatic_death_session(
         session=session,
         status=session.advance_until_decision_or_terminal(),
@@ -910,7 +914,7 @@ def _ecstatic_death_chain_session() -> tuple[
             "retained": Pose.at(x=11.0, y=20.0),
             "child": Pose.at(x=12.0, y=20.0),
         },
-        game_id="ecstatic-death-ordinary-chain",
+        game_id="ecstatic-chain-p05a-011",
         datasheet_id=DAEMON_PRINCE_ID,
         model_profile_id=f"{DAEMON_PRINCE_ID}:daemon-prince-of-slaanesh",
         model_count=1,
@@ -993,6 +997,13 @@ def _advance_ecstatic_death_session(
                 profile_suffix=melee_profile_suffix,
                 target_unit_instance_id=melee_target_unit_instance_id,
                 result_id=f"{result_id_prefix}:melee-{result_index:03d}",
+            )
+            continue
+        if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            current = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                payload=stratagem_decline_payload(),
+                result_id=f"{result_id_prefix}:stratagem-{result_index:03d}",
             )
             continue
         if request.decision_type == "select_fight_activation":
