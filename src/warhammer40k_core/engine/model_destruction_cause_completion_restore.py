@@ -253,7 +253,6 @@ def validate_model_logical_death_inventory(
         mortal_wound_resolution_progress,
         validate_mortal_wound_feel_no_pain_request_authority,
     )
-    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     canonical_by_id = {event.event_id: event for event in event_records}
     if len(canonical_by_id) != len(event_records):
@@ -286,6 +285,9 @@ def validate_model_logical_death_inventory(
         if not is_mortal_wound_resolution_request(request):
             continue
         progress = mortal_wound_resolution_progress(request)
+        target_lineage = progress.target_lineage
+        if target_lineage is None:
+            raise GameLifecycleError("Pending mortal-wound progress lacks target lineage.")
         request_events = tuple(
             event
             for event in event_records
@@ -328,10 +330,6 @@ def validate_model_logical_death_inventory(
                     "Pending mortal-wound logical death requires battlefield state."
                 )
             placement = battlefield.model_placement_or_none(record.model_instance_id)
-            rules_unit = rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=record.rules_unit_instance_id,
-            )
             placement_matches = (
                 placement == record.destroyed_model_placement
                 if record.placement_retained
@@ -341,7 +339,9 @@ def validate_model_logical_death_inventory(
                 model.is_alive
                 or state.unit_instance_id_for_model(record.model_instance_id)
                 != record.physical_unit_instance_id
-                or record.physical_unit_instance_id not in rules_unit.component_unit_instance_ids
+                or record.rules_unit_instance_id != progress.target_unit_instance_id
+                or record.physical_unit_instance_id
+                not in target_lineage.component_unit_instance_ids
                 or not placement_matches
             ):
                 raise GameLifecycleError("Pending mortal-wound logical-death state binding drift.")

@@ -1063,10 +1063,16 @@ selected model, automatic-or-player disposition, exact parent request/result clo
 and the selected model's loaded Feel No Pain sources and decline policy. Restore and lifecycle
 prevalidation reconstruct the occurrence, parent closure, child request, and exact events before
 queue pop, recording, RNG, damage, or completion. Damage application separately requires the
-supplied model to belong to the retained target rules unit. Shared attack-sequence ownership now
-classifies the complete decision family once; Fight-owned deferred mortal wounds, including active
-reaction frames, keep their Fight host across model selection, Feel No Pain, serialization, and
-replay.
+supplied model to belong to the retained target rules unit. Each application also freezes the
+target's owner, exact physical component-unit inventory, and Character-component classification.
+If destruction reconciles an Attached Unit into multiple current descendants before the packet
+finishes, the allocator continues across every living, placed model in that frozen lineage and
+recomputes the four tiers over that packet-wide population. Restore, Feel No Pain authority,
+logical-death validation, and final destruction evidence consume the same lineage; they neither
+choose an arbitrary descendant nor terminate a packet while a frozen descendant survives. Shared
+attack-sequence ownership now classifies the complete decision family once; Fight-owned deferred
+mortal wounds, including active reaction frames, keep their Fight host across model selection,
+Feel No Pain, serialization, and replay.
 
 Specific authoritative 40k.app rule/statement and source ID: 06.02, `MORTAL WOUNDS`, states that
 the controlling player resolves each mortal wound one at a time and must select, in order, a
@@ -1087,7 +1093,7 @@ The generated package hash is
 `3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a` and its canonical artifact
 byte SHA-256 is `d2ed90878ed9b54bee86c89432e0c9a452705da959b7bc7cf4934ada1e1cf16d`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:412e839d79a0f8cc65fb191a487ceebe7a3705a79fda3556b59cd811603417eb`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:21d28df6fb6ade1c53a0edacf4372492e6121c36805492f5b32800aeef45523f`.
 
 Load and execution support: The Mortal Wounds rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1101,6 +1107,12 @@ producer continuation migration, public adapter projection/event behavior, sourc
 regressions, and static bypass audit. It does not change Mortal Wounds generation, Feel No Pain
 eligibility or dice rules, damage spill semantics, Character keyword ownership, ordinary attack
 damage allocation, out-of-scope content, or hidden-information policy.
+
+Regression coverage includes facade submission and replay after the last Bodyguard is destroyed
+mid-packet and normal reconciliation splits the original Attached Unit. One case leaves Leader and
+Support Character descendants and exercises the Character-tier model decision plus Feel No Pain
+across serialized checkpoints; a second leaves one Character descendant and proves deterministic
+automatic continuation rather than an erroneous unit-destroyed termination.
 
 Owning source/validation/mutation/event/replay path: reviewed generated JSON and fail-closed
 loader → stable Mortal Wounds source ID and executable consumer inventory → producer-owned
@@ -1142,14 +1154,14 @@ Validation results:
 
 - Focused allocation-authority, source, tier-order, stale-decision, Fight-host, reaction-frame,
   replay, adapter, redaction, producer, faction-continuation, and static-audit regressions pass.
-- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2645` source files;
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2646` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required xdist work-stealing suite passes (`6359 passed` in `412.30s`), and the dedicated
-  serial code-quality run passes (`337 passed` in `317.29s`).
+- The required xdist work-stealing suite passes (`6362 passed` in `400.60s`), including the
+  complete code-quality suite.
 - The Other Concepts source artifact, final engine build identity, and external contract all pass
   fail-closed drift checks, including the `origin/main` compatibility comparison.
-- Installed-wheel smoke passes with `2474` packaged engine resources and `27` schemas. Generated
+- Installed-wheel smoke passes with `2475` packaged engine resources and `27` schemas. Generated
   TypeScript client drift and type checks pass, and the two-server HTTP conformance scenario passes
   all `342` assertions for contract version `11.1.0`.
 

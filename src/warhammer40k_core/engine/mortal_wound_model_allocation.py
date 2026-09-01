@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, TypedDict, cast
 
@@ -16,7 +16,6 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSourcePayload,
     MortalWoundApplicationProgress,
     MortalWoundRoutingResult,
-    alive_placed_models_for_rules_unit,
     build_feel_no_pain_request,
     model_by_id,
     resolve_feel_no_pain_rolls,
@@ -53,15 +52,14 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBinding,
     MortalWoundLogicalDeathRecorder,
 )
+from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    MortalWoundTargetLineage,
+    MortalWoundTargetLineagePayload,
+)
 from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.rules_units import (
-    current_placed_alive_rules_unit_view_for_identity,
-    rules_unit_view_by_id,
-)
-from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -290,6 +288,7 @@ class MortalWoundApplicationProgressPayload(TypedDict):
     ignored_mortal_wounds: int
     remaining_mortal_wounds_lost: int
     priority_model_ids: list[str]
+    target_lineage: MortalWoundTargetLineagePayload
     destroyed_model_placements: list[JsonValue]
 
 
@@ -431,6 +430,7 @@ def mortal_wound_progress_to_payload(
         "ignored_mortal_wounds": progress.ignored_mortal_wounds,
         "remaining_mortal_wounds_lost": progress.remaining_mortal_wounds_lost,
         "priority_model_ids": list(progress.priority_model_ids),
+        "target_lineage": _required_target_lineage(progress).to_payload(),
         "destroyed_model_placements": [
             cast(JsonValue, placement.to_payload())
             for placement in progress.destroyed_model_placements
@@ -475,6 +475,7 @@ def mortal_wound_progress_from_payload(
         ignored_mortal_wounds=payload["ignored_mortal_wounds"],
         remaining_mortal_wounds_lost=payload["remaining_mortal_wounds_lost"],
         priority_model_ids=tuple(payload["priority_model_ids"]),
+        target_lineage=MortalWoundTargetLineage.from_payload(payload["target_lineage"]),
         destroyed_model_placements=tuple(
             ModelPlacement.from_payload(cast(ModelPlacementPayload, placement))
             for placement in payload["destroyed_model_placements"]
@@ -501,9 +502,25 @@ def mortal_wound_priority_selection(
     state: GameState,
     target_unit_instance_id: str,
     priority_model_ids: tuple[str, ...] = (),
+    target_lineage: MortalWoundTargetLineage | None = None,
 ) -> tuple[tuple[str, ...], MortalWoundAllocationPriority]:
-    rules_unit = allocatable_rules_unit(state=state, unit_id=target_unit_instance_id)
-    alive_models = alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit)
+    lineage = (
+        MortalWoundTargetLineage.freeze(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            owner_player_id=allocatable_rules_unit(
+                state=state,
+                unit_id=target_unit_instance_id,
+            ).owner_player_id,
+        )
+        if target_lineage is None
+        else target_lineage
+    )
+    if lineage.canonical_target_unit_instance_id != target_unit_instance_id:
+        raise GameLifecycleError("Mortal-wound target lineage identity drift.")
+    alive_models, character_model_ids = lineage.alive_placed_models(state=state)
+    if not alive_models:
+        raise GameLifecycleError("Mortal wound allocation has no legal model.")
     requested_priority_ids = _validate_identifier_tuple(
         "mortal wound priority_model_ids",
         priority_model_ids,
@@ -514,18 +531,7 @@ def mortal_wound_priority_selection(
     alive_priority_ids = alive_ids & set(requested_priority_ids)
     allowed_ids = alive_priority_ids if alive_priority_ids else alive_ids
 
-    character_ids = set(rules_unit.character_model_ids(alive_models))
-    if rules_unit.is_attached_rules_unit:
-        character_ids.update(
-            model.model_instance_id
-            for model in alive_models
-            if unit_has_keyword(
-                rules_unit.component_unit_for_model(model.model_instance_id),
-                "CHARACTER",
-            )
-        )
-    elif unit_has_keyword(rules_unit.components[0].unit, "CHARACTER"):
-        character_ids.update(alive_ids)
+    character_ids = set(character_model_ids)
 
     wounded_ids = {
         model.model_instance_id
@@ -659,14 +665,12 @@ def continue_mortal_wound_application(
         progress.logical_death_cause_binding is None or logical_death_recorder is None
     ):
         raise GameLifecycleError("Retained mortal wound routing requires logical-death authority.")
-    _mwaa.ensure_started(state, decisions.event_log, progress)
-    current = progress
+    current = _progress_with_target_lineage(state=state, progress=progress)
+    _mwaa.ensure_started(state, decisions.event_log, current)
     while current.remaining_mortal_wounds:
-        rules_unit = current_placed_alive_rules_unit_view_for_identity(
-            state=state,
-            unit_instance_id=current.target_unit_instance_id,
-        )
-        if rules_unit is None:
+        lineage = _required_target_lineage(current)
+        alive_models, _ = lineage.alive_placed_models(state=state)
+        if not alive_models:
             completed = current.with_remaining_lost()
             record_finalized_mortal_wound_progress_destructions(
                 state=state,
@@ -680,8 +684,9 @@ def continue_mortal_wound_application(
             )
         legal_model_ids, priority_tier = mortal_wound_priority_selection(
             state=state,
-            target_unit_instance_id=rules_unit.unit_instance_id,
+            target_unit_instance_id=current.target_unit_instance_id,
             priority_model_ids=current.priority_model_ids,
+            target_lineage=lineage,
         )
         if len(legal_model_ids) > 1:
             return MortalWoundRoutingResult(
@@ -863,6 +868,7 @@ def resolve_mortal_wound_model_decision(
         state=state,
         target_unit_instance_id=progress.target_unit_instance_id,
         priority_model_ids=progress.priority_model_ids,
+        target_lineage=_required_target_lineage(progress),
     )
     if legal_model_ids != decision.legal_model_ids or priority_tier is not decision.priority_tier:
         raise GameLifecycleError("Mortal wound model priority context drifted.")
@@ -903,6 +909,7 @@ def invalid_mortal_wound_model_status(
             state=state,
             target_unit_instance_id=progress.target_unit_instance_id,
             priority_model_ids=progress.priority_model_ids,
+            target_lineage=_required_target_lineage(progress),
         )
     except GameLifecycleError as exc:
         return LifecycleStatus.invalid(
@@ -970,17 +977,16 @@ def validate_mortal_wound_feel_no_pain_request_authority(
     ):
         raise GameLifecycleError("Mortal-wound allocation occurrence context drift.")
 
-    rules_unit = rules_unit_view_by_id(
+    target_lineage = _required_target_lineage(progress)
+    target_lineage.assert_contains_model(
         state=state,
-        unit_instance_id=progress.target_unit_instance_id,
+        model_instance_id=occurrence.selected_model_id,
     )
-    if rules_unit.unit_instance_id != occurrence.target_unit_instance_id:
-        raise GameLifecycleError("Mortal-wound allocation target rules-unit drift.")
-    rules_unit.component_unit_for_model(occurrence.selected_model_id)
     legal_model_ids, priority_tier = mortal_wound_priority_selection(
         state=state,
         target_unit_instance_id=progress.target_unit_instance_id,
         priority_model_ids=progress.priority_model_ids,
+        target_lineage=target_lineage,
     )
     if (
         legal_model_ids != occurrence.legal_model_ids
@@ -1195,6 +1201,34 @@ def mortal_wound_feel_no_pain_decline_allowed(
     if type(value) is not bool:
         raise GameLifecycleError("Feel No Pain decline state must be a bool.")
     return value
+
+
+def _progress_with_target_lineage(
+    *,
+    state: GameState,
+    progress: MortalWoundApplicationProgress,
+) -> MortalWoundApplicationProgress:
+    lineage = progress.target_lineage
+    if lineage is None:
+        return replace(
+            progress,
+            target_lineage=MortalWoundTargetLineage.freeze(
+                state=state,
+                target_unit_instance_id=progress.target_unit_instance_id,
+                owner_player_id=progress.defender_player_id,
+            ),
+        )
+    lineage.validate_for_state(state)
+    return progress
+
+
+def _required_target_lineage(
+    progress: MortalWoundApplicationProgress,
+) -> MortalWoundTargetLineage:
+    lineage = progress.target_lineage
+    if type(lineage) is not MortalWoundTargetLineage:
+        raise GameLifecycleError("Mortal-wound application lacks frozen target lineage.")
+    return lineage
 
 
 def _payload_object(value: JsonValue) -> dict[str, JsonValue]:

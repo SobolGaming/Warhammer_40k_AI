@@ -90,11 +90,11 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     fixed_mortal_wound_logical_death_recorder,
     validate_mortal_wound_logical_death_progress,
 )
+from warhammer40k_core.engine.mortal_wound_target_lineage import MortalWoundTargetLineage
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_owner_player_id,
-    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -1178,6 +1178,7 @@ class MortalWoundApplicationProgress:
     remaining_mortal_wounds_lost: int = 0
     priority_model_ids: tuple[str, ...] = ()
     destroyed_model_placements: tuple[ModelPlacement, ...] = ()
+    target_lineage: MortalWoundTargetLineage | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1294,6 +1295,19 @@ class MortalWoundApplicationProgress:
                 has_destruction_evidence=self.destruction_evidence is not None,
             ),
         )
+        if self.target_lineage is not None:
+            if type(self.target_lineage) is not MortalWoundTargetLineage:
+                raise GameLifecycleError(
+                    "MortalWoundApplicationProgress target lineage is invalid."
+                )
+            if (
+                self.target_lineage.canonical_target_unit_instance_id
+                != self.target_unit_instance_id
+                or self.target_lineage.owner_player_id != self.defender_player_id
+            ):
+                raise GameLifecycleError(
+                    "MortalWoundApplicationProgress defender owner drift in target lineage."
+                )
         if (
             self.logical_death_cause_binding is not None
             and type(self.logical_death_cause_binding) is not MortalWoundLogicalDeathCauseBinding
@@ -1396,6 +1410,7 @@ class MortalWoundApplicationProgress:
             ignored_mortal_wounds=context["ignored_mortal_wounds"],
             remaining_mortal_wounds_lost=context["remaining_mortal_wounds_lost"],
             priority_model_ids=tuple(context["priority_model_ids"]),
+            target_lineage=MortalWoundTargetLineage.from_payload(context["target_lineage"]),
             destroyed_model_placements=tuple(
                 ModelPlacement.from_payload(placement)
                 for placement in context["destroyed_model_placements"]
@@ -1411,6 +1426,9 @@ class MortalWoundApplicationProgress:
         binding = self.logical_death_cause_binding
         if binding is None:
             raise GameLifecycleError("Mortal wound Feel No Pain context lacks cause binding.")
+        target_lineage = self.target_lineage
+        if target_lineage is None:
+            raise GameLifecycleError("Mortal wound Feel No Pain context lacks target lineage.")
         return {
             "context_kind": MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
             "application_id": self.application_id,
@@ -1434,6 +1452,7 @@ class MortalWoundApplicationProgress:
             "ignored_mortal_wounds": self.ignored_mortal_wounds,
             "remaining_mortal_wounds_lost": self.remaining_mortal_wounds_lost,
             "priority_model_ids": list(self.priority_model_ids),
+            "target_lineage": target_lineage.to_payload(),
             "destroyed_model_placements": [
                 placement.to_payload() for placement in self.destroyed_model_placements
             ],
@@ -1472,10 +1491,17 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError("remove_destroyed_model must be a bool.")
         if type(decisions) is not DecisionController:
             raise GameLifecycleError("Mortal wound progress requires DecisionController.")
-        rules_unit_view_by_id(
+        target_lineage = self.target_lineage
+        if target_lineage is None:
+            target_lineage = MortalWoundTargetLineage.freeze(
+                state=state,
+                target_unit_instance_id=self.target_unit_instance_id,
+                owner_player_id=self.defender_player_id,
+            )
+        target_lineage.assert_contains_model(
             state=state,
-            unit_instance_id=self.target_unit_instance_id,
-        ).component_unit_for_model(model_instance_id)
+            model_instance_id=model_instance_id,
+        )
         binding = self.logical_death_cause_binding
         if remove_destroyed_model:
             expected_binding = MortalWoundLogicalDeathCauseBinding.fixed(
@@ -1543,6 +1569,7 @@ class MortalWoundApplicationProgress:
             destroyed_model_placements=tuple(destroyed_model_placements),
             logical_death_events=tuple(logical_death_events),
             logical_death_cause_binding=binding,
+            target_lineage=target_lineage,
         )
 
     def to_application(self) -> MortalWoundApplication:

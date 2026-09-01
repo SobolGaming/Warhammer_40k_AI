@@ -26,8 +26,16 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = SRC_ROOT / "engine" / "attack_sequence.py"
 DAMAGE_ALLOCATION_PATH = SRC_ROOT / "engine" / "damage_allocation.py"
+DECISION_PATH = SRC_ROOT / "engine" / "decision.py"
 DIRECT_MORTAL_WOUND_PATH = SRC_ROOT / "engine" / "direct_mortal_wound_application.py"
 MORTAL_WOUND_MODEL_ALLOCATION_PATH = SRC_ROOT / "engine" / "mortal_wound_model_allocation.py"
+MORTAL_WOUND_TARGET_LINEAGE_PATH = SRC_ROOT / "engine" / "mortal_wound_target_lineage.py"
+MORTAL_WOUND_DESTRUCTION_EVIDENCE_PATH = (
+    SRC_ROOT / "engine" / "mortal_wound_destruction_evidence.py"
+)
+MODEL_DESTRUCTION_COMPLETION_RESTORE_PATH = (
+    SRC_ROOT / "engine" / "model_destruction_cause_completion_restore.py"
+)
 SHOOTING_PHASE_PATH = SRC_ROOT / "engine" / "phases" / "shooting.py"
 SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 LIFECYCLE_PATH = SRC_ROOT / "engine" / "lifecycle.py"
@@ -127,6 +135,26 @@ def test_p06b_mortal_wound_model_ties_cannot_use_sorted_first_fallback() -> None
     assert "select_mortal_wound_model" in contract_source
     assert "tuple(sorted(alive_model_ids))[0]" not in mortal_wound_model_source
     assert "tuple(sorted(alive_model_ids))[0]" not in direct_source
+
+
+def test_p06b_in_flight_mortal_wounds_preserve_split_target_lineage() -> None:
+    allocation_source = source_for(MORTAL_WOUND_MODEL_ALLOCATION_PATH)
+    lineage_source = source_for(MORTAL_WOUND_TARGET_LINEAGE_PATH)
+    damage_source = source_for(DAMAGE_ALLOCATION_PATH)
+    destruction_source = source_for(MORTAL_WOUND_DESTRUCTION_EVIDENCE_PATH)
+    restore_source = source_for(MODEL_DESTRUCTION_COMPLETION_RESTORE_PATH)
+    decision_source = source_for(DECISION_PATH)
+
+    assert "current_placed_alive_rules_unit_view_for_identity" not in allocation_source
+    assert "_progress_with_target_lineage" in allocation_source
+    assert "target_lineage=lineage" in allocation_source
+    assert "FROZEN_RULES_UNIT_COMPONENTS_POLICY" in lineage_source
+    assert "current_rules_unit_views_for_canonical_identity" in lineage_source
+    assert "target_lineage.assert_contains_model" in damage_source
+    assert "logical_death.rules_unit_instance_id" in destruction_source
+    assert "record.physical_unit_instance_id" in restore_source
+    assert "target_lineage.component_unit_instance_ids" in restore_source
+    assert '"target_lineage",' in decision_source
 
 
 def test_p06b_shared_attack_sequence_phase_ownership_cannot_drift() -> None:

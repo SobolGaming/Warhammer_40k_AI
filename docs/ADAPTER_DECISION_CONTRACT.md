@@ -1881,8 +1881,11 @@ Phase 13C implements these defender-visible attack-resolution decisions:
   "mortal_wound_model"`, `target_unit_instance_id`, `source_rule_id`,
   replay-safe `source_context`, `remaining_mortal_wounds`,
   `legal_model_ids`, `priority_tier`, and the complete
-  `mortal_wound_progress`; each option repeats its `selected_model_id` and
-  `priority_tier`. The four tier tokens are `wounded_non_character`,
+  `mortal_wound_progress`. That private progress includes a `target_lineage`
+  object with policy `frozen_rules_unit_components`, the canonical packet
+  target and owner, exact component-unit IDs, and the components classified as
+  Character when the packet began; each option repeats its `selected_model_id`
+  and `priority_tier`. The four tier tokens are `wounded_non_character`,
   `non_character`, `wounded_character`, and `character`, in that exact order.
   The engine auto-selects only when the active tier contains exactly one legal
   model. Accepted submissions resolve exactly one mortal wound on the selected
@@ -3499,11 +3502,20 @@ RNG, damage, or completion. The shared redaction owner removes the occurrence
 with the rest of the private lost-wound context; adapters must not create,
 modify, or interpret it.
 
+The same private context retains the packet's frozen target lineage. If model
+destruction reconciles an Attached Unit into multiple current descendants while
+the packet is paused, restore and pre-submission validation expand all placed,
+living descendants represented by those exact frozen components and recompute
+the four priority tiers across that packet-wide population. They do not select
+one descendant, terminate the packet, or admit a component that joined later.
+The frozen Character-component classification survives the split. This lineage
+is engine authority and remains inside the redacted mortal-wound context.
+
 The engine records one private `mortal_wound_application_started` authority
 event before any shared mortal-wound packet applies damage. It freezes the
 game/application ID, exact source rule/context, target and defender, packet size,
-spillover, destruction evidence, priority models, and initial logical-death
-binding mode. Restore requires it to precede and bind exactly one pending Feel
+spillover, destruction evidence, priority models, frozen target lineage, and
+initial logical-death binding mode. Restore requires it to precede and bind exactly one pending Feel
 No Pain request or supported packet terminal, and also validates terminals back
 to exactly one root. Auxiliary Deadly Demise collateral-cause finalization is a
 separate typed finalization kind, not a packet terminal; restore binds each such

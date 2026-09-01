@@ -281,6 +281,7 @@ __all__ = (
     "_weapon_payload_to_declaration_payload",
     "_weapon_profile_by_wargear",
     "catalog_with_replaced_bolt_profiles",
+    "compact_intercessor_catalog",
     "lifecycle_decisions_payload",
     "proposal_from_request",
     "shooting_lifecycle",
@@ -3065,5 +3066,6 @@ def _attack_step_payload(
 
 shooting_lifecycle = _shooting_lifecycle
 catalog_with_replaced_bolt_profiles = _catalog_with_replaced_bolt_profiles
+compact_intercessor_catalog = _compact_intercessor_catalog
 proposal_from_request = _proposal_from_request
 weapon_profile_by_wargear = _weapon_profile_by_wargear

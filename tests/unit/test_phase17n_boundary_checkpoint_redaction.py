@@ -51,6 +51,10 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
 from warhammer40k_core.engine.mortal_wound_model_allocation import (
     MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
 )
+from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    FROZEN_RULES_UNIT_COMPONENTS_POLICY,
+    MortalWoundTargetLineage,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
@@ -921,6 +925,13 @@ def _pending_fnp_request_with_logical_death_authority() -> tuple[DecisionRequest
             producer_id=application_id,
         ),
         applications=(damage,),
+        target_lineage=MortalWoundTargetLineage(
+            policy=FROZEN_RULES_UNIT_COMPONENTS_POLICY,
+            canonical_target_unit_instance_id=physical_unit_id,
+            owner_player_id="player-a",
+            component_unit_instance_ids=(physical_unit_id,),
+            character_component_unit_instance_ids=(),
+        ),
     )
     return (
         build_feel_no_pain_request(

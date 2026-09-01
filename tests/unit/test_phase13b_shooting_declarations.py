@@ -277,6 +277,7 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
     mortal_wound_priority_selection,
     resolve_mortal_wound_decision,
 )
+from warhammer40k_core.engine.mortal_wound_target_lineage import MortalWoundTargetLineage
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -16324,7 +16325,14 @@ def test_phase13d_mortal_wound_lifecycle_progress_round_trip() -> None:
     )
     application = completed.application
 
-    assert restored_progress == progress
+    assert restored_progress == replace(
+        progress,
+        target_lineage=MortalWoundTargetLineage.freeze(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+            owner_player_id="player-b",
+        ),
+    )
     assert application is not None
     assert completed.request is None
     assert MortalWoundApplication.from_payload(application.to_payload()) == application
@@ -16464,6 +16472,14 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
         logical_death_cause_binding=MortalWoundLogicalDeathCauseBinding.fixed(
             cause_kind=ModelDestructionCauseKind.RULE_EFFECT,
             producer_id="phase13d-validation-progress",
+        ),
+    )
+    progress = replace(
+        progress,
+        target_lineage=MortalWoundTargetLineage.freeze(
+            state=state,
+            target_unit_instance_id=defender.unit_instance_id,
+            owner_player_id="player-b",
         ),
     )
     context_payload = cast(

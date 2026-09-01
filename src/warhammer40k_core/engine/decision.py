@@ -79,6 +79,7 @@ _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS = frozenset(
         "logical_death_cause_binding",
         "logical_death_events",
         "model_destruction_cause_id",
+        "target_lineage",
         "weapon_instance_id",
     )
 )

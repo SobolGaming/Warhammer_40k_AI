@@ -19,6 +19,9 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.mortal_wound_logical_death import (
         MortalWoundLogicalDeathCauseBindingPayload,
     )
+    from warhammer40k_core.engine.mortal_wound_target_lineage import (
+        MortalWoundTargetLineagePayload,
+    )
 
 MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
 
@@ -40,6 +43,7 @@ class MortalWoundFeelNoPainContextPayload(TypedDict):
     ignored_mortal_wounds: int
     remaining_mortal_wounds_lost: int
     priority_model_ids: list[str]
+    target_lineage: MortalWoundTargetLineagePayload
     destruction_evidence: MortalWoundDestructionEvidencePayload | None
     destroyed_model_placements: list[ModelPlacementPayload]
     logical_death_events: list[EventRecordPayload]
@@ -73,6 +77,7 @@ def parse_mortal_wound_feel_no_pain_context(
         "ignored_mortal_wounds",
         "remaining_mortal_wounds_lost",
         "priority_model_ids",
+        "target_lineage",
         "destruction_evidence",
         "destroyed_model_placements",
         "logical_death_events",
@@ -99,6 +104,9 @@ def parse_mortal_wound_feel_no_pain_context(
             "Mortal wound context logical_death_events must contain exact event records."
         )
     priority_model_ids = tuple(_string_list(payload, "priority_model_ids"))
+    target_lineage = payload.get("target_lineage")
+    if not isinstance(target_lineage, dict):
+        raise GameLifecycleError("Mortal wound context target_lineage must be an object.")
     raw_destruction_evidence = payload.get("destruction_evidence")
     if raw_destruction_evidence is not None and not isinstance(raw_destruction_evidence, dict):
         raise GameLifecycleError(
@@ -126,6 +134,7 @@ def parse_mortal_wound_feel_no_pain_context(
         "ignored_mortal_wounds": _int(payload, "ignored_mortal_wounds"),
         "remaining_mortal_wounds_lost": _int(payload, "remaining_mortal_wounds_lost"),
         "priority_model_ids": list(_validate_identifiers(priority_model_ids)),
+        "target_lineage": cast("MortalWoundTargetLineagePayload", target_lineage),
         "destruction_evidence": cast(
             "MortalWoundDestructionEvidencePayload | None",
             raw_destruction_evidence,
