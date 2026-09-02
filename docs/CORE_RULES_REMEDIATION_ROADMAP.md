@@ -1495,8 +1495,8 @@ pending review and merge.
 
 ### P18C — C18-03
 
-Status: Implementation, source/contract updates, focused and aggregate validation, and
-architecture/scope audits are complete; remote PR publication is pending.
+Status: Implementation, source/contract updates, focused and aggregate validation,
+architecture/scope audits, and remote PR publication are complete.
 
 Finding IDs: `C18-03`.
 
@@ -1619,7 +1619,8 @@ Validation results:
   TypeScript type checks, and all `5` client unit tests pass, and the two-server HTTP conformance
   scenario passes all `342` assertions for contract version `11.1.0`.
 
-PR URL and merge commit: pending publication.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/414`; merge commit
+pending review and merge.
 
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
