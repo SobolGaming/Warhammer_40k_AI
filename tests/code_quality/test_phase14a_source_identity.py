@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -40,6 +41,7 @@ CHAOS_DAEMONS_DATASHEET_RUNTIME = (
 GIT_ATTRIBUTES = ROOT / ".gitattributes"
 RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     RECONCILIATION_ARTIFACT,
+    ROOT / "data" / "source_audits" / "maintained_app_mirrors" / "core_rules_2026_09_02.audit.json",
     ROOT
     / "src"
     / "warhammer40k_core"
@@ -104,6 +106,34 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "artifacts"
     / "package.json",
 )
+
+
+def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> None:
+    policy = (ROOT / "docs" / "CORE_RULES_SOURCE_POLICY.md").read_text(encoding="utf-8")
+    source_evidence = (
+        ROOT / "src" / "warhammer40k_core" / "rules" / "source_evidence.py"
+    ).read_text(encoding="utf-8")
+    audit = json.loads(
+        (
+            ROOT
+            / "data"
+            / "source_audits"
+            / "maintained_app_mirrors"
+            / "core_rules_2026_09_02.audit.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    current_policy_id = "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
+    assert current_policy_id in policy
+    assert "co-versioned 40k.app and Game Datamissions observations disagree" in policy
+    assert "provider wins by preference" in policy
+    assert {provider["provider_name"] for provider in audit["providers"]} == {
+        "40k.app",
+        "Game Datamissions",
+    }
+    assert all(not provider["owned_by_games_workshop"] for provider in audit["providers"])
+    assert current_policy_id in source_evidence
+    assert "Co-versioned maintained App mirrors disagree" in source_evidence
 
 
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:

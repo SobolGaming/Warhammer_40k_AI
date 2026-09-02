@@ -7,15 +7,18 @@ This roadmap covers only Warhammer 40,000 11th Edition Core Rules categories
 content listed in `AGENTS.md` are excluded.
 
 The retained 40k.app snapshot is the exhaustive Core Rules corpus for the
-completed portion of this audit. Under repository policy
-`core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`,
-the owner attests that it is verbatim Games Workshop App data. It is therefore
-the project-authoritative maintained App mirror for those completed findings.
-Evidence controls in this order:
+completed portion of this audit. Its immutable observations retain historical
+policy ID
+`core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`.
+Order 11 supersedes that provider-specific policy for new observations with
+`core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02`, which
+recognizes both 40k.app and Game Datamissions as non-affiliated maintained
+direct App-data mirrors. Evidence controls in this order:
 
-1. Direct official-App evidence when an actual App/40k.app divergence is
-   observed.
-2. Hash-pinned 40k.app observations under the owner-approved authority policy.
+1. Direct official-App evidence when an actual App/maintained-mirror divergence
+   is observed.
+2. Complete, hash-pinned observations from either named maintained direct
+   App-data mirror under the owner-approved authority policy.
 3. Hash-pinned official Games Workshop PDFs for history and material the App
    corpus does not replace.
 
@@ -39,15 +42,13 @@ and its Universal Rules Updates v1.1 independently establish Assault and Shock
 Disembark as new Core Rules concepts; the complete numbered statements and FAQ
 snapshot are available through the Game Datamissions App-data changelog.
 
-This roadmap update maps all 18 distinct v931 obligations and the v946 Rapid
-Disembark obligation, but it does not change the checked-in P00 source-policy
-artifact or claim implementation evidence for any newly mapped behavior. Before
-an owning PR pins implementation evidence, `S-MIRRORS` must replace the
-provider-specific “40k.app only” wording with “maintained direct App-data
-mirrors” and name both providers. Every retained observation must pin provider,
-URL, App-data version or observation timestamp, transcription SHA-256, and
-source-observation fingerprint. If the mirrors disagree for the same App-data
-version, validation fails closed pending comparison with the official App.
+This roadmap maps all 18 distinct v931 obligations and the v946 Rapid
+Disembark obligation. Order 11 (`S-MIRRORS`) now supplies their source-
+governance prerequisite: every retained implementation observation must pin
+provider, URL, App-data version or observation timestamp, transcription
+SHA-256, and source-observation fingerprint. Shared source-package validation
+fails closed when named mirrors disagree for the same stable rule ID and
+App-data version, pending comparison with the official App.
 
 P00 is PR #405. It changes provenance and planning only; it does not change
 gameplay semantics. The retained official Core Rules PDF has SHA-256
@@ -96,7 +97,7 @@ still only one open roadmap PR.
 merged. The user may approve a narrower definition before P20, but it must be
 recorded in this document rather than inferred during implementation.
 
-`S-MIRRORS` is the source-governance PR scheduled immediately after P18C. It is
+`S-MIRRORS` is the source-governance PR immediately after P18C. It is
 a documentation/evidence prerequisite, not a gameplay-remediation PR or a
 closable implementation finding. It owns `docs/CORE_RULES_SOURCE_POLICY.md`,
 the maintained-mirror comparison/audit generator, and shared source-package
@@ -1770,6 +1771,113 @@ Validation results:
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/414`; merge commit
 pending review and merge.
 
+### S-MIRRORS — source-governance gate
+
+Status: Implemented in Order 11; PR publication pending.
+
+Finding IDs: None. `S-MIRRORS` is a source-governance prerequisite and does not close a gameplay
+finding.
+
+Dependencies and evidence gate: P18C/PR #414 is merged on `main` at `44a9b52e`. The repository-
+owner direction already recorded in this roadmap names 40k.app and Game Datamissions as maintained
+direct App-data mirrors. The retained provider review records the historical 40k.app observation,
+Game Datamissions App-data versions 931 and 946, both provider identities and URLs, and the
+non-affiliation boundary. No co-versioned rule observation from both providers is retained in this
+governance PR, so no source disagreement or `EXCEPTION-PAUSE` applies.
+
+Violated invariant: Project-authoritative source evidence must carry a complete immutable evidence
+tuple and fail closed on disagreement. The shared source-evidence boundary must not authorize only
+one provider when repository policy recognizes two maintained direct App-data mirrors.
+
+How it was done before S-MIRRORS: `docs/CORE_RULES_SOURCE_POLICY.md` and
+`RuleEvidenceRecord._validate_evidence_authority(...)` named and accepted only 40k.app. Mirror
+records required a 40k.app observation timestamp and canonical 40k.app URL, rejected App-data
+version metadata, and could not represent Game Datamissions. `SourceEvidenceCatalog` checked
+unique evidence IDs but did not compare same-rule, same-App-data-version observations across
+providers. The repository had no two-provider governance audit or generated review.
+
+How it is done after S-MIRRORS: Current policy ID
+`core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02` explicitly recognizes
+40k.app and Game Datamissions while preserving both as non-affiliated third-party providers. Shared
+validation allowlists each provider with its canonical HTTPS surface and requires the provider,
+URL, App-data version or offset-bearing observation timestamp, transcription SHA-256, immutable
+observation SHA-256, linked audit tuple, policy ID, and non-affiliation marker. Historical 40k.app
+records keep their immutable superseded policy ID; that policy cannot authorize Game Datamissions
+or a new provider. `SourceEvidenceCatalog` groups project-authoritative mirror records by stable
+rule source ID and App-data version and rejects differing transcription hashes before a source
+package can load or certify semantics.
+
+Specific authoritative maintained direct App-data mirror statement and source ID: S-MIRRORS does
+not introduce or change a gameplay source row, stable gameplay source ID, or operative rule text.
+Its authority is the owner decision recorded in this roadmap and policy artifact. The provider
+surfaces are `https://www.40k.app/rules` and
+`https://game-datamissions.com/11th/rules/changelog`. Exact rule-specific statements remain an
+obligation of each owning implementation PR.
+
+Provider, URL, App-data version or observation timestamp, transcription SHA-256, and source-
+observation fingerprint: Retained governance observation
+`40k-app-core-rules-observed-2026-08-25` uses 40k.app,
+`https://www.40k.app/rules`, timestamp `2026-08-25T00:00:00-04:00`, transcription
+`c392a03e240536e5fe5ca489c777b596047cd9c0bb9023ff902392dd30c360de`, and observation
+`ae80bd86900f54bc80f2ab711b80a3dc8b1ba70d1e8764a9a831bb63cc2742a5`. Retained observations
+`game-datamissions-core-rules-data-931` and `game-datamissions-core-rules-data-946` use Game
+Datamissions and `https://game-datamissions.com/11th/rules/changelog`; their App-data versions are
+`931` and `946`, transcriptions are respectively
+`99d400c59b8879a6c0bc6b9324435c677f22af27e0610810fb8fae0d21770d81` and
+`d5b30faddcf23204073ca566ccb53a0a355ec893382413c542e74738f27296ab`, and observation fingerprints
+are respectively `1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668` and
+`d56418ca2a27645d032519c4fe11c97ae5520c50d0cb5b54201e97534a2d3279`. Both were reviewed at
+`2026-09-02T12:30:09-04:00`. These provider-level statements establish governance only and are not
+substitutes for future rule-specific operative transcriptions. The audit artifact byte SHA-256 is
+`9fe12e806c461d930de62f7b781392b30eb67bbefff831e616a06e10997f50c2`; the generated report byte
+SHA-256 is `c8be1c3610e8339bc42b7d260124e8347f3845a60d8bc0bc4f2944d81cbb81f9`. The regenerated engine
+build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:1250283283683efed4920ae4ef67162e96b074e6566ae591cc28395ab247c86c`.
+
+Scope and explicit exclusions: S-MIRRORS changes source governance, shared evidence validation,
+offline review artifacts, tests, and documentation only. It does not change gameplay semantics,
+load or certify any v931/v946 operative rule, query a live provider at runtime, modify decisions or
+adapters, add faction content, or expand any scope prohibited by `AGENTS.md`.
+
+Owning state/validation/mutation/event/replay path: Repository-owner policy -> checked-in provider
+review artifact -> offline typed audit loader/generator -> `RuleEvidenceRecord` provider and tuple
+validation -> `SourceEvidenceCatalog` co-version comparison -> `RuleSourcePackage` catalog and
+execution-evidence validation. There is no authoritative game-state mutation, domain event,
+decision, adapter payload, or replay effect.
+
+Decision and viewer-visibility impact: None. S-MIRRORS adds no decision type, option family,
+proposal kind, adapter-visible payload, hidden-information classification, or redaction path.
+
+Regression scenarios and same-bug-class search: Tests accept a complete Game Datamissions record
+using App-data version in place of timestamp; reject a tuple missing both; reject a Game
+Datamissions record using the superseded 40k.app-only policy; reject a non-canonical provider URL;
+accept matching 40k.app/Game Datamissions records for one source ID and version; and reject their
+transcription mismatch. Audit tests pin both provider identities, non-affiliation, ownership and
+runtime-input flags, versions/timestamps, transcription hashes, observation fingerprints, exact
+provider surfaces, report output, and tamper rejection. A static code-quality audit prevents
+regression to a provider-specific policy or omission of mismatch rejection. No behavioral test file
+was added, removed, moved, or renamed, so the four-shard inventory does not change.
+
+Generated artifacts/documentation: S-MIRRORS adds
+`data/source_audits/maintained_app_mirrors/core_rules_2026_09_02.audit.json`, its offline typed
+validator/generator, and `docs/CORE_RULES_MAINTAINED_MIRROR_REVIEW.md`; replaces the active source
+policy; documents the shared validation boundary in README and `ARCHITECTURE_V2.md`; preserves the
+older 40k.app audit as historical evidence; and updates this roadmap record. Engine-build and
+external-contract artifacts are regenerated because shared packaged source validation changed;
+their final identities are recorded after generation.
+
+Validation results: Focused source-identity, governance-audit, renderer, and code-quality coverage
+passes (`106 passed`). `ruff check`, `ruff format --check`, `mypy`, and `pyright` pass; the complete
+xdist work-stealing suite passes (`6387 passed`); and the completed behavioral coverage database
+passes `coverage report --fail-under=85` at `85%`. The exact four-shard inventory check and all
+`11` import-linter contracts pass. The historical 40k.app audit, maintained-mirror audit, all seven
+Core Rules source generators, engine-build identity, base-ref external contract, and installed-wheel
+smoke checks pass. The repository-pinned client generated-artifact check, TypeScript check, all `5`
+client unit tests, and the two-server HTTP conformance scenario pass (`342` assertions for contract
+version `11.1.0`). The all-files pre-commit hooks pass.
+
+PR URL and merge commit: Pending publication; merge commit pending review and merge.
+
 ### Post-P18C v931/v946 findings
 
 Status: Planned documentation only in PR #414. No P18C production, contract, source-package, or
@@ -1781,10 +1889,10 @@ dated 2026-08-26. The duplicated 01.02.06 changed/errata entries are one semanti
 the canonical map above contains 18 distinct obligations. Version 946, dated 2026-09-02, adds the
 separate 18.04.01 Rapid Disembark And Limitations row. The official August 26 Universal Rules
 Updates v1.1 independently confirms that Assault and Shock Disembark are new Core Rules concepts.
-S-MIRRORS follows P18C as the explicit source-governance gate. P18D follows S-MIRRORS and owns
-C18-04; P18E follows P18D and owns C18-05; P20 owns C18-06 together with C20-01. S-MIRRORS closes
-only with the policy artifact, evidence-tuple validation, co-version mismatch rejection, and
-retained two-provider review evidence specified in its canonical sequence row.
+S-MIRRORS now closes after P18C as the explicit source-governance gate. P18D follows S-MIRRORS and
+owns C18-04; P18E follows P18D and owns C18-05; P20 owns C18-06 together with C20-01. Its policy
+artifact, evidence-tuple validation, co-version mismatch rejection, and retained two-provider
+review evidence satisfy the acceptance criteria in the canonical sequence row.
 
 The remaining v931 obligations are closure gates, not deferred audit suggestions. Nine new scoped
 PRs own C24-06/P24F, C15-06/P15F, C24-07/P24G, C22-02/P22B, C01-02/P01B,

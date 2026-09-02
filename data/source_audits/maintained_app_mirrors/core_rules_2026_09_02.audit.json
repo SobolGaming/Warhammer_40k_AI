@@ -1,0 +1,77 @@
+{
+  "audit_schema": "core-v2-maintained-app-mirror-review-v1",
+  "audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+  "reviewed_at": "2026-09-02T12:30:09-04:00",
+  "scope": {
+    "edition": "warhammer_40000_11th",
+    "review_scope": "core_rules_only",
+    "excluded_scopes": [
+      "factions",
+      "faction_detachments",
+      "faction_datasheets"
+    ]
+  },
+  "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+  "providers": [
+    {
+      "provider_id": "40k-app",
+      "provider_name": "40k.app",
+      "provider_root_url": "https://www.40k.app/rules",
+      "authority_status": "project_authoritative_maintained_direct_app_data_mirror",
+      "affiliation": "not_affiliated_with_or_endorsed_by_games_workshop",
+      "runtime_input": false,
+      "owned_by_games_workshop": false
+    },
+    {
+      "provider_id": "game-datamissions",
+      "provider_name": "Game Datamissions",
+      "provider_root_url": "https://game-datamissions.com/11th/rules/changelog",
+      "authority_status": "project_authoritative_maintained_direct_app_data_mirror",
+      "affiliation": "not_affiliated_with_or_endorsed_by_games_workshop",
+      "runtime_input": false,
+      "owned_by_games_workshop": false
+    }
+  ],
+  "observations": [
+    {
+      "observation_id": "40k-app-core-rules-observed-2026-08-25",
+      "provider_id": "40k-app",
+      "source_url": "https://www.40k.app/rules",
+      "app_version": null,
+      "observed_at": "2026-08-25T00:00:00-04:00",
+      "reviewed_statement": "Repository-owner review identifies the 40k.app Core Rules corpus as a maintained direct Warhammer App-data mirror for categories 01-25.",
+      "transcription_sha256": "c392a03e240536e5fe5ca489c777b596047cd9c0bb9023ff902392dd30c360de",
+      "source_observation_sha256": "ae80bd86900f54bc80f2ab711b80a3dc8b1ba70d1e8764a9a831bb63cc2742a5",
+      "review_record_sha256": "71b64d99c41b4c5b307ce0f0d89cc4652c04c06d147131de7357de2d6b6e65fe"
+    },
+    {
+      "observation_id": "game-datamissions-core-rules-data-931",
+      "provider_id": "game-datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "app_version": "931",
+      "observed_at": "2026-09-02T12:30:09-04:00",
+      "reviewed_statement": "Data version 931, dated 2026-08-26, records 19 changed Core Rules items representing 18 distinct obligations.",
+      "transcription_sha256": "99d400c59b8879a6c0bc6b9324435c677f22af27e0610810fb8fae0d21770d81",
+      "source_observation_sha256": "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668",
+      "review_record_sha256": "e458f860266309086696f3842ae95f34a24558ba39c29e88cf9ea2866188cde4"
+    },
+    {
+      "observation_id": "game-datamissions-core-rules-data-946",
+      "provider_id": "game-datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "app_version": "946",
+      "observed_at": "2026-09-02T12:30:09-04:00",
+      "reviewed_statement": "Data version 946, dated 2026-09-02, records one added Core Rules item: 18.04.01 Rapid Disembark And Limitations.",
+      "transcription_sha256": "d5b30faddcf23204073ca566ccb53a0a355ec893382413c542e74738f27296ab",
+      "source_observation_sha256": "d56418ca2a27645d032519c4fe11c97ae5520c50d0cb5b54201e97534a2d3279",
+      "review_record_sha256": "7cd23164fdb5057275f207770d1c04dc26b94fa3166756a6e8faa8e829a8e433"
+    }
+  ],
+  "comparison_policy": {
+    "identity_fields": [
+      "rule_source_id",
+      "app_version"
+    ],
+    "mismatch_disposition": "official_app_comparison_required"
+  }
+}

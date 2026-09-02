@@ -428,19 +428,20 @@ Current status:
   and hashes remain authoritative provenance. Reviewed provider observations may
   be retained as assignment-level evidence under `data/source_audits/39k_pro`,
   but no provider content is loaded by the runtime.
-- The checked-in [40k.app core-rules comparison](docs/CORE_RULES_40K_APP_COMPARISON.md)
-  inventories all 25 Core Rules category locators under
-  `data/source_audits/40k_app`. Under the owner-approved
-  [Core Rules source authority policy](docs/CORE_RULES_SOURCE_POLICY.md), each
-  pinned observation is the project's authoritative verbatim mirror of the
-  maintained Games Workshop App for this scope. Its App wording supersedes
-  older PDF wording where they differ. 40k.app remains a non-affiliated host,
-  and the live website is never runtime input: loaders consume only reviewed,
-  normalized, hash-pinned artifacts. Routine official-App capture is
-  unnecessary; a source-policy disambiguation exception instead requires an
-  owner check and prefers a retained capture when mirror equivalence is itself
-  disputed. This audit excludes factions, faction detachments, and faction
-  datasheet content.
+- The checked-in
+  [maintained App-data mirror review](docs/CORE_RULES_MAINTAINED_MIRROR_REVIEW.md)
+  records 40k.app and Game Datamissions as the two non-affiliated providers
+  accepted by the owner-approved
+  [Core Rules source authority policy](docs/CORE_RULES_SOURCE_POLICY.md).
+  Source-package validation requires the provider, canonical URL, App-data
+  version or timestamp, transcription SHA-256, and immutable observation
+  fingerprint. Co-versioned observations for one stable rule ID must agree or
+  validation fails pending official-App comparison. The earlier
+  [40k.app category comparison](docs/CORE_RULES_40K_APP_COMPARISON.md) remains
+  retained under `data/source_audits/40k_app` with its historical policy ID.
+  Neither provider is presented as Games Workshop-owned, and live provider
+  sites are never runtime input. These audits exclude factions, faction
+  detachments, and faction datasheet content.
 - P19's reviewed 19.01.01 Attached Units wording is pinned in
   `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_attached_units_source.py` and
