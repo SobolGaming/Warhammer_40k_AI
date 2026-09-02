@@ -1662,7 +1662,13 @@ Review regressions additionally cover one attached passenger snapshot across mul
 components, one canonical grouped survivor placement with no intermediate component state, an
 immediate lifecycle round trip after that placement, zero-survivor primary destruction/scoring
 evidence, and rejection of a forged restore that deletes a living survivor from both pending state
-and its queued request.
+and its queued request. Final review regressions authenticate both pre-embark attached-component
+loss directions: a retained Bodyguard after Leader loss and a retained Leader after Bodyguard loss
+each preserve the immutable canonical lineage while the hazard packet contains only the living,
+embarked component, complete one canonical placement, and restore through the full lifecycle. A
+separate partial-hazard regression destroys the last living Bodyguard model, proves shared
+destruction cleanup removes that physical component from live cargo, and then completes the
+surviving Leader's grouped placement from frozen hazard/completion authority.
 
 Generated artifacts/documentation: P18C adds
 `core_transports_2026_09/artifacts/package.json`, its typed loader/source package, and the offline
@@ -1671,13 +1677,13 @@ decision-contract documents, and this finding record.
 
 Validation results:
 
-- Focused post-review transport, Shooting, and closeout coverage passes (`289` tests). Fresh
-  branch-inclusive behavioral coverage passes (`6033 passed`) at the repository's `85.00%`
-  threshold.
+- The final P18C-focused transport, Shooting, and closeout cluster passes (`13` tests), and the
+  complete code-quality suite passes (`346` tests). Fresh branch-inclusive behavioral coverage
+  passes (`6036 passed`) at the repository's `85.00%` threshold.
 - Repository-wide Ruff check and Ruff format check pass; mypy passes across `2658` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6379 passed` in `450.42s`), including the
+- The required final xdist work-stealing suite passes (`6382 passed` in `412.38s`), including the
   complete code-quality suite.
 - The Core Transports source artifact, final engine build identity, and regenerated external
   contract pass fail-closed checks, including the `origin/main` compatibility comparison.

@@ -32,6 +32,7 @@ from warhammer40k_core.engine.rule_model_destruction_unplaced import (
     destroy_emergency_disembark_omitted_model,
     destroy_emergency_disembark_omitted_rules_unit_models,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_contains_component_lineage
 
 # fmt: off
 if TYPE_CHECKING:
@@ -683,8 +684,9 @@ def _destroyed_transport_hazard_survivor_ids(
         state=state,
         unit_instance_id=hazard_rolls.unit_instance_id,
     )
-    if tuple(sorted(rules_unit.component_unit_instance_ids)) != (
-        hazard_rolls.component_unit_instance_ids
+    if not rules_unit_contains_component_lineage(
+        rules_unit=rules_unit,
+        component_unit_instance_ids=hazard_rolls.component_unit_instance_ids,
     ):
         raise GameLifecycleError("Destroyed Transport hazard component inventory drift.")
     models_by_id = {model.model_instance_id: model for model in rules_unit.own_models}

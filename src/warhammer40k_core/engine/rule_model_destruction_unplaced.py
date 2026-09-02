@@ -5,7 +5,10 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule, model_by_id
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_contains_component_lineage,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.transports import (
     EMERGENCY_DISEMBARK_RULE_ID,
     DestroyedTransportDisembark,
@@ -132,9 +135,10 @@ def _destroy_emergency_disembark_omitted_models(
         state=state,
         unit_instance_id=rules_unit_instance_id,
     )
-    if rules_unit.owner_player_id != player_id or set(
-        rules_unit.component_unit_instance_ids
-    ) != set(component_unit_instance_ids):
+    if rules_unit.owner_player_id != player_id or not rules_unit_contains_component_lineage(
+        rules_unit=rules_unit,
+        component_unit_instance_ids=component_unit_instance_ids,
+    ):
         raise GameLifecycleError("Emergency Disembark destruction rules-unit drift.")
     omitted_model_ids = set(omitted_model_instance_ids)
     if not set(requested_model_ids).issubset(omitted_model_ids):
@@ -148,11 +152,19 @@ def _destroy_emergency_disembark_omitted_models(
         for model_id in requested_model_ids
     ):
         raise GameLifecycleError("Emergency Disembark casualty unit drift.")
+    survivor_model_ids = placed_model_ids | omitted_model_ids
+    survivor_component_ids = {
+        state.unit_instance_id_for_model(model_id) for model_id in survivor_model_ids
+    }
+    if not survivor_component_ids.issubset(component_ids):
+        raise GameLifecycleError("Emergency Disembark survivor component drift.")
     cargo_state = state.transport_cargo_state_for_transport(transport_unit_instance_id)
     if (
         cargo_state is None
         or cargo_state.player_id != player_id
-        or any(not cargo_state.contains_unit(component_id) for component_id in component_ids)
+        or any(
+            not cargo_state.contains_unit(component_id) for component_id in survivor_component_ids
+        )
     ):
         raise GameLifecycleError("Emergency Disembark casualty lacks embarked authority.")
     battlefield = state.battlefield_state

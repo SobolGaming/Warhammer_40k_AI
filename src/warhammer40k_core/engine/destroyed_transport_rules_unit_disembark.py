@@ -24,7 +24,11 @@ from warhammer40k_core.engine.rules_unit_placement import (
     RulesUnitPlacement,
     RulesUnitPlacementPayload,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitComponent, RulesUnitView
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitComponent,
+    RulesUnitView,
+    rules_unit_contains_component_lineage,
+)
 from warhammer40k_core.engine.transports import (
     EMERGENCY_DISEMBARK_MOVE_SOURCE_ID,
     EMERGENCY_DISEMBARK_RULE_ID,
@@ -355,12 +359,15 @@ def resolve_destroyed_transport_rules_unit_disembark(
         )
     if (
         rules_unit.unit_instance_id != hazard_rolls.unit_instance_id
-        or tuple(sorted(rules_unit.component_unit_instance_ids))
-        != hazard_rolls.component_unit_instance_ids
         or cargo_state.transport_unit_instance_id != hazard_rolls.transport_unit_instance_id
         or attempted_placement.rules_unit_instance_id != rules_unit.unit_instance_id
     ):
         raise GameLifecycleError("Destroyed Transport rules-unit disembark context drift.")
+    if not rules_unit_contains_component_lineage(
+        rules_unit=rules_unit,
+        component_unit_instance_ids=hazard_rolls.component_unit_instance_ids,
+    ):
+        raise GameLifecycleError("Destroyed Transport rules-unit disembark component drift.")
     survivor_ids = tuple(
         sorted(
             model.model_instance_id
@@ -400,7 +407,8 @@ def resolve_destroyed_transport_rules_unit_disembark(
     if placement.is_valid:
         updated_cargo = cargo_state.for_movement_phase(battle_round=hazard_rolls.battle_round)
         for component_id in hazard_rolls.component_unit_instance_ids:
-            updated_cargo = updated_cargo.with_disembarked_unit(component_id)
+            if updated_cargo.contains_unit(component_id):
+                updated_cargo = updated_cargo.with_disembarked_unit(component_id)
         placement = replace(placement, updated_cargo_state=updated_cargo)
     survivor_id_set = set(survivor_ids)
     return DestroyedTransportRulesUnitDisembark(

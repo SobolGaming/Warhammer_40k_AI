@@ -25,6 +25,9 @@ EMERGENCY_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "emer
 DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_rules_unit_disembark.py"
 )
+RULE_MODEL_DESTRUCTION_UNPLACED_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction_unplaced.py"
+)
 DESTROYED_TRANSPORT_PENDING_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_pending.py"
 )
@@ -273,6 +276,10 @@ def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() ->
         "resolve_destroyed_transport_disembark_service",
     )
     grouped_disembark_source = source_for(DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH)
+    omitted_destruction_source = function_source_for(
+        (RULE_MODEL_DESTRUCTION_UNPLACED_PATH,),
+        "_destroy_emergency_disembark_omitted_models",
+    )
     pending_validation_source = function_source_for(
         (DESTROYED_TRANSPORT_PENDING_PATH,),
         "validate_pending_destroyed_transport_disembark",
@@ -299,6 +306,12 @@ def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() ->
     assert "for component_id in hazard_rolls.component_unit_instance_ids" in (
         grouped_disembark_source
     )
+    assert "rules_unit_contains_component_lineage" in grouped_disembark_source
+    assert "if updated_cargo.contains_unit(component_id)" in grouped_disembark_source
+    assert "rules_unit_contains_component_lineage" in destroyed_transport_source
+    assert "rules_unit_contains_component_lineage" in omitted_destruction_source
+    assert "survivor_component_ids" in omitted_destruction_source
+    assert "for component_id in survivor_component_ids" in omitted_destruction_source
     assert "_current_hazard_component_survivor_ids" not in destroyed_transport_source
     assert "retain_current_hazard=" not in destroyed_transport_source
     assert '"pending_unit_instance_ids"' in pending_validation_source
