@@ -1773,7 +1773,7 @@ pending review and merge.
 
 ### S-MIRRORS — source-governance gate
 
-Status: Implemented in Order 11; PR publication pending.
+Status: Implemented in Order 11; PR #416 pending review and merge.
 
 Finding IDs: None. `S-MIRRORS` is a source-governance prerequisite and does not close a gameplay
 finding.
@@ -1876,7 +1876,8 @@ smoke checks pass. The repository-pinned client generated-artifact check, TypeSc
 client unit tests, and the two-server HTTP conformance scenario pass (`342` assertions for contract
 version `11.1.0`). The all-files pre-commit hooks pass.
 
-PR URL and merge commit: Pending publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/416`; merge commit
+pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
