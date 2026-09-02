@@ -9,8 +9,10 @@ from pathlib import Path
 from typing import cast
 from urllib.parse import urlsplit
 
-from warhammer40k_core.rules.source_evidence import (
+from warhammer40k_core.rules.source_authority_registry import (
     CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+    CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+    source_authority_registry,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -213,6 +215,12 @@ def core_rules_maintained_mirror_markdown(
             "The live provider sites are not runtime inputs. Engine loaders consume only reviewed, "
             "normalized, hash-pinned source artifacts.",
             "",
+            "Runtime mirror records authenticate their audit ID, audit row ID, retained "
+            "fingerprint, provider, URL, and version or timestamp against the hash-pinned "
+            "packaged source-authority registry. Rule source packages also carry its typed "
+            "Core-Rules-only scope. The superseded 40k.app policy is accepted only for the "
+            "registry's exact immutable legacy-observation inventory.",
+            "",
         )
     )
     return "\n".join(lines)
@@ -349,6 +357,41 @@ def _validate_audit(audit: CoreRulesMaintainedMirrorAudit) -> None:
         or audit.mismatch_disposition != "official_app_comparison_required"
     ):
         raise ValueError("Maintained App-mirror comparison policy drifted.")
+    registry_scope = source_authority_registry().scope(CORE_RULES_SOURCE_AUTHORITY_SCOPE)
+    provider_names = {provider.provider_id: provider.provider_name for provider in audit.providers}
+    registered_rows = tuple(
+        sorted(
+            (
+                row.audit_id,
+                row.row_id,
+                row.source_observation_sha256,
+                row.provider_name,
+                row.source_url,
+                row.policy_id,
+                row.identity_kind,
+                row.identity_value,
+            )
+            for row in registry_scope.audit_rows
+            if row.policy_id == CORE_RULES_MAINTAINED_MIRROR_POLICY_ID
+        )
+    )
+    audited_rows = tuple(
+        sorted(
+            (
+                audit.audit_id,
+                row.observation_id,
+                row.source_observation_sha256,
+                provider_names[row.provider_id],
+                row.source_url,
+                audit.project_authority_policy_id,
+                "app_version" if row.app_version is not None else "observed_at",
+                row.app_version if row.app_version is not None else row.observed_at,
+            )
+            for row in audit.observations
+        )
+    )
+    if registered_rows != audited_rows:
+        raise ValueError("Maintained App-mirror authority registry drifted from its audit rows.")
 
 
 def _write_refreshed_hashes() -> None:

@@ -26,3 +26,5 @@ These provider-level records establish the governance boundary only. They do not
 Source-package validation groups project-authoritative mirror records by stable rule source ID and App-data version. When two named providers are present for the same group, their transcription hashes must match. A mismatch is rejected and requires an official-App comparison before certification; it is never resolved by provider preference or silent fallback.
 
 The live provider sites are not runtime inputs. Engine loaders consume only reviewed, normalized, hash-pinned source artifacts.
+
+Runtime mirror records authenticate their audit ID, audit row ID, retained fingerprint, provider, URL, and version or timestamp against the hash-pinned packaged source-authority registry. Rule source packages also carry its typed Core-Rules-only scope. The superseded 40k.app policy is accepted only for the registry's exact immutable legacy-observation inventory.

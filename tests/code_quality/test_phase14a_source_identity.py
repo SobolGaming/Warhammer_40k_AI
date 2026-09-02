@@ -41,6 +41,7 @@ CHAOS_DAEMONS_DATASHEET_RUNTIME = (
 GIT_ATTRIBUTES = ROOT / ".gitattributes"
 RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     RECONCILIATION_ARTIFACT,
+    ROOT / "src" / "warhammer40k_core" / "rules" / "source_authority_registry.json",
     ROOT / "data" / "source_audits" / "maintained_app_mirrors" / "core_rules_2026_09_02.audit.json",
     ROOT
     / "src"
@@ -113,6 +114,14 @@ def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> Non
     source_evidence = (
         ROOT / "src" / "warhammer40k_core" / "rules" / "source_evidence.py"
     ).read_text(encoding="utf-8")
+    source_authority_registry = (
+        ROOT / "src" / "warhammer40k_core" / "rules" / "source_authority_registry.py"
+    ).read_text(encoding="utf-8")
+    authority_registry_payload = json.loads(
+        (ROOT / "src" / "warhammer40k_core" / "rules" / "source_authority_registry.json").read_text(
+            encoding="utf-8"
+        )
+    )
     audit = json.loads(
         (
             ROOT
@@ -132,8 +141,20 @@ def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> Non
         "Game Datamissions",
     }
     assert all(not provider["owned_by_games_workshop"] for provider in audit["providers"])
-    assert current_policy_id in source_evidence
+    assert current_policy_id in source_authority_registry
+    assert "authorize_audit_reference" in source_evidence
+    assert "authorize_source_package" in source_evidence
     assert "Co-versioned maintained App mirrors disagree" in source_evidence
+    scope = authority_registry_payload["scopes"][0]
+    assert scope["scope_id"] == "warhammer_40000_11th_core_rules"
+    assert scope["edition"] == "warhammer_40000_11th"
+    assert scope["corpus"] == "core_rules_categories_01_25"
+    assert set(scope["policy_ids"]) == {
+        current_policy_id,
+        "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    }
+    assert len(scope["legacy_observations"]) == 33
+    assert len(scope["source_packages"]) == 9
 
 
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:

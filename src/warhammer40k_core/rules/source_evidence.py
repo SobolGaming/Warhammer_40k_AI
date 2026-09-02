@@ -8,6 +8,14 @@ from pathlib import PurePosixPath
 from typing import Literal, Self, TypedDict, cast
 from urllib.parse import urlsplit
 
+from warhammer40k_core.rules.source_authority_registry import (
+    CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID,
+    CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+    CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+    SourceAuthorityRegistryError,
+    SourceAuthorityScope,
+    source_authority_registry,
+)
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceCatalogError
 
 RuleEvidenceKind = Literal[
@@ -39,12 +47,6 @@ SemanticExecutionStatus = Literal[
     "unsupported",
 ]
 
-CORE_RULES_MAINTAINED_MIRROR_POLICY_ID = (
-    "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
-)
-CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID = (
-    "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
-)
 _MAINTAINED_APP_MIRROR_PROVIDERS = frozenset({"40k.app", "Game Datamissions"})
 
 
@@ -330,6 +332,8 @@ class RuleEvidenceRecord:
             authority=self.authority,
             project_authority_policy_id=self.project_authority_policy_id,
         )
+        if self.authority == "project_authoritative_app_mirror":
+            _validate_project_authoritative_mirror_registry(self)
 
     def _validate_execution_status(self) -> None:
         has_consumers = bool(self.runtime_consumer_ids)
@@ -483,6 +487,7 @@ class RuleSourcePackage:
     source_catalog: SourceCatalog
     source_evidence_catalog: SourceEvidenceCatalog
     evidence_required_source_ids: tuple[str, ...]
+    source_authority_scope: SourceAuthorityScope
 
     def __post_init__(self) -> None:
         if type(self.source_catalog) is not SourceCatalog:
@@ -491,6 +496,8 @@ class RuleSourcePackage:
             raise RuleEvidenceError(
                 "RuleSourcePackage source_evidence_catalog must be a SourceEvidenceCatalog."
             )
+        if self.source_authority_scope != CORE_RULES_SOURCE_AUTHORITY_SCOPE:
+            raise RuleEvidenceError("RuleSourcePackage source-authority scope is unsupported.")
         required_source_ids = _validate_text_tuple(
             "evidence_required_source_ids",
             self.evidence_required_source_ids,
@@ -511,6 +518,32 @@ class RuleSourcePackage:
             raise RuleEvidenceError(
                 "RuleSourcePackage evidence inventory must exactly cover required source IDs."
             )
+        package_id = self.source_catalog.package_id
+        try:
+            registry = source_authority_registry()
+            registry.authorize_source_package(
+                scope_id=self.source_authority_scope,
+                namespace=package_id.namespace,
+                package_name=package_id.package_name,
+                version=package_id.version,
+                rule_source_ids=required_source_ids,
+            )
+            for record in self.source_evidence_catalog.records:
+                if record.authority != "project_authoritative_app_mirror":
+                    continue
+                if record.project_authority_policy_id is None:
+                    raise RuleEvidenceError(
+                        "Project-authoritative mirror evidence requires its authority policy ID."
+                    )
+                if (
+                    registry.scope_for_policy_id(record.project_authority_policy_id).scope_id
+                    != self.source_authority_scope
+                ):
+                    raise RuleEvidenceError(
+                        "Mirror evidence policy scope does not match its RuleSourcePackage scope."
+                    )
+        except SourceAuthorityRegistryError as exc:
+            raise RuleEvidenceError(str(exc)) from exc
         for source_id in required_source_ids:
             try:
                 source_text = self.source_catalog.source_text_by_id(source_id)
@@ -678,6 +711,35 @@ def _validate_mirror_provider(
     _validate_mirror_url(provider_name=provider_name, source_url=source_url)
 
 
+def _validate_project_authoritative_mirror_registry(record: RuleEvidenceRecord) -> None:
+    policy_id = cast(str, record.project_authority_policy_id)
+    audit_id = cast(str, record.review_audit_id)
+    audit_row_id = cast(str, record.review_audit_row_id)
+    audit_observation_sha256 = cast(str, record.review_audit_source_observation_sha256)
+    source_url = cast(str, record.source_url)
+    try:
+        registry = source_authority_registry()
+        scope_id = registry.authorize_audit_reference(
+            policy_id=policy_id,
+            audit_id=audit_id,
+            row_id=audit_row_id,
+            source_observation_sha256=audit_observation_sha256,
+            provider_name=record.provider_name,
+            source_url=source_url,
+            observed_at=record.observed_at,
+            app_version=record.app_version,
+        )
+        if policy_id == CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID:
+            registry.authorize_legacy_observation(
+                scope_id=scope_id,
+                evidence_id=record.evidence_id,
+                rule_source_id=record.rule_source_id,
+                observation_sha256=record.observation_sha256,
+            )
+    except SourceAuthorityRegistryError as exc:
+        raise RuleEvidenceError(str(exc)) from exc
+
+
 def _validate_mirror_url(*, provider_name: str, source_url: str) -> None:
     has_ascii_control = any(
         ord(character) < 32 or ord(character) == 127 for character in source_url
@@ -741,6 +803,7 @@ def _validate_co_versioned_mirror_agreement(
 __all__ = (
     "CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID",
     "CORE_RULES_MAINTAINED_MIRROR_POLICY_ID",
+    "CORE_RULES_SOURCE_AUTHORITY_SCOPE",
     "LoadSupportStatus",
     "RuleEvidenceAuthority",
     "RuleEvidenceError",
@@ -750,5 +813,6 @@ __all__ = (
     "RuleSourcePackage",
     "RuleVerificationStatus",
     "SemanticExecutionStatus",
+    "SourceAuthorityScope",
     "SourceEvidenceCatalog",
 )

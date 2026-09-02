@@ -1801,11 +1801,16 @@ How it is done after S-MIRRORS: Current policy ID
 40k.app and Game Datamissions while preserving both as non-affiliated third-party providers. Shared
 validation allowlists each provider with its canonical HTTPS surface and requires the provider,
 URL, App-data version or offset-bearing observation timestamp, transcription SHA-256, immutable
-observation SHA-256, linked audit tuple, policy ID, and non-affiliation marker. Historical 40k.app
-records keep their immutable superseded policy ID; that policy cannot authorize Game Datamissions
-or a new provider. `SourceEvidenceCatalog` groups project-authoritative mirror records by stable
-rule source ID and App-data version and rejects differing transcription hashes before a source
-package can load or certify semantics.
+observation SHA-256, linked audit tuple, policy ID, and non-affiliation marker. The complete audit
+tuple is authenticated against a hash-pinned packaged registry; invented audit IDs or rows and
+mismatched row fingerprints fail record construction. Historical 40k.app records keep their
+superseded policy ID only when evidence ID, stable rule source ID, and observation hash match the
+registry's exact immutable legacy inventory. Every `RuleSourcePackage` carries the typed
+`warhammer_40000_11th_core_rules` scope and must match one of nine registered Core Rules package
+identities and its allowed stable source-ID inventory, so faction content cannot reuse this policy.
+`SourceEvidenceCatalog` groups project-authoritative mirror records by stable rule source ID and
+App-data version and rejects differing transcription hashes before a source package can load or
+certify semantics.
 
 Specific authoritative maintained direct App-data mirror statement and source ID: S-MIRRORS does
 not introduce or change a gameplay source row, stable gameplay source ID, or operative rule text.
@@ -1830,9 +1835,11 @@ are respectively `1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b86
 `2026-09-02T12:30:09-04:00`. These provider-level statements establish governance only and are not
 substitutes for future rule-specific operative transcriptions. The audit artifact byte SHA-256 is
 `9fe12e806c461d930de62f7b781392b30eb67bbefff831e616a06e10997f50c2`; the generated report byte
-SHA-256 is `c8be1c3610e8339bc42b7d260124e8347f3845a60d8bc0bc4f2944d81cbb81f9`. The regenerated engine
+SHA-256 is `79204b29bf28d74b2fc05b24bc9a4454f0d97b179b250c7444db492d92413238`. The packaged source-
+authority registry byte SHA-256 is
+`edf13cf6091cd64450a5dd627eb727d626dc631f1b7b7dd6d55eec0c6a2b5c79`. The regenerated engine
 build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:1250283283683efed4920ae4ef67162e96b074e6566ae591cc28395ab247c86c`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:e56cce72fd709f7438c3585dccd2a8d1bd20f404244ce8387029ff9ee09f8791`.
 
 Scope and explicit exclusions: S-MIRRORS changes source governance, shared evidence validation,
 offline review artifacts, tests, and documentation only. It does not change gameplay semantics,
@@ -1840,10 +1847,11 @@ load or certify any v931/v946 operative rule, query a live provider at runtime, 
 adapters, add faction content, or expand any scope prohibited by `AGENTS.md`.
 
 Owning state/validation/mutation/event/replay path: Repository-owner policy -> checked-in provider
-review artifact -> offline typed audit loader/generator -> `RuleEvidenceRecord` provider and tuple
-validation -> `SourceEvidenceCatalog` co-version comparison -> `RuleSourcePackage` catalog and
-execution-evidence validation. There is no authoritative game-state mutation, domain event,
-decision, adapter payload, or replay effect.
+review artifact -> offline typed audit loader/generator -> pinned packaged source-authority
+registry -> `RuleEvidenceRecord` audit-row and legacy-observation authentication ->
+`SourceEvidenceCatalog` co-version comparison -> `RuleSourcePackage` typed scope, package identity,
+stable source-ID, catalog, and execution-evidence validation. There is no authoritative game-state
+mutation, domain event, decision, adapter payload, or replay effect.
 
 Decision and viewer-visibility impact: None. S-MIRRORS adds no decision type, option family,
 proposal kind, adapter-visible payload, hidden-information classification, or redaction path.
@@ -1851,24 +1859,28 @@ proposal kind, adapter-visible payload, hidden-information classification, or re
 Regression scenarios and same-bug-class search: Tests accept a complete Game Datamissions record
 using App-data version in place of timestamp; reject a tuple missing both; reject a Game
 Datamissions record using the superseded 40k.app-only policy; reject a non-canonical provider URL;
-accept matching 40k.app/Game Datamissions records for one source ID and version; and reject their
-transcription mismatch. Audit tests pin both provider identities, non-affiliation, ownership and
-runtime-input flags, versions/timestamps, transcription hashes, observation fingerprints, exact
-provider surfaces, report output, and tamper rejection. A static code-quality audit prevents
-regression to a provider-specific policy or omission of mismatch rejection. No behavioral test file
-was added, removed, moved, or renamed, so the four-shard inventory does not change.
+reject nonexistent audit IDs and row IDs; reject a registered row with a mismatched fingerprint;
+reject a newly timestamped/evidence-identified record that reuses the superseded policy; reject a
+faction source ID presented under the Core-only scope; accept matching co-versioned provider
+fingerprints; and reject their transcription mismatch. Audit tests pin both provider identities,
+non-affiliation, ownership and runtime-input flags, versions/timestamps, transcription hashes,
+observation fingerprints, exact provider surfaces, registry/report output, and tamper rejection. A
+static code-quality audit prevents regression to a provider-specific policy, unauthenticated audit
+tuple, unscoped source package, or omission of mismatch rejection. No behavioral test file was
+added, removed, moved, or renamed, so the four-shard inventory does not change.
 
 Generated artifacts/documentation: S-MIRRORS adds
 `data/source_audits/maintained_app_mirrors/core_rules_2026_09_02.audit.json`, its offline typed
-validator/generator, and `docs/CORE_RULES_MAINTAINED_MIRROR_REVIEW.md`; replaces the active source
-policy; documents the shared validation boundary in README and `ARCHITECTURE_V2.md`; preserves the
-older 40k.app audit as historical evidence; and updates this roadmap record. Engine-build and
-external-contract artifacts are regenerated because shared packaged source validation changed;
-their final identities are recorded after generation.
+validator/generator, `docs/CORE_RULES_MAINTAINED_MIRROR_REVIEW.md`, and the hash-pinned packaged
+`source_authority_registry.json` with its typed fail-fast loader; replaces the active source policy;
+documents the shared validation boundary in README and `ARCHITECTURE_V2.md`; preserves the older
+40k.app audit as historical evidence; and updates this roadmap record. Engine-build and external-
+contract artifacts are regenerated because shared packaged source validation changed; their final
+identities are recorded after generation.
 
 Validation results: Focused source-identity, governance-audit, renderer, and code-quality coverage
-passes (`106 passed`). `ruff check`, `ruff format --check`, `mypy`, and `pyright` pass; the complete
-xdist work-stealing suite passes (`6387 passed`); and the completed behavioral coverage database
+passes (`112 passed`). `ruff check`, `ruff format --check`, `mypy`, and `pyright` pass; the complete
+xdist work-stealing suite passes (`6393 passed`); and the completed behavioral coverage database
 passes `coverage report --fail-under=85` at `85%`. The exact four-shard inventory check and all
 `11` import-linter contracts pass. The historical 40k.app audit, maintained-mirror audit, all seven
 Core Rules source generators, engine-build identity, base-ref external contract, and installed-wheel

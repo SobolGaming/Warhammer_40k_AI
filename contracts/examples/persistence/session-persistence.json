@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "9380844d96a7bcb98cf9afc2f6291794e96b80ca3f914250358734cc295494e5",
+  "content_hash": "5ca9b335112e249ad808991dcc8a3337f261c0f6081bccd7a6961b913e9b072f",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,7 +92,7 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1250283283683efed4920ae4ef67162e96b074e6566ae591cc28395ab247c86c",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e56cce72fd709f7438c3585dccd2a8d1bd20f404244ce8387029ff9ee09f8791",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "11.0.0",
@@ -14317,7 +14317,7 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1250283283683efed4920ae4ef67162e96b074e6566ae591cc28395ab247c86c",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e56cce72fd709f7438c3585dccd2a8d1bd20f404244ce8387029ff9ee09f8791",
               "engine_version": "0.1.0",
               "event_cursor": "388W53mqNJ9kUCV-Fj9fODjzD11j4q3iMJSAvsKPs-8cRXX5bVPD1YUATMEGNWi2",
               "game_id": "phase18l-contract-persistence",
@@ -14364,7 +14364,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "8223ffcaa1308d51c67b5adce751e3b0ade1a3b12d19f905c491f15cfcc653ed",
+      "history_head": "eb8b7f15af0f45bc70fe6eee4fe995a378d634d7f14662ac1c7f1a99b80f30a1",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -14486,7 +14486,7 @@
             },
             "token": "YZJA38OJu5UyOZl4J5q7ELsstxFF_7eq5djAo-dtBx66u9ie5C6doHWxiFyJT5O1"
           },
-          "journal_entry_hash": "44b459f9906a65fcf23fb58936e6f61b564178705ddc4b4cb21bbc2e76736791",
+          "journal_entry_hash": "74e09ce4daa3a0cb708d0d838073078ae8f6da549e0170aea7d5930fe69e87e8",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -14504,8 +14504,8 @@
             "origin_kind": "protocol_command"
           },
           "previous_revision_commitment": "a146eee3b8df4c4e45aa944708512919d33de284edee3642c0f3831b007353dc",
-          "response_hash": "5b232049c93358ab7ad0a1005207c15e9b29cee0a3e506094362f89ffe3b3780",
-          "revision_commitment": "8223ffcaa1308d51c67b5adce751e3b0ade1a3b12d19f905c491f15cfcc653ed",
+          "response_hash": "efa07f3e3d2a7ecba3ee715b5a3a455b98c968025a8a8b97e15b75a9c336566a",
+          "revision_commitment": "eb8b7f15af0f45bc70fe6eee4fe995a378d634d7f14662ac1c7f1a99b80f30a1",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",

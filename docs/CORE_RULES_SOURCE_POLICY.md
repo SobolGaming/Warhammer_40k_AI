@@ -27,8 +27,10 @@ that actually came from Games Workshop.
 This policy supersedes
 `core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26` for
 new observations. Existing immutable 40k.app observations retain that earlier
-policy ID as historical provenance; the superseded policy cannot authorize a
-new provider or a new source observation.
+policy ID as historical provenance only when their evidence ID, stable rule
+source ID, and complete observation fingerprint match the exact legacy
+inventory in the checked-in source-authority registry. The superseded policy
+cannot authorize a new provider, evidence identity, timestamp, or observation.
 
 ## Required evidence tuple
 
@@ -45,10 +47,22 @@ following:
    fingerprint.
 7. The non-affiliation marker and the current policy ID.
 
-Missing or malformed tuple data fails source-package loading. Provider names
-and URLs are allowlisted together: 40k.app records use canonical
+Every project-authoritative tuple is resolved against the hash-pinned
+[packaged source-authority registry](../src/warhammer40k_core/rules/source_authority_registry.json).
+The registered audit ID and row ID must exist, and their retained fingerprint,
+provider, URL, policy, and version-or-timestamp identity must match exactly.
+Missing, malformed, unregistered, or mismatched tuple data fails record
+construction and source-package loading. Provider names and URLs are
+allowlisted together: 40k.app records use canonical
 `https://www.40k.app/rules...` URLs, while Game Datamissions records use
 `https://game-datamissions.com/11th/rules/changelog`.
+
+The current policy is also bound to the typed
+`warhammer_40000_11th_core_rules` scope. A `RuleSourcePackage` must match a
+registered package namespace, name, version, and allowed stable rule-source-ID
+inventory for Core Rules categories 01–25. A faction, detachment, datasheet,
+or other non-Core source ID cannot be certified by supplying an otherwise
+complete Core Rules mirror tuple.
 
 ## Comparison and conflict rules
 
@@ -90,6 +104,9 @@ and URLs are allowlisted together: 40k.app records use canonical
    [maintained-mirror review](CORE_RULES_MAINTAINED_MIRROR_REVIEW.md) and its
    audit artifact record both approved providers without treating either as a
    Games Workshop source.
+9. Update the packaged source-authority registry only in the same reviewed PR
+   that adds an audit row, immutable legacy observation, or authorized Core
+   Rules source package. Its raw bytes are pinned by the typed loader.
 
 ## User disambiguation exception
 

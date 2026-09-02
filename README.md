@@ -435,10 +435,16 @@ Current status:
   [Core Rules source authority policy](docs/CORE_RULES_SOURCE_POLICY.md).
   Source-package validation requires the provider, canonical URL, App-data
   version or timestamp, transcription SHA-256, and immutable observation
-  fingerprint. Co-versioned observations for one stable rule ID must agree or
-  validation fails pending official-App comparison. The earlier
+  fingerprint, then authenticates the full audit tuple against the hash-pinned
+  [source-authority registry](src/warhammer40k_core/rules/source_authority_registry.json).
+  Each package carries a typed Core-Rules-only scope and must match a registered
+  package identity and stable source-ID inventory. Co-versioned observations
+  for one stable rule ID must agree or validation fails pending official-App
+  comparison. The earlier
   [40k.app category comparison](docs/CORE_RULES_40K_APP_COMPARISON.md) remains
-  retained under `data/source_audits/40k_app` with its historical policy ID.
+  retained under `data/source_audits/40k_app` with its historical policy ID,
+  which is accepted only for the registry's exact immutable observation
+  inventory.
   Neither provider is presented as Games Workshop-owned, and live provider
   sites are never runtime input. These audits exclude factions, faction
   detachments, and faction datasheet content.
