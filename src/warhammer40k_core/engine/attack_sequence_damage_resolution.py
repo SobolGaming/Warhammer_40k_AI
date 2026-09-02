@@ -337,7 +337,10 @@ def _apply_damage_after_feel_no_pain(
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
         sources=tuple(source for source in destruction_sources if not source.optional),
     )
-    if destroyed_transport_status is not None:
+    if (
+        destroyed_transport_status is not None
+        or attack_sequence.pending_destroyed_transport_disembark is not None
+    ):
         return attack_sequence, allocated_model_ids, destroyed_transport_status
     mandatory_status = _resolve_mandatory_destruction_reactions_before_removal(
         state=state,

@@ -235,15 +235,21 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.transports import (
+    TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     DestroyedTransportDisembark,
     DestroyedTransportDisembarkPayload,
+    DestroyedTransportHazardRolls,
+    DestroyedTransportHazardRollsPayload,
     DisembarkModeKind,
     DisembarkSelection,
     TransportCargoState,
+    TransportHazardMortalWounds,
+    TransportHazardMortalWoundsPayload,
     TransportMovementStatus,
     apply_destroyed_transport_disembark_to_battlefield,
     apply_transport_hazard_mortal_wounds,
     resolve_destroyed_transport_disembark,
+    resolve_destroyed_transport_hazard_rolls,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
@@ -442,6 +448,9 @@ __all__ = (
     "TimingWindow",
     "TimingWindowDescriptor",
     "TransportCargoState",
+    "TransportHazardMortalWounds",
+    "TransportHazardMortalWoundsPayload",
+    "TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE",
     "TransportMovementStatus",
     "TriggerBatchingMode",
     "TypedDict",
@@ -461,6 +470,8 @@ __all__ = (
     "apply_damage_to_model",
     "apply_destroyed_transport_disembark_to_battlefield",
     "apply_transport_hazard_mortal_wounds",
+    "DestroyedTransportHazardRolls",
+    "DestroyedTransportHazardRollsPayload",
     "battle_phase_kind_from_token",
     "build_allocation_order_request",
     "build_damage_allocation_model_request",
@@ -494,6 +505,7 @@ __all__ = (
     "remove_destroyed_model_from_battlefield",
     "replace",
     "resolve_destroyed_transport_disembark",
+    "resolve_destroyed_transport_hazard_rolls",
     "resolve_feel_no_pain_rolls",
     "resolve_mortal_wound_decision",
     "resolve_saving_throw",

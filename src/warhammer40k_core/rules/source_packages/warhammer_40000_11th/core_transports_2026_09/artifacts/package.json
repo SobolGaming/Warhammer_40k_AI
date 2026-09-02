@@ -1,0 +1,97 @@
+{
+  "artifact_schema": "core-v2-transports-source-v1",
+  "evidence": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-transports-source-review:emergency-disembark-move",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "41830aeaa0b2d711ad77a31e60092acf543b4d31b24c6cd286e1818948237b63",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-rules:transports:emergency-disembark-move",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attack_sequence_destroyed_transport:_continue_pending_destroyed_transport_disembark",
+        "warhammer40k_core.engine.attack_sequence_destroyed_transport:_request_destroyed_transport_disembark_placement",
+        "warhammer40k_core.engine.emergency_disembark:apply_transport_hazard_mortal_wounds_service",
+        "warhammer40k_core.engine.emergency_disembark:resolve_destroyed_transport_hazard_rolls_service"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 18.05 Emergency Disembark Move",
+      "source_url": null,
+      "transcription_sha256": "3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "40k-app-transports-2026-09-01:emergency-disembark-move",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "645e8e96af35d4aefe38c755c2ce6b72579d925865ace9e5b16e5b58158c5b98",
+      "observed_at": "2026-09-01T18:46:11-04:00",
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "40k-app-core-rules-2026-08-25",
+      "review_audit_row_id": "category:18",
+      "review_audit_source_observation_sha256": "d9a06d3c5b350f66bad9e4b89f62242fd0f0b4c54579ea3ad6bbf2c2674b8d0e",
+      "rule_source_id": "gw-11e-core-rules:transports:emergency-disembark-move",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attack_sequence_destroyed_transport:_continue_pending_destroyed_transport_disembark",
+        "warhammer40k_core.engine.attack_sequence_destroyed_transport:_request_destroyed_transport_disembark_placement",
+        "warhammer40k_core.engine.emergency_disembark:apply_transport_hazard_mortal_wounds_service",
+        "warhammer40k_core.engine.emergency_disembark:resolve_destroyed_transport_hazard_rolls_service"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "40k.app Core Rules 18.05 Emergency Disembark Move",
+      "source_url": "https://www.40k.app/rules/18-transports",
+      "transcription_sha256": "3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "11ef8c6081238b8271effc171f9cd90cd85f1ec0028589db833b517bbe3fede0",
+  "rules": [
+    {
+      "load_support_status": "loaded",
+      "rule_id": "emergency-disembark-move",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.attack_sequence_destroyed_transport:_continue_pending_destroyed_transport_disembark",
+        "warhammer40k_core.engine.attack_sequence_destroyed_transport:_request_destroyed_transport_disembark_placement",
+        "warhammer40k_core.engine.emergency_disembark:apply_transport_hazard_mortal_wounds_service",
+        "warhammer40k_core.engine.emergency_disembark:resolve_destroyed_transport_hazard_rolls_service"
+      ],
+      "section_heading": "EMERGENCY DISEMBARK MOVE",
+      "section_id": "18.05",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-rules:transports:emergency-disembark-move",
+      "source_text": "EMERGENCY DISEMBARK MOVE\nWhen eligible: Your unit is embarked within a TRANSPORT model that was just destroyed.\nMaximum distance: SET-UP DISTANCE: 6\"\nEffect: Your unit is set up as described in Set Up (03.02)\nBefore moving: Make a hazard roll for each model in your unit (06.03)\nWhile moving: Set up each model in your unit:\n- Wholly within the set-up distance of that TRANSPORT, and as close as possible to that TRANSPORT.\n- Or: If the above is not possible while remaining unengaged, set up that model wholly within the set-up distance of that TRANSPORT, as close as possible to that TRANSPORT, and engaged.\nEach model that still cannot be set up is destroyed.\nAfter moving: Your unit is battle-shocked and, until the end of the turn, it is not eligible to declare a charge.",
+      "transcription_sha256": "3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56"
+    }
+  ],
+  "source_document": {
+    "document_id": "40k-app-transports-2026-09-01",
+    "observed_at": "2026-09-01T18:46:11-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
+    "source_title": "40k.app Core Rules Transports",
+    "source_url": "https://www.40k.app/rules/18-transports"
+  },
+  "source_package_id": "gw-11e-core-transports",
+  "source_version": "40k-app-transports-observed-2026-09-01"
+}

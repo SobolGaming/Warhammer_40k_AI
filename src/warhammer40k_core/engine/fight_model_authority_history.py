@@ -50,9 +50,13 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_identities_share_lineage,
 )
 from warhammer40k_core.engine.transports import (
+    TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     DestroyedTransportDisembark,
     DestroyedTransportDisembarkPayload,
+    DestroyedTransportHazardRolls,
     DisembarkModeKind,
+    TransportHazardMortalWounds,
+    TransportHazardMortalWoundsPayload,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     model_restoration_events_for_event_log_interval,
@@ -383,6 +387,13 @@ def _authority_mutations_by_event_index(
                     model_unit_by_id=model_unit_by_id,
                 )
             )
+        elif event.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE:
+            event_mutations.extend(
+                _embedded_transport_hazard_destruction_mutations(
+                    event=event,
+                    model_unit_by_id=model_unit_by_id,
+                )
+            )
         elif event_index in restoration_model_ids_by_index:
             event_mutations.extend(
                 _restoration_mutations(
@@ -436,6 +447,48 @@ def _authority_mutations_by_event_index(
             )
         mutations[event_index] = tuple(event_mutations)
     return mutations
+
+
+def _embedded_transport_hazard_destruction_mutations(
+    *,
+    event: EventRecord,
+    model_unit_by_id: dict[str, str],
+) -> tuple[_AuthorityMutation, ...]:
+    payload = _event_payload(event, field_name="Transport hazard mortal wounds")
+    try:
+        result = TransportHazardMortalWounds.from_payload(
+            cast(TransportHazardMortalWoundsPayload, payload)
+        )
+    except (GeometryError, KeyError, PlacementError, TypeError, ValueError) as exc:
+        raise GameLifecycleError("Transport hazard authority is invalid.") from exc
+    if type(result.disembark) is not DestroyedTransportHazardRolls:
+        return ()
+    application = result.mortal_wound_application
+    if application is None:
+        return ()
+    destroyed_model_ids = tuple(
+        damage.model_instance_id for damage in application.applications if damage.destroyed
+    )
+    if len(destroyed_model_ids) != len(set(destroyed_model_ids)):
+        raise GameLifecycleError("Transport hazard authority duplicates a casualty.")
+    for model_id in destroyed_model_ids:
+        if _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id) != (
+            result.disembark.unit_instance_id
+        ):
+            raise GameLifecycleError("Transport hazard casualty lineage drift.")
+    return tuple(
+        _AuthorityMutation(
+            model_instance_id=model_id,
+            after_exists=True,
+            after_living=False,
+            after_placed=False,
+            before_exists=True,
+            before_living=True,
+            before_placed=False,
+            source=TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
+        )
+        for model_id in destroyed_model_ids
+    )
 
 
 def _destroyed_transport_disembark_destruction_mutations(

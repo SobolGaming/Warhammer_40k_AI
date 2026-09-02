@@ -22,7 +22,6 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
     ModelPlacementRecord,
-    PlacementError,
     UnitPlacement,
     UnitPlacementPayload,
     geometry_model_for_placement,
@@ -68,6 +67,9 @@ from warhammer40k_core.engine.weapon_instances import equipped_weapon_instance_b
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_transports_2026_09,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.damage_allocation import (
@@ -75,6 +77,9 @@ if TYPE_CHECKING:
         MortalWoundApplicationPayload,
     )
     from warhammer40k_core.engine.game_state import GameState
+
+
+EMERGENCY_DISEMBARK_MOVE_SOURCE_ID = core_transports_2026_09.EMERGENCY_DISEMBARK_MOVE_SOURCE_ID
 
 
 class TransportMovementStatus(StrEnum):
@@ -219,7 +224,21 @@ class DestroyedTransportModelRollPayload(TypedDict):
     mortal_wound_inflicted: bool
 
 
+class DestroyedTransportHazardRollsPayload(TypedDict):
+    source_rule_id: str
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    transport_unit_instance_id: str
+    disembark_mode: str
+    roll_threshold: int
+    mortal_wounds_per_failed_roll: int
+    model_rolls: list[DestroyedTransportModelRollPayload]
+    mortal_wound_count: int
+
+
 class DestroyedTransportDisembarkPayload(TypedDict):
+    source_rule_id: str
     player_id: str
     battle_round: int
     unit_instance_id: str
@@ -231,6 +250,7 @@ class DestroyedTransportDisembarkPayload(TypedDict):
     model_rolls: list[DestroyedTransportModelRollPayload]
     mortal_wound_count: int
     destroyed_model_instance_ids: list[str]
+    hazard_destroyed_model_instance_ids: list[str]
     disembarked_unit_state: DisembarkedUnitStatePayload | None
 
 
@@ -251,7 +271,11 @@ class TransportHazardMortalWoundsPayload(TypedDict):
     source_rule_id: str
     source_kind: str
     disembark_mode: str
-    disembark: CombatDisembarkPayload | DestroyedTransportDisembarkPayload
+    disembark: (
+        CombatDisembarkPayload
+        | DestroyedTransportDisembarkPayload
+        | DestroyedTransportHazardRollsPayload
+    )
     mortal_wounds: int
     mortal_wound_application: MortalWoundApplicationPayload | None
     pending_mortal_wound_request: DecisionRequestPayload | None
@@ -1248,6 +1272,53 @@ class DestroyedTransportModelRoll:
 
 
 @dataclass(frozen=True, slots=True)
+class DestroyedTransportHazardRolls:
+    player_id: str
+    battle_round: int
+    unit_instance_id: str
+    transport_unit_instance_id: str
+    disembark_mode: DisembarkModeKind
+    roll_threshold: int
+    model_rolls: tuple[DestroyedTransportModelRoll, ...]
+    mortal_wounds_per_failed_roll: int = 1
+    source_rule_id: str = EMERGENCY_DISEMBARK_MOVE_SOURCE_ID
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.emergency_disembark import (
+            validate_destroyed_transport_hazard_rolls,
+        )
+
+        validate_destroyed_transport_hazard_rolls(self)
+
+    @property
+    def mortal_wound_count(self) -> int:
+        return sum(
+            self.mortal_wounds_per_failed_roll
+            for roll in self.model_rolls
+            if roll.mortal_wound_inflicted
+        )
+
+    @property
+    def model_instance_ids(self) -> tuple[str, ...]:
+        return tuple(roll.model_instance_id for roll in self.model_rolls)
+
+    def to_payload(self) -> DestroyedTransportHazardRollsPayload:
+        from warhammer40k_core.engine.emergency_disembark import (
+            destroyed_transport_hazard_rolls_to_payload,
+        )
+
+        return destroyed_transport_hazard_rolls_to_payload(self)
+
+    @classmethod
+    def from_payload(cls, payload: DestroyedTransportHazardRollsPayload) -> Self:
+        from warhammer40k_core.engine.emergency_disembark import (
+            destroyed_transport_hazard_rolls_from_payload,
+        )
+
+        return cast(Self, destroyed_transport_hazard_rolls_from_payload(payload))
+
+
+@dataclass(frozen=True, slots=True)
 class DestroyedTransportDisembark:
     player_id: str
     battle_round: int
@@ -1259,8 +1330,20 @@ class DestroyedTransportDisembark:
     model_rolls: tuple[DestroyedTransportModelRoll, ...]
     mortal_wounds_per_failed_roll: int = 1
     destroyed_model_instance_ids: tuple[str, ...] = ()
+    hazard_destroyed_model_instance_ids: tuple[str, ...] = ()
+    source_rule_id: str = EMERGENCY_DISEMBARK_MOVE_SOURCE_ID
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier(
+                "DestroyedTransportDisembark source_rule_id",
+                self.source_rule_id,
+            ),
+        )
+        if self.source_rule_id != EMERGENCY_DISEMBARK_MOVE_SOURCE_ID:
+            raise GameLifecycleError("DestroyedTransportDisembark source rule drift.")
         object.__setattr__(
             self,
             "player_id",
@@ -1338,6 +1421,16 @@ class DestroyedTransportDisembark:
                 self.destroyed_model_instance_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "hazard_destroyed_model_instance_ids",
+            _validate_identifier_tuple(
+                "DestroyedTransportDisembark hazard_destroyed_model_instance_ids",
+                self.hazard_destroyed_model_instance_ids,
+            ),
+        )
+        if set(self.destroyed_model_instance_ids) & set(self.hazard_destroyed_model_instance_ids):
+            raise GameLifecycleError("DestroyedTransportDisembark casualty inventories overlap.")
         if self.roll_threshold != HAZARD_ROLL_FAILURE_THRESHOLD:
             raise GameLifecycleError("DestroyedTransportDisembark roll threshold drift.")
         for roll in self.model_rolls:
@@ -1352,6 +1445,7 @@ class DestroyedTransportDisembark:
             expected_roll_model_ids = set(placed_model_ids)
             if self.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK:
                 expected_roll_model_ids.update(self.destroyed_model_instance_ids)
+                expected_roll_model_ids.update(self.hazard_destroyed_model_instance_ids)
             rolled_model_ids = {roll.model_instance_id for roll in self.model_rolls}
             if rolled_model_ids != expected_roll_model_ids:
                 raise GameLifecycleError("DestroyedTransportDisembark roll model drift.")
@@ -1370,6 +1464,7 @@ class DestroyedTransportDisembark:
 
     def to_payload(self) -> DestroyedTransportDisembarkPayload:
         return {
+            "source_rule_id": self.source_rule_id,
             "player_id": self.player_id,
             "battle_round": self.battle_round,
             "unit_instance_id": self.unit_instance_id,
@@ -1381,6 +1476,7 @@ class DestroyedTransportDisembark:
             "model_rolls": [roll.to_payload() for roll in self.model_rolls],
             "mortal_wound_count": self.mortal_wound_count,
             "destroyed_model_instance_ids": list(self.destroyed_model_instance_ids),
+            "hazard_destroyed_model_instance_ids": list(self.hazard_destroyed_model_instance_ids),
             "disembarked_unit_state": None
             if self.disembarked_unit_state is None
             else self.disembarked_unit_state.to_payload(),
@@ -1389,6 +1485,7 @@ class DestroyedTransportDisembark:
     @classmethod
     def from_payload(cls, payload: DestroyedTransportDisembarkPayload) -> Self:
         result = cls(
+            source_rule_id=payload["source_rule_id"],
             player_id=payload["player_id"],
             battle_round=payload["battle_round"],
             unit_instance_id=payload["unit_instance_id"],
@@ -1401,6 +1498,9 @@ class DestroyedTransportDisembark:
                 DestroyedTransportModelRoll.from_payload(roll) for roll in payload["model_rolls"]
             ),
             destroyed_model_instance_ids=tuple(payload["destroyed_model_instance_ids"]),
+            hazard_destroyed_model_instance_ids=tuple(
+                payload["hazard_destroyed_model_instance_ids"]
+            ),
         )
         if result.mortal_wound_count != payload["mortal_wound_count"]:
             raise GameLifecycleError("DestroyedTransportDisembark mortal wound count drift.")
@@ -1556,7 +1656,7 @@ class CombatDisembark:
 class TransportHazardMortalWounds:
     source_rule_id: str
     source_kind: str
-    disembark: CombatDisembark | DestroyedTransportDisembark
+    disembark: CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls
     mortal_wound_application: MortalWoundApplication | None = None
     pending_mortal_wound_request: DecisionRequest | None = None
 
@@ -1581,14 +1681,23 @@ class TransportHazardMortalWounds:
         )
         if self.source_kind != TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
             raise GameLifecycleError("TransportHazardMortalWounds source_kind drift.")
-        if type(self.disembark) not in {CombatDisembark, DestroyedTransportDisembark}:
+        if type(self.disembark) not in {
+            CombatDisembark,
+            DestroyedTransportDisembark,
+            DestroyedTransportHazardRolls,
+        }:
             raise GameLifecycleError(
                 "TransportHazardMortalWounds requires a transport hazard disembark."
             )
-        if not self.disembark.placement.is_valid:
-            raise GameLifecycleError(
-                "TransportHazardMortalWounds requires a valid disembark placement."
+        if type(self.disembark) is not DestroyedTransportHazardRolls:
+            placed_disembark = cast(
+                CombatDisembark | DestroyedTransportDisembark,
+                self.disembark,
             )
+            if not placed_disembark.placement.is_valid:
+                raise GameLifecycleError(
+                    "TransportHazardMortalWounds requires a valid disembark placement."
+                )
         application = self.mortal_wound_application
         request = self.pending_mortal_wound_request
         if application is not None and type(application) is not MortalWoundApplication:
@@ -1643,6 +1752,8 @@ class TransportHazardMortalWounds:
             return DisembarkModeKind.COMBAT_DISEMBARK
         if type(self.disembark) is DestroyedTransportDisembark:
             return self.disembark.disembark_mode
+        if type(self.disembark) is DestroyedTransportHazardRolls:
+            return self.disembark.disembark_mode
         raise GameLifecycleError("Unsupported transport hazard disembark.")
 
     @property
@@ -1673,16 +1784,20 @@ class TransportHazardMortalWounds:
 
         disembark_mode = disembark_mode_kind_from_token(payload["disembark_mode"])
         if disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
-            disembark: CombatDisembark | DestroyedTransportDisembark = CombatDisembark.from_payload(
-                payload["disembark"]
-            )
+            disembark: (
+                CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls
+            ) = CombatDisembark.from_payload(cast(CombatDisembarkPayload, payload["disembark"]))
         elif disembark_mode in {
             DisembarkModeKind.DESTROYED_TRANSPORT,
             DisembarkModeKind.EMERGENCY_DISEMBARK,
         }:
-            disembark = DestroyedTransportDisembark.from_payload(
-                cast(DestroyedTransportDisembarkPayload, payload["disembark"])
-            )
+            disembark_payload = payload["disembark"]
+            if "placement" in disembark_payload:
+                disembark = DestroyedTransportDisembark.from_payload(
+                    cast(DestroyedTransportDisembarkPayload, disembark_payload)
+                )
+            else:
+                disembark = DestroyedTransportHazardRolls.from_payload(disembark_payload)
         else:
             raise GameLifecycleError(
                 "TransportHazardMortalWounds requires a hazard disembark mode."
@@ -2227,6 +2342,27 @@ def apply_combat_disembark_to_battlefield(
     )
 
 
+def resolve_destroyed_transport_hazard_rolls(
+    *,
+    cargo_state: TransportCargoState,
+    unit: UnitInstance,
+    dice_manager: DiceRollManager,
+    battle_round: int,
+    disembark_mode: DisembarkModeKind = DisembarkModeKind.EMERGENCY_DISEMBARK,
+) -> DestroyedTransportHazardRolls:
+    from warhammer40k_core.engine.emergency_disembark import (
+        resolve_destroyed_transport_hazard_rolls_service,
+    )
+
+    return resolve_destroyed_transport_hazard_rolls_service(
+        cargo_state=cargo_state,
+        unit=unit,
+        dice_manager=dice_manager,
+        battle_round=battle_round,
+        disembark_mode=disembark_mode,
+    )
+
+
 def resolve_destroyed_transport_disembark(
     *,
     scenario: BattlefieldScenario,
@@ -2235,74 +2371,28 @@ def resolve_destroyed_transport_disembark(
     selection: DisembarkSelection,
     unit: UnitInstance,
     transport_placement: UnitPlacement,
-    dice_manager: DiceRollManager,
+    hazard_rolls: DestroyedTransportHazardRolls,
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> DestroyedTransportDisembark:
-    if type(dice_manager) is not DiceRollManager:
-        raise GameLifecycleError("Destroyed Transport disembark requires a DiceRollManager.")
-    if selection.disembark_mode not in {
-        DisembarkModeKind.DESTROYED_TRANSPORT,
-        DisembarkModeKind.EMERGENCY_DISEMBARK,
-    }:
-        raise GameLifecycleError(
-            "Destroyed Transport disembark requires destroyed or emergency mode."
-        )
-    emergency = selection.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
-    destroyed_selection = replace(
-        selection,
-        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    from warhammer40k_core.engine.emergency_disembark import (
+        resolve_destroyed_transport_disembark_service,
     )
-    placement = _resolve_disembark(
+
+    return resolve_destroyed_transport_disembark_service(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         cargo_state=cargo_state,
-        selection=destroyed_selection,
+        selection=selection,
         unit=unit,
         transport_placement=transport_placement,
-        require_started_phase_embarked=False,
+        hazard_rolls=hazard_rolls,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
-    )
-    roll_threshold = HAZARD_ROLL_FAILURE_THRESHOLD
-    expected_model_ids = {model.model_instance_id for model in unit.own_models}
-    placed_model_ids = {
-        placement.model_instance_id for placement in selection.attempted_placement.model_placements
-    }
-    destroyed_model_ids = tuple(sorted(expected_model_ids - placed_model_ids)) if emergency else ()
-    model_rolls: list[DestroyedTransportModelRoll] = []
-    if placement.is_valid:
-        roll_model_ids = tuple(sorted(expected_model_ids if emergency else placed_model_ids))
-        for model_instance_id in roll_model_ids:
-            roll_state = dice_manager.roll(
-                hazard_roll_spec(
-                    reason=(f"Destroyed Transport disembark roll for {model_instance_id}"),
-                    roll_type="destroyed_transport_disembark",
-                    actor_id=model_instance_id,
-                )
-            )
-            model_rolls.append(
-                DestroyedTransportModelRoll(
-                    model_instance_id=model_instance_id,
-                    roll_state=roll_state,
-                    mortal_wound_inflicted=hazard_roll_failed(roll_state),
-                )
-            )
-    return DestroyedTransportDisembark(
-        player_id=selection.player_id,
-        battle_round=selection.battle_round,
-        unit_instance_id=selection.unit_instance_id,
-        transport_unit_instance_id=selection.transport_unit_instance_id,
-        disembark_mode=selection.disembark_mode,
-        placement=placement,
-        roll_threshold=roll_threshold,
-        model_rolls=tuple(model_rolls),
-        mortal_wounds_per_failed_roll=hazard_mortal_wounds_per_failed_roll(unit),
-        destroyed_model_instance_ids=destroyed_model_ids,
     )
 
 
@@ -2331,92 +2421,19 @@ def apply_transport_hazard_mortal_wounds(
     *,
     state: GameState,
     decisions: DecisionController,
-    disembark: CombatDisembark | DestroyedTransportDisembark,
+    disembark: (CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls),
     dice_manager: DiceRollManager,
 ) -> TransportHazardMortalWounds:
-    from warhammer40k_core.engine.damage_allocation import continue_mortal_wound_application
-    from warhammer40k_core.engine.game_state import GameState
-    from warhammer40k_core.engine.mortal_wound_application_progress import (
-        start_hazardous_mortal_wound_application,
+    from warhammer40k_core.engine.emergency_disembark import (
+        apply_transport_hazard_mortal_wounds_service,
     )
 
-    if type(state) is not GameState:
-        raise GameLifecycleError("Transport hazard mortal wounds require GameState.")
-    if type(decisions) is not DecisionController:
-        raise GameLifecycleError("Transport hazard mortal wounds require DecisionController.")
-    if type(disembark) not in {CombatDisembark, DestroyedTransportDisembark}:
-        raise GameLifecycleError(
-            "Transport hazard mortal wounds require a transport hazard disembark."
-        )
-    if type(dice_manager) is not DiceRollManager:
-        raise GameLifecycleError("Transport hazard mortal wounds require DiceRollManager.")
-    if state.battle_round != disembark.battle_round:
-        raise GameLifecycleError("Transport hazard mortal wounds battle_round drift.")
-    if not disembark.placement.is_valid:
-        raise GameLifecycleError(
-            "Transport hazard mortal wounds require a valid disembark placement."
-        )
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Transport hazard mortal wounds require battlefield_state.")
-    try:
-        battlefield.unit_placement_by_id(disembark.unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError(
-            "Transport hazard mortal wounds require the disembarked unit to be placed."
-        ) from exc
-
-    mortal_wounds = disembark.mortal_wound_count
-    if mortal_wounds == 0:
-        resolved = TransportHazardMortalWounds(
-            source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
-            source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
-            disembark=disembark,
-        )
-        _emit_transport_hazard_mortal_wounds_resolved(decisions=decisions, result=resolved)
-        return resolved
-
-    progress = start_hazardous_mortal_wound_application(
-        state=state,
-        application_id=(
-            f"{disembark.unit_instance_id}:{disembark_mode_for_hazard(disembark).value}:"
-            f"transport-hazard-mortal-wounds:r{disembark.battle_round}"
-        ),
-        source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
-        source_context=_transport_hazard_source_context(
-            disembark=disembark,
-            mortal_wounds=mortal_wounds,
-        ),
-        target_unit_instance_id=disembark.unit_instance_id,
-        destroying_player_id=disembark.player_id,
-        mortal_wounds=mortal_wounds,
-        source_step="transport_hazard_mortal_wounds",
-    )
-    routed = continue_mortal_wound_application(
+    return apply_transport_hazard_mortal_wounds_service(
         state=state,
         decisions=decisions,
-        request_id=state.next_decision_request_id(),
-        progress=progress,
+        disembark=disembark,
         dice_manager=dice_manager,
     )
-    if routed.request is not None:
-        decisions.request_decision(routed.request)
-        return TransportHazardMortalWounds(
-            source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
-            source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
-            disembark=disembark,
-            pending_mortal_wound_request=routed.request,
-        )
-    if routed.application is None:
-        raise GameLifecycleError("Transport hazard mortal wounds did not produce application.")
-    resolved = TransportHazardMortalWounds(
-        source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
-        source_kind=TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
-        disembark=disembark,
-        mortal_wound_application=routed.application,
-    )
-    _emit_transport_hazard_mortal_wounds_resolved(decisions=decisions, result=resolved)
-    return resolved
 
 
 def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
@@ -2452,6 +2469,7 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
         result=result,
         next_request_id=state.next_decision_request_id(),
         dice_manager=manager,
+        remove_destroyed_models=(type(disembark) is not DestroyedTransportHazardRolls),
     )
     if routed.request is not None:
         decisions.request_decision(routed.request)
@@ -2480,18 +2498,20 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
 
 
 def disembark_mode_for_hazard(
-    disembark: CombatDisembark | DestroyedTransportDisembark,
+    disembark: (CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls),
 ) -> DisembarkModeKind:
     if type(disembark) is CombatDisembark:
         return DisembarkModeKind.COMBAT_DISEMBARK
     if type(disembark) is DestroyedTransportDisembark:
+        return disembark.disembark_mode
+    if type(disembark) is DestroyedTransportHazardRolls:
         return disembark.disembark_mode
     raise GameLifecycleError("Unsupported transport hazard disembark.")
 
 
 def _transport_hazard_source_context(
     *,
-    disembark: CombatDisembark | DestroyedTransportDisembark,
+    disembark: (CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls),
     mortal_wounds: int,
 ) -> JsonValue:
     return validate_json_value(
@@ -2511,41 +2531,12 @@ def _transport_hazard_source_context(
 
 def _transport_hazard_disembark_from_source_context(
     source_context: JsonValue,
-) -> CombatDisembark | DestroyedTransportDisembark:
-    if not isinstance(source_context, dict):
-        raise GameLifecycleError("Transport hazard source context is invalid.")
-    if source_context.get("source_kind") != TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
-        raise GameLifecycleError("Transport hazard source kind is invalid.")
-    if source_context.get("source_rule_id") != CORE_HAZARD_ROLLS_RULE_ID:
-        raise GameLifecycleError("Transport hazard source_rule_id is invalid.")
-    mode = disembark_mode_kind_from_token(source_context.get("disembark_mode"))
-    disembark_payload = source_context.get("disembark")
-    if not isinstance(disembark_payload, dict):
-        raise GameLifecycleError("Transport hazard disembark payload is invalid.")
-    if mode is DisembarkModeKind.COMBAT_DISEMBARK:
-        disembark: CombatDisembark | DestroyedTransportDisembark = CombatDisembark.from_payload(
-            cast(CombatDisembarkPayload, disembark_payload)
-        )
-    elif mode in {
-        DisembarkModeKind.DESTROYED_TRANSPORT,
-        DisembarkModeKind.EMERGENCY_DISEMBARK,
-    }:
-        disembark = DestroyedTransportDisembark.from_payload(
-            cast(DestroyedTransportDisembarkPayload, disembark_payload)
-        )
-    else:
-        raise GameLifecycleError("Transport hazard source mode is invalid.")
-    if source_context.get("player_id") != disembark.player_id:
-        raise GameLifecycleError("Transport hazard source player drift.")
-    if source_context.get("battle_round") != disembark.battle_round:
-        raise GameLifecycleError("Transport hazard source battle_round drift.")
-    if source_context.get("unit_instance_id") != disembark.unit_instance_id:
-        raise GameLifecycleError("Transport hazard source unit drift.")
-    if source_context.get("transport_unit_instance_id") != disembark.transport_unit_instance_id:
-        raise GameLifecycleError("Transport hazard source transport drift.")
-    if source_context.get("mortal_wounds") != disembark.mortal_wound_count:
-        raise GameLifecycleError("Transport hazard source mortal wound drift.")
-    return disembark
+) -> CombatDisembark | DestroyedTransportDisembark | DestroyedTransportHazardRolls:
+    from warhammer40k_core.engine.emergency_disembark import (
+        transport_hazard_disembark_from_source_context,
+    )
+
+    return transport_hazard_disembark_from_source_context(source_context)
 
 
 def _emit_transport_hazard_mortal_wounds_resolved(
@@ -3564,3 +3555,11 @@ def _validate_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+emit_transport_hazard_mortal_wounds_resolved = _emit_transport_hazard_mortal_wounds_resolved
+resolve_disembark_internal = _resolve_disembark
+transport_hazard_source_context = _transport_hazard_source_context
+validate_destroyed_transport_roll_tuple = _validate_destroyed_transport_roll_tuple
+validate_transport_identifier = _validate_identifier
+validate_transport_positive_int = _validate_positive_int

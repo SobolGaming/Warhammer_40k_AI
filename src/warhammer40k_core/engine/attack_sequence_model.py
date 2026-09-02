@@ -365,6 +365,9 @@ class PendingDestroyedTransportDisembarkPayload(TypedDict):
     transport_unit_instance_id: str
     pending_unit_instance_ids: list[str]
     resolved_disembarks: list[DestroyedTransportDisembarkPayload]
+    current_hazard_rolls: DestroyedTransportHazardRollsPayload | None
+    current_hazard_surviving_model_instance_ids: list[str] | None
+    hazard_destroyed_unit_instance_ids: list[str]
     pending_sources: list[DestructionReactionSourcePayload]
 
 
@@ -938,84 +941,17 @@ class PendingDestroyedTransportDisembark:
     transport_unit_instance_id: str
     pending_unit_instance_ids: tuple[str, ...]
     resolved_disembarks: tuple[DestroyedTransportDisembark, ...] = ()
+    current_hazard_rolls: DestroyedTransportHazardRolls | None = None
+    current_hazard_surviving_model_instance_ids: tuple[str, ...] | None = None
+    hazard_destroyed_unit_instance_ids: tuple[str, ...] = ()
     pending_sources: tuple[DestructionReactionSource, ...] = ()
 
     def __post_init__(self) -> None:
-        attack_context = validate_json_value(self.attack_context)
-        if not isinstance(attack_context, dict):
-            raise GameLifecycleError(
-                "Pending destroyed Transport attack_context must be an object."
-            )
-        object.__setattr__(
-            self,
-            "attack_context",
-            cast(AttackResolutionContextPayload, attack_context),
+        from warhammer40k_core.engine.destroyed_transport_pending import (
+            validate_pending_destroyed_transport_disembark,
         )
-        if type(self.damage_application) is not DamageApplication:
-            raise GameLifecycleError(
-                "Pending destroyed Transport damage_application must be DamageApplication."
-            )
-        if not self.damage_application.destroyed:
-            raise GameLifecycleError("Pending destroyed Transport requires destroyed damage.")
-        if (
-            self.damage_application.target_unit_instance_id
-            != self.attack_context["target_unit_instance_id"]
-        ):
-            raise GameLifecycleError("Pending destroyed Transport damage target drift.")
-        object.__setattr__(
-            self,
-            "saving_throw_payload",
-            validate_json_value(self.saving_throw_payload),
-        )
-        if type(self.feel_no_pain) is not FeelNoPainResolution:
-            raise GameLifecycleError(
-                "Pending destroyed Transport feel_no_pain must be FeelNoPainResolution."
-            )
-        object.__setattr__(
-            self,
-            "destroyed_model_controller_player_id",
-            _validate_identifier(
-                "Pending destroyed Transport controller",
-                self.destroyed_model_controller_player_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "transport_unit_instance_id",
-            _validate_identifier(
-                "Pending destroyed Transport transport_unit_instance_id",
-                self.transport_unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "pending_unit_instance_ids",
-            _validate_identifier_tuple(
-                "Pending destroyed Transport unit ids",
-                self.pending_unit_instance_ids,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "resolved_disembarks",
-            _validate_destroyed_transport_disembark_tuple(self.resolved_disembarks),
-        )
-        object.__setattr__(
-            self,
-            "pending_sources",
-            _validate_destruction_reaction_source_tuple(
-                "Pending destroyed Transport pending_sources",
-                self.pending_sources,
-            ),
-        )
-        resolved_unit_ids = {disembark.unit_instance_id for disembark in self.resolved_disembarks}
-        if resolved_unit_ids & set(self.pending_unit_instance_ids):
-            raise GameLifecycleError("Pending destroyed Transport unit appears in both states.")
-        for disembark in self.resolved_disembarks:
-            if disembark.transport_unit_instance_id != self.transport_unit_instance_id:
-                raise GameLifecycleError("Pending destroyed Transport disembark transport drift.")
-            if disembark.battle_round < 1:
-                raise GameLifecycleError("Pending destroyed Transport disembark round drift.")
+
+        validate_pending_destroyed_transport_disembark(self)
 
     @property
     def next_unit_instance_id(self) -> str | None:
@@ -1028,6 +964,21 @@ class PendingDestroyedTransportDisembark:
             raise GameLifecycleError("Resolved destroyed Transport disembark is invalid.")
         if self.next_unit_instance_id != disembark.unit_instance_id:
             raise GameLifecycleError("Resolved destroyed Transport disembark unit drift.")
+        if self.current_hazard_rolls is None or (
+            self.current_hazard_surviving_model_instance_ids is None
+        ):
+            raise GameLifecycleError(
+                "Resolved destroyed Transport disembark requires completed hazard casualties."
+            )
+        if disembark.model_rolls != self.current_hazard_rolls.model_rolls or set(
+            self.current_hazard_surviving_model_instance_ids
+        ) != {
+            placement.model_instance_id
+            for placement in disembark.placement.selection.attempted_placement.model_placements
+        } | set(disembark.destroyed_model_instance_ids):
+            raise GameLifecycleError(
+                "Resolved destroyed Transport disembark survivor snapshot drift."
+            )
         return type(self)(
             attack_context=self.attack_context,
             damage_application=self.damage_application,
@@ -1037,23 +988,72 @@ class PendingDestroyedTransportDisembark:
             transport_unit_instance_id=self.transport_unit_instance_id,
             pending_unit_instance_ids=self.pending_unit_instance_ids[1:],
             resolved_disembarks=(*self.resolved_disembarks, disembark),
+            current_hazard_rolls=None,
+            current_hazard_surviving_model_instance_ids=None,
+            hazard_destroyed_unit_instance_ids=self.hazard_destroyed_unit_instance_ids,
+            pending_sources=self.pending_sources,
+        )
+
+    def with_current_hazard_rolls(
+        self,
+        hazard_rolls: DestroyedTransportHazardRolls,
+    ) -> Self:
+        if type(hazard_rolls) is not DestroyedTransportHazardRolls:
+            raise GameLifecycleError("Pending destroyed Transport hazard rolls are invalid.")
+        if self.current_hazard_rolls is not None:
+            raise GameLifecycleError("Pending destroyed Transport hazard rolls already exist.")
+        return replace(self, current_hazard_rolls=hazard_rolls)
+
+    def with_current_hazard_survivors(
+        self,
+        model_instance_ids: tuple[str, ...],
+    ) -> Self:
+        if self.current_hazard_rolls is None:
+            raise GameLifecycleError("Pending destroyed Transport survivors require hazard rolls.")
+        if self.current_hazard_surviving_model_instance_ids is not None:
+            raise GameLifecycleError("Pending destroyed Transport hazard survivors already exist.")
+        return replace(
+            self,
+            current_hazard_surviving_model_instance_ids=_validate_identifier_tuple(
+                "Pending destroyed Transport hazard survivor ids",
+                model_instance_ids,
+            ),
+        )
+
+    def with_hazard_destroyed_current_unit(self) -> Self:
+        unit_instance_id = self.next_unit_instance_id
+        if (
+            unit_instance_id is None
+            or self.current_hazard_rolls is None
+            or self.current_hazard_surviving_model_instance_ids != ()
+        ):
+            raise GameLifecycleError(
+                "Pending destroyed Transport destroyed cargo requires zero survivors."
+            )
+        return type(self)(
+            attack_context=self.attack_context,
+            damage_application=self.damage_application,
+            saving_throw_payload=self.saving_throw_payload,
+            feel_no_pain=self.feel_no_pain,
+            destroyed_model_controller_player_id=self.destroyed_model_controller_player_id,
+            transport_unit_instance_id=self.transport_unit_instance_id,
+            pending_unit_instance_ids=self.pending_unit_instance_ids[1:],
+            resolved_disembarks=self.resolved_disembarks,
+            current_hazard_rolls=None,
+            current_hazard_surviving_model_instance_ids=None,
+            hazard_destroyed_unit_instance_ids=(
+                *self.hazard_destroyed_unit_instance_ids,
+                unit_instance_id,
+            ),
             pending_sources=self.pending_sources,
         )
 
     def to_payload(self) -> PendingDestroyedTransportDisembarkPayload:
-        return {
-            "attack_context": self.attack_context,
-            "damage_application": self.damage_application.to_payload(),
-            "saving_throw": self.saving_throw_payload,
-            "feel_no_pain": self.feel_no_pain.to_payload(),
-            "destroyed_model_controller_player_id": self.destroyed_model_controller_player_id,
-            "transport_unit_instance_id": self.transport_unit_instance_id,
-            "pending_unit_instance_ids": list(self.pending_unit_instance_ids),
-            "resolved_disembarks": [
-                disembark.to_payload() for disembark in self.resolved_disembarks
-            ],
-            "pending_sources": [source.to_payload() for source in self.pending_sources],
-        }
+        from warhammer40k_core.engine.destroyed_transport_pending import (
+            pending_destroyed_transport_disembark_to_payload,
+        )
+
+        return pending_destroyed_transport_disembark_to_payload(self)
 
     @classmethod
     def from_payload(cls, payload: PendingDestroyedTransportDisembarkPayload) -> Self:
@@ -1069,6 +1069,17 @@ class PendingDestroyedTransportDisembark:
                 DestroyedTransportDisembark.from_payload(disembark)
                 for disembark in payload["resolved_disembarks"]
             ),
+            current_hazard_rolls=(
+                None
+                if payload["current_hazard_rolls"] is None
+                else DestroyedTransportHazardRolls.from_payload(payload["current_hazard_rolls"])
+            ),
+            current_hazard_surviving_model_instance_ids=(
+                None
+                if payload["current_hazard_surviving_model_instance_ids"] is None
+                else tuple(payload["current_hazard_surviving_model_instance_ids"])
+            ),
+            hazard_destroyed_unit_instance_ids=tuple(payload["hazard_destroyed_unit_instance_ids"]),
             pending_sources=tuple(
                 DestructionReactionSource.from_payload(source)
                 for source in payload["pending_sources"]

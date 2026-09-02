@@ -53,6 +53,7 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathRecorder,
 )
 from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY,
     MortalWoundTargetLineage,
     MortalWoundTargetLineagePayload,
 )
@@ -518,7 +519,7 @@ def mortal_wound_priority_selection(
     )
     if lineage.canonical_target_unit_instance_id != target_unit_instance_id:
         raise GameLifecycleError("Mortal-wound target lineage identity drift.")
-    alive_models, character_model_ids = lineage.alive_placed_models(state=state)
+    alive_models, character_model_ids = lineage.alive_models_for_policy(state=state)
     if not alive_models:
         raise GameLifecycleError("Mortal wound allocation has no legal model.")
     requested_priority_ids = _validate_identifier_tuple(
@@ -661,15 +662,21 @@ def continue_mortal_wound_application(
         progress=progress,
         remove_destroyed_models=remove_destroyed_models,
     )
-    if not remove_destroyed_models and (
-        progress.logical_death_cause_binding is None or logical_death_recorder is None
+    embedded_target = (
+        progress.target_lineage is not None
+        and progress.target_lineage.policy == FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY
+    )
+    if (
+        not remove_destroyed_models
+        and not embedded_target
+        and (progress.logical_death_cause_binding is None or logical_death_recorder is None)
     ):
         raise GameLifecycleError("Retained mortal wound routing requires logical-death authority.")
     current = _progress_with_target_lineage(state=state, progress=progress)
     _mwaa.ensure_started(state, decisions.event_log, current)
     while current.remaining_mortal_wounds:
         lineage = _required_target_lineage(current)
-        alive_models, _ = lineage.alive_placed_models(state=state)
+        alive_models, _ = lineage.alive_models_for_policy(state=state)
         if not alive_models:
             completed = current.with_remaining_lost()
             record_finalized_mortal_wound_progress_destructions(

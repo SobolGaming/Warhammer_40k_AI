@@ -24,6 +24,7 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     MortalWoundLogicalDeathCauseBindingPayload,
 )
 from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY,
     MortalWoundTargetLineage,
     MortalWoundTargetLineagePayload,
 )
@@ -630,7 +631,15 @@ def _direct_mortal_wound_progress_from_event(
     if not is_mortal_wound_resolution_request(request):
         return None
     progress = mortal_wound_resolution_progress(request)
-    return progress if progress.destruction_evidence is not None else None
+    return (
+        progress
+        if progress.destruction_evidence is not None
+        or (
+            progress.target_lineage is not None
+            and progress.target_lineage.policy == FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY
+        )
+        else None
+    )
 
 
 def mortal_wound_application_authority_from_event(
@@ -693,6 +702,18 @@ def _completion_events_for_authority(
             if event.event_type == SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT
             and _self_mortal_wound_completion_matches(authority=authority, event=event)
         )
+    from warhammer40k_core.engine.transports import (
+        TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
+        TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+    )
+
+    if source_kind == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
+        return tuple(
+            event
+            for event in event_records
+            if event.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
+            and _transport_hazard_completion_matches(authority=authority, event=event)
+        )
     raise GameLifecycleError("Retained mortal-wound application source is unsupported.")
 
 
@@ -707,6 +728,9 @@ def _supported_completion_events(
         MortalWoundDestructionFinalizationKind,
         mortal_wound_destruction_finalization_kind_from_event,
     )
+    from warhammer40k_core.engine.transports import (
+        TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
+    )
 
     supported: list[EventRecord] = []
     for event in event_records:
@@ -720,6 +744,19 @@ def _supported_completion_events(
             "deadly_demise_mortal_wounds_applied",
         }:
             supported.append(event)
+            continue
+        if event.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE and isinstance(
+            event.payload, dict
+        ):
+            disembark_payload = event.payload.get("disembark")
+            mortal_wounds = event.payload.get("mortal_wounds")
+            if (
+                type(mortal_wounds) is int
+                and mortal_wounds > 0
+                and isinstance(disembark_payload, dict)
+                and "placement" not in disembark_payload
+            ):
+                supported.append(event)
     return tuple(supported)
 
 
@@ -928,6 +965,32 @@ def _self_mortal_wound_completion_matches(
     )
 
 
+def _transport_hazard_completion_matches(
+    *,
+    authority: MortalWoundApplicationAuthority,
+    event: EventRecord,
+) -> bool:
+    from warhammer40k_core.engine.hazard import CORE_HAZARD_ROLLS_RULE_ID
+    from warhammer40k_core.engine.transports import (
+        TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+    )
+
+    payload = event.payload
+    source_context = authority.source_context
+    if not isinstance(payload, dict) or not isinstance(source_context, dict):
+        return False
+    return (
+        payload.get("source_rule_id") == CORE_HAZARD_ROLLS_RULE_ID
+        and payload.get("source_rule_id") == authority.source_rule_id
+        and payload.get("source_kind") == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+        and source_context.get("source_kind") == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+        and payload.get("disembark_mode") == source_context.get("disembark_mode")
+        and payload.get("disembark") == source_context.get("disembark")
+        and payload.get("mortal_wounds") == authority.mortal_wounds
+        and _completion_application_matches(authority=authority, payload=payload)
+    )
+
+
 def _completion_application_matches(
     *,
     authority: MortalWoundApplicationAuthority,
@@ -962,6 +1025,7 @@ def _validate_completed_logical_death_order(
     from warhammer40k_core.engine.damage_allocation import (
         MortalWoundApplication,
         MortalWoundApplicationPayload,
+        model_by_id,
     )
 
     payload = completion_event.payload
@@ -978,6 +1042,28 @@ def _validate_completed_logical_death_order(
     )
     if len(destroyed_model_ids) != len(set(destroyed_model_ids)):
         raise GameLifecycleError("Mortal-wound completed logical-death models are duplicated.")
+    if authority.target_lineage.policy == FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY:
+        battlefield = state.battlefield_state
+        if battlefield is None:
+            raise GameLifecycleError("Embarked mortal-wound completion requires battlefield state.")
+        removed_model_ids = set(battlefield.removed_model_ids)
+        for model_instance_id in destroyed_model_ids:
+            if (
+                model_by_id(state=state, model_instance_id=model_instance_id).is_alive
+                or battlefield.model_placement_or_none(model_instance_id) is not None
+                or model_instance_id not in removed_model_ids
+            ):
+                raise GameLifecycleError("Embarked mortal-wound completion casualty state drift.")
+        if any(
+            event.event_type == "model_logical_death_recorded"
+            and isinstance(event.payload, dict)
+            and event.payload.get("producer_id") == authority.application_id
+            for event in event_records
+        ):
+            raise GameLifecycleError(
+                "Embarked mortal-wound completion cannot claim placed logical death."
+            )
+        return
     _validate_owned_logical_death_order(
         state=state,
         authority=authority,
@@ -1260,6 +1346,22 @@ def _validate_initial_binding_source(
         validate_selected_to_fight_self_mortal_wound_progress(progress)
         if binding != _initial_binding(progress.logical_death_cause_binding):
             raise GameLifecycleError("Self mortal-wound application start binding drift.")
+        return
+    from warhammer40k_core.engine.transports import (
+        TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
+    )
+
+    if source_kind == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND:
+        expected = MortalWoundLogicalDeathCauseBinding.fixed(
+            cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+            producer_id=progress.application_id,
+        )
+        if (
+            progress.target_lineage is None
+            or progress.target_lineage.policy != FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY
+            or binding != expected
+        ):
+            raise GameLifecycleError("Embarked Transport hazard application start binding drift.")
         return
     raise GameLifecycleError("Retained mortal-wound application source is unsupported.")
 

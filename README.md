@@ -445,6 +445,10 @@ Current status:
   `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_attached_units_source.py` and
   the same command plus `--check`.
+- P18C's reviewed 18.05 Emergency Disembark wording is pinned in
+  `core_transports_2026_09/artifacts/package.json`; refresh and verify it
+  offline with `uv run python tools/build_core_transports_source.py` and the
+  same command plus `--check`.
 - The dependency-ordered
   [Core Rules remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md)
   tracks the itemized implementation findings from the accompanying

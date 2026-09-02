@@ -1493,6 +1493,134 @@ Validation results:
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/413`; merge commit
 pending review and merge.
 
+### P18C — C18-03
+
+Status: Implementation, source/contract updates, focused and aggregate validation, and
+architecture/scope audits are complete; remote PR publication is pending.
+
+Finding IDs: `C18-03`.
+
+Dependencies and evidence gate: P05A and P06B are merged. The exact 18.05 statement is retained as
+a reviewed transcription and a separately classified, project-authoritative 40k.app mirror
+observation linked to the recorded non-affiliation and source-authority policy. This satisfies
+`APP-AUTHORITY`; no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: Emergency Disembark says to make a Hazard Roll for each embarked model before
+moving it. The authoritative damage/FNP path must therefore finish every hazard casualty while the
+cargo is still embarked and unplaced, and the later placement proposal must contain only the exact
+surviving models. Adapters, replay restore, and event authority must observe that same order.
+
+How it was done before P18C: The destroyed-Transport continuation emitted a placement proposal for
+the complete living cargo unit first. After accepting that placement, the resolver rolled each
+model's Hazard Roll and applied the resulting mortal wounds to the now-placed unit. A model that
+should have died before moving could therefore appear in the placement submission and battlefield
+transition, and its casualty evidence was ordered after the placement request.
+
+How it is done after P18C: When the P05A deferred destruction boundary reaches destroyed-Transport
+cargo, the engine freezes the exact embarked model lineage and creates a typed, source-linked
+`DestroyedTransportHazardRolls` snapshot before requesting any placement. The shared P06B mortal-
+wound allocator applies failed-roll wounds and any finite model/FNP decisions against living,
+unplaced cargo. A lethal result updates wounds and the removed-model authority without creating a
+placed-model logical-death or `model_destroyed` event. Checkpoint restore reconstructs those
+alive-unplaced to dead-unplaced mutations from the typed transport-hazard completion event.
+
+Only after the hazard application completes does the attack continuation derive the exact living
+survivor inventory. If no model survives, it records that the cargo unit was destroyed before
+placement and advances without emitting a placement decision. Otherwise it emits the existing
+`submit_placement_proposal` request with immutable `hazard_rolls` and
+`surviving_model_instance_ids` context. Proposal prevalidation rejects any attempted placement
+containing a hazard casualty before queue pop. Accepted placement consumes the precomputed rolls,
+records pre-placement casualties separately from genuinely unplaceable survivors, and then
+continues Battle-shock/no-charge state, Transport removal, and Deadly Demise in the existing order.
+
+Specific authoritative 40k.app rule/statement and source ID: 18.05, `EMERGENCY DISEMBARK MOVE`,
+states under “Before moving” to make a Hazard Roll for each model in the unit. Its stable source ID
+is `gw-11e-core-rules:transports:emergency-disembark-move`. Runtime behavior binds to the typed
+source package constant and never a display name or source-text token.
+
+40k.app URL, observation timestamp, transcription SHA-256, and source-observation fingerprint:
+`https://www.40k.app/rules/18-transports`, observed `2026-09-01T18:46:11-04:00`;
+transcription `3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56`;
+reviewed-transcription observation
+`41830aeaa0b2d711ad77a31e60092acf543b4d31b24c6cd286e1818948237b63`;
+authoritative-mirror observation
+`645e8e96af35d4aefe38c755c2ce6b72579d925865ace9e5b16e5b58158c5b98`;
+category-audit source observation
+`d9a06d3c5b350f66bad9e4b89f62242fd0f0b4c54579ea3ad6bbf2c2674b8d0e`.
+The generated package hash is
+`11ef8c6081238b8271effc171f9cd90cd85f1ec0028589db833b517bbe3fede0` and its canonical artifact
+byte SHA-256 is `661543a9aa9084cf9d4c583940baab0a75382ef7e08efdb2a09f6e35678dc7d2`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:1bd92edcf202dd401f1edc56b34b5465ce404386ce6d3c939cfba8f4b27fba16`.
+
+Load and execution support: The Emergency Disembark Move rule and both evidence rows are `loaded`
+and `executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked mirror observation carries project
+authority. The fail-fast typed loader pins schema, document identity, rule identity, text hash,
+both evidence fingerprints, package hash, and canonical artifact byte hash.
+
+Scope and explicit exclusions: P18C owns the hazard-before-placement timing, embedded/unplaced
+mortal-wound lineage, survivor-only request context and validation, replay/event authority,
+source identity, adapter documentation, regression coverage, and static bug-class audit. It does
+not implement P18B's maximum-placeable-set, closest-possible positioning, unengaged preference,
+engaged fallback, or proof that an omitted survivor is genuinely unplaceable. It does not change
+ordinary, Rapid, Tactical, or Combat Disembark timing, nor the generic P06B placed-model path.
+
+Owning abstraction and architecture: `attack_sequence_destroyed_transport.py` owns the persisted
+destruction continuation and request timing; `emergency_disembark.py` owns the typed pre-placement
+hazard service; `mortal_wound_target_lineage.py` owns the frozen embarked lineage policy; and
+`fight_model_authority_history.py` owns replay reconstruction of the unplaced casualty transition.
+The public transport API remains stable while the new implementation is extracted from the frozen
+oversized `transports.py`; both new engine modules remain below the 1,500-line budget, and the
+legacy transport module does not exceed its historical ceiling.
+
+Decision and viewer-visibility impact: P18C adds no decision type, option family, proposal kind,
+or viewer-visibility rule. The existing public `submit_placement_proposal` request gains additive
+engine-authored survivor/hazard context. Any P06B model-allocation or Feel No Pain choice resolves
+through its existing finite decision registrations before placement. Existing shared adapter
+redaction remains authoritative.
+
+Regression scenarios and same-bug-class search: The Order 10 end-to-end regression wounds the
+last passenger model, injects a failed Emergency Disembark Hazard Roll for that model, resolves
+the shared mortal-wound allocation before placement, and proves the subsequent request contains
+only the other four survivors. It proves the casualty is dead, removed, never placed, and never
+emitted as a placed `model_destroyed`, and that hazard completion precedes placement request,
+`unit_disembarked`, Deadly Demise, and Transport removal. Full lifecycle JSON restore preserves the
+result. Proposal prevalidation separately rejects a casualty ID with
+`destroyed_transport_non_survivor_placement`. Existing direct transport payload/drift tests cover
+typed roll/disembark round trips and context mismatch. The bug-class search covers direct and
+grouped attack destruction, deferred destruction restore, every destroyed-Transport request and
+retry site, shared P06B allocation/FNP, event authority reconstruction, and the normal placed-model
+hazard path. A static audit enforces roll/application calls before placement request, survivor
+context and validation, absence of new placement-time dice, the embedded lineage policy, replay
+event authority, stable source identity, and module-size boundaries. No behavioral test file was
+added, removed, moved, or renamed, so the four-shard inventory does not change.
+
+Generated artifacts/documentation: P18C adds
+`core_transports_2026_09/artifacts/package.json`, its typed loader/source package, and the offline
+builder; regenerates the engine build manifest and external contract; and updates README, both
+decision-contract documents, and this finding record.
+
+Validation results:
+
+- Focused transport, Shooting, source-identity, generated-artifact, closeout, and module-size
+  coverage passes (`394` tests). Fresh branch-inclusive behavioral coverage passes (`6031 passed`)
+  at the repository's `85.00%` threshold.
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2657` source files;
+  Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
+  four-shard inventory check and all-files pre-commit gate pass.
+- The required final xdist work-stealing suite passes (`6377 passed` in `467.17s`), including the
+  complete code-quality suite.
+- The Core Transports source artifact, final engine build identity, and regenerated external
+  contract pass fail-closed checks, including the `origin/main` compatibility comparison.
+- Installed-wheel smoke passes with `2489` packaged engine resources and `27` schemas. This host
+  has no `npm` executable, so `npm ci` and npm wrapper commands could not run; the existing locked
+  dependencies were exercised with the bundled Node runtime and `pnpm`. Generated-client drift,
+  TypeScript type checks, and all `5` client unit tests pass, and the two-server HTTP conformance
+  scenario passes all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: pending publication.
+
 PFINAL is an audit/certification PR rather than a gameplay-remediation PR. After
 P25C and every preceding implementation PR merge, prepare a fresh audit of all
 25 categories before opening PFINAL. The audit must select one maintained-App

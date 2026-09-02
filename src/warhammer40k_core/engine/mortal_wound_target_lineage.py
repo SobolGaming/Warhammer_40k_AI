@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 
 FROZEN_RULES_UNIT_COMPONENTS_POLICY = "frozen_rules_unit_components"
+FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY = "frozen_embarked_rules_unit_components"
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -41,7 +42,10 @@ class MortalWoundTargetLineage:
     character_component_unit_instance_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        if self.policy != FROZEN_RULES_UNIT_COMPONENTS_POLICY:
+        if self.policy not in {
+            FROZEN_RULES_UNIT_COMPONENTS_POLICY,
+            FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY,
+        }:
             raise GameLifecycleError("Mortal-wound target lineage policy is unsupported.")
         object.__setattr__(
             self,
@@ -116,6 +120,29 @@ class MortalWoundTargetLineage:
         lineage.validate_for_state(state)
         return lineage
 
+    @classmethod
+    def freeze_embarked(
+        cls,
+        *,
+        state: GameState,
+        target_unit_instance_id: str,
+        owner_player_id: str,
+    ) -> Self:
+        lineage = cls.freeze(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            owner_player_id=owner_player_id,
+        )
+        embedded = cls(
+            policy=FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY,
+            canonical_target_unit_instance_id=(lineage.canonical_target_unit_instance_id),
+            owner_player_id=lineage.owner_player_id,
+            component_unit_instance_ids=lineage.component_unit_instance_ids,
+            character_component_unit_instance_ids=(lineage.character_component_unit_instance_ids),
+        )
+        embedded.validate_for_state(state)
+        return embedded
+
     def validate_for_state(self, state: GameState) -> tuple[RulesUnitView, ...]:
         views = current_rules_unit_views_for_canonical_identity(
             state=state,
@@ -165,6 +192,49 @@ class MortalWoundTargetLineage:
         model_ids = tuple(model.model_instance_id for model in models)
         if len(model_ids) != len(set(model_ids)):
             raise GameLifecycleError("Mortal-wound target lineage model inventory is duplicated.")
+        character_component_ids = set(self.character_component_unit_instance_ids)
+        character_model_ids = tuple(
+            sorted(
+                model.model_instance_id
+                for model in models
+                if state.unit_instance_id_for_model(model.model_instance_id)
+                in character_component_ids
+            )
+        )
+        return models, character_model_ids
+
+    def alive_models_for_policy(
+        self,
+        *,
+        state: GameState,
+    ) -> tuple[tuple[ModelInstance, ...], tuple[str, ...]]:
+        if self.policy == FROZEN_RULES_UNIT_COMPONENTS_POLICY:
+            return self.alive_placed_models(state=state)
+        if self.policy != FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY:
+            raise GameLifecycleError("Mortal-wound target lineage policy is unsupported.")
+        views = self.validate_for_state(state)
+        battlefield = state.battlefield_state
+        if battlefield is None:
+            raise GameLifecycleError("Mortal-wound target lineage requires battlefield_state.")
+        placed_model_ids = set(battlefield.placed_model_ids())
+        models = tuple(
+            sorted(
+                (model for view in views for model in view.own_models if model.is_alive),
+                key=lambda model: model.model_instance_id,
+            )
+        )
+        model_ids = tuple(model.model_instance_id for model in models)
+        if len(model_ids) != len(set(model_ids)):
+            raise GameLifecycleError("Mortal-wound target lineage model inventory is duplicated.")
+        if placed_model_ids & set(model_ids):
+            raise GameLifecycleError(
+                "Embarked mortal-wound target lineage contains a placed living model."
+            )
+        removed_model_ids = set(battlefield.removed_model_ids)
+        if removed_model_ids & set(model_ids):
+            raise GameLifecycleError(
+                "Embarked mortal-wound target lineage contains a removed living model."
+            )
         character_component_ids = set(self.character_component_unit_instance_ids)
         character_model_ids = tuple(
             sorted(
@@ -309,6 +379,7 @@ def _payload_identifier_tuple(payload: dict[str, object], key: str) -> tuple[str
 
 
 __all__ = (
+    "FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY",
     "FROZEN_RULES_UNIT_COMPONENTS_POLICY",
     "MortalWoundTargetLineage",
     "MortalWoundTargetLineagePayload",
