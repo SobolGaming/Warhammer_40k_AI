@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:34a146e2fe04a3fa8c6c522124d404af5d27da813c3be9cf1e34180bdf08729f",
-  "fingerprint": "34a146e2fe04a3fa8c6c522124d404af5d27da813c3be9cf1e34180bdf08729f",
-  "resource_count": 2489,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ef49d4ac518459d9615b7c5d576f9c9dd81f63c456fe70532183c3212e7345c0",
+  "fingerprint": "ef49d4ac518459d9615b7c5d576f9c9dd81f63c456fe70532183c3212e7345c0",
+  "resource_count": 2490,
   "resources": [
     {
       "byte_length": 113,
@@ -650,9 +650,9 @@
       "sha256": "46a871f1f28ba73ef708c4d57a4e2f785b656fa3ec5eefb26b3ee6f8fd9c9f3e"
     },
     {
-      "byte_length": 66387,
+      "byte_length": 73355,
       "path": "warhammer40k_core/engine/attack_sequence_destroyed_transport.py",
-      "sha256": "5fd44a6e11662d8eaa463b0d426b3328f1f62d55598be98c0732f00037e15229"
+      "sha256": "b4d9a53ca9c85b232bc94b08a21e4021a2570a3070ae523e5c1fa9067ecbca54"
     },
     {
       "byte_length": 5164,
@@ -1515,9 +1515,14 @@
       "sha256": "f6582693ac8aa6acafc8a6aefb6d2cb192c5bda0d8d9248a9c36fcc980fd885e"
     },
     {
-      "byte_length": 17302,
+      "byte_length": 20340,
       "path": "warhammer40k_core/engine/destroyed_transport_pending.py",
-      "sha256": "c342dccc4f844aa14d405e6e45d47dfe80aa6ffaec927a8aed30e9db05675de0"
+      "sha256": "139817334cc840ed115cc9d661e5420abd256ea59077a53b6da06c49f58cbe9f"
+    },
+    {
+      "byte_length": 24720,
+      "path": "warhammer40k_core/engine/destroyed_transport_rules_unit_disembark.py",
+      "sha256": "10b7045235721f366f117112063e2896594f0542cbd891899d40478bb9560834"
     },
     {
       "byte_length": 14209,
@@ -9120,9 +9125,9 @@
       "sha256": "642e0981792614eeff1c2792802ffce89081bde4a67e16b9d6cd8656abbb1e3e"
     },
     {
-      "byte_length": 53523,
+      "byte_length": 52826,
       "path": "warhammer40k_core/engine/fight_model_authority_history.py",
-      "sha256": "5ed9815fa1749208b31c5f22e910776d69a80ec2c99224c0c72934a3af7e4bfb"
+      "sha256": "67553fb228e4167b9619dc02838f1c0dbdf68a56b9cc7f744921f734e02bbdf2"
     },
     {
       "byte_length": 5734,
@@ -9825,9 +9830,9 @@
       "sha256": "dd41497c0c010c7c9e5fb04fd175ab40003440bd17d2910a6fa179738b541a32"
     },
     {
-      "byte_length": 36256,
+      "byte_length": 37915,
       "path": "warhammer40k_core/engine/phases/movement_rules_unit_disembark.py",
-      "sha256": "f4b2433c269ebae7226ddd6ce370e834855d99ac2510b21a1cb3a8b41fbf3678"
+      "sha256": "3eb1dccb80417f9fc230d1d3c874b9e372d5d80d837006a606fbb6604c2de923"
     },
     {
       "byte_length": 20084,
@@ -9985,9 +9990,9 @@
       "sha256": "571f1e152cc3582c8d12ad45904823d2b41b91c545bae75afeb2ab5c4c624718"
     },
     {
-      "byte_length": 67629,
+      "byte_length": 67506,
       "path": "warhammer40k_core/engine/primary_historical_event_integrity.py",
-      "sha256": "78348027a9c3091d1ea12044b20fd5209d31553fedfb80368ea7ea64a527eb56"
+      "sha256": "dd368c028e756339c5f0fe05ebb486be840d077c41c3e145b2b847c7e2810475"
     },
     {
       "byte_length": 21002,
@@ -10065,9 +10070,9 @@
       "sha256": "44a49a43e12321261781e2bc4573132f37a76a089d0011831bc59531eaaf46e9"
     },
     {
-      "byte_length": 63746,
+      "byte_length": 62915,
       "path": "warhammer40k_core/engine/primary_mission_boundary_physical_authority.py",
-      "sha256": "0e849f77d65f3b5ca86dac712ca98bce5a8fcb986956a00e4d5a95024587ad66"
+      "sha256": "cecc4f5153bbeccfc58f4e302639d44aee814ece66b4c87fe16731340bfa92d3"
     },
     {
       "byte_length": 18138,
@@ -10495,9 +10500,9 @@
       "sha256": "cc360b32b7f8e39278abd1ab57c3cd62acd13ae63b69800ad3152223ce18e703"
     },
     {
-      "byte_length": 3884,
+      "byte_length": 7954,
       "path": "warhammer40k_core/engine/rule_model_destruction_unplaced.py",
-      "sha256": "aeaee0d0c3afeca2899f43cd221e1d270b9b729a5ffe38601bdd50730d203739"
+      "sha256": "9bd78da1630b9014e58a86af495187a1f94502582e5e3f7b1b58727073976557"
     },
     {
       "byte_length": 8735,

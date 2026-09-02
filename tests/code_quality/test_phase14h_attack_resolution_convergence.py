@@ -97,6 +97,7 @@ DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     },
     "with_unplaced_models_marked_removed": {
         "src/warhammer40k_core/engine/damage_allocation.py": 1,
+        "src/warhammer40k_core/engine/destroyed_transport_rules_unit_disembark.py": 1,
         "src/warhammer40k_core/engine/reserves.py": 1,
         "src/warhammer40k_core/engine/transports.py": 1,
     },

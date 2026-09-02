@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
 from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
+    emergency_disembark_omitted_model_evidence_from_event_payload,
+)
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.emergency_disembark import (
     destroyed_transport_hazard_destroyed_model_ids_from_completion_event,
@@ -35,8 +38,6 @@ from warhammer40k_core.engine.primary_historical_events import (
 )
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 from warhammer40k_core.engine.transports import (
-    DestroyedTransportDisembark,
-    DestroyedTransportDisembarkPayload,
     DisembarkModeKind,
 )
 
@@ -661,22 +662,18 @@ def _emergency_disembark_departure_source(
         )
     terminal = matching[0]
     payload = _event_payload(terminal, event_name="unit_disembarked")
-    raw_disembark = payload.get("destroyed_transport_disembark")
-    if not isinstance(raw_disembark, dict):
+    evidence = emergency_disembark_omitted_model_evidence_from_event_payload(payload)
+    if evidence is None:
         raise GameLifecycleError(
             "Emergency Disembark terminal event lacks typed destruction evidence."
         )
-    disembark = DestroyedTransportDisembark.from_payload(
-        cast(DestroyedTransportDisembarkPayload, raw_disembark)
-    )
     result_payload = _json_object(decision.result.payload, name="Emergency Disembark result")
     if (
         payload.get("game_id") != state.game_id
         or payload.get("active_player_id") != decision.result.actor_id
-        or disembark.disembark_mode is not DisembarkModeKind.EMERGENCY_DISEMBARK
-        or disembark.player_id != decision.result.actor_id
-        or result_payload.get("unit_instance_id") != disembark.unit_instance_id
-        or payload.get("unit_instance_id") != disembark.unit_instance_id
+        or evidence.player_id != decision.result.actor_id
+        or result_payload.get("unit_instance_id") != evidence.rules_unit_instance_id
+        or payload.get("unit_instance_id") != evidence.rules_unit_instance_id
     ):
         raise GameLifecycleError("Emergency Disembark departure terminal evidence drift.")
     return _DestroyedDepartureSource(
@@ -684,7 +681,7 @@ def _emergency_disembark_departure_source(
         completion_key=f"emergency-disembark:{mutation_id}",
         event_order=event_index_by_id[terminal.event_id],
         expected_model_ids_by_component=_model_ids_grouped_by_component(
-            disembark.destroyed_model_instance_ids,
+            evidence.destroyed_model_instance_ids,
             component_by_model_id=component_by_model_id,
         ),
     )

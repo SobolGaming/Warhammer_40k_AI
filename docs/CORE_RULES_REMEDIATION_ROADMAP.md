@@ -1536,12 +1536,15 @@ continues Battle-shock/no-charge state, Transport removal, and Deadly Demise in 
 Post-review correctness hardening makes that snapshot canonical for attached passengers: one
 hazard packet carries the attached rules-unit ID, the complete sorted physical-component IDs, and
 one roll for every living model across those components. The packet is applied once through the
-frozen canonical embarked lineage and then reused while the existing physical-component placement
-requests drain. Hazard casualties are recorded at that completion boundary through primary
+frozen canonical embarked lineage. One canonical placement proposal then carries all surviving
+physical components in `attempted_rules_unit_placement`; grouped validation, battlefield
+placement, cargo removal, `DisembarkedUnitState`, and terminal event evidence commit in one engine
+operation, so no component-level checkpoint can expose a partially disembarked attached unit.
+Hazard casualties are recorded at that completion boundary through primary
 battlefield-departure and logical unit-destruction tracking, so a passenger killed before placement
 is visible to mission evidence and scoring. Restore now requires the persisted survivor tuple to
 equal both the typed completion-event result and authoritative living-model state, and requires the
-queued placement request to carry that same component survivor set and full hazard packet.
+queued canonical placement request to carry that same full survivor set and hazard packet.
 
 Specific authoritative 40k.app rule/statement and source ID: 18.05, `EMERGENCY DISEMBARK MOVE`,
 states under “Before moving” to make a Hazard Roll for each model in the unit. Its stable source ID
@@ -1561,7 +1564,7 @@ The generated package hash is
 `11ef8c6081238b8271effc171f9cd90cd85f1ec0028589db833b517bbe3fede0` and its canonical artifact
 byte SHA-256 is `661543a9aa9084cf9d4c583940baab0a75382ef7e08efdb2a09f6e35678dc7d2`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:34a146e2fe04a3fa8c6c522124d404af5d27da813c3be9cf1e34180bdf08729f`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:ef49d4ac518459d9615b7c5d576f9c9dd81f63c456fe70532183c3212e7345c0`.
 
 Load and execution support: The Emergency Disembark Move rule and both evidence rows are `loaded`
 and `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1582,8 +1585,10 @@ hazard service; `destroyed_transport_pending.py` owns exact pending restore bind
 `mortal_wound_target_lineage.py` owns the frozen embarked lineage policy; and the shared mortal-
 wound, fight-history, primary-history, and mission-boundary authority modules reconstruct the
 unplaced casualty transition and its scoring provenance.
-The public transport API remains stable while the new implementation is extracted from the frozen
-oversized `transports.py`; both new engine modules remain below the 1,500-line budget, and the
+`destroyed_transport_rules_unit_disembark.py` owns the canonical grouped placement result and its
+typed event evidence. The public transport API remains stable while the new implementation is
+extracted from the frozen oversized `transports.py`; the new engine modules remain below the
+1,500-line budget, and the
 legacy transport module does not exceed its historical ceiling.
 
 Decision and viewer-visibility impact: P18C adds no decision type, option family, proposal kind,
@@ -1611,9 +1616,10 @@ event authority, stable source identity, and module-size boundaries. No behavior
 added, removed, moved, or renamed, so the four-shard inventory does not change.
 
 Review regressions additionally cover one attached passenger snapshot across multiple physical
-components, retention of that snapshot across the next component placement, zero-survivor primary
-destruction/scoring evidence, and rejection of a forged restore that deletes a living survivor
-from both pending state and its queued request.
+components, one canonical grouped survivor placement with no intermediate component state, an
+immediate lifecycle round trip after that placement, zero-survivor primary destruction/scoring
+evidence, and rejection of a forged restore that deletes a living survivor from both pending state
+and its queued request.
 
 Generated artifacts/documentation: P18C adds
 `core_transports_2026_09/artifacts/package.json`, its typed loader/source package, and the offline
@@ -1622,17 +1628,17 @@ decision-contract documents, and this finding record.
 
 Validation results:
 
-- Focused post-review transport, Shooting, and closeout coverage passes (`284` tests). Fresh
+- Focused post-review transport, Shooting, and closeout coverage passes (`288` tests). Fresh
   branch-inclusive behavioral coverage passes (`6032 passed`) at the repository's `85.00%`
   threshold.
-- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2657` source files;
+- Repository-wide Ruff check and Ruff format check pass; mypy passes across `2658` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6378 passed` in `674.18s`), including the
+- The required final xdist work-stealing suite passes (`6378 passed` in `410.43s`), including the
   complete code-quality suite.
 - The Core Transports source artifact, final engine build identity, and regenerated external
   contract pass fail-closed checks, including the `origin/main` compatibility comparison.
-- Installed-wheel smoke passes with `2489` packaged engine resources and `27` schemas. This host
+- Installed-wheel smoke passes with `2490` packaged engine resources and `27` schemas. This host
   has no `npm` executable, so `npm ci` and npm wrapper commands could not run; the existing locked
   dependencies were exercised with the bundled Node runtime and `pnpm`. Generated-client drift,
   TypeScript type checks, and all `5` client unit tests pass, and the two-server HTTP conformance

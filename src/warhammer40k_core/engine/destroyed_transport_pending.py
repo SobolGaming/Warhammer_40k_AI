@@ -156,6 +156,11 @@ def validate_pending_destroyed_transport_disembark(
         return
     if pending.next_unit_instance_id not in hazard_rolls.component_unit_instance_ids:
         raise GameLifecycleError("Pending destroyed Transport current hazard unit drift.")
+    component_count = len(hazard_rolls.component_unit_instance_ids)
+    if tuple(sorted(pending.pending_unit_instance_ids[:component_count])) != (
+        hazard_rolls.component_unit_instance_ids
+    ):
+        raise GameLifecycleError("Pending destroyed Transport current hazard component drift.")
     if hazard_rolls.transport_unit_instance_id != pending.transport_unit_instance_id:
         raise GameLifecycleError("Pending destroyed Transport current hazard transport drift.")
     if surviving_model_ids is not None and not set(surviving_model_ids) <= set(
@@ -236,6 +241,69 @@ def pending_with_hazard_destroyed_current_unit(
         hazard_destroyed_unit_instance_ids=(
             *pending.hazard_destroyed_unit_instance_ids,
             unit_instance_id,
+        ),
+    )
+
+
+def pending_with_resolved_rules_unit_disembark(
+    pending: PendingDestroyedTransportDisembark,
+    *,
+    disembark: object,
+) -> PendingDestroyedTransportDisembark:
+    from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
+        DestroyedTransportRulesUnitDisembark,
+    )
+
+    if type(disembark) is not DestroyedTransportRulesUnitDisembark:
+        raise GameLifecycleError("Resolved destroyed Transport rules-unit disembark is invalid.")
+    hazard_rolls = pending.current_hazard_rolls
+    survivor_ids = pending.current_hazard_surviving_model_instance_ids
+    if hazard_rolls is None or survivor_ids is None:
+        raise GameLifecycleError(
+            "Resolved destroyed Transport rules-unit disembark requires hazard survivors."
+        )
+    if disembark.hazard_rolls != hazard_rolls or not disembark.is_valid:
+        raise GameLifecycleError("Resolved destroyed Transport rules-unit hazard drift.")
+    placed_ids = {
+        placement.model_instance_id
+        for placement in disembark.placement.selection.attempted_placement.model_placements
+    }
+    if placed_ids | set(disembark.destroyed_model_instance_ids) != set(survivor_ids):
+        raise GameLifecycleError("Resolved destroyed Transport rules-unit survivor drift.")
+    component_count = len(hazard_rolls.component_unit_instance_ids)
+    if tuple(sorted(pending.pending_unit_instance_ids[:component_count])) != (
+        hazard_rolls.component_unit_instance_ids
+    ):
+        raise GameLifecycleError("Resolved destroyed Transport rules-unit component drift.")
+    return replace(
+        pending,
+        pending_unit_instance_ids=pending.pending_unit_instance_ids[component_count:],
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+
+
+def pending_with_hazard_destroyed_rules_unit(
+    pending: PendingDestroyedTransportDisembark,
+) -> PendingDestroyedTransportDisembark:
+    hazard_rolls = pending.current_hazard_rolls
+    survivor_ids = pending.current_hazard_surviving_model_instance_ids
+    if hazard_rolls is None or survivor_ids != ():
+        raise GameLifecycleError(
+            "Pending destroyed Transport rules-unit destruction requires zero survivors."
+        )
+    component_ids = hazard_rolls.component_unit_instance_ids
+    component_count = len(component_ids)
+    if tuple(sorted(pending.pending_unit_instance_ids[:component_count])) != component_ids:
+        raise GameLifecycleError("Destroyed Transport rules-unit component drift.")
+    return replace(
+        pending,
+        pending_unit_instance_ids=pending.pending_unit_instance_ids[component_count:],
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+        hazard_destroyed_unit_instance_ids=(
+            *pending.hazard_destroyed_unit_instance_ids,
+            *component_ids,
         ),
     )
 
@@ -341,11 +409,7 @@ def _validate_pending_destroyed_transport_placement_request(
         raise GameLifecycleError(
             "Pending destroyed Transport placement restore context is incomplete."
         )
-    component_survivor_ids = tuple(
-        model_instance_id
-        for model_instance_id in survivor_ids
-        if state.unit_instance_id_for_model(model_instance_id) == unit_instance_id
-    )
+    request_unit_instance_id = hazard_rolls.unit_instance_id
     matching_requests: list[MovementProposalRequest] = []
     for request in pending_decision_requests:
         if request.decision_type != PLACEMENT_PROPOSAL_DECISION_TYPE:
@@ -358,10 +422,10 @@ def _validate_pending_destroyed_transport_placement_request(
     proposal = matching_requests[0]
     context = proposal.context or {}
     if (
-        proposal.unit_instance_id != unit_instance_id
+        proposal.unit_instance_id != request_unit_instance_id
         or proposal.proposal_kind is not ProposalKind.DISEMBARK
         or context.get("transport_unit_instance_id") != pending.transport_unit_instance_id
-        or context.get("surviving_model_instance_ids") != list(component_survivor_ids)
+        or context.get("surviving_model_instance_ids") != list(survivor_ids)
         or context.get("hazard_rolls") != hazard_rolls.to_payload()
     ):
         raise GameLifecycleError(

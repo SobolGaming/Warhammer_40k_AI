@@ -22,6 +22,9 @@ from warhammer40k_core.engine.catalog_model_materialization_runtime import (
     CATALOG_MODELS_MATERIALIZED_EVENT,
     CATALOG_UNIT_DATASHEET_REPLACED_EVENT,
 )
+from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
+    emergency_disembark_omitted_model_evidence_from_event_payload,
+)
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.healing import HealingStep, HealingStepKind, HealingStepPayload
 from warhammer40k_core.engine.model_destruction_cause_authority import (
@@ -51,10 +54,7 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
-    DestroyedTransportDisembark,
-    DestroyedTransportDisembarkPayload,
     DestroyedTransportHazardRolls,
-    DisembarkModeKind,
     TransportHazardMortalWounds,
     TransportHazardMortalWoundsPayload,
 )
@@ -501,31 +501,14 @@ def _destroyed_transport_disembark_destruction_mutations(
     if event.event_type != "unit_disembarked":
         return ()
     payload = _event_payload(event, field_name="Destroyed Transport disembark")
-    raw_disembark = payload.get("destroyed_transport_disembark")
-    if raw_disembark is None:
+    evidence = emergency_disembark_omitted_model_evidence_from_event_payload(payload)
+    if evidence is None or not evidence.destroyed_model_instance_ids:
         return ()
-    if not isinstance(raw_disembark, dict):
-        raise GameLifecycleError("Destroyed Transport disembark authority is invalid.")
-    try:
-        disembark = DestroyedTransportDisembark.from_payload(
-            cast(DestroyedTransportDisembarkPayload, raw_disembark)
-        )
-    except (GeometryError, KeyError, PlacementError, TypeError, ValueError) as exc:
-        raise GameLifecycleError("Destroyed Transport disembark authority is invalid.") from exc
-    if not disembark.destroyed_model_instance_ids:
-        return ()
-    if disembark.disembark_mode is not DisembarkModeKind.EMERGENCY_DISEMBARK:
-        raise GameLifecycleError("Destroyed Transport omitted-model authority mode drift.")
-    placed_model_ids = {
-        placement.model_instance_id
-        for placement in disembark.placement.selection.attempted_placement.model_placements
-    }
-    if placed_model_ids.intersection(disembark.destroyed_model_instance_ids):
+    if set(evidence.placed_model_instance_ids).intersection(evidence.destroyed_model_instance_ids):
         raise GameLifecycleError("Destroyed Transport omitted-model authority overlaps placement.")
-    for model_id in disembark.destroyed_model_instance_ids:
-        if _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id) != (
-            disembark.unit_instance_id
-        ):
+    component_ids = set(evidence.component_unit_instance_ids)
+    for model_id in evidence.destroyed_model_instance_ids:
+        if _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id) not in component_ids:
             raise GameLifecycleError("Destroyed Transport omitted-model authority lineage drift.")
     return tuple(
         _AuthorityMutation(
@@ -538,7 +521,7 @@ def _destroyed_transport_disembark_destruction_mutations(
             before_placed=False,
             source="unit_disembarked:destroyed_transport",
         )
-        for model_id in disembark.destroyed_model_instance_ids
+        for model_id in evidence.destroyed_model_instance_ids
     )
 
 

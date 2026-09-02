@@ -23,6 +23,9 @@ from warhammer40k_core.engine.damage_allocation import (
     DamageApplicationPayload,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
+    emergency_disembark_omitted_model_evidence_from_event_payload,
+)
 from warhammer40k_core.engine.emergency_disembark import (
     transport_hazard_mortal_wounds_from_completion_event,
 )
@@ -81,10 +84,7 @@ from warhammer40k_core.engine.scoring import (
     PrimaryUnitDestructionStatePayload,
 )
 from warhammer40k_core.engine.transports import (
-    DestroyedTransportDisembark,
-    DestroyedTransportDisembarkPayload,
     DestroyedTransportHazardRolls,
-    DisembarkModeKind,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     model_restoration_events_for_event_log_interval,
@@ -718,30 +718,12 @@ def _apply_destroyed_transport_disembark_omitted_model_destruction(
     authority: dict[str, _PhysicalAuthority],
     event: EventRecord,
 ) -> None:
-    if not isinstance(event.payload, dict):
-        raise GameLifecycleError("Destroyed Transport disembark authority payload is invalid.")
-    raw_disembark = event.payload.get("destroyed_transport_disembark")
-    if raw_disembark is None:
+    evidence = emergency_disembark_omitted_model_evidence_from_event_payload(event.payload)
+    if evidence is None or not evidence.destroyed_model_instance_ids:
         return
-    if not isinstance(raw_disembark, dict):
-        raise GameLifecycleError("Destroyed Transport disembark authority is invalid.")
-    try:
-        disembark = DestroyedTransportDisembark.from_payload(
-            cast(DestroyedTransportDisembarkPayload, raw_disembark)
-        )
-    except (KeyError, TypeError, ValueError) as exc:
-        raise GameLifecycleError("Destroyed Transport disembark authority is invalid.") from exc
-    if not disembark.destroyed_model_instance_ids:
-        return
-    if disembark.disembark_mode is not DisembarkModeKind.EMERGENCY_DISEMBARK:
-        raise GameLifecycleError("Destroyed Transport omitted-model authority mode drift.")
-    placed_model_ids = {
-        placement.model_instance_id
-        for placement in disembark.placement.selection.attempted_placement.model_placements
-    }
-    if placed_model_ids.intersection(disembark.destroyed_model_instance_ids):
+    if set(evidence.placed_model_instance_ids).intersection(evidence.destroyed_model_instance_ids):
         raise GameLifecycleError("Destroyed Transport omitted-model authority overlaps placement.")
-    for model_id in disembark.destroyed_model_instance_ids:
+    for model_id in evidence.destroyed_model_instance_ids:
         prior = authority.get(model_id)
         if prior is not None and prior.presence == "battlefield":
             raise GameLifecycleError("Destroyed Transport omitted-model history is discontinuous.")

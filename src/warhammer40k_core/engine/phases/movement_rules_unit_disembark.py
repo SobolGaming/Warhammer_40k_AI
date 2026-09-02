@@ -36,6 +36,7 @@ from warhammer40k_core.engine.transports import (
     TransportRestrictionOverride,
     resolve_combat_disembark,
     resolve_disembark,
+    resolve_disembark_internal,
 )
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
@@ -266,19 +267,42 @@ def resolve_rules_unit_disembark(
             transport_movement_status=selection.transport_movement_status,
             restriction_overrides=selection.restriction_overrides,
         )
-        component_resolution = resolve_disembark(
-            scenario=validation_scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            cargo_state=active_cargo,
-            selection=physical_selection,
-            unit=next(
-                rules_component.unit
-                for rules_component in rules_unit.components
-                if rules_component.unit.unit_instance_id == component.unit_instance_id
-            ),
-            transport_placement=transport_placement,
-            objective_markers=objective_markers,
+        component_unit = next(
+            rules_component.unit
+            for rules_component in rules_unit.components
+            if rules_component.unit.unit_instance_id == component.unit_instance_id
         )
+        if selection.disembark_mode in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }:
+            component_resolution = resolve_disembark_internal(
+                scenario=validation_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                cargo_state=active_cargo,
+                selection=physical_selection,
+                unit=component_unit,
+                transport_placement=transport_placement,
+                require_started_phase_embarked=False,
+                battlefield_width_inches=(
+                    validation_scenario.battlefield_state.battlefield_width_inches
+                ),
+                battlefield_depth_inches=(
+                    validation_scenario.battlefield_state.battlefield_depth_inches
+                ),
+                terrain_features=validation_scenario.battlefield_state.terrain_features,
+                objective_markers=objective_markers,
+            )
+        else:
+            component_resolution = resolve_disembark(
+                scenario=validation_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                cargo_state=active_cargo,
+                selection=physical_selection,
+                unit=component_unit,
+                transport_placement=transport_placement,
+                objective_markers=objective_markers,
+            )
         violations.extend(
             violation
             for violation in component_resolution.violations
@@ -316,13 +340,27 @@ def resolve_rules_unit_disembark(
     updated_cargo = active_cargo
     for component_id in component_ids:
         updated_cargo = updated_cargo.with_disembarked_unit(component_id)
-    disembarked_state = DisembarkedUnitState.for_mode(
-        player_id=selection.player_id,
-        battle_round=selection.battle_round,
-        unit_instance_id=selection.unit_instance_id,
-        transport_unit_instance_id=selection.transport_unit_instance_id,
-        disembark_mode=selection.disembark_mode,
-        transport_movement_status=selection.transport_movement_status,
+    disembarked_state = (
+        DisembarkedUnitState.for_destroyed_transport(
+            player_id=selection.player_id,
+            battle_round=selection.battle_round,
+            unit_instance_id=selection.unit_instance_id,
+            transport_unit_instance_id=selection.transport_unit_instance_id,
+            disembark_mode=selection.disembark_mode,
+        )
+        if selection.disembark_mode
+        in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }
+        else DisembarkedUnitState.for_mode(
+            player_id=selection.player_id,
+            battle_round=selection.battle_round,
+            unit_instance_id=selection.unit_instance_id,
+            transport_unit_instance_id=selection.transport_unit_instance_id,
+            disembark_mode=selection.disembark_mode,
+            transport_movement_status=selection.transport_movement_status,
+        )
     )
     return RulesUnitDisembarkResolution(
         selection=selection,
