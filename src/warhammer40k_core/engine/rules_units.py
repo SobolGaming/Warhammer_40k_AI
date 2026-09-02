@@ -155,6 +155,26 @@ class RulesUnitView:
         )
 
 
+def rules_unit_contains_component_lineage(
+    *,
+    rules_unit: RulesUnitView,
+    component_unit_instance_ids: tuple[str, ...],
+) -> bool:
+    """Return whether frozen physical components belong to immutable rules-unit lineage."""
+
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Rules-unit component lineage requires RulesUnitView.")
+    if type(component_unit_instance_ids) is not tuple:
+        raise GameLifecycleError("Rules-unit component lineage ids must be a tuple.")
+    component_ids = tuple(
+        _validate_identifier("component_unit_instance_id", component_id)
+        for component_id in component_unit_instance_ids
+    )
+    if not component_ids or len(component_ids) != len(set(component_ids)):
+        raise GameLifecycleError("Rules-unit component lineage ids must be non-empty and unique.")
+    return set(component_ids).issubset(rules_unit.component_unit_instance_ids)
+
+
 @dataclass(frozen=True, slots=True)
 class RulesUnitIdentityReconciliation:
     historical_unit_instance_id: str

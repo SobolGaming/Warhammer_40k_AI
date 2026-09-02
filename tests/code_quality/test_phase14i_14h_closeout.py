@@ -21,6 +21,16 @@ ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
 README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
+EMERGENCY_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "emergency_disembark.py"
+DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_rules_unit_disembark.py"
+)
+RULE_MODEL_DESTRUCTION_UNPLACED_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction_unplaced.py"
+)
+DESTROYED_TRANSPORT_PENDING_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_pending.py"
+)
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
 ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("attack_sequence*.py")))
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
@@ -29,6 +39,12 @@ GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
 HEALING_REVIVAL_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing_revival.py"
+MORTAL_WOUND_TARGET_LINEAGE_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "mortal_wound_target_lineage.py"
+)
+FIGHT_MODEL_AUTHORITY_HISTORY_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_model_authority_history.py"
+)
 DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
 ATTACHMENT_ELIGIBILITY_PATH = (
     ROOT / "src" / "warhammer40k_core" / "core" / "attachment_eligibility.py"
@@ -232,6 +248,79 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "def _starting_strength_record_for_attached_unit(" in game_state_source
     assert "def _remove_attached_unit_formation(" not in game_state_source
     assert "attached_unit.component_unit_instance_ids" in stratagems_source
+
+
+def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() -> None:
+    transport_source = source_for(TRANSPORTS_PATH)
+    destroyed_transport_source = source_for(ENGINE_ROOT / "attack_sequence_destroyed_transport.py")
+    lineage_source = source_for(MORTAL_WOUND_TARGET_LINEAGE_PATH)
+    authority_history_source = source_for(FIGHT_MODEL_AUTHORITY_HISTORY_PATH)
+    continuation_source = function_source_for(
+        ATTACK_SEQUENCE_SPLIT_PATHS,
+        "_continue_pending_destroyed_transport_disembark",
+    )
+    placement_request_source = function_source_for(
+        ATTACK_SEQUENCE_SPLIT_PATHS,
+        "_request_destroyed_transport_disembark_placement",
+    )
+    placement_resolution_source = function_source_for(
+        ATTACK_SEQUENCE_SPLIT_PATHS,
+        "_resolve_destroyed_transport_disembark_submission",
+    )
+    transport_resolution_source = function_source_for(
+        (TRANSPORTS_PATH,),
+        "resolve_destroyed_transport_disembark",
+    )
+    transport_resolution_service_source = function_source_for(
+        (EMERGENCY_DISEMBARK_PATH,),
+        "resolve_destroyed_transport_disembark_service",
+    )
+    grouped_disembark_source = source_for(DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH)
+    omitted_destruction_source = function_source_for(
+        (RULE_MODEL_DESTRUCTION_UNPLACED_PATH,),
+        "_destroy_emergency_disembark_omitted_models",
+    )
+    pending_validation_source = function_source_for(
+        (DESTROYED_TRANSPORT_PENDING_PATH,),
+        "validate_pending_destroyed_transport_disembark",
+    )
+
+    assert continuation_source.index("resolve_destroyed_transport_rules_unit_hazard_rolls") < (
+        continuation_source.index("_request_destroyed_transport_disembark_placement")
+    )
+    assert continuation_source.index("apply_transport_hazard_mortal_wounds") < (
+        continuation_source.index("_request_destroyed_transport_disembark_placement")
+    )
+    assert "current_hazard_surviving_model_instance_ids" in continuation_source
+    assert "rules_unit_view_by_id" in continuation_source
+    assert "completed hazard survivors" in placement_request_source
+    assert '"surviving_model_instance_ids"' in placement_request_source
+    assert '"hazard_rolls"' in placement_request_source
+    assert "survivor_id_set" in placement_resolution_source
+    assert "hazard_rolls=component_hazard_rolls" in placement_resolution_source
+    assert "submission.resolved_rules_unit_placement()" in placement_resolution_source
+    assert "resolve_destroyed_transport_rules_unit_disembark" in placement_resolution_source
+    assert "RulesUnitPlacement" in grouped_disembark_source
+    assert "apply_rules_unit_disembark_to_battlefield" in grouped_disembark_source
+    assert "DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_EVENT_FIELD" in grouped_disembark_source
+    assert "for component_id in hazard_rolls.component_unit_instance_ids" in (
+        grouped_disembark_source
+    )
+    assert "rules_unit_contains_component_lineage" in grouped_disembark_source
+    assert "if updated_cargo.contains_unit(component_id)" in grouped_disembark_source
+    assert "rules_unit_contains_component_lineage" in destroyed_transport_source
+    assert "rules_unit_contains_component_lineage" in omitted_destruction_source
+    assert "survivor_component_ids" in omitted_destruction_source
+    assert "for component_id in survivor_component_ids" in omitted_destruction_source
+    assert "_current_hazard_component_survivor_ids" not in destroyed_transport_source
+    assert "retain_current_hazard=" not in destroyed_transport_source
+    assert '"pending_unit_instance_ids"' in pending_validation_source
+    assert "_validate_ordered_identifier_tuple(" in pending_validation_source
+    assert "dice_manager" not in transport_resolution_source
+    assert "pre-placement hazard rolls" in transport_resolution_service_source
+    assert "FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY" in lineage_source
+    assert "TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE" in authority_history_source
+    assert "EMERGENCY_DISEMBARK_MOVE_SOURCE_ID" in transport_source
 
 
 def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:

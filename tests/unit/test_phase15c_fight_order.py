@@ -12,6 +12,9 @@ from tests.phase13b_shooting_declaration_helpers import (
     _catalog_with_extra_bolt_profile as _shooting_catalog_with_extra_bolt_profile,
 )
 from tests.phase13b_shooting_declaration_helpers import (
+    _destroyed_transport_hazard_roll_results_for_test as _shooting_hazard_results,
+)
+from tests.phase13b_shooting_declaration_helpers import (
     _fixed_roll_result as _shooting_fixed_roll_result,
 )
 from tests.phase13b_shooting_declaration_helpers import (
@@ -4029,6 +4032,7 @@ def test_pending_destroyed_transport_retains_physical_model_but_restores_living_
     transport_model = transport.own_models[0]
     battlefield = state.battlefield_state
     assert battlefield is not None
+    passenger_placement = battlefield.unit_placement_by_id(passenger.unit_instance_id)
     state.replace_battlefield_state(battlefield.without_unit_placement(passenger.unit_instance_id))
     state.record_transport_cargo_state(
         TransportCargoState(
@@ -4105,6 +4109,11 @@ def test_pending_destroyed_transport_retains_physical_model_but_restores_living_
                     roll_id="phase15c-pending-transport-save",
                     spec=save_spec,
                     value=1,
+                ),
+                *_shooting_hazard_results(
+                    passenger_placement,
+                    values=tuple(6 for _model in passenger.own_models),
+                    roll_id_prefix="phase15c-pending-transport-hazard",
                 ),
             ),
         ),

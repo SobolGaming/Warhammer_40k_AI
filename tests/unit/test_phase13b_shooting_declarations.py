@@ -158,6 +158,14 @@ from warhammer40k_core.engine.attack_sequence import (
     resolve_attack_sequence_until_blocked,
     wound_roll_target_number,
 )
+from warhammer40k_core.engine.attack_sequence_destroyed_transport import (
+    _continue_pending_destroyed_transport_disembark,
+    _destroyed_transport_proposal_parse_failure,
+    _key_error_field,
+    _missing_destroyed_transport_disembark_field,
+    _request_destroyed_transport_disembark_placement,
+    _resolve_destroyed_transport_disembark_submission,
+)
 from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
     CORE_DESTROYED_TIMING_RULE_ID,
 )
@@ -316,10 +324,13 @@ from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
     PostRollWeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.primary_destruction_evidence import (
+    PrimaryUnattributedDestructionCause,
     rules_unit_objective_proximity_witness,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+from warhammer40k_core.engine.rule_model_destruction import destroy_model_with_rule_reactions
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.saves import (
@@ -13241,7 +13252,12 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     transport = units["enemy-transport"]
     passenger = units["enemy-passenger"]
     transport_model = transport.own_models[0]
-    emergency_destroyed_model = passenger.own_models[-1]
+    emergency_destroyed_model = replace(passenger.own_models[-1], wounds_remaining=1)
+    passenger = replace(
+        passenger,
+        own_models=(*passenger.own_models[:-1], emergency_destroyed_model),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=passenger)
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.without_unit_placement(passenger.unit_instance_id)
@@ -13311,6 +13327,18 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         allocated_model_id=transport_model.model_instance_id,
         attack_context_id=attack_context_id,
     )
+    hazard_model_snapshot = _unit_placement_at(
+        passenger,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(38.1, 33.5),
+            Pose.at(39.0, 34.8),
+            Pose.at(39.0, 36.2),
+            Pose.at(38.1, 37.5),
+            Pose.at(37.8, 35.5),
+        ),
+    )
 
     remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
@@ -13337,14 +13365,15 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
                     spec=save_spec,
                     value=1,
                 ),
+                *_destroyed_transport_hazard_roll_results_for_test(
+                    hazard_model_snapshot,
+                    values=(6, 6, 6, 6, 1),
+                    roll_id_prefix="phase14h-destroyed-transport-hazard",
+                ),
             ),
         ),
     )
     request = _decision_request(cast(LifecycleStatus, status))
-    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    proposal_context = proposal_request.context or {}
-    battlefield_before_disembark = state.battlefield_state
-    assert battlefield_before_disembark is not None
     shooting_phase_state = state.shooting_phase_state
     assert shooting_phase_state is not None
     state.replace_shooting_phase_state(
@@ -13353,18 +13382,73 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
             allocated_model_ids_this_phase=allocated_ids,
         )
     )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    proposal_context = proposal_request.context or {}
+    battlefield_before_disembark = state.battlefield_state
+    assert battlefield_before_disembark is not None
 
     assert request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert not model_by_id(
+        state=state,
+        model_instance_id=emergency_destroyed_model.model_instance_id,
+    ).is_alive
     assert request.actor_id == "player-b"
     assert proposal_request.unit_instance_id == passenger.unit_instance_id
     assert proposal_context["destruction_timing"] == "destroyed_transport"
     assert proposal_context["disembark_mode"] == (DisembarkModeKind.EMERGENCY_DISEMBARK.value)
     assert proposal_context["transport_unit_instance_id"] == transport.unit_instance_id
+    assert proposal_context["surviving_model_instance_ids"] == [
+        model.model_instance_id for model in passenger.own_models[:-1]
+    ]
+    hazard_context = proposal_context["hazard_rolls"]
+    assert isinstance(hazard_context, dict)
+    hazard_model_rolls = hazard_context["model_rolls"]
+    assert isinstance(hazard_model_rolls, list)
+    assert {
+        cast(str, cast(dict[str, JsonValue], roll)["model_instance_id"])
+        for roll in hazard_model_rolls
+    } == {model.model_instance_id for model in passenger.own_models}
     assert transport_model.model_instance_id in battlefield_before_disembark.placed_model_ids()
     assert not any(
         payload["model_instance_id"] == transport_model.model_instance_id
         for payload in _event_payloads(lifecycle, "model_destroyed")
     )
+
+    forged_survivor_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    forged_state = cast(dict[str, Any], forged_survivor_checkpoint["state"])
+    forged_shooting = cast(dict[str, Any], forged_state["shooting_phase_state"])
+    forged_sequence = cast(dict[str, Any], forged_shooting["attack_sequence"])
+    forged_pending = cast(
+        dict[str, Any],
+        forged_sequence["pending_destroyed_transport_disembark"],
+    )
+    forged_survivors = cast(
+        list[str], forged_pending["current_hazard_surviving_model_instance_ids"]
+    )
+    omitted_living_survivor = forged_survivors.pop()
+    forged_decisions = cast(dict[str, Any], forged_survivor_checkpoint["decisions"])
+    forged_queue = cast(dict[str, Any], forged_decisions["queue"])
+    forged_request = cast(list[dict[str, Any]], forged_queue["pending_requests"])[0]
+    forged_request_payload = cast(dict[str, Any], forged_request["payload"])
+    forged_proposal_request = cast(dict[str, Any], forged_request_payload["proposal_request"])
+    forged_context = cast(dict[str, Any], forged_proposal_request["context"])
+    forged_context["surviving_model_instance_ids"] = list(forged_survivors)
+    forged_request_event = next(
+        event
+        for event in cast(list[dict[str, Any]], forged_decisions["event_log"])
+        if event["event_type"] == "decision_requested"
+        and cast(dict[str, Any], event["payload"])["request_id"] == forged_request["request_id"]
+    )
+    forged_request_event["payload"] = json.loads(json.dumps(forged_request, sort_keys=True))
+    assert model_by_id(
+        state=state,
+        model_instance_id=omitted_living_survivor,
+    ).is_alive
+    with pytest.raises(GameLifecycleError, match="exact hazard survivor inventory"):
+        GameLifecycle.from_payload(forged_survivor_checkpoint)
 
     attempted_placement = _unit_placement_at(
         passenger,
@@ -13399,12 +13483,6 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         payload=placement_payload,
         result_id="phase14h-destroyed-transport-emergency-placement",
     )
-    post_disembark_request = _decision_request(post_disembark_status)
-    if post_disembark_request.decision_type == SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE:
-        post_disembark_status = _submit_all_pending_fnp_declines(
-            lifecycle,
-            request=post_disembark_request,
-        )
     updated_battlefield = state.battlefield_state
     assert updated_battlefield is not None
     disembarked_state = state.disembarked_unit_state_for_unit(
@@ -13443,25 +13521,17 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         payload["model_instance_id"] == emergency_destroyed_model.model_instance_id
         for payload in _event_payloads(lifecycle, "model_destroyed")
     )
-    emergency_departure = next(
-        departure
-        for departure in state.primary_battlefield_departure_states
-        if departure.source_id.startswith(
-            "core-rules:emergency-disembark:phase14h-destroyed-transport-emergency-placement:"
-        )
-    )
-    assert emergency_departure.removed_model_instance_ids == (
-        emergency_destroyed_model.model_instance_id,
-    )
     assert state.transport_cargo_state_for_transport(transport.unit_instance_id) is None
     assert disembarked_state is not None
     assert disembarked_state.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
     assert disembarked_state.battle_shocked_until == "end_of_turn"
+    assert event_records.index(hazard_event) < event_types.index(
+        "destroyed_transport_disembark_placement_requested"
+    )
     assert event_types.index("destroyed_transport_disembark_placement_requested") < (
         event_records.index(unit_disembarked_event)
     )
-    assert event_records.index(unit_disembarked_event) < event_records.index(hazard_event)
-    assert event_records.index(hazard_event) < event_records.index(deadly_demise_event)
+    assert event_records.index(unit_disembarked_event) < event_records.index(deadly_demise_event)
     assert event_records.index(deadly_demise_event) < event_records.index(transport_destroyed_event)
     assert post_disembark_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     phase_end_request = _decision_request(post_disembark_status)
@@ -13480,7 +13550,1047 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     restored_lifecycle = GameLifecycle.from_payload(lifecycle_payload)
     restored_state = _state(restored_lifecycle)
     assert restored_lifecycle.to_payload() == lifecycle_payload
-    assert emergency_departure in restored_state.primary_battlefield_departure_states
+    assert restored_state.battlefield_state is not None
+    assert emergency_destroyed_model.model_instance_id in (
+        restored_state.battlefield_state.removed_model_ids
+    )
+
+
+@pytest.mark.slow
+def test_p18c_fully_destroyed_cargo_skips_its_placement_request() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="p18c-fully-destroyed-cargo",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            ("enemy-passenger-a", "core-character-leader", "core-character-leader", 1),
+            ("enemy-passenger-b", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+        ),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    passenger_a = units["enemy-passenger-a"]
+    passenger_b = units["enemy-passenger-b"]
+    pending = _destroyed_transport_pending_for_test(
+        sequence_id="p18c-fully-destroyed-cargo",
+        attacker=attacker,
+        transport=transport,
+        passenger=passenger_a,
+    )
+    survivor = passenger_a.own_models[0]
+    passenger_a = replace(
+        passenger_a,
+        own_models=(replace(survivor, wounds_remaining=1),),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=passenger_a)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.without_unit_placement(
+        passenger_a.unit_instance_id
+    ).without_unit_placement(passenger_b.unit_instance_id)
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(
+                passenger_a.unit_instance_id,
+                passenger_b.unit_instance_id,
+            ),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(
+                passenger_a.unit_instance_id,
+                passenger_b.unit_instance_id,
+            ),
+        )
+    )
+    pending = replace(
+        pending,
+        pending_unit_instance_ids=(
+            passenger_a.unit_instance_id,
+            passenger_b.unit_instance_id,
+        ),
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    sequence = AttackSequence.start(
+        sequence_id="p18c-fully-destroyed-cargo",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    passenger_a_snapshot = _unit_placement_at(
+        passenger_a,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(
+            Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
+            for index, _model in enumerate(passenger_a.own_models)
+        ),
+    )
+    passenger_a_snapshot = replace(
+        passenger_a_snapshot,
+        model_placements=tuple(
+            model_placement
+            for model_placement in passenger_a_snapshot.model_placements
+            if model_placement.model_instance_id == survivor.model_instance_id
+        ),
+    )
+    passenger_b_snapshot = _unit_placement_at(
+        passenger_b,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(
+            Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
+            for index, _model in enumerate(passenger_b.own_models)
+        ),
+    )
+
+    updated_sequence, allocated_ids, status = _continue_pending_destroyed_transport_disembark(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        manager=DiceRollManager(
+            "p18c-fully-destroyed-cargo",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                *_destroyed_transport_hazard_roll_results_for_test(
+                    passenger_a_snapshot,
+                    values=(1,),
+                    roll_id_prefix="p18c-passenger-a-hazard",
+                ),
+                *_destroyed_transport_hazard_roll_results_for_test(
+                    passenger_b_snapshot,
+                    values=(6, 6, 6, 6, 6),
+                    roll_id_prefix="p18c-passenger-b-hazard",
+                ),
+            ),
+        ),
+        attack_sequence=sequence,
+        allocated_model_ids=(),
+        hooks=AttackSequenceHooks.empty(),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    updated_battlefield = state.battlefield_state
+    assert updated_sequence is not None
+    assert updated_sequence.pending_destroyed_transport_disembark is not None
+    assert updated_battlefield is not None
+
+    assert allocated_ids == ()
+    assert proposal_request.unit_instance_id == passenger_b.unit_instance_id
+    assert (
+        updated_sequence.pending_destroyed_transport_disembark.hazard_destroyed_unit_instance_ids
+        == (passenger_a.unit_instance_id,)
+    )
+    assert survivor.model_instance_id in updated_battlefield.removed_model_ids
+    assert not any(
+        cast(dict[str, object], event.payload).get("unit_instance_id")
+        == passenger_a.unit_instance_id
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "destroyed_transport_disembark_placement_requested"
+    )
+    destroyed_before_placement = _last_event_payload(
+        lifecycle,
+        "destroyed_transport_cargo_destroyed_before_placement",
+    )
+    assert destroyed_before_placement["unit_instance_id"] == passenger_a.unit_instance_id
+    passenger_a_destruction = next(
+        destruction
+        for destruction in state.primary_unit_destruction_states
+        if destruction.destroyed_unit_instance_id == passenger_a.unit_instance_id
+    )
+    assert passenger_a_destruction.unattributed_cause is (
+        PrimaryUnattributedDestructionCause.EMERGENCY_DISEMBARK
+    )
+
+
+@pytest.mark.slow
+def test_p18c_pending_cargo_order_keeps_interleaved_attached_components_adjacent() -> None:
+    attached_specs = _attached_enemy_unit_specs()[:2]
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="p18c-interleaved-attached-cargo",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            attached_specs[0],
+            (
+                "intermediate-unit",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+            attached_specs[1],
+        ),
+        enemy_attachment_declarations=_attached_enemy_declarations()[:1],
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    bodyguard = units["bodyguard-unit"]
+    intermediate = units["intermediate-unit"]
+    leader = units["leader-unit"]
+    attached = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.without_unit_placement(bodyguard.unit_instance_id)
+        .without_unit_placement(intermediate.unit_instance_id)
+        .without_unit_placement(leader.unit_instance_id)
+    )
+    interleaved_cargo_ids = (
+        bodyguard.unit_instance_id,
+        intermediate.unit_instance_id,
+        leader.unit_instance_id,
+    )
+    attached_component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=15,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=interleaved_cargo_ids,
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=interleaved_cargo_ids,
+        )
+    )
+    assert tuple(sorted(interleaved_cargo_ids)) == interleaved_cargo_ids
+    grouped_queue_ids = (
+        intermediate.unit_instance_id,
+        bodyguard.unit_instance_id,
+        leader.unit_instance_id,
+    )
+    pending = replace(
+        _destroyed_transport_pending_for_test(
+            sequence_id="p18c-interleaved-attached-cargo",
+            attacker=attacker,
+            transport=transport,
+            passenger=bodyguard,
+        ),
+        pending_unit_instance_ids=grouped_queue_ids,
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    assert pending.pending_unit_instance_ids == grouped_queue_ids
+    assert (
+        PendingDestroyedTransportDisembark.from_payload(
+            pending.to_payload()
+        ).pending_unit_instance_ids
+        == grouped_queue_ids
+    )
+    sequence = AttackSequence.start(
+        sequence_id="p18c-interleaved-attached-cargo",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    intermediate_placement = _unit_placement_at(
+        intermediate,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(38.1, 33.5),
+            Pose.at(39.0, 34.8),
+            Pose.at(39.0, 36.2),
+            Pose.at(38.1, 37.5),
+            Pose.at(37.8, 35.5),
+        ),
+    )
+    hazard_results = tuple(
+        result
+        for component in (intermediate, bodyguard, leader)
+        for result in _destroyed_transport_hazard_roll_results_for_test(
+            _unit_placement_at(
+                component,
+                army_id="army-beta",
+                player_id="player-b",
+                poses=tuple(
+                    Pose.at(38.0 + index, 34.0 + index)
+                    for index, _model in enumerate(component.own_models)
+                ),
+            ),
+            values=tuple(6 for _model in component.own_models),
+            roll_id_prefix=f"p18c-interleaved-{component.unit_instance_id}",
+        )
+    )
+    manager = DiceRollManager(
+        "p18c-interleaved-attached-cargo",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=hazard_results,
+    )
+
+    updated_sequence, allocated_ids, status = _continue_pending_destroyed_transport_disembark(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        manager=manager,
+        attack_sequence=sequence,
+        allocated_model_ids=(),
+        hooks=AttackSequenceHooks.empty(),
+    )
+
+    intermediate_request = _decision_request(cast(LifecycleStatus, status))
+    assert allocated_ids == ()
+    assert updated_sequence is not None
+    updated_pending = updated_sequence.pending_destroyed_transport_disembark
+    assert updated_pending is not None
+    assert updated_pending.pending_unit_instance_ids == grouped_queue_ids
+    assert updated_pending.current_hazard_rolls is not None
+    assert updated_pending.current_hazard_rolls.unit_instance_id == intermediate.unit_instance_id
+    intermediate_proposal = MovementProposalRequest.from_decision_request_payload(
+        intermediate_request.payload
+    )
+    assert intermediate_proposal.unit_instance_id == intermediate.unit_instance_id
+    intermediate_result = _proposal_decision_result(
+        request=intermediate_request,
+        payload=PlacementProposalPayload(
+            proposal_request_id=intermediate_proposal.request_id,
+            proposal_kind=intermediate_proposal.proposal_kind,
+            unit_instance_id=intermediate.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.DISEMBARK,
+            attempted_placement=intermediate_placement,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ).to_payload(),
+        result_id="p18c-interleaved-singleton-placement",
+    )
+    lifecycle.decision_controller.submit_result(intermediate_result)
+
+    attached_sequence, next_allocated_ids, attached_status = (
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=updated_sequence,
+            result=intermediate_result,
+            already_allocated_model_ids=allocated_ids,
+            hooks=AttackSequenceHooks.empty(),
+            dice_manager=manager,
+        )
+    )
+
+    attached_request = _decision_request(cast(LifecycleStatus, attached_status))
+    assert next_allocated_ids == ()
+    assert attached_sequence is not None
+    attached_pending = attached_sequence.pending_destroyed_transport_disembark
+    assert attached_pending is not None
+    assert attached_pending.pending_unit_instance_ids == attached_component_ids
+    assert attached_pending.current_hazard_rolls is not None
+    assert attached_pending.current_hazard_rolls.unit_instance_id == attached.unit_instance_id
+    assert (
+        attached_pending.current_hazard_rolls.component_unit_instance_ids == attached_component_ids
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        attached_request.payload
+    )
+    assert proposal_request.unit_instance_id == attached.unit_instance_id
+
+
+def _p18c_destroy_models_before_embark(
+    *,
+    lifecycle: GameLifecycle,
+    rules_unit_instance_id: str,
+    model_instance_ids: tuple[str, ...],
+    source_id: str,
+) -> None:
+    state = _state(lifecycle)
+    for index, model_instance_id in enumerate(model_instance_ids, start=1):
+        effect_id = f"{source_id}:liability:{index}"
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id=effect_id,
+                source_rule_id=source_id,
+                owner_player_id="player-a",
+                target_unit_instance_ids=(rules_unit_instance_id,),
+                started_battle_round=state.battle_round,
+                started_phase=BattlePhase.SHOOTING,
+                expiration=EffectExpiration.end_phase(
+                    battle_round=state.battle_round,
+                    phase=BattlePhase.SHOOTING,
+                    player_id="player-a",
+                ),
+                effect_payload={"effect_kind": "p18c_pre_embark_destruction_liability"},
+            )
+        )
+        destruction = destroy_model_with_rule_reactions(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            model_instance_id=model_instance_id,
+            rules_unit_instance_id=rules_unit_instance_id,
+            destroying_player_id="player-a",
+            source_rule_id=source_id,
+            source_effect_ids=(effect_id,),
+            source_phase=BattlePhase.SHOOTING,
+            source_step="p18c_pre_embark_destruction",
+            source_result_id=f"{source_id}:result:{index}",
+            completion_event_type="p18c_pre_embark_model_destroyed",
+            completion_event_payload={"model_instance_id": model_instance_id},
+        )
+        assert destruction.status is None
+
+
+def _p18c_attached_hazard_placement_request(
+    *,
+    lifecycle: GameLifecycle,
+    sequence_id: str,
+    attacker: UnitInstance,
+    transport: UnitInstance,
+    cargo_components: tuple[UnitInstance, ...],
+    hazard_values: tuple[tuple[int, ...], ...],
+) -> tuple[AttackSequence, DiceRollManager, DecisionRequest]:
+    state = _state(lifecycle)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    for component in cargo_components:
+        battlefield = battlefield.without_unit_placement(component.unit_instance_id)
+    state.replace_battlefield_state(battlefield)
+    component_ids = tuple(sorted(component.unit_instance_id for component in cargo_components))
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=component_ids,
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=component_ids,
+        )
+    )
+    pending = replace(
+        _destroyed_transport_pending_for_test(
+            sequence_id=sequence_id,
+            attacker=attacker,
+            transport=transport,
+            passenger=next(
+                component
+                for component in cargo_components
+                if all(model.is_alive for model in component.own_models)
+            ),
+        ),
+        pending_unit_instance_ids=component_ids,
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    pending = replace(
+        pending,
+        damage_application=apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=transport.unit_instance_id,
+            model_instance_id=transport.own_models[0].model_instance_id,
+            damage=transport.own_models[0].wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+            remove_destroyed_model=False,
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    hazard_results = tuple(
+        result
+        for component, values in zip(cargo_components, hazard_values, strict=True)
+        for result in _destroyed_transport_hazard_roll_results_for_test(
+            _unit_placement_at(
+                replace(
+                    component,
+                    own_models=tuple(model for model in component.own_models if model.is_alive),
+                ),
+                army_id="army-beta",
+                player_id="player-b",
+                poses=tuple(
+                    Pose.at(38.0 + index, 34.0 + index)
+                    for index, _model in enumerate(
+                        model for model in component.own_models if model.is_alive
+                    )
+                ),
+            ),
+            values=values,
+            roll_id_prefix=f"{sequence_id}-{component.unit_instance_id}",
+        )
+    )
+    manager = DiceRollManager(
+        sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=hazard_results,
+    )
+    updated_sequence, allocated_ids, status = _continue_pending_destroyed_transport_disembark(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        manager=manager,
+        attack_sequence=sequence,
+        allocated_model_ids=(),
+        hooks=AttackSequenceHooks.empty(),
+    )
+    assert updated_sequence is not None
+    assert allocated_ids == ()
+    return updated_sequence, manager, _decision_request(cast(LifecycleStatus, status))
+
+
+def _submit_p18c_attached_rules_unit_placement(
+    *,
+    lifecycle: GameLifecycle,
+    attack_sequence: AttackSequence,
+    manager: DiceRollManager,
+    request: DecisionRequest,
+    transport: UnitInstance,
+    rules_unit_instance_id: str,
+    component_unit_placements: tuple[UnitPlacement, ...],
+    result_id: str,
+) -> AttackSequence:
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    result = _proposal_decision_result(
+        request=request,
+        payload=PlacementProposalPayload(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=rules_unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.DISEMBARK,
+            attempted_rules_unit_placement=RulesUnitPlacement(
+                rules_unit_instance_id=rules_unit_instance_id,
+                component_unit_placements=component_unit_placements,
+            ),
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ).to_payload(),
+        result_id=result_id,
+    )
+    lifecycle.decision_controller.submit_result(result)
+    updated_sequence, allocated_ids, status = apply_destroyed_transport_disembark_proposal_decision(
+        state=_state(lifecycle),
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=attack_sequence,
+        result=result,
+        already_allocated_model_ids=(),
+        hooks=AttackSequenceHooks.empty(),
+        dice_manager=manager,
+    )
+    assert updated_sequence is not None
+    assert allocated_ids == ()
+    assert status is None
+    assert updated_sequence.pending_destroyed_transport_disembark is None
+    return updated_sequence
+
+
+@pytest.mark.parametrize("destroyed_component_key", ["bodyguard-unit", "leader-unit"])
+@pytest.mark.slow
+def test_p18c_retained_attached_lineage_accepts_living_embarked_component(
+    destroyed_component_key: str,
+) -> None:
+    sequence_id = f"p18c-retained-attached-{destroyed_component_key}"
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id=sequence_id,
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            *_attached_enemy_unit_specs()[:2],
+        ),
+        enemy_attachment_declarations=_attached_enemy_declarations()[:1],
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    bodyguard = units["bodyguard-unit"]
+    leader = units["leader-unit"]
+    destroyed_component = units[destroyed_component_key]
+    surviving_component = leader if destroyed_component is bodyguard else bodyguard
+    destroyed_model_ids = tuple(model.model_instance_id for model in destroyed_component.own_models)
+    attached_before = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=surviving_component.unit_instance_id,
+    )
+    _p18c_destroy_models_before_embark(
+        lifecycle=lifecycle,
+        rules_unit_instance_id=attached_before.unit_instance_id,
+        model_instance_ids=destroyed_model_ids,
+        source_id=f"{sequence_id}:pre-embark",
+    )
+    attached = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=surviving_component.unit_instance_id,
+    )
+    assert set(attached.component_unit_instance_ids) == {
+        bodyguard.unit_instance_id,
+        leader.unit_instance_id,
+    }
+    assert attached.living_components[0].unit.unit_instance_id == (
+        surviving_component.unit_instance_id
+    )
+
+    updated_sequence, manager, request = _p18c_attached_hazard_placement_request(
+        lifecycle=lifecycle,
+        sequence_id=sequence_id,
+        attacker=attacker,
+        transport=transport,
+        cargo_components=(surviving_component,),
+        hazard_values=(tuple(6 for _model in surviving_component.own_models),),
+    )
+    pending = updated_sequence.pending_destroyed_transport_disembark
+    assert pending is not None
+    assert pending.current_hazard_rolls is not None
+    assert pending.current_hazard_rolls.unit_instance_id == attached.unit_instance_id
+    assert pending.current_hazard_rolls.component_unit_instance_ids == (
+        surviving_component.unit_instance_id,
+    )
+    placement = _unit_placement_at(
+        surviving_component,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            (Pose.at(40.8, 34.8),)
+            if surviving_component is leader
+            else (
+                Pose.at(38.1, 33.5),
+                Pose.at(39.0, 34.8),
+                Pose.at(39.0, 36.2),
+                Pose.at(38.1, 37.5),
+                Pose.at(37.8, 35.5),
+            )
+        ),
+    )
+    _submit_p18c_attached_rules_unit_placement(
+        lifecycle=lifecycle,
+        attack_sequence=updated_sequence,
+        manager=manager,
+        request=request,
+        transport=transport,
+        rules_unit_instance_id=attached.unit_instance_id,
+        component_unit_placements=(placement,),
+        result_id=f"{sequence_id}-placement",
+    )
+
+    disembarked_states = tuple(
+        disembarked_state
+        for disembarked_state in state.disembarked_unit_states
+        if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
+    )
+    assert len(disembarked_states) == 1
+    assert disembarked_states[0].unit_instance_id == attached.unit_instance_id
+    assert state.battlefield_state is not None
+    assert set(destroyed_model_ids).issubset(state.battlefield_state.removed_model_ids)
+    checkpoint = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(
+        cast(GameLifecyclePayload, json.loads(json.dumps(checkpoint, sort_keys=True)))
+    )
+    restored_state = _state(restored)
+    assert restored_state.battlefield_state is not None
+    assert set(destroyed_model_ids).issubset(restored_state.battlefield_state.removed_model_ids)
+    assert tuple(
+        disembarked_state.unit_instance_id
+        for disembarked_state in restored_state.disembarked_unit_states
+        if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
+    ) == (attached.unit_instance_id,)
+
+
+@pytest.mark.slow
+def test_p18c_hazard_destroyed_attached_component_uses_frozen_cargo_authority() -> None:
+    sequence_id = "p18c-hazard-destroyed-attached-component"
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id=sequence_id,
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            *_attached_enemy_unit_specs()[:2],
+        ),
+        enemy_attachment_declarations=_attached_enemy_declarations()[:1],
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    original_bodyguard = units["bodyguard-unit"]
+    leader = units["leader-unit"]
+    attached_before = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=original_bodyguard.unit_instance_id,
+    )
+    pre_hazard_destroyed_model_ids = tuple(
+        model.model_instance_id for model in original_bodyguard.own_models[:-1]
+    )
+    _p18c_destroy_models_before_embark(
+        lifecycle=lifecycle,
+        rules_unit_instance_id=attached_before.unit_instance_id,
+        model_instance_ids=pre_hazard_destroyed_model_ids,
+        source_id=f"{sequence_id}:pre-embark",
+    )
+    bodyguard_after_destruction = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=original_bodyguard.unit_instance_id,
+    ).component_unit_for_model(original_bodyguard.own_models[-1].model_instance_id)
+    bodyguard = replace(
+        bodyguard_after_destruction,
+        own_models=tuple(
+            replace(model, wounds_remaining=1) if model.is_alive else model
+            for model in bodyguard_after_destruction.own_models
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=bodyguard)
+    attached = rules_unit_view_by_id(state=state, unit_instance_id=bodyguard.unit_instance_id)
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    hazard_destroyed_model_id = next(
+        model.model_instance_id for model in bodyguard.own_models if model.is_alive
+    )
+
+    updated_sequence, manager, request = _p18c_attached_hazard_placement_request(
+        lifecycle=lifecycle,
+        sequence_id=sequence_id,
+        attacker=attacker,
+        transport=transport,
+        cargo_components=(bodyguard, leader),
+        hazard_values=(
+            (1,),
+            (6,),
+        ),
+    )
+    pending = updated_sequence.pending_destroyed_transport_disembark
+    assert pending is not None
+    assert pending.current_hazard_rolls is not None
+    assert pending.current_hazard_rolls.component_unit_instance_ids == component_ids
+    assert pending.current_hazard_surviving_model_instance_ids == (
+        leader.own_models[0].model_instance_id,
+    )
+    cargo_state = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert cargo_state is not None
+    assert not cargo_state.contains_unit(bodyguard.unit_instance_id)
+    assert cargo_state.contains_unit(leader.unit_instance_id)
+    assert not model_by_id(
+        state=state,
+        model_instance_id=hazard_destroyed_model_id,
+    ).is_alive
+    leader_placement = _unit_placement_at(
+        leader,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(40.8, 34.8),),
+    )
+    _submit_p18c_attached_rules_unit_placement(
+        lifecycle=lifecycle,
+        attack_sequence=updated_sequence,
+        manager=manager,
+        request=request,
+        transport=transport,
+        rules_unit_instance_id=attached.unit_instance_id,
+        component_unit_placements=(leader_placement,),
+        result_id=f"{sequence_id}-placement",
+    )
+
+    updated_cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert updated_cargo is None
+    disembarked_states = tuple(
+        disembarked_state
+        for disembarked_state in state.disembarked_unit_states
+        if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
+    )
+    assert len(disembarked_states) == 1
+    assert disembarked_states[0].unit_instance_id == attached.unit_instance_id
+    grouped_event = next(
+        payload
+        for payload in _event_payloads(lifecycle, "unit_disembarked")
+        if payload.get("result_id") == f"{sequence_id}-placement"
+    )
+    assert grouped_event["component_unit_instance_ids"] == list(component_ids)
+    grouped_evidence = cast(
+        dict[str, object],
+        grouped_event["destroyed_transport_rules_unit_disembark"],
+    )
+    assert grouped_evidence["hazard_destroyed_model_instance_ids"] == [hazard_destroyed_model_id]
+    checkpoint = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(
+        cast(GameLifecyclePayload, json.loads(json.dumps(checkpoint, sort_keys=True)))
+    )
+    restored_state = _state(restored)
+    assert restored_state.battlefield_state is not None
+    assert hazard_destroyed_model_id in restored_state.battlefield_state.removed_model_ids
+    assert tuple(
+        disembarked_state.unit_instance_id
+        for disembarked_state in restored_state.disembarked_unit_states
+        if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
+    ) == (attached.unit_instance_id,)
+
+
+@pytest.mark.slow
+def test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="p18c-attached-cargo-hazard",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            *_attached_enemy_unit_specs()[:2],
+        ),
+        enemy_attachment_declarations=_attached_enemy_declarations()[:1],
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    bodyguard = units["bodyguard-unit"]
+    leader = units["leader-unit"]
+    attached = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.without_unit_placement(bodyguard.unit_instance_id).without_unit_placement(
+            leader.unit_instance_id
+        )
+    )
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=component_ids,
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=component_ids,
+        )
+    )
+    pending = replace(
+        _destroyed_transport_pending_for_test(
+            sequence_id="p18c-attached-cargo-hazard",
+            attacker=attacker,
+            transport=transport,
+            passenger=bodyguard,
+        ),
+        pending_unit_instance_ids=component_ids,
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    pending = replace(
+        pending,
+        damage_application=apply_damage_to_model(
+            state=state,
+            target_unit_instance_id=transport.unit_instance_id,
+            model_instance_id=transport.own_models[0].model_instance_id,
+            damage=transport.own_models[0].wounds_remaining,
+            damage_kind=DamageKind.NORMAL,
+            remove_destroyed_model=False,
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id="p18c-attached-cargo-hazard",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    hazard_results = tuple(
+        result
+        for component in (bodyguard, leader)
+        for result in _destroyed_transport_hazard_roll_results_for_test(
+            _unit_placement_at(
+                component,
+                army_id="army-beta",
+                player_id="player-b",
+                poses=tuple(
+                    Pose.at(38.0 + index, 34.0 + index)
+                    for index, _model in enumerate(component.own_models)
+                ),
+            ),
+            values=tuple(6 for _model in component.own_models),
+            roll_id_prefix=f"p18c-attached-{component.unit_instance_id}",
+        )
+    )
+
+    manager = DiceRollManager(
+        "p18c-attached-cargo-hazard",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=hazard_results,
+    )
+    updated_sequence, allocated_ids, status = _continue_pending_destroyed_transport_disembark(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        manager=manager,
+        attack_sequence=sequence,
+        allocated_model_ids=(),
+        hooks=AttackSequenceHooks.empty(),
+    )
+    request = _decision_request(cast(LifecycleStatus, status))
+    assert updated_sequence is not None
+    updated_pending = updated_sequence.pending_destroyed_transport_disembark
+    assert updated_pending is not None
+    hazard_rolls = updated_pending.current_hazard_rolls
+    assert hazard_rolls is not None
+    assert allocated_ids == ()
+    assert hazard_rolls.unit_instance_id == attached.unit_instance_id
+    assert hazard_rolls.component_unit_instance_ids == component_ids
+    assert hazard_rolls.model_instance_ids == tuple(
+        sorted(model.model_instance_id for model in attached.alive_models())
+    )
+    assert request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE
+    assert len(_event_payloads(lifecycle, TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE)) == 1
+
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert proposal_request.unit_instance_id == attached.unit_instance_id
+    bodyguard_placement = _unit_placement_at(
+        bodyguard,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(38.1, 33.5),
+            Pose.at(39.0, 34.8),
+            Pose.at(39.0, 36.2),
+            Pose.at(38.1, 37.5),
+            Pose.at(37.8, 35.5),
+        ),
+    )
+    omitted_bodyguard_model_id = bodyguard_placement.model_placements[-1].model_instance_id
+    bodyguard_placement = replace(
+        bodyguard_placement,
+        model_placements=bodyguard_placement.model_placements[:-1],
+    )
+    leader_placement = _unit_placement_at(
+        leader,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(40.8, 34.8),),
+    )
+    placement_result = _proposal_decision_result(
+        request=request,
+        payload=PlacementProposalPayload(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=attached.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.DISEMBARK,
+            attempted_rules_unit_placement=RulesUnitPlacement(
+                rules_unit_instance_id=attached.unit_instance_id,
+                component_unit_placements=(bodyguard_placement, leader_placement),
+            ),
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ).to_payload(),
+        result_id="p18c-attached-rules-unit-placement",
+    )
+    lifecycle.decision_controller.submit_result(placement_result)
+    next_sequence, next_allocated_ids, next_status = (
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=updated_sequence,
+            result=placement_result,
+            already_allocated_model_ids=allocated_ids,
+            hooks=AttackSequenceHooks.empty(),
+            dice_manager=manager,
+        )
+    )
+    assert next_allocated_ids == ()
+    assert next_status is None
+    assert next_sequence is not None
+    assert next_sequence.pending_destroyed_transport_disembark is None
+    assert len(_event_payloads(lifecycle, TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE)) == 1
+    updated_battlefield = state.battlefield_state
+    assert updated_battlefield is not None
+    assert updated_battlefield.unit_placement_by_id(bodyguard.unit_instance_id) == (
+        bodyguard_placement
+    )
+    assert updated_battlefield.unit_placement_by_id(leader.unit_instance_id) == leader_placement
+    assert omitted_bodyguard_model_id in updated_battlefield.removed_model_ids
+    assert not model_by_id(
+        state=state,
+        model_instance_id=omitted_bodyguard_model_id,
+    ).is_alive
+    disembarked_states = tuple(
+        disembarked_state
+        for disembarked_state in state.disembarked_unit_states
+        if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
+    )
+    assert len(disembarked_states) == 1
+    assert disembarked_states[0].unit_instance_id == attached.unit_instance_id
+    grouped_events = tuple(
+        payload
+        for payload in _event_payloads(lifecycle, "unit_disembarked")
+        if payload.get("result_id") == "p18c-attached-rules-unit-placement"
+    )
+    assert len(grouped_events) == 1
+    assert grouped_events[0]["unit_instance_id"] == attached.unit_instance_id
+    assert grouped_events[0]["component_unit_instance_ids"] == list(component_ids)
+    assert "destroyed_transport_rules_unit_disembark" in grouped_events[0]
+    checkpoint = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(
+        cast(GameLifecyclePayload, json.loads(json.dumps(checkpoint, sort_keys=True)))
+    )
+    restored_state = _state(restored)
+    assert tuple(
+        disembarked_state.unit_instance_id
+        for disembarked_state in restored_state.disembarked_unit_states
+        if disembarked_state.transport_unit_instance_id == transport.unit_instance_id
+    ) == (attached.unit_instance_id,)
+    assert restored_state.battlefield_state is not None
+    assert omitted_bodyguard_model_id in restored_state.battlefield_state.removed_model_ids
+    forged_checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    forged_decisions = cast(dict[str, Any], forged_checkpoint["decisions"])
+    forged_event = next(
+        event
+        for event in cast(list[dict[str, Any]], forged_decisions["event_log"])
+        if event["event_type"] == "unit_disembarked"
+        and cast(dict[str, Any], event["payload"]).get("result_id")
+        == "p18c-attached-rules-unit-placement"
+    )
+    forged_event_payload = cast(dict[str, Any], forged_event["payload"])
+    forged_evidence = cast(
+        dict[str, Any],
+        forged_event_payload["destroyed_transport_rules_unit_disembark"],
+    )
+    forged_evidence["rules_unit_instance_id"] = bodyguard.unit_instance_id
+    with pytest.raises(GameLifecycleError, match="canonical attached identity"):
+        GameLifecycle.from_payload(forged_checkpoint)
 
 
 @pytest.mark.slow
@@ -13617,6 +14727,60 @@ def test_phase14h_pending_destroyed_transport_state_round_trips_and_rejects_drif
             transport_unit_instance_id=pending.transport_unit_instance_id,
             pending_unit_instance_ids=pending.pending_unit_instance_ids,
         )
+    hazard_rolls = pending.current_hazard_rolls
+    assert hazard_rolls is not None
+    with pytest.raises(GameLifecycleError, match="current hazard rolls are invalid"):
+        replace(pending, current_hazard_rolls=cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="appears in both states"):
+        replace(
+            pending,
+            hazard_destroyed_unit_instance_ids=(passenger.unit_instance_id,),
+        )
+    with pytest.raises(GameLifecycleError, match="survivors require current hazard rolls"):
+        replace(pending, current_hazard_rolls=None)
+    with pytest.raises(GameLifecycleError, match="current hazard unit drift"):
+        replace(
+            pending,
+            current_hazard_rolls=replace(
+                hazard_rolls,
+                unit_instance_id="unit:forged",
+                component_unit_instance_ids=("unit:forged",),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="current hazard transport drift"):
+        replace(
+            pending,
+            current_hazard_rolls=replace(
+                hazard_rolls,
+                transport_unit_instance_id="transport:forged",
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="survivor inventory drift"):
+        replace(
+            pending,
+            current_hazard_surviving_model_instance_ids=("model:forged",),
+        )
+    with pytest.raises(GameLifecycleError, match="hazard rolls are invalid"):
+        pending.with_current_hazard_rolls(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="hazard rolls already exist"):
+        pending.with_current_hazard_rolls(hazard_rolls)
+    pending_without_hazard = replace(
+        pending,
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    with pytest.raises(GameLifecycleError, match="survivors require hazard rolls"):
+        pending_without_hazard.with_current_hazard_survivors(())
+    with pytest.raises(GameLifecycleError, match="hazard survivors already exist"):
+        pending.with_current_hazard_survivors(())
+    with pytest.raises(GameLifecycleError, match="destroyed cargo requires zero survivors"):
+        pending.with_hazard_destroyed_current_unit()
+    hazard_destroyed = replace(
+        pending,
+        current_hazard_surviving_model_instance_ids=(),
+    ).with_hazard_destroyed_current_unit()
+    assert hazard_destroyed.pending_unit_instance_ids == ()
+    assert hazard_destroyed.hazard_destroyed_unit_instance_ids == (passenger.unit_instance_id,)
     with pytest.raises(GameLifecycleError, match="Resolved destroyed Transport disembark"):
         pending.with_resolved_disembark(cast(Any, object()))
 
@@ -13773,6 +14937,141 @@ def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_pay
         attack_sequence=sequence,
     )
     base_proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert _key_error_field(KeyError("field-a", "field-b")) == "payload"
+    assert _key_error_field(KeyError("")) == "payload"
+    parse_failures = (
+        (GameLifecycleError("proposal_kind drift"), "proposal_kind"),
+        (GameLifecycleError("disembark_mode drift"), "disembark_mode"),
+        (
+            GameLifecycleError("transport_movement_status drift"),
+            "transport_movement_status",
+        ),
+        (
+            GameLifecycleError("transport_unit_instance_id drift"),
+            "transport_unit_instance_id",
+        ),
+        (GameLifecycleError("attempted placement drift"), "attempted_placement"),
+    )
+    for error, expected_field in parse_failures:
+        assert (
+            _destroyed_transport_proposal_parse_failure(
+                proposal_request=base_proposal_request,
+                error=error,
+            )
+            .violations[0]
+            .field
+            == expected_field
+        )
+    parsed_submission = PlacementProposalPayload.from_payload(cast(Any, valid_payload))
+    assert (
+        _missing_destroyed_transport_disembark_field(
+            replace(parsed_submission, disembark_mode=None)
+        )
+        == "disembark_mode"
+    )
+    assert (
+        _missing_destroyed_transport_disembark_field(
+            replace(parsed_submission, transport_movement_status=None)
+        )
+        == "transport_movement_status"
+    )
+
+    hazard_context_drift_request = replace(
+        base_proposal_request,
+        request_id="phase14h-destroyed-transport-hazard-context-drift",
+        context={
+            **dict(base_proposal_request.context or {}),
+            "hazard_rolls": None,
+        },
+    ).to_decision_request()
+    hazard_context_drift_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(
+            hazard_context_drift_request.payload
+        ),
+        unit=passenger,
+        transport=transport,
+    )
+    hazard_context_drift_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=hazard_context_drift_request,
+        result=_proposal_decision_result(
+            request=hazard_context_drift_request,
+            payload=hazard_context_drift_payload,
+            result_id="phase14h-destroyed-transport-hazard-context-drift",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=sequence,
+    )
+    assert hazard_context_drift_status is not None
+    _assert_invalid_proposal_status(
+        hazard_context_drift_status,
+        expected_code="destroyed_transport_hazard_context_drift",
+        expected_field="context",
+    )
+
+    pending_without_hazard = replace(
+        pending,
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    with pytest.raises(GameLifecycleError, match="completed hazard survivors"):
+        _request_destroyed_transport_disembark_placement(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            attack_sequence=base_sequence.with_pending_destroyed_transport_disembark(
+                pending_without_hazard
+            ),
+            pending=pending_without_hazard,
+        )
+    state.transport_cargo_states = []
+    with pytest.raises(GameLifecycleError, match="require current cargo state"):
+        _continue_pending_destroyed_transport_disembark(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            manager=DiceRollManager("phase14h-p18c-missing-cargo"),
+            attack_sequence=base_sequence.with_pending_destroyed_transport_disembark(
+                pending_without_hazard
+            ),
+            allocated_model_ids=(),
+            hooks=AttackSequenceHooks(),
+        )
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(passenger.unit_instance_id,),
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="completed hazard survivors"):
+        _resolve_destroyed_transport_disembark_submission(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            pending=pending_without_hazard,
+            submission=parsed_submission,
+        )
+    survivors = pending.current_hazard_surviving_model_instance_ids
+    assert survivors is not None
+    with pytest.raises(GameLifecycleError, match="survivor inventory drift"):
+        _resolve_destroyed_transport_disembark_submission(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            pending=replace(
+                pending,
+                current_hazard_surviving_model_instance_ids=tuple(
+                    sorted((*survivors, "model:forged"))
+                ),
+            ),
+            submission=parsed_submission,
+        )
+
     mode_drift_request = replace(
         base_proposal_request,
         request_id="phase14h-destroyed-transport-mode-drift",
@@ -13827,6 +15126,40 @@ def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_pay
         decisions=lifecycle.decision_controller,
         attack_sequence=sequence,
     )
+    survivor_ids = tuple(sorted(model.model_instance_id for model in passenger.own_models)[:-1])
+    casualty_pending = replace(
+        pending,
+        current_hazard_surviving_model_instance_ids=survivor_ids,
+    )
+    casualty_sequence = replace(
+        sequence,
+        pending_destroyed_transport_disembark=casualty_pending,
+    )
+    casualty_request = _destroyed_transport_proposal_request_for_test(
+        state=state,
+        pending=casualty_pending,
+        sequence=casualty_sequence,
+        unit_instance_id=passenger.unit_instance_id,
+        request_id="phase14h-destroyed-transport-hazard-casualty",
+    )
+    casualty_payload = _destroyed_transport_placement_payload_for_test(
+        proposal_request=MovementProposalRequest.from_decision_request_payload(
+            casualty_request.payload
+        ),
+        unit=passenger,
+        transport=transport,
+    )
+    casualty_status = invalid_destroyed_transport_disembark_proposal_status(
+        state=state,
+        request=casualty_request,
+        result=_proposal_decision_result(
+            request=casualty_request,
+            payload=casualty_payload,
+            result_id="phase14h-destroyed-transport-hazard-casualty",
+        ),
+        decisions=lifecycle.decision_controller,
+        attack_sequence=casualty_sequence,
+    )
     invalid_events = _event_payloads(
         lifecycle,
         "destroyed_transport_disembark_proposal_invalid",
@@ -13872,7 +15205,12 @@ def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_pay
         expected_code="destroyed_transport_status_drift",
         expected_field="transport_movement_status",
     )
-    assert len(invalid_events) == 8
+    _assert_invalid_proposal_status(
+        casualty_status,
+        expected_code="destroyed_transport_non_survivor_placement",
+        expected_field="attempted_placement",
+    )
+    assert len(invalid_events) == 10
 
 
 def test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requirements() -> None:
@@ -13967,7 +15305,12 @@ def test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requiremen
             state=state,
             decisions=lifecycle.decision_controller,
             attack_sequence=sequence,
-            pending=replace(pending, pending_unit_instance_ids=()),
+            pending=replace(
+                pending,
+                pending_unit_instance_ids=(),
+                current_hazard_rolls=None,
+                current_hazard_surviving_model_instance_ids=None,
+            ),
         )
     with pytest.raises(GameLifecycleError, match="cargo state is missing before removal"):
         remove_cargo(
@@ -14007,7 +15350,6 @@ def test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requiremen
             ruleset_descriptor=_ruleset(),
             pending=pending,
             submission=submission_without_mode,
-            dice_manager=DiceRollManager("phase14h-fail-fast-incomplete"),
         )
     state_without_cargo = _state(
         _shooting_lifecycle(
@@ -14025,7 +15367,6 @@ def test_phase14h_destroyed_transport_fail_fast_guards_preserve_state_requiremen
             ruleset_descriptor=_ruleset(),
             pending=pending,
             submission=submission_without_cargo,
-            dice_manager=DiceRollManager("phase14h-fail-fast-no-cargo"),
         )
     with pytest.raises(GameLifecycleError, match="retry missing attack_sequence_id"):
         retry_request(
@@ -14303,6 +15644,15 @@ def test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal
         result_id="phase14h-destroyed-transport-passenger-a",
     )
     lifecycle.decision_controller.submit_result(result)
+    passenger_b_hazard_snapshot = _unit_placement_at(
+        passenger_b,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(
+            Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
+            for index, _model in enumerate(passenger_b.own_models)
+        ),
+    )
 
     updated_sequence, allocated_ids, status = apply_destroyed_transport_disembark_proposal_decision(
         state=state,
@@ -14315,9 +15665,9 @@ def test_phase14h_destroyed_transport_requests_each_embarked_unit_before_removal
             "phase14h-destroyed-transport-multi-cargo",
             event_log=lifecycle.decision_controller.event_log,
             injected_results=_destroyed_transport_hazard_roll_results_for_test(
-                attempted_placement,
+                passenger_b_hazard_snapshot,
                 values=(6, 6, 6, 6, 6),
-                roll_id_prefix="phase14h-destroyed-transport-passenger-a",
+                roll_id_prefix="phase14h-destroyed-transport-passenger-b",
             ),
         ),
     )

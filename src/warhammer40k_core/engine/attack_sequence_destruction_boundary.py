@@ -236,7 +236,10 @@ def resolve_pending_attack_destruction_until_blocked(
         destroyed_model_controller_player_id=(pending.destroyed_model_controller_player_id),
         sources=pending.destruction_sources,
     )
-    if transport_status is not None:
+    if (
+        transport_status is not None
+        or updated_sequence.pending_destroyed_transport_disembark is not None
+    ):
         return updated_sequence, transport_status
 
     mandatory_status = _resolve_mandatory_destruction_reactions_before_removal(

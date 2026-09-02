@@ -21,6 +21,9 @@ from tools.build_core_movement_phase_source import build_payload as build_moveme
 from tools.build_core_other_concepts_source import (
     build_payload as build_other_concepts_source_payload,
 )
+from tools.build_core_transports_source import (
+    build_payload as build_transports_source_payload,
+)
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -47,6 +50,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_rules,
     core_stratagems,
     core_stratagems_2026_08,
+    core_transports_2026_09,
     july_rules_updates_2026_07,
 )
 
@@ -117,6 +121,16 @@ def test_p09a_move_units_source_artifact_is_pinned_typed_and_executable() -> Non
     assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
         package.source_catalog.to_payload()
     )
+    consumer_ids = set(rule.runtime_consumer_ids) | {
+        consumer_id for record in evidence for consumer_id in record.runtime_consumer_ids
+    }
+    for consumer_id in sorted(consumer_ids):
+        module_name, separator, qualified_name = consumer_id.partition(":")
+        assert separator, consumer_id
+        resolved: object = importlib.import_module(module_name)
+        for attribute in qualified_name.split("."):
+            resolved = getattr(resolved, attribute)
+        assert resolved is not None, consumer_id
 
 
 def test_p19_attached_units_source_artifact_is_pinned_typed_and_executable() -> None:
@@ -223,6 +237,58 @@ def test_p05a_destroyed_source_loader_rejects_schema_and_byte_drift() -> None:
         core_attack_sequence_2026_09.validate_core_attack_sequence_source_artifact_bytes(
             raw + b"\n"
         )
+
+
+def test_p18c_emergency_disembark_source_artifact_is_pinned_typed_and_executable() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_transports_2026_09/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    package = core_transports_2026_09.source_package()
+    rule = core_transports_2026_09.source_rule_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert hashlib.sha256(raw).hexdigest() == (core_transports_2026_09.EXPECTED_ARTIFACT_SHA256)
+    assert json.loads(raw) == build_transports_source_payload()
+    assert rule.section_id == "18.05"
+    assert rule.source_id == core_transports_2026_09.EMERGENCY_DISEMBARK_MOVE_SOURCE_ID
+    assert rule.transcription_sha256 == core_transports_2026_09.TRANSCRIPTION_SHA256
+    assert "Before moving: Make a hazard roll for each model" in rule.source_text
+    assert "While moving: Set up each model" in rule.source_text
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
+        package.source_catalog.to_payload()
+    )
+
+
+def test_p18c_emergency_disembark_source_loader_rejects_schema_and_byte_drift() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_transports_2026_09/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    payload = json.loads(raw)
+    payload["rules"][0]["section_id"] = "18.04"
+
+    with pytest.raises(
+        core_transports_2026_09.CoreTransportsSourceArtifactError,
+        match="reviewed identity",
+    ):
+        core_transports_2026_09.core_transports_source_artifact_from_json_bytes(
+            json.dumps(payload).encode()
+        )
+    with pytest.raises(
+        core_transports_2026_09.CoreTransportsSourceArtifactError,
+        match="bytes drifted",
+    ):
+        core_transports_2026_09.validate_core_transports_source_artifact_bytes(raw + b"\n")
 
 
 def test_p06a_visibility_source_artifact_is_pinned_typed_and_executable() -> None:

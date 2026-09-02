@@ -154,12 +154,14 @@ from warhammer40k_core.engine.shooting_types import (
 )
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.transports import (
+    DestroyedTransportHazardRolls,
     DisembarkModeKind,
     FiringDeckSelection,
     FiringDeckWeaponSelection,
     TransportCapacityProfile,
     TransportCargoState,
     TransportMovementStatus,
+    resolve_destroyed_transport_hazard_rolls,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
@@ -1761,7 +1763,7 @@ def _destroyed_transport_pending_for_test(
     passenger: UnitInstance,
 ) -> PendingDestroyedTransportDisembark:
     transport_model = transport.own_models[0]
-    return PendingDestroyedTransportDisembark(
+    pending = PendingDestroyedTransportDisembark(
         attack_context=_destroyed_transport_attack_context_for_test(
             sequence_id=sequence_id,
             attacker=attacker,
@@ -1801,6 +1803,42 @@ def _destroyed_transport_pending_for_test(
                 optional=False,
             ),
         ),
+    )
+    hazard_model_snapshot = _unit_placement_at(
+        passenger,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(
+            Pose.at(38.0 + (0.7 * index), 34.0 + (0.5 * index))
+            for index, _model in enumerate(passenger.own_models)
+        ),
+    )
+    hazard_rolls = resolve_destroyed_transport_hazard_rolls(
+        cargo_state=TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=10,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=(passenger.unit_instance_id,),
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=(passenger.unit_instance_id,),
+        ),
+        unit=passenger,
+        dice_manager=DiceRollManager(
+            f"{sequence_id}-hazard-snapshot",
+            injected_results=_destroyed_transport_hazard_roll_results_for_test(
+                hazard_model_snapshot,
+                values=tuple(6 for _model in passenger.own_models),
+                roll_id_prefix=f"{sequence_id}-hazard-snapshot",
+            ),
+        ),
+        battle_round=1,
+    )
+    return pending.with_current_hazard_rolls(hazard_rolls).with_current_hazard_survivors(
+        tuple(sorted(model.model_instance_id for model in passenger.own_models))
     )
 
 
@@ -1876,6 +1914,13 @@ def _destroyed_transport_proposal_request_for_test(
             "attack_sequence_id": sequence.sequence_id,
             "attack_context_id": attack_context_id,
             "destroyed_model_instance_id": pending.damage_application.model_instance_id,
+            "surviving_model_instance_ids": list(
+                pending.current_hazard_surviving_model_instance_ids or ()
+            ),
+            "hazard_rolls": cast(
+                JsonValue,
+                _current_destroyed_transport_hazard_rolls(pending).to_payload(),
+            ),
         },
     ).to_decision_request()
 
@@ -1921,9 +1966,7 @@ def _destroyed_transport_hazard_roll_results_for_test(
         DiceRollResult.from_values(
             roll_id=f"{roll_id_prefix}-{index:03d}",
             spec=hazard_roll_spec(
-                reason=(
-                    f"Destroyed Transport disembark roll for {model_placement.model_instance_id}"
-                ),
+                reason=(f"Emergency Disembark hazard roll for {model_placement.model_instance_id}"),
                 roll_type="destroyed_transport_disembark",
                 actor_id=model_placement.model_instance_id,
             ),
@@ -1935,6 +1978,15 @@ def _destroyed_transport_hazard_roll_results_for_test(
             start=1,
         )
     )
+
+
+def _current_destroyed_transport_hazard_rolls(
+    pending: PendingDestroyedTransportDisembark,
+) -> DestroyedTransportHazardRolls:
+    hazard_rolls = pending.current_hazard_rolls
+    if hazard_rolls is None:
+        raise AssertionError("Destroyed Transport test fixture requires hazard rolls.")
+    return hazard_rolls
 
 
 def _proposal_decision_result(

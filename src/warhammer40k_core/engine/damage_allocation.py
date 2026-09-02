@@ -90,7 +90,10 @@ from warhammer40k_core.engine.mortal_wound_logical_death import (
     fixed_mortal_wound_logical_death_recorder,
     validate_mortal_wound_logical_death_progress,
 )
-from warhammer40k_core.engine.mortal_wound_target_lineage import MortalWoundTargetLineage
+from warhammer40k_core.engine.mortal_wound_target_lineage import (
+    FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY,
+    MortalWoundTargetLineage,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -1318,20 +1321,33 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError(
                 "MortalWoundApplicationProgress logical-death binding is invalid."
             )
-        object.__setattr__(
-            self,
-            "logical_death_events",
-            validate_mortal_wound_logical_death_progress(
-                binding=self.logical_death_cause_binding,
-                logical_death_events=self.logical_death_events,
-                destroyed_damage_application_payloads=tuple(
-                    cast(JsonValue, application.to_payload())
-                    for application in self.applications
-                    if application.destroyed
+        if (
+            self.target_lineage is not None
+            and self.target_lineage.policy == FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY
+        ):
+            if self.destruction_evidence is not None:
+                raise GameLifecycleError(
+                    "Embarked mortal-wound progress cannot use battlefield destruction evidence."
+                )
+            if self.destroyed_model_placements or self.logical_death_events:
+                raise GameLifecycleError(
+                    "Embarked mortal-wound progress cannot contain placed-model death evidence."
+                )
+        else:
+            object.__setattr__(
+                self,
+                "logical_death_events",
+                validate_mortal_wound_logical_death_progress(
+                    binding=self.logical_death_cause_binding,
+                    logical_death_events=self.logical_death_events,
+                    destroyed_damage_application_payloads=tuple(
+                        cast(JsonValue, application.to_payload())
+                        for application in self.applications
+                        if application.destroyed
+                    ),
+                    placement_retained=self.destruction_evidence is None,
                 ),
-                placement_retained=self.destruction_evidence is None,
-            ),
-        )
+            )
         accounted = (
             sum(application.wounds_lost for application in self.applications)
             + self.ignored_mortal_wounds
@@ -1355,6 +1371,7 @@ class MortalWoundApplicationProgress:
         destruction_evidence: MortalWoundDestructionEvidence | None,
         priority_model_ids: tuple[str, ...] = (),
         logical_death_cause_binding: MortalWoundLogicalDeathCauseBinding | None = None,
+        target_lineage: MortalWoundTargetLineage | None = None,
     ) -> Self:
         wounds = _validate_positive_int("mortal_wounds", mortal_wounds)
         binding = logical_death_cause_binding
@@ -1379,6 +1396,7 @@ class MortalWoundApplicationProgress:
             logical_death_events=(),
             logical_death_cause_binding=binding,
             priority_model_ids=priority_model_ids,
+            target_lineage=target_lineage,
         )
 
     @classmethod
@@ -1505,8 +1523,26 @@ class MortalWoundApplicationProgress:
             state=state,
             model_instance_id=model_instance_id,
         )
+        embedded_target = target_lineage.policy == FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY
         binding = self.logical_death_cause_binding
-        if remove_destroyed_model:
+        recorder: MortalWoundLogicalDeathRecorder | None
+        if embedded_target:
+            if remove_destroyed_model:
+                raise GameLifecycleError(
+                    "Embarked mortal-wound destruction must retain off-battlefield placement."
+                )
+            if self.destruction_evidence is not None:
+                raise GameLifecycleError(
+                    "Embarked mortal-wound destruction cannot use battlefield evidence."
+                )
+            expected_binding = MortalWoundLogicalDeathCauseBinding.fixed(
+                cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
+                producer_id=self.application_id,
+            )
+            if binding != expected_binding:
+                raise GameLifecycleError("Embarked mortal wound destruction binding drift.")
+            recorder = None
+        elif remove_destroyed_model:
             expected_binding = MortalWoundLogicalDeathCauseBinding.fixed(
                 cause_kind=ModelDestructionCauseKind.MORTAL_WOUND,
                 producer_id=self.application_id,
@@ -1531,9 +1567,13 @@ class MortalWoundApplicationProgress:
         destroyed_model_placements = list(self.destroyed_model_placements)
         logical_death_events = list(self.logical_death_events)
         if resolution.remaining_wounds > 0:
-            pre_removal_placement = pre_removal_model_placement_for_mortal_wound_destruction(
-                state=state,
-                model_instance_id=model_instance_id,
+            pre_removal_placement = (
+                None
+                if embedded_target
+                else pre_removal_model_placement_for_mortal_wound_destruction(
+                    state=state,
+                    model_instance_id=model_instance_id,
+                )
             )
             application = apply_damage_to_model(
                 state=state,
@@ -1545,15 +1585,34 @@ class MortalWoundApplicationProgress:
             )
             applications.append(application)
             if application.destroyed:
-                logical_death_event = recorder(
-                    damage_application=application,
-                    destroyed_model_placement=pre_removal_placement,
-                    placement_retained=not remove_destroyed_model,
-                )
-                binding = binding.with_logical_death_event(logical_death_event)
-                logical_death_events.append(logical_death_event)
-                if remove_destroyed_model:
-                    destroyed_model_placements.append(pre_removal_placement)
+                if embedded_target:
+                    battlefield = state.battlefield_state
+                    if battlefield is None:
+                        raise GameLifecycleError(
+                            "Embarked mortal-wound destruction requires battlefield state."
+                        )
+                    try:
+                        state.replace_battlefield_state(
+                            battlefield.with_unplaced_models_marked_removed((model_instance_id,))
+                        )
+                    except PlacementError as exc:
+                        raise GameLifecycleError(
+                            "Embarked mortal-wound destruction removal failed."
+                        ) from exc
+                else:
+                    if recorder is None or pre_removal_placement is None or binding is None:
+                        raise GameLifecycleError(
+                            "Mortal-wound destruction lacks placed-model authority."
+                        )
+                    logical_death_event = recorder(
+                        damage_application=application,
+                        destroyed_model_placement=pre_removal_placement,
+                        placement_retained=not remove_destroyed_model,
+                    )
+                    binding = binding.with_logical_death_event(logical_death_event)
+                    logical_death_events.append(logical_death_event)
+                    if remove_destroyed_model:
+                        destroyed_model_placements.append(pre_removal_placement)
             if application.destroyed and not self.spill_over:
                 remaining_lost += self.remaining_mortal_wounds - 1
         else:

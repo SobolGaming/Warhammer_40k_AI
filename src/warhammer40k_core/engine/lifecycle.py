@@ -21,6 +21,7 @@ from warhammer40k_core.engine import (
 from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import core_stratagem_mortal_wound_continuation as _stratagem_mw
+from warhammer40k_core.engine import destroyed_transport_pending as _destroyed_transport_pending
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_activation_history_integrity as _fahi
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
@@ -3575,6 +3576,11 @@ def _validate_payload_consistency(
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)
+    _destroyed_transport_pending.validate_pending_destroyed_transport_restore(
+        state=state,
+        event_records=event_records,
+        pending_decision_requests=pending_decision_requests,
+    )
     _bsa.validate_restore(state, event_records, decision_records, pending_decision_requests)
     _fahi.validate_restore(state, event_records, decision_records, pending_decision_requests)
     validate_disembarked_unit_state_consistency(state=state)
