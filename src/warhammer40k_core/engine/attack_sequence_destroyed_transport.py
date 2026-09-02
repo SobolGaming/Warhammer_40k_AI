@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.emergency_disembark import (
+    resolve_destroyed_transport_rules_unit_hazard_rolls_service,
+)
 from warhammer40k_core.engine.primary_destruction_evidence import (
     PrimaryUnattributedDestructionCause,
 )
@@ -115,7 +118,10 @@ def invalid_destroyed_transport_disembark_proposal_status(
     if isinstance(parsed, LifecycleStatus):
         return parsed
     proposal_request, submission = parsed
-    survivor_ids = pending.current_hazard_surviving_model_instance_ids
+    survivor_ids = _current_hazard_component_survivor_ids(
+        state=state,
+        pending=pending,
+    )
     hazard_rolls = pending.current_hazard_rolls
     proposal_context = proposal_request.context or {}
     if (
@@ -324,7 +330,12 @@ def apply_destroyed_transport_disembark_proposal_decision(
         result=result,
         source_phase=attack_sequence.source_phase,
     )
-    updated_pending = pending.with_resolved_disembark(disembark)
+    updated_pending = pending.with_resolved_disembark(
+        disembark,
+        retain_current_hazard=_next_pending_unit_shares_current_hazard(
+            pending=pending,
+        ),
+    )
     updated_sequence = attack_sequence.with_pending_destroyed_transport_disembark(updated_pending)
     return _continue_pending_destroyed_transport_disembark(
         state=state,
@@ -356,12 +367,16 @@ def _continue_pending_destroyed_transport_disembark(
             raise GameLifecycleError(
                 "Destroyed Transport hazard rolls require current cargo state."
             )
-        unit = unit_by_id(state=state, unit_instance_id=pending.next_unit_instance_id)
-        hazard_rolls = resolve_destroyed_transport_hazard_rolls(
+        rules_unit = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=pending.next_unit_instance_id,
+        )
+        hazard_rolls = resolve_destroyed_transport_rules_unit_hazard_rolls_service(
             cargo_state=cargo_state,
-            unit=unit,
+            rules_unit=rules_unit,
             dice_manager=manager,
             battle_round=state.battle_round,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
         )
         pending = pending.with_current_hazard_rolls(hazard_rolls)
         attack_sequence = attack_sequence.with_pending_destroyed_transport_disembark(pending)
@@ -395,10 +410,50 @@ def _continue_pending_destroyed_transport_disembark(
         and pending.current_hazard_rolls is not None
         and pending.current_hazard_surviving_model_instance_ids is None
     ):
-        _require_completed_destroyed_transport_hazard(
+        hazard_completion, hazard_completion_event = _require_completed_destroyed_transport_hazard(
             decisions=decisions,
             hazard_rolls=pending.current_hazard_rolls,
         )
+        hazard_destroyed_model_ids = tuple(
+            sorted(
+                application.model_instance_id
+                for application in (
+                    ()
+                    if hazard_completion.mortal_wound_application is None
+                    else hazard_completion.mortal_wound_application.applications
+                )
+                if application.destroyed
+            )
+        )
+        if hazard_destroyed_model_ids:
+            departure_ids_before = tuple(
+                value.departure_id for value in state.primary_battlefield_departure_states
+            )
+            destruction_ids_before = tuple(
+                value.destruction_id for value in state.primary_unit_destruction_states
+            )
+            record_primary_unit_destructions_for_destroyed_models(
+                state=state,
+                destroyed_model_instance_ids=hazard_destroyed_model_ids,
+                destruction_attribution=None,
+                source_model_destroyed_event_id=None,
+                source_rules_unit_objective_proximity_witness=None,
+                destroyed_rules_unit_objective_proximity_witness=None,
+                unattributed_cause=PrimaryUnattributedDestructionCause.EMERGENCY_DISEMBARK,
+                source_mutation_id=hazard_completion_event.event_id,
+                left_battlefield=True,
+                source_id=(f"core-rules:emergency-disembark:{hazard_completion_event.event_id}"),
+            )
+            record_new_primary_battlefield_departure_events(
+                state=state,
+                event_log=decisions.event_log,
+                departure_ids_before=departure_ids_before,
+            )
+            record_new_primary_unit_destruction_events(
+                state=state,
+                event_log=decisions.event_log,
+                destruction_ids_before=destruction_ids_before,
+            )
         pending = pending.with_current_hazard_survivors(
             _destroyed_transport_hazard_survivor_ids(
                 state=state,
@@ -406,10 +461,18 @@ def _continue_pending_destroyed_transport_disembark(
             )
         )
         attack_sequence = attack_sequence.with_pending_destroyed_transport_disembark(pending)
-    if (
-        pending.next_unit_instance_id is not None
-        and pending.current_hazard_surviving_model_instance_ids == ()
-    ):
+    current_component_survivor_ids = _current_hazard_component_survivor_ids(
+        state=state,
+        pending=pending,
+    )
+    if pending.next_unit_instance_id is not None and current_component_survivor_ids == ():
+        current_hazard_rolls = pending.current_hazard_rolls
+        if current_hazard_rolls is None:
+            raise GameLifecycleError("Destroyed Transport zero survivors require hazard rolls.")
+        _hazard_completion, hazard_completion_event = _require_completed_destroyed_transport_hazard(
+            decisions=decisions,
+            hazard_rolls=current_hazard_rolls,
+        )
         decisions.event_log.append(
             "destroyed_transport_cargo_destroyed_before_placement",
             validate_json_value(
@@ -419,14 +482,17 @@ def _continue_pending_destroyed_transport_disembark(
                     "phase": attack_sequence.source_phase.value,
                     "unit_instance_id": pending.next_unit_instance_id,
                     "transport_unit_instance_id": pending.transport_unit_instance_id,
-                    "hazard_rolls": pending.current_hazard_rolls.to_payload()
-                    if pending.current_hazard_rolls is not None
-                    else None,
+                    "hazard_rolls": current_hazard_rolls.to_payload(),
+                    "hazard_completion_event_id": hazard_completion_event.event_id,
                     "phase_body_status": ("destroyed_transport_cargo_destroyed_before_placement"),
                 }
             ),
         )
-        pending = pending.with_hazard_destroyed_current_unit()
+        pending = pending.with_hazard_destroyed_current_unit(
+            retain_current_hazard=_next_pending_unit_shares_current_hazard(
+                pending=pending,
+            )
+        )
         attack_sequence = attack_sequence.with_pending_destroyed_transport_disembark(pending)
         return _continue_pending_destroyed_transport_disembark(
             state=state,
@@ -553,10 +619,13 @@ def _require_completed_destroyed_transport_hazard(
     *,
     decisions: DecisionController,
     hazard_rolls: DestroyedTransportHazardRolls,
-) -> TransportHazardMortalWounds:
+) -> tuple[TransportHazardMortalWounds, EventRecord]:
     matches = tuple(
-        TransportHazardMortalWounds.from_payload(
-            cast(TransportHazardMortalWoundsPayload, event.payload)
+        (
+            TransportHazardMortalWounds.from_payload(
+                cast(TransportHazardMortalWoundsPayload, event.payload)
+            ),
+            event,
         )
         for event in decisions.event_log.records
         if event.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
@@ -567,12 +636,12 @@ def _require_completed_destroyed_transport_hazard(
         raise GameLifecycleError(
             "Destroyed Transport hazard lacks one completed mortal-wound result."
         )
-    result = matches[0]
+    result, event = matches[0]
     if result.disembark != hazard_rolls or (
         hazard_rolls.mortal_wound_count > 0 and result.mortal_wound_application is None
     ):
         raise GameLifecycleError("Destroyed Transport hazard completion drift.")
-    return result
+    return result, event
 
 
 def _destroyed_transport_hazard_survivor_ids(
@@ -580,8 +649,15 @@ def _destroyed_transport_hazard_survivor_ids(
     state: GameState,
     hazard_rolls: DestroyedTransportHazardRolls,
 ) -> tuple[str, ...]:
-    unit = unit_by_id(state=state, unit_instance_id=hazard_rolls.unit_instance_id)
-    models_by_id = {model.model_instance_id: model for model in unit.own_models}
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=hazard_rolls.unit_instance_id,
+    )
+    if tuple(sorted(rules_unit.component_unit_instance_ids)) != (
+        hazard_rolls.component_unit_instance_ids
+    ):
+        raise GameLifecycleError("Destroyed Transport hazard component inventory drift.")
+    models_by_id = {model.model_instance_id: model for model in rules_unit.own_models}
     hazard_model_ids = set(hazard_rolls.model_instance_ids)
     if not hazard_model_ids <= set(models_by_id):
         raise GameLifecycleError("Destroyed Transport hazard cargo inventory drift.")
@@ -605,6 +681,40 @@ def _destroyed_transport_hazard_survivor_ids(
         elif model_instance_id not in removed_model_ids:
             raise GameLifecycleError("Destroyed Transport hazard casualty lacks removal evidence.")
     return tuple(survivors)
+
+
+def _current_hazard_component_survivor_ids(
+    *,
+    state: GameState,
+    pending: PendingDestroyedTransportDisembark,
+) -> tuple[str, ...] | None:
+    survivor_ids = pending.current_hazard_surviving_model_instance_ids
+    unit_instance_id = pending.next_unit_instance_id
+    if survivor_ids is None or unit_instance_id is None:
+        return survivor_ids
+    hazard_rolls = pending.current_hazard_rolls
+    if hazard_rolls is None or unit_instance_id not in set(
+        hazard_rolls.component_unit_instance_ids
+    ):
+        raise GameLifecycleError("Destroyed Transport current hazard component drift.")
+    return tuple(
+        model_instance_id
+        for model_instance_id in survivor_ids
+        if state.unit_instance_id_for_model(model_instance_id) == unit_instance_id
+    )
+
+
+def _next_pending_unit_shares_current_hazard(
+    *,
+    pending: PendingDestroyedTransportDisembark,
+) -> bool:
+    hazard_rolls = pending.current_hazard_rolls
+    if hazard_rolls is None:
+        raise GameLifecycleError("Destroyed Transport current hazard rolls are missing.")
+    return bool(
+        len(pending.pending_unit_instance_ids) > 1
+        and pending.pending_unit_instance_ids[1] in hazard_rolls.component_unit_instance_ids
+    )
 
 
 def _remove_resolved_destroyed_transport_cargo_state(
@@ -644,11 +754,35 @@ def _begin_destroyed_transport_disembark_if_needed(
         feel_no_pain=feel_no_pain,
         destroyed_model_controller_player_id=destroyed_model_controller_player_id,
         transport_unit_instance_id=cargo_state.transport_unit_instance_id,
-        pending_unit_instance_ids=cargo_state.embarked_unit_instance_ids,
+        pending_unit_instance_ids=_ordered_destroyed_transport_cargo_unit_ids(
+            state=state,
+            unit_instance_ids=cargo_state.embarked_unit_instance_ids,
+        ),
         pending_sources=sources,
     )
     updated_sequence = attack_sequence.with_pending_destroyed_transport_disembark(pending)
     return updated_sequence, None
+
+
+def _ordered_destroyed_transport_cargo_unit_ids(
+    *,
+    state: GameState,
+    unit_instance_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    """Keep physical components of one attached rules unit adjacent."""
+
+    return tuple(
+        sorted(
+            unit_instance_ids,
+            key=lambda unit_instance_id: (
+                rules_unit_view_by_id(
+                    state=state,
+                    unit_instance_id=unit_instance_id,
+                ).unit_instance_id,
+                unit_instance_id,
+            ),
+        )
+    )
 
 
 def _request_destroyed_transport_disembark_placement(
@@ -662,7 +796,10 @@ def _request_destroyed_transport_disembark_placement(
     if unit_instance_id is None:
         raise GameLifecycleError("Destroyed Transport placement request requires pending cargo.")
     hazard_rolls = pending.current_hazard_rolls
-    survivor_ids = pending.current_hazard_surviving_model_instance_ids
+    survivor_ids = _current_hazard_component_survivor_ids(
+        state=state,
+        pending=pending,
+    )
     if hazard_rolls is None or survivor_ids is None or not survivor_ids:
         raise GameLifecycleError(
             "Destroyed Transport placement request requires completed hazard survivors."
@@ -928,7 +1065,11 @@ def _request_destroyed_transport_disembark_placement_retry(
                 "destroyed_model_instance_id": pending.damage_application.model_instance_id,
                 "remaining_embarked_unit_ids": list(pending.pending_unit_instance_ids),
                 "surviving_model_instance_ids": list(
-                    pending.current_hazard_surviving_model_instance_ids or ()
+                    _current_hazard_component_survivor_ids(
+                        state=state,
+                        pending=pending,
+                    )
+                    or ()
                 ),
                 "hazard_rolls": (
                     None
@@ -954,7 +1095,10 @@ def _resolve_destroyed_transport_disembark_submission(
     cargo_state = state.transport_cargo_state_for_transport(submission.transport_unit_instance_id)
     if cargo_state is None:
         raise GameLifecycleError("Destroyed Transport disembark cargo state is missing.")
-    survivor_ids = pending.current_hazard_surviving_model_instance_ids
+    survivor_ids = _current_hazard_component_survivor_ids(
+        state=state,
+        pending=pending,
+    )
     hazard_rolls = pending.current_hazard_rolls
     if hazard_rolls is None or survivor_ids is None or not survivor_ids:
         raise GameLifecycleError(
@@ -992,6 +1136,17 @@ def _resolve_destroyed_transport_disembark_submission(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Destroyed Transport disembark requires battlefield_state.")
+    component_model_ids = {model.model_instance_id for model in authoritative_unit.own_models}
+    component_hazard_rolls = replace(
+        hazard_rolls,
+        unit_instance_id=submission.unit_instance_id,
+        component_unit_instance_ids=(submission.unit_instance_id,),
+        model_rolls=tuple(
+            roll
+            for roll in hazard_rolls.model_rolls
+            if roll.model_instance_id in component_model_ids
+        ),
+    )
     return resolve_destroyed_transport_disembark(
         scenario=_battlefield_scenario_for_attack_sequence(state),
         ruleset_descriptor=ruleset_descriptor,
@@ -999,7 +1154,7 @@ def _resolve_destroyed_transport_disembark_submission(
         selection=selection,
         unit=unit,
         transport_placement=transport_placement,
-        hazard_rolls=hazard_rolls,
+        hazard_rolls=component_hazard_rolls,
         battlefield_width_inches=battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
         terrain_features=battlefield_state.terrain_features,

@@ -959,39 +959,20 @@ class PendingDestroyedTransportDisembark:
             return None
         return self.pending_unit_instance_ids[0]
 
-    def with_resolved_disembark(self, disembark: DestroyedTransportDisembark) -> Self:
-        if type(disembark) is not DestroyedTransportDisembark:
-            raise GameLifecycleError("Resolved destroyed Transport disembark is invalid.")
-        if self.next_unit_instance_id != disembark.unit_instance_id:
-            raise GameLifecycleError("Resolved destroyed Transport disembark unit drift.")
-        if self.current_hazard_rolls is None or (
-            self.current_hazard_surviving_model_instance_ids is None
-        ):
-            raise GameLifecycleError(
-                "Resolved destroyed Transport disembark requires completed hazard casualties."
-            )
-        if disembark.model_rolls != self.current_hazard_rolls.model_rolls or set(
-            self.current_hazard_surviving_model_instance_ids
-        ) != {
-            placement.model_instance_id
-            for placement in disembark.placement.selection.attempted_placement.model_placements
-        } | set(disembark.destroyed_model_instance_ids):
-            raise GameLifecycleError(
-                "Resolved destroyed Transport disembark survivor snapshot drift."
-            )
-        return type(self)(
-            attack_context=self.attack_context,
-            damage_application=self.damage_application,
-            saving_throw_payload=self.saving_throw_payload,
-            feel_no_pain=self.feel_no_pain,
-            destroyed_model_controller_player_id=self.destroyed_model_controller_player_id,
-            transport_unit_instance_id=self.transport_unit_instance_id,
-            pending_unit_instance_ids=self.pending_unit_instance_ids[1:],
-            resolved_disembarks=(*self.resolved_disembarks, disembark),
-            current_hazard_rolls=None,
-            current_hazard_surviving_model_instance_ids=None,
-            hazard_destroyed_unit_instance_ids=self.hazard_destroyed_unit_instance_ids,
-            pending_sources=self.pending_sources,
+    def with_resolved_disembark(
+        self,
+        disembark: DestroyedTransportDisembark,
+        *,
+        retain_current_hazard: bool = False,
+    ) -> PendingDestroyedTransportDisembark:
+        from warhammer40k_core.engine.destroyed_transport_pending import (
+            pending_with_resolved_disembark,
+        )
+
+        return pending_with_resolved_disembark(
+            self,
+            disembark=disembark,
+            retain_current_hazard=retain_current_hazard,
         )
 
     def with_current_hazard_rolls(
@@ -1020,32 +1001,18 @@ class PendingDestroyedTransportDisembark:
             ),
         )
 
-    def with_hazard_destroyed_current_unit(self) -> Self:
-        unit_instance_id = self.next_unit_instance_id
-        if (
-            unit_instance_id is None
-            or self.current_hazard_rolls is None
-            or self.current_hazard_surviving_model_instance_ids != ()
-        ):
-            raise GameLifecycleError(
-                "Pending destroyed Transport destroyed cargo requires zero survivors."
-            )
-        return type(self)(
-            attack_context=self.attack_context,
-            damage_application=self.damage_application,
-            saving_throw_payload=self.saving_throw_payload,
-            feel_no_pain=self.feel_no_pain,
-            destroyed_model_controller_player_id=self.destroyed_model_controller_player_id,
-            transport_unit_instance_id=self.transport_unit_instance_id,
-            pending_unit_instance_ids=self.pending_unit_instance_ids[1:],
-            resolved_disembarks=self.resolved_disembarks,
-            current_hazard_rolls=None,
-            current_hazard_surviving_model_instance_ids=None,
-            hazard_destroyed_unit_instance_ids=(
-                *self.hazard_destroyed_unit_instance_ids,
-                unit_instance_id,
-            ),
-            pending_sources=self.pending_sources,
+    def with_hazard_destroyed_current_unit(
+        self,
+        *,
+        retain_current_hazard: bool = False,
+    ) -> PendingDestroyedTransportDisembark:
+        from warhammer40k_core.engine.destroyed_transport_pending import (
+            pending_with_hazard_destroyed_current_unit,
+        )
+
+        return pending_with_hazard_destroyed_current_unit(
+            self,
+            retain_current_hazard=retain_current_hazard,
         )
 
     def to_payload(self) -> PendingDestroyedTransportDisembarkPayload:

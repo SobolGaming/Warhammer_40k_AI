@@ -4085,7 +4085,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             battle_round=1,
             dice_manager=cast(DiceRollManager, object()),
         )
-    with pytest.raises(GameLifecycleError, match="is not embarked"):
+    with pytest.raises(GameLifecycleError, match="not all embarked"):
         resolve_destroyed_transport_hazard_rolls(
             cargo_state=replace(
                 cargo_state,
@@ -4810,13 +4810,12 @@ def test_p18c_hazard_survivor_inventory_and_completion_evidence_fail_closed() ->
         TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
         no_wound_result.to_payload(),
     )
-    assert (
-        _require_completed_destroyed_transport_hazard(
-            decisions=decisions,
-            hazard_rolls=hazard_rolls,
-        )
-        == no_wound_result
+    completed_result, completed_event = _require_completed_destroyed_transport_hazard(
+        decisions=decisions,
+        hazard_rolls=hazard_rolls,
     )
+    assert completed_result == no_wound_result
+    assert completed_event.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE
     decisions.event_log.append(
         TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
         no_wound_result.to_payload(),

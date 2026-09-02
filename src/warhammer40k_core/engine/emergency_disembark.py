@@ -12,7 +12,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.hazard import (
     CORE_HAZARD_ROLLS_RULE_ID,
     HAZARD_ROLL_FAILURE_THRESHOLD,
@@ -21,8 +21,10 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_spec,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import RulesUnitComponent, RulesUnitView
 from warhammer40k_core.engine.transports import (
     EMERGENCY_DISEMBARK_MOVE_SOURCE_ID,
+    TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
     CombatDisembark,
     CombatDisembarkPayload,
@@ -35,6 +37,7 @@ from warhammer40k_core.engine.transports import (
     DisembarkSelection,
     TransportCargoState,
     TransportHazardMortalWounds,
+    TransportHazardMortalWoundsPayload,
     TransportMovementStatus,
     disembark_mode_for_hazard,
     disembark_mode_kind_from_token,
@@ -85,6 +88,25 @@ def validate_destroyed_transport_hazard_rolls(
             "DestroyedTransportHazardRolls unit_instance_id",
             hazard_rolls.unit_instance_id,
         ),
+    )
+    component_unit_instance_ids = tuple(
+        validate_transport_identifier(
+            "DestroyedTransportHazardRolls component_unit_instance_id",
+            component_unit_instance_id,
+        )
+        for component_unit_instance_id in hazard_rolls.component_unit_instance_ids
+    )
+    if not component_unit_instance_ids or component_unit_instance_ids != tuple(
+        sorted(set(component_unit_instance_ids))
+    ):
+        raise GameLifecycleError(
+            "DestroyedTransportHazardRolls component unit ids must be non-empty, unique, "
+            "and sorted."
+        )
+    object.__setattr__(
+        hazard_rolls,
+        "component_unit_instance_ids",
+        component_unit_instance_ids,
     )
     object.__setattr__(
         hazard_rolls,
@@ -152,6 +174,7 @@ def destroyed_transport_hazard_rolls_to_payload(
         "player_id": hazard_rolls.player_id,
         "battle_round": hazard_rolls.battle_round,
         "unit_instance_id": hazard_rolls.unit_instance_id,
+        "component_unit_instance_ids": list(hazard_rolls.component_unit_instance_ids),
         "transport_unit_instance_id": hazard_rolls.transport_unit_instance_id,
         "disembark_mode": hazard_rolls.disembark_mode.value,
         "roll_threshold": hazard_rolls.roll_threshold,
@@ -169,6 +192,7 @@ def destroyed_transport_hazard_rolls_from_payload(
         player_id=payload["player_id"],
         battle_round=payload["battle_round"],
         unit_instance_id=payload["unit_instance_id"],
+        component_unit_instance_ids=tuple(payload["component_unit_instance_ids"]),
         transport_unit_instance_id=payload["transport_unit_instance_id"],
         disembark_mode=disembark_mode_kind_from_token(payload["disembark_mode"]),
         roll_threshold=payload["roll_threshold"],
@@ -180,6 +204,41 @@ def destroyed_transport_hazard_rolls_from_payload(
     if result.mortal_wound_count != payload["mortal_wound_count"]:
         raise GameLifecycleError("DestroyedTransportHazardRolls mortal wound drift.")
     return result
+
+
+def transport_hazard_mortal_wounds_from_completion_event(
+    event: EventRecord,
+) -> TransportHazardMortalWounds | None:
+    if event.event_type != TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE:
+        return None
+    if not isinstance(event.payload, dict):
+        raise GameLifecycleError("Transport hazard completion event payload is invalid.")
+    return TransportHazardMortalWounds.from_payload(
+        cast(TransportHazardMortalWoundsPayload, event.payload)
+    )
+
+
+def destroyed_transport_hazard_destroyed_model_ids_from_completion_event(
+    event: EventRecord,
+) -> tuple[str, ...] | None:
+    result = transport_hazard_mortal_wounds_from_completion_event(event)
+    if result is None:
+        return None
+    if (
+        type(result.disembark) is not DestroyedTransportHazardRolls
+        or result.mortal_wound_application is None
+    ):
+        raise GameLifecycleError(
+            "Emergency Disembark hazard departure lacks typed destruction evidence."
+        )
+    destroyed_model_ids = tuple(
+        application.model_instance_id
+        for application in result.mortal_wound_application.applications
+        if application.destroyed
+    )
+    if not destroyed_model_ids:
+        raise GameLifecycleError("Emergency Disembark hazard departure lacks destroyed models.")
+    return destroyed_model_ids
 
 
 def resolve_destroyed_transport_hazard_rolls_service(
@@ -194,13 +253,49 @@ def resolve_destroyed_transport_hazard_rolls_service(
         raise GameLifecycleError("Destroyed Transport hazard rolls require cargo state.")
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Destroyed Transport hazard rolls require UnitInstance.")
+    return resolve_destroyed_transport_rules_unit_hazard_rolls_service(
+        cargo_state=cargo_state,
+        rules_unit=RulesUnitView(
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id=cargo_state.player_id,
+            components=(RulesUnitComponent(unit=unit, role="unit"),),
+        ),
+        dice_manager=dice_manager,
+        battle_round=battle_round,
+        disembark_mode=disembark_mode,
+    )
+
+
+def resolve_destroyed_transport_rules_unit_hazard_rolls_service(
+    *,
+    cargo_state: TransportCargoState,
+    rules_unit: RulesUnitView,
+    dice_manager: DiceRollManager,
+    battle_round: int,
+    disembark_mode: DisembarkModeKind,
+) -> DestroyedTransportHazardRolls:
+    if type(cargo_state) is not TransportCargoState:
+        raise GameLifecycleError("Destroyed Transport hazard rolls require cargo state.")
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Destroyed Transport hazard rolls require RulesUnitView.")
     if type(dice_manager) is not DiceRollManager:
         raise GameLifecycleError("Destroyed Transport hazard rolls require DiceRollManager.")
-    if not cargo_state.contains_unit(unit.unit_instance_id):
-        raise GameLifecycleError("Destroyed Transport hazard unit is not embarked.")
-    model_ids = tuple(
-        sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+    if rules_unit.owner_player_id != cargo_state.player_id:
+        raise GameLifecycleError("Destroyed Transport hazard rules-unit owner drift.")
+    living_components = rules_unit.living_components
+    if not living_components:
+        raise GameLifecycleError("Destroyed Transport hazard rolls require living cargo models.")
+    component_unit_instance_ids = tuple(
+        sorted(component.unit.unit_instance_id for component in living_components)
     )
+    if any(
+        not cargo_state.contains_unit(component_unit_instance_id)
+        for component_unit_instance_id in component_unit_instance_ids
+    ):
+        raise GameLifecycleError(
+            "Destroyed Transport hazard rules-unit components are not all embarked."
+        )
+    model_ids = tuple(sorted(model.model_instance_id for model in rules_unit.alive_models()))
     if not model_ids:
         raise GameLifecycleError("Destroyed Transport hazard rolls require living cargo models.")
     model_rolls = tuple(
@@ -222,13 +317,26 @@ def resolve_destroyed_transport_hazard_rolls_service(
     return DestroyedTransportHazardRolls(
         player_id=cargo_state.player_id,
         battle_round=battle_round,
-        unit_instance_id=unit.unit_instance_id,
+        unit_instance_id=rules_unit.unit_instance_id,
+        component_unit_instance_ids=component_unit_instance_ids,
         transport_unit_instance_id=cargo_state.transport_unit_instance_id,
         disembark_mode=disembark_mode,
         roll_threshold=HAZARD_ROLL_FAILURE_THRESHOLD,
         model_rolls=model_rolls,
-        mortal_wounds_per_failed_roll=hazard_mortal_wounds_per_failed_roll(unit),
+        mortal_wounds_per_failed_roll=_rules_unit_hazard_mortal_wounds_per_failed_roll(rules_unit),
     )
+
+
+def _rules_unit_hazard_mortal_wounds_per_failed_roll(rules_unit: RulesUnitView) -> int:
+    values = {
+        hazard_mortal_wounds_per_failed_roll(component.unit)
+        for component in rules_unit.living_components
+    }
+    if len(values) != 1:
+        raise GameLifecycleError(
+            "Destroyed Transport hazard rules-unit components disagree on mortal wounds."
+        )
+    return values.pop()
 
 
 def resolve_destroyed_transport_disembark_service(
@@ -360,7 +468,10 @@ def apply_transport_hazard_mortal_wounds_service(
         if (
             cargo_state is None
             or cargo_state.player_id != hazard_rolls.player_id
-            or not cargo_state.contains_unit(hazard_rolls.unit_instance_id)
+            or any(
+                not cargo_state.contains_unit(component_unit_instance_id)
+                for component_unit_instance_id in hazard_rolls.component_unit_instance_ids
+            )
         ):
             raise GameLifecycleError(
                 "Pre-placement Transport hazard requires embarked cargo authority."

@@ -229,6 +229,7 @@ class DestroyedTransportHazardRollsPayload(TypedDict):
     player_id: str
     battle_round: int
     unit_instance_id: str
+    component_unit_instance_ids: list[str]
     transport_unit_instance_id: str
     disembark_mode: str
     roll_threshold: int
@@ -1276,6 +1277,7 @@ class DestroyedTransportHazardRolls:
     player_id: str
     battle_round: int
     unit_instance_id: str
+    component_unit_instance_ids: tuple[str, ...]
     transport_unit_instance_id: str
     disembark_mode: DisembarkModeKind
     roll_threshold: int

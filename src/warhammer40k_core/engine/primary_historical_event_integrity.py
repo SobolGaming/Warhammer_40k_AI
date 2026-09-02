@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
+from warhammer40k_core.engine.emergency_disembark import (
+    destroyed_transport_hazard_destroyed_model_ids_from_completion_event,
+)
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -326,7 +329,6 @@ def _validate_destroyed_departure_provenance(
                     source = _desperate_escape_departure_source(
                         state=state,
                         mutation_id=mutation_id,
-                        source_base=source_base,
                         event_records=event_records,
                         event_index_by_id=event_index_by_id,
                         decisions_by_result_id=decisions_by_result_id,
@@ -341,7 +343,7 @@ def _validate_destroyed_departure_provenance(
                     source = _emergency_disembark_departure_source(
                         state=state,
                         mutation_id=mutation_id,
-                        source_base=source_base,
+                        events_by_id=events_by_id,
                         event_records=event_records,
                         event_index_by_id=event_index_by_id,
                         decisions_by_result_id=decisions_by_result_id,
@@ -540,7 +542,6 @@ def _desperate_escape_departure_source(
     *,
     state: GameState,
     mutation_id: str,
-    source_base: str,
     event_records: tuple[EventRecord, ...],
     event_index_by_id: dict[str, int],
     decisions_by_result_id: dict[str, DecisionRecord],
@@ -616,12 +617,30 @@ def _emergency_disembark_departure_source(
     *,
     state: GameState,
     mutation_id: str,
-    source_base: str,
+    events_by_id: dict[str, EventRecord],
     event_records: tuple[EventRecord, ...],
     event_index_by_id: dict[str, int],
     decisions_by_result_id: dict[str, DecisionRecord],
     component_by_model_id: dict[str, str],
 ) -> _DestroyedDepartureSource:
+    hazard_event = events_by_id.get(mutation_id)
+    if hazard_event is not None:
+        destroyed_model_ids = destroyed_transport_hazard_destroyed_model_ids_from_completion_event(
+            hazard_event
+        )
+        if destroyed_model_ids is None:
+            raise GameLifecycleError(
+                "Emergency Disembark hazard departure lacks typed destruction evidence."
+            )
+        return _DestroyedDepartureSource(
+            source_key=f"emergency-disembark:{mutation_id}",
+            completion_key=f"emergency-disembark:{mutation_id}",
+            event_order=event_index_by_id[hazard_event.event_id],
+            expected_model_ids_by_component=_model_ids_grouped_by_component(
+                destroyed_model_ids,
+                component_by_model_id=component_by_model_id,
+            ),
+        )
     decision = _require_source_decision(
         mutation_id=mutation_id,
         expected_decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,

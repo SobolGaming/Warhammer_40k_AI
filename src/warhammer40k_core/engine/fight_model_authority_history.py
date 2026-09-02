@@ -471,9 +471,11 @@ def _embedded_transport_hazard_destruction_mutations(
     )
     if len(destroyed_model_ids) != len(set(destroyed_model_ids)):
         raise GameLifecycleError("Transport hazard authority duplicates a casualty.")
+    component_unit_instance_ids = set(result.disembark.component_unit_instance_ids)
     for model_id in destroyed_model_ids:
-        if _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id) != (
-            result.disembark.unit_instance_id
+        if (
+            _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id)
+            not in component_unit_instance_ids
         ):
             raise GameLifecycleError("Transport hazard casualty lineage drift.")
     return tuple(

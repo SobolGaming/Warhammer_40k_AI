@@ -266,18 +266,19 @@ def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() ->
         "resolve_destroyed_transport_disembark_service",
     )
 
-    assert continuation_source.index("resolve_destroyed_transport_hazard_rolls") < (
+    assert continuation_source.index("resolve_destroyed_transport_rules_unit_hazard_rolls") < (
         continuation_source.index("_request_destroyed_transport_disembark_placement")
     )
     assert continuation_source.index("apply_transport_hazard_mortal_wounds") < (
         continuation_source.index("_request_destroyed_transport_disembark_placement")
     )
     assert "current_hazard_surviving_model_instance_ids" in continuation_source
+    assert "rules_unit_view_by_id" in continuation_source
     assert "completed hazard survivors" in placement_request_source
     assert '"surviving_model_instance_ids"' in placement_request_source
     assert '"hazard_rolls"' in placement_request_source
     assert "survivor_id_set" in placement_resolution_source
-    assert "hazard_rolls=hazard_rolls" in placement_resolution_source
+    assert "hazard_rolls=component_hazard_rolls" in placement_resolution_source
     assert "dice_manager" not in transport_resolution_source
     assert "pre-placement hazard rolls" in transport_resolution_service_source
     assert "FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY" in lineage_source

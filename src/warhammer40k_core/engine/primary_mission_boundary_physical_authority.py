@@ -23,6 +23,9 @@ from warhammer40k_core.engine.damage_allocation import (
     DamageApplicationPayload,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.emergency_disembark import (
+    transport_hazard_mortal_wounds_from_completion_event,
+)
 from warhammer40k_core.engine.event_log import EventLog, EventRecord
 from warhammer40k_core.engine.mortal_wound_application_authority import (
     direct_mortal_wound_damage_snapshot_from_event,
@@ -80,6 +83,7 @@ from warhammer40k_core.engine.scoring import (
 from warhammer40k_core.engine.transports import (
     DestroyedTransportDisembark,
     DestroyedTransportDisembarkPayload,
+    DestroyedTransportHazardRolls,
     DisembarkModeKind,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import (
@@ -622,6 +626,14 @@ def _physical_authority_by_model(
                     continue
                 _apply_damage_application(authority=authority, damage=damage)
                 applied.add(damage)
+        transport_hazard = transport_hazard_mortal_wounds_from_completion_event(event)
+        if (
+            transport_hazard is not None
+            and type(transport_hazard.disembark) is DestroyedTransportHazardRolls
+            and transport_hazard.mortal_wound_application is not None
+        ):
+            for damage in transport_hazard.mortal_wound_application.applications:
+                _apply_damage_application(authority=authority, damage=damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
         if event.event_type == "fall_back_move_applied":
             transition = authoritative_battlefield_transition_batch_or_none(
