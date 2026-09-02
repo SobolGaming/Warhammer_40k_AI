@@ -1540,6 +1540,8 @@ frozen canonical embarked lineage. One canonical placement proposal then carries
 physical components in `attempted_rules_unit_placement`; grouped validation, battlefield
 placement, cargo removal, `DisembarkedUnitState`, and terminal event evidence commit in one engine
 operation, so no component-level checkpoint can expose a partially disembarked attached unit.
+The pending cargo queue preserves the rules-unit-grouped order chosen by the engine; validation and
+payload round trips reject duplicates without lexicographically separating attached components.
 Hazard casualties are recorded at that completion boundary through primary
 battlefield-departure and logical unit-destruction tracking, so a passenger killed before placement
 is visible to mission evidence and scoring. Restore now requires the persisted survivor tuple to
@@ -1564,7 +1566,7 @@ The generated package hash is
 `11ef8c6081238b8271effc171f9cd90cd85f1ec0028589db833b517bbe3fede0` and its canonical artifact
 byte SHA-256 is `661543a9aa9084cf9d4c583940baab0a75382ef7e08efdb2a09f6e35678dc7d2`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:ef49d4ac518459d9615b7c5d576f9c9dd81f63c456fe70532183c3212e7345c0`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:78023c3fa5ef5da68ccccd1437c9af93e07b9c94b3fd55c4e45a99b3dfd60d2b`.
 
 Load and execution support: The Emergency Disembark Move rule and both evidence rows are `loaded`
 and `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1628,13 +1630,13 @@ decision-contract documents, and this finding record.
 
 Validation results:
 
-- Focused post-review transport, Shooting, and closeout coverage passes (`288` tests). Fresh
-  branch-inclusive behavioral coverage passes (`6032 passed`) at the repository's `85.00%`
+- Focused post-review transport, Shooting, and closeout coverage passes (`289` tests). Fresh
+  branch-inclusive behavioral coverage passes (`6033 passed`) at the repository's `85.00%`
   threshold.
 - Repository-wide Ruff check and Ruff format check pass; mypy passes across `2658` source files;
   Pyright reports `0 errors, 0 warnings`; all `11` import-linter contracts pass; the exact
   four-shard inventory check and all-files pre-commit gate pass.
-- The required final xdist work-stealing suite passes (`6378 passed` in `410.43s`), including the
+- The required final xdist work-stealing suite passes (`6379 passed` in `450.42s`), including the
   complete code-quality suite.
 - The Core Transports source artifact, final engine build identity, and regenerated external
   contract pass fail-closed checks, including the `origin/main` compatibility comparison.

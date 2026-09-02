@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ef49d4ac518459d9615b7c5d576f9c9dd81f63c456fe70532183c3212e7345c0",
-  "fingerprint": "ef49d4ac518459d9615b7c5d576f9c9dd81f63c456fe70532183c3212e7345c0",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:78023c3fa5ef5da68ccccd1437c9af93e07b9c94b3fd55c4e45a99b3dfd60d2b",
+  "fingerprint": "78023c3fa5ef5da68ccccd1437c9af93e07b9c94b3fd55c4e45a99b3dfd60d2b",
   "resource_count": 2490,
   "resources": [
     {
@@ -1515,9 +1515,9 @@
       "sha256": "f6582693ac8aa6acafc8a6aefb6d2cb192c5bda0d8d9248a9c36fcc980fd885e"
     },
     {
-      "byte_length": 20340,
+      "byte_length": 20388,
       "path": "warhammer40k_core/engine/destroyed_transport_pending.py",
-      "sha256": "139817334cc840ed115cc9d661e5420abd256ea59077a53b6da06c49f58cbe9f"
+      "sha256": "29d013b2b1edd6228333a931287f463afcaf3128b038d7365e476b3442fbbf7d"
     },
     {
       "byte_length": 24720,

@@ -13717,6 +13717,202 @@ def test_p18c_fully_destroyed_cargo_skips_its_placement_request() -> None:
 
 
 @pytest.mark.slow
+def test_p18c_pending_cargo_order_keeps_interleaved_attached_components_adjacent() -> None:
+    attached_specs = _attached_enemy_unit_specs()[:2]
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="p18c-interleaved-attached-cargo",
+        enemy_unit_specs=(
+            ("enemy-transport", "core-transport", "core-transport", 1),
+            attached_specs[0],
+            (
+                "intermediate-unit",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+            attached_specs[1],
+        ),
+        enemy_attachment_declarations=_attached_enemy_declarations()[:1],
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    transport = units["enemy-transport"]
+    bodyguard = units["bodyguard-unit"]
+    intermediate = units["intermediate-unit"]
+    leader = units["leader-unit"]
+    attached = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(
+        battlefield.without_unit_placement(bodyguard.unit_instance_id)
+        .without_unit_placement(intermediate.unit_instance_id)
+        .without_unit_placement(leader.unit_instance_id)
+    )
+    interleaved_cargo_ids = (
+        bodyguard.unit_instance_id,
+        intermediate.unit_instance_id,
+        leader.unit_instance_id,
+    )
+    attached_component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-b",
+            transport_unit_instance_id=transport.unit_instance_id,
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id=transport.datasheet_id,
+                max_model_count=15,
+                allowed_keywords=("INFANTRY",),
+            ),
+            embarked_unit_instance_ids=interleaved_cargo_ids,
+            phase_battle_round=1,
+            started_phase_embarked_unit_instance_ids=interleaved_cargo_ids,
+        )
+    )
+    assert tuple(sorted(interleaved_cargo_ids)) == interleaved_cargo_ids
+    grouped_queue_ids = (
+        intermediate.unit_instance_id,
+        bodyguard.unit_instance_id,
+        leader.unit_instance_id,
+    )
+    pending = replace(
+        _destroyed_transport_pending_for_test(
+            sequence_id="p18c-interleaved-attached-cargo",
+            attacker=attacker,
+            transport=transport,
+            passenger=bodyguard,
+        ),
+        pending_unit_instance_ids=grouped_queue_ids,
+        current_hazard_rolls=None,
+        current_hazard_surviving_model_instance_ids=None,
+    )
+    assert pending.pending_unit_instance_ids == grouped_queue_ids
+    assert (
+        PendingDestroyedTransportDisembark.from_payload(
+            pending.to_payload()
+        ).pending_unit_instance_ids
+        == grouped_queue_ids
+    )
+    sequence = AttackSequence.start(
+        sequence_id="p18c-interleaved-attached-cargo",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=transport,
+                weapon_profile=_first_weapon_profile(lifecycle, attacker),
+                attacks=1,
+            ),
+        ),
+    ).with_pending_destroyed_transport_disembark(pending)
+    intermediate_placement = _unit_placement_at(
+        intermediate,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(38.1, 33.5),
+            Pose.at(39.0, 34.8),
+            Pose.at(39.0, 36.2),
+            Pose.at(38.1, 37.5),
+            Pose.at(37.8, 35.5),
+        ),
+    )
+    hazard_results = tuple(
+        result
+        for component in (intermediate, bodyguard, leader)
+        for result in _destroyed_transport_hazard_roll_results_for_test(
+            _unit_placement_at(
+                component,
+                army_id="army-beta",
+                player_id="player-b",
+                poses=tuple(
+                    Pose.at(38.0 + index, 34.0 + index)
+                    for index, _model in enumerate(component.own_models)
+                ),
+            ),
+            values=tuple(6 for _model in component.own_models),
+            roll_id_prefix=f"p18c-interleaved-{component.unit_instance_id}",
+        )
+    )
+    manager = DiceRollManager(
+        "p18c-interleaved-attached-cargo",
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=hazard_results,
+    )
+
+    updated_sequence, allocated_ids, status = _continue_pending_destroyed_transport_disembark(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        manager=manager,
+        attack_sequence=sequence,
+        allocated_model_ids=(),
+        hooks=AttackSequenceHooks.empty(),
+    )
+
+    intermediate_request = _decision_request(cast(LifecycleStatus, status))
+    assert allocated_ids == ()
+    assert updated_sequence is not None
+    updated_pending = updated_sequence.pending_destroyed_transport_disembark
+    assert updated_pending is not None
+    assert updated_pending.pending_unit_instance_ids == grouped_queue_ids
+    assert updated_pending.current_hazard_rolls is not None
+    assert updated_pending.current_hazard_rolls.unit_instance_id == intermediate.unit_instance_id
+    intermediate_proposal = MovementProposalRequest.from_decision_request_payload(
+        intermediate_request.payload
+    )
+    assert intermediate_proposal.unit_instance_id == intermediate.unit_instance_id
+    intermediate_result = _proposal_decision_result(
+        request=intermediate_request,
+        payload=PlacementProposalPayload(
+            proposal_request_id=intermediate_proposal.request_id,
+            proposal_kind=intermediate_proposal.proposal_kind,
+            unit_instance_id=intermediate.unit_instance_id,
+            placement_kind=BattlefieldPlacementKind.DISEMBARK,
+            attempted_placement=intermediate_placement,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        ).to_payload(),
+        result_id="p18c-interleaved-singleton-placement",
+    )
+    lifecycle.decision_controller.submit_result(intermediate_result)
+
+    attached_sequence, next_allocated_ids, attached_status = (
+        apply_destroyed_transport_disembark_proposal_decision(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            attack_sequence=updated_sequence,
+            result=intermediate_result,
+            already_allocated_model_ids=allocated_ids,
+            hooks=AttackSequenceHooks.empty(),
+            dice_manager=manager,
+        )
+    )
+
+    attached_request = _decision_request(cast(LifecycleStatus, attached_status))
+    assert next_allocated_ids == ()
+    assert attached_sequence is not None
+    attached_pending = attached_sequence.pending_destroyed_transport_disembark
+    assert attached_pending is not None
+    assert attached_pending.pending_unit_instance_ids == attached_component_ids
+    assert attached_pending.current_hazard_rolls is not None
+    assert attached_pending.current_hazard_rolls.unit_instance_id == attached.unit_instance_id
+    assert (
+        attached_pending.current_hazard_rolls.component_unit_instance_ids == attached_component_ids
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        attached_request.payload
+    )
+    assert proposal_request.unit_instance_id == attached.unit_instance_id
+
+
+@pytest.mark.slow
 def test_p18c_attached_cargo_hazard_resolves_one_canonical_rules_unit_snapshot() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),

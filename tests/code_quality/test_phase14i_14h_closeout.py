@@ -25,6 +25,9 @@ EMERGENCY_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "emer
 DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_rules_unit_disembark.py"
 )
+DESTROYED_TRANSPORT_PENDING_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_pending.py"
+)
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
 ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("attack_sequence*.py")))
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
@@ -270,6 +273,10 @@ def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() ->
         "resolve_destroyed_transport_disembark_service",
     )
     grouped_disembark_source = source_for(DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH)
+    pending_validation_source = function_source_for(
+        (DESTROYED_TRANSPORT_PENDING_PATH,),
+        "validate_pending_destroyed_transport_disembark",
+    )
 
     assert continuation_source.index("resolve_destroyed_transport_rules_unit_hazard_rolls") < (
         continuation_source.index("_request_destroyed_transport_disembark_placement")
@@ -294,6 +301,8 @@ def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() ->
     )
     assert "_current_hazard_component_survivor_ids" not in destroyed_transport_source
     assert "retain_current_hazard=" not in destroyed_transport_source
+    assert '"pending_unit_instance_ids"' in pending_validation_source
+    assert "_validate_ordered_identifier_tuple(" in pending_validation_source
     assert "dice_manager" not in transport_resolution_source
     assert "pre-placement hazard rolls" in transport_resolution_service_source
     assert "FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY" in lineage_source

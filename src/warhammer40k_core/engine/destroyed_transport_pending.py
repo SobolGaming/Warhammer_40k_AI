@@ -13,6 +13,7 @@ from warhammer40k_core.engine.attack_sequence_validation import (
     _validate_destruction_reaction_source_tuple,
     _validate_identifier,
     _validate_identifier_tuple,
+    _validate_ordered_identifier_tuple,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
@@ -92,7 +93,7 @@ def validate_pending_destroyed_transport_disembark(
     object.__setattr__(
         pending,
         "pending_unit_instance_ids",
-        _validate_identifier_tuple(
+        _validate_ordered_identifier_tuple(
             "Pending destroyed Transport unit ids",
             pending.pending_unit_instance_ids,
         ),
