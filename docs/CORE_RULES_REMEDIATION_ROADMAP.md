@@ -1894,8 +1894,8 @@ PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/4
 
 ### P18D — C18-04
 
-Status: Implemented in Order 12; local validation is complete and remote PR publication is in
-progress.
+Status: Implemented in Order 12 and published in PR #417; local validation is complete, with
+remote review, CI, and merge pending.
 
 Finding IDs: `C18-04`.
 
@@ -2021,7 +2021,8 @@ contract check, and installed-wheel smoke pass. The repository-pinned TypeScript
 artifact and type checks pass, all `5` client unit tests pass, and the two-server HTTP conformance
 scenario passes all `342` assertions for contract version `11.1.0`.
 
-PR URL and merge commit: Pending remote PR publication and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/417`; merge commit
+pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
