@@ -206,6 +206,10 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.transport_disembark_state import (
+    DisembarkedUnitState,
+    DisembarkModeKind,
+)
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookBinding,
@@ -4628,6 +4632,122 @@ def test_unit_move_completed_battle_shock_hooks_resolve_and_validate() -> None:
             movement_actions=("charge_move",),
             ability_indexes_by_player_id=ability_indexes,
         )
+    with pytest.raises(GameLifecycleError, match="requires DecisionController"):
+        resolve_unit_move_completed_battle_shock_hooks(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            registry=registry,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.CHARGE,
+            event_type="test_charge_completed",
+            movement_actions=("charge_move",),
+            ability_indexes_by_player_id=ability_indexes,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a registry"):
+        resolve_unit_move_completed_battle_shock_hooks(
+            state=state,
+            decisions=decisions,
+            registry=cast(UnitMoveCompletedBattleShockHookRegistry, object()),
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.CHARGE,
+            event_type="test_charge_completed",
+            movement_actions=("charge_move",),
+            ability_indexes_by_player_id=ability_indexes,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
+        resolve_unit_move_completed_battle_shock_hooks(
+            state=state,
+            decisions=decisions,
+            registry=registry,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            ruleset_descriptor=cast(RulesetDescriptor, object()),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.CHARGE,
+            event_type="test_charge_completed",
+            movement_actions=("charge_move",),
+            ability_indexes_by_player_id=ability_indexes,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a RuntimeModifierRegistry"):
+        resolve_unit_move_completed_battle_shock_hooks(
+            state=state,
+            decisions=decisions,
+            registry=registry,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=cast(RuntimeModifierRegistry, object()),
+            completed_phase=BattlePhase.CHARGE,
+            event_type="test_charge_completed",
+            movement_actions=("charge_move",),
+            ability_indexes_by_player_id=ability_indexes,
+        )
+
+
+def test_battle_shock_move_completed_hook_uses_opponent_turn_disembark_passenger_owner() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-b",
+    )
+    decisions = DecisionController()
+    disembarked_state = DisembarkedUnitState.for_destroyed_transport(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        turn_player_id="player-b",
+        unit_instance_id=_CORSAIR_UNIT_ID,
+        transport_unit_instance_id="army-a:test-transport",
+        disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+    )
+    decisions.event_log.append(
+        "unit_disembarked",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": "player-b",
+            "unit_instance_id": _CORSAIR_UNIT_ID,
+            "transport_unit_instance_id": "army-a:test-transport",
+            "disembark_mode": DisembarkModeKind.EMERGENCY_DISEMBARK.value,
+            "transport_movement_status": "not_moved",
+            "disembarked_unit_state": disembarked_state.to_payload(),
+        },
+    )
+    triggering_player_ids: list[str] = []
+
+    def record_triggering_player(
+        context: UnitMoveCompletedContext,
+    ) -> tuple[UnitMoveCompletedBattleShockEffect, ...]:
+        triggering_player_ids.append(context.triggering_player_id)
+        return ()
+
+    registry = UnitMoveCompletedBattleShockHookRegistry.from_bindings(
+        (
+            UnitMoveCompletedBattleShockHookBinding(
+                hook_id="opponent-turn-disembark-hook",
+                source_id="opponent-turn-disembark-source",
+                handler=record_triggering_player,
+            ),
+        )
+    )
+
+    assert (
+        resolve_unit_move_completed_battle_shock_hooks(
+            state=state,
+            decisions=decisions,
+            registry=registry,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="unit_disembarked",
+            movement_actions=("set_up",),
+            ability_indexes_by_player_id={},
+        )
+        is None
+    )
+    assert triggering_player_ids == ["player-a"]
 
 
 def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:

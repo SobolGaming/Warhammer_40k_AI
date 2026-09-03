@@ -802,6 +802,15 @@ class PlacementProposalPayload:
         )
         if model_result is not None:
             return model_result
+        transport_result = _placement_proposal_context_match(
+            request=request,
+            submitted_value=self.transport_unit_instance_id,
+            context_key="transport_unit_instance_id",
+            violation_code="proposal_transport_unit_drift",
+            message="Disembark proposal Transport does not match the pending request.",
+        )
+        if transport_result is not None:
+            return transport_result
         disembark_mode_result = _placement_proposal_disembark_mode_match(
             request=request,
             submitted_value=None if self.disembark_mode is None else self.disembark_mode.value,
@@ -821,6 +830,12 @@ class PlacementProposalPayload:
         )
         if transport_status_result is not None:
             return transport_status_result
+        restriction_override_result = _placement_proposal_restriction_overrides_match(
+            request=request,
+            submitted_values=self.restriction_overrides,
+        )
+        if restriction_override_result is not None:
+            return restriction_override_result
         return ProposalValidationResult.valid(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
@@ -991,6 +1006,14 @@ def _placement_proposal_context_match(
         )
     if type(expected) is not str:
         raise GameLifecycleError(f"Placement proposal context {context_key} must be a string.")
+    if submitted_value is None:
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code="proposal_payload_missing_field",
+            message=f"Disembark placement proposal missing {context_key}.",
+            field=context_key,
+        )
     if submitted_value != expected:
         return ProposalValidationResult.invalid(
             proposal_request_id=request.request_id,
@@ -1054,6 +1077,14 @@ def _placement_proposal_disembark_mode_match(
         )
     if type(expected) is not str:
         raise GameLifecycleError("Placement proposal context disembark_mode must be a string.")
+    if submitted_value is None:
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code="proposal_payload_missing_field",
+            message="Disembark placement proposal missing disembark_mode.",
+            field="disembark_mode",
+        )
     allowed_values = _placement_proposal_allowed_disembark_modes(context)
     if allowed_values:
         if submitted_value in allowed_values:
@@ -1066,6 +1097,46 @@ def _placement_proposal_disembark_mode_match(
         violation_code="proposal_disembark_mode_drift",
         message="Disembark proposal mode does not match the pending request.",
         field="disembark_mode",
+    )
+
+
+def _placement_proposal_restriction_overrides_match(
+    *,
+    request: MovementProposalRequest,
+    submitted_values: tuple[TransportRestrictionOverride, ...],
+) -> ProposalValidationResult | None:
+    context = request.context or {}
+    raw_expected = context.get("restriction_overrides")
+    if raw_expected is None:
+        expected: tuple[TransportRestrictionOverride, ...] = ()
+    else:
+        if not isinstance(raw_expected, list):
+            raise GameLifecycleError(
+                "Placement proposal context restriction_overrides must be a list."
+            )
+        parsed: list[TransportRestrictionOverride] = []
+        for raw_override in raw_expected:
+            if not isinstance(raw_override, dict):
+                raise GameLifecycleError(
+                    "Placement proposal context restriction_overrides must contain objects."
+                )
+            parsed.append(
+                TransportRestrictionOverride.from_payload(
+                    cast(TransportRestrictionOverridePayload, raw_override)
+                )
+            )
+        expected = _validate_transport_override_tuple(
+            "Placement proposal context restriction_overrides",
+            tuple(parsed),
+        )
+    if submitted_values == expected:
+        return None
+    return ProposalValidationResult.invalid(
+        proposal_request_id=request.request_id,
+        proposal_kind=request.proposal_kind,
+        violation_code="proposal_transport_override_drift",
+        message="Disembark proposal restriction overrides do not match the pending request.",
+        field="restriction_overrides",
     )
 
 

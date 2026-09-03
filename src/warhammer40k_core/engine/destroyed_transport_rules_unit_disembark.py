@@ -40,6 +40,7 @@ from warhammer40k_core.engine.transports import (
     TransportCargoState,
     TransportMovementStatus,
     TransportRestrictionOverride,
+    disembarked_unit_state_from_event_payload,
 )
 from warhammer40k_core.geometry.pose import GeometryError
 
@@ -342,6 +343,7 @@ def resolve_destroyed_transport_rules_unit_disembark(
     attempted_placement: RulesUnitPlacement,
     transport_placement: UnitPlacement,
     hazard_rolls: DestroyedTransportHazardRolls,
+    turn_player_id: str,
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = (),
 ) -> DestroyedTransportRulesUnitDisembark:
@@ -402,6 +404,7 @@ def resolve_destroyed_transport_rules_unit_disembark(
         ),
         rules_unit=filtered_view,
         transport_placement=transport_placement,
+        turn_player_id=turn_player_id,
         objective_markers=objective_markers,
     )
     if placement.is_valid:
@@ -449,8 +452,10 @@ def emergency_disembark_omitted_model_evidence_from_event_payload(
         raise GameLifecycleError("Destroyed Transport disembark evidence is ambiguous.")
     if grouped is not None:
         evidence = DestroyedTransportRulesUnitDisembarkEvidence.from_payload(grouped)
+        disembarked_state = disembarked_unit_state_from_event_payload(validated_payload)
         if (
-            validated_payload.get("active_player_id") != evidence.player_id
+            validated_payload.get("active_player_id") != disembarked_state.turn_player_id
+            or disembarked_state.player_id != evidence.player_id
             or validated_payload.get("battle_round") != evidence.battle_round
             or validated_payload.get("unit_instance_id") != evidence.rules_unit_instance_id
             or validated_payload.get("component_unit_instance_ids")

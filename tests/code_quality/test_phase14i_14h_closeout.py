@@ -22,6 +22,15 @@ ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
 README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
 EMERGENCY_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "emergency_disembark.py"
+ASSAULT_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "assault_disembark.py"
+TRANSPORT_DISEMBARK_STATE_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "transport_disembark_state.py"
+)
+MOVEMENT_TRANSPORTS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_transports.py"
+)
+MOVEMENT_PROPOSALS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_proposals.py"
+CHARGE_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_rules_unit_disembark.py"
 )
@@ -36,6 +45,12 @@ ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("att
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
 HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
+LIFECYCLE_STATE_VALIDATION_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle_state_validation.py"
+)
+UNIT_MOVE_COMPLETED_HOOKS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "unit_move_completed_hooks.py"
+)
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
 HEALING_REVIVAL_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing_revival.py"
@@ -321,6 +336,75 @@ def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() ->
     assert "FROZEN_EMBARKED_RULES_UNIT_COMPONENTS_POLICY" in lineage_source
     assert "TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE" in authority_history_source
     assert "EMERGENCY_DISEMBARK_MOVE_SOURCE_ID" in transport_source
+
+
+def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritative() -> None:
+    transport_source = source_for(TRANSPORTS_PATH)
+    disembark_state_source = source_for(TRANSPORT_DISEMBARK_STATE_PATH)
+    permission_source = source_for(ASSAULT_DISEMBARK_PATH)
+    candidate_source = function_source_for(
+        (MOVEMENT_TRANSPORTS_PATH,),
+        "_disembark_candidate_for_movement_unit",
+    )
+    proposal_validation_source = source_for(MOVEMENT_PROPOSALS_PATH)
+    charge_eligibility_source = function_source_for(
+        (CHARGE_PHASE_PATH,),
+        "_charge_unit_ineligibility_reason",
+    )
+    adapter_contract = source_for(ADAPTER_CONTRACT_PATH)
+    turn_cleanup_source = source_for(GAME_STATE_PATH)
+    restore_integrity_source = function_source_for(
+        (LIFECYCLE_STATE_VALIDATION_PATH,),
+        "_validate_disembarked_unit_state_history",
+    )
+    move_completed_owner_source = function_source_for(
+        (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
+        "_triggering_player_id_from_move_completion_payload",
+    )
+    mortal_wound_hook_source = function_source_for(
+        (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
+        "resolve_unit_move_completed_mortal_wound_hooks",
+    )
+    battle_shock_hook_source = function_source_for(
+        (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
+        "resolve_unit_move_completed_battle_shock_hooks",
+    )
+
+    assert "ASSAULT_DISEMBARK_MOVE_SOURCE_ID" in transport_source
+    assert 'ASSAULT_DISEMBARK = "assault_disembark"' in disembark_state_source
+    assert "ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE" in disembark_state_source
+    assert "ASSAULT_DISEMBARK_PERMISSION_REQUIRED" in transport_source
+    assert "permission_source_rule_id" in disembark_state_source
+    assert "_DISEMBARK_DISTANCE_INCHES" in transport_source
+    assert "ASSAULT_DISEMBARK_PERMISSION_EFFECT_KIND" in permission_source
+    assert "eligible_rules_unit_instance_ids" in permission_source
+    assert "effect.source_rule_id" in permission_source
+    assert "assault_disembark_restriction_overrides" in candidate_source
+    assert "DisembarkModeKind.ASSAULT_DISEMBARK" in candidate_source
+    assert "proposal_transport_unit_drift" in proposal_validation_source
+    assert "proposal_transport_override_drift" in proposal_validation_source
+    assert "disembarked_unit_state_for_unit" in charge_eligibility_source
+    assert "disembarked_state.can_declare_charge" in charge_eligibility_source
+    assert "state.turn_player_id == requested_player_id" in turn_cleanup_source
+    assert 'event_record.event_type != "unit_disembarked"' in restore_integrity_source
+    assert "proposal.validation_result_for_request" in restore_integrity_source
+    assert "event_state != disembarked_state" in restore_integrity_source
+    assert 'record.event_type == "decision_requested"' in restore_integrity_source
+    assert 'record.event_type == "decision_recorded"' in restore_integrity_source
+    assert "assault_permission_sources" in restore_integrity_source
+    assert "disembarked_unit_state_from_event_payload" in move_completed_owner_source
+    assert "disembarked_state.turn_player_id" in move_completed_owner_source
+    assert "return disembarked_state.player_id" in move_completed_owner_source
+    assert "_triggering_player_id_from_move_completion_payload" in mortal_wound_hook_source
+    assert "_triggering_player_id_from_move_completion_payload" in battle_shock_hook_source
+    assert "assault_disembark" in adapter_contract
+    for forbidden_display_name in (
+        "Assault Ramp",
+        "Full-throttle Assault",
+        "Full-Throttle Assault",
+    ):
+        assert forbidden_display_name not in permission_source
+        assert forbidden_display_name not in candidate_source
 
 
 def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:

@@ -455,6 +455,9 @@ def _embedded_transport_hazard_destruction_mutations(
     model_unit_by_id: dict[str, str],
 ) -> tuple[_AuthorityMutation, ...]:
     payload = _event_payload(event, field_name="Transport hazard mortal wounds")
+    disembark_payload = payload.get("disembark")
+    if isinstance(disembark_payload, dict) and "placement" in disembark_payload:
+        return ()
     try:
         result = TransportHazardMortalWounds.from_payload(
             cast(TransportHazardMortalWoundsPayload, payload)

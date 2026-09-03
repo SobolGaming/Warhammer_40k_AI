@@ -174,6 +174,23 @@ def _apply_placement_proposal_decision(
     if isinstance(parsed, LifecycleStatus):
         return parsed
     proposal_request, submission = parsed
+    if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+        missing = _missing_disembark_proposal_field(submission)
+        if missing is not None:
+            return _reject_invalid_proposal(
+                state=state,
+                decisions=decisions,
+                result=result,
+                proposal_validation=ProposalValidationResult.invalid(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=proposal_request.proposal_kind,
+                    violation_code="proposal_payload_missing_field",
+                    message=f"Disembark placement proposal missing {missing}.",
+                    field=missing,
+                ),
+                event_type="placement_proposal_invalid",
+                message="Disembark placement proposal is incomplete.",
+            )
     proposal_validation = submission.validation_result_for_request(proposal_request)
     if not proposal_validation.is_valid:
         return _reject_invalid_proposal(
@@ -216,22 +233,6 @@ def _apply_placement_proposal_decision(
         return status
 
     if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
-        missing = _missing_disembark_proposal_field(submission)
-        if missing is not None:
-            return _reject_invalid_proposal(
-                state=state,
-                decisions=decisions,
-                result=result,
-                proposal_validation=ProposalValidationResult.invalid(
-                    proposal_request_id=proposal_request.request_id,
-                    proposal_kind=proposal_request.proposal_kind,
-                    violation_code="proposal_payload_missing_field",
-                    message=f"Disembark placement proposal missing {missing}.",
-                    field=missing,
-                ),
-                event_type="placement_proposal_invalid",
-                message="Disembark placement proposal is incomplete.",
-            )
         if (
             submission.transport_unit_instance_id is None
             or submission.disembark_mode is None
@@ -310,7 +311,10 @@ def _apply_valid_disembark(
         raise GameLifecycleError("Disembark requires active movement selection.")
     if movement_state.active_selection.unit_instance_id != disembark.selection.unit_instance_id:
         raise GameLifecycleError("Disembark active movement selection drift.")
-    if disembark.selection.disembark_mode is DisembarkModeKind.RAPID_DISEMBARK:
+    if disembark.selection.disembark_mode in {
+        DisembarkModeKind.RAPID_DISEMBARK,
+        DisembarkModeKind.ASSAULT_DISEMBARK,
+    }:
         state.replace_movement_phase_state(
             movement_state.with_activation_complete(
                 disembark.selection.unit_instance_id,
@@ -323,12 +327,16 @@ def _apply_valid_disembark(
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
-            "active_player_id": disembark.selection.player_id,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": disembark.selection.unit_instance_id,
             "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
             "disembark_mode": disembark.selection.disembark_mode.value,
             "transport_movement_status": disembark.selection.transport_movement_status.value,
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in disembark.selection.restriction_overrides
+            ],
             "request_id": result.request_id,
             "result_id": result.result_id,
             "phase_body_status": "unit_disembarked",
@@ -389,12 +397,16 @@ def _apply_valid_combat_disembark(
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
-            "active_player_id": disembark.selection.player_id,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": disembark.selection.unit_instance_id,
             "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
             "disembark_mode": disembark.selection.disembark_mode.value,
             "transport_movement_status": disembark.selection.transport_movement_status.value,
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in disembark.selection.restriction_overrides
+            ],
             "request_id": result.request_id,
             "result_id": result.result_id,
             "phase_body_status": "unit_disembarked",

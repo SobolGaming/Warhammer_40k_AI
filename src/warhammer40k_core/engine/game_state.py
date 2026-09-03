@@ -4443,6 +4443,14 @@ class GameState:
             raise GameLifecycleError("Disembarked unit state must be a DisembarkedUnitState.")
         if state.player_id not in self.player_ids:
             raise GameLifecycleError("DisembarkedUnitState player_id is not in this game.")
+        if state.turn_player_id not in self.player_ids:
+            raise GameLifecycleError("DisembarkedUnitState turn_player_id is not in this game.")
+        if self.stage is not GameLifecycleStage.BATTLE or self.active_player_id is None:
+            raise GameLifecycleError("DisembarkedUnitState requires an active battle turn.")
+        if state.battle_round != self.battle_round:
+            raise GameLifecycleError("DisembarkedUnitState battle round drift.")
+        if state.turn_player_id != self.active_player_id:
+            raise GameLifecycleError("DisembarkedUnitState turn player drift.")
         if (
             self.disembarked_unit_state_for_unit(
                 player_id=state.player_id,
@@ -4456,6 +4464,7 @@ class GameState:
         self.disembarked_unit_states.sort(
             key=lambda stored: (
                 stored.battle_round,
+                stored.turn_player_id,
                 stored.player_id,
                 stored.unit_instance_id,
             )
@@ -5640,7 +5649,8 @@ class GameState:
             state
             for state in self.disembarked_unit_states
             if not (
-                state.player_id == requested_player_id and state.battle_round == requested_round
+                state.turn_player_id == requested_player_id
+                and state.battle_round == requested_round
             )
         ]
         self.reserve_states = [

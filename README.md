@@ -452,7 +452,8 @@ Current status:
   `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_attached_units_source.py` and
   the same command plus `--check`.
-- P18C's reviewed 18.05 Emergency Disembark wording is pinned in
+- P18C/P18D's reviewed 18.05 Emergency Disembark and App-data v931 18.06
+  Assault Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_transports_source.py` and the
   same command plus `--check`.

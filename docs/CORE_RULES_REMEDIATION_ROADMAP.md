@@ -1607,8 +1607,7 @@ pending review and merge.
 
 ### P18C — C18-03
 
-Status: Implementation, source/contract updates, focused and aggregate validation,
-architecture/scope audits, and remote PR publication are complete.
+Status: Merged in PR #414 at `44a9b52e`.
 
 Finding IDs: `C18-03`.
 
@@ -1768,12 +1767,12 @@ Validation results:
   TypeScript type checks, and all `5` client unit tests pass, and the two-server HTTP conformance
   scenario passes all `342` assertions for contract version `11.1.0`.
 
-PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/414`; merge commit
-pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/414`;
+`44a9b52e44f26f9357c36363a32129b3bd4212bc`.
 
 ### S-MIRRORS — source-governance gate
 
-Status: Implemented in Order 11; PR #416 pending review and merge.
+Status: Merged in PR #416 at `6b115220`.
 
 Finding IDs: None. `S-MIRRORS` is a source-governance prerequisite and does not close a gameplay
 finding.
@@ -1890,14 +1889,162 @@ smoke checks pass. The repository-pinned client generated-artifact check, TypeSc
 client unit tests, and the two-server HTTP conformance scenario pass (`342` assertions for contract
 version `11.1.0`). The all-files pre-commit hooks pass.
 
-PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/416`; merge commit
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/416`;
+`6b1152203b1976ea1b74cdcdc0970c67c8a17606`.
+
+### P18D — C18-04
+
+Status: Implemented in Order 12 and published in PR #417; local validation is complete, with
+remote review, CI, and merge pending.
+
+Finding IDs: `C18-04`.
+
+Dependencies and evidence gate: P18C/PR #414 is merged on `main` at
+`44a9b52e44f26f9357c36363a32129b3bd4212bc`, and S-MIRRORS/PR #416 is merged on `main` at
+`6b1152203b1976ea1b74cdcdc0970c67c8a17606`. The exact 18.06 statement is retained as a reviewed
+transcription and a separately classified, project-authoritative Game Datamissions v931 App-data
+mirror observation authenticated against the S-MIRRORS provider audit. This satisfies
+`APP-AUTHORITY`; no co-versioned contrary observation is retained, so no `EXCEPTION-PAUSE`
+applies.
+
+Violated invariant: Assault Disembark is a source-permitted Transport move with its own setup and
+post-move state. A local ability exception or Rapid Disembark alias cannot authoritatively preserve
+the permitting rule identity, require the exact eligible canonical rules unit, enforce wholly
+within 3″, or make only that resulting unit eligible to declare a charge through decisions,
+events, restore, replay, and adapters.
+
+How it was done before P18D: A Transport that completed a Normal Move exposed only Rapid
+Disembark. The resulting passenger state always prohibited a charge, no typed source-bound
+permission could select a distinct move, and the Charge phase did not consume
+`DisembarkedUnitState.can_declare_charge`. Placement proposal validation bound the mode and
+Transport movement status but did not bind the submitted Transport ID or restriction overrides to
+the pending engine-authored request, leaving the same forged-context gap for every standard
+disembark proposal.
+
+How it is done after P18D: A typed `assault_disembark_permission` persisting effect binds one
+permitting source rule, owning player, battlefield Transport, and exact eligible canonical
+rules-unit IDs. After that Transport completes a Normal Move, the shared movement owner derives a
+source-carrying restriction override and emits the first-class `assault_disembark` candidate. The
+existing engine-owned placement proposal path validates and atomically sets up every living model
+in the canonical attached rules unit wholly within 3″ of the Transport. Existing Transport
+authority rejects a passenger that is not embarked, is not friendly, embarked this phase, or is
+otherwise absent or drifted; the Assault mode separately requires Normal Move status and its exact
+permission override, so Advance, Fall Back, and ingress status fail closed.
+
+The committed `DisembarkedUnitState` prohibits a further move and Remain Stationary, preserves
+charge eligibility, records both the Core 18.06 source ID and the distinct permitting rule ID, and
+round-trips those fields through game state, events, restore, and replay. The Charge-phase selector
+now consumes the shared state: ordinary Rapid, Combat, and Emergency states remain ineligible,
+while Assault Disembark remains eligible. Placement request context, lifecycle status, accepted
+events, and proposal payloads carry the exact restriction override, and prevalidation rejects a
+forged Transport ID or permission before queue pop or mutation.
+
+Review hardening binds every retained disembark state to the `turn_player_id` that created it,
+which is distinct from passenger ownership during opponent-turn destroyed-Transport timing.
+Turn-end cleanup removes all records created in the completed turn, so an Emergency Disembark
+owned by the inactive player cannot leak its no-charge restriction into that player's next turn.
+Restore now requires exact correspondence among the retained state, one ordered
+`unit_disembarked` event, the recorded placement request/result and their decision-history events,
+the Transport movement status, and the complete restriction-override payload. An Assault charge
+permission is accepted only when that authenticated override's source is exactly the stored
+`permission_source_rule_id`; a rewritten Rapid state therefore fails closed. Move-completed
+mortal-wound and Battle-shock hooks derive the triggering passenger owner from that authenticated
+embedded state rather than conflating it with the event's active-turn identity.
+
+Specific authoritative maintained direct App-data mirror statement and source ID: Game
+Datamissions App-data v931 section 18.06, `ASSAULT DISEMBARK MOVE`, requires the unit to be set up
+as in Set Up when a rule permits the move; the unit must be embarked in a battlefield Transport,
+must not have embarked in it this phase, and the Transport must not have Advanced or Fallen Back;
+every model is set up wholly within 3″ of that Transport. Its stable source ID is
+`gw-11e-core-rules:transports:assault-disembark-move`. Runtime behavior gates on that source ID,
+typed mode, and source-carrying permission effect, never on display names or source-text tokens.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog`, App-data version `931`, reviewed
+at `2026-09-02T12:30:09-04:00`; transcription
+`93b5d311d7bce309e94f93c6b501a6980a820505786f59e0cb2bbfc6e53e4bee`; reviewed-transcription
+observation `21dde0c665b4a09fecc0ddc6f4e09ee252b6a3b27af1779f858aa8a4fcfc0dae`;
+authoritative-mirror observation
+`afa51f8bbba769ecf4c34cf7acfa62c02addc247f11b42d830cc91bbded0066b`; authenticated provider-audit
+observation `1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`. The expanded Core
+Transports package hash is
+`b7c5f73b5e8299c5c6e29936b6fdf6d20d4a78148b83ac93b2be3e298b3d45b5`, and its canonical artifact
+byte SHA-256 is `861a86d603ea1c9e676c2f9c505760b3130eb006a278f7e387fbffaedfe6e190`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:91bceab654863c3ec6bd5bbe67b0b4ba066a1e9b8fb679a4de7deb729a89700b`.
+
+Load and execution support: The 18.06 rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation carries
+project authority. The fail-fast loader pins both Transport source documents, both rule rows,
+their complete evidence inventory, runtime consumers, package hash, and artifact byte hash.
+
+Scope and explicit exclusions: P18D owns the generic typed permission surface, first-class Assault
+mode, source eligibility, Normal-Move-only lifecycle candidate, canonical 3″ grouped placement,
+charge state, typed invalid outcomes, event/replay/adapter context, exact pending-request binding,
+source package, documentation, regressions, and static bug-class audit. Content-specific rules that
+grant this permission remain responsible for producing the typed effect from their own stable
+source IDs through RuleIR or an approved runtime hook. P18D does not add a faction named handler,
+implement Shock Disembark/P18E, implement Rapid Disembark ingress-restriction propagation/P20, or
+change Emergency Disembark maximum-placement behavior/P18B. It adds no out-of-scope content.
+
+Owning source/validation/mutation/event/replay path: reviewed generated Core Transports JSON and
+fail-closed loader -> stable 18.06 source identity and executable consumer inventory -> typed
+source-rule permission effect -> movement-owned candidate enumeration -> existing parameterized
+placement `DecisionRequest`/`DecisionResult` -> request-context and proposal prevalidation ->
+engine-owned grouped `resolve_disembark` validation and battlefield mutation -> typed
+`DisembarkedUnitState` -> public event/status projection, restore/replay, and Charge eligibility.
+Adapters echo engine-authored context and never grant permission or mutate placement independently.
+
+Decision and viewer-visibility impact: P18D adds no decision type, option family, or visibility
+classification. The existing public disembark finite option can name `assault_disembark`, and its
+public `submit_placement_proposal` request/payload/status/event surfaces carry the additive exact
+permission override and permitting source ID. Both viewers observe the same public movement and
+charge state. Shared adapter redaction remains the sole projection/event owner.
+
+Regression scenarios and same-bug-class search: A real lifecycle test records a source-backed
+permission, moves the Transport normally, selects the eligible canonical passenger, submits the
+engine-authored grouped placement, verifies the 3″ limit, state and event sources, serializes and
+restores the lifecycle, and confirms deterministic replay. Direct resolver tests reject missing
+permission, a passenger that embarked this phase, wrong movement status, and a model outside 3″.
+An attached-unit regression places Bodyguard and Leader components atomically under one canonical
+rules-unit identity. Charge coverage proves Rapid is excluded and Assault is retained. Adapter
+coverage forges both the Transport ID and the permission override and proves typed rejection before
+queue pop. Lifecycle regressions also prove opponent-owned Emergency state expires with the turn
+that created it and that persisted state cannot drift from its exact event, request, decision
+history, or restriction override. The bug-class search binds those fields for every standard
+disembark proposal and every `unit_disembarked` emitter, and a static audit pins source identity,
+generic permission ownership, grouped resolution, turn-keyed cleanup, authenticated restore,
+lifecycle selection, charge consumption, adapter contract, and absence of display-name dispatch. No
+behavioral test file was added, removed, moved, or renamed, so the four-shard inventory does not
+change.
+
+Generated artifacts/documentation: P18D expands the existing
+`core_transports_2026_09/artifacts/package.json`, typed loader/source package, authority registry,
+and offline builder for 18.06; adds the bounded disembark-state and generic Assault-permission
+modules while shrinking the frozen legacy Transport facade; regenerates the engine build identity
+and affected external-contract artifacts; and updates README,
+`ARCHITECTURE_V2.md`, `docs/ADAPTER_DECISION_CONTRACT.md`, and this finding record.
+
+Validation results: All required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
+Pyright, the exact xdist work-stealing full suite (`6413 passed`), the four-shard inventory check,
+all `11` import-linter contracts, and all-files pre-commit. The separate coverage-enabled
+behavioral suite passes (`6065 passed`), and its completed coverage database passes
+`coverage report --fail-under=85` at `85%`. The historical 40k.app and maintained-mirror audits,
+all seven Core Rules source generators, final engine-build identity check, base-ref external
+contract check, and installed-wheel smoke pass. The repository-pinned TypeScript client generated
+artifact and type checks pass, all `5` client unit tests pass, and the two-server HTTP conformance
+scenario passes all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/417`; merge commit
 pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
-Status: Planned documentation only in PR #414. No P18C production, contract, source-package, or
-generated-runtime scope is expanded by these findings. P18C remains scoped to C18-03 and must not
-claim complete category-18 or complete v931 compliance.
+Status: This section was introduced as planning documentation in PR #414. The P18D finding record
+above now implements and closes C18-04 without expanding P18C's production, contract,
+source-package, or generated-runtime scope. P18C remains scoped to C18-03 and must not claim
+complete category-18 or complete v931 compliance.
 
 Evidence and sequencing: Game Datamissions records 19 changed items in direct App-data version 931,
 dated 2026-08-26. The duplicated 01.02.06 changed/errata entries are one semantic obligation, so

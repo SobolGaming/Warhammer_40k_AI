@@ -10,6 +10,9 @@ from warhammer40k_core.engine.phases.movement_state import *
 from warhammer40k_core.engine.phases.movement_handler import *
 from warhammer40k_core.engine.phases.movement_reactions import *
 from warhammer40k_core.engine.phases.movement_reinforcements import *
+from warhammer40k_core.engine.assault_disembark import (
+    assault_disembark_restriction_overrides,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -116,16 +119,30 @@ def _disembark_candidate_for_movement_unit(
     )
     if normal_move_states:
         movement_status = TransportMovementStatus.NORMAL_MOVE
-        disembark_mode = DisembarkModeKind.RAPID_DISEMBARK
+        restriction_overrides = assault_disembark_restriction_overrides(
+            state=state,
+            player_id=movement_state.active_player_id,
+            battle_round=state.battle_round,
+            rules_unit_instance_id=unit_id,
+            transport_unit_instance_id=transport_id,
+        )
+        disembark_mode = (
+            DisembarkModeKind.ASSAULT_DISEMBARK
+            if restriction_overrides
+            else DisembarkModeKind.RAPID_DISEMBARK
+        )
     elif arrived_by_ingress:
         movement_status = TransportMovementStatus.INGRESS_MOVE
         disembark_mode = DisembarkModeKind.RAPID_DISEMBARK
+        restriction_overrides = ()
     elif transport_id in movement_state.moved_unit_ids:
         movement_status = TransportMovementStatus.REMAIN_STATIONARY
         disembark_mode = DisembarkModeKind.TACTICAL_DISEMBARK
+        restriction_overrides = ()
     else:
         movement_status = TransportMovementStatus.NOT_MOVED
         disembark_mode = DisembarkModeKind.TACTICAL_DISEMBARK
+        restriction_overrides = ()
     return DisembarkCandidate(
         player_id=movement_state.active_player_id,
         battle_round=state.battle_round,
@@ -133,6 +150,7 @@ def _disembark_candidate_for_movement_unit(
         transport_unit_instance_id=transport_id,
         disembark_mode=disembark_mode,
         transport_movement_status=movement_status,
+        restriction_overrides=restriction_overrides,
     )
 
 
@@ -197,6 +215,10 @@ def _request_disembark_placement(
             "allowed_disembark_modes": list(
                 _allowed_disembark_modes_for_placement_request(selection)
             ),
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in selection.restriction_overrides
+            ],
             "proposal_kind": ProposalKind.DISEMBARK.value,
             "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
             "request_id": request.request_id,
@@ -219,6 +241,10 @@ def _request_disembark_placement(
             "allowed_disembark_modes": list(
                 _allowed_disembark_modes_for_placement_request(selection)
             ),
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in selection.restriction_overrides
+            ],
             "proposal_kind": ProposalKind.DISEMBARK.value,
             "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
             "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
@@ -357,6 +383,7 @@ def _resolve_disembark_placement_submission(
         selection=selection,
         rules_unit=rules_unit,
         transport_placement=transport_placement,
+        turn_player_id=active_player_id,
         objective_markers=_objective_markers_for_state(state),
     )
     if not resolution.is_valid:

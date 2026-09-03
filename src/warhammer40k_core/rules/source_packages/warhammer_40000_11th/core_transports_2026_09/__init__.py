@@ -25,10 +25,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 )
 
 from ._artifacts import (
-    EXPECTED_OBSERVED_AT,
     EXPECTED_PACKAGE_HASH,
-    EXPECTED_RULE_IDENTITY,
-    EXPECTED_SOURCE_URL,
+    EXPECTED_RULE_IDENTITIES,
     CoreTransportsSourceArtifactError,
     CoreTransportsSourcePackageArtifact,
     CoreTransportsSourceRuleArtifact,
@@ -36,7 +34,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "661543a9aa9084cf9d4c583940baab0a75382ef7e08efdb2a09f6e35678dc7d2"
+EXPECTED_ARTIFACT_SHA256: Final = "861a86d603ea1c9e676c2f9c505760b3130eb006a278f7e387fbffaedfe6e190"
 
 
 def _load_artifact() -> CoreTransportsSourcePackageArtifact:
@@ -61,15 +59,15 @@ def validate_core_transports_source_artifact_bytes(raw: bytes) -> None:
 _ARTIFACT: Final = _load_artifact()
 SOURCE_PACKAGE_ID: Final = _ARTIFACT.source_package_id
 SOURCE_VERSION: Final = _ARTIFACT.source_version
-SOURCE_URL: Final = EXPECTED_SOURCE_URL
-OBSERVED_AT: Final = EXPECTED_OBSERVED_AT
 PACKAGE_HASH: Final = EXPECTED_PACKAGE_HASH
-EMERGENCY_DISEMBARK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITY[1]
-TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITY[4]
+EMERGENCY_DISEMBARK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[0][1]
+EMERGENCY_DISEMBARK_TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[0][4]
+ASSAULT_DISEMBARK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[1][1]
+ASSAULT_DISEMBARK_TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[1][4]
 
 
-def source_rule_record() -> CoreTransportsSourceRuleArtifact:
-    return _ARTIFACT.rules[0]
+def source_rule_records() -> tuple[CoreTransportsSourceRuleArtifact, ...]:
+    return _ARTIFACT.rules
 
 
 def source_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
@@ -84,60 +82,70 @@ def source_package() -> RuleSourcePackage:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 9, 1),
+        source_date=date(2026, 9, 2),
     )
-    document_id = SourceDocumentId(
-        package_id=package_id,
-        document_id=_ARTIFACT.source_document.document_id,
+    document_ids = tuple(
+        SourceDocumentId(package_id=package_id, document_id=document.document_id)
+        for document in _ARTIFACT.source_documents
     )
+    rule_by_source_id = {rule.source_id: rule for rule in source_rule_records()}
     source_catalog = SourceCatalog(
         package_id=package_id,
         catalog_version=catalog_version,
-        documents=(
+        documents=tuple(
             SourceDocument(
                 document_id=document_id,
-                title=_ARTIFACT.source_document.source_title,
-                source_texts=(
+                title=document.source_title,
+                source_texts=tuple(
                     RuleSourceText.from_raw(
-                        source_id=source_rule_record().source_id,
-                        raw_text=source_rule_record().source_text,
-                    ),
+                        source_id=source_id,
+                        raw_text=rule_by_source_id[source_id].source_text,
+                    )
+                    for source_id in document.rule_source_ids
                 ),
-            ),
+            )
+            for document_id, document in zip(
+                document_ids,
+                _ARTIFACT.source_documents,
+                strict=True,
+            )
         ),
         ruleset_bundles=(
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-transports-source-observed-2026-09-01"
+                    version="core-v2-transports-source-observed-2026-09-02"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
-                source_document_ids=(document_id,),
+                source_document_ids=document_ids,
             ),
         ),
     )
     return RuleSourcePackage(
         source_catalog=source_catalog,
         source_evidence_catalog=SourceEvidenceCatalog(records=source_evidence_records()),
-        evidence_required_source_ids=(EMERGENCY_DISEMBARK_MOVE_SOURCE_ID,),
+        evidence_required_source_ids=(
+            ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
+            EMERGENCY_DISEMBARK_MOVE_SOURCE_ID,
+        ),
         source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     )
 
 
 __all__ = (
+    "ASSAULT_DISEMBARK_MOVE_SOURCE_ID",
+    "ASSAULT_DISEMBARK_TRANSCRIPTION_SHA256",
     "EMERGENCY_DISEMBARK_MOVE_SOURCE_ID",
+    "EMERGENCY_DISEMBARK_TRANSCRIPTION_SHA256",
     "EXPECTED_ARTIFACT_SHA256",
-    "OBSERVED_AT",
     "PACKAGE_HASH",
     "SOURCE_PACKAGE_ID",
-    "SOURCE_URL",
     "SOURCE_VERSION",
-    "TRANSCRIPTION_SHA256",
     "CoreTransportsSourceArtifactError",
     "core_transports_source_artifact_from_json_bytes",
     "source_evidence_records",
     "source_package",
-    "source_rule_record",
+    "source_rule_records",
     "validate_core_transports_source_artifact_bytes",
 )

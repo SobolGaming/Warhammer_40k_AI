@@ -13522,9 +13522,17 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         for payload in _event_payloads(lifecycle, "model_destroyed")
     )
     assert state.transport_cargo_state_for_transport(transport.unit_instance_id) is None
-    assert disembarked_state is not None
-    assert disembarked_state.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
-    assert disembarked_state.battle_shocked_until == "end_of_turn"
+    assert disembarked_state is None
+    event_disembarked_state = DisembarkedUnitState.from_payload(
+        cast(
+            Any,
+            cast(dict[str, JsonValue], unit_disembarked_event.payload)["disembarked_unit_state"],
+        )
+    )
+    assert event_disembarked_state.player_id == "player-b"
+    assert event_disembarked_state.turn_player_id == "player-a"
+    assert event_disembarked_state.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
+    assert event_disembarked_state.battle_shocked_until == "end_of_turn"
     assert event_records.index(hazard_event) < event_types.index(
         "destroyed_transport_disembark_placement_requested"
     )
@@ -15192,7 +15200,7 @@ def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_pay
     )
     _assert_invalid_proposal_status(
         transport_drift_status,
-        expected_code="destroyed_transport_transport_drift",
+        expected_code="proposal_transport_unit_drift",
         expected_field="transport_unit_instance_id",
     )
     _assert_invalid_proposal_status(

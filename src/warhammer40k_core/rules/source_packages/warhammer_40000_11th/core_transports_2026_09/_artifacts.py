@@ -18,21 +18,46 @@ from warhammer40k_core.rules.source_evidence import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-transports-source-v1"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-transports"
-EXPECTED_SOURCE_VERSION: Final = "40k-app-transports-observed-2026-09-01"
-EXPECTED_SOURCE_URL: Final = "https://www.40k.app/rules/18-transports"
-EXPECTED_OBSERVED_AT: Final = "2026-09-01T18:46:11-04:00"
-EXPECTED_RULE_IDENTITY: Final = (
-    "emergency-disembark-move",
-    "gw-11e-core-rules:transports:emergency-disembark-move",
-    "18.05",
-    "EMERGENCY DISEMBARK MOVE",
-    "3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56",
+EXPECTED_SOURCE_VERSION: Final = "reviewed-transports-observed-2026-09-02"
+EXPECTED_DOCUMENT_IDENTITIES: Final = (
+    (
+        "40k-app-transports-2026-09-01",
+        "https://www.40k.app/rules/18-transports",
+        "2026-09-01T18:46:11-04:00",
+        None,
+        ("gw-11e-core-rules:transports:emergency-disembark-move",),
+    ),
+    (
+        "game-datamissions-core-rules-data-931",
+        "https://game-datamissions.com/11th/rules/changelog",
+        "2026-09-02T12:30:09-04:00",
+        "931",
+        ("gw-11e-core-rules:transports:assault-disembark-move",),
+    ),
+)
+EXPECTED_RULE_IDENTITIES: Final = (
+    (
+        "emergency-disembark-move",
+        "gw-11e-core-rules:transports:emergency-disembark-move",
+        "18.05",
+        "EMERGENCY DISEMBARK MOVE",
+        "3d2ae5c7c61267b25d42f7139353d31528f5b4f7c66acbc63c64b596f3f8eb56",
+    ),
+    (
+        "assault-disembark-move",
+        "gw-11e-core-rules:transports:assault-disembark-move",
+        "18.06",
+        "ASSAULT DISEMBARK MOVE",
+        "93b5d311d7bce309e94f93c6b501a6980a820505786f59e0cb2bbfc6e53e4bee",
+    ),
 )
 EXPECTED_OBSERVATION_SHA256S: Final = (
     "41830aeaa0b2d711ad77a31e60092acf543b4d31b24c6cd286e1818948237b63",
     "645e8e96af35d4aefe38c755c2ce6b72579d925865ace9e5b16e5b58158c5b98",
+    "21dde0c665b4a09fecc0ddc6f4e09ee252b6a3b27af1779f858aa8a4fcfc0dae",
+    "afa51f8bbba769ecf4c34cf7acfa62c02addc247f11b42d830cc91bbded0066b",
 )
-EXPECTED_PACKAGE_HASH: Final = "11ef8c6081238b8271effc171f9cd90cd85f1ec0028589db833b517bbe3fede0"
+EXPECTED_PACKAGE_HASH: Final = "b7c5f73b5e8299c5c6e29936b6fdf6d20d4a78148b83ac93b2be3e298b3d45b5"
 
 
 class CoreTransportsSourceArtifactError(ValueError):
@@ -48,7 +73,9 @@ class CoreTransportsSourceDocumentArtifact(
     source_title: str
     source_url: str
     observed_at: str
+    app_version: str | None
     project_authority_policy_id: str
+    rule_source_ids: tuple[str, ...]
 
 
 class CoreTransportsSourceRuleArtifact(
@@ -136,7 +163,7 @@ class CoreTransportsSourcePackageArtifact(
     artifact_schema: str
     source_package_id: str
     source_version: str
-    source_document: CoreTransportsSourceDocumentArtifact
+    source_documents: tuple[CoreTransportsSourceDocumentArtifact, ...]
     rules: tuple[CoreTransportsSourceRuleArtifact, ...]
     evidence: tuple[CoreTransportsEvidenceArtifact, ...]
     package_hash: str
@@ -156,31 +183,64 @@ def core_transports_source_artifact_from_json_bytes(
         raise CoreTransportsSourceArtifactError(
             "Transports source artifact schema is invalid."
         ) from exc
-    if len(artifact.rules) != 1:
+    if len(artifact.rules) != 2 or len(artifact.source_documents) != 2:
         raise CoreTransportsSourceArtifactError(
             "Transports source artifact drifted from its reviewed identity."
         )
-    rule = artifact.rules[0]
-    actual_identity = (
-        rule.rule_id,
-        rule.source_id,
-        rule.section_id,
-        rule.section_heading,
-        rule.transcription_sha256,
+    actual_rule_identities = tuple(
+        (
+            rule.rule_id,
+            rule.source_id,
+            rule.section_id,
+            rule.section_heading,
+            rule.transcription_sha256,
+        )
+        for rule in artifact.rules
     )
+    actual_document_identities = tuple(
+        (
+            document.document_id,
+            document.source_url,
+            document.observed_at,
+            document.app_version,
+            document.rule_source_ids,
+        )
+        for document in artifact.source_documents
+    )
+    rule_by_source_id = {rule.source_id: rule for rule in artifact.rules}
     if (
         artifact.artifact_schema != ARTIFACT_SCHEMA
         or artifact.source_package_id != EXPECTED_SOURCE_PACKAGE_ID
         or artifact.source_version != EXPECTED_SOURCE_VERSION
-        or artifact.source_document.source_url != EXPECTED_SOURCE_URL
-        or artifact.source_document.observed_at != EXPECTED_OBSERVED_AT
-        or actual_identity != EXPECTED_RULE_IDENTITY
-        or hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
-        or len(artifact.evidence) != 2
+        or actual_document_identities != EXPECTED_DOCUMENT_IDENTITIES
+        or actual_rule_identities != EXPECTED_RULE_IDENTITIES
         or any(
-            evidence.rule_source_id != rule.source_id
-            or evidence.transcription_sha256 != rule.transcription_sha256
+            hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
+            for rule in artifact.rules
+        )
+        or tuple(
+            source_id
+            for document in artifact.source_documents
+            for source_id in document.rule_source_ids
+        )
+        != tuple(rule.source_id for rule in artifact.rules)
+        or len(artifact.evidence) != 4
+        or any(
+            evidence.rule_source_id not in rule_by_source_id
+            or evidence.transcription_sha256
+            != rule_by_source_id[evidence.rule_source_id].transcription_sha256
             for evidence in artifact.evidence
+        )
+        or any(
+            len(
+                tuple(
+                    evidence
+                    for evidence in artifact.evidence
+                    if evidence.rule_source_id == rule.source_id
+                )
+            )
+            != 2
+            for rule in artifact.rules
         )
         or tuple(evidence.observation_sha256 for evidence in artifact.evidence)
         != EXPECTED_OBSERVATION_SHA256S
@@ -205,11 +265,10 @@ def core_transports_source_artifact_from_json_bytes(
 
 
 __all__ = (
+    "EXPECTED_DOCUMENT_IDENTITIES",
     "EXPECTED_OBSERVATION_SHA256S",
-    "EXPECTED_OBSERVED_AT",
     "EXPECTED_PACKAGE_HASH",
-    "EXPECTED_RULE_IDENTITY",
-    "EXPECTED_SOURCE_URL",
+    "EXPECTED_RULE_IDENTITIES",
     "CoreTransportsSourceArtifactError",
     "CoreTransportsSourcePackageArtifact",
     "CoreTransportsSourceRuleArtifact",

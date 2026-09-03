@@ -2587,6 +2587,13 @@ def _charge_unit_ineligibility_reason(
         )
     ):
         return "charge_unit_fell_back"
+    disembarked_state = state.disembarked_unit_state_for_unit(
+        player_id=charge_state.active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=requested_unit_id,
+    )
+    if disembarked_state is not None and not disembarked_state.can_declare_charge:
+        return "charge_unit_disembarked"
     if not _aircraft_policy_for_charge_unit(
         state=state,
         unit_instance_id=requested_unit_id,

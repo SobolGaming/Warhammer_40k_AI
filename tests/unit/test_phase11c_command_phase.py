@@ -8963,7 +8963,9 @@ def test_authenticated_reposition_preserves_prior_turn_advance_history() -> None
     )
 
 
-def test_authenticated_reposition_preserves_disembark_history_and_effects() -> None:
+def test_authenticated_reposition_rejects_cross_turn_disembark_history_and_preserves_effects() -> (
+    None
+):
     state, decisions, registry, request, unit, transport = _gate_of_infinity_pending_decision()
     unit_id = unit.unit_instance_id
     assert "INFANTRY" in unit.keywords
@@ -8989,7 +8991,8 @@ def test_authenticated_reposition_preserves_disembark_history_and_effects() -> N
         ),
         effect_payload={"modifier": "phase14h-repositioned-effect"},
     )
-    state.record_disembarked_unit_state(disembarked)
+    with pytest.raises(GameLifecycleError, match="turn player drift"):
+        state.record_disembarked_unit_state(disembarked)
     state.record_persisting_effect(effect)
 
     result, provider = _accept_gate_of_infinity_decision(
@@ -9014,7 +9017,7 @@ def test_authenticated_reposition_preserves_disembark_history_and_effects() -> N
             battle_round=state.battle_round,
             unit_instance_id=unit_id,
         )
-        == disembarked
+        is None
     )
     assert effect in state.persisting_effects_for_unit(unit_id)
     reserve_state = state.reserve_state_for_unit(unit_id)

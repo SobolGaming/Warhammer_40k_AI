@@ -18,6 +18,10 @@ from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.assault_disembark import (
+    assault_disembark_permission_effect,
+    assault_disembark_restriction_overrides,
+)
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence_destroyed_transport import (
     _destroyed_transport_hazard_survivor_ids,  # pyright: ignore[reportPrivateUsage]
@@ -90,6 +94,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
     PlacementProposalPayload,
+    ProposalKind,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -120,6 +125,7 @@ from warhammer40k_core.engine.phases.movement_rules_unit_disembark import (
     apply_rules_unit_combat_disembark_feel_no_pain_decision,
     apply_rules_unit_combat_disembark_to_state,
     resolve_rules_unit_combat_disembark,
+    resolve_rules_unit_disembark,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reserve_arrival_requirements import (
@@ -144,6 +150,7 @@ from warhammer40k_core.engine.transport_state_integrity import (
     validate_transport_cargo_state_consistency,
 )
 from warhammer40k_core.engine.transports import (
+    ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
     CombatDisembark,
@@ -167,6 +174,7 @@ from warhammer40k_core.engine.transports import (
     TransportOperationViolationCode,
     TransportRestrictionOverride,
     TransportRestrictionOverrideKind,
+    TransportRestrictionOverridePayload,
     apply_combat_disembark_to_battlefield,
     apply_destroyed_transport_disembark_to_battlefield,
     apply_disembark_to_battlefield,
@@ -1901,18 +1909,58 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     assert combat_result.is_valid
     assert combat_result.mortal_wounds == 2
     lifecycle = GameLifecycle(state=state)
+    proposal_request = MovementProposalRequest(
+        request_id="phase10q-attached-combat-fnp-placement-request",
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-a",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=attached_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        source_decision_request_id="phase10q-attached-combat-fnp-selection-request",
+        source_decision_result_id="phase10q-attached-combat-fnp-selection-result",
+        spatial_context_hash="0" * 64,
+        placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
+        context={
+            "component_unit_instance_ids": list(component_ids),
+            "model_instance_ids": cast(
+                JsonValue,
+                sorted(
+                    placement.model_instance_id for placement in grouped_placement.model_placements
+                ),
+            ),
+            "transport_unit_instance_id": transport.unit_instance_id,
+            "disembark_mode": DisembarkModeKind.COMBAT_DISEMBARK.value,
+            "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+            "restriction_overrides": [],
+        },
+    ).to_decision_request()
+    lifecycle.decision_controller.request_decision(proposal_request)
+    placement_payload = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=attached_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_rules_unit_placement=grouped_placement,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    placement_result = DecisionResult(
+        result_id="phase10q-attached-combat-fnp-placement-result",
+        request_id=proposal_request.request_id,
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-a",
+        selected_option_id="submit_parameterized_payload",
+        payload=validate_json_value(placement_payload.to_payload()),
+    )
+    lifecycle.decision_controller.submit_result(placement_result)
     request = apply_rules_unit_combat_disembark_to_state(
         state=state,
         decisions=lifecycle.decision_controller,
         combat_disembark=combat_result,
-        result=DecisionResult(
-            result_id="phase10q-attached-combat-fnp-placement-result",
-            request_id="phase10q-attached-combat-fnp-placement-request",
-            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
-            actor_id="player-a",
-            selected_option_id="submit_parameterized_payload",
-            payload={},
-        ),
+        result=placement_result,
         dice_manager=DiceRollManager(
             "phase10q-attached-combat-fnp-route",
             event_log=lifecycle.decision_controller.event_log,
@@ -2924,6 +2972,562 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
     assert lifecycle.state is not None
     assert lifecycle.state.to_payload() == state.to_payload()
 
+    forged_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    forged_state = cast(dict[str, Any], forged_payload["state"])
+    forged_disembarked_states = cast(
+        list[dict[str, Any]],
+        forged_state["disembarked_unit_states"],
+    )
+    forged_disembarked_states[0].update(
+        {
+            "disembark_mode": DisembarkModeKind.ASSAULT_DISEMBARK.value,
+            "can_declare_charge": True,
+            "source_rule_id": ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
+            "permission_source_rule_id": "phase10q:forged-assault-permission",
+        }
+    )
+    with pytest.raises(GameLifecycleError, match="disembarked unit state event drift"):
+        GameLifecycle.from_payload(forged_payload)
+
+    forged_event_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    forged_events = forged_event_payload["decisions"]["event_log"]
+    forged_disembark_event = next(
+        event for event in forged_events if event["event_type"] == "unit_disembarked"
+    )
+    forged_disembark_event_payload = cast(dict[str, JsonValue], forged_disembark_event["payload"])
+    forged_disembark_event_payload["restriction_overrides"] = [
+        {
+            "override_kind": (
+                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
+            ),
+            "source_rule_id": "phase10q:forged-assault-permission",
+        }
+    ]
+    with pytest.raises(GameLifecycleError, match="restriction override drift"):
+        GameLifecycle.from_payload(forged_event_payload)
+
+    forged_request_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    forged_decision = next(
+        record
+        for record in forged_request_payload["decisions"]["records"]
+        if record["result"]["result_id"] == "phase10q-place-post-normal-disembark"
+    )
+    forged_decision_request_payload = cast(
+        dict[str, JsonValue], forged_decision["request"]["payload"]
+    )
+    forged_proposal_request = cast(
+        dict[str, JsonValue],
+        forged_decision_request_payload["proposal_request"],
+    )
+    forged_proposal_context = cast(dict[str, JsonValue], forged_proposal_request["context"])
+    forged_proposal_context["restriction_overrides"] = [
+        {
+            "override_kind": (
+                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
+            ),
+            "source_rule_id": "phase10q:forged-assault-permission",
+        }
+    ]
+    with pytest.raises(GameLifecycleError, match="decision history drift"):
+        GameLifecycle.from_payload(forged_request_payload)
+
+
+def test_opponent_turn_destroyed_transport_disembark_state_expires_with_that_turn() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id="phase18d-opponent-turn-disembark-expiration")
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_disembarked_unit_state(
+        DisembarkedUnitState.for_destroyed_transport(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            turn_player_id="player-b",
+        )
+    )
+
+    state.prepare_current_turn_end_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        runtime_modifier_registry=None,
+    )
+
+    assert state.disembarked_unit_states == []
+
+
+def test_assault_disembark_permission_flows_through_decision_event_and_replay() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id="phase18d-assault-disembark")
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        passenger.unit_instance_id
+    )
+    state.record_transport_cargo_state(
+        _cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            started_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        )
+    )
+    permission_source_rule_id = "test:assault-disembark-permitting-rule"
+    state.record_persisting_effect(
+        assault_disembark_permission_effect(
+            effect_id="phase18d:assault-disembark-permission",
+            source_rule_id=permission_source_rule_id,
+            owner_player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            eligible_rules_unit_instance_ids=(passenger.unit_instance_id,),
+            started_battle_round=1,
+            started_phase=BattlePhase.MOVEMENT,
+            expiration=EffectExpiration.end_phase(
+                battle_round=1,
+                phase=BattlePhase.MOVEMENT,
+                player_id="player-a",
+            ),
+        )
+    )
+
+    handler, decisions, post_move_disembark_request = (
+        _rapid_disembark_request_after_transport_normal_move(
+            state=state,
+            passenger=passenger,
+            transport=transport,
+        )
+    )
+    action_payload = cast(
+        dict[str, JsonValue],
+        post_move_disembark_request.option_by_id(MovementPhaseActionKind.DISEMBARK.value).payload,
+    )
+    assert action_payload["disembark_mode"] == DisembarkModeKind.ASSAULT_DISEMBARK.value
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler,
+            state=state,
+            decisions=decisions,
+            request=post_move_disembark_request,
+            option_id=MovementPhaseActionKind.DISEMBARK.value,
+            result_id="phase18d-select-assault-disembark",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    assert proposal.context is not None
+    assert proposal.context["disembark_mode"] == DisembarkModeKind.ASSAULT_DISEMBARK.value
+    assert proposal.context["restriction_overrides"] == [
+        {
+            "override_kind": (
+                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
+            ),
+            "source_rule_id": permission_source_rule_id,
+        }
+    ]
+
+    status = _submit_disembark_placement_payload(
+        handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        passenger=passenger,
+        transport=transport,
+        disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        result_id="phase18d-place-assault-disembark",
+    )
+
+    assert status is None
+    disembarked_state = state.disembarked_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+    )
+    assert disembarked_state is not None
+    assert disembarked_state.disembark_mode is DisembarkModeKind.ASSAULT_DISEMBARK
+    assert not disembarked_state.can_move_further
+    assert disembarked_state.can_declare_charge
+    assert disembarked_state.permission_source_rule_id == permission_source_rule_id
+    event_payload = _last_event_payload(decisions, "unit_disembarked")
+    assert event_payload["restriction_overrides"] == proposal.context["restriction_overrides"]
+    assert event_payload["disembarked_unit_state"] == disembarked_state.to_payload()
+    lifecycle_payload: GameLifecyclePayload = {
+        "config": None,
+        "parameterized_movement_proposals": True,
+        "state": state.to_payload(),
+        "decisions": decisions.to_payload(),
+        "reaction_queue": {"frames": []},
+    }
+    restored = GameLifecycle.from_payload(lifecycle_payload)
+    assert restored.to_payload() == lifecycle_payload
+
+
+def test_assault_disembark_resolver_requires_permission_start_state_and_three_inches() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    scenario = _without_unit(scenario, passenger.unit_instance_id)
+    cargo = _cargo_state(
+        transport=transport,
+        embarked_unit_ids=(passenger.unit_instance_id,),
+        started_unit_ids=(passenger.unit_instance_id,),
+        battle_round=1,
+    )
+    permission = TransportRestrictionOverride(
+        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE),
+        source_rule_id="test:assault-disembark-permitting-rule",
+    )
+    attempted_placement = _unit_placement_at(
+        passenger,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_disembark_poses(),
+    )
+
+    missing_permission = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo,
+        selection=DisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=attempted_placement,
+            disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        ),
+        unit=passenger,
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+    did_not_start_embarked = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=_cargo_state(
+            transport=transport,
+            embarked_unit_ids=(passenger.unit_instance_id,),
+            battle_round=1,
+        ),
+        selection=replace(missing_permission.selection, restriction_overrides=(permission,)),
+        unit=passenger,
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+    outside_three_inches = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo,
+        selection=replace(
+            missing_permission.selection,
+            attempted_placement=_unit_placement_at(
+                passenger,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=tuple(
+                    Pose.at(pose.position.x + 5.0, pose.position.y) for pose in _disembark_poses()
+                ),
+            ),
+            restriction_overrides=(permission,),
+        ),
+        unit=passenger,
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+    valid = resolve_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=cargo,
+        selection=replace(missing_permission.selection, restriction_overrides=(permission,)),
+        unit=passenger,
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+    )
+
+    assert TransportOperationViolationCode.ASSAULT_DISEMBARK_PERMISSION_REQUIRED in {
+        violation.violation_code for violation in missing_permission.violations
+    }
+    assert TransportOperationViolationCode.UNIT_DID_NOT_START_PHASE_EMBARKED in {
+        violation.violation_code for violation in did_not_start_embarked.violations
+    }
+    assert TransportOperationViolationCode.DISEMBARK_DISTANCE in {
+        violation.violation_code for violation in outside_three_inches.violations
+    }
+    assert valid.is_valid
+    assert valid.disembarked_unit_state is not None
+    assert valid.disembarked_unit_state.can_declare_charge
+    with pytest.raises(GameLifecycleError, match="requires Normal Transport movement"):
+        replace(
+            valid.selection,
+            transport_movement_status=TransportMovementStatus.ADVANCE,
+        )
+
+
+def test_assault_disembark_permission_and_state_payloads_fail_closed() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    permission = assault_disembark_permission_effect(
+        effect_id="phase18d:strict-permission",
+        source_rule_id="test:assault-disembark-permitting-rule",
+        owner_player_id="player-a",
+        transport_unit_instance_id=transport.unit_instance_id,
+        eligible_rules_unit_instance_ids=(passenger.unit_instance_id,),
+        started_battle_round=1,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.MOVEMENT,
+            player_id="player-a",
+        ),
+    )
+
+    def overrides_for(
+        effect: PersistingEffect,
+        *,
+        battle_round: int = 1,
+    ) -> tuple[TransportRestrictionOverride, ...]:
+        state = _battle_state(scenario, game_id=f"phase18d:{effect.effect_id}")
+        state.record_persisting_effect(effect)
+        return assault_disembark_restriction_overrides(
+            state=state,
+            player_id="player-a",
+            battle_round=battle_round,
+            rules_unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+        )
+
+    assert (
+        overrides_for(
+            replace(
+                permission,
+                effect_id="phase18d:other-effect-kind",
+                effect_payload={"effect_kind": "other_effect"},
+            )
+        )
+        == ()
+    )
+    assert (
+        overrides_for(
+            replace(
+                permission,
+                effect_id="phase18d:other-passenger",
+                effect_payload={
+                    **cast(dict[str, JsonValue], permission.effect_payload),
+                    "eligible_rules_unit_instance_ids": ["army-alpha:other-passenger"],
+                },
+            )
+        )
+        == ()
+    )
+    malformed_effects = (
+        (
+            replace(
+                permission,
+                effect_id="phase18d:extra-field",
+                effect_payload={
+                    **cast(dict[str, JsonValue], permission.effect_payload),
+                    "extra": True,
+                },
+            ),
+            1,
+            "payload fields are invalid",
+        ),
+        (
+            replace(
+                permission,
+                effect_id="phase18d:transport-drift",
+                effect_payload={
+                    **cast(dict[str, JsonValue], permission.effect_payload),
+                    "transport_unit_instance_id": passenger.unit_instance_id,
+                },
+            ),
+            1,
+            "Transport identity drift",
+        ),
+        (
+            replace(permission, effect_id="phase18d:owner-drift", owner_player_id="player-b"),
+            1,
+            "player identity drift",
+        ),
+        (
+            replace(permission, effect_id="phase18d:future", started_battle_round=2),
+            1,
+            "future battle round",
+        ),
+        (
+            replace(
+                permission,
+                effect_id="phase18d:eligible-shape",
+                effect_payload={
+                    **cast(dict[str, JsonValue], permission.effect_payload),
+                    "eligible_rules_unit_instance_ids": passenger.unit_instance_id,
+                },
+            ),
+            1,
+            "must be a list",
+        ),
+    )
+    for effect, battle_round, message in malformed_effects:
+        with pytest.raises(GameLifecycleError, match=message):
+            overrides_for(effect, battle_round=battle_round)
+
+    state = _battle_state(scenario, game_id="phase18d:duplicate-permission")
+    state.record_persisting_effect(permission)
+    state.record_persisting_effect(replace(permission, effect_id="phase18d:second-permission"))
+    with pytest.raises(GameLifecycleError, match="one unambiguous permitting source"):
+        assault_disembark_restriction_overrides(
+            state=state,
+            player_id="player-a",
+            battle_round=1,
+            rules_unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="positive integer"):
+        overrides_for(permission, battle_round=0)
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        assault_disembark_permission_effect(
+            effect_id="phase18d:empty",
+            source_rule_id="test:assault-disembark-permitting-rule",
+            owner_player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            eligible_rules_unit_instance_ids=(),
+            started_battle_round=1,
+            expiration=permission.expiration,
+        )
+    with pytest.raises(GameLifecycleError, match="must not contain duplicates"):
+        assault_disembark_permission_effect(
+            effect_id="phase18d:duplicates",
+            source_rule_id="test:assault-disembark-permitting-rule",
+            owner_player_id="player-a",
+            transport_unit_instance_id=transport.unit_instance_id,
+            eligible_rules_unit_instance_ids=(
+                passenger.unit_instance_id,
+                passenger.unit_instance_id,
+            ),
+            started_battle_round=1,
+            expiration=permission.expiration,
+        )
+
+    override = TransportRestrictionOverride(
+        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE),
+        source_rule_id=permission.source_rule_id,
+    )
+    assault_state = DisembarkedUnitState.for_mode(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        restriction_overrides=(override,),
+    )
+    rapid_state = DisembarkedUnitState.for_mode(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+    )
+    with pytest.raises(GameLifecycleError, match="permitting source rule ID"):
+        replace(assault_state, permission_source_rule_id=None)
+    with pytest.raises(GameLifecycleError, match="state flags drifted"):
+        replace(assault_state, can_move_further=True)
+    with pytest.raises(GameLifecycleError, match="Only Assault Disembark state"):
+        replace(rapid_state, permission_source_rule_id=permission.source_rule_id)
+    with pytest.raises(GameLifecycleError, match="must be at least 1"):
+        replace(assault_state, battle_round=0)
+    with pytest.raises(GameLifecycleError, match="must be a bool"):
+        replace(assault_state, can_declare_charge=cast(bool, 1))
+    with pytest.raises(GameLifecycleError, match="source-backed permitting rule"):
+        DisembarkedUnitState.for_mode(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        )
+
+
+def test_assault_disembark_places_attached_rules_unit_atomically() -> None:
+    scenario, bodyguard, leader, transport = _attached_embark_ready_scenario()
+    attached_id = "attached-unit:army-alpha:attached-transport-passengers"
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    scenario = _without_unit(
+        _without_unit(scenario, bodyguard.unit_instance_id),
+        leader.unit_instance_id,
+    )
+    permission = TransportRestrictionOverride(
+        override_kind=(TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE),
+        source_rule_id="test:attached-assault-disembark-permitting-rule",
+    )
+    grouped_placement = RulesUnitPlacement(
+        rules_unit_instance_id=attached_id,
+        component_unit_placements=(
+            _unit_placement_at(
+                bodyguard,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=(
+                    Pose.at(8.6, 13.0),
+                    Pose.at(10.0, 13.0),
+                    Pose.at(11.4, 13.0),
+                    Pose.at(9.3, 14.2),
+                    Pose.at(10.7, 14.2),
+                ),
+            ),
+            _unit_placement_at(
+                leader,
+                army_id="army-alpha",
+                player_id="player-a",
+                poses=(Pose.at(12.6, 11.8),),
+            ),
+        ),
+    )
+    rules_unit = rules_unit_view_from_armies(
+        armies=scenario.armies,
+        unit_instance_id=attached_id,
+    )
+
+    resolution = resolve_rules_unit_disembark(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        cargo_state=_cargo_state(
+            transport=transport,
+            embarked_unit_ids=component_ids,
+            started_unit_ids=component_ids,
+            battle_round=1,
+            max_model_count=6,
+        ),
+        selection=RulesUnitDisembarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=attached_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            attempted_placement=grouped_placement,
+            disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+            restriction_overrides=(permission,),
+        ),
+        rules_unit=rules_unit,
+        transport_placement=scenario.battlefield_state.unit_placement_by_id(
+            transport.unit_instance_id
+        ),
+        turn_player_id="player-a",
+    )
+
+    assert resolution.is_valid
+    assert resolution.updated_cargo_state is not None
+    assert resolution.updated_cargo_state.embarked_unit_instance_ids == ()
+    assert resolution.disembarked_unit_state is not None
+    assert resolution.disembarked_unit_state.unit_instance_id == attached_id
+    assert resolution.disembarked_unit_state.permission_source_rule_id == (
+        permission.source_rule_id
+    )
+    assert resolution.transition_batch is not None
+    assert {record.model_instance_id for record in resolution.transition_batch.placements} == {
+        model.model_instance_id for unit in (bodyguard, leader) for model in unit.own_models
+    }
+
 
 def test_replay_rejects_transport_cargo_when_transport_is_not_placed() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
@@ -3241,6 +3845,23 @@ def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
         disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
         transport_movement_status=TransportMovementStatus.INGRESS_MOVE,
     )
+    assault_selection = DisembarkSelection(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=passenger.unit_instance_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        attempted_placement=attempted_placement,
+        disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        restriction_overrides=(
+            TransportRestrictionOverride(
+                override_kind=(
+                    TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
+                ),
+                source_rule_id="test:assault-disembark-permitting-rule",
+            ),
+        ),
+    )
     combat_selection = DisembarkSelection(
         player_id="player-a",
         battle_round=1,
@@ -3275,6 +3896,7 @@ def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
         DisembarkSelection.from_payload(rapid_ingress_selection.to_payload())
         == rapid_ingress_selection
     )
+    assert DisembarkSelection.from_payload(assault_selection.to_payload()) == assault_selection
     assert DisembarkSelection.from_payload(combat_selection.to_payload()) == combat_selection
     with pytest.raises(GameLifecycleError, match="requires resolve_combat_disembark"):
         resolve_disembark(
@@ -3337,6 +3959,11 @@ def test_disembark_mode_status_pairs_are_fail_fast_and_round_trip() -> None:
             attempted_placement=attempted_placement,
             disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
             transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        )
+    with pytest.raises(GameLifecycleError, match="Assault Disembark requires Normal"):
+        replace(
+            assault_selection,
+            transport_movement_status=TransportMovementStatus.INGRESS_MOVE,
         )
 
 
@@ -3982,6 +4609,7 @@ def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() ->
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     updated_battlefield = apply_destroyed_transport_disembark_to_battlefield(
         battlefield_state=disembark_scenario.battlefield_state,
@@ -4130,6 +4758,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             unit=passenger,
             transport_placement=transport_placement,
             hazard_rolls=cast(DestroyedTransportHazardRolls, object()),
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires destroyed or emergency mode"):
         resolve_destroyed_transport_disembark(
@@ -4140,6 +4769,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             unit=passenger,
             transport_placement=transport_placement,
             hazard_rolls=hazard_rolls,
+            turn_player_id="player-a",
         )
     for drifted_rolls in (
         replace(hazard_rolls, player_id="player-b"),
@@ -4157,6 +4787,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
                 unit=passenger,
                 transport_placement=transport_placement,
                 hazard_rolls=drifted_rolls,
+                turn_player_id="player-a",
             )
     with pytest.raises(GameLifecycleError, match="survivor snapshot drift"):
         resolve_destroyed_transport_disembark(
@@ -4167,6 +4798,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             unit=passenger,
             transport_placement=transport_placement,
             hazard_rolls=replace(hazard_rolls, model_rolls=hazard_rolls.model_rolls[:-1]),
+            turn_player_id="player-a",
         )
 
 
@@ -4358,6 +4990,7 @@ def test_p18c_transport_hazard_records_and_placement_objects_reject_drift() -> N
         unit=passenger,
         transport_placement=transport_placement,
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     first_roll = hazard_rolls.model_rolls[0]
 
@@ -5011,6 +5644,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         unit=passenger,
         transport_placement=transport_placement,
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     resolution = destroyed_result.placement
 
@@ -5054,6 +5688,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         DisembarkedUnitState.for_destroyed_transport(
             player_id="player-a",
             battle_round=1,
+            turn_player_id="player-a",
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
@@ -5134,6 +5769,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
             selection=cast(DisembarkSelection, object()),
             unit=passenger,
             transport_placement=transport_placement,
+            turn_player_id="player-a",
             require_started_phase_embarked=True,
             battlefield_width_inches=44.0,
             battlefield_depth_inches=60.0,
@@ -5370,6 +6006,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
             unit=dead_passenger,
             transport_placement=transport_placement,
             hazard_rolls=hazard_rolls,
+            turn_player_id="player-a",
         )
 
 
@@ -5684,6 +6321,7 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
 
     assert result.placement.is_valid
@@ -5934,6 +6572,7 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     firing_deck_resolution = resolve_firing_deck_selection(
         cargo_state=cargo_state,
@@ -6037,6 +6676,7 @@ def test_resolution_payloads_reject_destroyed_transport_and_firing_deck_drift() 
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     bad_mortal_wound_roll = replace(
         destroyed_resolution.model_rolls[0],
@@ -6745,6 +7385,16 @@ def _submit_disembark_placement_payload(
     poses: tuple[Pose, ...] | None = None,
 ) -> LifecycleStatus | None:
     proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    raw_restriction_overrides = (proposal.context or {}).get("restriction_overrides", [])
+    assert isinstance(raw_restriction_overrides, list)
+    restriction_overrides = tuple(
+        TransportRestrictionOverride.from_payload(
+            cast(TransportRestrictionOverridePayload, raw_override)
+        )
+        for raw_override in raw_restriction_overrides
+        if isinstance(raw_override, dict)
+    )
+    assert len(restriction_overrides) == len(raw_restriction_overrides)
     placement_poses = _disembark_poses()[: len(passenger.own_models)] if poses is None else poses
     if transport_movement_status is TransportMovementStatus.NORMAL_MOVE:
         placement_poses = tuple(
@@ -6771,6 +7421,7 @@ def _submit_disembark_placement_payload(
         transport_unit_instance_id=transport.unit_instance_id,
         disembark_mode=disembark_mode,
         transport_movement_status=transport_movement_status,
+        restriction_overrides=restriction_overrides,
     ).to_payload()
     return _submit_parameterized_handler_payload(
         handler=handler,
