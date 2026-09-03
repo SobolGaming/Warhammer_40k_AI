@@ -39,6 +39,7 @@ from warhammer40k_core.engine.primary_historical_events import (
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 from warhammer40k_core.engine.transports import (
     DisembarkModeKind,
+    disembarked_unit_state_from_event_payload,
 )
 
 if TYPE_CHECKING:
@@ -668,9 +669,11 @@ def _emergency_disembark_departure_source(
             "Emergency Disembark terminal event lacks typed destruction evidence."
         )
     result_payload = _json_object(decision.result.payload, name="Emergency Disembark result")
+    disembarked_state = disembarked_unit_state_from_event_payload(payload)
     if (
         payload.get("game_id") != state.game_id
-        or payload.get("active_player_id") != decision.result.actor_id
+        or payload.get("active_player_id") != disembarked_state.turn_player_id
+        or disembarked_state.player_id != decision.result.actor_id
         or evidence.player_id != decision.result.actor_id
         or result_payload.get("unit_instance_id") != evidence.rules_unit_instance_id
         or payload.get("unit_instance_id") != evidence.rules_unit_instance_id

@@ -327,7 +327,7 @@ def _apply_valid_disembark(
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
-            "active_player_id": disembark.selection.player_id,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": disembark.selection.unit_instance_id,
             "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,
@@ -397,7 +397,7 @@ def _apply_valid_combat_disembark(
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
-            "active_player_id": disembark.selection.player_id,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": disembark.selection.unit_instance_id,
             "transport_unit_instance_id": disembark.selection.transport_unit_instance_id,

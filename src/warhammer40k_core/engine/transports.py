@@ -83,6 +83,9 @@ from warhammer40k_core.engine.transport_disembark_state import (
     disembark_mode_kind_from_token as disembark_mode_kind_from_token,
 )
 from warhammer40k_core.engine.transport_disembark_state import (
+    disembarked_unit_state_from_event_payload as disembarked_unit_state_from_event_payload,
+)
+from warhammer40k_core.engine.transport_disembark_state import (
     transport_movement_status_from_token as transport_movement_status_from_token,
 )
 from warhammer40k_core.engine.transport_disembark_state import (
@@ -2018,6 +2021,7 @@ def resolve_disembark(
         selection=selection,
         unit=unit,
         transport_placement=transport_placement,
+        turn_player_id=selection.player_id,
         require_started_phase_embarked=True,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
@@ -2051,6 +2055,7 @@ def resolve_combat_disembark(
         selection=selection,
         unit=unit,
         transport_placement=transport_placement,
+        turn_player_id=selection.player_id,
         require_started_phase_embarked=True,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
@@ -2143,6 +2148,7 @@ def resolve_destroyed_transport_disembark(
     unit: UnitInstance,
     transport_placement: UnitPlacement,
     hazard_rolls: DestroyedTransportHazardRolls,
+    turn_player_id: str,
     battlefield_width_inches: float = _DEFAULT_BATTLEFIELD_WIDTH_INCHES,
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
@@ -2160,6 +2166,7 @@ def resolve_destroyed_transport_disembark(
         unit=unit,
         transport_placement=transport_placement,
         hazard_rolls=hazard_rolls,
+        turn_player_id=turn_player_id,
         battlefield_width_inches=battlefield_width_inches,
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
@@ -2489,6 +2496,7 @@ def _resolve_disembark(
     selection: DisembarkSelection,
     unit: UnitInstance,
     transport_placement: UnitPlacement,
+    turn_player_id: str,
     require_started_phase_embarked: bool,
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
@@ -2507,6 +2515,16 @@ def _resolve_disembark(
         raise GameLifecycleError("resolve_disembark unit must be a UnitInstance.")
     if type(transport_placement) is not UnitPlacement:
         raise GameLifecycleError("resolve_disembark transport_placement must be UnitPlacement.")
+    resolved_turn_player_id = _validate_identifier("turn_player_id", turn_player_id)
+    if (
+        selection.disembark_mode
+        not in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }
+        and resolved_turn_player_id != selection.player_id
+    ):
+        raise GameLifecycleError("Standard Disembark turn player drift.")
     width = _validate_positive_number("battlefield_width_inches", battlefield_width_inches)
     depth = _validate_positive_number("battlefield_depth_inches", battlefield_depth_inches)
     features = _validate_terrain_feature_tuple("terrain_features", terrain_features)
@@ -2642,6 +2660,7 @@ def _resolve_disembark(
         DisembarkedUnitState.for_destroyed_transport(
             player_id=selection.player_id,
             battle_round=selection.battle_round,
+            turn_player_id=resolved_turn_player_id,
             unit_instance_id=selection.unit_instance_id,
             transport_unit_instance_id=selection.transport_unit_instance_id,
             disembark_mode=selection.disembark_mode,

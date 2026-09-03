@@ -94,6 +94,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
     PlacementProposalPayload,
+    ProposalKind,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -149,6 +150,7 @@ from warhammer40k_core.engine.transport_state_integrity import (
     validate_transport_cargo_state_consistency,
 )
 from warhammer40k_core.engine.transports import (
+    ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
     CombatDisembark,
@@ -1907,18 +1909,58 @@ def test_attached_combat_disembark_hazard_fnp_round_trips_and_resumes() -> None:
     assert combat_result.is_valid
     assert combat_result.mortal_wounds == 2
     lifecycle = GameLifecycle(state=state)
+    proposal_request = MovementProposalRequest(
+        request_id="phase10q-attached-combat-fnp-placement-request",
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-a",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=attached_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        source_decision_request_id="phase10q-attached-combat-fnp-selection-request",
+        source_decision_result_id="phase10q-attached-combat-fnp-selection-result",
+        spatial_context_hash="0" * 64,
+        placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
+        context={
+            "component_unit_instance_ids": list(component_ids),
+            "model_instance_ids": cast(
+                JsonValue,
+                sorted(
+                    placement.model_instance_id for placement in grouped_placement.model_placements
+                ),
+            ),
+            "transport_unit_instance_id": transport.unit_instance_id,
+            "disembark_mode": DisembarkModeKind.COMBAT_DISEMBARK.value,
+            "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+            "restriction_overrides": [],
+        },
+    ).to_decision_request()
+    lifecycle.decision_controller.request_decision(proposal_request)
+    placement_payload = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=attached_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_rules_unit_placement=grouped_placement,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    placement_result = DecisionResult(
+        result_id="phase10q-attached-combat-fnp-placement-result",
+        request_id=proposal_request.request_id,
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id="player-a",
+        selected_option_id="submit_parameterized_payload",
+        payload=validate_json_value(placement_payload.to_payload()),
+    )
+    lifecycle.decision_controller.submit_result(placement_result)
     request = apply_rules_unit_combat_disembark_to_state(
         state=state,
         decisions=lifecycle.decision_controller,
         combat_disembark=combat_result,
-        result=DecisionResult(
-            result_id="phase10q-attached-combat-fnp-placement-result",
-            request_id="phase10q-attached-combat-fnp-placement-request",
-            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
-            actor_id="player-a",
-            selected_option_id="submit_parameterized_payload",
-            payload={},
-        ),
+        result=placement_result,
         dice_manager=DiceRollManager(
             "phase10q-attached-combat-fnp-route",
             event_log=lifecycle.decision_controller.event_log,
@@ -2930,6 +2972,89 @@ def test_post_transport_normal_move_disembark_lifecycle_records_restrictions_and
     assert lifecycle.state is not None
     assert lifecycle.state.to_payload() == state.to_payload()
 
+    forged_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    forged_state = cast(dict[str, Any], forged_payload["state"])
+    forged_disembarked_states = cast(
+        list[dict[str, Any]],
+        forged_state["disembarked_unit_states"],
+    )
+    forged_disembarked_states[0].update(
+        {
+            "disembark_mode": DisembarkModeKind.ASSAULT_DISEMBARK.value,
+            "can_declare_charge": True,
+            "source_rule_id": ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
+            "permission_source_rule_id": "phase10q:forged-assault-permission",
+        }
+    )
+    with pytest.raises(GameLifecycleError, match="disembarked unit state event drift"):
+        GameLifecycle.from_payload(forged_payload)
+
+    forged_event_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    forged_events = forged_event_payload["decisions"]["event_log"]
+    forged_disembark_event = next(
+        event for event in forged_events if event["event_type"] == "unit_disembarked"
+    )
+    forged_disembark_event_payload = cast(dict[str, JsonValue], forged_disembark_event["payload"])
+    forged_disembark_event_payload["restriction_overrides"] = [
+        {
+            "override_kind": (
+                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
+            ),
+            "source_rule_id": "phase10q:forged-assault-permission",
+        }
+    ]
+    with pytest.raises(GameLifecycleError, match="restriction override drift"):
+        GameLifecycle.from_payload(forged_event_payload)
+
+    forged_request_payload = cast(GameLifecyclePayload, json.loads(json.dumps(payload)))
+    forged_decision = next(
+        record
+        for record in forged_request_payload["decisions"]["records"]
+        if record["result"]["result_id"] == "phase10q-place-post-normal-disembark"
+    )
+    forged_decision_request_payload = cast(
+        dict[str, JsonValue], forged_decision["request"]["payload"]
+    )
+    forged_proposal_request = cast(
+        dict[str, JsonValue],
+        forged_decision_request_payload["proposal_request"],
+    )
+    forged_proposal_context = cast(dict[str, JsonValue], forged_proposal_request["context"])
+    forged_proposal_context["restriction_overrides"] = [
+        {
+            "override_kind": (
+                TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE.value
+            ),
+            "source_rule_id": "phase10q:forged-assault-permission",
+        }
+    ]
+    with pytest.raises(GameLifecycleError, match="decision history drift"):
+        GameLifecycle.from_payload(forged_request_payload)
+
+
+def test_opponent_turn_destroyed_transport_disembark_state_expires_with_that_turn() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    state = _battle_state(scenario, game_id="phase18d-opponent-turn-disembark-expiration")
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_disembarked_unit_state(
+        DisembarkedUnitState.for_destroyed_transport(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            disembark_mode=DisembarkModeKind.EMERGENCY_DISEMBARK,
+            turn_player_id="player-b",
+        )
+    )
+
+    state.prepare_current_turn_end_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        runtime_modifier_registry=None,
+    )
+
+    assert state.disembarked_unit_states == []
+
 
 def test_assault_disembark_permission_flows_through_decision_event_and_replay() -> None:
     scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
@@ -3387,6 +3512,7 @@ def test_assault_disembark_places_attached_rules_unit_atomically() -> None:
         transport_placement=scenario.battlefield_state.unit_placement_by_id(
             transport.unit_instance_id
         ),
+        turn_player_id="player-a",
     )
 
     assert resolution.is_valid
@@ -4483,6 +4609,7 @@ def test_emergency_disembark_hazard_mortal_wounds_use_shared_damage_service() ->
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     updated_battlefield = apply_destroyed_transport_disembark_to_battlefield(
         battlefield_state=disembark_scenario.battlefield_state,
@@ -4631,6 +4758,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             unit=passenger,
             transport_placement=transport_placement,
             hazard_rolls=cast(DestroyedTransportHazardRolls, object()),
+            turn_player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires destroyed or emergency mode"):
         resolve_destroyed_transport_disembark(
@@ -4641,6 +4769,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             unit=passenger,
             transport_placement=transport_placement,
             hazard_rolls=hazard_rolls,
+            turn_player_id="player-a",
         )
     for drifted_rolls in (
         replace(hazard_rolls, player_id="player-b"),
@@ -4658,6 +4787,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
                 unit=passenger,
                 transport_placement=transport_placement,
                 hazard_rolls=drifted_rolls,
+                turn_player_id="player-a",
             )
     with pytest.raises(GameLifecycleError, match="survivor snapshot drift"):
         resolve_destroyed_transport_disembark(
@@ -4668,6 +4798,7 @@ def test_p18c_preplacement_hazard_snapshot_rejects_semantic_and_payload_drift() 
             unit=passenger,
             transport_placement=transport_placement,
             hazard_rolls=replace(hazard_rolls, model_rolls=hazard_rolls.model_rolls[:-1]),
+            turn_player_id="player-a",
         )
 
 
@@ -4859,6 +4990,7 @@ def test_p18c_transport_hazard_records_and_placement_objects_reject_drift() -> N
         unit=passenger,
         transport_placement=transport_placement,
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     first_roll = hazard_rolls.model_rolls[0]
 
@@ -5512,6 +5644,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         unit=passenger,
         transport_placement=transport_placement,
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     resolution = destroyed_result.placement
 
@@ -5555,6 +5688,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
         DisembarkedUnitState.for_destroyed_transport(
             player_id="player-a",
             battle_round=1,
+            turn_player_id="player-a",
             unit_instance_id=passenger.unit_instance_id,
             transport_unit_instance_id=transport.unit_instance_id,
             disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
@@ -5635,6 +5769,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
             selection=cast(DisembarkSelection, object()),
             unit=passenger,
             transport_placement=transport_placement,
+            turn_player_id="player-a",
             require_started_phase_embarked=True,
             battlefield_width_inches=44.0,
             battlefield_depth_inches=60.0,
@@ -5871,6 +6006,7 @@ def test_p18c_disembark_boundary_objects_reject_malformed_authority() -> None:
             unit=dead_passenger,
             transport_placement=transport_placement,
             hazard_rolls=hazard_rolls,
+            turn_player_id="player-a",
         )
 
 
@@ -6185,6 +6321,7 @@ def test_destroyed_transport_emergency_destroys_unplaceable_models_and_battlesho
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
 
     assert result.placement.is_valid
@@ -6435,6 +6572,7 @@ def test_transport_payloads_round_trip_without_python_reprs() -> None:
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     firing_deck_resolution = resolve_firing_deck_selection(
         cargo_state=cargo_state,
@@ -6538,6 +6676,7 @@ def test_resolution_payloads_reject_destroyed_transport_and_firing_deck_drift() 
             transport.unit_instance_id
         ),
         hazard_rolls=hazard_rolls,
+        turn_player_id="player-a",
     )
     bad_mortal_wound_roll = replace(
         destroyed_resolution.model_rolls[0],

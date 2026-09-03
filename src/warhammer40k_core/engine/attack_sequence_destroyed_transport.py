@@ -1124,6 +1124,9 @@ def _resolve_destroyed_transport_disembark_submission(
 ) -> DestroyedTransportDisembark | DestroyedTransportRulesUnitDisembark:
     if submission.transport_unit_instance_id is None or submission.disembark_mode is None:
         raise GameLifecycleError("Destroyed Transport disembark submission is incomplete.")
+    turn_player_id = state.active_player_id
+    if turn_player_id is None:
+        raise GameLifecycleError("Destroyed Transport disembark requires an active player.")
     cargo_state = state.transport_cargo_state_for_transport(submission.transport_unit_instance_id)
     if cargo_state is None:
         raise GameLifecycleError("Destroyed Transport disembark cargo state is missing.")
@@ -1155,6 +1158,7 @@ def _resolve_destroyed_transport_disembark_submission(
             attempted_placement=submission.resolved_rules_unit_placement(),
             transport_placement=transport_placement,
             hazard_rolls=hazard_rolls,
+            turn_player_id=turn_player_id,
             objective_markers=_objective_markers_for_attack_sequence(state),
             restriction_overrides=submission.restriction_overrides,
         )
@@ -1204,6 +1208,7 @@ def _resolve_destroyed_transport_disembark_submission(
         unit=unit,
         transport_placement=transport_placement,
         hazard_rolls=component_hazard_rolls,
+        turn_player_id=turn_player_id,
         battlefield_width_inches=battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
         terrain_features=battlefield_state.terrain_features,
@@ -1261,12 +1266,16 @@ def _apply_valid_destroyed_transport_disembark(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
-                "active_player_id": disembark.player_id,
+                "active_player_id": disembark.placement.disembarked_unit_state.turn_player_id,
                 "phase": source_phase.value,
                 "unit_instance_id": disembark.unit_instance_id,
                 "transport_unit_instance_id": disembark.transport_unit_instance_id,
                 "disembark_mode": disembark.disembark_mode.value,
                 "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+                "restriction_overrides": [
+                    validate_json_value(override.to_payload())
+                    for override in disembark.placement.selection.restriction_overrides
+                ],
                 "request_id": result.request_id,
                 "result_id": result.result_id,
                 "phase_body_status": "destroyed_transport_unit_disembarked",
@@ -1333,13 +1342,17 @@ def _apply_valid_destroyed_transport_rules_unit_disembark(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
-                "active_player_id": hazard_rolls.player_id,
+                "active_player_id": disembarked_state.turn_player_id,
                 "phase": source_phase.value,
                 "unit_instance_id": hazard_rolls.unit_instance_id,
                 "component_unit_instance_ids": list(hazard_rolls.component_unit_instance_ids),
                 "transport_unit_instance_id": hazard_rolls.transport_unit_instance_id,
                 "disembark_mode": hazard_rolls.disembark_mode.value,
                 "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+                "restriction_overrides": [
+                    validate_json_value(override.to_payload())
+                    for override in disembark.placement.selection.restriction_overrides
+                ],
                 "request_id": result.request_id,
                 "result_id": result.result_id,
                 "phase_body_status": "destroyed_transport_rules_unit_disembarked",

@@ -45,6 +45,9 @@ ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("att
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
 HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
+LIFECYCLE_STATE_VALIDATION_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle_state_validation.py"
+)
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
 HEALING_REVIVAL_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing_revival.py"
@@ -346,6 +349,11 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
         "_charge_unit_ineligibility_reason",
     )
     adapter_contract = source_for(ADAPTER_CONTRACT_PATH)
+    turn_cleanup_source = source_for(GAME_STATE_PATH)
+    restore_integrity_source = function_source_for(
+        (LIFECYCLE_STATE_VALIDATION_PATH,),
+        "_validate_disembarked_unit_state_history",
+    )
 
     assert "ASSAULT_DISEMBARK_MOVE_SOURCE_ID" in transport_source
     assert 'ASSAULT_DISEMBARK = "assault_disembark"' in disembark_state_source
@@ -362,6 +370,13 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     assert "proposal_transport_override_drift" in proposal_validation_source
     assert "disembarked_unit_state_for_unit" in charge_eligibility_source
     assert "disembarked_state.can_declare_charge" in charge_eligibility_source
+    assert "state.turn_player_id == requested_player_id" in turn_cleanup_source
+    assert 'event_record.event_type != "unit_disembarked"' in restore_integrity_source
+    assert "proposal.validation_result_for_request" in restore_integrity_source
+    assert "event_state != disembarked_state" in restore_integrity_source
+    assert 'record.event_type == "decision_requested"' in restore_integrity_source
+    assert 'record.event_type == "decision_recorded"' in restore_integrity_source
+    assert "assault_permission_sources" in restore_integrity_source
     assert "assault_disembark" in adapter_contract
     for forbidden_display_name in (
         "Assault Ramp",

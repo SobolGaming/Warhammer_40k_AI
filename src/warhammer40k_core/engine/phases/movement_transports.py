@@ -383,6 +383,7 @@ def _resolve_disembark_placement_submission(
         selection=selection,
         rules_unit=rules_unit,
         transport_placement=transport_placement,
+        turn_player_id=active_player_id,
         objective_markers=_objective_markers_for_state(state),
     )
     if not resolution.is_valid:

@@ -1939,6 +1939,16 @@ while Assault Disembark remains eligible. Placement request context, lifecycle s
 events, and proposal payloads carry the exact restriction override, and prevalidation rejects a
 forged Transport ID or permission before queue pop or mutation.
 
+Review hardening binds every retained disembark state to the `turn_player_id` that created it,
+which is distinct from passenger ownership during opponent-turn destroyed-Transport timing.
+Turn-end cleanup removes all records created in the completed turn, so an Emergency Disembark
+owned by the inactive player cannot leak its no-charge restriction into that player's next turn.
+Restore now requires exact correspondence among the retained state, one ordered
+`unit_disembarked` event, the recorded placement request/result and their decision-history events,
+the Transport movement status, and the complete restriction-override payload. An Assault charge
+permission is accepted only when that authenticated override's source is exactly the stored
+`permission_source_rule_id`; a rewritten Rapid state therefore fails closed.
+
 Specific authoritative maintained direct App-data mirror statement and source ID: Game
 Datamissions App-data v931 section 18.06, `ASSAULT DISEMBARK MOVE`, requires the unit to be set up
 as in Set Up when a rule permits the move; the unit must be embarked in a battlefield Transport,
@@ -1959,7 +1969,7 @@ Transports package hash is
 `b7c5f73b5e8299c5c6e29936b6fdf6d20d4a78148b83ac93b2be3e298b3d45b5`, and its canonical artifact
 byte SHA-256 is `861a86d603ea1c9e676c2f9c505760b3130eb006a278f7e387fbffaedfe6e190`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:db63d66d9b54f29ac580da8555558cd5fc0488e6adacb298b90bbb31b6926d43`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:7c14570ebfc2647293570935fa1400398ece312b310c87a71d9d5c0a0e25e853`.
 
 Load and execution support: The 18.06 rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -1998,9 +2008,12 @@ permission, a passenger that embarked this phase, wrong movement status, and a m
 An attached-unit regression places Bodyguard and Leader components atomically under one canonical
 rules-unit identity. Charge coverage proves Rapid is excluded and Assault is retained. Adapter
 coverage forges both the Transport ID and the permission override and proves typed rejection before
-queue pop. The bug-class search binds those fields for every standard disembark proposal, and a
-static audit pins source identity, generic permission ownership, grouped resolution, lifecycle
-selection, charge consumption, adapter contract, and absence of display-name dispatch. No
+queue pop. Lifecycle regressions also prove opponent-owned Emergency state expires with the turn
+that created it and that persisted state cannot drift from its exact event, request, decision
+history, or restriction override. The bug-class search binds those fields for every standard
+disembark proposal and every `unit_disembarked` emitter, and a static audit pins source identity,
+generic permission ownership, grouped resolution, turn-keyed cleanup, authenticated restore,
+lifecycle selection, charge consumption, adapter contract, and absence of display-name dispatch. No
 behavioral test file was added, removed, moved, or renamed, so the four-shard inventory does not
 change.
 
@@ -2012,9 +2025,9 @@ and affected external-contract artifacts; and updates README,
 `ARCHITECTURE_V2.md`, `docs/ADAPTER_DECISION_CONTRACT.md`, and this finding record.
 
 Validation results: All required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
-Pyright, the exact xdist work-stealing full suite (`6401 passed`), the four-shard inventory check,
+Pyright, the exact xdist work-stealing full suite (`6402 passed`), the four-shard inventory check,
 all `11` import-linter contracts, and all-files pre-commit. The separate coverage-enabled
-behavioral suite passes (`6053 passed`), and its completed coverage database passes
+behavioral suite passes (`6054 passed`), and its completed coverage database passes
 `coverage report --fail-under=85` at `85%`. The historical 40k.app and maintained-mirror audits,
 all seven Core Rules source generators, final engine-build identity check, base-ref external
 contract check, and installed-wheel smoke pass. The repository-pinned TypeScript client generated

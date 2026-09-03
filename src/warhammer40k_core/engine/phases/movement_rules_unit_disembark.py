@@ -243,12 +243,26 @@ def resolve_rules_unit_disembark(
     selection: RulesUnitDisembarkSelection,
     rules_unit: RulesUnitView,
     transport_placement: object,
+    turn_player_id: str,
     objective_markers: tuple[ObjectiveMarker, ...] = (),
 ) -> RulesUnitDisembarkResolution:
     from warhammer40k_core.engine.battlefield_state import UnitPlacement
 
     if type(transport_placement) is not UnitPlacement:
         raise GameLifecycleError("Rules-unit Disembark requires Transport UnitPlacement.")
+    resolved_turn_player_id = _validate_identifier(
+        "Rules-unit Disembark turn_player_id",
+        turn_player_id,
+    )
+    if (
+        selection.disembark_mode
+        not in {
+            DisembarkModeKind.DESTROYED_TRANSPORT,
+            DisembarkModeKind.EMERGENCY_DISEMBARK,
+        }
+        and resolved_turn_player_id != selection.player_id
+    ):
+        raise GameLifecycleError("Standard rules-unit Disembark turn player drift.")
     selection.attempted_placement.validate_for_view(rules_unit)
     if rules_unit.unit_instance_id != selection.unit_instance_id:
         raise GameLifecycleError("Rules-unit Disembark canonical identity drift.")
@@ -283,6 +297,7 @@ def resolve_rules_unit_disembark(
                 selection=physical_selection,
                 unit=component_unit,
                 transport_placement=transport_placement,
+                turn_player_id=resolved_turn_player_id,
                 require_started_phase_embarked=False,
                 battlefield_width_inches=(
                     validation_scenario.battlefield_state.battlefield_width_inches
@@ -344,6 +359,7 @@ def resolve_rules_unit_disembark(
         DisembarkedUnitState.for_destroyed_transport(
             player_id=selection.player_id,
             battle_round=selection.battle_round,
+            turn_player_id=resolved_turn_player_id,
             unit_instance_id=selection.unit_instance_id,
             transport_unit_instance_id=selection.transport_unit_instance_id,
             disembark_mode=selection.disembark_mode,
@@ -411,6 +427,7 @@ def resolve_rules_unit_combat_disembark(
         ),
         rules_unit=rules_unit,
         transport_placement=transport_placement,
+        turn_player_id=selection.player_id,
         objective_markers=objective_markers,
     )
     validation_placement, _validation_rolls = _resolve_rules_unit_combat_components(
@@ -647,12 +664,16 @@ def apply_rules_unit_combat_disembark_to_state(
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
-            "active_player_id": disembark.selection.player_id,
+            "active_player_id": disembark.disembarked_unit_state.turn_player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "unit_instance_id": disembark.selection.unit_instance_id,
             "transport_unit_instance_id": (disembark.selection.transport_unit_instance_id),
             "disembark_mode": disembark.selection.disembark_mode.value,
             "transport_movement_status": (disembark.selection.transport_movement_status.value),
+            "restriction_overrides": [
+                validate_json_value(override.to_payload())
+                for override in disembark.selection.restriction_overrides
+            ],
             "request_id": result.request_id,
             "result_id": result.result_id,
             "phase_body_status": "unit_disembarked",

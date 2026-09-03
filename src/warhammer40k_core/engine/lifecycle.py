@@ -3583,7 +3583,11 @@ def _validate_payload_consistency(
     )
     _bsa.validate_restore(state, event_records, decision_records, pending_decision_requests)
     _fahi.validate_restore(state, event_records, decision_records, pending_decision_requests)
-    validate_disembarked_unit_state_consistency(state=state)
+    validate_disembarked_unit_state_consistency(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
     validate_normal_move_state_consistency(state=state)

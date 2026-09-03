@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_transports_2026_09,
@@ -51,6 +52,7 @@ class TransportRestrictionOverridePayload(TypedDict):
 class DisembarkedUnitStatePayload(TypedDict):
     player_id: str
     battle_round: int
+    turn_player_id: str
     unit_instance_id: str
     transport_unit_instance_id: str
     disembark_mode: str
@@ -99,6 +101,7 @@ class TransportRestrictionOverride:
 class DisembarkedUnitState:
     player_id: str
     battle_round: int
+    turn_player_id: str
     unit_instance_id: str
     transport_unit_instance_id: str
     disembark_mode: DisembarkModeKind
@@ -119,6 +122,14 @@ class DisembarkedUnitState:
             self,
             "battle_round",
             _validate_positive_int("DisembarkedUnitState battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "turn_player_id",
+            _validate_identifier(
+                "DisembarkedUnitState turn_player_id",
+                self.turn_player_id,
+            ),
         )
         object.__setattr__(
             self,
@@ -234,6 +245,7 @@ class DisembarkedUnitState:
             return cls(
                 player_id=player_id,
                 battle_round=battle_round,
+                turn_player_id=player_id,
                 unit_instance_id=unit_instance_id,
                 transport_unit_instance_id=transport_unit_instance_id,
                 disembark_mode=mode,
@@ -248,6 +260,7 @@ class DisembarkedUnitState:
             return cls(
                 player_id=player_id,
                 battle_round=battle_round,
+                turn_player_id=player_id,
                 unit_instance_id=unit_instance_id,
                 transport_unit_instance_id=transport_unit_instance_id,
                 disembark_mode=mode,
@@ -261,6 +274,7 @@ class DisembarkedUnitState:
             return cls(
                 player_id=player_id,
                 battle_round=battle_round,
+                turn_player_id=player_id,
                 unit_instance_id=unit_instance_id,
                 transport_unit_instance_id=transport_unit_instance_id,
                 disembark_mode=mode,
@@ -277,6 +291,7 @@ class DisembarkedUnitState:
         return cls(
             player_id=player_id,
             battle_round=battle_round,
+            turn_player_id=player_id,
             unit_instance_id=unit_instance_id,
             transport_unit_instance_id=transport_unit_instance_id,
             disembark_mode=mode,
@@ -293,6 +308,7 @@ class DisembarkedUnitState:
         *,
         player_id: str,
         battle_round: int,
+        turn_player_id: str,
         unit_instance_id: str,
         transport_unit_instance_id: str,
         disembark_mode: DisembarkModeKind,
@@ -308,6 +324,7 @@ class DisembarkedUnitState:
         return cls(
             player_id=player_id,
             battle_round=battle_round,
+            turn_player_id=turn_player_id,
             unit_instance_id=unit_instance_id,
             transport_unit_instance_id=transport_unit_instance_id,
             disembark_mode=mode,
@@ -326,6 +343,7 @@ class DisembarkedUnitState:
         return {
             "player_id": self.player_id,
             "battle_round": self.battle_round,
+            "turn_player_id": self.turn_player_id,
             "unit_instance_id": self.unit_instance_id,
             "transport_unit_instance_id": self.transport_unit_instance_id,
             "disembark_mode": self.disembark_mode.value,
@@ -342,6 +360,7 @@ class DisembarkedUnitState:
         return cls(
             player_id=payload["player_id"],
             battle_round=payload["battle_round"],
+            turn_player_id=payload["turn_player_id"],
             unit_instance_id=payload["unit_instance_id"],
             transport_unit_instance_id=payload["transport_unit_instance_id"],
             disembark_mode=disembark_mode_kind_from_token(payload["disembark_mode"]),
@@ -352,6 +371,21 @@ class DisembarkedUnitState:
             source_rule_id=payload["source_rule_id"],
             permission_source_rule_id=payload["permission_source_rule_id"],
         )
+
+
+def disembarked_unit_state_from_event_payload(payload: object) -> DisembarkedUnitState:
+    event_payload = validate_json_value(payload)
+    if not isinstance(event_payload, dict):
+        raise GameLifecycleError("unit_disembarked event payload must be an object.")
+    state_payload = event_payload.get("disembarked_unit_state")
+    if not isinstance(state_payload, dict):
+        raise GameLifecycleError("unit_disembarked event requires disembarked unit state.")
+    try:
+        return DisembarkedUnitState.from_payload(cast(DisembarkedUnitStatePayload, state_payload))
+    except KeyError as exc:
+        raise GameLifecycleError(
+            "unit_disembarked event disembarked unit state is malformed."
+        ) from exc
 
 
 def transport_movement_status_from_token(token: object) -> TransportMovementStatus:
@@ -492,6 +526,7 @@ __all__ = (
     "TransportRestrictionOverrideKind",
     "TransportRestrictionOverridePayload",
     "disembark_mode_kind_from_token",
+    "disembarked_unit_state_from_event_payload",
     "transport_movement_status_from_token",
     "transport_restriction_override_kind_from_token",
     "validate_disembark_mode_status",
