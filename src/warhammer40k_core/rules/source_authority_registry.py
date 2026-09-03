@@ -200,11 +200,17 @@ class SourceAuthorityRegistry:
             raise SourceAuthorityRegistryError(
                 "RuleSourcePackage identity is not authorized for its source scope."
             )
-        unauthorized_source_ids = set(rule_source_ids).difference(package.allowed_rule_source_ids)
-        if unauthorized_source_ids:
+        supplied_source_ids = set(rule_source_ids)
+        registered_source_ids = set(package.allowed_rule_source_ids)
+        if supplied_source_ids == registered_source_ids:
+            return
+        if supplied_source_ids.difference(registered_source_ids):
             raise SourceAuthorityRegistryError(
                 "RuleSourcePackage contains a rule source ID outside its authorized source scope."
             )
+        raise SourceAuthorityRegistryError(
+            "RuleSourcePackage omits a rule source ID from its registered source inventory."
+        )
 
 
 def load_source_authority_registry_from_json_bytes(raw: bytes) -> SourceAuthorityRegistry:

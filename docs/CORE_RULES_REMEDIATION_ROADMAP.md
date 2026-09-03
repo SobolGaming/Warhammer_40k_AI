@@ -1807,7 +1807,8 @@ mismatched row fingerprints fail record construction. Historical 40k.app records
 superseded policy ID only when evidence ID, stable rule source ID, and observation hash match the
 registry's exact immutable legacy inventory. Every `RuleSourcePackage` carries the typed
 `warhammer_40000_11th_core_rules` scope and must match one of nine registered Core Rules package
-identities and its allowed stable source-ID inventory, so faction content cannot reuse this policy.
+identities and its complete registered stable source-ID inventory exactly, so neither omitted Core
+Rules rows nor added faction content can reuse this policy.
 `SourceEvidenceCatalog` groups project-authoritative mirror records by stable rule source ID and
 App-data version and rejects differing transcription hashes before a source package can load or
 certify semantics.
@@ -1839,7 +1840,7 @@ SHA-256 is `79204b29bf28d74b2fc05b24bc9a4454f0d97b179b250c7444db492d92413238`. T
 authority registry byte SHA-256 is
 `edf13cf6091cd64450a5dd627eb727d626dc631f1b7b7dd6d55eec0c6a2b5c79`. The regenerated engine
 build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:e56cce72fd709f7438c3585dccd2a8d1bd20f404244ce8387029ff9ee09f8791`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:668358d15be7fce321182af0f3d5e2001d76f9fb657b552dca7ae19e6f5e457a`.
 
 Scope and explicit exclusions: S-MIRRORS changes source governance, shared evidence validation,
 offline review artifacts, tests, and documentation only. It does not change gameplay semantics,
@@ -1861,8 +1862,9 @@ using App-data version in place of timestamp; reject a tuple missing both; rejec
 Datamissions record using the superseded 40k.app-only policy; reject a non-canonical provider URL;
 reject nonexistent audit IDs and row IDs; reject a registered row with a mismatched fingerprint;
 reject a newly timestamped/evidence-identified record that reuses the superseded policy; reject a
-faction source ID presented under the Core-only scope; accept matching co-versioned provider
-fingerprints; and reject their transcription mismatch. Audit tests pin both provider identities,
+faction source ID presented under the Core-only scope; reject a July package presenting only one
+of its sixteen registered source IDs; accept matching co-versioned provider fingerprints; and
+reject their transcription mismatch. Audit tests pin both provider identities,
 non-affiliation, ownership and runtime-input flags, versions/timestamps, transcription hashes,
 observation fingerprints, exact provider surfaces, registry/report output, and tamper rejection. A
 static code-quality audit prevents regression to a provider-specific policy, unauthenticated audit
@@ -1878,9 +1880,9 @@ documents the shared validation boundary in README and `ARCHITECTURE_V2.md`; pre
 contract artifacts are regenerated because shared packaged source validation changed; their final
 identities are recorded after generation.
 
-Validation results: Focused source-identity, governance-audit, renderer, and code-quality coverage
-passes (`112 passed`). `ruff check`, `ruff format --check`, `mypy`, and `pyright` pass; the complete
-xdist work-stealing suite passes (`6393 passed`); and the completed behavioral coverage database
+Validation results: Focused source-identity and code-quality coverage passes (`94 passed`). `ruff
+check`, `ruff format --check`, `mypy`, and `pyright` pass; the complete xdist work-stealing suite
+passes (`6394 passed`); and the completed behavioral coverage database
 passes `coverage report --fail-under=85` at `85%`. The exact four-shard inventory check and all
 `11` import-linter contracts pass. The historical 40k.app audit, maintained-mirror audit, all seven
 Core Rules source generators, engine-build identity, base-ref external contract, and installed-wheel

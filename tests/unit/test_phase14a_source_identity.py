@@ -774,8 +774,14 @@ def test_rule_source_package_rejects_provenance_and_grouped_status_gaps() -> Non
     with pytest.raises(RuleEvidenceError, match="mirror comparison alone is insufficient"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(mirror,)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=tuple(
+                    record
+                    for record in package.source_evidence_catalog.records
+                    if record.evidence_id != owner.evidence_id
+                )
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
             source_authority_scope=package.source_authority_scope,
         )
 
@@ -785,8 +791,10 @@ def test_rule_source_package_rejects_provenance_and_grouped_status_gaps() -> Non
     with pytest.raises(RuleEvidenceError, match="must agree on load and semantic"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(owner, contradictory)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=_replace_evidence_records(package, contradictory)
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
             source_authority_scope=package.source_authority_scope,
         )
 
@@ -797,8 +805,10 @@ def test_rule_source_package_rejects_provenance_and_grouped_status_gaps() -> Non
     with pytest.raises(RuleEvidenceError, match="does not match its source row"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(mismatched, mirror)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=_replace_evidence_records(package, mismatched)
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
             source_authority_scope=package.source_authority_scope,
         )
 
@@ -858,8 +868,10 @@ def test_rule_source_package_requires_grouped_conflict_block_equivalence() -> No
     with pytest.raises(RuleEvidenceError, match="source-conflict evidence and blocked semantic"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=tuple(blocked_records)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=_replace_evidence_records(package, *blocked_records)
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
             source_authority_scope=package.source_authority_scope,
         )
 
@@ -1172,6 +1184,22 @@ def test_core_rules_source_authority_scope_rejects_faction_rule_source_id() -> N
         )
 
 
+def test_core_rules_source_authority_scope_rejects_strict_subset_inventory() -> None:
+    package = july_rules_updates_2026_07.source_package()
+    retained_source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
+        "01.02.03-embarked-model-return"
+    ]
+    retained_records = package.source_evidence_catalog.records_for_source_id(retained_source_id)
+
+    with pytest.raises(RuleEvidenceError, match="omits a rule source ID"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=retained_records),
+            evidence_required_source_ids=(retained_source_id,),
+            source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+        )
+
+
 @pytest.mark.stubbed
 def test_source_evidence_catalog_rejects_co_versioned_mirror_disagreement(
     monkeypatch: pytest.MonkeyPatch,
@@ -1359,18 +1387,9 @@ def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() 
         RuleSourcePackage(
             source_catalog=package.source_catalog,
             source_evidence_catalog=SourceEvidenceCatalog(
-                records=(
-                    *tuple(
-                        record
-                        for record in package.source_evidence_catalog.records_for_source_id(
-                            false_conflict_record.rule_source_id
-                        )
-                        if record.evidence_id != false_conflict_record.evidence_id
-                    ),
-                    false_conflict_record,
-                )
+                records=_replace_evidence_records(package, false_conflict_record)
             ),
-            evidence_required_source_ids=(false_conflict_record.rule_source_id,),
+            evidence_required_source_ids=package.evidence_required_source_ids,
             source_authority_scope=package.source_authority_scope,
         )
 
@@ -2445,8 +2464,14 @@ def test_project_reviewed_app_transcription_is_truthful_and_insufficient_alone()
     ):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(project_review,)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=tuple(
+                    record
+                    for record in package.source_evidence_catalog.records
+                    if record.rule_source_id != source_id or record == project_review
+                )
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
             source_authority_scope=package.source_authority_scope,
         )
 
@@ -2457,6 +2482,17 @@ def test_ruleset_descriptor_hash_is_eleventh_only_and_deterministic() -> None:
 
     assert payload["ruleset_id"]["edition"] == "11e"
     assert descriptor.descriptor_hash == RulesetDescriptor.from_payload(payload).descriptor_hash
+
+
+def _replace_evidence_records(
+    package: RuleSourcePackage,
+    *replacements: RuleEvidenceRecord,
+) -> tuple[RuleEvidenceRecord, ...]:
+    replacements_by_id = {record.evidence_id: record for record in replacements}
+    return tuple(
+        replacements_by_id.get(record.evidence_id, record)
+        for record in package.source_evidence_catalog.records
+    )
 
 
 def _july_rules_update_payload() -> dict[str, object]:

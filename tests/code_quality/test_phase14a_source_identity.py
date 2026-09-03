@@ -144,6 +144,7 @@ def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> Non
     assert current_policy_id in source_authority_registry
     assert "authorize_audit_reference" in source_evidence
     assert "authorize_source_package" in source_evidence
+    assert "supplied_source_ids == registered_source_ids" in source_authority_registry
     assert "Co-versioned maintained App mirrors disagree" in source_evidence
     scope = authority_registry_payload["scopes"][0]
     assert scope["scope_id"] == "warhammer_40000_11th_core_rules"
