@@ -468,8 +468,9 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-transports",
-          "version": "40k-app-transports-observed-2026-09-01",
+          "version": "reviewed-transports-observed-2026-09-02",
           "allowed_rule_source_ids": [
+            "gw-11e-core-rules:transports:assault-disembark-move",
             "gw-11e-core-rules:transports:emergency-disembark-move"
           ]
         },

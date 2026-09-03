@@ -360,6 +360,7 @@ def resolve_rules_unit_disembark(
             transport_unit_instance_id=selection.transport_unit_instance_id,
             disembark_mode=selection.disembark_mode,
             transport_movement_status=selection.transport_movement_status,
+            restriction_overrides=selection.restriction_overrides,
         )
     )
     return RulesUnitDisembarkResolution(
@@ -549,6 +550,7 @@ def _resolve_rules_unit_combat_components(
         transport_unit_instance_id=selection.transport_unit_instance_id,
         disembark_mode=selection.disembark_mode,
         transport_movement_status=selection.transport_movement_status,
+        restriction_overrides=selection.restriction_overrides,
     )
     return (
         RulesUnitDisembarkResolution(

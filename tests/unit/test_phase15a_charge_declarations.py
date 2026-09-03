@@ -170,6 +170,13 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_decline_payload,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.transports import (
+    DisembarkedUnitState,
+    DisembarkModeKind,
+    TransportMovementStatus,
+    TransportRestrictionOverride,
+    TransportRestrictionOverrideKind,
+)
 from warhammer40k_core.engine.unit_coherency import MovementRollbackRecord, UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
@@ -3075,6 +3082,60 @@ def test_charge_phase_filters_ineligible_units() -> None:
     assert request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
     assert {option.option_id for option in request.options} == {
         units["intercessor-5"].unit_instance_id,
+        COMPLETE_CHARGE_PHASE_OPTION_ID,
+    }
+
+
+def test_charge_phase_consumes_disembark_charge_eligibility_state() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("rapid-passenger", "assault-passenger"),
+        alpha_origins={
+            "rapid-passenger": Pose.at(10.0, 20.0),
+            "assault-passenger": Pose.at(10.0, 25.0),
+        },
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 22.5),
+            model_count=5,
+        ),
+        game_id="phase18d-disembark-charge-eligibility",
+    )
+    state = _state(lifecycle)
+    rapid_id = units["rapid-passenger"].unit_instance_id
+    assault_id = units["assault-passenger"].unit_instance_id
+    state.record_disembarked_unit_state(
+        DisembarkedUnitState.for_mode(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=rapid_id,
+            transport_unit_instance_id=assault_id,
+            disembark_mode=DisembarkModeKind.RAPID_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+        )
+    )
+    state.record_disembarked_unit_state(
+        DisembarkedUnitState.for_mode(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=assault_id,
+            transport_unit_instance_id=rapid_id,
+            disembark_mode=DisembarkModeKind.ASSAULT_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NORMAL_MOVE,
+            restriction_overrides=(
+                TransportRestrictionOverride(
+                    override_kind=(
+                        TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
+                    ),
+                    source_rule_id="test:assault-disembark-permitting-rule",
+                ),
+            ),
+        )
+    )
+
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+
+    assert request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        assault_id,
         COMPLETE_CHARGE_PHASE_OPTION_ID,
     }
 

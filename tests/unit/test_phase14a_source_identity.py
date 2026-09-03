@@ -247,43 +247,64 @@ def test_p05a_destroyed_source_loader_rejects_schema_and_byte_drift() -> None:
         )
 
 
-def test_p18c_emergency_disembark_source_artifact_is_pinned_typed_and_executable() -> None:
+def test_p18c_p18d_transport_source_artifact_is_pinned_typed_and_executable() -> None:
     artifact_path = Path(
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
         "core_transports_2026_09/artifacts/package.json"
     )
     raw = artifact_path.read_bytes()
     package = core_transports_2026_09.source_package()
-    rule = core_transports_2026_09.source_rule_record()
-    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+    rules = core_transports_2026_09.source_rule_records()
+    rules_by_source_id = {rule.source_id: rule for rule in rules}
+    emergency_rule = rules_by_source_id[core_transports_2026_09.EMERGENCY_DISEMBARK_MOVE_SOURCE_ID]
+    assault_rule = rules_by_source_id[core_transports_2026_09.ASSAULT_DISEMBARK_MOVE_SOURCE_ID]
 
     assert hashlib.sha256(raw).hexdigest() == (core_transports_2026_09.EXPECTED_ARTIFACT_SHA256)
     assert json.loads(raw) == build_transports_source_payload()
-    assert rule.section_id == "18.05"
-    assert rule.source_id == core_transports_2026_09.EMERGENCY_DISEMBARK_MOVE_SOURCE_ID
-    assert rule.transcription_sha256 == core_transports_2026_09.TRANSCRIPTION_SHA256
-    assert "Before moving: Make a hazard roll for each model" in rule.source_text
-    assert "While moving: Set up each model" in rule.source_text
-    assert rule.load_support_status == "loaded"
-    assert rule.semantic_execution_status == "executable_engine_runtime"
-    assert {record.evidence_kind for record in evidence} == {
-        "project_reviewed_app_transcription",
-        "third_party_mirror",
-    }
-    assert all(record.runtime_consumer_ids for record in evidence)
+    assert emergency_rule.section_id == "18.05"
+    assert emergency_rule.transcription_sha256 == (
+        core_transports_2026_09.EMERGENCY_DISEMBARK_TRANSCRIPTION_SHA256
+    )
+    assert "Before moving: Make a hazard roll for each model" in emergency_rule.source_text
+    assert "While moving: Set up each model" in emergency_rule.source_text
+    assert assault_rule.section_id == "18.06"
+    assert assault_rule.transcription_sha256 == (
+        core_transports_2026_09.ASSAULT_DISEMBARK_TRANSCRIPTION_SHA256
+    )
+    assert "Did not embark within that TRANSPORT this phase" in assault_rule.source_text
+    assert "wholly within the set" in assault_rule.source_text
+    for rule in rules:
+        evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "executable_engine_runtime"
+        assert {record.evidence_kind for record in evidence} == {
+            "project_reviewed_app_transcription",
+            "third_party_mirror",
+        }
+        assert all(record.runtime_consumer_ids for record in evidence)
+    assault_mirror = next(
+        record
+        for record in package.source_evidence_catalog.records_for_source_id(assault_rule.source_id)
+        if record.authority == "project_authoritative_app_mirror"
+    )
+    assert assault_mirror.provider_name == "Game Datamissions"
+    assert assault_mirror.app_version == "931"
+    assert assault_mirror.review_audit_source_observation_sha256 == (
+        "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
+    )
     assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
         package.source_catalog.to_payload()
     )
 
 
-def test_p18c_emergency_disembark_source_loader_rejects_schema_and_byte_drift() -> None:
+def test_p18c_p18d_transport_source_loader_rejects_schema_and_byte_drift() -> None:
     artifact_path = Path(
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
         "core_transports_2026_09/artifacts/package.json"
     )
     raw = artifact_path.read_bytes()
     payload = json.loads(raw)
-    payload["rules"][0]["section_id"] = "18.04"
+    payload["rules"][1]["section_id"] = "18.05"
 
     with pytest.raises(
         core_transports_2026_09.CoreTransportsSourceArtifactError,

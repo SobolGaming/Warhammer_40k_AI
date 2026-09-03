@@ -1268,6 +1268,76 @@ def test_disembark_placement_wrong_mode_keeps_pending_request_clean() -> None:
     assert decisions.queue.pending_requests == (placement_request,)
 
 
+def test_disembark_placement_binds_transport_and_permission_to_pending_request() -> None:
+    state, passenger, transport = _battle_state_with_embarked_passenger()
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        parameterized_proposals=True,
+    )
+    decisions = DecisionController()
+    placement_request = _enter_disembark_placement_choice(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        passenger=passenger,
+        result_id_prefix="phase18d-select-disembark-authority",
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    base_payload = PlacementProposalPayload(
+        proposal_request_id=proposal.request_id,
+        proposal_kind=ProposalKind.DISEMBARK,
+        unit_instance_id=passenger.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=_disembark_placement(passenger),
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    )
+    submissions = (
+        (
+            replace(base_payload, transport_unit_instance_id="army-alpha:forged-transport"),
+            "proposal_transport_unit_drift",
+            "transport_unit_instance_id",
+        ),
+        (
+            replace(
+                base_payload,
+                restriction_overrides=(
+                    TransportRestrictionOverride(
+                        override_kind=(
+                            TransportRestrictionOverrideKind.ALLOW_ASSAULT_DISEMBARK_AFTER_NORMAL_MOVE
+                        ),
+                        source_rule_id="test:forged-assault-disembark-permission",
+                    ),
+                ),
+            ),
+            "proposal_transport_override_drift",
+            "restriction_overrides",
+        ),
+    )
+    before_record_count = len(decisions.records)
+
+    for index, (submission, expected_code, expected_field) in enumerate(submissions):
+        status = _submit_parameterized_handler_payload(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=placement_request,
+            payload=_json(submission.to_payload()),
+            result_id=f"phase18d-forged-disembark-authority-{index}",
+        )
+        assert status is not None
+        violation = cast(
+            list[dict[str, object]],
+            _proposal_validation(status)["violations"],
+        )[0]
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert violation["violation_code"] == expected_code
+        assert violation["field"] == expected_field
+        assert len(decisions.records) == before_record_count
+        assert decisions.queue.pending_requests == (placement_request,)
+
+
 def test_disembark_placement_allowed_mode_context_is_fail_fast() -> None:
     state, passenger, transport = _battle_state_with_embarked_passenger()
     handler = MovementPhaseHandler(

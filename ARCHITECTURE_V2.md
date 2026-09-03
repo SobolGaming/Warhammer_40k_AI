@@ -2913,6 +2913,10 @@ hazard damage now routes through the shared mortal-wound and Feel No Pain
 service. Movement-phase Combat Disembark fallback now accepts Combat mode only
 when the pending placement proposal advertises that fallback and the engine
 first proves the same submitted placement is invalid as Tactical Disembark.
+The frozen legacy `engine/transports.py` facade delegates disembark mode tokens,
+restriction permissions, and post-disembark state ownership to the bounded
+`engine/transport_disembark_state.py` module; source-permission discovery is
+separately owned by `engine/assault_disembark.py`.
 Healing Wounds primitive now iterates each healing amount in order, heals
 wounded models before REVIVED returns, uses opposing-player finite model
 selection for ambiguous attached-unit wounded/revival choices, and validates
@@ -2924,11 +2928,12 @@ payloads, and runtime Mission Action interruption are complete in Phase 14D.
 
 Invariants:
 
-- Transport capacity, multiple embarked units, battle-formation Embark, post-move Embark, Rapid/Tactical/Combat Disembark, Emergency Disembark, and destroyed-transport timing are source-backed and replay-facing;
+- Transport capacity, multiple embarked units, battle-formation Embark, post-move Embark, Rapid/Assault/Tactical/Combat Disembark, Emergency Disembark, and destroyed-transport timing are source-backed and replay-facing;
 - Embark after the first battle round has started is legal only after a Normal, Advance, or Fall Back move, only if every model is within 3" of a friendly `TRANSPORT`, the unit was not set up on the battlefield this turn, the unit is datasheet-eligible for that Transport, the Transport has sufficient remaining model capacity, and the engine removes the unit from the battlefield into that Transport's cargo state with deterministic removal records;
 - Disembark is legal only for a unit embarked within a `TRANSPORT` model that is on the battlefield, only if that unit did not Embark within that Transport this phase, and only if that Transport has not Advanced or Fell Back this phase;
-- Disembark uses an explicit source-backed mode enum and replay payload for `rapid_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`; any new adapter-visible mode, option family, proposal payload, or event shape must update `docs/ADAPTER_DECISION_CONTRACT.md` in the same implementation PR;
-- Rapid Disembark uses 3" wholly-within setup, is mandatory after the Transport makes a Normal or Ingress move, prevents charges until end of turn, and if the Transport made an Ingress move this turn the disembarking models must inherit the same setup restrictions that constrained the Transport's Ingress placement;
+- Disembark uses an explicit source-backed mode enum and replay payload for `rapid_disembark`, `assault_disembark`, `tactical_disembark`, `combat_disembark`, `destroyed_transport`, and `emergency_disembark`; any new adapter-visible mode, option family, proposal payload, or event shape must update `docs/ADAPTER_DECISION_CONTRACT.md` in the same implementation PR;
+- Rapid Disembark uses 3" wholly-within setup after the Transport makes a Normal or Ingress move when no Assault permission applies, prevents charges until end of turn, and if the Transport made an Ingress move this turn the disembarking models must inherit the same setup restrictions that constrained the Transport's Ingress placement;
+- Assault Disembark is a distinct 3" wholly-within setup after a Transport's Normal Move. It requires a typed persisting-effect permission naming the Transport, canonical embarked rules unit, and permitting rule source ID; completes that rules unit's Movement activation without further movement; and records the Core 18.06 source and permitting source while preserving charge eligibility through state, replay, decisions, events, and adapters;
 - Tactical Disembark uses 3" wholly-within setup, is mandatory when the Transport remained stationary or has not yet been selected to move and a legal 3" setup exists, forbids Remain Stationary, and immediately routes the unit through the shared Movement phase decision path for a Normal or Advance move;
 - Combat Disembark uses 6" wholly-within setup when Rapid/Tactical conditions do not apply, makes one Hazard roll for each model through the shared Hazard/mortal-wound allocation service, can set up engaged only with enemy units that the Transport is engaged with, writes through Battle-shock, and prevents charges until end of turn;
 - Emergency Disembark uses 6" wholly-within setup for units embarked in a Transport that was just destroyed, makes one Hazard roll for each model before setup through the shared Hazard/mortal-wound allocation service, requires each model to be set up as close as possible to that Transport, destroys each model that cannot be placed that way, writes through Battle-shock, and prevents charges until end of turn;
@@ -2952,6 +2957,7 @@ Required tests:
 - each transport mode has valid, invalid, replay, stale/drift/malformed submission, deterministic payload, and viewer-safe event/projection coverage;
 - Embark tests cover Normal, Advance, and Fall Back triggers; reject Remain Stationary, units set up this turn, wrong-player or non-Transport targets, datasheet-ineligible units, insufficient capacity, same-phase Disembark-then-Embark without an explicit typed override, and every-model-within-3" failures without mutation;
 - Rapid Disembark tests cover post-Normal and post-Ingress Transport movement, 3" wholly-within placement, no-charge state, and inheritance of Ingress restrictions such as enemy-distance and deployment-zone bans;
+- Assault Disembark tests cover source eligibility, same-phase embark rejection, Normal-only Transport movement, canonical attached rules-unit 3" placement, no-further-move/charge-eligible state, forged Transport/permission rejection before queue pop, event and replay provenance, and charge-phase consumption;
 - Tactical Disembark tests prove a legal 3" setup before a stationary/not-yet-selected Transport forces the Tactical mode, excludes Remain Stationary, routes to Normal/Advance movement through the shared Movement decision path, and rejects Fall Back unless an independent rule makes Fall Back legal;
 - Combat Disembark tests prove the 6" setup distance, fallback from impossible Tactical placement, one Hazard roll per model through the shared Hazard/mortal-wound service, Battle-shock/no-charge write-through, and the narrow permission to set up engaged only with enemies engaged with the Transport;
 - Emergency Disembark tests prove 6" closest-possible placement, destruction of unplaceable models, Hazard/mortal-wound allocation, Battle-shock/no-charge write-through, replay serialization, and no stale endpoint-only placement acceptance;

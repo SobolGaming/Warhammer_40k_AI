@@ -15192,7 +15192,7 @@ def test_phase14h_destroyed_transport_proposal_prevalidation_rejects_invalid_pay
     )
     _assert_invalid_proposal_status(
         transport_drift_status,
-        expected_code="destroyed_transport_transport_drift",
+        expected_code="proposal_transport_unit_drift",
         expected_field="transport_unit_instance_id",
     )
     _assert_invalid_proposal_status(

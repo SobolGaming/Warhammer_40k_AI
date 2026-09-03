@@ -523,6 +523,23 @@ class MovementPhaseHandler:
             if isinstance(placement_parsed, LifecycleStatus):
                 return placement_parsed
             proposal_request, placement_submission = placement_parsed
+            if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
+                missing = _missing_disembark_proposal_field(placement_submission)
+                if missing is not None:
+                    return _reject_invalid_proposal(
+                        state=state,
+                        decisions=decisions,
+                        result=result,
+                        proposal_validation=ProposalValidationResult.invalid(
+                            proposal_request_id=proposal_request.request_id,
+                            proposal_kind=proposal_request.proposal_kind,
+                            violation_code="proposal_payload_missing_field",
+                            message=f"Disembark placement proposal missing {missing}.",
+                            field=missing,
+                        ),
+                        event_type="placement_proposal_invalid",
+                        message="Disembark placement proposal is incomplete.",
+                    )
             spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
                 state=state,
                 decisions=decisions,
@@ -543,23 +560,6 @@ class MovementPhaseHandler:
                     event_type="placement_proposal_invalid",
                     message="Placement proposal does not match the pending request.",
                 )
-            if proposal_request.proposal_kind is ProposalKind.DISEMBARK:
-                missing = _missing_disembark_proposal_field(placement_submission)
-                if missing is not None:
-                    return _reject_invalid_proposal(
-                        state=state,
-                        decisions=decisions,
-                        result=result,
-                        proposal_validation=ProposalValidationResult.invalid(
-                            proposal_request_id=proposal_request.request_id,
-                            proposal_kind=proposal_request.proposal_kind,
-                            violation_code="proposal_payload_missing_field",
-                            message=f"Disembark placement proposal missing {missing}.",
-                            field=missing,
-                        ),
-                        event_type="placement_proposal_invalid",
-                        message="Disembark placement proposal is incomplete.",
-                    )
             return None
         raise GameLifecycleError("Movement proposal prevalidation received unsupported request.")
 
