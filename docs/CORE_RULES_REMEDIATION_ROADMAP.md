@@ -2171,7 +2171,8 @@ base-ref external-contract verification, installed-wheel smoke, generated TypeSc
 check, TypeScript typecheck, five TypeScript unit tests, and the 342-assertion external conformance
 scenario also pass.
 
-PR URL and merge commit: pending publication and review.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/418`; merge commit
+pending review.
 
 ### Post-P18C v931/v946 findings
 
