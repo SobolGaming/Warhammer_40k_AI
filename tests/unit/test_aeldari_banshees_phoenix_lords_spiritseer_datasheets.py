@@ -76,7 +76,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect
 from warhammer40k_core.engine.healing_revival import (
@@ -104,6 +104,11 @@ from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_paylo
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.transport_disembark_state import (
+    DisembarkedUnitState,
+    DisembarkModeKind,
+    TransportMovementStatus,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
@@ -1233,16 +1238,34 @@ def _record_move_completed_event(
     movement_action: str,
     unit_instance_id: str,
 ) -> None:
+    payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.MOVEMENT.value,
+        "active_player_id": "player-a",
+        "unit_instance_id": unit_instance_id,
+        "movement_phase_action": movement_action,
+    }
+    if event_type == "unit_disembarked":
+        disembarked_state = DisembarkedUnitState.for_mode(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit_instance_id,
+            transport_unit_instance_id="army-a:test-transport",
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.NOT_MOVED,
+        )
+        payload.update(
+            {
+                "transport_unit_instance_id": "army-a:test-transport",
+                "transport_movement_status": TransportMovementStatus.NOT_MOVED.value,
+                "disembark_mode": DisembarkModeKind.TACTICAL_DISEMBARK.value,
+                "disembarked_unit_state": cast(JsonValue, disembarked_state.to_payload()),
+            }
+        )
     decisions.event_log.append(
         event_type,
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.MOVEMENT.value,
-            "active_player_id": "player-a",
-            "unit_instance_id": unit_instance_id,
-            "movement_phase_action": movement_action,
-        },
+        payload,
     )
 
 

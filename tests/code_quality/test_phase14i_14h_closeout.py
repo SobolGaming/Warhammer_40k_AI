@@ -48,6 +48,9 @@ GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py
 LIFECYCLE_STATE_VALIDATION_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle_state_validation.py"
 )
+UNIT_MOVE_COMPLETED_HOOKS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "unit_move_completed_hooks.py"
+)
 UNIT_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "unit_state.py"
 HEALING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing.py"
 HEALING_REVIVAL_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "healing_revival.py"
@@ -354,6 +357,18 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
         (LIFECYCLE_STATE_VALIDATION_PATH,),
         "_validate_disembarked_unit_state_history",
     )
+    move_completed_owner_source = function_source_for(
+        (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
+        "_triggering_player_id_from_move_completion_payload",
+    )
+    mortal_wound_hook_source = function_source_for(
+        (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
+        "resolve_unit_move_completed_mortal_wound_hooks",
+    )
+    battle_shock_hook_source = function_source_for(
+        (UNIT_MOVE_COMPLETED_HOOKS_PATH,),
+        "resolve_unit_move_completed_battle_shock_hooks",
+    )
 
     assert "ASSAULT_DISEMBARK_MOVE_SOURCE_ID" in transport_source
     assert 'ASSAULT_DISEMBARK = "assault_disembark"' in disembark_state_source
@@ -377,6 +392,11 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     assert 'record.event_type == "decision_requested"' in restore_integrity_source
     assert 'record.event_type == "decision_recorded"' in restore_integrity_source
     assert "assault_permission_sources" in restore_integrity_source
+    assert "disembarked_unit_state_from_event_payload" in move_completed_owner_source
+    assert "disembarked_state.turn_player_id" in move_completed_owner_source
+    assert "return disembarked_state.player_id" in move_completed_owner_source
+    assert "_triggering_player_id_from_move_completion_payload" in mortal_wound_hook_source
+    assert "_triggering_player_id_from_move_completion_payload" in battle_shock_hook_source
     assert "assault_disembark" in adapter_contract
     for forbidden_display_name in (
         "Assault Ramp",

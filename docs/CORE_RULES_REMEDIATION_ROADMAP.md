@@ -1947,7 +1947,9 @@ Restore now requires exact correspondence among the retained state, one ordered
 `unit_disembarked` event, the recorded placement request/result and their decision-history events,
 the Transport movement status, and the complete restriction-override payload. An Assault charge
 permission is accepted only when that authenticated override's source is exactly the stored
-`permission_source_rule_id`; a rewritten Rapid state therefore fails closed.
+`permission_source_rule_id`; a rewritten Rapid state therefore fails closed. Move-completed
+mortal-wound and Battle-shock hooks derive the triggering passenger owner from that authenticated
+embedded state rather than conflating it with the event's active-turn identity.
 
 Specific authoritative maintained direct App-data mirror statement and source ID: Game
 Datamissions App-data v931 section 18.06, `ASSAULT DISEMBARK MOVE`, requires the unit to be set up
@@ -1969,7 +1971,7 @@ Transports package hash is
 `b7c5f73b5e8299c5c6e29936b6fdf6d20d4a78148b83ac93b2be3e298b3d45b5`, and its canonical artifact
 byte SHA-256 is `861a86d603ea1c9e676c2f9c505760b3130eb006a278f7e387fbffaedfe6e190`.
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:7c14570ebfc2647293570935fa1400398ece312b310c87a71d9d5c0a0e25e853`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:91bceab654863c3ec6bd5bbe67b0b4ba066a1e9b8fb679a4de7deb729a89700b`.
 
 Load and execution support: The 18.06 rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -2025,9 +2027,9 @@ and affected external-contract artifacts; and updates README,
 `ARCHITECTURE_V2.md`, `docs/ADAPTER_DECISION_CONTRACT.md`, and this finding record.
 
 Validation results: All required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
-Pyright, the exact xdist work-stealing full suite (`6402 passed`), the four-shard inventory check,
+Pyright, the exact xdist work-stealing full suite (`6413 passed`), the four-shard inventory check,
 all `11` import-linter contracts, and all-files pre-commit. The separate coverage-enabled
-behavioral suite passes (`6054 passed`), and its completed coverage database passes
+behavioral suite passes (`6065 passed`), and its completed coverage database passes
 `coverage report --fail-under=85` at `85%`. The historical 40k.app and maintained-mirror audits,
 all seven Core Rules source generators, final engine-build identity check, base-ref external
 contract check, and installed-wheel smoke pass. The repository-pinned TypeScript client generated

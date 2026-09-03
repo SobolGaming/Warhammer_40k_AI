@@ -39,6 +39,9 @@ from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.transport_disembark_state import (
+    disembarked_unit_state_from_event_payload,
+)
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 if TYPE_CHECKING:
@@ -547,7 +550,10 @@ def resolve_unit_move_completed_mortal_wound_hooks(
     processed_effect_keys = _processed_effect_keys(decisions)
     for event_id, payload in events:
         triggering_unit_id = _payload_string(payload, "unit_instance_id")
-        triggering_player_id = _payload_string(payload, "active_player_id")
+        triggering_player_id = _triggering_player_id_from_move_completion_payload(
+            payload,
+            event_type=requested_event_type,
+        )
         movement_action = _movement_action_from_payload(
             payload,
             event_type=requested_event_type,
@@ -627,7 +633,10 @@ def resolve_unit_move_completed_battle_shock_hooks(
         movement_actions=requested_actions,
     ):
         triggering_unit_id = _payload_string(payload, "unit_instance_id")
-        triggering_player_id = _payload_string(payload, "active_player_id")
+        triggering_player_id = _triggering_player_id_from_move_completion_payload(
+            payload,
+            event_type=requested_event_type,
+        )
         movement_action = _movement_action_from_payload(
             payload,
             event_type=requested_event_type,
@@ -1096,9 +1105,12 @@ def _unprocessed_move_completion_events(
             continue
         if requested_unit_id is not None and payload.get("unit_instance_id") != requested_unit_id:
             continue
-        if (
-            requested_player_id is not None
-            and payload.get("active_player_id") != requested_player_id
+        if requested_player_id is not None and (
+            _triggering_player_id_from_move_completion_payload(
+                payload,
+                event_type=event_type,
+            )
+            != requested_player_id
         ):
             continue
         if _movement_action_from_payload(payload, event_type=event_type) not in movement_actions:
@@ -1109,6 +1121,24 @@ def _unprocessed_move_completion_events(
             "Move-completed hook trigger occurrence is missing or has drifted context."
         )
     return tuple(events)
+
+
+def _triggering_player_id_from_move_completion_payload(
+    payload: dict[str, JsonValue],
+    *,
+    event_type: str,
+) -> str:
+    if event_type != "unit_disembarked":
+        return _payload_string(payload, "active_player_id")
+    disembarked_state = disembarked_unit_state_from_event_payload(payload)
+    if payload.get("active_player_id") != disembarked_state.turn_player_id:
+        raise GameLifecycleError("unit_disembarked move-completed turn player drift.")
+    if (
+        payload.get("battle_round") != disembarked_state.battle_round
+        or payload.get("unit_instance_id") != disembarked_state.unit_instance_id
+    ):
+        raise GameLifecycleError("unit_disembarked move-completed state context drift.")
+    return disembarked_state.player_id
 
 
 def _processed_effect_keys(decisions: DecisionController) -> set[str]:

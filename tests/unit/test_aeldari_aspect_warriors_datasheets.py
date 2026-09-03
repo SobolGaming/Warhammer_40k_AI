@@ -755,6 +755,229 @@ def test_grenade_pack_consumes_pre_and_post_move_disembark_as_setup(
     assert payload["trigger_event_id"] == decisions.event_log.records[0].event_id
 
 
+def test_grenade_pack_uses_passenger_owner_for_opponent_turn_emergency_disembark() -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    fixture.state.active_player_id = "player-b"
+    decisions, registry = _grenade_pack_runtime(fixture)
+    _record_move_completed_event(
+        fixture.state,
+        decisions,
+        event_type="unit_disembarked",
+        movement_action=None,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED.value,
+        active_player_id="player-b",
+        triggering_player_id="player-a",
+    )
+
+    status = resolve_unit_move_completed_mortal_wound_hooks(
+        state=fixture.state,
+        decisions=decisions,
+        registry=registry,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.MOVEMENT,
+        event_type="unit_disembarked",
+        movement_actions=("set_up",),
+        ability_indexes_by_player_id=fixture.indexes,
+    )
+
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    assert request.actor_id == "player-a"
+    payload = cast(dict[str, JsonValue], status.payload)
+    assert payload["active_player_id"] == "player-b"
+    assert payload["player_id"] == "player-a"
+
+
+@pytest.mark.parametrize(
+    ("drifted_field", "drifted_value", "expected_error"),
+    [
+        (
+            "active_player_id",
+            "player-a",
+            "unit_disembarked move-completed turn player drift",
+        ),
+        (
+            "battle_round",
+            2,
+            "unit_disembarked move-completed state context drift",
+        ),
+        (
+            "unit_instance_id",
+            "army-a:other-passenger",
+            "unit_disembarked move-completed state context drift",
+        ),
+    ],
+)
+def test_grenade_pack_rejects_disembark_turn_and_passenger_context_drift(
+    drifted_field: str,
+    drifted_value: JsonValue,
+    expected_error: str,
+) -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    fixture.state.active_player_id = "player-b"
+    decisions, registry = _grenade_pack_runtime(fixture)
+    _record_move_completed_event(
+        fixture.state,
+        decisions,
+        event_type="unit_disembarked",
+        movement_action=None,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED.value,
+        active_player_id="player-b",
+        triggering_player_id="player-a",
+    )
+    event_payload = cast(dict[str, JsonValue], decisions.event_log.records[0].payload)
+    if drifted_field == "active_player_id":
+        event_payload[drifted_field] = drifted_value
+    else:
+        disembarked_state_payload = cast(
+            dict[str, JsonValue],
+            event_payload["disembarked_unit_state"],
+        )
+        disembarked_state_payload[drifted_field] = drifted_value
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        resolve_unit_move_completed_mortal_wound_hooks(
+            state=fixture.state,
+            decisions=decisions,
+            registry=registry,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="unit_disembarked",
+            movement_actions=("set_up",),
+            ability_indexes_by_player_id=fixture.indexes,
+        )
+
+
+def test_grenade_pack_exact_disembark_trigger_uses_passenger_owner() -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    fixture.state.active_player_id = "player-b"
+    decisions, registry = _grenade_pack_runtime(fixture)
+    _record_move_completed_event(
+        fixture.state,
+        decisions,
+        event_type="unit_disembarked",
+        movement_action=None,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED.value,
+        active_player_id="player-b",
+        triggering_player_id="player-a",
+    )
+    trigger_event_id = decisions.event_log.records[0].event_id
+
+    status = resolve_unit_move_completed_mortal_wound_hooks(
+        state=fixture.state,
+        decisions=decisions,
+        registry=registry,
+        ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        completed_phase=BattlePhase.MOVEMENT,
+        event_type="unit_disembarked",
+        movement_actions=("set_up",),
+        ability_indexes_by_player_id=fixture.indexes,
+        trigger_event_id=trigger_event_id,
+        expected_triggering_unit_instance_id=fixture.swooping_hawks.unit_instance_id,
+        expected_triggering_player_id="player-a",
+    )
+
+    assert status is not None
+    assert status.decision_request is not None
+    assert status.decision_request.actor_id == "player-a"
+
+
+@pytest.mark.parametrize(
+    "drift_kind",
+    ["turn_owner", "passenger_unit", "non_object_payload", "wrong_game"],
+)
+def test_grenade_pack_exact_disembark_trigger_rejects_identity_and_envelope_drift(
+    drift_kind: str,
+) -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    fixture.state.active_player_id = "player-b"
+    decisions, registry = _grenade_pack_runtime(fixture)
+    _record_move_completed_event(
+        fixture.state,
+        decisions,
+        event_type="unit_disembarked",
+        movement_action=None,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED.value,
+        active_player_id="player-b",
+        triggering_player_id="player-a",
+    )
+    trigger_event_id = decisions.event_log.records[0].event_id
+    expected_unit_id = fixture.swooping_hawks.unit_instance_id
+    expected_player_id = "player-a"
+    if drift_kind == "turn_owner":
+        expected_player_id = "player-b"
+    elif drift_kind == "passenger_unit":
+        expected_unit_id = fixture.fire_dragons.unit_instance_id
+    elif drift_kind == "non_object_payload":
+        decisions = DecisionController()
+        trigger_event_id = decisions.event_log.append("unit_disembarked", "invalid").event_id
+    else:
+        event_payload = cast(dict[str, JsonValue], decisions.event_log.records[0].payload)
+        event_payload["game_id"] = "other-game"
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Move-completed hook trigger occurrence is missing or has drifted context",
+    ):
+        resolve_unit_move_completed_mortal_wound_hooks(
+            state=fixture.state,
+            decisions=decisions,
+            registry=registry,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="unit_disembarked",
+            movement_actions=("set_up",),
+            ability_indexes_by_player_id=fixture.indexes,
+            trigger_event_id=trigger_event_id,
+            expected_triggering_unit_instance_id=expected_unit_id,
+            expected_triggering_player_id=expected_player_id,
+        )
+
+
+def test_grenade_pack_exact_disembark_trigger_requires_complete_identity() -> None:
+    fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
+    decisions, registry = _grenade_pack_runtime(fixture)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Expected move-completed trigger identity requires an exact trigger event",
+    ):
+        resolve_unit_move_completed_mortal_wound_hooks(
+            state=fixture.state,
+            decisions=decisions,
+            registry=registry,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="unit_disembarked",
+            movement_actions=("set_up",),
+            ability_indexes_by_player_id=fixture.indexes,
+            expected_triggering_unit_instance_id=fixture.swooping_hawks.unit_instance_id,
+            expected_triggering_player_id="player-a",
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Exact move-completed trigger event requires expected unit and player identities",
+    ):
+        resolve_unit_move_completed_mortal_wound_hooks(
+            state=fixture.state,
+            decisions=decisions,
+            registry=registry,
+            ruleset_descriptor=fixture.state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="unit_disembarked",
+            movement_actions=("set_up",),
+            ability_indexes_by_player_id=fixture.indexes,
+            trigger_event_id="event-000001",
+        )
+
+
 def test_tactical_disembark_closes_actual_grenade_pack_boundary_before_follow_up_move() -> None:
     fixture = _runtime_fixture(phase=BattlePhase.MOVEMENT)
     decisions, registry = _grenade_pack_runtime(fixture)
@@ -1685,12 +1908,14 @@ def _record_move_completed_event(
     movement_action: str | None,
     unit_instance_id: str = "army-a:swooping-hawks",
     transport_movement_status: str | None = None,
+    active_player_id: str = "player-a",
+    triggering_player_id: str = "player-a",
 ) -> None:
     payload: dict[str, JsonValue] = {
         "game_id": state.game_id,
         "battle_round": state.battle_round,
         "phase": BattlePhase.MOVEMENT.value,
-        "active_player_id": "player-a",
+        "active_player_id": active_player_id,
         "unit_instance_id": unit_instance_id,
     }
     if movement_action is not None:
@@ -1698,6 +1923,37 @@ def _record_move_completed_event(
     if transport_movement_status is not None:
         payload["transport_unit_instance_id"] = "army-a:test-transport"
         payload["transport_movement_status"] = transport_movement_status
+    if event_type == "unit_disembarked":
+        if active_player_id == triggering_player_id:
+            assert transport_movement_status is not None
+            disembark_mode = (
+                DisembarkModeKind.RAPID_DISEMBARK
+                if transport_movement_status == TransportMovementStatus.NORMAL_MOVE.value
+                else DisembarkModeKind.TACTICAL_DISEMBARK
+            )
+            disembarked_state = DisembarkedUnitState.for_mode(
+                player_id=triggering_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id="army-a:test-transport",
+                disembark_mode=disembark_mode,
+                transport_movement_status=TransportMovementStatus(transport_movement_status),
+            )
+        else:
+            disembark_mode = DisembarkModeKind.EMERGENCY_DISEMBARK
+            disembarked_state = DisembarkedUnitState.for_destroyed_transport(
+                player_id=triggering_player_id,
+                battle_round=state.battle_round,
+                turn_player_id=active_player_id,
+                unit_instance_id=unit_instance_id,
+                transport_unit_instance_id="army-a:test-transport",
+                disembark_mode=disembark_mode,
+            )
+        payload["disembark_mode"] = disembark_mode.value
+        payload["disembarked_unit_state"] = cast(
+            JsonValue,
+            disembarked_state.to_payload(),
+        )
     decisions.event_log.append(
         event_type,
         payload,
