@@ -14,6 +14,7 @@ from warhammer40k_core.rules.data_package import (
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
+    CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     RuleSourcePackage,
     SourceEvidenceCatalog,
 )
@@ -132,6 +133,7 @@ def source_package() -> RuleSourcePackage:
         source_catalog=_build_source_catalog(),
         source_evidence_catalog=evidence_catalog,
         evidence_required_source_ids=(RULE_SOURCE_ID,),
+        source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     )
 
 

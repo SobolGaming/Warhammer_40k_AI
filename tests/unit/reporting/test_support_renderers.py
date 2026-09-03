@@ -25,6 +25,17 @@ from tools.core_rules_40k_app_audit import (
     core_rules_forty_k_app_audit_markdown,
     load_core_rules_forty_k_app_audit,
 )
+from tools.core_rules_maintained_mirror_audit import (
+    AUDIT_PATH as CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH,
+)
+from tools.core_rules_maintained_mirror_audit import (
+    REPORT_PATH as CORE_RULES_MAINTAINED_MIRROR_REPORT_PATH,
+)
+from tools.core_rules_maintained_mirror_audit import (
+    core_rules_maintained_mirror_audit,
+    core_rules_maintained_mirror_markdown,
+    load_core_rules_maintained_mirror_audit,
+)
 from tools.emperors_children_39k_pro_audit import (
     AUDIT_PATH,
     emperors_children_thirty_nine_k_pro_audit,
@@ -429,6 +440,72 @@ def test_core_rules_40k_app_audit_retains_exact_review_only_category_inventory()
     assert "How it should be treated" in report
     assert "Specific rule/source basis" in report
     assert "Faction review is explicitly excluded" in report
+
+
+def test_core_rules_maintained_mirror_audit_retains_both_non_affiliated_providers() -> None:
+    audit = core_rules_maintained_mirror_audit()
+
+    assert audit.audit_id == "core-rules-maintained-app-mirrors-2026-09-02"
+    assert audit.project_authority_policy_id == (
+        "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
+    )
+    assert tuple(provider.provider_name for provider in audit.providers) == (
+        "40k.app",
+        "Game Datamissions",
+    )
+    assert all(
+        provider.affiliation == "not_affiliated_with_or_endorsed_by_games_workshop"
+        and not provider.runtime_input
+        and not provider.owned_by_games_workshop
+        for provider in audit.providers
+    )
+    assert tuple(observation.app_version for observation in audit.observations) == (
+        None,
+        "931",
+        "946",
+    )
+    assert all(
+        observation.app_version is not None or observation.observed_at is not None
+        for observation in audit.observations
+    )
+    assert all(observation.transcription_sha256 for observation in audit.observations)
+    assert all(observation.source_observation_sha256 for observation in audit.observations)
+    assert audit.comparison_identity_fields == ("rule_source_id", "app_version")
+    assert audit.mismatch_disposition == "official_app_comparison_required"
+
+    report = core_rules_maintained_mirror_markdown(audit)
+    assert CORE_RULES_MAINTAINED_MIRROR_REPORT_PATH.read_text(encoding="utf-8") == report
+    assert "40k.app" in report
+    assert "Game Datamissions" in report
+    assert "Neither provider is presented as owned" in report
+    assert "A mismatch is rejected" in report
+
+
+def test_core_rules_maintained_mirror_audit_rejects_incomplete_or_drifted_tuple(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH.read_text(encoding="utf-8"))
+    observation = payload["observations"][1]
+    observation["app_version"] = None
+    observation["observed_at"] = None
+    tampered_path = tmp_path / "missing-version-and-timestamp.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="requires an App-data version or timestamp"):
+        load_core_rules_maintained_mirror_audit(tampered_path)
+
+    payload = json.loads(CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["observations"][1]["reviewed_statement"] += " Drifted."
+    tampered_path = tmp_path / "drifted-transcription.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="transcription hash drifted"):
+        load_core_rules_maintained_mirror_audit(tampered_path)
+
+    payload = json.loads(CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["providers"][1]["owned_by_games_workshop"] = True
+    tampered_path = tmp_path / "false-official-provider.audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="provider authority boundary drifted"):
+        load_core_rules_maintained_mirror_audit(tampered_path)
 
 
 def test_core_rules_40k_app_audit_rejects_url_and_scope_drift(tmp_path: Path) -> None:

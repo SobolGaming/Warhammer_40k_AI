@@ -22,6 +22,28 @@ Primary references for roadmap coverage:
 
 CORE V2 is now 11th Edition-only. Edition 10 source package names, descriptor IDs, tests, and comments are migration debt unless they are explicitly part of the Wahapedia bridge into Edition 11, not supported compatibility targets. Do not add edition-diff switches, compatibility shims, or dual-edition behavior unless a future repository policy explicitly reverses this decision.
 
+## Core Rules source authority boundary
+
+The current Core Rules source policy is
+`core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02`.
+It recognizes 40k.app and Game Datamissions as distinct non-affiliated
+maintained direct App-data mirrors without presenting either as a Games
+Workshop source. `RuleEvidenceRecord` validates each provider together with its
+canonical HTTPS URL and requires an App-data version or observation timestamp,
+transcription SHA-256, immutable observation fingerprint, audit link, and
+non-affiliation marker. It authenticates the audit identity, row fingerprint,
+provider surface, policy, and version-or-timestamp identity against the
+hash-pinned packaged `source_authority_registry.json`. `RuleSourcePackage`
+requires the registry's typed `warhammer_40000_11th_core_rules` scope and an
+exact registered package identity; only its allowlisted Core Rules stable
+source IDs can cross that boundary. `SourceEvidenceCatalog` compares records
+sharing one stable rule source ID and App-data version; if multiple named
+providers have different transcription hashes, construction fails pending
+official-App comparison. Historical 40k.app records keep their superseded
+policy ID only when their evidence identity, stable source ID, and observation
+hash match the registry's immutable inventory. Live mirror sites are not
+runtime inputs.
+
 ## Roadmap status
 
 Everything through **Phase 14H** is treated as implemented at the time this file

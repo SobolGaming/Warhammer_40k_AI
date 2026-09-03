@@ -1,8 +1,11 @@
 # 40k.app core-rules observation artifacts
 
-These artifacts retain observations from a non-affiliated hosting provider. Under repository-owner
-policy `core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`, the Core Rules
-corpus is treated as a verbatim authoritative mirror of the maintained Warhammer 40,000 App.
+These artifacts retain historical observations from a non-affiliated hosting provider. Under the
+then-current repository-owner policy
+`core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26`, the Core Rules corpus
+was treated as a verbatim authoritative mirror of the maintained Warhammer 40,000 App. New
+observations use the superseding maintained-direct-App-data-mirror policy and the provider registry
+under `data/source_audits/maintained_app_mirrors`.
 Maintained App wording supersedes older PDF wording where they differ. This authority decision does
 not relabel the provider as Games Workshop or claim endorsement; see
 `docs/CORE_RULES_SOURCE_POLICY.md`.

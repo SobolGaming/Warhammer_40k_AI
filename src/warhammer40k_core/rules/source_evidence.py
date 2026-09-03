@@ -8,6 +8,14 @@ from pathlib import PurePosixPath
 from typing import Literal, Self, TypedDict, cast
 from urllib.parse import urlsplit
 
+from warhammer40k_core.rules.source_authority_registry import (
+    CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID,
+    CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+    CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+    SourceAuthorityRegistryError,
+    SourceAuthorityScope,
+    source_authority_registry,
+)
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceCatalogError
 
 RuleEvidenceKind = Literal[
@@ -38,6 +46,8 @@ SemanticExecutionStatus = Literal[
     "blocked_by_source_conflict",
     "unsupported",
 ]
+
+_MAINTAINED_APP_MIRROR_PROVIDERS = frozenset({"40k.app", "Game Datamissions"})
 
 
 class RuleEvidenceError(ValueError):
@@ -294,54 +304,36 @@ class RuleEvidenceRecord:
                 raise RuleEvidenceError("A third-party mirror authority classification is invalid.")
         if (
             self.verification_status not in allowed_verification_statuses
-            or self.provider_name != "40k.app"
             or self.source_platform != "Web"
             or self.source_url is None
-            or self.observed_at is None
+            or (self.observed_at is None and self.app_version is None)
             or self.review_audit_id is None
             or self.review_audit_row_id is None
             or self.review_audit_source_observation_sha256 is None
             or any(
                 value is not None
                 for value in (
-                    self.app_version,
-                    self.app_build,
                     self.capture_artifact_path,
                     self.capture_sha256,
                 )
             )
+            or (self.app_build is not None and self.app_version is None)
             or self.official_corroborating_source_ids
             or not self.provider_non_affiliation_recorded
         ):
             raise RuleEvidenceError(
-                "A 40k.app record must retain its declared project or secondary authority "
-                "without official-provider, corroboration, or capture claims."
+                "A maintained App-mirror record must retain its provider, URL, App-data version "
+                "or observation timestamp, audit fingerprint, declared authority, and "
+                "non-affiliation without official-provider, corroboration, or capture claims."
             )
-        has_ascii_control = any(
-            ord(character) < 32 or ord(character) == 127 for character in self.source_url
+        _validate_mirror_provider(
+            provider_name=self.provider_name,
+            source_url=self.source_url,
+            authority=self.authority,
+            project_authority_policy_id=self.project_authority_policy_id,
         )
-        split = urlsplit(self.source_url)
-        rule_slug = split.path.removeprefix("/rules/")
-        has_canonical_rules_path = split.path == "/rules" or (
-            split.path == f"/rules/{rule_slug}"
-            and bool(rule_slug)
-            and rule_slug[0] != "-"
-            and rule_slug[-1] != "-"
-            and "--" not in rule_slug
-            and all(character in "abcdefghijklmnopqrstuvwxyz0123456789-" for character in rule_slug)
-        )
-        if (
-            has_ascii_control
-            or split.scheme != "https"
-            or split.hostname != "www.40k.app"
-            or split.username is not None
-            or split.password is not None
-            or split.port is not None
-            or split.query
-            or split.fragment
-            or not has_canonical_rules_path
-        ):
-            raise RuleEvidenceError("A 40k.app mirror record must use a canonical HTTPS rules URL.")
+        if self.authority == "project_authoritative_app_mirror":
+            _validate_project_authoritative_mirror_registry(self)
 
     def _validate_execution_status(self) -> None:
         has_consumers = bool(self.runtime_consumer_ids)
@@ -471,6 +463,7 @@ class SourceEvidenceCatalog:
         evidence_ids = tuple(record.evidence_id for record in self.records)
         if len(evidence_ids) != len(set(evidence_ids)):
             raise RuleEvidenceError("SourceEvidenceCatalog evidence IDs must be unique.")
+        _validate_co_versioned_mirror_agreement(self.records)
         object.__setattr__(
             self,
             "records",
@@ -494,6 +487,7 @@ class RuleSourcePackage:
     source_catalog: SourceCatalog
     source_evidence_catalog: SourceEvidenceCatalog
     evidence_required_source_ids: tuple[str, ...]
+    source_authority_scope: SourceAuthorityScope
 
     def __post_init__(self) -> None:
         if type(self.source_catalog) is not SourceCatalog:
@@ -502,6 +496,8 @@ class RuleSourcePackage:
             raise RuleEvidenceError(
                 "RuleSourcePackage source_evidence_catalog must be a SourceEvidenceCatalog."
             )
+        if self.source_authority_scope != CORE_RULES_SOURCE_AUTHORITY_SCOPE:
+            raise RuleEvidenceError("RuleSourcePackage source-authority scope is unsupported.")
         required_source_ids = _validate_text_tuple(
             "evidence_required_source_ids",
             self.evidence_required_source_ids,
@@ -522,6 +518,32 @@ class RuleSourcePackage:
             raise RuleEvidenceError(
                 "RuleSourcePackage evidence inventory must exactly cover required source IDs."
             )
+        package_id = self.source_catalog.package_id
+        try:
+            registry = source_authority_registry()
+            registry.authorize_source_package(
+                scope_id=self.source_authority_scope,
+                namespace=package_id.namespace,
+                package_name=package_id.package_name,
+                version=package_id.version,
+                rule_source_ids=required_source_ids,
+            )
+            for record in self.source_evidence_catalog.records:
+                if record.authority != "project_authoritative_app_mirror":
+                    continue
+                if record.project_authority_policy_id is None:
+                    raise RuleEvidenceError(
+                        "Project-authoritative mirror evidence requires its authority policy ID."
+                    )
+                if (
+                    registry.scope_for_policy_id(record.project_authority_policy_id).scope_id
+                    != self.source_authority_scope
+                ):
+                    raise RuleEvidenceError(
+                        "Mirror evidence policy scope does not match its RuleSourcePackage scope."
+                    )
+        except SourceAuthorityRegistryError as exc:
+            raise RuleEvidenceError(str(exc)) from exc
         for source_id in required_source_ids:
             try:
                 source_text = self.source_catalog.source_text_by_id(source_id)
@@ -669,7 +691,119 @@ def _validate_capture_artifact_path(value: str) -> str:
     return value
 
 
+def _validate_mirror_provider(
+    *,
+    provider_name: str,
+    source_url: str,
+    authority: RuleEvidenceAuthority,
+    project_authority_policy_id: str | None,
+) -> None:
+    if provider_name not in _MAINTAINED_APP_MIRROR_PROVIDERS:
+        raise RuleEvidenceError("A maintained App-mirror provider is unsupported.")
+    if authority == "project_authoritative_app_mirror":
+        if project_authority_policy_id == CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID:
+            if provider_name != "40k.app":
+                raise RuleEvidenceError(
+                    "The historical 40k.app-only policy cannot authorize another provider."
+                )
+        elif project_authority_policy_id != CORE_RULES_MAINTAINED_MIRROR_POLICY_ID:
+            raise RuleEvidenceError("A maintained App-mirror authority policy ID is unsupported.")
+    _validate_mirror_url(provider_name=provider_name, source_url=source_url)
+
+
+def _validate_project_authoritative_mirror_registry(record: RuleEvidenceRecord) -> None:
+    policy_id = cast(str, record.project_authority_policy_id)
+    audit_id = cast(str, record.review_audit_id)
+    audit_row_id = cast(str, record.review_audit_row_id)
+    audit_observation_sha256 = cast(str, record.review_audit_source_observation_sha256)
+    source_url = cast(str, record.source_url)
+    try:
+        registry = source_authority_registry()
+        scope_id = registry.authorize_audit_reference(
+            policy_id=policy_id,
+            audit_id=audit_id,
+            row_id=audit_row_id,
+            source_observation_sha256=audit_observation_sha256,
+            provider_name=record.provider_name,
+            source_url=source_url,
+            observed_at=record.observed_at,
+            app_version=record.app_version,
+        )
+        if policy_id == CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID:
+            registry.authorize_legacy_observation(
+                scope_id=scope_id,
+                evidence_id=record.evidence_id,
+                rule_source_id=record.rule_source_id,
+                observation_sha256=record.observation_sha256,
+            )
+    except SourceAuthorityRegistryError as exc:
+        raise RuleEvidenceError(str(exc)) from exc
+
+
+def _validate_mirror_url(*, provider_name: str, source_url: str) -> None:
+    has_ascii_control = any(
+        ord(character) < 32 or ord(character) == 127 for character in source_url
+    )
+    split = urlsplit(source_url)
+    common_invalid = (
+        has_ascii_control
+        or split.scheme != "https"
+        or split.username is not None
+        or split.password is not None
+        or split.port is not None
+        or bool(split.query)
+        or bool(split.fragment)
+    )
+    if provider_name == "40k.app":
+        rule_slug = split.path.removeprefix("/rules/")
+        valid_path = split.path == "/rules" or (
+            split.path == f"/rules/{rule_slug}"
+            and bool(rule_slug)
+            and rule_slug[0] != "-"
+            and rule_slug[-1] != "-"
+            and "--" not in rule_slug
+            and all(character in "abcdefghijklmnopqrstuvwxyz0123456789-" for character in rule_slug)
+        )
+        if common_invalid or split.hostname != "www.40k.app" or not valid_path:
+            raise RuleEvidenceError("A 40k.app mirror record must use a canonical HTTPS rules URL.")
+        return
+    if (
+        common_invalid
+        or split.hostname != "game-datamissions.com"
+        or split.path != "/11th/rules/changelog"
+    ):
+        raise RuleEvidenceError(
+            "A Game Datamissions mirror record must use its canonical HTTPS Core Rules "
+            "changelog URL."
+        )
+
+
+def _validate_co_versioned_mirror_agreement(
+    records: tuple[RuleEvidenceRecord, ...],
+) -> None:
+    groups: dict[tuple[str, str], list[RuleEvidenceRecord]] = {}
+    for record in records:
+        if (
+            record.evidence_kind != "third_party_mirror"
+            or record.authority != "project_authoritative_app_mirror"
+            or record.app_version is None
+        ):
+            continue
+        groups.setdefault((record.rule_source_id, record.app_version), []).append(record)
+    for version_records in groups.values():
+        if len({record.provider_name for record in version_records}) < 2:
+            continue
+        if len({record.transcription_sha256 for record in version_records}) != 1:
+            raise RuleEvidenceError(
+                "Co-versioned maintained App mirrors disagree; official-App comparison is "
+                "required before source certification."
+            )
+
+
 __all__ = (
+    "CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID",
+    "CORE_RULES_MAINTAINED_MIRROR_POLICY_ID",
+    "CORE_RULES_SOURCE_AUTHORITY_SCOPE",
     "LoadSupportStatus",
     "RuleEvidenceAuthority",
     "RuleEvidenceError",
@@ -679,5 +813,6 @@ __all__ = (
     "RuleSourcePackage",
     "RuleVerificationStatus",
     "SemanticExecutionStatus",
+    "SourceAuthorityScope",
     "SourceEvidenceCatalog",
 )

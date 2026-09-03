@@ -27,8 +27,17 @@ from tools.build_core_transports_source import (
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.rules import source_evidence as source_evidence_module
+from warhammer40k_core.rules.source_authority_registry import (
+    EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256,
+    SourceAuthorityRegistryError,
+    load_source_authority_registry_from_json_bytes,
+)
 from warhammer40k_core.rules.source_catalog import SourceCatalog
 from warhammer40k_core.rules.source_evidence import (
+    CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID,
+    CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+    CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     RuleEvidenceAuthority,
     RuleEvidenceError,
     RuleEvidenceKind,
@@ -36,6 +45,7 @@ from warhammer40k_core.rules.source_evidence import (
     RuleEvidenceRecord,
     RuleSourcePackage,
     RuleVerificationStatus,
+    SourceAuthorityScope,
     SourceEvidenceCatalog,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -54,9 +64,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     july_rules_updates_2026_07,
 )
 
-PROJECT_AUTHORITY_POLICY_ID = (
-    "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
-)
+PROJECT_AUTHORITY_POLICY_ID = CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID
 CORE_RULES_REVIEW_AUDIT_ID = "40k-app-core-rules-2026-08-25"
 CORE_RULES_REVIEW_AUDIT_PATH = Path("data/source_audits/40k_app/core_rules_2026_08_25.audit.json")
 
@@ -766,8 +774,15 @@ def test_rule_source_package_rejects_provenance_and_grouped_status_gaps() -> Non
     with pytest.raises(RuleEvidenceError, match="mirror comparison alone is insufficient"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(mirror,)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=tuple(
+                    record
+                    for record in package.source_evidence_catalog.records
+                    if record.evidence_id != owner.evidence_id
+                )
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
 
     contradictory_payload = mirror.to_payload()
@@ -776,19 +791,25 @@ def test_rule_source_package_rejects_provenance_and_grouped_status_gaps() -> Non
     with pytest.raises(RuleEvidenceError, match="must agree on load and semantic"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(owner, contradictory)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=_replace_evidence_records(package, contradictory)
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
 
-    mismatched_payload = mirror.to_payload()
+    mismatched_payload = owner.to_payload()
     mismatched_payload["transcription_sha256"] = "0" * 64
     mismatched_payload["observation_sha256"] = _observation_sha256(mismatched_payload)
     mismatched = RuleEvidenceRecord.from_payload(mismatched_payload)
     with pytest.raises(RuleEvidenceError, match="does not match its source row"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(owner, mismatched)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=_replace_evidence_records(package, mismatched)
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
 
 
@@ -803,25 +824,32 @@ def test_rule_source_package_requires_exact_evidence_inventory_and_catalog_owner
             source_catalog=package.source_catalog,
             source_evidence_catalog=SourceEvidenceCatalog(records=first_records),
             evidence_required_source_ids=source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
     with pytest.raises(RuleEvidenceError, match="must exactly cover required source IDs"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
             source_evidence_catalog=SourceEvidenceCatalog(records=first_records + second_records),
             evidence_required_source_ids=(source_ids[0],),
+            source_authority_scope=package.source_authority_scope,
         )
 
     absent_source_id = f"{july_rules_updates_2026_07.SOURCE_PACKAGE_ID}:app-core-rules:absent"
-    absent_payload = first_records[0].to_payload()
+    absent_payload = next(
+        record
+        for record in first_records
+        if record.evidence_kind == "owner_supplied_app_transcription"
+    ).to_payload()
     absent_payload["evidence_id"] = "repository-app-core-rules-transcription:absent"
     absent_payload["rule_source_id"] = absent_source_id
     absent_payload["observation_sha256"] = _observation_sha256(absent_payload)
     absent_record = RuleEvidenceRecord.from_payload(absent_payload)
-    with pytest.raises(RuleEvidenceError, match="required evidence source ID is absent"):
+    with pytest.raises(RuleEvidenceError, match="outside its authorized source scope"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
             source_evidence_catalog=SourceEvidenceCatalog(records=(absent_record,)),
             evidence_required_source_ids=(absent_source_id,),
+            source_authority_scope=package.source_authority_scope,
         )
 
 
@@ -840,12 +868,17 @@ def test_rule_source_package_requires_grouped_conflict_block_equivalence() -> No
     with pytest.raises(RuleEvidenceError, match="source-conflict evidence and blocked semantic"):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=tuple(blocked_records)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=_replace_evidence_records(package, *blocked_records)
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
 
     mirror = next(record for record in records if record.evidence_kind == "third_party_mirror")
     unblocked_conflict_payload = mirror.to_payload()
+    unblocked_conflict_payload["authority"] = "secondary_mirror_only"
+    unblocked_conflict_payload["project_authority_policy_id"] = None
     unblocked_conflict_payload["verification_status"] = "conflict"
     unblocked_conflict_payload["observation_sha256"] = _observation_sha256(
         unblocked_conflict_payload
@@ -872,6 +905,7 @@ def test_rule_source_package_rejects_executable_hidden_owner_without_authoritati
             source_catalog=package.source_catalog,
             source_evidence_catalog=SourceEvidenceCatalog(records=(owner,)),
             evidence_required_source_ids=(app_core_rules_hidden_2026_08_09.RULE_SOURCE_ID,),
+            source_authority_scope=package.source_authority_scope,
         )
 
 
@@ -929,7 +963,7 @@ def test_rule_evidence_rejects_mirror_official_authority_and_uncaptured_app_clai
             verification_status="authoritative_app_mirror",
         )
 
-    with pytest.raises(RuleEvidenceError, match="must retain its declared project"):
+    with pytest.raises(RuleEvidenceError, match="App-data version or observation timestamp"):
         invalid_record(
             evidence_kind="third_party_mirror",
             authority="project_authoritative_app_mirror",
@@ -979,8 +1013,259 @@ def test_project_authoritative_mirror_requires_complete_retained_audit_link(
     payload[field_name] = None
     payload["observation_sha256"] = _observation_sha256(cast(RuleEvidencePayload, payload))
 
-    with pytest.raises(RuleEvidenceError, match=r"40k\.app record"):
+    with pytest.raises(RuleEvidenceError, match="maintained App-mirror record"):
         RuleEvidenceRecord.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("field_name", "replacement", "expected_message"),
+    [
+        ("review_audit_id", "does-not-exist", "audit ID or row ID is not registered"),
+        ("review_audit_row_id", "does-not-exist", "audit ID or row ID is not registered"),
+        (
+            "review_audit_source_observation_sha256",
+            "0" * 64,
+            "audit reference does not match its registered row",
+        ),
+    ],
+)
+def test_project_authoritative_mirror_authenticates_retained_audit_registry_row(
+    field_name: str,
+    replacement: str,
+    expected_message: str,
+) -> None:
+    record = next(
+        evidence
+        for evidence in july_rules_updates_2026_07.source_package().source_evidence_catalog.records
+        if evidence.evidence_kind == "third_party_mirror"
+        and evidence.verification_status == "authoritative_app_mirror"
+    )
+    payload = cast(dict[str, object], record.to_payload())
+    payload[field_name] = replacement
+    payload["observation_sha256"] = _observation_sha256(cast(RuleEvidencePayload, payload))
+
+    with pytest.raises(RuleEvidenceError, match=expected_message):
+        RuleEvidenceRecord.from_payload(payload)
+
+
+def test_superseded_mirror_policy_rejects_new_observation_identity() -> None:
+    record = next(
+        evidence
+        for evidence in july_rules_updates_2026_07.source_package().source_evidence_catalog.records
+        if evidence.evidence_kind == "third_party_mirror"
+        and evidence.verification_status == "authoritative_app_mirror"
+    )
+    payload = record.to_payload()
+    payload["evidence_id"] = f"{record.evidence_id}:new-observation"
+    payload["observed_at"] = "2026-09-02T00:00:00-04:00"
+    payload["observation_sha256"] = _observation_sha256(payload)
+
+    with pytest.raises(RuleEvidenceError, match="restricted to its immutable observation"):
+        RuleEvidenceRecord.from_payload(payload)
+
+
+def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
+    raw = Path("src/warhammer40k_core/rules/source_authority_registry.json").read_bytes()
+
+    assert hashlib.sha256(raw).hexdigest() == EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256
+    registry = load_source_authority_registry_from_json_bytes(raw)
+    scope = registry.scope(CORE_RULES_SOURCE_AUTHORITY_SCOPE)
+    assert scope.edition == "warhammer_40000_11th"
+    assert scope.corpus == "core_rules_categories_01_25"
+    assert len(scope.legacy_observations) == 33
+    assert len(scope.source_packages) == 9
+    with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
+        load_source_authority_registry_from_json_bytes(raw + b"\n")
+
+
+def test_maintained_mirror_evidence_accepts_either_provider_with_complete_tuple() -> None:
+    existing = next(
+        evidence
+        for evidence in july_rules_updates_2026_07.source_package().source_evidence_catalog.records
+        if evidence.evidence_kind == "third_party_mirror"
+        and evidence.verification_status == "authoritative_app_mirror"
+    )
+    payload = existing.to_payload()
+    payload.update(
+        {
+            "evidence_id": "game-datamissions-core-rules-data-931:test-rule",
+            "project_authority_policy_id": CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+            "review_audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+            "review_audit_row_id": "game-datamissions-core-rules-data-931",
+            "review_audit_source_observation_sha256": (
+                "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
+            ),
+            "provider_name": "Game Datamissions",
+            "source_title": "Game Datamissions Core Rules Data Changelog",
+            "source_url": "https://game-datamissions.com/11th/rules/changelog",
+            "observed_at": None,
+            "app_version": "931",
+        }
+    )
+    payload["observation_sha256"] = _observation_sha256(payload)
+
+    record = RuleEvidenceRecord.from_payload(payload)
+
+    assert record.provider_name == "Game Datamissions"
+    assert record.app_version == "931"
+    assert record.observed_at is None
+    assert record.project_authority_policy_id == CORE_RULES_MAINTAINED_MIRROR_POLICY_ID
+
+    missing_version = dict(payload)
+    missing_version["app_version"] = None
+    missing_version["observation_sha256"] = _observation_sha256(
+        cast(RuleEvidencePayload, missing_version)
+    )
+    with pytest.raises(RuleEvidenceError, match="App-data version or observation timestamp"):
+        RuleEvidenceRecord.from_payload(missing_version)
+
+    legacy_policy = dict(payload)
+    legacy_policy["project_authority_policy_id"] = PROJECT_AUTHORITY_POLICY_ID
+    legacy_policy["observation_sha256"] = _observation_sha256(
+        cast(RuleEvidencePayload, legacy_policy)
+    )
+    with pytest.raises(RuleEvidenceError, match=r"historical 40k\.app-only policy"):
+        RuleEvidenceRecord.from_payload(legacy_policy)
+
+    invalid_url = dict(payload)
+    invalid_url["source_url"] = "https://game-datamissions.com/11th/rules/../factions"
+    invalid_url["observation_sha256"] = _observation_sha256(cast(RuleEvidencePayload, invalid_url))
+    with pytest.raises(RuleEvidenceError, match="canonical HTTPS Core Rules changelog URL"):
+        RuleEvidenceRecord.from_payload(invalid_url)
+
+
+def test_core_rules_source_authority_scope_rejects_faction_rule_source_id() -> None:
+    package = july_rules_updates_2026_07.source_package()
+    existing_source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
+        "01.02.03-embarked-model-return"
+    ]
+    existing_records = package.source_evidence_catalog.records_for_source_id(existing_source_id)
+    faction_source_id = "faction:chaos-daemons:test-rule"
+
+    owner_payload = next(
+        record
+        for record in existing_records
+        if record.evidence_kind == "owner_supplied_app_transcription"
+    ).to_payload()
+    owner_payload["evidence_id"] = "repository-app-transcription:faction-test-rule"
+    owner_payload["rule_source_id"] = faction_source_id
+    owner_payload["observation_sha256"] = _observation_sha256(owner_payload)
+    owner = RuleEvidenceRecord.from_payload(owner_payload)
+
+    mirror_payload = next(
+        record for record in existing_records if record.evidence_kind == "third_party_mirror"
+    ).to_payload()
+    mirror_payload.update(
+        {
+            "evidence_id": "game-datamissions-data-931:faction-test-rule",
+            "rule_source_id": faction_source_id,
+            "project_authority_policy_id": CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+            "review_audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+            "review_audit_row_id": "game-datamissions-core-rules-data-931",
+            "review_audit_source_observation_sha256": (
+                "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
+            ),
+            "provider_name": "Game Datamissions",
+            "source_title": "Game Datamissions Core Rules Data Changelog",
+            "source_url": "https://game-datamissions.com/11th/rules/changelog",
+            "observed_at": None,
+            "app_version": "931",
+        }
+    )
+    mirror_payload["observation_sha256"] = _observation_sha256(mirror_payload)
+    mirror = RuleEvidenceRecord.from_payload(mirror_payload)
+
+    with pytest.raises(RuleEvidenceError, match="outside its authorized source scope"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=(owner, mirror)),
+            evidence_required_source_ids=(faction_source_id,),
+            source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+        )
+
+
+def test_core_rules_source_authority_scope_rejects_strict_subset_inventory() -> None:
+    package = july_rules_updates_2026_07.source_package()
+    retained_source_id = july_rules_updates_2026_07.APP_CORE_RULE_SOURCE_IDS[
+        "01.02.03-embarked-model-return"
+    ]
+    retained_records = package.source_evidence_catalog.records_for_source_id(retained_source_id)
+
+    with pytest.raises(RuleEvidenceError, match="omits a rule source ID"):
+        RuleSourcePackage(
+            source_catalog=package.source_catalog,
+            source_evidence_catalog=SourceEvidenceCatalog(records=retained_records),
+            evidence_required_source_ids=(retained_source_id,),
+            source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+        )
+
+
+@pytest.mark.stubbed
+def test_source_evidence_catalog_rejects_co_versioned_mirror_disagreement(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    existing = next(
+        evidence
+        for evidence in july_rules_updates_2026_07.source_package().source_evidence_catalog.records
+        if evidence.evidence_kind == "third_party_mirror"
+        and evidence.verification_status == "authoritative_app_mirror"
+    )
+
+    class _StubbedAuthorityRegistry:
+        def authorize_audit_reference(self, **_: object) -> SourceAuthorityScope:
+            return CORE_RULES_SOURCE_AUTHORITY_SCOPE
+
+    monkeypatch.setattr(
+        source_evidence_module,
+        "source_authority_registry",
+        _StubbedAuthorityRegistry,
+    )
+    forty_k_payload = existing.to_payload()
+    forty_k_payload.update(
+        {
+            "evidence_id": "40k-app-data-931:test-rule",
+            "project_authority_policy_id": CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+            "app_version": "931",
+        }
+    )
+    forty_k_payload["observation_sha256"] = _observation_sha256(forty_k_payload)
+    forty_k = RuleEvidenceRecord.from_payload(forty_k_payload)
+
+    game_datamissions_payload = dict(forty_k_payload)
+    game_datamissions_payload.update(
+        {
+            "evidence_id": "game-datamissions-data-931:test-rule",
+            "provider_name": "Game Datamissions",
+            "source_title": "Game Datamissions Core Rules Data Changelog",
+            "source_url": "https://game-datamissions.com/11th/rules/changelog",
+            "review_audit_row_id": "game-datamissions-core-rules-data-931",
+            "review_audit_source_observation_sha256": (
+                "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
+            ),
+        }
+    )
+    game_datamissions_payload["observation_sha256"] = _observation_sha256(
+        cast(RuleEvidencePayload, game_datamissions_payload)
+    )
+    matching_game_datamissions = RuleEvidenceRecord.from_payload(game_datamissions_payload)
+
+    catalog = SourceEvidenceCatalog(records=(forty_k, matching_game_datamissions))
+    assert {record.provider_name for record in catalog.records} == {
+        "40k.app",
+        "Game Datamissions",
+    }
+
+    disagreeing_payload = dict(game_datamissions_payload)
+    disagreeing_payload["transcription_sha256"] = "0" * 64
+    disagreeing_payload["observation_sha256"] = _observation_sha256(
+        cast(RuleEvidencePayload, disagreeing_payload)
+    )
+    disagreeing_game_datamissions = RuleEvidenceRecord.from_payload(disagreeing_payload)
+    with pytest.raises(
+        RuleEvidenceError,
+        match="Co-versioned maintained App mirrors disagree",
+    ):
+        SourceEvidenceCatalog(records=(forty_k, disagreeing_game_datamissions))
 
 
 def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() -> None:
@@ -1079,7 +1364,7 @@ def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() 
     mislabeled_mirror = dict(mirror_payload)
     mislabeled_mirror["provider_name"] = "Games Workshop"
     mislabeled_mirror["source_platform"] = "Warhammer 40,000 App"
-    with pytest.raises(RuleEvidenceError, match=r"40k\.app record"):
+    with pytest.raises(RuleEvidenceError, match="maintained App-mirror record"):
         RuleEvidenceRecord.from_payload(mislabeled_mirror)
     for invalid_url in (
         "https://www.40k.app/rulesevil",
@@ -1102,18 +1387,10 @@ def test_rule_evidence_official_capture_requires_authenticated_retained_bytes() 
         RuleSourcePackage(
             source_catalog=package.source_catalog,
             source_evidence_catalog=SourceEvidenceCatalog(
-                records=(
-                    *tuple(
-                        record
-                        for record in package.source_evidence_catalog.records_for_source_id(
-                            false_conflict_record.rule_source_id
-                        )
-                        if record.evidence_id != false_conflict_record.evidence_id
-                    ),
-                    false_conflict_record,
-                )
+                records=_replace_evidence_records(package, false_conflict_record)
             ),
-            evidence_required_source_ids=(false_conflict_record.rule_source_id,),
+            evidence_required_source_ids=package.evidence_required_source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
 
 
@@ -1287,7 +1564,7 @@ def test_app_source_artifacts_reject_project_authority_policy_id_drift() -> None
 
     with pytest.raises(
         app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
-        match="authoritative-mirror evidence provenance drifted",
+        match="transcription evidence is invalid",
     ):
         app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
             json.dumps(hidden_payload, sort_keys=True).encode()
@@ -1316,7 +1593,7 @@ def test_app_source_artifacts_reject_retained_audit_link_drift() -> None:
 
     with pytest.raises(
         july_rules_updates_2026_07.JulyRulesUpdateArtifactError,
-        match="retained audit source-observation link drifted",
+        match="evidence record is invalid",
     ):
         july_rules_updates_2026_07.july_rules_updates_package_artifact_from_json_bytes(
             json.dumps(july_payload, sort_keys=True).encode()
@@ -1340,7 +1617,7 @@ def test_app_source_artifacts_reject_retained_audit_link_drift() -> None:
 
     with pytest.raises(
         app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
-        match="authoritative-mirror evidence provenance drifted",
+        match="transcription evidence is invalid",
     ):
         app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
             json.dumps(hidden_payload, sort_keys=True).encode()
@@ -2187,8 +2464,15 @@ def test_project_reviewed_app_transcription_is_truthful_and_insufficient_alone()
     ):
         RuleSourcePackage(
             source_catalog=package.source_catalog,
-            source_evidence_catalog=SourceEvidenceCatalog(records=(project_review,)),
-            evidence_required_source_ids=(source_id,),
+            source_evidence_catalog=SourceEvidenceCatalog(
+                records=tuple(
+                    record
+                    for record in package.source_evidence_catalog.records
+                    if record.rule_source_id != source_id or record == project_review
+                )
+            ),
+            evidence_required_source_ids=package.evidence_required_source_ids,
+            source_authority_scope=package.source_authority_scope,
         )
 
 
@@ -2198,6 +2482,17 @@ def test_ruleset_descriptor_hash_is_eleventh_only_and_deterministic() -> None:
 
     assert payload["ruleset_id"]["edition"] == "11e"
     assert descriptor.descriptor_hash == RulesetDescriptor.from_payload(payload).descriptor_hash
+
+
+def _replace_evidence_records(
+    package: RuleSourcePackage,
+    *replacements: RuleEvidenceRecord,
+) -> tuple[RuleEvidenceRecord, ...]:
+    replacements_by_id = {record.evidence_id: record for record in replacements}
+    return tuple(
+        replacements_by_id.get(record.evidence_id, record)
+        for record in package.source_evidence_catalog.records
+    )
 
 
 def _july_rules_update_payload() -> dict[str, object]:
