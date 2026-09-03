@@ -468,10 +468,11 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-transports",
-          "version": "reviewed-transports-observed-2026-09-02",
+          "version": "reviewed-transports-observed-2026-09-03",
           "allowed_rule_source_ids": [
             "gw-11e-core-rules:transports:assault-disembark-move",
-            "gw-11e-core-rules:transports:emergency-disembark-move"
+            "gw-11e-core-rules:transports:emergency-disembark-move",
+            "gw-11e-core-rules:transports:shock-disembark-move"
           ]
         },
         {

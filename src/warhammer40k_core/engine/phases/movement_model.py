@@ -1287,6 +1287,7 @@ class DisembarkCandidate:
     disembark_mode: DisembarkModeKind
     transport_movement_status: TransportMovementStatus
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
+    start_engaged_enemy_unit_instance_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1333,6 +1334,19 @@ class DisembarkCandidate:
                 self.restriction_overrides,
             ),
         )
+        object.__setattr__(
+            self,
+            "start_engaged_enemy_unit_instance_ids",
+            _validate_identifier_tuple(
+                "DisembarkCandidate start_engaged_enemy_unit_instance_ids",
+                self.start_engaged_enemy_unit_instance_ids,
+            ),
+        )
+        if (
+            self.disembark_mode is not DisembarkModeKind.SHOCK_DISEMBARK
+            and self.start_engaged_enemy_unit_instance_ids
+        ):
+            raise GameLifecycleError("Only Shock Disembark may carry start engagement state.")
 
 
 @dataclass(frozen=True, slots=True)

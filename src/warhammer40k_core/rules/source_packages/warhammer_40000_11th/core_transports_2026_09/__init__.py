@@ -34,7 +34,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "861a86d603ea1c9e676c2f9c505760b3130eb006a278f7e387fbffaedfe6e190"
+EXPECTED_ARTIFACT_SHA256: Final = "a5d78f54c1507625a7911397f181e0f6466cb6f168d78febf0412628408287c5"
 
 
 def _load_artifact() -> CoreTransportsSourcePackageArtifact:
@@ -64,6 +64,8 @@ EMERGENCY_DISEMBARK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[0][1]
 EMERGENCY_DISEMBARK_TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[0][4]
 ASSAULT_DISEMBARK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[1][1]
 ASSAULT_DISEMBARK_TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[1][4]
+SHOCK_DISEMBARK_MOVE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITIES[2][1]
+SHOCK_DISEMBARK_TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITIES[2][4]
 
 
 def source_rule_records() -> tuple[CoreTransportsSourceRuleArtifact, ...]:
@@ -82,7 +84,7 @@ def source_package() -> RuleSourcePackage:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 9, 2),
+        source_date=date(2026, 9, 3),
     )
     document_ids = tuple(
         SourceDocumentId(package_id=package_id, document_id=document.document_id)
@@ -114,7 +116,7 @@ def source_package() -> RuleSourcePackage:
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-transports-source-observed-2026-09-02"
+                    version="core-v2-transports-source-observed-2026-09-03"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
@@ -128,6 +130,7 @@ def source_package() -> RuleSourcePackage:
         evidence_required_source_ids=(
             ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
             EMERGENCY_DISEMBARK_MOVE_SOURCE_ID,
+            SHOCK_DISEMBARK_MOVE_SOURCE_ID,
         ),
         source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     )
@@ -140,6 +143,8 @@ __all__ = (
     "EMERGENCY_DISEMBARK_TRANSCRIPTION_SHA256",
     "EXPECTED_ARTIFACT_SHA256",
     "PACKAGE_HASH",
+    "SHOCK_DISEMBARK_MOVE_SOURCE_ID",
+    "SHOCK_DISEMBARK_TRANSCRIPTION_SHA256",
     "SOURCE_PACKAGE_ID",
     "SOURCE_VERSION",
     "CoreTransportsSourceArtifactError",

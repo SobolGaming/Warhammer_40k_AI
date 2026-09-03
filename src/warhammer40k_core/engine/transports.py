@@ -59,6 +59,9 @@ from warhammer40k_core.engine.transport_disembark_state import (
     EMERGENCY_DISEMBARK_RULE_ID as EMERGENCY_DISEMBARK_RULE_ID,
 )
 from warhammer40k_core.engine.transport_disembark_state import (
+    SHOCK_DISEMBARK_MOVE_SOURCE_ID as SHOCK_DISEMBARK_MOVE_SOURCE_ID,
+)
+from warhammer40k_core.engine.transport_disembark_state import (
     DisembarkedUnitState as DisembarkedUnitState,
 )
 from warhammer40k_core.engine.transport_disembark_state import (
@@ -141,6 +144,9 @@ class TransportOperationViolationCode(StrEnum):
     DISEMBARK_DISTANCE = "disembark_distance"
     TRANSPORT_ADVANCED_OR_FELL_BACK = "transport_advanced_or_fell_back"
     ASSAULT_DISEMBARK_PERMISSION_REQUIRED = "assault_disembark_permission_required"
+    SHOCK_DISEMBARK_PERMISSION_REQUIRED = "shock_disembark_permission_required"
+    SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED = "shock_disembark_engagement_not_preserved"
+    SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT = "shock_disembark_engagement_snapshot_drift"
     UNIT_PLACEMENT_DRIFT = "unit_placement_drift"
     MODEL_OVERLAP = "model_overlap"
     BATTLEFIELD_EDGE_CROSSED = "battlefield_edge_crossed"
@@ -212,6 +218,7 @@ class DisembarkSelectionPayload(TypedDict):
     disembark_mode: str
     transport_movement_status: str
     restriction_overrides: list[TransportRestrictionOverridePayload]
+    start_engaged_enemy_unit_instance_ids: list[str]
 
 
 class DisembarkResolutionPayload(TypedDict):
@@ -800,6 +807,7 @@ class DisembarkSelection:
     disembark_mode: DisembarkModeKind
     transport_movement_status: TransportMovementStatus
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
+    start_engaged_enemy_unit_instance_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -855,6 +863,19 @@ class DisembarkSelection:
                 self.restriction_overrides,
             ),
         )
+        object.__setattr__(
+            self,
+            "start_engaged_enemy_unit_instance_ids",
+            _validate_identifier_tuple(
+                "DisembarkSelection start_engaged_enemy_unit_instance_ids",
+                self.start_engaged_enemy_unit_instance_ids,
+            ),
+        )
+        if (
+            self.disembark_mode is not DisembarkModeKind.SHOCK_DISEMBARK
+            and self.start_engaged_enemy_unit_instance_ids
+        ):
+            raise GameLifecycleError("Only Shock Disembark may carry start engagement state.")
 
     def has_override(self, override_kind: TransportRestrictionOverrideKind) -> bool:
         kind = transport_restriction_override_kind_from_token(override_kind)
@@ -872,6 +893,9 @@ class DisembarkSelection:
             "restriction_overrides": [
                 override.to_payload() for override in self.restriction_overrides
             ],
+            "start_engaged_enemy_unit_instance_ids": list(
+                self.start_engaged_enemy_unit_instance_ids
+            ),
         }
 
     @classmethod
@@ -889,6 +913,9 @@ class DisembarkSelection:
             restriction_overrides=tuple(
                 TransportRestrictionOverride.from_payload(override)
                 for override in payload["restriction_overrides"]
+            ),
+            start_engaged_enemy_unit_instance_ids=tuple(
+                payload["start_engaged_enemy_unit_instance_ids"]
             ),
         )
 
@@ -2005,12 +2032,14 @@ def resolve_disembark(
     battlefield_depth_inches: float = _DEFAULT_BATTLEFIELD_DEPTH_INCHES,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    enforce_shock_engagement_preservation: bool = True,
 ) -> DisembarkResolution:
     if selection.disembark_mode is DisembarkModeKind.COMBAT_DISEMBARK:
         raise GameLifecycleError("Combat Disembark requires resolve_combat_disembark.")
     if selection.disembark_mode not in {
         DisembarkModeKind.RAPID_DISEMBARK,
         DisembarkModeKind.ASSAULT_DISEMBARK,
+        DisembarkModeKind.SHOCK_DISEMBARK,
         DisembarkModeKind.TACTICAL_DISEMBARK,
     }:
         raise GameLifecycleError("resolve_disembark requires a standard Disembark mode.")
@@ -2027,6 +2056,7 @@ def resolve_disembark(
         battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
+        enforce_shock_engagement_preservation=enforce_shock_engagement_preservation,
     )
 
 
@@ -2502,6 +2532,7 @@ def _resolve_disembark(
     battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     objective_markers: tuple[ObjectiveMarker, ...],
+    enforce_shock_engagement_preservation: bool = True,
 ) -> DisembarkResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_disembark requires a BattlefieldScenario.")
@@ -2570,11 +2601,23 @@ def _resolve_disembark(
                 source_rule_id=_CORE_TRANSPORT_RULE_ID,
             )
         )
-    if selection.transport_movement_status in {
-        TransportMovementStatus.ADVANCE,
-        TransportMovementStatus.FALL_BACK,
-    } and not selection.has_override(
-        TransportRestrictionOverrideKind.ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK
+    shock_advance_is_permitted = (
+        selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+        and selection.transport_movement_status is TransportMovementStatus.ADVANCE
+        and selection.has_override(
+            TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE
+        )
+    )
+    if (
+        selection.transport_movement_status
+        in {
+            TransportMovementStatus.ADVANCE,
+            TransportMovementStatus.FALL_BACK,
+        }
+        and not selection.has_override(
+            TransportRestrictionOverrideKind.ALLOW_DISEMBARK_AFTER_ADVANCE_OR_FALL_BACK
+        )
+        and not shock_advance_is_permitted
     ):
         violations.append(
             TransportOperationViolation(
@@ -2601,6 +2644,20 @@ def _resolve_disembark(
                 source_rule_id=ASSAULT_DISEMBARK_MOVE_SOURCE_ID,
             )
         )
+    if selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK and not (
+        selection.has_override(TransportRestrictionOverrideKind.ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE)
+    ):
+        violations.append(
+            TransportOperationViolation(
+                violation_code=(
+                    TransportOperationViolationCode.SHOCK_DISEMBARK_PERMISSION_REQUIRED
+                ),
+                message="Shock Disembark requires a source-backed permitting rule.",
+                unit_instance_id=unit.unit_instance_id,
+                blocker_id=transport_placement.unit_instance_id,
+                source_rule_id=_transport_disembark_state.SHOCK_DISEMBARK_MOVE_SOURCE_ID,
+            )
+        )
     _append_unit_placement_drift_violations(
         violations=violations,
         unit=unit,
@@ -2615,6 +2672,27 @@ def _resolve_disembark(
         scenario=scenario,
         unit_placement=transport_placement,
     )
+    if disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
+        actual_start_engagements = _enemy_unit_ids_engaged_with_transport(
+            scenario=scenario,
+            ruleset_descriptor=ruleset_descriptor,
+            transport_models=transport_models,
+        )
+        if actual_start_engagements != selection.start_engaged_enemy_unit_instance_ids:
+            violations.append(
+                TransportOperationViolation(
+                    violation_code=(
+                        TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT
+                    ),
+                    message=(
+                        "Shock Disembark start engagements must match the Transport's "
+                        "authoritative engagement state."
+                    ),
+                    unit_instance_id=selection.unit_instance_id,
+                    blocker_id=selection.transport_unit_instance_id,
+                    source_rule_id=(_transport_disembark_state.SHOCK_DISEMBARK_MOVE_SOURCE_ID),
+                )
+            )
     _append_disembark_endpoint_violations(
         violations=violations,
         scenario=scenario,
@@ -2629,7 +2707,41 @@ def _resolve_disembark(
         terrain_features=features,
         objective_markers=markers,
         disembark_mode=disembark_mode,
+        allowed_enemy_engagement_unit_ids=(selection.start_engaged_enemy_unit_instance_ids),
     )
+    if (
+        enforce_shock_engagement_preservation
+        and disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+    ):
+        post_placement_scenario = BattlefieldScenario(
+            armies=scenario.armies,
+            battlefield_state=scenario.battlefield_state.with_added_unit_placement(
+                selection.attempted_placement
+            ),
+        )
+        post_engaged_unit_ids = set(
+            scenario_physically_engaged_enemy_rules_unit_ids(
+                scenario=post_placement_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_instance_id=selection.unit_instance_id,
+            )
+        )
+        for required_enemy_id in selection.start_engaged_enemy_unit_instance_ids:
+            if required_enemy_id not in post_engaged_unit_ids:
+                violations.append(
+                    TransportOperationViolation(
+                        violation_code=(
+                            TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED
+                        ),
+                        message=(
+                            "Shock Disembark must preserve every enemy engagement "
+                            "that existed at the start of the move."
+                        ),
+                        unit_instance_id=selection.unit_instance_id,
+                        blocker_id=required_enemy_id,
+                        source_rule_id=(_transport_disembark_state.SHOCK_DISEMBARK_MOVE_SOURCE_ID),
+                    )
+                )
     coherency_result = unit_placement_coherency_result(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -2674,6 +2786,7 @@ def _resolve_disembark(
             disembark_mode=selection.disembark_mode,
             transport_movement_status=selection.transport_movement_status,
             restriction_overrides=selection.restriction_overrides,
+            start_engaged_enemy_unit_instance_ids=(selection.start_engaged_enemy_unit_instance_ids),
         )
     )
     return DisembarkResolution(
@@ -2699,6 +2812,7 @@ def _disembark_distance_inches(disembark_mode: DisembarkModeKind) -> float:
     if mode in {
         DisembarkModeKind.RAPID_DISEMBARK,
         DisembarkModeKind.ASSAULT_DISEMBARK,
+        DisembarkModeKind.SHOCK_DISEMBARK,
         DisembarkModeKind.TACTICAL_DISEMBARK,
         DisembarkModeKind.DESTROYED_TRANSPORT,
     }:
@@ -2806,6 +2920,7 @@ def _append_disembark_endpoint_violations(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     objective_markers: tuple[ObjectiveMarker, ...],
     disembark_mode: DisembarkModeKind,
+    allowed_enemy_engagement_unit_ids: tuple[str, ...] = (),
 ) -> None:
     mode = disembark_mode_kind_from_token(disembark_mode)
     placed_models = _placed_geometry_models(scenario)
@@ -2826,7 +2941,10 @@ def _append_disembark_endpoint_violations(
         if mode is DisembarkModeKind.COMBAT_DISEMBARK
         else ()
     )
-    combat_engagement_units = set(combat_engagement_unit_ids)
+    allowed_engagement_units = {
+        *combat_engagement_unit_ids,
+        *allowed_enemy_engagement_unit_ids,
+    }
     for model in models:
         if not _model_is_within_battlefield(
             model,
@@ -2877,7 +2995,7 @@ def _append_disembark_endpoint_violations(
                         model_instance_id=enemy_model.model_id,
                     ),
                 ).unit_instance_id
-                if enemy_unit_id in combat_engagement_units:
+                if enemy_unit_id in allowed_engagement_units:
                     continue
                 violations.append(
                     TransportOperationViolation(

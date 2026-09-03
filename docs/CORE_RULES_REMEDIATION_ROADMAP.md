@@ -2039,19 +2039,153 @@ scenario passes all `342` assertions for contract version `11.1.0`.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/417`; merge commit
 pending review and merge.
 
+### P18E — C18-05
+
+Status: Implemented in Order 13; local validation and publication details are recorded in the PR.
+
+Finding IDs: `C18-05`.
+
+Dependencies and evidence gate: P18D/PR #417 is merged on `main` at
+`2fb55409b816ce80925f7edca10c219b23048d86`, and S-MIRRORS/PR #416 remains the controlling
+source-governance gate. The exact 18.07 statement is retained as a reviewed transcription and a
+separately classified, project-authoritative Game Datamissions v931 App-data mirror observation
+authenticated against the S-MIRRORS provider audit. This satisfies `APP-AUTHORITY`; no
+co-versioned contrary observation is retained, so no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: Shock Disembark is a distinct source-permitted Transport move. It cannot be an
+Advance exception on Rapid Disembark because the engine must authenticate the enemy rules units
+engaged with the Transport at move start, preserve every one of those engagements after 3″ grouped
+setup, then give the opponent one canonical selected-to-fight activation for each affected unit
+that has not already been selected in the current phase. Those identities and the temporary
+cross-phase Fight control state must remain deterministic through decisions, events, adapters,
+restore, and replay.
+
+How it was done before P18E: an Advanced Transport exposed no Disembark candidate. There was no
+Shock mode, typed source permission, start-engagement snapshot, grouped preservation check, or
+source-tagged way to run an opponent Fight activation while Movement remained the active phase.
+The ordinary Fight selection and selected-unit hook context assumed the global Fight phase, so a
+local forced-selection event would have bypassed canonical validation and mutation.
+
+How it is done after P18E: the shared typed Transport-disembark permission service now owns exact
+effect payload validation for both Assault and Shock consumers. A `shock_disembark_permission`
+effect binds one permitting source, owner, battlefield Transport, battle round, and exact eligible
+canonical passenger IDs. When that Transport has Advanced, movement-owned candidate enumeration
+emits only `shock_disembark`, captures the sorted canonical enemy rules-unit IDs physically engaged
+with the Transport, and carries the exact permission override and engagement snapshot into the
+public placement request. The submission must echo both unchanged before queue pop. The grouped
+resolver requires every living passenger model wholly within 3″, rejects engagement with any enemy
+outside the snapshot, and proves every starting enemy engagement still exists after the atomic
+placement. The committed `DisembarkedUnitState` records the Core 18.07 source, permitting source,
+and engagement snapshot while prohibiting further movement, Remain Stationary, and charging.
+
+Each starting enemy not already selected to fight in the current phase enters one transient
+`ForcedFightActivationContext` owned by the existing Fight state. It binds the triggering
+`unit_disembarked` event, Core source ID, Movement source phase, passenger, Transport, opponent,
+and eligible canonical enemy IDs. The ordinary `select_fight_activation` request is reused with no
+pass option; the opponent chooses one unit at a time, and the normal selection validation,
+selected-to-fight hooks, melee declaration/attack execution, `fight_activation_selected`, and
+`unit_has_fought` paths run unchanged. The selected-unit hook context accepts a non-Fight source
+phase only when the active state contains the matching typed forced context. Movement resumes only
+after every still-eligible affected enemy resolves and the queue-completion event clears that
+transient state.
+
+Specific authoritative maintained direct App-data mirror statement and source ID: Game
+Datamissions App-data v931 section 18.07, `SHOCK DISEMBARK MOVE`, requires setup as in Set Up when
+the permitting rule applies; the unit must be embarked in a battlefield Transport and must not
+have embarked in it this phase; each model is set up wholly within 3″; every enemy unit engaged at
+move start must remain engaged; and the opponent selects each such not-yet-selected unit one at a
+time, making it eligible and selected to fight. Its stable source ID is
+`gw-11e-core-rules:transports:shock-disembark-move`. Runtime behavior gates only on that source ID,
+typed mode, permission effect, and canonical identities, never on display names or source text.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog`, App-data version `931`, reviewed
+at `2026-09-02T12:30:09-04:00`; transcription
+`d8dae354aabcc30c582b66e70939dd67c010055637f86923292c0c76ffe7252c`;
+reviewed-transcription observation
+`3c866ae008d4085ac1c09d21b794221bb72eb18d62a9dd7415668733bfb722cc`;
+authoritative-mirror observation
+`cc8a85d4bcd88e7eb0ec3d9228721e5c1e4d1e4287b57d02a18ae3e8b3523efe`; authenticated
+provider-audit observation
+`1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`. The expanded Core
+Transports package hash is
+`62c267ae792834ddd371541f177e78056492656db964cfdcaaa1a3de6581472f`, and its canonical artifact
+byte SHA-256 is `a5d78f54c1507625a7911397f181e0f6466cb6f168d78febf0412628408287c5`.
+The engine build ID at implementation is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:78e8d74e1f926a835b88da067893cbdd1878cc3e882915c2ead13d16b3160cbd`.
+
+Load and execution support: the 18.07 rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation carries
+project authority. The fail-fast loader pins all three Transport source documents, all three rule
+rows, their complete evidence inventory and runtime consumers, package hash, and artifact byte
+hash.
+
+Scope and explicit exclusions: P18E owns the shared exact permission extraction, first-class Shock
+mode, Advance-only candidate, source eligibility, canonical 3″ grouped placement, start-engagement
+authentication/preservation, transient opponent Fight activation queue, decision/event/adapter and
+restore/replay integrity, source package, documentation, regressions, and static bug-class audit.
+Content rules that grant Shock permission must still produce the typed effect through RuleIR or an
+approved runtime hook. P18E adds no faction named handler, does not implement Rapid Disembark
+ingress-restriction propagation/P20, Ongoing Consolidation/P12, or Emergency maximum-placement
+behavior/P18B, and exposes no out-of-scope content.
+
+Owning source/validation/mutation/event/replay path: reviewed generated Core Transports JSON and
+fail-closed loader -> stable 18.07 identity -> typed source permission -> movement-owned candidate
+and start-engagement snapshot -> parameterized placement decision/prevalidation -> grouped
+Transport validation and atomic battlefield mutation -> typed disembarked state -> transient
+source-tagged canonical Fight selection/activation -> public status/events/projection -> strict
+restore/replay authentication. Engine state remains the sole mutation owner.
+
+Decision and viewer-visibility impact: P18E adds one public disembark mode and two additive public
+fields to existing request/event families: `start_engaged_enemy_unit_instance_ids` and
+`forced_activation_context`. It adds no decision type or proposal kind. The placement submission
+echoes the pending snapshot; the forced queue uses the existing public `select_fight_activation`
+decision. Both players receive the same request and event payloads under the current public
+battlefield-information scope through shared adapter redaction. Adapters cannot infer eligibility,
+alter ordering, pass, or mutate Fight state.
+
+Regression scenarios and same-bug-class search: focused tests cover missing permission, wrong
+snapshot, broken preserved engagement, 3″ grouped setup, no-charge/no-further-move state, canonical
+attached enemy identity, malformed omission before queue pop, deterministic option selection,
+opponent ownership, no pass, canonical selected-to-fight hooks, queue completion, both-viewer
+request/event projection, active and completed restore, event-source drift, and payload round-trip.
+The same-bug-class audit binds the new mode/snapshot through every standard candidate, proposal,
+selection, state, event, and lifecycle restore path, factors duplicated Assault/ Shock permission
+parsing into one fail-closed service, and pins reuse of the canonical Fight activation constant and
+handler. No behavioral test file was added, removed, moved, or renamed, so the four-shard inventory
+does not change.
+
+Generated artifacts/documentation: P18E expands the existing
+`core_transports_2026_09/artifacts/package.json`, typed loader/source package, authority registry,
+and offline builder for 18.07; adds bounded shared-permission and Shock modules; regenerates the
+engine build identity and affected external-contract examples; and updates README,
+`ARCHITECTURE_V2.md`, `docs/ADAPTER_DECISION_CONTRACT.md`, and this finding record.
+
+Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
+Pyright, the exact xdist/work-stealing full suite (`6419 passed`), the four-shard fail-closed check,
+all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
+coverage run passes `--cov-fail-under=85` at `85.000128%` across `195753` statements and `77376`
+branches. All seven Core source-package generator checks, engine-build identity verification,
+base-ref external-contract verification, installed-wheel smoke, generated TypeScript contract
+check, TypeScript typecheck, five TypeScript unit tests, and the 342-assertion external conformance
+scenario also pass.
+
+PR URL and merge commit: pending publication and review.
+
 ### Post-P18C v931/v946 findings
 
-Status: This section was introduced as planning documentation in PR #414. The P18D finding record
-above now implements and closes C18-04 without expanding P18C's production, contract,
-source-package, or generated-runtime scope. P18C remains scoped to C18-03 and must not claim
-complete category-18 or complete v931 compliance.
+Status: This section was introduced as planning documentation in PR #414. The P18D and P18E
+finding records above now implement C18-04 and C18-05 without expanding P18C's production,
+contract, source-package, or generated-runtime scope. P18C remains scoped to C18-03 and category
+18 remains incomplete until its remaining scheduled findings close.
 
 Evidence and sequencing: Game Datamissions records 19 changed items in direct App-data version 931,
 dated 2026-08-26. The duplicated 01.02.06 changed/errata entries are one semantic obligation, so
 the canonical map above contains 18 distinct obligations. Version 946, dated 2026-09-02, adds the
 separate 18.04.01 Rapid Disembark And Limitations row. The official August 26 Universal Rules
 Updates v1.1 independently confirms that Assault and Shock Disembark are new Core Rules concepts.
-S-MIRRORS now closes after P18C as the explicit source-governance gate. P18D follows S-MIRRORS and
+S-MIRRORS closes after P18C as the explicit source-governance gate. P18D follows S-MIRRORS and
 owns C18-04; P18E follows P18D and owns C18-05; P20 owns C18-06 together with C20-01. Its policy
 artifact, evidence-tuple validation, co-version mismatch rejection, and retained two-provider
 review evidence satisfy the acceptance criteria in the canonical sequence row.
@@ -2077,12 +2211,10 @@ implementation must own source eligibility, canonical attached rules-unit setup 
 the charge-eligibility state granted by the permitting rule, typed invalid outcomes, engine events,
 payload restore/replay, adapter submissions/projections, and deterministic tests.
 
-C18-05 requires a separate first-class Shock Disembark move when a rule permits disembarkation after
-the Transport Advanced. In addition to source eligibility and canonical 3″ setup, it must preserve
-every enemy engagement that existed at the start of the move and force the opponent to select each
-such not-yet-selected enemy rules unit, one at a time, through the canonical Fight
-selection/activation path. The implementation must cover attached identities, events, payload
-restore/replay, adapter visibility, stale or invalid submissions, and determinism.
+C18-05 is implemented by the P18E record above as a separate first-class Shock Disembark move. Its
+source-bound Advance permission, canonical 3″ grouped setup, exact start-engagement preservation,
+one-at-a-time opponent Fight activations, attached identities, events, restore/replay, adapter
+visibility, invalid-submission handling, and determinism are all owned by that record.
 
 C18-06 is scheduled with P20 because the missing behavior belongs at the common Transport-ingress
 boundary: a unit using Rapid Disembark after its Transport ingresses must inherit every setup rule

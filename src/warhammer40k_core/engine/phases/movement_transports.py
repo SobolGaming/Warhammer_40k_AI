@@ -13,6 +13,12 @@ from warhammer40k_core.engine.phases.movement_reinforcements import *
 from warhammer40k_core.engine.assault_disembark import (
     assault_disembark_restriction_overrides,
 )
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
+from warhammer40k_core.engine.shock_disembark import (
+    shock_disembark_restriction_overrides,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -87,15 +93,11 @@ def _disembark_candidate_for_movement_unit(
     if state.battlefield_state.unit_placement_or_none(transport_id) is None:
         return None
 
-    if (
-        state.advanced_unit_state_for_unit(
-            player_id=movement_state.active_player_id,
-            battle_round=state.battle_round,
-            unit_instance_id=transport_id,
-        )
-        is not None
-    ):
-        return None
+    advanced_transport = state.advanced_unit_state_for_unit(
+        player_id=movement_state.active_player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=transport_id,
+    )
     if (
         state.fell_back_unit_state_for_unit(
             player_id=movement_state.active_player_id,
@@ -117,7 +119,25 @@ def _disembark_candidate_for_movement_unit(
         and reserve_state.arrived_battle_round == state.battle_round
         and reserve_state.arrived_phase == BattlePhase.MOVEMENT.value
     )
-    if normal_move_states:
+    start_engaged_enemy_unit_instance_ids: tuple[str, ...] = ()
+    if advanced_transport is not None:
+        movement_status = TransportMovementStatus.ADVANCE
+        restriction_overrides = shock_disembark_restriction_overrides(
+            state=state,
+            player_id=movement_state.active_player_id,
+            battle_round=state.battle_round,
+            rules_unit_instance_id=unit_id,
+            transport_unit_instance_id=transport_id,
+        )
+        if not restriction_overrides:
+            return None
+        disembark_mode = DisembarkModeKind.SHOCK_DISEMBARK
+        start_engaged_enemy_unit_instance_ids = scenario_physically_engaged_enemy_rules_unit_ids(
+            scenario=_battlefield_scenario(state),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            unit_instance_id=transport_id,
+        )
+    elif normal_move_states:
         movement_status = TransportMovementStatus.NORMAL_MOVE
         restriction_overrides = assault_disembark_restriction_overrides(
             state=state,
@@ -151,6 +171,7 @@ def _disembark_candidate_for_movement_unit(
         disembark_mode=disembark_mode,
         transport_movement_status=movement_status,
         restriction_overrides=restriction_overrides,
+        start_engaged_enemy_unit_instance_ids=start_engaged_enemy_unit_instance_ids,
     )
 
 
@@ -198,6 +219,15 @@ def _request_disembark_placement(
                 validate_json_value(override.to_payload())
                 for override in selection.restriction_overrides
             ],
+            **(
+                {
+                    "start_engaged_enemy_unit_instance_ids": list(
+                        selection.start_engaged_enemy_unit_instance_ids
+                    )
+                }
+                if selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK
+                else {}
+            ),
         },
     )
     request = proposal_request.to_decision_request()
@@ -219,6 +249,9 @@ def _request_disembark_placement(
                 validate_json_value(override.to_payload())
                 for override in selection.restriction_overrides
             ],
+            "start_engaged_enemy_unit_instance_ids": list(
+                selection.start_engaged_enemy_unit_instance_ids
+            ),
             "proposal_kind": ProposalKind.DISEMBARK.value,
             "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
             "request_id": request.request_id,
@@ -245,6 +278,9 @@ def _request_disembark_placement(
                 validate_json_value(override.to_payload())
                 for override in selection.restriction_overrides
             ],
+            "start_engaged_enemy_unit_instance_ids": list(
+                selection.start_engaged_enemy_unit_instance_ids
+            ),
             "proposal_kind": ProposalKind.DISEMBARK.value,
             "placement_kinds": [BattlefieldPlacementKind.DISEMBARK.value],
             "ruleset_descriptor_hash": ruleset_descriptor.descriptor_hash,
@@ -264,6 +300,7 @@ def _resolve_disembark_placement_submission(
     disembark_mode: DisembarkModeKind,
     transport_movement_status: TransportMovementStatus,
     restriction_overrides: tuple[TransportRestrictionOverride, ...],
+    start_engaged_enemy_unit_instance_ids: tuple[str, ...],
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -289,6 +326,7 @@ def _resolve_disembark_placement_submission(
         disembark_mode=disembark_mode,
         transport_movement_status=transport_movement_status,
         restriction_overrides=restriction_overrides,
+        start_engaged_enemy_unit_instance_ids=(start_engaged_enemy_unit_instance_ids),
     )
     cargo_state = state.transport_cargo_state_for_transport(transport_unit_instance_id)
     if cargo_state is None:
@@ -407,6 +445,7 @@ def _resolve_disembark_placement_submission(
         decisions=decisions,
         disembark=resolution,
         result=result,
+        ruleset_descriptor=ruleset_descriptor,
     )
     return None
 
