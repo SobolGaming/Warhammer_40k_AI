@@ -128,6 +128,7 @@ class PlacementProposalPayloadPayload(TypedDict):
     disembark_mode: NotRequired[str]
     transport_movement_status: NotRequired[str]
     restriction_overrides: NotRequired[list[TransportRestrictionOverridePayload]]
+    start_engaged_enemy_unit_instance_ids: NotRequired[list[str]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -651,6 +652,7 @@ class PlacementProposalPayload:
     disembark_mode: DisembarkModeKind | None = None
     transport_movement_status: TransportMovementStatus | None = None
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
+    start_engaged_enemy_unit_instance_ids: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -736,6 +738,15 @@ class PlacementProposalPayload:
                 self.restriction_overrides,
             ),
         )
+        if self.start_engaged_enemy_unit_instance_ids is not None:
+            object.__setattr__(
+                self,
+                "start_engaged_enemy_unit_instance_ids",
+                _validate_identifier_tuple(
+                    "PlacementProposalPayload start_engaged_enemy_unit_instance_ids",
+                    self.start_engaged_enemy_unit_instance_ids,
+                ),
+            )
 
     def validation_result_for_request(
         self,
@@ -836,6 +847,16 @@ class PlacementProposalPayload:
         )
         if restriction_override_result is not None:
             return restriction_override_result
+        start_engagement_result = _placement_proposal_optional_identifier_list_match(
+            request=request,
+            submitted_values=self.start_engaged_enemy_unit_instance_ids,
+            context_key="start_engaged_enemy_unit_instance_ids",
+            violation_code="proposal_start_engagement_drift",
+            message=("Disembark proposal start engagements do not match the pending request."),
+            field="start_engaged_enemy_unit_instance_ids",
+        )
+        if start_engagement_result is not None:
+            return start_engagement_result
         return ProposalValidationResult.valid(
             proposal_request_id=request.request_id,
             proposal_kind=request.proposal_kind,
@@ -880,6 +901,10 @@ class PlacementProposalPayload:
             payload["restriction_overrides"] = [
                 override.to_payload() for override in self.restriction_overrides
             ]
+        if self.start_engaged_enemy_unit_instance_ids is not None:
+            payload["start_engaged_enemy_unit_instance_ids"] = list(
+                self.start_engaged_enemy_unit_instance_ids
+            )
         return payload
 
     @classmethod
@@ -888,6 +913,7 @@ class PlacementProposalPayload:
         disembark_mode_payload = payload.get("disembark_mode")
         movement_status_payload = payload.get("transport_movement_status")
         overrides_payload = payload.get("restriction_overrides")
+        start_engagement_payload = payload.get("start_engaged_enemy_unit_instance_ids")
         has_placement = "attempted_placement" in payload
         has_rules_unit_placement = "attempted_rules_unit_placement" in payload
         if not has_placement and not has_rules_unit_placement:
@@ -929,6 +955,9 @@ class PlacementProposalPayload:
             else tuple(
                 TransportRestrictionOverride.from_payload(override)
                 for override in overrides_payload
+            ),
+            start_engaged_enemy_unit_instance_ids=(
+                None if start_engagement_payload is None else tuple(start_engagement_payload)
             ),
         )
 
@@ -1056,6 +1085,44 @@ def _placement_proposal_identifier_list_match(
             field=field,
         )
     return None
+
+
+def _placement_proposal_optional_identifier_list_match(
+    *,
+    request: MovementProposalRequest,
+    submitted_values: tuple[str, ...] | None,
+    context_key: str,
+    violation_code: str,
+    message: str,
+    field: str,
+) -> ProposalValidationResult | None:
+    context = request.context or {}
+    if context_key not in context:
+        if submitted_values is None:
+            return None
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code=violation_code,
+            message=message,
+            field=field,
+        )
+    if submitted_values is None:
+        return ProposalValidationResult.invalid(
+            proposal_request_id=request.request_id,
+            proposal_kind=request.proposal_kind,
+            violation_code="proposal_payload_missing_field",
+            message=f"Disembark placement proposal missing {context_key}.",
+            field=field,
+        )
+    return _placement_proposal_identifier_list_match(
+        request=request,
+        submitted_values=submitted_values,
+        context_key=context_key,
+        violation_code=violation_code,
+        message=message,
+        field=field,
+    )
 
 
 def _placement_proposal_disembark_mode_match(
@@ -1249,6 +1316,17 @@ def _validate_transport_override_tuple(
             )
         overrides.append(value)
     return tuple(sorted(overrides, key=lambda override: override.override_kind.value))
+
+
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    identifiers = tuple(
+        _validate_identifier(field_name, value) for value in cast(tuple[object, ...], values)
+    )
+    if len(identifiers) != len(set(identifiers)):
+        raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+    return tuple(sorted(identifiers))
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

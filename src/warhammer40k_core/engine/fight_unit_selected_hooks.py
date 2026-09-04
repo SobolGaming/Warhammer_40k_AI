@@ -64,14 +64,32 @@ class FightUnitSelectedContext:
     ordering_band: str
     request_id: str
     result_id: str
+    source_phase: BattlePhase = BattlePhase.FIGHT
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
 
         if type(self.state) is not GameState:
             raise GameLifecycleError("FightUnitSelectedContext state must be a GameState.")
-        if self.state.current_battle_phase is not BattlePhase.FIGHT:
-            raise GameLifecycleError("FightUnitSelectedContext requires the Fight phase.")
+        try:
+            source_phase = BattlePhase(self.source_phase)
+        except ValueError as exc:
+            raise GameLifecycleError("FightUnitSelectedContext source_phase is invalid.") from exc
+        object.__setattr__(self, "source_phase", source_phase)
+        if self.state.current_battle_phase is not source_phase:
+            if source_phase is BattlePhase.FIGHT:
+                raise GameLifecycleError("FightUnitSelectedContext requires the Fight phase.")
+            raise GameLifecycleError(
+                "FightUnitSelectedContext source phase must match the active phase."
+            )
+        if source_phase is not BattlePhase.FIGHT:
+            fight_state = self.state.fight_phase_state
+            forced_context = None if fight_state is None else fight_state.forced_activation_context
+            if forced_context is None or forced_context.source_phase is not source_phase:
+                raise GameLifecycleError(
+                    "FightUnitSelectedContext outside the Fight phase requires a matching "
+                    "forced activation context."
+                )
         object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
         object.__setattr__(
             self,

@@ -247,7 +247,7 @@ def test_p05a_destroyed_source_loader_rejects_schema_and_byte_drift() -> None:
         )
 
 
-def test_p18c_p18d_transport_source_artifact_is_pinned_typed_and_executable() -> None:
+def test_p18c_p18d_p18e_transport_source_artifact_is_pinned_typed_and_executable() -> None:
     artifact_path = Path(
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
         "core_transports_2026_09/artifacts/package.json"
@@ -258,6 +258,7 @@ def test_p18c_p18d_transport_source_artifact_is_pinned_typed_and_executable() ->
     rules_by_source_id = {rule.source_id: rule for rule in rules}
     emergency_rule = rules_by_source_id[core_transports_2026_09.EMERGENCY_DISEMBARK_MOVE_SOURCE_ID]
     assault_rule = rules_by_source_id[core_transports_2026_09.ASSAULT_DISEMBARK_MOVE_SOURCE_ID]
+    shock_rule = rules_by_source_id[core_transports_2026_09.SHOCK_DISEMBARK_MOVE_SOURCE_ID]
 
     assert hashlib.sha256(raw).hexdigest() == (core_transports_2026_09.EXPECTED_ARTIFACT_SHA256)
     assert json.loads(raw) == build_transports_source_payload()
@@ -273,6 +274,14 @@ def test_p18c_p18d_transport_source_artifact_is_pinned_typed_and_executable() ->
     )
     assert "Did not embark within that TRANSPORT this phase" in assault_rule.source_text
     assert "wholly within the set" in assault_rule.source_text
+    assert shock_rule.section_id == "18.07"
+    assert shock_rule.transcription_sha256 == (
+        core_transports_2026_09.SHOCK_DISEMBARK_TRANSCRIPTION_SHA256
+    )
+    assert "must still be engaged with that enemy unit" in shock_rule.source_text
+    assert "your opponent must select each of those units, one at a time" in (
+        shock_rule.source_text
+    )
     for rule in rules:
         evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
         assert rule.load_support_status == "loaded"
@@ -297,7 +306,7 @@ def test_p18c_p18d_transport_source_artifact_is_pinned_typed_and_executable() ->
     )
 
 
-def test_p18c_p18d_transport_source_loader_rejects_schema_and_byte_drift() -> None:
+def test_p18c_p18d_p18e_transport_source_loader_rejects_schema_and_byte_drift() -> None:
     artifact_path = Path(
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
         "core_transports_2026_09/artifacts/package.json"

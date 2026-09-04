@@ -34,6 +34,12 @@ from warhammer40k_core.engine.fights_first import (
 from warhammer40k_core.engine.fights_first import (
     FightsFirstSource as FightsFirstSource,
 )
+from warhammer40k_core.engine.forced_fight_context import (
+    ForcedFightActivationContext as ForcedFightActivationContext,
+)
+from warhammer40k_core.engine.forced_fight_context import (
+    ForcedFightActivationContextPayload as ForcedFightActivationContextPayload,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.physical_engagement import (
     current_closest_physical_enemy_distance_inches,
@@ -145,6 +151,7 @@ class FightPhaseStatePayload(TypedDict):
     allocated_model_ids_this_phase: list[str]
     overrun_pile_in_completed_activation_result_ids: list[str]
     phase_complete: bool
+    forced_activation_context: NotRequired[ForcedFightActivationContextPayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -905,6 +912,7 @@ class FightPhaseState:
     allocated_model_ids_this_phase: tuple[str, ...] = ()
     overrun_pile_in_completed_activation_result_ids: tuple[str, ...] = ()
     phase_complete: bool = False
+    forced_activation_context: ForcedFightActivationContext | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -974,6 +982,11 @@ class FightPhaseState:
         )
         if type(self.phase_complete) is not bool:
             raise GameLifecycleError("FightPhaseState phase_complete must be a bool.")
+        if (
+            self.forced_activation_context is not None
+            and type(self.forced_activation_context) is not ForcedFightActivationContext
+        ):
+            raise GameLifecycleError("FightPhaseState forced_activation_context must be typed.")
 
     @classmethod
     def start(
@@ -1010,6 +1023,39 @@ class FightPhaseState:
                 engaged_at_fight_step_start_unit_ids=engaged_at_fight_step_start_unit_ids,
                 fights_first_registry=fights_first_registry,
             ),
+        )
+
+    @classmethod
+    def for_forced_activations(
+        cls,
+        *,
+        battle_round: int,
+        active_player_id: str,
+        policy: FightPolicyDescriptor,
+        context: ForcedFightActivationContext,
+        fights_first_registry: FightsFirstRegistry,
+    ) -> Self:
+        if type(policy) is not FightPolicyDescriptor:
+            raise GameLifecycleError("Forced Fight activations require a FightPolicyDescriptor.")
+        if type(context) is not ForcedFightActivationContext:
+            raise GameLifecycleError("Forced Fight activations require a typed source context.")
+        return cls(
+            battle_round=battle_round,
+            active_player_id=active_player_id,
+            current_step=FightPhaseStepKind.FIGHT,
+            step_states=_step_states_for_current_step(
+                steps=policy.steps,
+                current_step=FightPhaseStepKind.FIGHT,
+                phase_complete=False,
+            ),
+            fight_order_state=FightOrderState(
+                ordering_bands=(FightOrderingBandKind.REMAINING_COMBATS,),
+                current_band_index=0,
+                next_player_id=context.selecting_player_id,
+                engaged_at_fight_step_start_unit_ids=(context.eligible_unit_instance_ids),
+                fights_first_registry=fights_first_registry,
+            ),
+            forced_activation_context=context,
         )
 
     @property
@@ -1093,6 +1139,7 @@ class FightPhaseState:
                 self.overrun_pile_in_completed_activation_result_ids
             ),
             phase_complete=False,
+            forced_activation_context=self.forced_activation_context,
         )
 
     def with_pile_in_state(self, pile_in_state: FightMovementStepState) -> Self:
@@ -1176,6 +1223,7 @@ class FightPhaseState:
                 self.overrun_pile_in_completed_activation_result_ids
             ),
             phase_complete=True,
+            forced_activation_context=self.forced_activation_context,
         )
 
     def _with_order_state(self, fight_order_state: FightOrderState) -> Self:
@@ -1237,6 +1285,7 @@ class FightPhaseState:
                 else overrun_pile_in_completed_activation_result_ids
             ),
             phase_complete=False,
+            forced_activation_context=self.forced_activation_context,
         )
 
     def to_payload(self) -> FightPhaseStatePayload:
@@ -1268,6 +1317,8 @@ class FightPhaseState:
             payload["pending_completed_attack_sequence"] = (
                 self.pending_completed_attack_sequence.to_payload()
             )
+        if self.forced_activation_context is not None:
+            payload["forced_activation_context"] = self.forced_activation_context.to_payload()
         return payload
 
     @classmethod
@@ -1308,6 +1359,11 @@ class FightPhaseState:
                 payload["overrun_pile_in_completed_activation_result_ids"]
             ),
             phase_complete=payload["phase_complete"],
+            forced_activation_context=(
+                None
+                if (forced_payload := payload.get("forced_activation_context")) is None
+                else ForcedFightActivationContext.from_payload(forced_payload)
+            ),
         )
 
 
@@ -1319,6 +1375,9 @@ def eligible_fight_contexts_for_player(
     policy: FightPolicyDescriptor,
 ) -> tuple[FightEligibilityContext, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
+    forced_context = fight_state.forced_activation_context
+    if forced_context is not None and requested_player_id != forced_context.selecting_player_id:
+        return ()
     if state.army_definition_for_player(requested_player_id) is None:
         raise GameLifecycleError("Fight phase requires mustered army definitions.")
     placed_rules_units = fight_present_rules_unit_views(state=state)
@@ -1330,6 +1389,12 @@ def eligible_fight_contexts_for_player(
     contexts: list[FightEligibilityContext] = []
     for rules_unit in player_rules_units:
         unit_id = rules_unit.unit_instance_id
+        if forced_context is not None and not rules_unit_identity_history_contains(
+            state=state,
+            identity_ids=forced_context.eligible_unit_instance_ids,
+            unit_instance_id=unit_id,
+        ):
+            continue
         if rules_unit_identity_history_contains(
             state=state,
             identity_ids=fight_state.fight_order_state.selected_to_fight_unit_ids,
@@ -1349,10 +1414,11 @@ def eligible_fight_contexts_for_player(
             state=state,
             unit_instance_id=unit_id,
         )
-        if band is FightOrderingBandKind.FIGHTS_FIRST and not has_fights_first:
-            continue
-        if band is FightOrderingBandKind.REMAINING_COMBATS and has_fights_first:
-            continue
+        if forced_context is None:
+            if band is FightOrderingBandKind.FIGHTS_FIRST and not has_fights_first:
+                continue
+            if band is FightOrderingBandKind.REMAINING_COMBATS and has_fights_first:
+                continue
         contexts.append(
             FightEligibilityContext(
                 player_id=requested_player_id,
@@ -1434,20 +1500,23 @@ def fight_activation_option_payload(
     fight_type: FightTypeKind,
 ) -> JsonValue:
     fight_type_value = fight_type_kind_from_token(fight_type)
-    return validate_json_value(
-        {
-            "submission_kind": "select_fight_activation",
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhaseKind.FIGHT.value,
-            "player_id": context.player_id,
-            "active_player_id": fight_state.active_player_id,
-            "unit_instance_id": context.unit_instance_id,
-            "ordering_band": context.ordering_band.value,
-            "fight_type": fight_type_value.value,
-            "eligibility_context": context.to_payload(),
-        }
-    )
+    payload: dict[str, JsonValue] = {
+        "submission_kind": "select_fight_activation",
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhaseKind.FIGHT.value,
+        "player_id": context.player_id,
+        "active_player_id": fight_state.active_player_id,
+        "unit_instance_id": context.unit_instance_id,
+        "ordering_band": context.ordering_band.value,
+        "fight_type": fight_type_value.value,
+        "eligibility_context": validate_json_value(context.to_payload()),
+    }
+    if fight_state.forced_activation_context is not None:
+        payload["forced_activation_context"] = validate_json_value(
+            fight_state.forced_activation_context.to_payload()
+        )
+    return validate_json_value(payload)
 
 
 def eligible_pass_option_payload(

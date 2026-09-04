@@ -23,6 +23,10 @@ README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
 EMERGENCY_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "emergency_disembark.py"
 ASSAULT_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "assault_disembark.py"
+SHOCK_DISEMBARK_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "shock_disembark.py"
+TRANSPORT_DISEMBARK_PERMISSIONS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "transport_disembark_permissions.py"
+)
 TRANSPORT_DISEMBARK_STATE_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "transport_disembark_state.py"
 )
@@ -30,6 +34,21 @@ MOVEMENT_TRANSPORTS_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_transports.py"
 )
 MOVEMENT_PROPOSALS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_proposals.py"
+MOVEMENT_PLACEMENT_PROPOSALS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_placement_proposals.py"
+)
+FIGHT_ORDER_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_order.py"
+FIGHT_ACTIVATION_REQUESTS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_activation_requests.py"
+)
+FIGHT_HISTORICAL_ELIGIBILITY_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_historical_eligibility.py"
+)
+FIGHT_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
+FIGHT_UNIT_SELECTED_HOOKS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_unit_selected_hooks.py"
+)
+LIFECYCLE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle.py"
 CHARGE_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 DESTROYED_TRANSPORT_RULES_UNIT_DISEMBARK_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "destroyed_transport_rules_unit_disembark.py"
@@ -342,6 +361,7 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     transport_source = source_for(TRANSPORTS_PATH)
     disembark_state_source = source_for(TRANSPORT_DISEMBARK_STATE_PATH)
     permission_source = source_for(ASSAULT_DISEMBARK_PATH)
+    shared_permission_source = source_for(TRANSPORT_DISEMBARK_PERMISSIONS_PATH)
     candidate_source = function_source_for(
         (MOVEMENT_TRANSPORTS_PATH,),
         "_disembark_candidate_for_movement_unit",
@@ -378,7 +398,7 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
     assert "_DISEMBARK_DISTANCE_INCHES" in transport_source
     assert "ASSAULT_DISEMBARK_PERMISSION_EFFECT_KIND" in permission_source
     assert "eligible_rules_unit_instance_ids" in permission_source
-    assert "effect.source_rule_id" in permission_source
+    assert "effect.source_rule_id" in shared_permission_source
     assert "assault_disembark_restriction_overrides" in candidate_source
     assert "DisembarkModeKind.ASSAULT_DISEMBARK" in candidate_source
     assert "proposal_transport_unit_drift" in proposal_validation_source
@@ -404,6 +424,70 @@ def test_p18d_assault_disembark_is_source_bound_grouped_and_adapter_authoritativ
         "Full-Throttle Assault",
     ):
         assert forbidden_display_name not in permission_source
+        assert forbidden_display_name not in candidate_source
+
+
+def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activation() -> None:
+    transport_source = source_for(TRANSPORTS_PATH)
+    disembark_state_source = source_for(TRANSPORT_DISEMBARK_STATE_PATH)
+    shock_permission_source = source_for(SHOCK_DISEMBARK_PATH)
+    shared_permission_source = source_for(TRANSPORT_DISEMBARK_PERMISSIONS_PATH)
+    candidate_source = function_source_for(
+        (MOVEMENT_TRANSPORTS_PATH,),
+        "_disembark_candidate_for_movement_unit",
+    )
+    proposal_source = source_for(MOVEMENT_PROPOSALS_PATH)
+    placement_source = source_for(MOVEMENT_PLACEMENT_PROPOSALS_PATH)
+    fight_order_source = source_for(FIGHT_ORDER_PATH)
+    fight_request_source = source_for(FIGHT_ACTIVATION_REQUESTS_PATH)
+    historical_eligibility_source = source_for(FIGHT_HISTORICAL_ELIGIBILITY_PATH)
+    fight_phase_source = source_for(FIGHT_PHASE_PATH)
+    fight_hook_source = source_for(FIGHT_UNIT_SELECTED_HOOKS_PATH)
+    lifecycle_source = source_for(LIFECYCLE_PATH)
+    restore_source = source_for(LIFECYCLE_STATE_VALIDATION_PATH)
+    adapter_contract = source_for(ADAPTER_CONTRACT_PATH)
+
+    assert "SHOCK_DISEMBARK_MOVE_SOURCE_ID" in transport_source
+    assert 'SHOCK_DISEMBARK = "shock_disembark"' in disembark_state_source
+    assert "ALLOW_SHOCK_DISEMBARK_AFTER_ADVANCE" in disembark_state_source
+    assert "SHOCK_DISEMBARK_PERMISSION_REQUIRED" in transport_source
+    assert "SHOCK_DISEMBARK_ENGAGEMENT_SNAPSHOT_DRIFT" in transport_source
+    assert "SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED" in transport_source
+    assert "SHOCK_DISEMBARK_PERMISSION_EFFECT_KIND" in shock_permission_source
+    assert "transport_disembark_permission_effect" in shared_permission_source
+    assert "shock_disembark_restriction_overrides" in candidate_source
+    assert "start_engaged_enemy_unit_instance_ids" in candidate_source
+    assert "ruleset_descriptor=ruleset_descriptor" in candidate_source
+    assert "RulesetDescriptor.warhammer_40000_eleventh()" not in candidate_source
+    assert "proposal_start_engagement_drift" in proposal_source
+    assert "_start_shock_disembark_forced_fight_activations" in placement_source
+    assert "ForcedFightActivationContext" in fight_order_source
+    assert "for_forced_activations" in fight_order_source
+    assert "build_fight_activation_request" in fight_request_source
+    assert "fight_activation_selection_requested_payload" in fight_request_source
+    assert "advance_forced_fight_activations_if_needed" in fight_phase_source
+    assert "FIGHT_ACTIVATION_DECISION_TYPE" in fight_phase_source
+    assert "pass_available=False" in fight_phase_source
+    assert "forced_activation_context" in fight_hook_source
+    assert "advance_forced_fight_activations_if_needed" in lifecycle_source
+    assert "_validate_shock_disembark_fight_history" in restore_source
+    assert "_authenticated_forced_fight_selections" in restore_source
+    assert "build_fight_activation_request" in restore_source
+    assert "fight_activation_selection_requested_payload" in restore_source
+    assert "forced_fight_eligibility_contexts_before_event" in restore_source
+    assert "selection_request_event_index" in restore_source
+    assert "physical_model_authority_before_event" in historical_eligibility_source
+    assert "geometry_models_are_physically_engaged" in historical_eligibility_source
+    assert "historical_rules_unit_model_ids" in historical_eligibility_source
+    assert "CURRENTLY_ENGAGED in eligible_context.eligibility_reasons" not in restore_source
+    assert "omitted mandatory forced-Fight activations" in restore_source
+    assert "shock_disembark" in adapter_contract
+    for forbidden_display_name in (
+        "Assault Ramp",
+        "Full-throttle Assault",
+        "Full-Throttle Assault",
+    ):
+        assert forbidden_display_name not in shock_permission_source
         assert forbidden_display_name not in candidate_source
 
 

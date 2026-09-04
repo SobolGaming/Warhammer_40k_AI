@@ -20,8 +20,14 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import CORE_HAZARD_ROLLS_RULE_ID
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.engine.transport_disembark_state import (
+    SHOCK_DISEMBARK_MOVE_SOURCE_ID,
+)
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
@@ -61,6 +67,7 @@ class RulesUnitDisembarkSelection:
     disembark_mode: DisembarkModeKind
     transport_movement_status: TransportMovementStatus
     restriction_overrides: tuple[TransportRestrictionOverride, ...] = ()
+    start_engaged_enemy_unit_instance_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.attempted_placement) is not RulesUnitPlacement:
@@ -69,6 +76,19 @@ class RulesUnitDisembarkSelection:
             raise GameLifecycleError("Rules-unit Disembark placement identity drift.")
         if self.attempted_placement.player_id != self.player_id:
             raise GameLifecycleError("Rules-unit Disembark placement player drift.")
+        start_engaged_ids = tuple(
+            sorted(
+                _validate_identifier("Rules-unit Disembark start enemy identity", unit_instance_id)
+                for unit_instance_id in self.start_engaged_enemy_unit_instance_ids
+            )
+        )
+        if len(start_engaged_ids) != len(set(start_engaged_ids)):
+            raise GameLifecycleError(
+                "Rules-unit Disembark start enemy identities must not contain duplicates."
+            )
+        object.__setattr__(self, "start_engaged_enemy_unit_instance_ids", start_engaged_ids)
+        if self.disembark_mode is not DisembarkModeKind.SHOCK_DISEMBARK and start_engaged_ids:
+            raise GameLifecycleError("Only Shock Disembark may carry start engagement state.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,6 +138,9 @@ class RulesUnitDisembarkResolution:
                     validate_json_value(override.to_payload())
                     for override in self.selection.restriction_overrides
                 ],
+                "start_engaged_enemy_unit_instance_ids": list(
+                    self.selection.start_engaged_enemy_unit_instance_ids
+                ),
             },
             "is_valid": self.is_valid,
             "violations": [
@@ -280,6 +303,7 @@ def resolve_rules_unit_disembark(
             disembark_mode=selection.disembark_mode,
             transport_movement_status=selection.transport_movement_status,
             restriction_overrides=selection.restriction_overrides,
+            start_engaged_enemy_unit_instance_ids=(selection.start_engaged_enemy_unit_instance_ids),
         )
         component_unit = next(
             rules_component.unit
@@ -307,6 +331,7 @@ def resolve_rules_unit_disembark(
                 ),
                 terrain_features=validation_scenario.battlefield_state.terrain_features,
                 objective_markers=objective_markers,
+                enforce_shock_engagement_preservation=False,
             )
         else:
             component_resolution = resolve_disembark(
@@ -317,6 +342,7 @@ def resolve_rules_unit_disembark(
                 unit=component_unit,
                 transport_placement=transport_placement,
                 objective_markers=objective_markers,
+                enforce_shock_engagement_preservation=False,
             )
         violations.extend(
             violation
@@ -343,6 +369,30 @@ def resolve_rules_unit_disembark(
                 unit_instance_id=rules_unit.unit_instance_id,
             )
         )
+    if selection.disembark_mode is DisembarkModeKind.SHOCK_DISEMBARK:
+        post_engaged_ids = set(
+            scenario_physically_engaged_enemy_rules_unit_ids(
+                scenario=validation_scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_instance_id=rules_unit.unit_instance_id,
+            )
+        )
+        for required_enemy_id in selection.start_engaged_enemy_unit_instance_ids:
+            if required_enemy_id not in post_engaged_ids:
+                violations.append(
+                    TransportOperationViolation(
+                        violation_code=(
+                            TransportOperationViolationCode.SHOCK_DISEMBARK_ENGAGEMENT_NOT_PRESERVED
+                        ),
+                        message=(
+                            "Shock Disembark must preserve every enemy engagement "
+                            "that existed at the start of the move."
+                        ),
+                        unit_instance_id=rules_unit.unit_instance_id,
+                        blocker_id=required_enemy_id,
+                        source_rule_id=SHOCK_DISEMBARK_MOVE_SOURCE_ID,
+                    )
+                )
     if violations:
         return RulesUnitDisembarkResolution(
             selection=selection,
@@ -377,6 +427,7 @@ def resolve_rules_unit_disembark(
             disembark_mode=selection.disembark_mode,
             transport_movement_status=selection.transport_movement_status,
             restriction_overrides=selection.restriction_overrides,
+            start_engaged_enemy_unit_instance_ids=(selection.start_engaged_enemy_unit_instance_ids),
         )
     )
     return RulesUnitDisembarkResolution(

@@ -86,6 +86,9 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     fight_activation_ability_use_from_result,
     is_fight_activation_ability_decline_payload,
 )
+from warhammer40k_core.engine.fight_activation_requests import (
+    request_fight_activation as _request_fight_activation,
+)
 from warhammer40k_core.engine.fight_activation_units import (
     active_fight_activation_rules_unit,
     finalize_rule_destructions_after_fight_activation,
@@ -120,10 +123,8 @@ from warhammer40k_core.engine.fight_order import (
     decline_fight_interrupt_payload,
     eligible_fight_contexts_for_player,
     eligible_pass_is_available,
-    eligible_pass_option_payload,
     engaged_unit_ids_at_fight_start,
     fight_activation_option_id,
-    fight_activation_option_payload,
     fight_interrupt_option_payload,
     fight_interrupt_request_from_payload,
     fight_interrupt_sources_for_player,
@@ -266,7 +267,6 @@ _FIGHT_PILE_IN_REQUIRED_STATUS = "fight_pile_in_required"
 _FIGHT_CONSOLIDATE_REQUIRED_STATUS = "fight_consolidate_required"
 _FIGHT_MOVEMENT_COMPLETED_STATUS = "fight_movement_completed"
 _FIGHT_MOVEMENT_INVALID_STATUS = "fight_movement_invalid"
-_FIGHT_ACTIVATION_REQUIRED_STATUS = "fight_activation_required"
 _FIGHT_PASS_RECORDED_STATUS = "eligible_to_fight_pass_recorded"
 _FIGHT_ACTIVATION_RECORDED_STATUS = "fight_activation_recorded"
 _MELEE_DECLARATION_REQUIRED_STATUS = "melee_declaration_required"
@@ -471,6 +471,82 @@ class FightPhaseHandler:
             if status is not None:
                 return status
         raise GameLifecycleError("Fight phase exceeded deterministic Phase 15D guard.")
+
+    def advance_forced_fight_activations_if_needed(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        reaction_queue: ReactionQueue | None = None,
+    ) -> LifecycleStatus | None:
+        fight_state = state.fight_phase_state
+        if fight_state is None or fight_state.forced_activation_context is None:
+            return None
+        policy = _fight_policy_for_handler(self)
+        for _iteration in range(64):
+            current = _require_fight_state(state)
+            forced_context = current.forced_activation_context
+            if forced_context is None:
+                raise GameLifecycleError("Forced Fight activation context was lost.")
+            if (
+                current.pending_completed_attack_sequence is not None
+                or current.attack_sequence is not None
+                or current.active_activation is not None
+            ):
+                status = _advance_fight_phase_body(
+                    handler=self,
+                    state=state,
+                    decisions=decisions,
+                    reaction_queue=reaction_queue,
+                    policy=policy,
+                )
+                if status is not None:
+                    return status
+                continue
+            contexts = eligible_fight_contexts_for_player(
+                state=state,
+                fight_state=current,
+                player_id=forced_context.selecting_player_id,
+                policy=policy,
+            )
+            if contexts:
+                return _request_fight_activation(
+                    state=state,
+                    decisions=decisions,
+                    fight_state=current,
+                    contexts=contexts,
+                    pass_available=False,
+                    policy=policy,
+                )
+            decisions.event_log.append(
+                "forced_fight_activation_queue_completed",
+                validate_json_value(
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "phase": forced_context.source_phase.value,
+                        "active_player_id": current.active_player_id,
+                        "phase_body_status": "forced_fight_activation_queue_completed",
+                        "forced_activation_context": validate_json_value(
+                            forced_context.to_payload()
+                        ),
+                        "activation_selections": [
+                            selection.to_payload()
+                            for selection in current.fight_order_state.activation_selections
+                        ],
+                    }
+                ),
+            )
+            state.replace_fight_phase_state(None)
+            return LifecycleStatus.advanced(
+                stage=GameLifecycleStage.BATTLE,
+                payload={
+                    "phase": forced_context.source_phase.value,
+                    "phase_body_status": "forced_fight_activation_queue_completed",
+                    "forced_activation_context": validate_json_value(forced_context.to_payload()),
+                },
+            )
+        raise GameLifecycleError("Forced Fight activations exceeded deterministic guard.")
 
     def apply_decision(
         self,
@@ -993,6 +1069,15 @@ def _complete_active_fight_activation(
                 "phase": BattlePhase.FIGHT.value,
                 "phase_body_status": _UNIT_FOUGHT_STATUS,
                 "activation_selection": activation.to_payload(),
+                **(
+                    {}
+                    if fight_state.forced_activation_context is None
+                    else {
+                        "forced_activation_context": (
+                            fight_state.forced_activation_context.to_payload()
+                        )
+                    }
+                ),
             }
         ),
     )
@@ -1008,6 +1093,8 @@ def _complete_active_fight_activation(
         )
         if finalization_status is not None:
             return finalization_status
+    if fight_state.forced_activation_context is not None:
+        return None
     counteroffensive_status = _request_counteroffensive_if_available(
         handler=handler,
         state=state,
@@ -2356,6 +2443,15 @@ def invalid_fight_activation_status(
         policy=policy,
     )
     if result.selected_option_id == ELIGIBLE_TO_FIGHT_PASS_OPTION_ID:
+        if fight_state.forced_activation_context is not None:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="A forced Fight activation cannot be passed.",
+                payload={
+                    "invalid_reason": "invalid_fight_activation_result",
+                    "field": "selected_option_id",
+                },
+            )
         return _invalid_fight_pass_status(
             state=state,
             result=result,
@@ -2800,117 +2896,6 @@ def _stratagem_used_for_context(
     return False
 
 
-def _request_fight_activation(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    fight_state: FightPhaseState,
-    contexts: tuple[FightEligibilityContext, ...],
-    pass_available: bool,
-    policy: FightPolicyDescriptor,
-) -> LifecycleStatus:
-    request = DecisionRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=FIGHT_ACTIVATION_DECISION_TYPE,
-        actor_id=fight_state.fight_order_state.next_player_id,
-        payload=validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.FIGHT.value,
-                "active_player_id": fight_state.active_player_id,
-                "player_id": fight_state.fight_order_state.next_player_id,
-                "step_states": [step.to_payload() for step in fight_state.step_states],
-                "ordering_band": fight_state.current_ordering_band.value,
-                "eligible_contexts": [context.to_payload() for context in contexts],
-                "eligible_pass_available": pass_available,
-            }
-        ),
-        options=_fight_activation_options(
-            state=state,
-            fight_state=fight_state,
-            contexts=contexts,
-            pass_available=pass_available,
-            policy=policy,
-        ),
-    )
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "fight_activation_selection_requested",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.FIGHT.value,
-                "active_player_id": fight_state.active_player_id,
-                "player_id": fight_state.fight_order_state.next_player_id,
-                "ordering_band": fight_state.current_ordering_band.value,
-                "request_id": request.request_id,
-                "eligible_unit_ids": [context.unit_instance_id for context in contexts],
-                "eligible_pass_available": pass_available,
-                "phase_body_status": _FIGHT_ACTIVATION_REQUIRED_STATUS,
-            }
-        ),
-    )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload={
-            "phase": BattlePhase.FIGHT.value,
-            "phase_body_status": _FIGHT_ACTIVATION_REQUIRED_STATUS,
-            "battle_round": state.battle_round,
-            "active_player_id": fight_state.active_player_id,
-            "player_id": fight_state.fight_order_state.next_player_id,
-            "ordering_band": fight_state.current_ordering_band.value,
-            "eligible_unit_ids": [context.unit_instance_id for context in contexts],
-            "eligible_pass_available": pass_available,
-        },
-    )
-
-
-def _fight_activation_options(
-    *,
-    state: GameState,
-    fight_state: FightPhaseState,
-    contexts: tuple[FightEligibilityContext, ...],
-    pass_available: bool,
-    policy: FightPolicyDescriptor,
-) -> tuple[DecisionOption, ...]:
-    options: list[DecisionOption] = []
-    for context in contexts:
-        for fight_type in legal_fight_types_for_context(context=context, policy=policy):
-            options.append(
-                DecisionOption(
-                    option_id=fight_activation_option_id(
-                        unit_instance_id=context.unit_instance_id,
-                        fight_type=fight_type,
-                    ),
-                    label=f"{context.unit_instance_id} {fight_type.value}",
-                    payload=fight_activation_option_payload(
-                        state=state,
-                        fight_state=fight_state,
-                        context=context,
-                        fight_type=fight_type,
-                    ),
-                )
-            )
-    if pass_available:
-        options.append(
-            DecisionOption(
-                option_id=ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
-                label="Eligible To Fight Pass",
-                payload=eligible_pass_option_payload(
-                    state=state,
-                    fight_state=fight_state,
-                    player_id=fight_state.fight_order_state.next_player_id,
-                    contexts=contexts,
-                    policy=policy,
-                ),
-            )
-        )
-    return tuple(options)
-
-
 def _fights_first_contexts_available(
     *,
     state: GameState,
@@ -2975,11 +2960,17 @@ def _apply_fight_activation_decision(
         request_id=result.request_id,
         result_id=result.result_id,
     )
+    next_player_id = (
+        fight_state.forced_activation_context.selecting_player_id
+        if fight_state.forced_activation_context is not None
+        else _next_player_id(
+            player_ids=state.player_ids,
+            current_player_id=selection.player_id,
+        )
+    )
     activated_state = (
         fight_state.with_activation(selection)
-        .with_next_player(
-            _next_player_id(player_ids=state.player_ids, current_player_id=selection.player_id)
-        )
+        .with_next_player(next_player_id)
         .with_active_activation(selection)
     )
     state.replace_fight_phase_state(activated_state)
@@ -2992,6 +2983,16 @@ def _apply_fight_activation_decision(
                 "phase": BattlePhase.FIGHT.value,
                 "phase_body_status": _FIGHT_ACTIVATION_RECORDED_STATUS,
                 "activation_selection": selection.to_payload(),
+                **(
+                    {}
+                    if fight_state.forced_activation_context is None
+                    else {
+                        "active_player_id": fight_state.active_player_id,
+                        "forced_activation_context": (
+                            fight_state.forced_activation_context.to_payload()
+                        ),
+                    }
+                ),
             }
         ),
     )
@@ -3238,6 +3239,8 @@ def _fight_unit_selected_context(
     state: GameState,
     activation: FightActivationSelection,
 ) -> FightUnitSelectedContext:
+    fight_state = state.fight_phase_state
+    forced_context = None if fight_state is None else fight_state.forced_activation_context
     return FightUnitSelectedContext(
         state=state,
         player_id=activation.player_id,
@@ -3247,6 +3250,11 @@ def _fight_unit_selected_context(
         ordering_band=activation.ordering_band.value,
         request_id=activation.request_id,
         result_id=activation.result_id,
+        source_phase=(
+            BattlePhase.FIGHT
+            if forced_context is None
+            else BattlePhase(forced_context.source_phase.value)
+        ),
     )
 
 

@@ -207,6 +207,7 @@ from warhammer40k_core.engine.lifecycle_setup_reactive import (
 from warhammer40k_core.engine.lifecycle_state_validation import (
     canonical_rules_unit_identity_matches_physical_units,
     validate_disembarked_unit_state_consistency,
+    validate_fight_phase_state_consistency,
     validate_movement_phase_state_consistency,
 )
 from warhammer40k_core.engine.mission_decisions import (
@@ -767,6 +768,15 @@ class GameLifecycle:
             if self._reconcile_catalog_model_state_changes():
                 self._refresh_runtime_content_bundle_if_armies_mustered()
             return out_of_phase_status
+        forced_fight_status = self._fight_phase_handler.advance_forced_fight_activations_if_needed(
+            state=state,
+            decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
+        )
+        if forced_fight_status is not None:
+            if self._reconcile_catalog_model_state_changes():
+                self._refresh_runtime_content_bundle_if_armies_mustered()
+            return forced_fight_status
         if state.stage is GameLifecycleStage.COMPLETE:
             return LifecycleStatus.terminal(
                 stage=GameLifecycleStage.COMPLETE,
@@ -3575,7 +3585,7 @@ def _validate_payload_consistency(
     )
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
-    _validate_fight_phase_state_consistency(state=state)
+    validate_fight_phase_state_consistency(state=state, event_records=event_records)
     _destroyed_transport_pending.validate_pending_destroyed_transport_restore(
         state=state,
         event_records=event_records,
@@ -3747,63 +3757,6 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
                 raise GameLifecycleError("charge_phase_state target unit is unknown.")
             if target_owner == state.active_player_id:
                 raise GameLifecycleError("charge_phase_state target unit is not an enemy.")
-
-
-def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
-    fight_state = state.fight_phase_state
-    if fight_state is None:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("fight_phase_state requires battle stage.")
-    if state.current_battle_phase is not BattlePhase.FIGHT:
-        raise GameLifecycleError("fight_phase_state requires FIGHT phase.")
-    if state.active_player_id is None:
-        raise GameLifecycleError("fight_phase_state requires active player.")
-    if fight_state.active_player_id != state.active_player_id:
-        raise GameLifecycleError("fight_phase_state active player drift.")
-    if fight_state.battle_round != state.battle_round:
-        raise GameLifecycleError("fight_phase_state battle round drift.")
-    if state.battlefield_state is None:
-        raise GameLifecycleError("fight_phase_state requires battlefield_state.")
-    fight_order_state = fight_state.fight_order_state
-    if fight_order_state.next_player_id not in state.player_ids:
-        raise GameLifecycleError("fight_phase_state next player is not in this game.")
-    unit_owner_by_id = {
-        rules_unit.unit_instance_id: rules_unit.owner_player_id
-        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
-    }
-    historical_attached_owner_by_id = {
-        record.attached_unit_instance_id: record.player_id
-        for record in state.starting_attached_unit_records
-    }
-    known_unit_ids = set(unit_owner_by_id) | set(historical_attached_owner_by_id)
-    for unit_id in (
-        *fight_order_state.engaged_at_fight_step_start_unit_ids,
-        *fight_order_state.selected_to_fight_unit_ids,
-        *fight_order_state.fights_first_registry.charged_unit_ids(),
-    ):
-        if unit_id not in known_unit_ids:
-            raise GameLifecycleError("fight_phase_state unit is unknown.")
-    for player_id in fight_order_state.passed_player_ids:
-        if player_id not in state.player_ids:
-            raise GameLifecycleError("fight_phase_state passed player is not in this game.")
-    for selection in fight_order_state.activation_selections:
-        owner = unit_owner_by_id.get(selection.unit_instance_id)
-        if owner is None:
-            owner = historical_attached_owner_by_id.get(selection.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("fight_phase_state activation unit is unknown.")
-        if owner != selection.player_id:
-            raise GameLifecycleError("fight_phase_state activation player drift.")
-    for eligible_pass in fight_order_state.eligible_passes:
-        if eligible_pass.player_id not in state.player_ids:
-            raise GameLifecycleError("fight_phase_state pass player is not in this game.")
-        for unit_id in eligible_pass.eligible_unit_ids:
-            owner = unit_owner_by_id.get(unit_id)
-            if owner is None:
-                raise GameLifecycleError("fight_phase_state pass unit is unknown.")
-            if owner != eligible_pass.player_id:
-                raise GameLifecycleError("fight_phase_state pass unit player drift.")
 
 
 def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:

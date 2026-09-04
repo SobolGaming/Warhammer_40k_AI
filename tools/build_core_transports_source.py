@@ -57,6 +57,9 @@ After moving: Your unit is battle-shocked and, until the end of the turn, it is 
 ASSAULT_SOURCE_TEXT = """ASSAULT DISEMBARK MOVE
 Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. That TRANSPORT has not made an advance/fall‑back move this phase. Set up each model in your unit wholly within the set‑up distance of that TRANSPORT. 3\" 18.06"""
 
+SHOCK_SOURCE_TEXT = """SHOCK DISEMBARK MOVE
+Your unit is set up as described in Set Up (Core Rules, 03.02). As stated in the rule allowing this move type, if all of the following apply to your unit: Embarked within a TRANSPORT model that is on the battlefield. Did not embark within that TRANSPORT this phase. Set up each model in your unit wholly within the set-up distance of that TRANSPORT. Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight. 3\" 18.07"""
+
 EMERGENCY_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.attack_sequence_destroyed_transport:_continue_pending_destroyed_transport_disembark",
     "warhammer40k_core.engine.attack_sequence_destroyed_transport:_request_destroyed_transport_disembark_placement",
@@ -70,6 +73,14 @@ ASSAULT_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
     "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
     "warhammer40k_core.engine.transports:resolve_disembark",
+]
+
+SHOCK_RUNTIME_CONSUMER_IDS = [
+    "warhammer40k_core.engine.shock_disembark:shock_disembark_restriction_overrides",
+    "warhammer40k_core.engine.phases.movement_transports:_disembark_candidate_for_movement_unit",
+    "warhammer40k_core.engine.transport_disembark_state:DisembarkedUnitState.for_mode",
+    "warhammer40k_core.engine.transports:resolve_disembark",
+    "warhammer40k_core.engine.phases.fight:FightPhaseHandler.advance_forced_fight_activations_if_needed",
 ]
 
 
@@ -165,10 +176,11 @@ def _evidence_rows(
 def build_payload() -> dict[str, object]:
     emergency_transcription_sha256 = _sha256_text(EMERGENCY_SOURCE_TEXT)
     assault_transcription_sha256 = _sha256_text(ASSAULT_SOURCE_TEXT)
+    shock_transcription_sha256 = _sha256_text(SHOCK_SOURCE_TEXT)
     payload: dict[str, object] = {
         "artifact_schema": "core-v2-transports-source-v1",
         "source_package_id": "gw-11e-core-transports",
-        "source_version": "reviewed-transports-observed-2026-09-02",
+        "source_version": "reviewed-transports-observed-2026-09-03",
         "source_documents": [
             {
                 "document_id": "40k-app-transports-2026-09-01",
@@ -186,7 +198,10 @@ def build_payload() -> dict[str, object]:
                 "observed_at": ASSAULT_OBSERVED_AT,
                 "app_version": ASSAULT_APP_VERSION,
                 "project_authority_policy_id": ASSAULT_PROJECT_AUTHORITY_POLICY_ID,
-                "rule_source_ids": ["gw-11e-core-rules:transports:assault-disembark-move"],
+                "rule_source_ids": [
+                    "gw-11e-core-rules:transports:assault-disembark-move",
+                    "gw-11e-core-rules:transports:shock-disembark-move",
+                ],
             },
         ],
         "rules": [
@@ -211,6 +226,17 @@ def build_payload() -> dict[str, object]:
                 "load_support_status": "loaded",
                 "semantic_execution_status": "executable_engine_runtime",
                 "runtime_consumer_ids": ASSAULT_RUNTIME_CONSUMER_IDS,
+            },
+            {
+                "rule_id": "shock-disembark-move",
+                "source_id": "gw-11e-core-rules:transports:shock-disembark-move",
+                "section_id": "18.07",
+                "section_heading": "SHOCK DISEMBARK MOVE",
+                "source_text": SHOCK_SOURCE_TEXT,
+                "transcription_sha256": shock_transcription_sha256,
+                "load_support_status": "loaded",
+                "semantic_execution_status": "executable_engine_runtime",
+                "runtime_consumer_ids": SHOCK_RUNTIME_CONSUMER_IDS,
             },
         ],
         "evidence": [
@@ -248,6 +274,23 @@ def build_payload() -> dict[str, object]:
                 review_audit_observation_sha256=(ASSAULT_REVIEW_AUDIT_OBSERVATION_SHA256),
                 mirror_evidence_id=("game-datamissions-core-rules-data-931:assault-disembark-move"),
             ),
+            *_evidence_rows(
+                rule_source_id="gw-11e-core-rules:transports:shock-disembark-move",
+                rule_slug="shock-disembark-move",
+                section_id="18.07",
+                section_heading="SHOCK DISEMBARK MOVE",
+                transcription_sha256=shock_transcription_sha256,
+                runtime_consumer_ids=SHOCK_RUNTIME_CONSUMER_IDS,
+                provider_name="Game Datamissions",
+                source_url=ASSAULT_SOURCE_URL,
+                observed_at=None,
+                app_version=ASSAULT_APP_VERSION,
+                project_authority_policy_id=ASSAULT_PROJECT_AUTHORITY_POLICY_ID,
+                review_audit_id=ASSAULT_REVIEW_AUDIT_ID,
+                review_audit_row_id=ASSAULT_REVIEW_AUDIT_ROW_ID,
+                review_audit_observation_sha256=(ASSAULT_REVIEW_AUDIT_OBSERVATION_SHA256),
+                mirror_evidence_id=("game-datamissions-core-rules-data-931:shock-disembark-move"),
+            ),
         ],
         "package_hash": "",
     }
@@ -257,7 +300,7 @@ def build_payload() -> dict[str, object]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build the reviewed 18.05 and 18.06 Transport source artifact."
+        description="Build the reviewed 18.05 through 18.07 Transport source artifact."
     )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
