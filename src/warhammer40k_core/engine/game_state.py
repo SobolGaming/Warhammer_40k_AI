@@ -3590,6 +3590,10 @@ class GameState:
             raise GameLifecycleError("PreBattleActionRecord setup_step is not in this game.")
         if any(stored.action_id == record.action_id for stored in self.prebattle_action_records):
             raise GameLifecycleError("PreBattleActionRecord action_id already exists.")
+        if any(stored.request_id == record.request_id for stored in self.prebattle_action_records):
+            raise GameLifecycleError("PreBattleActionRecord request_id already exists.")
+        if any(stored.result_id == record.result_id for stored in self.prebattle_action_records):
+            raise GameLifecycleError("PreBattleActionRecord result_id already exists.")
         if record.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
             if self.prebattle_alternation_cursor is None:
                 raise GameLifecycleError(
@@ -6676,7 +6680,9 @@ def _validate_prebattle_action_records(
         raise GameLifecycleError("GameState prebattle_action_records must be a list.")
     validated_game_id = _validate_identifier("game_id", game_id)
     validated: list[PreBattleActionRecord] = []
-    seen: set[str] = set()
+    seen_action_ids: set[str] = set()
+    seen_request_ids: set[str] = set()
+    seen_result_ids: set[str] = set()
     for record in cast(list[object], records):
         if type(record) is not PreBattleActionRecord:
             raise GameLifecycleError(
@@ -6686,9 +6692,17 @@ def _validate_prebattle_action_records(
             raise GameLifecycleError("PreBattleActionRecord game_id drift.")
         if record.player_id not in player_ids:
             raise GameLifecycleError("PreBattleActionRecord player_id is not in this game.")
-        if record.action_id in seen:
-            raise GameLifecycleError("GameState prebattle_action_records must be unique.")
-        seen.add(record.action_id)
+        if record.action_id in seen_action_ids:
+            raise GameLifecycleError("GameState prebattle_action_records action_id must be unique.")
+        if record.request_id in seen_request_ids:
+            raise GameLifecycleError(
+                "GameState prebattle_action_records request_id must be unique."
+            )
+        if record.result_id in seen_result_ids:
+            raise GameLifecycleError("GameState prebattle_action_records result_id must be unique.")
+        seen_action_ids.add(record.action_id)
+        seen_request_ids.add(record.request_id)
+        seen_result_ids.add(record.result_id)
         validated.append(record)
     return sorted(validated, key=lambda stored: stored.action_id)
 

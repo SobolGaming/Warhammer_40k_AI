@@ -297,7 +297,7 @@ from warhammer40k_core.engine.prebattle import (
     invalid_prebattle_proposal_status,
     is_prebattle_proposal_request,
 )
-from warhammer40k_core.engine.prebattle_alternation import (
+from warhammer40k_core.engine.prebattle_integrity import (
     validate_prebattle_alternation_restore,
 )
 from warhammer40k_core.engine.primary_mission_choices import (
@@ -3572,6 +3572,7 @@ def _validate_payload_consistency(
     _tsi.validate_transport_cargo_state_consistency(state=state)
     validate_prebattle_alternation_restore(
         state=state,
+        army_catalog=None if config is None else config.army_catalog,
         decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
     )

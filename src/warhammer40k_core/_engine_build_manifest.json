@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3fbc3832c94e2c48fd93240f8e57848f144d878028f6f05a48818a20bf6a74a6",
-  "fingerprint": "3fbc3832c94e2c48fd93240f8e57848f144d878028f6f05a48818a20bf6a74a6",
-  "resource_count": 2503,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4cf54ddd939ffb5166ebb2e0187b127f2436d5de97cefa83bf0e72275b0c6a6",
+  "fingerprint": "b4cf54ddd939ffb5166ebb2e0187b127f2436d5de97cefa83bf0e72275b0c6a6",
+  "resource_count": 2504,
   "resources": [
     {
       "byte_length": 113,
@@ -9255,9 +9255,9 @@
       "sha256": "546b87af37cf2ab8707ec2acdfc3e96f84b062fcc73ba046b28e44770c8d49df"
     },
     {
-      "byte_length": 315718,
+      "byte_length": 316638,
       "path": "warhammer40k_core/engine/game_state.py",
-      "sha256": "4936ac092e5c4d6a70f4de666c3d8efe62ffb516c69d2f4c5621e994e306a596"
+      "sha256": "30cc754fd59332c0fba93e5a3c7ae543a1d78bbb669e5a92c9a0a64e8e5142e2"
     },
     {
       "byte_length": 11174,
@@ -9440,9 +9440,9 @@
       "sha256": "fb7300a49719aa676e80ffdfe781faa7552de719e388ec454be34c473a94f7d2"
     },
     {
-      "byte_length": 168622,
+      "byte_length": 168690,
       "path": "warhammer40k_core/engine/lifecycle.py",
-      "sha256": "cdb95497c8d7101cbf1a2e317c94c0ada1fcd6ac4bca065d8c670e6b11fd5c36"
+      "sha256": "6b7fceb240a58cbaf0c8014459852d63d0a70017c74aa69d3d1efcf6b604295f"
     },
     {
       "byte_length": 2130,
@@ -9985,9 +9985,14 @@
       "sha256": "89f5808ce0e4e5213ff860b7098261132ed89c77be3e8e268260f19085e08201"
     },
     {
-      "byte_length": 4471,
+      "byte_length": 2096,
       "path": "warhammer40k_core/engine/prebattle_alternation.py",
-      "sha256": "c2318b8526e0e02d449753f3579d9e0e5f47b4c1f5419cb43a614f3f8ab1647f"
+      "sha256": "3980c5782da0c756d9c73bb789fab18ddce83fc9be6ff7482ad4492a1a40d230"
+    },
+    {
+      "byte_length": 28708,
+      "path": "warhammer40k_core/engine/prebattle_integrity.py",
+      "sha256": "f7c22cff5d973e36b6a083a1d844c0d8d61ada471200cd0e7e6e6fdf980f11e7"
     },
     {
       "byte_length": 12725,
