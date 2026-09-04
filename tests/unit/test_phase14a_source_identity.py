@@ -71,6 +71,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 PROJECT_AUTHORITY_POLICY_ID = CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID
 CORE_RULES_REVIEW_AUDIT_ID = "40k-app-core-rules-2026-08-25"
 CORE_RULES_REVIEW_AUDIT_PATH = Path("data/source_audits/40k_app/core_rules_2026_08_25.audit.json")
+CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH = Path(
+    "data/source_audits/maintained_app_mirrors/core_rules_2026_09_02.audit.json"
+)
 
 
 def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() -> None:
@@ -1910,7 +1913,7 @@ def test_eleventh_source_package_identity_payloads_are_json_safe() -> None:
     )
 
 
-def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
+def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
     raw = _core_stratagem_app_source_artifact_path().read_bytes()
     source_package = core_stratagems_2026_08.source_package()
     rules = core_stratagems_2026_08.source_rule_records()
@@ -1923,7 +1926,7 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
 
     assert hashlib.sha256(raw).hexdigest() == (core_stratagems_2026_08.EXPECTED_ARTIFACT_SHA256)
     assert core_stratagems_2026_08.PACKAGE_HASH == (
-        "c6bfeb538aa1a5b933c561c3c554691792259400234dc9ec303d36ff400c5a09"
+        "f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7"
     )
     assert [(rule.section_id, rule.title) for rule in rules] == [
         ("15.05", "Crushing Impact"),
@@ -1931,6 +1934,7 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         ("15.07", "Rapid Ingress"),
         ("15.08", "Fire Overwatch"),
         ("15.09", "Snap Shooting"),
+        ("FAQ", "Insane Bravery"),
     ]
     assert core_stratagems_2026_08.RULE_SOURCE_IDS == {
         "crushing-impact": "gw-11e-core-stratagems:core:crushing-impact",
@@ -1938,6 +1942,7 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         "rapid-ingress": "gw-11e-core-stratagems:core:rapid-ingress",
         "fire-overwatch": "gw-11e-core-stratagems:core:fire-overwatch",
         "snap-shooting": "gw-11e-core-stratagems:rule:snap-shooting",
+        "insane-bravery": "gw-11e-core-stratagems:core:insane-bravery",
     }
     assert {rule.rule_id: rule.runtime_rule_id for rule in rules} == {
         "crushing-impact": "core:crushing-impact",
@@ -1945,6 +1950,7 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         "rapid-ingress": "core:rapid-ingress",
         "fire-overwatch": "core:fire-overwatch",
         "snap-shooting": "core:snap-shooting",
+        "insane-bravery": "core:insane-bravery",
     }
     assert "MONSTER/VEHICLE" in rules_by_id["crushing-impact"].source_text
     assert "T characteristic" in rules_by_id["crushing-impact"].source_text
@@ -1953,6 +1959,10 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
     assert "shoots using Snap Shooting" in rules_by_id["fire-overwatch"].source_text
     assert "unmodified hit roll of 6" in rules_by_id["snap-shooting"].source_text
     assert "not eligible to start an action" in rules_by_id["snap-shooting"].source_text
+    assert rules_by_id["insane-bravery"].source_text == (
+        "Can I use the Insane Bravery stratagem on a battle-shocked unit?\n"
+        "No, as a unit's controlling player cannot target that unit with stratagems (01.07)."
+    )
     assert all(
         hashlib.sha256(rule.source_text.encode()).hexdigest()
         == core_stratagems_2026_08.TRANSCRIPTION_SHA256_BY_RULE_ID[rule.rule_id]
@@ -1970,12 +1980,23 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         "rapid-ingress": "partial_engine_runtime",
         "fire-overwatch": "partial_engine_runtime",
         "snap-shooting": "partial_engine_runtime",
+        "insane-bravery": "executable_engine_runtime",
     }
     assert all(rule.load_support_status == "loaded" for rule in rules)
     assert all(rule.runtime_consumer_ids for rule in rules)
 
     review_context, review_source_observation_by_row_id = _core_rules_review_audit_context()
-    assert len(evidence_by_source_id) == len(rules) == 5
+    maintained_audit = cast(
+        dict[str, object],
+        json.loads(CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH.read_text(encoding="utf-8")),
+    )
+    maintained_sources = cast(list[dict[str, object]], maintained_audit["observations"])
+    maintained_game_datamissions = next(
+        row
+        for row in maintained_sources
+        if row["observation_id"] == "game-datamissions-core-rules-data-931"
+    )
+    assert len(evidence_by_source_id) == len(rules) == 6
     assert all(len(records) == 2 for records in evidence_by_source_id.values())
     for rule in rules:
         records = evidence_by_source_id[rule.source_id]
@@ -1992,17 +2013,30 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         assert project_review.verification_status == "unverified"
         assert mirror.evidence_kind == "third_party_mirror"
         assert mirror.authority == "project_authoritative_app_mirror"
-        assert mirror.project_authority_policy_id == PROJECT_AUTHORITY_POLICY_ID
-        assert mirror.review_audit_id == review_context["audit_id"]
-        assert mirror.source_url == "https://www.40k.app/rules/15-stratagems"
-        assert mirror.observed_at == "2026-08-26T11:15:23-04:00"
+        if rule.rule_id == "insane-bravery":
+            assert mirror.project_authority_policy_id == CORE_RULES_MAINTAINED_MIRROR_POLICY_ID
+            assert mirror.review_audit_id == maintained_audit["audit_id"]
+            assert mirror.review_audit_row_id == maintained_game_datamissions["observation_id"]
+            assert (
+                mirror.review_audit_source_observation_sha256
+                == (maintained_game_datamissions["source_observation_sha256"])
+            )
+            assert mirror.source_url == "https://game-datamissions.com/11th/rules/changelog"
+            assert mirror.observed_at is None
+            assert mirror.app_version == "931"
+            assert mirror.provider_name == "Game Datamissions"
+        else:
+            assert mirror.project_authority_policy_id == PROJECT_AUTHORITY_POLICY_ID
+            assert mirror.review_audit_id == review_context["audit_id"]
+            assert mirror.source_url == "https://www.40k.app/rules/15-stratagems"
+            assert mirror.observed_at == "2026-08-26T11:15:23-04:00"
+            assert mirror.review_audit_row_id is not None
+            assert (
+                mirror.review_audit_source_observation_sha256
+                == (review_source_observation_by_row_id[mirror.review_audit_row_id])
+            )
         assert mirror.provider_non_affiliation_recorded
         assert mirror.verification_status == "authoritative_app_mirror"
-        assert mirror.review_audit_row_id is not None
-        assert (
-            mirror.review_audit_source_observation_sha256
-            == (review_source_observation_by_row_id[mirror.review_audit_row_id])
-        )
         assert mirror.observation_sha256 == rule.source_observation_sha256
         assert all(
             record.transcription_sha256 == rule.transcription_sha256
@@ -2039,6 +2073,10 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         == (review_source_observation_by_row_id["category:12"])
     )
     assert SourceCatalog.from_payload(catalog_payload).to_payload() == catalog_payload
+    assert len(source_package.source_catalog.documents) == 2
+    assert source_package.source_catalog.ruleset_bundles[0].source_document_ids == tuple(
+        document.document_id for document in source_package.source_catalog.documents
+    )
 
 
 @pytest.mark.parametrize(
@@ -2048,11 +2086,14 @@ def test_p15d_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
         ("rule", "source_id", "gw-11e-core-stratagems:core:wrong"),
         ("rule", "source_text", "stale source text"),
         ("mirror", "source_url", "https://example.invalid/rules/15-stratagems"),
+        ("faq_document", "app_version", "930"),
+        ("insane_rule", "restrictions_text", "stale FAQ answer"),
+        ("faq_mirror", "source_url", "https://example.invalid/changelog"),
         ("rule", "semantic_execution_status", "executable_engine_runtime"),
         ("anomaly", "resolved_section_id", "15.06"),
     ],
 )
-def test_p15d_core_stratagem_app_source_rejects_identity_evidence_and_status_drift(
+def test_p15df_core_stratagem_app_source_rejects_identity_evidence_and_status_drift(
     target: str,
     field_name: str,
     replacement: str,
@@ -2061,6 +2102,7 @@ def test_p15d_core_stratagem_app_source_rejects_identity_evidence_and_status_dri
     rules = cast(list[dict[str, object]], payload["rules"])
     evidence = cast(list[dict[str, object]], payload["evidence_records"])
     anomalies = cast(list[dict[str, object]], payload["numbering_anomalies"])
+    faq_source_document = cast(dict[str, object], payload["faq_source_document"])
     if target == "rule":
         rules[0][field_name] = replacement
     elif target == "mirror":
@@ -2070,6 +2112,19 @@ def test_p15d_core_stratagem_app_source_rejects_identity_evidence_and_status_dri
             if record["evidence_id"] == "40k-app-core-stratagems-2026-08-26:crushing-impact"
         )
         mirror[field_name] = replacement
+    elif target == "faq_document":
+        faq_source_document[field_name] = replacement
+    elif target == "insane_rule":
+        next(rule for rule in rules if rule["rule_id"] == "insane-bravery")[field_name] = (
+            replacement
+        )
+    elif target == "faq_mirror":
+        faq_mirror = next(
+            record
+            for record in evidence
+            if record["evidence_id"] == "game-datamissions-core-rules-data-931:insane-bravery"
+        )
+        faq_mirror[field_name] = replacement
     else:
         anomalies[0][field_name] = replacement
 
@@ -2079,7 +2134,7 @@ def test_p15d_core_stratagem_app_source_rejects_identity_evidence_and_status_dri
         )
 
 
-def test_p15d_core_stratagem_app_source_rejects_raw_byte_drift() -> None:
+def test_p15df_core_stratagem_app_source_rejects_raw_byte_drift() -> None:
     raw = _core_stratagem_app_source_artifact_path().read_bytes()
     core_stratagems_2026_08.validate_core_stratagem_app_source_artifact_bytes(raw)
 
@@ -2090,7 +2145,7 @@ def test_p15d_core_stratagem_app_source_rejects_raw_byte_drift() -> None:
         core_stratagems_2026_08.validate_core_stratagem_app_source_artifact_bytes(raw + b"\n")
 
 
-def test_p15d_core_stratagem_app_source_rejects_unknown_evidence_id_as_typed_error() -> None:
+def test_p15df_core_stratagem_app_source_rejects_unknown_evidence_id_as_typed_error() -> None:
     payload = _core_stratagem_app_source_payload()
     evidence = cast(list[dict[str, object]], payload["evidence_records"])
     record = next(

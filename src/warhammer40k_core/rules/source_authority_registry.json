@@ -464,11 +464,12 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-stratagems",
-          "version": "40k-app-observed-2026-08-26",
+          "version": "reviewed-stratagems-observed-2026-09-02",
           "allowed_rule_source_ids": [
             "gw-11e-core-stratagems:core:crushing-impact",
             "gw-11e-core-stratagems:core:explosives",
             "gw-11e-core-stratagems:core:fire-overwatch",
+            "gw-11e-core-stratagems:core:insane-bravery",
             "gw-11e-core-stratagems:core:rapid-ingress",
             "gw-11e-core-stratagems:rule:snap-shooting"
           ]

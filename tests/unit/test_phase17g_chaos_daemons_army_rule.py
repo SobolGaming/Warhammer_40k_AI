@@ -1074,7 +1074,7 @@ def test_greater_daemon_shadow_aura_host_table_covers_all_datasheet_sources() ->
 
 def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> None:
     state = battle_state()
-    state.game_id = "phase17g-overheal-seed-2"
+    state.game_id = "phase17g-overheal-seed-0"
     _mark_player_as_chaos_daemons(
         state,
         player_id="player-a",
@@ -3455,7 +3455,7 @@ def _july_manifestation_revival_session() -> tuple[
 ]:
     config = replace(
         _chaos_daemons_lifecycle_config(battleline=True),
-        game_id="phase17g-config-canonical-seed-2",
+        game_id="phase17g-config-canonical-seed-0",
     )
     session = LocalGameSession()
     session.start(config)

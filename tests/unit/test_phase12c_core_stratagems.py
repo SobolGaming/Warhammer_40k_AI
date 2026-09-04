@@ -34,7 +34,7 @@ from warhammer40k_core.engine.attack_sequence import (
     attack_sequence_wound_roll_spec,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
-from warhammer40k_core.engine.battle_shock import BattleShockResult
+from warhammer40k_core.engine.battle_shock import BattleShockedUnitState, BattleShockResult
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockModifierApplication
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -162,6 +162,7 @@ from warhammer40k_core.engine.stratagem_phase_use_exceptions import (
 from warhammer40k_core.engine.stratagems import (
     COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY,
     COMMAND_REROLL_DICE_CONTEXT_KEY,
+    CORE_INSANE_BRAVERY_HANDLER_ID,
     CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
     CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
@@ -958,6 +959,86 @@ def test_insane_bravery_target_proposal_spends_cp_and_auto_passes_battle_shock()
     assert request_payload["unit_instance_id"] == target_unit_id
     assert auto_passed["auto_passed"] is True
     assert target_unit_id not in state.battle_shocked_unit_ids
+
+    state.battle_round = 2
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _grant_cp(state, player_id="player-a", amount=1)
+    next_round_context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        timing_window_id="insane-bravery-battle-shock-round-2-player-player-a",
+    )
+    assert (
+        stratagem_target_proposal_from_index(
+            state=state,
+            index=eleventh_edition_stratagem_index(),
+            context=next_round_context,
+            handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
+            require_legal_affordable_target=True,
+        )
+        is None
+    )
+
+
+def test_insane_bravery_is_not_offered_for_already_battle_shocked_unit() -> None:
+    lifecycle = _command_lifecycle()
+    state = _state(lifecycle)
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    _mark_unit_battle_shocked_for_fixture(state, unit_instance_id=target_unit_id)
+    _grant_cp(state, player_id="player-a", amount=1)
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        timing_window_id="insane-bravery-battle-shock-round-1-player-player-a",
+    )
+
+    proposal = stratagem_target_proposal_from_index(
+        state=state,
+        index=eleventh_edition_stratagem_index(),
+        context=context,
+        handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
+        require_legal_affordable_target=True,
+    )
+
+    assert proposal is None
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+
+
+def test_insane_bravery_rejects_target_that_became_battle_shocked_before_spend() -> None:
+    lifecycle = _command_lifecycle()
+    state = _state(lifecycle)
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_player_id="player-a",
+            target_unit_instance_id=target_unit_id,
+        )
+    )
+    _mark_unit_battle_shocked_for_fixture(state, unit_instance_id=target_unit_id)
+
+    rejected = lifecycle.submit_decision(
+        _target_proposal_result(
+            request=request,
+            result_id="phase12c-p15f-stale-insane-bravery-target",
+            proposal=proposal,
+        )
+    )
+
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert rejected.payload == {"invalid_reason": "friendly_battle_shocked_unit"}
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert state.command_point_total("player-a") == 1
+    assert state.stratagem_use_records == []
+    assert not _has_event(lifecycle.decision_controller, "stratagem_target_proposal_accepted")
+    assert not _has_event(lifecycle.decision_controller, "command_points_spent")
+    assert not _has_event(lifecycle.decision_controller, "insane_bravery_auto_pass_registered")
 
 
 def test_parameterized_stratagem_decline_requires_engine_marked_optional_window() -> None:
@@ -6629,6 +6710,30 @@ def _remove_first_models(state: GameState, *, unit_instance_id: str, count: int)
             damage=model.wounds_remaining,
             damage_kind=DamageKind.NORMAL,
         )
+
+
+def _mark_unit_battle_shocked_for_fixture(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+) -> None:
+    army = state.army_definition_for_player("player-a")
+    assert army is not None
+    unit = army.unit_by_id(unit_instance_id)
+    state.replace_battle_shock_state(
+        (
+            [unit_instance_id],
+            [
+                BattleShockedUnitState(
+                    player_id=army.player_id,
+                    unit_instance_id=unit_instance_id,
+                    model_instance_ids=tuple(model.model_instance_id for model in unit.own_models),
+                    source_result_id="phase12c:p15f:preexisting-battle-shock",
+                    battle_round_started=state.battle_round,
+                )
+            ],
+        )
+    )
 
 
 def _record_secondary_choices(

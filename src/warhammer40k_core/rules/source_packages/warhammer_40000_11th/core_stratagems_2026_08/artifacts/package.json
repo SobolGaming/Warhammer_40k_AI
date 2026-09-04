@@ -1,5 +1,5 @@
 {
-  "artifact_schema": "core-v2-core-stratagem-app-source-v1",
+  "artifact_schema": "core-v2-core-stratagem-app-source-v2",
   "evidence_contexts": [
     {
       "app_build": null,
@@ -34,6 +34,40 @@
       "review_audit_id": "40k-app-core-rules-2026-08-25",
       "source_platform": "Web",
       "source_title": "40k.app Core Rules - Stratagems"
+    },
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "context_id": "core-v2-p15f-project-source-review",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of the Insane Bravery FAQ"
+    },
+    {
+      "app_build": null,
+      "app_version": "931",
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "context_id": "game-datamissions-core-rules-data-931",
+      "evidence_kind": "third_party_mirror",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "Game Datamissions",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+      "source_platform": "Web",
+      "source_title": "Game Datamissions Core Rules Data Changelog v931"
     }
   ],
   "evidence_records": [
@@ -214,8 +248,62 @@
       "source_url": "https://www.40k.app/rules/15-stratagems",
       "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
       "verification_status": "authoritative_app_mirror"
+    },
+    {
+      "evidence_context_id": "core-v2-p15f-project-source-review",
+      "evidence_id": "core-v2-p15f-source-review:insane-bravery",
+      "load_support_status": "loaded",
+      "observation_sha256": "e95e71061c9703aa78e104616ae95beb6391454de0c442aa6cbb317c55cc6fad",
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-stratagems:core:insane-bravery",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagem_catalog:eleventh_edition_core_stratagem_catalog_records",
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_apply:invalid_stratagem_target_proposal_status",
+        "warhammer40k_core.engine.stratagems_apply:_apply_stratagem_use",
+        "warhammer40k_core.engine.command_insane_bravery_authority:validate_loaded_command_auto_pass_authority"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_url": null,
+      "transcription_sha256": "caf8973ed7c25c2c99db11bc0e489e3d9803300012b40b4f29eb878df54b1a25",
+      "verification_status": "unverified"
+    },
+    {
+      "evidence_context_id": "game-datamissions-core-rules-data-931",
+      "evidence_id": "game-datamissions-core-rules-data-931:insane-bravery",
+      "load_support_status": "loaded",
+      "observation_sha256": "11af8114a1e14df4c9e2d6f52425c29a46c17385791480dc364129b84fe77252",
+      "review_audit_row_id": "game-datamissions-core-rules-data-931",
+      "review_audit_source_observation_sha256": "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668",
+      "rule_source_id": "gw-11e-core-stratagems:core:insane-bravery",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagem_catalog:eleventh_edition_core_stratagem_catalog_records",
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_apply:invalid_stratagem_target_proposal_status",
+        "warhammer40k_core.engine.stratagems_apply:_apply_stratagem_use",
+        "warhammer40k_core.engine.command_insane_bravery_authority:validate_loaded_command_auto_pass_authority"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "transcription_sha256": "caf8973ed7c25c2c99db11bc0e489e3d9803300012b40b4f29eb878df54b1a25",
+      "verification_status": "authoritative_app_mirror"
     }
   ],
+  "faq_source_document": {
+    "app_version": "931",
+    "document_id": "game-datamissions-core-rules-data-931",
+    "observed_at": "2026-09-02T12:30:09-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "provider_name": "Game Datamissions",
+    "provider_non_affiliation_recorded": true,
+    "rule_source_ids": [
+      "gw-11e-core-stratagems:core:insane-bravery"
+    ],
+    "source_platform": "Web",
+    "source_title": "Game Datamissions Core Rules Data Changelog v931",
+    "source_url": "https://game-datamissions.com/11th/rules/changelog"
+  },
   "numbering_anomalies": [
     {
       "anomaly_id": "gw-11e-core-stratagems:anomaly:fight-example-crushing-impact-cross-reference",
@@ -239,7 +327,7 @@
       "transcription_sha256": "b2a5f5ff431ab3728a163d8d785d3c21a2270b9fc5793444af5ec5f150098dff"
     }
   ],
-  "package_hash": "c6bfeb538aa1a5b933c561c3c554691792259400234dc9ec303d36ff400c5a09",
+  "package_hash": "f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7",
   "rules": [
     {
       "command_point_cost": 1,
@@ -379,6 +467,36 @@
       "title": "Snap Shooting",
       "transcription_sha256": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
       "when_text": "As stated in the rule allowing this shooting type."
+    },
+    {
+      "command_point_cost": 1,
+      "effect_text": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "evidence_ids": [
+        "core-v2-p15f-source-review:insane-bravery",
+        "game-datamissions-core-rules-data-931:insane-bravery"
+      ],
+      "kind": "stratagem_faq",
+      "load_support_status": "loaded",
+      "phase_text": "Command Phase",
+      "restrictions_text": "No, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "rule_id": "insane-bravery",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.stratagem_catalog:eleventh_edition_core_stratagem_catalog_records",
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_apply:invalid_stratagem_target_proposal_status",
+        "warhammer40k_core.engine.stratagems_apply:_apply_stratagem_use",
+        "warhammer40k_core.engine.command_insane_bravery_authority:validate_loaded_command_auto_pass_authority"
+      ],
+      "runtime_rule_id": "core:insane-bravery",
+      "section_id": "FAQ",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-stratagems:core:insane-bravery",
+      "source_observation_sha256": "11af8114a1e14df4c9e2d6f52425c29a46c17385791480dc364129b84fe77252",
+      "source_text": "Can I use the Insane Bravery stratagem on a battle-shocked unit?\nNo, as a unit's controlling player cannot target that unit with stratagems (01.07).",
+      "target_text": "a battle-shocked unit",
+      "title": "Insane Bravery",
+      "transcription_sha256": "caf8973ed7c25c2c99db11bc0e489e3d9803300012b40b4f29eb878df54b1a25",
+      "when_text": "Can I use the Insane Bravery stratagem on a battle-shocked unit?"
     }
   ],
   "source_document": {
@@ -394,5 +512,5 @@
     "supersession_scope": "maintained_app_wording_and_provider_locators_15.05_through_15.09"
   },
   "source_package_id": "gw-11e-core-stratagems",
-  "source_version": "40k-app-observed-2026-08-26"
+  "source_version": "reviewed-stratagems-observed-2026-09-02"
 }

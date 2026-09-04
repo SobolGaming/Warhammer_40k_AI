@@ -186,7 +186,7 @@ def _canonical_bytes(payload: dict[str, object]) -> bytes:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build the reviewed P15D Core Stratagem App-source artifact."
+        description="Build the reviewed P15D/P15F Core Stratagem source artifact."
     )
     parser.add_argument(
         "--check",
