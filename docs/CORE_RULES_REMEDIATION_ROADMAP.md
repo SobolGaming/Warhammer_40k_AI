@@ -2093,7 +2093,12 @@ transient state. Restore reconstructs the exact outstanding rules-unit lineage s
 authenticated disembark snapshot, prior and queue-local Fight selection decision/event chains, and
 authoritative model-destruction history. A skipped or completed queue is accepted only when that
 history proves no mandatory activation remains, and an active queue must retain the exact derived
-eligibility context and exact authenticated selections.
+eligibility context and exact authenticated selections. Each persisted forced selection is also
+reconstructed through the same canonical Fight request/option builder used at runtime: the
+historical forced context, typed ordered eligibility contexts, descriptor-legal Fight types,
+finite option IDs and payloads, selected result, and complete
+`fight_activation_selection_requested` event must all match exactly. Cross-linked forged copies
+cannot turn a Normal activation into an Overrun activation during restore.
 
 Specific authoritative maintained direct App-data mirror statement and source ID: Game
 Datamissions App-data v931 section 18.07, `SHOCK DISEMBARK MOVE`, requires setup as in Set Up when
@@ -2118,7 +2123,7 @@ Transports package hash is
 `62c267ae792834ddd371541f177e78056492656db964cfdcaaa1a3de6581472f`, and its canonical artifact
 byte SHA-256 is `a5d78f54c1507625a7911397f181e0f6466cb6f168d78febf0412628408287c5`.
 The engine build ID after review hardening is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:28d59472904daff9573b89d6cffd76d24fba2c7555cf34c6cae915896fe6e4d4`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:77ff44b7023cd761f2f30db5b9f483a903487607dc5262ce1175d481602dd1fc`.
 
 Load and execution support: the 18.07 rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -2158,12 +2163,14 @@ before queue pop, deterministic option selection, opponent ownership, no pass, c
 selected-to-fight hooks, queue completion, both-viewer request/event projection, active and
 completed restore, forged queue skip, forged empty completion, reduced active eligibility, forged
 completion selection summary, malformed selection/context/request authority, missing selection
-decision authority, decision/event authority drift, event-source drift, and payload round-trip. The
-same-bug-class audit binds the new mode/snapshot through every standard candidate, proposal,
-selection, state, event, and lifecycle restore path, factors duplicated Assault/ Shock permission
-parsing into one fail-closed service, pins use of the configured descriptor, and pins reuse of the
-canonical Fight activation constant and handler. No behavioral test file was added, removed,
-moved, or renamed, so the four-shard inventory does not change.
+decision authority, decision/event authority drift, event-source drift, a cross-linked
+Normal-to-Overrun payload forgery retaining the Normal option ID, a fully rewritten but
+rules-illegal Overrun option ID/payload forgery, and payload round-trip. The same-bug-class audit
+binds the new mode/snapshot through every standard candidate, proposal, selection, state, event,
+and lifecycle restore path, factors duplicated Assault/ Shock permission parsing into one
+fail-closed service, pins use of the configured descriptor, and pins runtime/restore reuse of the
+canonical Fight request and selection-request-event builders. No behavioral test file was added,
+removed, moved, or renamed, so the four-shard inventory does not change.
 
 Generated artifacts/documentation: P18E expands the existing
 `core_transports_2026_09/artifacts/package.json`, typed loader/source package, authority registry,
@@ -2174,8 +2181,8 @@ engine build identity and affected external-contract examples; and updates READM
 Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
 Pyright, the exact xdist/work-stealing full suite (`6420 passed`), the four-shard fail-closed check,
 all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
-coverage run passes `--cov-fail-under=85` with `6071 passed` at `85.000567%` across `195861`
-statements and `77436` branches. All seven Core source-package generator checks, engine-build
+coverage run passes `--cov-fail-under=85` with `6071 passed` at `85.000896%` across `195919`
+statements and `77464` branches. All seven Core source-package generator checks, engine-build
 identity verification,
 base-ref external-contract verification, installed-wheel smoke, generated TypeScript contract
 check, TypeScript typecheck, five TypeScript unit tests, and the 342-assertion external conformance

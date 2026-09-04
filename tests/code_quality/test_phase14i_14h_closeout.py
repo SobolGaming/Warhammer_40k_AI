@@ -38,6 +38,9 @@ MOVEMENT_PLACEMENT_PROPOSALS_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement_placement_proposals.py"
 )
 FIGHT_ORDER_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_order.py"
+FIGHT_ACTIVATION_REQUESTS_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_activation_requests.py"
+)
 FIGHT_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
 FIGHT_UNIT_SELECTED_HOOKS_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "fight_unit_selected_hooks.py"
@@ -433,6 +436,7 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     proposal_source = source_for(MOVEMENT_PROPOSALS_PATH)
     placement_source = source_for(MOVEMENT_PLACEMENT_PROPOSALS_PATH)
     fight_order_source = source_for(FIGHT_ORDER_PATH)
+    fight_request_source = source_for(FIGHT_ACTIVATION_REQUESTS_PATH)
     fight_phase_source = source_for(FIGHT_PHASE_PATH)
     fight_hook_source = source_for(FIGHT_UNIT_SELECTED_HOOKS_PATH)
     lifecycle_source = source_for(LIFECYCLE_PATH)
@@ -455,6 +459,8 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "_start_shock_disembark_forced_fight_activations" in placement_source
     assert "ForcedFightActivationContext" in fight_order_source
     assert "for_forced_activations" in fight_order_source
+    assert "build_fight_activation_request" in fight_request_source
+    assert "fight_activation_selection_requested_payload" in fight_request_source
     assert "advance_forced_fight_activations_if_needed" in fight_phase_source
     assert "FIGHT_ACTIVATION_DECISION_TYPE" in fight_phase_source
     assert "pass_available=False" in fight_phase_source
@@ -462,6 +468,8 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "advance_forced_fight_activations_if_needed" in lifecycle_source
     assert "_validate_shock_disembark_fight_history" in restore_source
     assert "_authenticated_forced_fight_selections" in restore_source
+    assert "build_fight_activation_request" in restore_source
+    assert "fight_activation_selection_requested_payload" in restore_source
     assert "omitted mandatory forced-Fight activations" in restore_source
     assert "shock_disembark" in adapter_contract
     for forbidden_display_name in (

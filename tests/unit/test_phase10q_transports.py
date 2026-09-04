@@ -3986,6 +3986,111 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     assert GameLifecycle.from_payload(active_selection_payload).to_payload() == (
         active_selection_payload
     )
+    forged_overrun_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _forge_last_forced_fight_selection_type(
+        forged_overrun_payload,
+        fight_type="overrun",
+        rewrite_option_id=False,
+    )
+    with pytest.raises(GameLifecycleError, match="canonical request drift"):
+        GameLifecycle.from_payload(forged_overrun_payload)
+
+    rules_illegal_overrun_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _forge_last_forced_fight_selection_type(
+        rules_illegal_overrun_payload,
+        fight_type="overrun",
+        rewrite_option_id=True,
+    )
+    with pytest.raises(GameLifecycleError, match="canonical request drift"):
+        GameLifecycle.from_payload(rules_illegal_overrun_payload)
+
+    drifted_selection_request_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _, _, _, _, drifted_selection_request_event = _last_forced_fight_selection_authority_payloads(
+        drifted_selection_request_payload
+    )
+    cast(dict[str, Any], drifted_selection_request_event["payload"])["eligible_unit_ids"] = []
+    with pytest.raises(GameLifecycleError, match="decision event history drift"):
+        GameLifecycle.from_payload(drifted_selection_request_payload)
+
+    malformed_eligibility_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _, malformed_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
+        malformed_eligibility_payload
+    )
+    cast(dict[str, Any], malformed_eligibility_record["request"])["payload"][
+        "eligible_contexts"
+    ] = None
+    with pytest.raises(GameLifecycleError, match="eligibility history is malformed"):
+        GameLifecycle.from_payload(malformed_eligibility_payload)
+
+    non_object_eligibility_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _, non_object_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
+        non_object_eligibility_payload
+    )
+    non_object_request = cast(dict[str, Any], non_object_eligibility_record["request"])
+    non_object_request_payload = cast(dict[str, Any], non_object_request["payload"])
+    non_object_request_payload["eligible_contexts"] = ["malformed"]
+    with pytest.raises(GameLifecycleError, match="eligibility history is malformed"):
+        GameLifecycle.from_payload(non_object_eligibility_payload)
+
+    incomplete_eligibility_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _, incomplete_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
+        incomplete_eligibility_payload
+    )
+    incomplete_request = cast(dict[str, Any], incomplete_eligibility_record["request"])
+    incomplete_request_payload = cast(dict[str, Any], incomplete_request["payload"])
+    incomplete_contexts = cast(
+        list[dict[str, Any]], incomplete_request_payload["eligible_contexts"]
+    )
+    incomplete_contexts[0].pop("player_id")
+    with pytest.raises(GameLifecycleError, match="eligibility history is malformed"):
+        GameLifecycle.from_payload(incomplete_eligibility_payload)
+
+    drifted_eligibility_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _, drifted_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
+        drifted_eligibility_payload
+    )
+    drifted_request = cast(dict[str, Any], drifted_eligibility_record["request"])
+    drifted_request_payload = cast(dict[str, Any], drifted_request["payload"])
+    drifted_contexts = cast(list[dict[str, Any]], drifted_request_payload["eligible_contexts"])
+    drifted_contexts[0]["more_than_pass_distance_from_all_enemies"] = True
+    with pytest.raises(GameLifecycleError, match="eligibility history drift"):
+        GameLifecycle.from_payload(drifted_eligibility_payload)
+
+    reordered_eligibility_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(active_selection_payload, sort_keys=True)),
+    )
+    _, reordered_eligibility_record, _, _, _ = _last_forced_fight_selection_authority_payloads(
+        reordered_eligibility_payload
+    )
+    reordered_request = cast(dict[str, Any], reordered_eligibility_record["request"])
+    reordered_request_payload = cast(dict[str, Any], reordered_request["payload"])
+    reordered_contexts = cast(list[dict[str, Any]], reordered_request_payload["eligible_contexts"])
+    reordered_contexts.reverse()
+    with pytest.raises(GameLifecycleError, match="eligibility history drift"):
+        GameLifecycle.from_payload(reordered_eligibility_payload)
+
     drifted_active_history_payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(active_selection_payload, sort_keys=True)),
@@ -4126,7 +4231,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     requested_event_payload["actor_id"] = "player-a"
     recorded_event_payload["request"]["actor_id"] = "player-a"
     recorded_event_payload["result"]["actor_id"] = "player-a"
-    with pytest.raises(GameLifecycleError, match="decision history drift"):
+    with pytest.raises(GameLifecycleError, match="canonical request drift"):
         GameLifecycle.from_payload(drifted_selection_decision_payload)
 
     drifted_selection_event_payload = cast(
@@ -8468,6 +8573,53 @@ def _last_forced_fight_selection_authority_payloads(
         cast(dict[str, Any], recorded_event["payload"]),
         selection_request_event,
     )
+
+
+def _forge_last_forced_fight_selection_type(
+    lifecycle_payload: GameLifecyclePayload,
+    *,
+    fight_type: str,
+    rewrite_option_id: bool,
+) -> None:
+    (
+        selection_event,
+        selection_record,
+        requested_event,
+        recorded_event,
+        _,
+    ) = _last_forced_fight_selection_authority_payloads(lifecycle_payload)
+    activation_selection = cast(dict[str, Any], selection_event["activation_selection"])
+    unit_instance_id = activation_selection["unit_instance_id"]
+    result = cast(dict[str, Any], selection_record["result"])
+    prior_option_id = result["selected_option_id"]
+    option_id = f"fight:{fight_type}:{unit_instance_id}" if rewrite_option_id else prior_option_id
+
+    def mutate_request(request: dict[str, Any]) -> None:
+        option = next(
+            candidate
+            for candidate in request["options"]
+            if candidate["option_id"] == prior_option_id
+        )
+        option["option_id"] = option_id
+        option["label"] = f"{unit_instance_id} {fight_type}"
+        cast(dict[str, Any], option["payload"])["fight_type"] = fight_type
+
+    mutate_request(cast(dict[str, Any], selection_record["request"]))
+    mutate_request(requested_event)
+    recorded_request = cast(dict[str, Any], recorded_event["request"])
+    mutate_request(recorded_request)
+    for result_payload in (
+        result,
+        cast(dict[str, Any], recorded_event["result"]),
+    ):
+        result_payload["selected_option_id"] = option_id
+        cast(dict[str, Any], result_payload["payload"])["fight_type"] = fight_type
+    activation_selection["fight_type"] = fight_type
+    state = cast(dict[str, Any], lifecycle_payload["state"])
+    fight_state = cast(dict[str, Any], state["fight_phase_state"])
+    cast(dict[str, Any], fight_state["active_activation"])["fight_type"] = fight_type
+    fight_order = cast(dict[str, Any], fight_state["fight_order_state"])
+    cast(dict[str, Any], fight_order["activation_selections"][0])["fight_type"] = fight_type
 
 
 def _movement_option_contains_component(payload: JsonValue, unit_instance_id: str) -> bool:

@@ -29,13 +29,63 @@ def request_fight_activation(
     pass_available: bool,
     policy: FightPolicyDescriptor,
 ) -> LifecycleStatus:
+    request = build_fight_activation_request(
+        state=state,
+        fight_state=fight_state,
+        contexts=contexts,
+        pass_available=pass_available,
+        policy=policy,
+        request_id=state.next_decision_request_id(),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "fight_activation_selection_requested",
+        fight_activation_selection_requested_payload(
+            state=state,
+            fight_state=fight_state,
+            contexts=contexts,
+            pass_available=pass_available,
+            request_id=request.request_id,
+        ),
+    )
     forced_payload: JsonValue = (
         None
         if fight_state.forced_activation_context is None
         else validate_json_value(fight_state.forced_activation_context.to_payload())
     )
-    request = DecisionRequest(
-        request_id=state.next_decision_request_id(),
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "phase_body_status": FIGHT_ACTIVATION_REQUIRED_STATUS,
+            "battle_round": state.battle_round,
+            "active_player_id": fight_state.active_player_id,
+            "player_id": fight_state.fight_order_state.next_player_id,
+            "ordering_band": fight_state.current_ordering_band.value,
+            "eligible_unit_ids": [context.unit_instance_id for context in contexts],
+            "eligible_pass_available": pass_available,
+            **({} if forced_payload is None else {"forced_activation_context": forced_payload}),
+        },
+    )
+
+
+def build_fight_activation_request(
+    *,
+    state: GameState,
+    fight_state: FightPhaseState,
+    contexts: tuple[FightEligibilityContext, ...],
+    pass_available: bool,
+    policy: FightPolicyDescriptor,
+    request_id: str,
+) -> DecisionRequest:
+    forced_payload: JsonValue = (
+        None
+        if fight_state.forced_activation_context is None
+        else validate_json_value(fight_state.forced_activation_context.to_payload())
+    )
+    return DecisionRequest(
+        request_id=request_id,
         decision_type=FIGHT_ACTIVATION_DECISION_TYPE,
         actor_id=fight_state.fight_order_state.next_player_id,
         payload=validate_json_value(
@@ -60,39 +110,35 @@ def request_fight_activation(
             policy=policy,
         ),
     )
-    decisions.request_decision(request)
-    decisions.event_log.append(
-        "fight_activation_selection_requested",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.FIGHT.value,
-                "active_player_id": fight_state.active_player_id,
-                "player_id": fight_state.fight_order_state.next_player_id,
-                "ordering_band": fight_state.current_ordering_band.value,
-                "request_id": request.request_id,
-                "eligible_unit_ids": [context.unit_instance_id for context in contexts],
-                "eligible_pass_available": pass_available,
-                "phase_body_status": FIGHT_ACTIVATION_REQUIRED_STATUS,
-                **({} if forced_payload is None else {"forced_activation_context": forced_payload}),
-            }
-        ),
+
+
+def fight_activation_selection_requested_payload(
+    *,
+    state: GameState,
+    fight_state: FightPhaseState,
+    contexts: tuple[FightEligibilityContext, ...],
+    pass_available: bool,
+    request_id: str,
+) -> JsonValue:
+    forced_payload: JsonValue = (
+        None
+        if fight_state.forced_activation_context is None
+        else validate_json_value(fight_state.forced_activation_context.to_payload())
     )
-    return LifecycleStatus.waiting_for_decision(
-        stage=GameLifecycleStage.BATTLE,
-        decision_request=request,
-        payload={
-            "phase": BattlePhase.FIGHT.value,
-            "phase_body_status": FIGHT_ACTIVATION_REQUIRED_STATUS,
+    return validate_json_value(
+        {
+            "game_id": state.game_id,
             "battle_round": state.battle_round,
+            "phase": BattlePhase.FIGHT.value,
             "active_player_id": fight_state.active_player_id,
             "player_id": fight_state.fight_order_state.next_player_id,
             "ordering_band": fight_state.current_ordering_band.value,
+            "request_id": request_id,
             "eligible_unit_ids": [context.unit_instance_id for context in contexts],
             "eligible_pass_available": pass_available,
+            "phase_body_status": FIGHT_ACTIVATION_REQUIRED_STATUS,
             **({} if forced_payload is None else {"forced_activation_context": forced_payload}),
-        },
+        }
     )
 
 
@@ -141,5 +187,7 @@ def _fight_activation_options(
 
 __all__ = (
     "FIGHT_ACTIVATION_REQUIRED_STATUS",
+    "build_fight_activation_request",
+    "fight_activation_selection_requested_payload",
     "request_fight_activation",
 )
