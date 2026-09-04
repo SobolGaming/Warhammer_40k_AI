@@ -2400,7 +2400,8 @@ passes all `342` assertions for contract version `11.1.0`. This Windows environm
 24.18.1 but no `npm` executable, so `npm ci` itself could not be run; the existing lockfile-matched
 dependencies were used to execute the underlying checks directly.
 
-PR URL and merge commit: pending publication.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/420`; merge commit
+pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
