@@ -41,6 +41,9 @@ FIGHT_ORDER_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_order.
 FIGHT_ACTIVATION_REQUESTS_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "fight_activation_requests.py"
 )
+FIGHT_HISTORICAL_ELIGIBILITY_PATH = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_historical_eligibility.py"
+)
 FIGHT_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
 FIGHT_UNIT_SELECTED_HOOKS_PATH = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "fight_unit_selected_hooks.py"
@@ -437,6 +440,7 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     placement_source = source_for(MOVEMENT_PLACEMENT_PROPOSALS_PATH)
     fight_order_source = source_for(FIGHT_ORDER_PATH)
     fight_request_source = source_for(FIGHT_ACTIVATION_REQUESTS_PATH)
+    historical_eligibility_source = source_for(FIGHT_HISTORICAL_ELIGIBILITY_PATH)
     fight_phase_source = source_for(FIGHT_PHASE_PATH)
     fight_hook_source = source_for(FIGHT_UNIT_SELECTED_HOOKS_PATH)
     lifecycle_source = source_for(LIFECYCLE_PATH)
@@ -470,6 +474,12 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "_authenticated_forced_fight_selections" in restore_source
     assert "build_fight_activation_request" in restore_source
     assert "fight_activation_selection_requested_payload" in restore_source
+    assert "forced_fight_eligibility_contexts_before_event" in restore_source
+    assert "selection_request_event_index" in restore_source
+    assert "physical_model_authority_before_event" in historical_eligibility_source
+    assert "geometry_models_are_physically_engaged" in historical_eligibility_source
+    assert "historical_rules_unit_model_ids" in historical_eligibility_source
+    assert "CURRENTLY_ENGAGED in eligible_context.eligibility_reasons" not in restore_source
     assert "omitted mandatory forced-Fight activations" in restore_source
     assert "shock_disembark" in adapter_contract
     for forbidden_display_name in (

@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:77ff44b7023cd761f2f30db5b9f483a903487607dc5262ce1175d481602dd1fc",
-  "fingerprint": "77ff44b7023cd761f2f30db5b9f483a903487607dc5262ce1175d481602dd1fc",
-  "resource_count": 2498,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a3cd9040fcc9307042de99a317f26b40900b227054c707aa940b343b39ed1a74",
+  "fingerprint": "a3cd9040fcc9307042de99a317f26b40900b227054c707aa940b343b39ed1a74",
+  "resource_count": 2499,
   "resources": [
     {
       "byte_length": 113,
@@ -9135,6 +9135,11 @@
       "sha256": "642e0981792614eeff1c2792802ffce89081bde4a67e16b9d6cd8656abbb1e3e"
     },
     {
+      "byte_length": 7406,
+      "path": "warhammer40k_core/engine/fight_historical_eligibility.py",
+      "sha256": "2c042c5850264edf3d31229f148c50c6c77cc9da8751f1484fe8e71e37c9e3aa"
+    },
+    {
       "byte_length": 52974,
       "path": "warhammer40k_core/engine/fight_model_authority_history.py",
       "sha256": "c1524a3529e888fda246f5b938c1d0681b84b70cec02d28526f2ce2465190bce"
@@ -9475,9 +9480,9 @@
       "sha256": "70aa09c74dd7a325d30b3d98304ddbb119cb6ae84fd8a87ae346255698e2c9d2"
     },
     {
-      "byte_length": 50927,
+      "byte_length": 49355,
       "path": "warhammer40k_core/engine/lifecycle_state_validation.py",
-      "sha256": "432375a9ab66915c843150885f3540b1c6934d8aa819146654da5d13aec3ba0e"
+      "sha256": "f8fbe0052e5b1265d372b1f15c468108fd9209ba1e16e8a29c61e12e8897c546"
     },
     {
       "byte_length": 57401,

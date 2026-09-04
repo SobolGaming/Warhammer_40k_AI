@@ -2165,12 +2165,17 @@ completed restore, forged queue skip, forged empty completion, reduced active el
 completion selection summary, malformed selection/context/request authority, missing selection
 decision authority, decision/event authority drift, event-source drift, a cross-linked
 Normal-to-Overrun payload forgery retaining the Normal option ID, a fully rewritten but
-rules-illegal Overrun option ID/payload forgery, and payload round-trip. The same-bug-class audit
+rules-illegal Overrun option ID/payload forgery, a later-activation forgery that removes
+`currently_engaged` from every persisted eligibility/selection copy before rewriting the active
+selection to Overrun, and payload round-trip. The same-bug-class audit
 binds the new mode/snapshot through every standard candidate, proposal, selection, state, event,
 and lifecycle restore path, factors duplicated Assault/ Shock permission parsing into one
 fail-closed service, pins use of the configured descriptor, and pins runtime/restore reuse of the
-canonical Fight request and selection-request-event builders. No behavioral test file was added,
-removed, moved, or renamed, so the four-shard inventory does not change.
+canonical Fight request and selection-request-event builders. Restore now reconstructs the exact
+remaining candidate set, model poses, closest-enemy distance, and physical Engagement state at each
+selection-request event from authenticated battlefield authority; persisted eligibility reasons
+are compared with that reconstruction and are never used as its input. No behavioral test file was
+added, removed, moved, or renamed, so the four-shard inventory does not change.
 
 Generated artifacts/documentation: P18E expands the existing
 `core_transports_2026_09/artifacts/package.json`, typed loader/source package, authority registry,
@@ -2181,8 +2186,8 @@ engine build identity and affected external-contract examples; and updates READM
 Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
 Pyright, the exact xdist/work-stealing full suite (`6420 passed`), the four-shard fail-closed check,
 all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
-coverage run passes `--cov-fail-under=85` with `6071 passed` at `85.000896%` across `195919`
-statements and `77464` branches. All seven Core source-package generator checks, engine-build
+coverage run passes `--cov-fail-under=85` with `6071 passed` at `85.000165%` across `195971`
+statements and `77472` branches. All seven Core source-package generator checks, engine-build
 identity verification,
 base-ref external-contract verification, installed-wheel smoke, generated TypeScript contract
 check, TypeScript typecheck, five TypeScript unit tests, and the 342-assertion external conformance

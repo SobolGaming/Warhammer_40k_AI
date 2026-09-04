@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
-    FightEligibilityKind,
     FightOrderingBandKind,
     FightPhaseStepKind,
     FightPolicyDescriptor,
@@ -18,6 +17,9 @@ from warhammer40k_core.engine.fight_activation_requests import (
     build_fight_activation_request,
     fight_activation_selection_requested_payload,
 )
+from warhammer40k_core.engine.fight_historical_eligibility import (
+    forced_fight_eligibility_contexts_before_event,
+)
 from warhammer40k_core.engine.fight_model_authority_history import (
     build_model_authority_timeline,
     historical_rules_unit_model_ids,
@@ -31,10 +33,7 @@ from warhammer40k_core.engine.fight_order import (
     FightPhaseState,
     current_fight_activation_selection_from_payload,
 )
-from warhammer40k_core.engine.fights_first import (
-    CHARGE_FIGHTS_FIRST_EFFECT_KIND,
-    FightsFirstRegistry,
-)
+from warhammer40k_core.engine.fights_first import FightsFirstRegistry
 from warhammer40k_core.engine.forced_fight_context import (
     ForcedFightActivationContext,
     ForcedFightActivationContextPayload,
@@ -844,6 +843,9 @@ def _authenticated_forced_fight_selections(
         ruleset_descriptor = state.runtime_ruleset_descriptor()
         historical_contexts = _forced_fight_eligibility_contexts_from_request(
             state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            selection_request_event_index=selection_request_event_index,
             request_payload=request_payload,
             context=context,
             prior_selections=prior_context_selections,
@@ -948,6 +950,9 @@ def _authenticated_forced_fight_selections(
 def _forced_fight_eligibility_contexts_from_request(
     *,
     state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    selection_request_event_index: int,
     request_payload: dict[str, JsonValue],
     context: ForcedFightActivationContext,
     prior_selections: tuple[FightActivationSelection, ...],
@@ -983,65 +988,24 @@ def _forced_fight_eligibility_contexts_from_request(
             raise GameLifecycleError("Forced Fight activation eligibility history drift.")
         contexts.append(eligible_context)
     context_tuple = tuple(contexts)
-    context_unit_ids = tuple(value.unit_instance_id for value in context_tuple)
-    if context_unit_ids != tuple(sorted(set(context_unit_ids))):
-        raise GameLifecycleError("Forced Fight activation eligibility history drift.")
-    prior_unit_ids = tuple(selection.unit_instance_id for selection in prior_selections)
-    remaining_unit_ids = tuple(
-        unit_id
-        for unit_id in context.eligible_unit_instance_ids
-        if not rules_unit_identity_history_contains(
-            state=state,
-            identity_ids=prior_unit_ids,
-            unit_instance_id=unit_id,
-        )
+    authoritative_contexts = forced_fight_eligibility_contexts_before_event(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        event_index=selection_request_event_index,
+        context=context,
+        prior_selections=prior_selections,
+        policy=policy,
     )
-    if not prior_selections:
-        if context_unit_ids != remaining_unit_ids:
-            raise GameLifecycleError("Forced Fight activation eligibility history drift.")
-    elif any(
-        not rules_unit_identity_history_contains(
-            state=state,
-            identity_ids=remaining_unit_ids,
-            unit_instance_id=unit_id,
-        )
-        for unit_id in context_unit_ids
-    ):
+    if context_tuple != authoritative_contexts:
         raise GameLifecycleError("Forced Fight activation eligibility history drift.")
     if not rules_unit_identity_history_contains(
         state=state,
-        identity_ids=context_unit_ids,
+        identity_ids=tuple(value.unit_instance_id for value in authoritative_contexts),
         unit_instance_id=selected_unit_instance_id,
     ):
         raise GameLifecycleError("Forced Fight activation eligibility history drift.")
-    fights_first_registry = FightsFirstRegistry.from_state(state)
-    for eligible_context in context_tuple:
-        charged_this_turn = fights_first_registry.has_unit_lineage(
-            state=state,
-            unit_instance_id=eligible_context.unit_instance_id,
-            effect_kind=CHARGE_FIGHTS_FIRST_EFFECT_KIND,
-        )
-        currently_engaged = (
-            FightEligibilityKind.CURRENTLY_ENGAGED in eligible_context.eligibility_reasons
-        )
-        expected_reasons = tuple(
-            reason
-            for reason, applies in (
-                (FightEligibilityKind.CHARGED_THIS_TURN, charged_this_turn),
-                (FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START, True),
-                (FightEligibilityKind.CURRENTLY_ENGAGED, currently_engaged),
-            )
-            if applies and reason in policy.eligibility_kinds
-        )
-        if (
-            eligible_context.player_id != context.selecting_player_id
-            or eligible_context.battle_round != state.battle_round
-            or eligible_context.ordering_band is not FightOrderingBandKind.REMAINING_COMBATS
-            or eligible_context.eligibility_reasons != expected_reasons
-            or (not prior_selections and not currently_engaged)
-        ):
-            raise GameLifecycleError("Forced Fight activation eligibility history drift.")
-    return context_tuple
+    return authoritative_contexts
 
 
 def _validate_unique_forced_fight_selection_lineages(

@@ -116,7 +116,10 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases import (
     movement_placement_proposals as _movement_placement_proposals,
 )
-from warhammer40k_core.engine.phases.fight import FightPhaseHandler
+from warhammer40k_core.engine.phases.fight import (
+    FightPhaseHandler,
+    _complete_active_fight_activation,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.phases.movement import (
     DECLINE_EMBARK_OPTION_ID,
     SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
@@ -4103,11 +4106,21 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     drifted_active_order["activation_selections"] = []
     with pytest.raises(GameLifecycleError, match="activation history drift"):
         GameLifecycle.from_payload(drifted_active_history_payload)
-    for model in enemy.own_models:
-        destroy_model_by_rule(
+    first_fight_state = restored.state.fight_phase_state
+    assert first_fight_state is not None
+    first_active_activation = first_fight_state.active_activation
+    assert first_active_activation is not None
+    assert (
+        _complete_active_fight_activation(
+            handler=fight_handler,
             state=restored.state,
-            model_instance_id=model.model_instance_id,
+            decisions=restored.decision_controller,
+            reaction_queue=None,
+            policy=_ruleset().fight_policy,
+            activation=first_active_activation,
         )
+        is None
+    )
     second_fight_request = _decision_request(
         fight_handler.advance_forced_fight_activations_if_needed(
             state=restored.state,
@@ -4131,11 +4144,38 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
         )
         is None
     )
-    for model in second_enemy.own_models:
-        destroy_model_by_rule(
+    second_active_selection_payload = restored.to_payload()
+    assert GameLifecycle.from_payload(second_active_selection_payload).to_payload() == (
+        second_active_selection_payload
+    )
+    forged_later_overrun_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(second_active_selection_payload, sort_keys=True)),
+    )
+    _forge_last_forced_fight_selection_type(
+        forged_later_overrun_payload,
+        fight_type="overrun",
+        rewrite_option_id=True,
+    )
+    _remove_currently_engaged_from_last_forced_fight_selection(forged_later_overrun_payload)
+    with pytest.raises(GameLifecycleError, match="eligibility history drift"):
+        GameLifecycle.from_payload(forged_later_overrun_payload)
+
+    second_fight_state = restored.state.fight_phase_state
+    assert second_fight_state is not None
+    second_active_activation = second_fight_state.active_activation
+    assert second_active_activation is not None
+    assert (
+        _complete_active_fight_activation(
+            handler=fight_handler,
             state=restored.state,
-            model_instance_id=model.model_instance_id,
+            decisions=restored.decision_controller,
+            reaction_queue=None,
+            policy=_ruleset().fight_policy,
+            activation=second_active_activation,
         )
+        is None
+    )
     completion = fight_handler.advance_forced_fight_activations_if_needed(
         state=restored.state,
         decisions=restored.decision_controller,
@@ -8619,7 +8659,65 @@ def _forge_last_forced_fight_selection_type(
     fight_state = cast(dict[str, Any], state["fight_phase_state"])
     cast(dict[str, Any], fight_state["active_activation"])["fight_type"] = fight_type
     fight_order = cast(dict[str, Any], fight_state["fight_order_state"])
-    cast(dict[str, Any], fight_order["activation_selections"][0])["fight_type"] = fight_type
+    persisted_selection = next(
+        candidate
+        for candidate in fight_order["activation_selections"]
+        if candidate["result_id"] == activation_selection["result_id"]
+    )
+    cast(dict[str, Any], persisted_selection)["fight_type"] = fight_type
+
+
+def _remove_currently_engaged_from_last_forced_fight_selection(
+    lifecycle_payload: GameLifecyclePayload,
+) -> None:
+    (
+        selection_event,
+        selection_record,
+        requested_event,
+        recorded_event,
+        _,
+    ) = _last_forced_fight_selection_authority_payloads(lifecycle_payload)
+    selected_unit_id = cast(dict[str, Any], selection_event["activation_selection"])[
+        "unit_instance_id"
+    ]
+
+    def mutate_context(context: dict[str, Any]) -> None:
+        if context["unit_instance_id"] != selected_unit_id:
+            return
+        reasons = cast(list[str], context["eligibility_reasons"])
+        reasons.remove("currently_engaged")
+
+    def mutate_request(request: dict[str, Any]) -> None:
+        payload = cast(dict[str, Any], request["payload"])
+        for context in cast(list[dict[str, Any]], payload["eligible_contexts"]):
+            mutate_context(context)
+        for option in cast(list[dict[str, Any]], request["options"]):
+            option_payload = cast(dict[str, Any], option["payload"])
+            mutate_context(cast(dict[str, Any], option_payload["eligibility_context"]))
+
+    mutate_request(cast(dict[str, Any], selection_record["request"]))
+    mutate_request(requested_event)
+    mutate_request(cast(dict[str, Any], recorded_event["request"]))
+    for result in (
+        cast(dict[str, Any], selection_record["result"]),
+        cast(dict[str, Any], recorded_event["result"]),
+    ):
+        result_payload = cast(dict[str, Any], result["payload"])
+        mutate_context(cast(dict[str, Any], result_payload["eligibility_context"]))
+    activation_selection = cast(dict[str, Any], selection_event["activation_selection"])
+    cast(list[str], activation_selection["eligibility_reasons"]).remove("currently_engaged")
+    state = cast(dict[str, Any], lifecycle_payload["state"])
+    fight_state = cast(dict[str, Any], state["fight_phase_state"])
+    cast(list[str], fight_state["active_activation"]["eligibility_reasons"]).remove(
+        "currently_engaged"
+    )
+    fight_order = cast(dict[str, Any], fight_state["fight_order_state"])
+    persisted_selection = next(
+        candidate
+        for candidate in fight_order["activation_selections"]
+        if candidate["result_id"] == activation_selection["result_id"]
+    )
+    cast(list[str], persisted_selection["eligibility_reasons"]).remove("currently_engaged")
 
 
 def _movement_option_contains_component(payload: JsonValue, unit_instance_id: str) -> bool:
