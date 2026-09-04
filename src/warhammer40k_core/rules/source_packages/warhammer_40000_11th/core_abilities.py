@@ -4,11 +4,15 @@ import hashlib
 import json
 from dataclasses import dataclass
 
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_abilities_2026_09 as app_source,
+)
+
 EDITION_ID = "warhammer_40000_11th"
-SOURCE_PACKAGE_ID = "gw-11e-core-abilities"
+SOURCE_PACKAGE_ID = app_source.SOURCE_PACKAGE_ID
 SOURCE_TITLE = "Warhammer 40,000 11th Edition Core Abilities"
-SOURCE_VERSION = "11e-core-rules"
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-ability-source-v1"
+SOURCE_VERSION = app_source.SOURCE_VERSION
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-ability-source-v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +76,7 @@ def source_package_identity_payload() -> dict[str, str]:
 
 def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
     source_prefix = f"{SOURCE_PACKAGE_ID}:core"
+    deadly_demise_source = app_source.source_rule_record()
     return tuple(
         sorted(
             (
@@ -142,16 +147,16 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     movement_flags=("is_walker",),
                 ),
                 SourceAbilityRow(
-                    ability_id="core-deadly-demise",
+                    ability_id=deadly_demise_source.runtime_ability_id,
                     name="Deadly Demise",
                     source_kind="core",
-                    source_id=f"{source_prefix}:deadly-demise",
-                    when_descriptor="when this unit is destroyed",
-                    effect_descriptor="roll for a mortal-wound explosion before removal",
-                    restrictions_descriptor="core ability parameters define the trigger value",
-                    trigger_kind="after_unit_destroyed",
+                    source_id=deadly_demise_source.source_id,
+                    when_descriptor=deadly_demise_source.when_descriptor,
+                    effect_descriptor=deadly_demise_source.effect_descriptor,
+                    restrictions_descriptor=deadly_demise_source.restrictions_descriptor,
+                    trigger_kind=deadly_demise_source.trigger_kind,
                     phase=None,
-                    handler_id="core:deadly-demise",
+                    handler_id=deadly_demise_source.runtime_handler_id,
                     required_keywords=("DEADLY_DEMISE",),
                 ),
                 SourceAbilityRow(
@@ -346,6 +351,7 @@ def _import_hash() -> str:
             "source_title": SOURCE_TITLE,
             "source_version": SOURCE_VERSION,
             "imported_at_schema_version": IMPORTED_AT_SCHEMA_VERSION,
+            "app_source_package_hash": app_source.PACKAGE_HASH,
             "abilities": [row.to_payload() for row in ability_rows()],
         },
         sort_keys=True,

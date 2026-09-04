@@ -87,7 +87,7 @@ class CatalogReturnOnDeathRuntime:
         if index is None:
             raise GameLifecycleError("Return-on-death runtime missing player ability index.")
         current_model_ids = unit.own_model_ids()
-        for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED):
+        for record in _return_on_death_records(index):
             if not catalog_rule_record_source_matches_unit(
                 record=record,
                 unit=unit,
@@ -130,7 +130,7 @@ class CatalogReturnOnDeathRuntime:
             index = self.ability_indexes_by_player_id.get(army.player_id)
             if index is None:
                 raise GameLifecycleError("Return-on-death runtime missing player ability index.")
-            for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED):
+            for record in _return_on_death_records(index):
                 for clause in catalog_rule_clauses_from_record(record):
                     if not catalog_rule_clause_is_supported_first_death_return(clause):
                         continue
@@ -434,5 +434,12 @@ def _has_return_on_death_records(
             for clause in catalog_rule_clauses_from_record(record)
         )
         for index in ability_indexes_by_player_id.values()
-        for record in index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED)
+        for record in _return_on_death_records(index)
+    )
+
+
+def _return_on_death_records(index: AbilityCatalogIndex) -> tuple[AbilityCatalogRecord, ...]:
+    return (
+        *index.records_for(TimingTriggerKind.AFTER_MODEL_DESTROYED),
+        *index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED),
     )

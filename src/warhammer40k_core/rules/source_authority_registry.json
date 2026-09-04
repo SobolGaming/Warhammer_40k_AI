@@ -410,6 +410,14 @@
         },
         {
           "namespace": "games-workshop",
+          "package_name": "gw-11e-core-abilities",
+          "version": "game-datamissions-v931-observed-2026-09-02",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-abilities:core:deadly-demise"
+          ]
+        },
+        {
+          "namespace": "games-workshop",
           "package_name": "gw-11e-core-attached-units",
           "version": "40k-app-attached-units-observed-2026-09-01",
           "allowed_rule_source_ids": [

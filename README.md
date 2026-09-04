@@ -457,6 +457,10 @@ Current status:
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_transports_source.py` and the
   same command plus `--check`.
+- P24F's reviewed App-data v931 24.08 Deadly Demise wording and model-destruction
+  timing are pinned in `core_abilities_2026_09/artifacts/package.json`; refresh
+  and verify it offline with `uv run python tools/build_core_abilities_source.py`
+  and the same command plus `--check`.
 - The dependency-ordered
   [Core Rules remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md)
   tracks the itemized implementation findings from the accompanying

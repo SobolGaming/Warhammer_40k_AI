@@ -859,7 +859,7 @@ def default_ability_handler_registry() -> AbilityHandlerRegistry:
         )
         .with_handler(
             handler_id=CORE_DEADLY_DEMISE_HANDLER_ID,
-            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED),
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_MODEL_DESTROYED),
             handler=_deadly_demise_keyword_handler,
         )
         .with_handler(
