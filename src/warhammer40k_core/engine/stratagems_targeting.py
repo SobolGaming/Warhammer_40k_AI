@@ -142,11 +142,17 @@ def _target_binding_error(
         )
     ):
         return "stratagem_target_forbidden_by_effect"
+    target_unit_instance_id = _require_target_unit_id(target_binding)
     permission = friendly_stratagem_target_permission(
         player_id=player_id,
         target_player_id=target_owner,
-        target_unit_instance_id=_require_target_unit_id(target_binding),
-        battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+        target_unit_instance_id=target_unit_instance_id,
+        battle_shocked_unit_ids=(target_unit_instance_id,)
+        if rules_unit_is_battle_shocked(
+            state=state,
+            unit_instance_id=target_unit_instance_id,
+        )
+        else (),
         allow_battle_shocked=policy.allow_battle_shocked_targets,
     )
     if not permission.is_allowed:

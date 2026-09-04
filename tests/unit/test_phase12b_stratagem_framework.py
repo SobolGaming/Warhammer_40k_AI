@@ -11,6 +11,7 @@ from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointLedger,
@@ -1118,6 +1119,45 @@ def test_attached_unit_components_share_one_stratagem_affected_key() -> None:
     )
 
     assert options == ()
+
+
+def test_battle_shocked_attached_unit_suppresses_every_component_target() -> None:
+    bodyguard_id = "army-alpha:intercessor-unit-1"
+    leader_id = "army-alpha:captain-unit"
+    attached_id = "attached-unit:army-alpha:captain-intercessors"
+    lifecycle = _battle_lifecycle(config=_attached_unit_config())
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _grant_cp(state, player_id="player-a", amount=1)
+    _mark_attached_unit_join(
+        state,
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        component_unit_instance_ids=(bodyguard_id, leader_id),
+    )
+    _attach_test_units(
+        state,
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard_id,
+        leader_unit_instance_id=leader_id,
+    )
+    state.battle_shocked_unit_ids = [leader_id]
+
+    options = stratagem_use_options(
+        state=state,
+        catalog_records=(
+            _core_stratagem(
+                stratagem_id="attached-target-check",
+                command_point_cost=1,
+                target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
+            ),
+        ),
+        context=_context(state=state, player_id="player-a"),
+    )
+
+    offered_unit_ids = {_target_unit_id_for_option(option) for option in options}
+    assert offered_unit_ids.isdisjoint({attached_id, bodyguard_id, leader_id})
 
 
 def test_parameterized_stratagem_target_proposals_validate_before_queue_pop() -> None:
@@ -2312,6 +2352,41 @@ def _option_id_for_target(request: DecisionRequest, target_unit_instance_id: str
         if binding["target_unit_instance_id"] == target_unit_instance_id:
             return option.option_id
     raise AssertionError(f"Missing Stratagem option for target {target_unit_instance_id}.")
+
+
+def _target_unit_id_for_option(option: DecisionOption) -> str:
+    payload = cast(dict[str, JsonValue], option.payload)
+    binding = cast(dict[str, JsonValue], payload["target_binding"])
+    return cast(str, binding["target_unit_instance_id"])
+
+
+def _attach_test_units(
+    state: GameState,
+    *,
+    player_id: str,
+    attached_unit_instance_id: str,
+    bodyguard_unit_instance_id: str,
+    leader_unit_instance_id: str,
+) -> None:
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_unit_instance_id,
+        bodyguard_unit_instance_id=bodyguard_unit_instance_id,
+        leader_unit_instance_ids=(leader_unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard_unit_instance_id, leader_unit_instance_id))
+        ),
+        source_id=f"phase12b:attachment:{attached_unit_instance_id}",
+        attachment_source_ids=(f"phase12b:attachment:{attached_unit_instance_id}:eligibility",),
+    )
+    for army_index, army in enumerate(state.army_definitions):
+        if army.player_id != player_id:
+            continue
+        state.army_definitions[army_index] = replace(
+            army,
+            attached_units=(*army.attached_units, formation),
+        )
+        return
+    raise AssertionError(f"Missing army for player {player_id}.")
 
 
 def _mark_attached_unit_join(

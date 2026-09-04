@@ -2302,6 +2302,106 @@ passes all `342` assertions for contract version `11.1.0`.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/419`; merge commit
 pending review and merge.
 
+### P15F — C15-06
+
+Status: Implemented in Order 15; local validation and publication details are recorded in the PR.
+
+Finding IDs: `C15-06`.
+
+Dependencies and evidence gate: P08B/PR #405 and S-MIRRORS/PR #416 are merged on `main`. The
+Insane Bravery FAQ is retained as a reviewed transcription and separately classified,
+project-authoritative Game Datamissions v931 App-data mirror observation authenticated against
+the S-MIRRORS provider audit. This satisfies `APP-DRIFT`; no co-versioned contrary observation is
+retained, so no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: a controlling player cannot target its already Battle-shocked unit with a
+Stratagem. This restriction must be applied by the shared Stratagem target validator both when an
+optional window is exposed and again before queue pop, CP spend, use recording, or effect mutation.
+
+How it was done before P15F: the Insane Bravery catalog row set
+`allow_battle_shocked_targets=True`. The about-to-test query correctly retained an already
+Battle-shocked unit when that unit still had to take a Command-phase Battle-shock test, but the
+catalog override converted that test obligation into permission to target the unit. A pending
+parameterized request could consequently spend CP and register the auto-pass effect even when the
+unit was already Battle-shocked or became Battle-shocked before submission.
+
+How it is done after P15F: the stable Insane Bravery catalog row consumes the reviewed FAQ source
+ID and restriction descriptor and no longer opts out of the shared friendly Battle-shocked target
+rule. The canonical about-to-test query remains unchanged. Command-phase request preflight now
+requires at least one legal, affordable target, while the existing proposal validator and atomic
+apply path repeat full target validation before mutation. The source-backed once-per-battle
+restriction remains unchanged. Generic target validation also resolves Battle-shock through the
+explicit rules-unit identity API, so an Attached Unit's synthetic and component identities cannot
+disagree about the restriction.
+
+Specific authoritative maintained direct App-data mirror statement and source ID: Game
+Datamissions App-data v931 records the Insane Bravery FAQ answer that a unit's controlling player
+cannot target an already Battle-shocked unit with Stratagems. The stable source ID is
+`gw-11e-core-stratagems:core:insane-bravery`; runtime behavior gates on the typed catalog policy,
+target-policy ID, handler ID, and rules-unit identity, never on display-name or source-text parsing.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog`, App-data version `931`, reviewed
+at `2026-09-02T12:30:09-04:00`; transcription
+`caf8973ed7c25c2c99db11bc0e489e3d9803300012b40b4f29eb878df54b1a25`;
+reviewed-transcription observation
+`e95e71061c9703aa78e104616ae95beb6391454de0c442aa6cbb317c55cc6fad`;
+authoritative-mirror observation
+`11af8114a1e14df4c9e2d6f52425c29a46c17385791480dc364129b84fe77252`; authenticated
+provider-audit observation
+`1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`. The Core Stratagem package
+hash is `f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7`, its canonical artifact
+byte SHA-256 is `25a89aadcee9ec31939dd08fedcec76e2bd1983aea1b94472a17c4721d89f17c`, and the engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:ef1d4f10404ce213ccfe8ac3e06685a4e41e07ccb70c96e46a4039787a73853e`.
+
+Load and execution support: the FAQ rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation carries
+project authority. The fail-fast loader pins both source documents, rule/runtime identity, FAQ
+text, evidence inventory, provider/version/audit tuple, runtime consumers, package hash, and raw
+artifact hash.
+
+Scope and owning path: P15F owns the Insane Bravery FAQ source row, catalog restriction,
+parameterized-request strict preflight, shared rules-unit target validation, documentation, and
+focused regressions. The authoritative path is reviewed JSON and typed loader -> stable Core
+Stratagem catalog record -> canonical Command start timing window -> parameterized target proposal
+-> validation before queue pop -> CP spend/use record -> auto-pass effect -> Battle-shock result.
+P15F adds no named handler, decision type, proposal kind, faction content, or out-of-scope content.
+
+Decision and viewer-visibility impact: the existing `submit_stratagem_target_proposal` payload
+family is unchanged. The adapter contract now explicitly records that Insane Bravery is offered
+only with a legal non-Battle-shocked pending-test target and is revalidated before mutation.
+Existing viewer-scoped projection, event redaction, deterministic option/request identity, and
+DecisionRequest/DecisionResult routing remain unchanged.
+
+Regression scenarios and same-bug-class search: behavior tests prove that an already
+Battle-shocked pending-test unit does not produce the optional Insane Bravery window, that a unit
+which becomes Battle-shocked after request emission is rejected before queue pop or CP/effect
+mutation, and that legal use and the once-per-battle restriction still work. A shared regression
+proves any Battle-shocked component suppresses every target alias of its Attached Unit. Source and
+code-quality tests pin the exact FAQ/evidence tuple, package identities and hashes, executable
+status, catalog policy, and document/rule/evidence tamper rejection. No behavioral test file was
+added, removed, moved, or renamed, so the four-shard inventory does not change.
+
+Generated artifacts/documentation: P15F extends
+`core_stratagems_2026_08/artifacts/package.json` and its typed loader/offline builder, updates the
+source-authority registry, regenerates the engine build identity and affected external-contract
+examples, and updates README, the adapter/decision submission contracts, and this finding record.
+
+Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
+Pyright, the exact xdist/work-stealing full suite (`6431 passed`), the four-shard fail-closed
+check, all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
+coverage run passes `6081` tests and the `--fail-under=85` gate at `85.01%` across `196196`
+statements and `77506` branches. Applicable Core source-package generator checks, engine-build
+identity verification, PR-base external-contract verification, and installed-wheel smoke pass
+with `2502` packaged resources and `27` schemas. The repository-pinned TypeScript generated-client
+and typechecks pass, all five client unit tests pass, and the two-server HTTP conformance scenario
+passes all `342` assertions for contract version `11.1.0`. This Windows environment exposes Node
+24.18.1 but no `npm` executable, so `npm ci` itself could not be run; the existing lockfile-matched
+dependencies were used to execute the underlying checks directly.
+
+PR URL and merge commit: pending publication.
+
 ### Post-P18C v931/v946 findings
 
 Status: This section was introduced as planning documentation in PR #414. The P18D and P18E
@@ -2319,8 +2419,8 @@ owns C18-04; P18E follows P18D and owns C18-05; P20 owns C18-06 together with C2
 artifact, evidence-tuple validation, co-version mismatch rejection, and retained two-provider
 review evidence satisfy the acceptance criteria in the canonical sequence row.
 
-The remaining v931 obligations are closure gates, not deferred audit suggestions. Eight new scoped
-PRs own C15-06/P15F, C24-07/P24G, C22-02/P22B, C01-02/P01B,
+The remaining v931 obligations are closure gates, not deferred audit suggestions. Seven new scoped
+PRs own C24-07/P24G, C22-02/P22B, C01-02/P01B,
 C01-03/P01C, C02-04/P02D, C05-04/P05D, and C04-02+C04-03/P04B. Existing future PRs are expanded
 atomically: P14 adds C14-02; P12 adds C12-03; P04 widens only C04-01 as the generic target-lifecycle
 and reselection service; P11A adds C11-03;
@@ -2329,8 +2429,8 @@ must retain any-part-to-any-part line-of-sight evidence; and P21A must prove the
 choice precedes an Advance or Charge roll. The repeated Splitting Units erratum reuses C01-02 and
 does not inflate the finding or PR count.
 
-The highest-priority contradictions are explicit: Insane Bravery currently permits an already
-Battle-shocked target; Snap Shooting can currently be lowered below an unmodified 6; the current
+The highest-priority remaining contradictions are explicit: Snap Shooting can currently be lowered
+below an unmodified 6; the current
 Fight On Death contract denies authority v931 preserves; Scout actions do not alternate by unit;
 and model-specific keyword loss is not representable. None may be treated as `REVALIDATE`-only or
 implicitly closed by an adjacent implementation.

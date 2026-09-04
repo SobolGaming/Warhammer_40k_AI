@@ -1220,6 +1220,7 @@ def _request_command_start_stratagem_if_available(
         context=insane_bravery_context,
         handler_id=CORE_INSANE_BRAVERY_HANDLER_ID,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        require_legal_affordable_target=True,
     )
     if proposal is None:
         return None

@@ -369,6 +369,11 @@
           "observation_sha256": "b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26"
         },
         {
+          "evidence_id": "game-datamissions-core-rules-data-931:insane-bravery",
+          "rule_source_id": "gw-11e-core-stratagems:core:insane-bravery",
+          "observation_sha256": "11af8114a1e14df4c9e2d6f52425c29a46c17385791480dc364129b84fe77252"
+        },
+        {
           "evidence_id": "40k-app-movement-phase-2026-08-30:fall-back-move",
           "rule_source_id": "gw-11e-core-rules:movement-phase:fall-back-move",
           "observation_sha256": "97d7323f54195e968c0cff8e7c8434ce5b5f8fe9dca4be3dc558359b3d1e9d23"
@@ -464,11 +469,12 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-stratagems",
-          "version": "40k-app-observed-2026-08-26",
+          "version": "reviewed-stratagems-observed-2026-09-02",
           "allowed_rule_source_ids": [
             "gw-11e-core-stratagems:core:crushing-impact",
             "gw-11e-core-stratagems:core:explosives",
             "gw-11e-core-stratagems:core:fire-overwatch",
+            "gw-11e-core-stratagems:core:insane-bravery",
             "gw-11e-core-stratagems:core:rapid-ingress",
             "gw-11e-core-stratagems:rule:snap-shooting"
           ]

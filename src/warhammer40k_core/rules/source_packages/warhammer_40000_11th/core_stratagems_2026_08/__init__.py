@@ -28,6 +28,8 @@ from ._artifacts import (
     EXPECTED_ANOMALY_OBSERVATION_SHA256,
     EXPECTED_ANOMALY_TRANSCRIPTION_SHA256,
     EXPECTED_ARTIFACT_SHA256,
+    EXPECTED_INSANE_BRAVERY_FAQ_OBSERVED_AT,
+    EXPECTED_INSANE_BRAVERY_FAQ_SOURCE_URL,
     EXPECTED_OBSERVED_AT,
     EXPECTED_SOURCE_URL,
     CoreStratagemAppSourceArtifactError,
@@ -60,6 +62,9 @@ SOURCE_VERSION: Final = _ARTIFACT.source_version
 SOURCE_TITLE: Final = _ARTIFACT.source_document.source_title
 SOURCE_URL: Final = EXPECTED_SOURCE_URL
 OBSERVED_AT: Final = EXPECTED_OBSERVED_AT
+FAQ_SOURCE_TITLE: Final = _ARTIFACT.faq_source_document.source_title
+FAQ_SOURCE_URL: Final = EXPECTED_INSANE_BRAVERY_FAQ_SOURCE_URL
+FAQ_OBSERVED_AT: Final = EXPECTED_INSANE_BRAVERY_FAQ_OBSERVED_AT
 PACKAGE_HASH: Final = _ARTIFACT.package_hash
 RULE_SOURCE_IDS: Final = {rule.rule_id: rule.source_id for rule in _ARTIFACT.rules}
 TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
@@ -109,11 +114,15 @@ def _build_source_catalog() -> SourceCatalog:
     )
     catalog_version = CatalogVersion.dated(
         version_id=SOURCE_VERSION,
-        source_date=date(2026, 8, 26),
+        source_date=date(2026, 9, 2),
     )
     document_id = SourceDocumentId(
         package_id=package_id,
         document_id=_ARTIFACT.source_document.document_id,
+    )
+    faq_document_id = SourceDocumentId(
+        package_id=package_id,
+        document_id=_ARTIFACT.faq_source_document.document_id,
     )
     provenance = RuleSourceText.from_raw(
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:p15d-source-provenance",
@@ -125,6 +134,16 @@ def _build_source_catalog() -> SourceCatalog:
             "cross-reference to current heading 15.05 without changing runtime identity. "
             "40k.app remains a non-affiliated hosting provider. The retained official Core "
             f"Rules PDF hash is {_ARTIFACT.source_document.official_pdf_sha256}."
+        ),
+    )
+    faq_provenance = RuleSourceText.from_raw(
+        source_id=f"{SOURCE_PACKAGE_ID}:manifest:p15f-source-provenance",
+        raw_text=(
+            "P15F records the reviewed Insane Bravery FAQ from the project-authoritative "
+            "maintained Game Datamissions App-data mirror v931, observed "
+            f"{FAQ_OBSERVED_AT}. The provider is non-affiliated, and the FAQ preserves the "
+            "stable Insane Bravery source and runtime identities while forbidding a "
+            "controlling player from targeting an already Battle-shocked unit."
         ),
     )
     return SourceCatalog(
@@ -142,6 +161,18 @@ def _build_source_catalog() -> SourceCatalog:
                             raw_text=rule.source_text,
                         )
                         for rule in _ARTIFACT.rules
+                        if rule.rule_id != "insane-bravery"
+                    ),
+                ),
+            ),
+            SourceDocument(
+                document_id=faq_document_id,
+                title=f"{FAQ_SOURCE_TITLE} (reviewed App-data observation {FAQ_OBSERVED_AT})",
+                source_texts=(
+                    faq_provenance,
+                    RuleSourceText.from_raw(
+                        source_id=source_rule_by_id("insane-bravery").source_id,
+                        raw_text=source_rule_by_id("insane-bravery").source_text,
                     ),
                 ),
             ),
@@ -150,11 +181,11 @@ def _build_source_catalog() -> SourceCatalog:
             RulesetBundle(
                 bundle_id=SOURCE_PACKAGE_ID,
                 ruleset_id=RulesetId.warhammer_40000_eleventh(
-                    version="core-v2-core-stratagem-app-source-observed-2026-08-26"
+                    version="core-v2-core-stratagem-source-observed-2026-09-02"
                 ),
                 package_id=package_id,
                 catalog_version=catalog_version,
-                source_document_ids=(document_id,),
+                source_document_ids=(document_id, faq_document_id),
             ),
         ),
     )
@@ -174,6 +205,9 @@ __all__ = (
     "EXPECTED_ANOMALY_OBSERVATION_SHA256",
     "EXPECTED_ANOMALY_TRANSCRIPTION_SHA256",
     "EXPECTED_ARTIFACT_SHA256",
+    "FAQ_OBSERVED_AT",
+    "FAQ_SOURCE_TITLE",
+    "FAQ_SOURCE_URL",
     "OBSERVED_AT",
     "PACKAGE_HASH",
     "RULE_SOURCE_IDS",

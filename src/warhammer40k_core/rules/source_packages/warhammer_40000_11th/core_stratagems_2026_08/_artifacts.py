@@ -16,15 +16,26 @@ from warhammer40k_core.rules.source_evidence import (
     SemanticExecutionStatus,
 )
 
-ARTIFACT_SCHEMA: Final = "core-v2-core-stratagem-app-source-v1"
+ARTIFACT_SCHEMA: Final = "core-v2-core-stratagem-app-source-v2"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-stratagems"
-EXPECTED_SOURCE_VERSION: Final = "40k-app-observed-2026-08-26"
+EXPECTED_SOURCE_VERSION: Final = "reviewed-stratagems-observed-2026-09-02"
 EXPECTED_OBSERVED_AT: Final = "2026-08-26T11:15:23-04:00"
 EXPECTED_SOURCE_URL: Final = "https://www.40k.app/rules/15-stratagems"
+EXPECTED_INSANE_BRAVERY_FAQ_SOURCE_URL: Final = "https://game-datamissions.com/11th/rules/changelog"
+EXPECTED_INSANE_BRAVERY_FAQ_OBSERVED_AT: Final = "2026-09-02T12:30:09-04:00"
+EXPECTED_INSANE_BRAVERY_FAQ_APP_VERSION: Final = "931"
 PROJECT_AUTHORITY_POLICY_ID: Final = (
     "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26"
 )
+MAINTAINED_MIRROR_AUTHORITY_POLICY_ID: Final = (
+    "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
+)
 EXPECTED_REVIEW_AUDIT_ID: Final = "40k-app-core-rules-2026-08-25"
+EXPECTED_MAINTAINED_MIRROR_AUDIT_ID: Final = "core-rules-maintained-app-mirrors-2026-09-02"
+EXPECTED_MAINTAINED_MIRROR_AUDIT_ROW_ID: Final = "game-datamissions-core-rules-data-931"
+EXPECTED_MAINTAINED_MIRROR_AUDIT_FINGERPRINT: Final = (
+    "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
+)
 EXPECTED_CATEGORY_15_AUDIT_FINGERPRINT: Final = (
     "90d660a2388e7f6799e71fe8c2305d019409614b70ee9fcb962609851ab15f59"
 )
@@ -37,8 +48,8 @@ EXPECTED_CATEGORY_12_AUDIT_FINGERPRINT: Final = (
 EXPECTED_OFFICIAL_PDF_SHA256: Final = (
     "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
 )
-EXPECTED_ARTIFACT_SHA256: Final = "c20bb95c9c657fe1b568c44454e566de4e3a52311ba838612fab2eb898b2d4c8"
-EXPECTED_PACKAGE_HASH: Final = "c6bfeb538aa1a5b933c561c3c554691792259400234dc9ec303d36ff400c5a09"
+EXPECTED_ARTIFACT_SHA256: Final = "25a89aadcee9ec31939dd08fedcec76e2bd1983aea1b94472a17c4721d89f17c"
+EXPECTED_PACKAGE_HASH: Final = "f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7"
 EXPECTED_ANOMALY_OBSERVATION_SHA256: Final = (
     "561c686491968ed20a2a6dd257a5b34cc02b72b0bcb633356d0baf96f815cc46"
 )
@@ -98,6 +109,15 @@ EXPECTED_RULE_IDENTITY: Final = {
         None,
         None,
     ),
+    "insane-bravery": (
+        "FAQ",
+        "Insane Bravery",
+        "gw-11e-core-stratagems:core:insane-bravery",
+        "core:insane-bravery",
+        "stratagem_faq",
+        "Command Phase",
+        1,
+    ),
 }
 EXPECTED_TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
     "crushing-impact": "63fe27d984e7863a906d1ff7edeaef678fa69cdc1c6a7040869409749353e060",
@@ -105,6 +125,7 @@ EXPECTED_TRANSCRIPTION_SHA256_BY_RULE_ID: Final = {
     "rapid-ingress": "2e9028ed2bf0c1fa19d7774ceb7bb81d415097e38b47c78ab67d7cff303955f6",
     "fire-overwatch": "7cbb6c048a5c5420b2209a7c585b6063dafebfbca4f1d6e52af607282c77c8f0",
     "snap-shooting": "d9a660775aab4e7e07277850b27f2930682a232115bc720c81cb1618b50c5545",
+    "insane-bravery": "caf8973ed7c25c2c99db11bc0e489e3d9803300012b40b4f29eb878df54b1a25",
 }
 EXPECTED_SOURCE_OBSERVATION_SHA256_BY_RULE_ID: Final = {
     "crushing-impact": "329f378b3cb1f78f28f7f32047e01e2b78295d155c30df9fde775bf0cab3afa4",
@@ -112,6 +133,7 @@ EXPECTED_SOURCE_OBSERVATION_SHA256_BY_RULE_ID: Final = {
     "rapid-ingress": "42c4328d54aa18d826225dedd0b1e0043f4d8e3fe0f2e09d1ab12db7913314a6",
     "fire-overwatch": "6cfdfa59d51b3bc1302101ac70a142bc3926ac2f532fb035254f4cc08eb6f9a1",
     "snap-shooting": "b88a09f338d839344e4d589dcc17b658cf075d11f20c079a9c55297ed70d1a26",
+    "insane-bravery": "11af8114a1e14df4c9e2d6f52425c29a46c17385791480dc364129b84fe77252",
 }
 EXPECTED_SEMANTIC_STATUS_BY_RULE_ID: Final = {
     "crushing-impact": "partial_engine_runtime",
@@ -119,6 +141,7 @@ EXPECTED_SEMANTIC_STATUS_BY_RULE_ID: Final = {
     "rapid-ingress": "partial_engine_runtime",
     "fire-overwatch": "partial_engine_runtime",
     "snap-shooting": "partial_engine_runtime",
+    "insane-bravery": "executable_engine_runtime",
 }
 EXPECTED_RUNTIME_CONSUMERS_BY_RULE_ID: Final = {
     "crushing-impact": (
@@ -147,6 +170,15 @@ EXPECTED_RUNTIME_CONSUMERS_BY_RULE_ID: Final = {
         "_attack_pools_or_validation",
         "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit",
     ),
+    "insane-bravery": (
+        "warhammer40k_core.engine.stratagem_catalog:"
+        "eleventh_edition_core_stratagem_catalog_records",
+        "warhammer40k_core.engine.stratagems_targeting:_target_binding_error",
+        "warhammer40k_core.engine.stratagems_apply:invalid_stratagem_target_proposal_status",
+        "warhammer40k_core.engine.stratagems_apply:_apply_stratagem_use",
+        "warhammer40k_core.engine.command_insane_bravery_authority:"
+        "validate_loaded_command_auto_pass_authority",
+    ),
 }
 
 
@@ -169,6 +201,23 @@ class CoreStratagemSourceDocumentArtifact(
     official_pdf_document_id: str
     official_pdf_sha256: str
     supersession_scope: str
+
+
+class CoreStratagemFaqSourceDocumentArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    document_id: str
+    source_title: str
+    source_platform: str
+    provider_name: str
+    source_url: str
+    app_version: str
+    observed_at: str
+    provider_non_affiliation_recorded: bool
+    project_authority_policy_id: str
+    rule_source_ids: tuple[str, ...]
 
 
 class CoreStratagemEvidenceContextArtifact(
@@ -306,6 +355,7 @@ class CoreStratagemAppSourcePackageArtifact(
     source_package_id: str
     source_version: str
     source_document: CoreStratagemSourceDocumentArtifact
+    faq_source_document: CoreStratagemFaqSourceDocumentArtifact
     evidence_contexts: tuple[CoreStratagemEvidenceContextArtifact, ...]
     rules: tuple[CoreStratagemSourceRuleArtifact, ...]
     evidence_records: tuple[CoreStratagemEvidenceArtifact, ...]
@@ -328,6 +378,7 @@ class CoreStratagemAppSourcePackageArtifact(
                 "Core Stratagem App-source package identity drifted."
             )
         _validate_source_document(self.source_document)
+        _validate_faq_source_document(self.faq_source_document)
         _validate_rules(self.rules)
         _validate_evidence(
             contexts=self.evidence_contexts,
@@ -408,6 +459,47 @@ def _validate_source_document(source: CoreStratagemSourceDocumentArtifact) -> No
         )
 
 
+def _validate_faq_source_document(source: CoreStratagemFaqSourceDocumentArtifact) -> None:
+    if (
+        source.document_id,
+        source.source_title,
+        source.source_platform,
+        source.provider_name,
+        source.source_url,
+        source.app_version,
+        source.observed_at,
+        source.provider_non_affiliation_recorded,
+        source.project_authority_policy_id,
+        source.rule_source_ids,
+    ) != (
+        "game-datamissions-core-rules-data-931",
+        "Game Datamissions Core Rules Data Changelog v931",
+        "Web",
+        "Game Datamissions",
+        EXPECTED_INSANE_BRAVERY_FAQ_SOURCE_URL,
+        EXPECTED_INSANE_BRAVERY_FAQ_APP_VERSION,
+        EXPECTED_INSANE_BRAVERY_FAQ_OBSERVED_AT,
+        True,
+        MAINTAINED_MIRROR_AUTHORITY_POLICY_ID,
+        ("gw-11e-core-stratagems:core:insane-bravery",),
+    ):
+        raise CoreStratagemAppSourceArtifactError(
+            "Insane Bravery FAQ source-document provenance drifted."
+        )
+
+
+def _expected_evidence_ids(rule_id: str) -> tuple[str, str]:
+    if rule_id == "insane-bravery":
+        return (
+            "core-v2-p15f-source-review:insane-bravery",
+            "game-datamissions-core-rules-data-931:insane-bravery",
+        )
+    return (
+        f"core-v2-p15d-source-review:{rule_id}",
+        f"40k-app-core-stratagems-2026-08-26:{rule_id}",
+    )
+
+
 def _validate_rules(rules: tuple[CoreStratagemSourceRuleArtifact, ...]) -> None:
     if type(rules) is not tuple or tuple(rule.rule_id for rule in rules) != tuple(
         EXPECTED_RULE_IDENTITY
@@ -462,10 +554,7 @@ def _validate_rules(rules: tuple[CoreStratagemSourceRuleArtifact, ...]) -> None:
             raise CoreStratagemAppSourceArtifactError(
                 "Core Stratagem App-source support status drifted."
             )
-        if rule.evidence_ids != (
-            f"core-v2-p15d-source-review:{rule.rule_id}",
-            f"40k-app-core-stratagems-2026-08-26:{rule.rule_id}",
-        ):
+        if rule.evidence_ids != _expected_evidence_ids(rule.rule_id):
             raise CoreStratagemAppSourceArtifactError(
                 "Core Stratagem App-source evidence linkage drifted."
             )
@@ -481,6 +570,8 @@ def _validate_evidence(
     if len(contexts_by_id) != len(contexts) or tuple(contexts_by_id) != (
         "core-v2-p15d-project-source-review",
         "40k-app-core-stratagems-observed-2026-08-26",
+        "core-v2-p15f-project-source-review",
+        "game-datamissions-core-rules-data-931",
     ):
         raise CoreStratagemAppSourceArtifactError(
             "Core Stratagem App-source evidence contexts drifted."
@@ -555,14 +646,79 @@ def _validate_evidence(
         raise CoreStratagemAppSourceArtifactError(
             "Core Stratagem authoritative-mirror provenance drifted."
         )
+    faq_project_review = contexts_by_id["core-v2-p15f-project-source-review"]
+    if (
+        faq_project_review.evidence_kind,
+        faq_project_review.authority,
+        faq_project_review.project_authority_policy_id,
+        faq_project_review.review_audit_id,
+        faq_project_review.provider_name,
+        faq_project_review.source_title,
+        faq_project_review.source_platform,
+        faq_project_review.observed_at,
+        faq_project_review.app_version,
+        faq_project_review.app_build,
+        faq_project_review.capture_artifact_path,
+        faq_project_review.capture_sha256,
+        faq_project_review.official_corroborating_source_ids,
+        faq_project_review.provider_non_affiliation_recorded,
+    ) != (
+        "project_reviewed_app_transcription",
+        "unverified_transcription_only",
+        None,
+        None,
+        "CORE V2 Source Review",
+        "Reviewed transcription of the Insane Bravery FAQ",
+        "Repository",
+        None,
+        None,
+        None,
+        None,
+        None,
+        (),
+        False,
+    ):
+        raise CoreStratagemAppSourceArtifactError(
+            "Insane Bravery project-reviewed transcription provenance drifted."
+        )
+    faq_mirror = contexts_by_id["game-datamissions-core-rules-data-931"]
+    if (
+        faq_mirror.evidence_kind,
+        faq_mirror.authority,
+        faq_mirror.project_authority_policy_id,
+        faq_mirror.review_audit_id,
+        faq_mirror.provider_name,
+        faq_mirror.source_title,
+        faq_mirror.source_platform,
+        faq_mirror.observed_at,
+        faq_mirror.app_version,
+        faq_mirror.app_build,
+        faq_mirror.capture_artifact_path,
+        faq_mirror.capture_sha256,
+        faq_mirror.official_corroborating_source_ids,
+        faq_mirror.provider_non_affiliation_recorded,
+    ) != (
+        "third_party_mirror",
+        "project_authoritative_app_mirror",
+        MAINTAINED_MIRROR_AUTHORITY_POLICY_ID,
+        EXPECTED_MAINTAINED_MIRROR_AUDIT_ID,
+        "Game Datamissions",
+        "Game Datamissions Core Rules Data Changelog v931",
+        "Web",
+        None,
+        EXPECTED_INSANE_BRAVERY_FAQ_APP_VERSION,
+        None,
+        None,
+        None,
+        (),
+        True,
+    ):
+        raise CoreStratagemAppSourceArtifactError(
+            "Insane Bravery authoritative-mirror provenance drifted."
+        )
     evidence_by_id = {evidence.evidence_id: evidence for evidence in evidence_records}
     expected_evidence_ids = tuple(
-        evidence_id
-        for rule in rules
-        for evidence_id in (
-            f"core-v2-p15d-source-review:{rule.rule_id}",
-            f"40k-app-core-stratagems-2026-08-26:{rule.rule_id}",
-        )
+        evidence_id for rule in rules for evidence_id in _expected_evidence_ids(rule.rule_id)
     )
     if (
         len(evidence_by_id) != len(evidence_records)
@@ -570,6 +726,25 @@ def _validate_evidence(
     ):
         raise CoreStratagemAppSourceArtifactError(
             "Core Stratagem App-source evidence inventory drifted."
+        )
+    expected_context_id_by_evidence_id = {
+        evidence_id: (
+            "core-v2-p15f-project-source-review"
+            if evidence_id.startswith("core-v2-p15f-source-review:")
+            else "game-datamissions-core-rules-data-931"
+            if evidence_id.startswith("game-datamissions-core-rules-data-931:")
+            else "core-v2-p15d-project-source-review"
+            if evidence_id.startswith("core-v2-p15d-source-review:")
+            else "40k-app-core-stratagems-observed-2026-08-26"
+        )
+        for evidence_id in expected_evidence_ids
+    }
+    if any(
+        evidence.evidence_context_id != expected_context_id_by_evidence_id[evidence.evidence_id]
+        for evidence in evidence_records
+    ):
+        raise CoreStratagemAppSourceArtifactError(
+            "Core Stratagem App-source evidence context linkage drifted."
         )
     records_by_id: dict[str, RuleEvidenceRecord] = {}
     for evidence in evidence_records:
@@ -596,6 +771,8 @@ def _validate_evidence(
         if (
             project_record.evidence_kind,
             project_record.authority,
+            project_record.project_authority_policy_id,
+            project_record.review_audit_id,
             project_record.source_url,
             project_record.observed_at,
             project_record.verification_status,
@@ -604,35 +781,65 @@ def _validate_evidence(
             "unverified_transcription_only",
             None,
             None,
+            None,
+            None,
             "unverified",
         ):
             raise CoreStratagemAppSourceArtifactError(
                 "Core Stratagem project-reviewed evidence drifted."
             )
-        expected_review_row = (
-            "finding:official-pdf-mirror-order-15-05-15-06"
-            if rule.rule_id in {"crushing-impact", "explosives"}
-            else "category:15"
-        )
-        expected_review_fingerprint = (
-            EXPECTED_NUMBERING_FINDING_AUDIT_FINGERPRINT
-            if rule.rule_id in {"crushing-impact", "explosives"}
-            else EXPECTED_CATEGORY_15_AUDIT_FINGERPRINT
-        )
+        if rule.rule_id == "insane-bravery":
+            expected_policy_id = MAINTAINED_MIRROR_AUTHORITY_POLICY_ID
+            expected_audit_id = EXPECTED_MAINTAINED_MIRROR_AUDIT_ID
+            expected_provider_name = "Game Datamissions"
+            expected_source_url = EXPECTED_INSANE_BRAVERY_FAQ_SOURCE_URL
+            expected_observed_at = None
+            expected_app_version = EXPECTED_INSANE_BRAVERY_FAQ_APP_VERSION
+            expected_review_row = EXPECTED_MAINTAINED_MIRROR_AUDIT_ROW_ID
+            expected_review_fingerprint = EXPECTED_MAINTAINED_MIRROR_AUDIT_FINGERPRINT
+        else:
+            expected_policy_id = PROJECT_AUTHORITY_POLICY_ID
+            expected_audit_id = EXPECTED_REVIEW_AUDIT_ID
+            expected_provider_name = "40k.app"
+            expected_source_url = EXPECTED_SOURCE_URL
+            expected_observed_at = EXPECTED_OBSERVED_AT
+            expected_app_version = None
+            expected_review_row = (
+                "finding:official-pdf-mirror-order-15-05-15-06"
+                if rule.rule_id in {"crushing-impact", "explosives"}
+                else "category:15"
+            )
+            expected_review_fingerprint = (
+                EXPECTED_NUMBERING_FINDING_AUDIT_FINGERPRINT
+                if rule.rule_id in {"crushing-impact", "explosives"}
+                else EXPECTED_CATEGORY_15_AUDIT_FINGERPRINT
+            )
         if (
+            project_record.evidence_id,
+            mirror_record.evidence_id,
             mirror_record.evidence_kind,
             mirror_record.authority,
+            mirror_record.project_authority_policy_id,
+            mirror_record.review_audit_id,
+            mirror_record.provider_name,
             mirror_record.source_url,
             mirror_record.observed_at,
+            mirror_record.app_version,
             mirror_record.review_audit_row_id,
             mirror_record.review_audit_source_observation_sha256,
             mirror_record.verification_status,
             mirror_record.observation_sha256,
         ) != (
+            _expected_evidence_ids(rule.rule_id)[0],
+            _expected_evidence_ids(rule.rule_id)[1],
             "third_party_mirror",
             "project_authoritative_app_mirror",
-            EXPECTED_SOURCE_URL,
-            EXPECTED_OBSERVED_AT,
+            expected_policy_id,
+            expected_audit_id,
+            expected_provider_name,
+            expected_source_url,
+            expected_observed_at,
+            expected_app_version,
             expected_review_row,
             expected_review_fingerprint,
             "authoritative_app_mirror",
@@ -771,6 +978,12 @@ __all__ = (
     "EXPECTED_ARTIFACT_SHA256",
     "EXPECTED_CATEGORY_12_AUDIT_FINGERPRINT",
     "EXPECTED_CATEGORY_15_AUDIT_FINGERPRINT",
+    "EXPECTED_INSANE_BRAVERY_FAQ_APP_VERSION",
+    "EXPECTED_INSANE_BRAVERY_FAQ_OBSERVED_AT",
+    "EXPECTED_INSANE_BRAVERY_FAQ_SOURCE_URL",
+    "EXPECTED_MAINTAINED_MIRROR_AUDIT_FINGERPRINT",
+    "EXPECTED_MAINTAINED_MIRROR_AUDIT_ID",
+    "EXPECTED_MAINTAINED_MIRROR_AUDIT_ROW_ID",
     "EXPECTED_NUMBERING_FINDING_AUDIT_FINGERPRINT",
     "EXPECTED_OBSERVED_AT",
     "EXPECTED_PACKAGE_HASH",
@@ -781,8 +994,10 @@ __all__ = (
     "EXPECTED_SOURCE_URL",
     "EXPECTED_SOURCE_VERSION",
     "EXPECTED_TRANSCRIPTION_SHA256_BY_RULE_ID",
+    "MAINTAINED_MIRROR_AUTHORITY_POLICY_ID",
     "CoreStratagemAppSourceArtifactError",
     "CoreStratagemAppSourcePackageArtifact",
+    "CoreStratagemFaqSourceDocumentArtifact",
     "CoreStratagemNumberingAnomalyArtifact",
     "CoreStratagemSourceRuleArtifact",
     "core_stratagem_app_source_artifact_from_json_bytes",

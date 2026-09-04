@@ -369,6 +369,14 @@ def test_phase14k_core_stratagem_source_package_uses_current_names() -> None:
     assert "TITANIC" in fire_overwatch.target_descriptor
     assert "Snap Shooting" in fire_overwatch.effect_descriptor
 
+    insane_bravery = rows_by_id["insane-bravery"]
+    assert insane_bravery.source_id == "gw-11e-core-stratagems:core:insane-bravery"
+    assert insane_bravery.once_per_battle
+    assert not insane_bravery.allow_battle_shocked_targets
+    assert "cannot target that unit with stratagems" in (
+        insane_bravery.restrictions_descriptor.lower()
+    )
+
     source = source_for(CORE_STRATAGEMS_PATH)
     current_source_artifact = source_for(CORE_STRATAGEM_APP_SOURCE_PATH)
     assert "Counter-offensive" not in source

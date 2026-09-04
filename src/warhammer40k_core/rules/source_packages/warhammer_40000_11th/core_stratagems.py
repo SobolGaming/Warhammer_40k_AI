@@ -89,6 +89,7 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
     crushing_impact_source = app_source.source_rule_by_id("crushing-impact")
     explosives_source = app_source.source_rule_by_id("explosives")
     fire_overwatch_source = app_source.source_rule_by_id("fire-overwatch")
+    insane_bravery_source = app_source.source_rule_by_id("insane-bravery")
     rapid_ingress_source = app_source.source_rule_by_id("rapid-ingress")
     return (
         SourceStratagemRow(
@@ -243,11 +244,18 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             category="epic_deed",
             availability_kind="core",
             detachment_id=None,
-            source_id=f"{source_prefix}:insane-bravery",
+            source_id=insane_bravery_source.source_id,
             when_descriptor="before a battle-shock test",
             target_descriptor="one unit from the player's army about to take the test",
             effect_descriptor="the battle-shock test is automatically passed",
-            restrictions_descriptor="once per battle",
+            restrictions_descriptor=(
+                "once per battle; "
+                + _required_source_descriptor(
+                    insane_bravery_source.restrictions_text,
+                    rule_id=insane_bravery_source.rule_id,
+                    field_name="restrictions_text",
+                )
+            ),
             trigger_kind="start_phase",
             phase="command",
             target_kind="friendly_unit",
@@ -255,7 +263,6 @@ def core_stratagem_rows() -> tuple[SourceStratagemRow, ...]:
             target_policy_id="battle_shock_test_unit",
             handler_id="core:insane-bravery",
             once_per_battle=True,
-            allow_battle_shocked_targets=True,
         ),
         SourceStratagemRow(
             stratagem_id="rapid-ingress",
