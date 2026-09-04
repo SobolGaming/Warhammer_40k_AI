@@ -2311,8 +2311,10 @@ Finding IDs: `C15-06`.
 Dependencies and evidence gate: P08B/PR #405 and S-MIRRORS/PR #416 are merged on `main`. The
 Insane Bravery FAQ is retained as a reviewed transcription and separately classified,
 project-authoritative Game Datamissions v931 App-data mirror observation authenticated against
-the S-MIRRORS provider audit. This satisfies `APP-DRIFT`; no co-versioned contrary observation is
-retained, so no `EXCEPTION-PAUSE` applies.
+the S-MIRRORS provider audit and authorized Core Stratagem source package. It is deliberately
+excluded from the superseded 40k.app policy's exact 33-entry immutable legacy-observation
+inventory. This satisfies `APP-DRIFT`; no co-versioned contrary observation is retained, so no
+`EXCEPTION-PAUSE` applies.
 
 Violated invariant: a controlling player cannot target its already Battle-shocked unit with a
 Stratagem. This restriction must be applied by the shared Stratagem target validator both when an
@@ -2352,7 +2354,7 @@ provider-audit observation
 `1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`. The Core Stratagem package
 hash is `f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7`, its canonical artifact
 byte SHA-256 is `25a89aadcee9ec31939dd08fedcec76e2bd1983aea1b94472a17c4721d89f17c`, and the engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:ef1d4f10404ce213ccfe8ac3e06685a4e41e07ccb70c96e46a4039787a73853e`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:316e9503a93552cd8560c0cadb24c088303e1bb822fb496fa9259dd80a5d7641`.
 
 Load and execution support: the FAQ rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -2380,16 +2382,19 @@ which becomes Battle-shocked after request emission is rejected before queue pop
 mutation, and that legal use and the once-per-battle restriction still work. A shared regression
 proves any Battle-shocked component suppresses every target alias of its Attached Unit. Source and
 code-quality tests pin the exact FAQ/evidence tuple, package identities and hashes, executable
-status, catalog policy, and document/rule/evidence tamper rejection. No behavioral test file was
-added, removed, moved, or renamed, so the four-shard inventory does not change.
+status, catalog policy, and document/rule/evidence tamper rejection. A static identity-set audit
+also pins all 33 superseded-policy legacy evidence IDs and rejects any current-policy or Game
+Datamissions addition to that immutable inventory. No behavioral test file was added, removed,
+moved, or renamed, so the four-shard inventory does not change.
 
 Generated artifacts/documentation: P15F extends
 `core_stratagems_2026_08/artifacts/package.json` and its typed loader/offline builder, updates the
-source-authority registry, regenerates the engine build identity and affected external-contract
-examples, and updates README, the adapter/decision submission contracts, and this finding record.
+source-authority registry's package authorization while preserving its exact legacy inventory,
+regenerates the engine build identity and affected external-contract examples, and updates README,
+the adapter/decision submission contracts, and this finding record.
 
 Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
-Pyright, the exact xdist/work-stealing full suite (`6431 passed`), the four-shard fail-closed
+Pyright, the exact xdist/work-stealing full suite (`6432 passed`), the four-shard fail-closed
 check, all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
 coverage run passes `6081` tests and the `--fail-under=85` gate at `85.01%` across `196196`
 statements and `77506` branches. Applicable Core source-package generator checks, engine-build

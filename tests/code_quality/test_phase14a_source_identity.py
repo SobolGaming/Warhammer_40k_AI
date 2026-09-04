@@ -107,6 +107,46 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "artifacts"
     / "package.json",
 )
+IMMUTABLE_LEGACY_OBSERVATION_IDS = frozenset(
+    {
+        "40k-app-attached-units-2026-09-01:bodyguard-unit-destroyed",
+        "40k-app-attack-sequence-2026-09-01:destroyed",
+        "40k-app-command-phase-search-index-2026-08-26:battle-shock",
+        "40k-app-command-phase-search-index-2026-08-26:gain-core-cp",
+        "40k-app-command-phase-search-index-2026-08-26:start-of-command-phase",
+        "40k-app-core-rules-2026-08-25:01.02.03-embarked-model-return",
+        "40k-app-core-rules-2026-08-25:05.03.02-post-roll-attack-profiles",
+        "40k-app-core-rules-2026-08-25:05.04.05-fight-on-death",
+        "40k-app-core-rules-2026-08-25:09-normal-move-one-per-phase",
+        "40k-app-core-rules-2026-08-25:09.07.01-desperate-escape-definition",
+        "40k-app-core-rules-2026-08-25:09.07.01-forced-desperate-escape",
+        "40k-app-core-rules-2026-08-25:12.08-objective-consolidation",
+        "40k-app-core-rules-2026-08-25:13.09-hidden",
+        "40k-app-core-rules-2026-08-25:14.02.01-control-first",
+        "40k-app-core-rules-2026-08-25:18.01-dedicated-transport",
+        "40k-app-core-rules-2026-08-25:20.01.02-strategic-reserves",
+        "40k-app-core-rules-2026-08-25:24.28.01-precision-devastating-wounds",
+        "40k-app-core-rules-2026-08-25:24.37.01-torrent",
+        "40k-app-core-rules-2026-08-25:25.04-epic-hero-enhancements",
+        "40k-app-core-rules-2026-08-25:25.04-incursion-detachment",
+        "40k-app-core-rules-2026-08-25:faq-hazardous-mixed-unit-keywords",
+        "40k-app-core-rules-2026-08-25:faq-heavy-fly-horizontal-distance",
+        "40k-app-core-stratagems-2026-08-26:crushing-impact",
+        "40k-app-core-stratagems-2026-08-26:explosives",
+        "40k-app-core-stratagems-2026-08-26:fire-overwatch",
+        "40k-app-core-stratagems-2026-08-26:rapid-ingress",
+        "40k-app-core-stratagems-2026-08-26:snap-shooting",
+        "40k-app-movement-phase-2026-08-30:fall-back-move",
+        "40k-app-movement-phase-2026-08-30:move-units-step",
+        "40k-app-movement-phase-2026-08-30:selecting-modes",
+        "40k-app-other-concepts-2026-08-31:mortal-wounds",
+        "40k-app-other-concepts-2026-08-31:visibility",
+        "40k-app-transports-2026-09-01:emergency-disembark-move",
+    }
+)
+IMMUTABLE_LEGACY_OBSERVATION_INVENTORY_SHA256 = (
+    "19a15062c806e2776dec3d7e71d165a62a1348162b8b42f7c9c1cab89338170a"
+)
 
 
 def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> None:
@@ -154,8 +194,37 @@ def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> Non
         current_policy_id,
         "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
     }
-    assert len(scope["legacy_observations"]) == 34
+    assert len(scope["legacy_observations"]) == 33
     assert len(scope["source_packages"]) == 10
+
+
+def test_superseded_mirror_policy_legacy_observation_inventory_is_immutable() -> None:
+    authority_registry_payload = json.loads(
+        (ROOT / "src" / "warhammer40k_core" / "rules" / "source_authority_registry.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    scope = authority_registry_payload["scopes"][0]
+    legacy_observation_ids = frozenset(
+        observation["evidence_id"] for observation in scope["legacy_observations"]
+    )
+    legacy_observation_inventory = tuple(
+        sorted(
+            (
+                observation["evidence_id"],
+                observation["rule_source_id"],
+                observation["observation_sha256"],
+            )
+            for observation in scope["legacy_observations"]
+        )
+    )
+    inventory_sha256 = hashlib.sha256(
+        json.dumps(legacy_observation_inventory, separators=(",", ":")).encode()
+    ).hexdigest()
+
+    assert legacy_observation_ids == IMMUTABLE_LEGACY_OBSERVATION_IDS
+    assert inventory_sha256 == IMMUTABLE_LEGACY_OBSERVATION_INVENTORY_SHA256
+    assert all(evidence_id.startswith("40k-app-") for evidence_id in legacy_observation_ids)
 
 
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:
