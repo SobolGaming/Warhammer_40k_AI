@@ -35,6 +35,16 @@ EXPECTED_RULE_IDENTITY: Final = (
     "after_model_destroyed",
     "a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4",
 )
+EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY: Final = (
+    "alternating-scout-moves-faq",
+    "core-scouts",
+    "core:scouts",
+    "gw-11e-core-abilities:faq:alternating-scout-moves",
+    "FAQ",
+    "ALTERNATING SCOUT MOVES",
+    "before_battle",
+    "e2e4740b73d2ea159eecb42da7246c399dc157bef038a623f9ecd94d07ba1296",
+)
 EXPECTED_DESCRIPTORS: Final = (
     "Each time a model with this ability is destroyed, after the units embarked within it "
     "(if any) have made their emergency disembark moves",
@@ -43,11 +53,19 @@ EXPECTED_DESCRIPTORS: Final = (
     'separately for each unit within 6").',
     "This ability always takes the form Deadly Demise X.",
 )
+EXPECTED_SCOUT_ALTERNATION_DESCRIPTORS: Final = (
+    "If both players have units with pre-battle rules to resolve",
+    "players alternate resolving those units, starting with the player who will take the first "
+    "turn",
+    "skip a player only when that player has no unresolved pre-battle rule",
+)
 EXPECTED_OBSERVATION_SHA256S: Final = (
     "18455fe967731b81b8ceacbe9e0121c3750b6bf648e4ec3a781113aaf5b12511",
     "3b3c615e97dab76873c0ab7974cf593480baa4a028eb88a1312254d0c3a6252b",
+    "4df59af220872b1b09a3dcd36acef6b792b5e8c11245bd6ca2bea2f12433e9fe",
+    "cb6c3244b50cff6017b30f269dff2530f1a8c8a461627710cc149064034d1453",
 )
-EXPECTED_PACKAGE_HASH: Final = "805db3a2131ceef3e4a120dd1bfa2605dc9a1e4cc1508619e02ed9bc1ec72d4a"
+EXPECTED_PACKAGE_HASH: Final = "37e11c8e58049b5a0804c131e84714dba9c4fd192cbaac63eab915b8ca638f0e"
 
 
 class CoreAbilitiesSourceArtifactError(ValueError):
@@ -178,44 +196,55 @@ def core_abilities_source_artifact_from_json_bytes(
         raise CoreAbilitiesSourceArtifactError(
             "Core Abilities source artifact schema is invalid."
         ) from exc
-    if len(artifact.rules) != 1:
+    if len(artifact.rules) != 2:
         raise CoreAbilitiesSourceArtifactError(
             "Core Abilities source artifact drifted from its reviewed identity."
         )
-    rule = artifact.rules[0]
     actual_document_identity = (
         artifact.source_document.document_id,
         artifact.source_document.source_url,
         artifact.source_document.observed_at,
         artifact.source_document.app_version,
     )
-    actual_rule_identity = (
-        rule.rule_id,
-        rule.runtime_ability_id,
-        rule.runtime_handler_id,
-        rule.source_id,
-        rule.section_id,
-        rule.section_heading,
-        rule.trigger_kind,
-        rule.transcription_sha256,
+    actual_rule_identities = tuple(
+        (
+            rule.rule_id,
+            rule.runtime_ability_id,
+            rule.runtime_handler_id,
+            rule.source_id,
+            rule.section_id,
+            rule.section_heading,
+            rule.trigger_kind,
+            rule.transcription_sha256,
+        )
+        for rule in artifact.rules
     )
-    actual_descriptors = (
-        rule.when_descriptor,
-        rule.effect_descriptor,
-        rule.restrictions_descriptor,
+    actual_descriptors = tuple(
+        (
+            rule.when_descriptor,
+            rule.effect_descriptor,
+            rule.restrictions_descriptor,
+        )
+        for rule in artifact.rules
     )
+    rules_by_source_id = {rule.source_id: rule for rule in artifact.rules}
     if (
         artifact.artifact_schema != ARTIFACT_SCHEMA
         or artifact.source_package_id != EXPECTED_SOURCE_PACKAGE_ID
         or artifact.source_version != EXPECTED_SOURCE_VERSION
         or actual_document_identity != EXPECTED_DOCUMENT_IDENTITY
-        or actual_rule_identity != EXPECTED_RULE_IDENTITY
-        or actual_descriptors != EXPECTED_DESCRIPTORS
-        or hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
-        or len(artifact.evidence) != 2
+        or actual_rule_identities
+        != (EXPECTED_RULE_IDENTITY, EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY)
+        or actual_descriptors != (EXPECTED_DESCRIPTORS, EXPECTED_SCOUT_ALTERNATION_DESCRIPTORS)
         or any(
-            evidence.rule_source_id != rule.source_id
-            or evidence.transcription_sha256 != rule.transcription_sha256
+            hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
+            for rule in artifact.rules
+        )
+        or len(artifact.evidence) != 4
+        or any(
+            evidence.rule_source_id not in rules_by_source_id
+            or evidence.transcription_sha256
+            != rules_by_source_id[evidence.rule_source_id].transcription_sha256
             for evidence in artifact.evidence
         )
         or tuple(evidence.observation_sha256 for evidence in artifact.evidence)
@@ -250,6 +279,8 @@ __all__ = (
     "EXPECTED_OBSERVATION_SHA256S",
     "EXPECTED_PACKAGE_HASH",
     "EXPECTED_RULE_IDENTITY",
+    "EXPECTED_SCOUT_ALTERNATION_DESCRIPTORS",
+    "EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY",
     "CoreAbilitiesSourceArtifactError",
     "CoreAbilitiesSourcePackageArtifact",
     "CoreAbilitiesSourceRuleArtifact",

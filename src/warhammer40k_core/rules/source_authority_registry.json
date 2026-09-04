@@ -413,7 +413,8 @@
           "package_name": "gw-11e-core-abilities",
           "version": "game-datamissions-v931-observed-2026-09-02",
           "allowed_rule_source_ids": [
-            "gw-11e-core-abilities:core:deadly-demise"
+            "gw-11e-core-abilities:core:deadly-demise",
+            "gw-11e-core-abilities:faq:alternating-scout-moves"
           ]
         },
         {

@@ -2408,6 +2408,110 @@ dependencies were used to execute the underlying checks directly.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/420`; merge commit
 pending review and merge.
 
+### P24G — C24-07
+
+Status: Implemented in Order 16; local validation and publication details are recorded in the PR.
+
+Finding IDs: `C24-07`.
+
+Dependencies and evidence gate: P19/PR #412 and S-MIRRORS/PR #416 are merged on `main`. The
+alternating-Scout FAQ is retained as a reviewed transcription and separately classified,
+project-authoritative Game Datamissions v931 App-data mirror observation authenticated against
+the S-MIRRORS provider audit and authorized Core Abilities source package. This satisfies
+`APP-DRIFT`; no co-versioned contrary observation is retained, so no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: simultaneous pre-battle unit rules must resolve one unit at a time in player
+alternation, beginning with the player who will take the first turn. Sequencing state must be
+engine-owned, persistent, replay-safe, and shared by UI, headless, network, tests, and restore. A
+generic once-per-window ordering followed by repeated first-unresolved lookup is not alternation.
+
+How it was done before P24G: `resolve_prebattle_actions` reused the generic Phase 12A
+`resolve_sequencing_order` conflict. After that one ordering decision, every lifecycle advance
+scanned the resolved participant order from its beginning and returned the first player who still
+had an available Scout action. That player therefore resolved every Scout unit before the other
+player acted. The selected order lived in the decision/event ledger rather than a dedicated
+player/unit-resolution cursor.
+
+How it is done after P24G: the engine creates a typed `PreBattleAlternationCursor` from the
+first-turn `GameState.turn_order`, aligns it to the next player with an unresolved pre-battle unit
+rule, and persists it in `GameState`. Each accepted Scout Move, Dedicated Transport Scout Move,
+Scout reserve setup, or completion action advances the cursor atomically with its
+`PreBattleActionRecord`. The next lifecycle pass scans once from that position, skipping only
+players with no unresolved action. `resolve_prebattle_actions` no longer emits a generic
+sequencing request; redeploy conflicts retain their existing Phase 12A sequencing path. Restore
+binds every cursor action to its authoritative decision record and rejects pending-actor drift.
+
+Specific authoritative maintained direct App-data mirror statement and source ID: Game
+Datamissions App-data v931 asks whether players with Scouts units alternate resolving Scout moves
+and answers that players alternate resolving any pre-battle rules their army's units may have,
+starting with the player who will take the first turn. The stable source ID is
+`gw-11e-core-abilities:faq:alternating-scout-moves`; runtime gates on the typed cursor, setup-step,
+turn-order, action-record, and decision identities, never on display-name or source-text parsing.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog?v=931`, App-data version `931`,
+reviewed at `2026-09-02T12:30:09-04:00`; transcription
+`e2e4740b73d2ea159eecb42da7246c399dc157bef038a623f9ecd94d07ba1296`;
+reviewed-transcription observation
+`4df59af220872b1b09a3dcd36acef6b792b5e8c11245bd6ca2bea2f12433e9fe`;
+authoritative-mirror observation
+`cb6c3244b50cff6017b30f269dff2530f1a8c8a461627710cc149064034d1453`; authenticated
+provider-audit observation
+`1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`. The extended Core
+Abilities package hash is `37e11c8e58049b5a0804c131e84714dba9c4fd192cbaac63eab915b8ca638f0e`,
+its canonical artifact byte SHA-256 is
+`4a33e49c5d7c0c043a0f074ae3c89fce9dae688452da4e752593dc7a76a1ad12`, the source-authority
+registry byte SHA-256 is `78b96059f2bb2aed28768e93b54d238ff4567b54a328c3cd7d2659dc2d964abd`,
+and the engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:3fbc3832c94e2c48fd93240f8e57848f144d878028f6f05a48818a20bf6a74a6`.
+
+Load and execution support: the FAQ rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation
+carries project authority. The fail-fast loader pins both Core Abilities rules, descriptors,
+timing, evidence inventory, runtime consumers, package hash, and artifact byte hash.
+
+Scope and owning path: P24G owns the FAQ source row, typed alternation cursor, pre-battle timing
+selection, action-ledger coupling, restore validation, adapter contract, and focused regressions.
+The authoritative path is reviewed JSON and typed loader -> first-turn order -> persisted cursor ->
+engine-enumerated `select_prebattle_action` -> optional parameterized proposal -> validation ->
+engine mutation and `PreBattleActionRecord` -> cursor advance -> next engine-selected actor. P24G
+adds no named handler, decision type, proposal kind, faction content, generic hook family, or
+out-of-scope content.
+
+Decision and viewer-visibility impact: the existing finite and parameterized decision families
+are unchanged, but `prebattle_timing_state` and serialized `GameState` now carry the JSON-safe
+cursor payload. The adapter contract and decision submission catalog explicitly prohibit clients
+from reconstructing or advancing it. Pre-battle deployment and movement data remain public in the
+current rules scope, so the shared projection/event redaction path does not gain a hidden type.
+
+Regression scenarios and same-bug-class search: lifecycle coverage gives both players two Scout
+units and proves the actor sequence starts with the first-turn player and alternates by unit without
+`resolve_sequencing_order`; the same test round-trips a pending request, rejects a drifted cursor,
+and replays both accepted actions from a checkpoint. A second regression proves that a player with
+no unresolved rule is the only player skipped. The LocalGameSession smoke proves adapters receive
+the same first-turn/next-player decisions. Source tests pin exact FAQ text, evidence, executable
+status, consumer IDs, package identity, and fail-fast loader behavior. The bug-class search found
+redeploy as a valid generic sequencing consumer and kept that path unchanged. No behavioral test
+file was added, removed, moved, or renamed, so the four-shard inventory does not change.
+
+Generated artifacts/documentation: P24G extends
+`core_abilities_2026_09/artifacts/package.json` and its typed loader/offline builder, updates the
+source-authority registry, regenerates the engine build identity and affected external-contract
+examples, and updates README, the adapter/decision submission contracts, and this finding record.
+
+Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
+Pyright, the exact xdist/work-stealing full suite (`6434 passed`), the four-shard fail-closed
+check, all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
+coverage run passes `6083` tests and the `--cov-fail-under=85` gate at `85.00%` across `196364`
+statements and `77590` branches. The Core Abilities source generator, engine-build identity,
+PR-base external-contract verification, and installed-wheel smoke pass with `2503` packaged
+resources and `27` schemas. A clean Node 24.18 `npm ci`, the repository-pinned generated-client
+check and TypeScript typecheck pass, all five client unit tests pass, and the two-server HTTP
+conformance scenario passes all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: pending publication and review.
+
 ### Post-P18C v931/v946 findings
 
 Status: This section was introduced as planning documentation in PR #414. The P18D and P18E

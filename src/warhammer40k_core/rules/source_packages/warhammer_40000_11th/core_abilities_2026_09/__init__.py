@@ -28,6 +28,7 @@ from ._artifacts import (
     EXPECTED_DOCUMENT_IDENTITY,
     EXPECTED_PACKAGE_HASH,
     EXPECTED_RULE_IDENTITY,
+    EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY,
     CoreAbilitiesSourceArtifactError,
     CoreAbilitiesSourcePackageArtifact,
     CoreAbilitiesSourceRuleArtifact,
@@ -35,7 +36,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "bd3dda22e3b39c18fa50c76e3131563feaa887ea25807bf8c67cd6e895e6ff6f"
+EXPECTED_ARTIFACT_SHA256: Final = "4a33e49c5d7c0c043a0f074ae3c89fce9dae688452da4e752593dc7a76a1ad12"
 
 
 def _load_artifact() -> CoreAbilitiesSourcePackageArtifact:
@@ -66,10 +67,16 @@ APP_VERSION: Final = EXPECTED_DOCUMENT_IDENTITY[3]
 PACKAGE_HASH: Final = EXPECTED_PACKAGE_HASH
 DEADLY_DEMISE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITY[3]
 TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITY[7]
+SCOUT_ALTERNATION_FAQ_SOURCE_ID: Final = EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY[3]
+SCOUT_ALTERNATION_TRANSCRIPTION_SHA256: Final = EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY[7]
 
 
 def source_rule_record() -> CoreAbilitiesSourceRuleArtifact:
     return _ARTIFACT.rules[0]
+
+
+def scout_alternation_faq_record() -> CoreAbilitiesSourceRuleArtifact:
+    return _ARTIFACT.rules[1]
 
 
 def source_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
@@ -97,11 +104,12 @@ def source_package() -> RuleSourcePackage:
             SourceDocument(
                 document_id=document_id,
                 title=_ARTIFACT.source_document.source_title,
-                source_texts=(
+                source_texts=tuple(
                     RuleSourceText.from_raw(
-                        source_id=source_rule_record().source_id,
-                        raw_text=source_rule_record().source_text,
-                    ),
+                        source_id=rule.source_id,
+                        raw_text=rule.source_text,
+                    )
+                    for rule in _ARTIFACT.rules
                 ),
             ),
         ),
@@ -120,7 +128,10 @@ def source_package() -> RuleSourcePackage:
     return RuleSourcePackage(
         source_catalog=source_catalog,
         source_evidence_catalog=SourceEvidenceCatalog(records=source_evidence_records()),
-        evidence_required_source_ids=(DEADLY_DEMISE_SOURCE_ID,),
+        evidence_required_source_ids=(
+            DEADLY_DEMISE_SOURCE_ID,
+            SCOUT_ALTERNATION_FAQ_SOURCE_ID,
+        ),
         source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
     )
 
@@ -131,12 +142,15 @@ __all__ = (
     "EXPECTED_ARTIFACT_SHA256",
     "OBSERVED_AT",
     "PACKAGE_HASH",
+    "SCOUT_ALTERNATION_FAQ_SOURCE_ID",
+    "SCOUT_ALTERNATION_TRANSCRIPTION_SHA256",
     "SOURCE_PACKAGE_ID",
     "SOURCE_URL",
     "SOURCE_VERSION",
     "TRANSCRIPTION_SHA256",
     "CoreAbilitiesSourceArtifactError",
     "core_abilities_source_artifact_from_json_bytes",
+    "scout_alternation_faq_record",
     "source_evidence_records",
     "source_package",
     "source_rule_record",

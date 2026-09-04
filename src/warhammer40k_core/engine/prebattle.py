@@ -60,8 +60,22 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
+from warhammer40k_core.engine.prebattle_alternation import (
+    SELECT_PREBATTLE_ACTION_DECISION_TYPE as SELECT_PREBATTLE_ACTION_DECISION_TYPE,
+)
+from warhammer40k_core.engine.prebattle_alternation import (
+    SUBMIT_SCOUT_MOVE_DECISION_TYPE as SUBMIT_SCOUT_MOVE_DECISION_TYPE,
+)
+from warhammer40k_core.engine.prebattle_alternation import (
+    SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE as SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
+)
+from warhammer40k_core.engine.prebattle_alternation import (
+    align_prebattle_alternation_cursor,
+)
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionKind,
+    PreBattleAlternationCursor,
+    PreBattleAlternationCursorPayload,
     record_prebattle_action,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
@@ -105,9 +119,6 @@ from warhammer40k_core.geometry.volume import Model
 
 SELECT_REDEPLOY_UNIT_DECISION_TYPE = "select_redeploy_unit"
 SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE = "submit_redeploy_placement"
-SELECT_PREBATTLE_ACTION_DECISION_TYPE = "select_prebattle_action"
-SUBMIT_SCOUT_MOVE_DECISION_TYPE = "submit_scout_move"
-SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE = "submit_scout_reserve_setup"
 
 REDEPLOY_PROPOSAL_KIND = "redeploy_placement"
 SCOUT_MOVE_PROPOSAL_KIND = "scout_move"
@@ -159,6 +170,7 @@ class PreBattleTimingWindowStatePayload(TypedDict):
     next_player_id: str | None
     available_action_count_by_player: dict[str, int]
     completed_player_ids: list[str]
+    alternation_cursor: PreBattleAlternationCursorPayload | None
 
 
 class PreBattleProposalRequestPayload(TypedDict):
@@ -239,6 +251,7 @@ class PreBattleTimingWindowState:
     next_player_id: str | None
     available_action_count_by_player: dict[str, int]
     completed_player_ids: tuple[str, ...]
+    alternation_cursor: PreBattleAlternationCursor | None = None
 
     def __post_init__(self) -> None:
         if self.setup_step not in {SetupStep.REDEPLOY_UNITS, SetupStep.RESOLVE_PREBATTLE_ACTIONS}:
@@ -265,6 +278,16 @@ class PreBattleTimingWindowState:
                 self.completed_player_ids,
             ),
         )
+        if self.setup_step is SetupStep.REDEPLOY_UNITS:
+            if self.alternation_cursor is not None:
+                raise GameLifecycleError("Redeploy timing cannot carry a Scout cursor.")
+        else:
+            if type(self.alternation_cursor) is not PreBattleAlternationCursor:
+                raise GameLifecycleError("Pre-battle timing requires an alternation cursor.")
+            if self.alternation_cursor.next_player_id != self.next_player_id:
+                raise GameLifecycleError(
+                    "Pre-battle timing player drifted from the alternation cursor."
+                )
 
     def to_payload(self) -> PreBattleTimingWindowStatePayload:
         return {
@@ -272,6 +295,9 @@ class PreBattleTimingWindowState:
             "next_player_id": self.next_player_id,
             "available_action_count_by_player": dict(self.available_action_count_by_player),
             "completed_player_ids": list(self.completed_player_ids),
+            "alternation_cursor": (
+                None if self.alternation_cursor is None else self.alternation_cursor.to_payload()
+            ),
         }
 
 
@@ -964,6 +990,8 @@ def prebattle_sequencing_request_for_timing_state(
 ) -> DecisionRequest | None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Pre-battle sequencing requires a DecisionController.")
+    if timing_state.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+        return None
     participants = _prebattle_sequencing_participants(timing_state)
     if len(participants) < 2:
         return None
@@ -997,6 +1025,8 @@ def prebattle_next_player_id_for_timing_state(
 ) -> str | None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Pre-battle sequencing requires a DecisionController.")
+    if timing_state.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+        return timing_state.next_player_id
     resolved_order = _resolved_prebattle_sequencing_order(
         decisions=decisions,
         conflict_id=_prebattle_sequencing_conflict_id(timing_state.setup_step),
@@ -1083,6 +1113,11 @@ def prebattle_action_selection_request(
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Pre-battle action selection requires RulesetDescriptor.")
     requested_player_id = _validate_identifier("player_id", player_id)
+    timing_state = prebattle_timing_state_for_state(state, army_catalog=army_catalog)
+    if requested_player_id != timing_state.next_player_id:
+        raise GameLifecycleError(
+            "Pre-battle action selection actor drifted from the alternation cursor."
+        )
     mission_setup = _require_mission_setup(state)
     options: list[DecisionOption] = []
     for candidate in scout_reserve_setup_candidates_for_player(
@@ -1763,29 +1798,36 @@ def _timing_state_for_step(
         if _completed_kind_for_step_player(state=state, setup_step=setup_step, player_id=player_id)
         is not None
     )
-    next_player_id = None
-    for player_id in state.turn_order:
-        if player_id in completed:
-            continue
-        if counts[player_id] > 0:
-            next_player_id = player_id
-            break
+    alternation_cursor: PreBattleAlternationCursor | None = None
+    if setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+        alternation_cursor = align_prebattle_alternation_cursor(
+            state=state,
+            action_counts=counts,
+            completed_player_ids=completed,
+        )
+        next_player_id = alternation_cursor.next_player_id
+    else:
+        next_player_id = None
+        for player_id in state.turn_order:
+            if player_id in completed:
+                continue
+            if counts[player_id] > 0:
+                next_player_id = player_id
+                break
     return PreBattleTimingWindowState(
         setup_step=setup_step,
         next_player_id=next_player_id,
         available_action_count_by_player=counts,
         completed_player_ids=completed,
+        alternation_cursor=alternation_cursor,
     )
 
 
 def _prebattle_sequencing_participants(
     timing_state: PreBattleTimingWindowState,
 ) -> tuple[SequencingParticipant, ...]:
-    source_rule_id = (
-        CORE_REDEPLOY_SOURCE_RULE_ID
-        if timing_state.setup_step is SetupStep.REDEPLOY_UNITS
-        else CORE_SCOUTS_SOURCE_RULE_ID
-    )
+    if timing_state.setup_step is not SetupStep.REDEPLOY_UNITS:
+        raise GameLifecycleError("Generic pre-battle sequencing is limited to redeploys.")
     participants: list[SequencingParticipant] = []
     for player_id, action_count in timing_state.available_action_count_by_player.items():
         if player_id in timing_state.completed_player_ids:
@@ -1799,7 +1841,7 @@ def _prebattle_sequencing_participants(
                     player_id=player_id,
                 ),
                 player_id=player_id,
-                source_rule_id=source_rule_id,
+                source_rule_id=CORE_REDEPLOY_SOURCE_RULE_ID,
                 payload={
                     "setup_step": timing_state.setup_step.value,
                     "available_action_count": action_count,
@@ -1819,8 +1861,8 @@ def _prebattle_sequencing_participant_id(
 
 def _prebattle_sequencing_conflict_id(setup_step: SetupStep) -> str:
     resolved_step = _setup_step_from_token(setup_step)
-    if resolved_step not in {SetupStep.REDEPLOY_UNITS, SetupStep.RESOLVE_PREBATTLE_ACTIONS}:
-        raise GameLifecycleError("Pre-battle sequencing requires a pre-battle setup step.")
+    if resolved_step is not SetupStep.REDEPLOY_UNITS:
+        raise GameLifecycleError("Generic pre-battle sequencing is limited to redeploys.")
     return f"prebattle-sequencing:{resolved_step.value}"
 
 

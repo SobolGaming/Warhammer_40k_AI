@@ -83,6 +83,7 @@ from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionRecord,
     prebattle_action_kind_from_token,
 )
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -433,32 +434,143 @@ def test_phase16b_setup_sequencing_replay_accepts_unchanged_round_trip(
     assert _event_types(lifecycle).count("sequencing_order_resolved") == (before_resolved_count + 1)
 
 
-def test_phase16b_simultaneous_scouts_use_phase12a_sequencing_order() -> None:
+def test_phase16b_simultaneous_scouts_start_with_first_turn_player_and_alternate_by_unit() -> None:
     catalog = _catalog_with_datasheet_keywords(
         {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
     )
-    lifecycle, status = _advance_after_deployments(_config(catalog=catalog))
-    sequencing_request = _decision_request(status)
-
-    assert sequencing_request.decision_type == SEQUENCING_DECISION_TYPE
-    assert {
-        "prebattle:resolve_prebattle_actions:player-a",
-        "prebattle:resolve_prebattle_actions:player-b",
-    } == set(_sequencing_participant_ids(sequencing_request))
-
-    follow_up = _submit_option(
-        lifecycle,
-        request=sequencing_request,
-        option_id=(
-            "order:prebattle:resolve_prebattle_actions:player-b,"
-            "prebattle:resolve_prebattle_actions:player-a"
-        ),
-        result_id="phase16b-scout-sequencing",
+    lifecycle, status = _advance_after_deployments(
+        _config(
+            catalog=catalog,
+            player_a_unit_selections=(
+                _unit_selection(unit_selection_id="scout-unit-1"),
+                _unit_selection(unit_selection_id="scout-unit-2"),
+            ),
+            player_b_unit_selections=(
+                _unit_selection(unit_selection_id="scout-unit-1"),
+                _unit_selection(unit_selection_id="scout-unit-2"),
+            ),
+        )
     )
-    request = _decision_request(follow_up)
+    first_request = _decision_request(status)
 
-    assert request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
-    assert request.actor_id == "player-b"
+    assert first_request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
+    assert first_request.actor_id == "player-a"
+    assert "scout_move:army-alpha:scout-unit-1" in _option_ids(first_request)
+    assert "scout_move:army-alpha:scout-unit-2" in _option_ids(first_request)
+    assert not any(
+        event.event_type == "sequencing_order_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("conflict_id") == "prebattle-sequencing:resolve_prebattle_actions"
+        for event in lifecycle.decision_controller.event_log.records
+    )
+    replay_initial_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    first_proposal_status = _submit_option(
+        lifecycle,
+        request=first_request,
+        option_id="scout_move:army-alpha:scout-unit-1",
+        result_id="phase16b-alternating-scout-select-a-1",
+    )
+    first_proposal = _decision_request(first_proposal_status)
+    assert lifecycle.state is not None
+    second_status = _submit_scout_move(
+        lifecycle,
+        request=first_proposal,
+        result_id="phase16b-alternating-scout-apply-a-1",
+        witness=_scout_move_witness(lifecycle.state, request=first_proposal, dx=1.0),
+    )
+    second_request = _decision_request(second_status)
+
+    assert second_request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
+    assert second_request.actor_id == "player-b"
+    assert "scout_move:army-beta:scout-unit-1" in _option_ids(second_request)
+    assert "scout_move:army-alpha:scout-unit-2" not in _option_ids(second_request)
+
+    restored_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(restored_payload)
+    restored_second_request = restored.decision_controller.queue.peek_next()
+    assert restored_second_request == second_request
+    drifted_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(restored_payload, sort_keys=True)),
+    )
+    drifted_cursor = cast(dict[str, Any], drifted_payload["state"])["prebattle_alternation_cursor"]
+    assert isinstance(drifted_cursor, dict)
+    drifted_cursor["next_player_id"] = "player-a"
+    with pytest.raises(GameLifecycleError, match="pending decision actor drifted"):
+        GameLifecycle.from_payload(drifted_payload)
+    second_proposal_status = _submit_option(
+        restored,
+        request=restored_second_request,
+        option_id="scout_move:army-beta:scout-unit-1",
+        result_id="phase16b-alternating-scout-select-b-1",
+    )
+    second_proposal = _decision_request(second_proposal_status)
+    assert restored.state is not None
+    third_status = _submit_scout_move(
+        restored,
+        request=second_proposal,
+        result_id="phase16b-alternating-scout-apply-b-1",
+        witness=_scout_move_witness(restored.state, request=second_proposal, dx=-1.0),
+    )
+    third_request = _decision_request(third_status)
+
+    assert third_request.decision_type == SELECT_PREBATTLE_ACTION_DECISION_TYPE
+    assert third_request.actor_id == "player-a"
+    assert "scout_move:army-alpha:scout-unit-2" in _option_ids(third_request)
+    assert restored.state.prebattle_alternation_cursor is not None
+    assert restored.state.prebattle_alternation_cursor.next_player_id == "player-a"
+    assert restored.state.prebattle_alternation_cursor.resolved_action_count == 2
+
+    artifact = ReplayArtifact.capture(
+        artifact_id="phase16b-alternating-scout-replay",
+        initial_lifecycle_payload=replay_initial_payload,
+        final_lifecycle=restored,
+    )
+    replay_result = ReplayRunner(artifact).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_phase16b_scout_cursor_skips_only_player_without_unresolved_rule() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")}
+    )
+    lifecycle, status = _advance_after_deployments(
+        _config(
+            catalog=catalog,
+            player_a_unit_selections=(_vehicle_unit_selection(unit_selection_id="vehicle-1"),),
+            player_b_unit_selections=(
+                _unit_selection(unit_selection_id="scout-unit-1"),
+                _unit_selection(unit_selection_id="scout-unit-2"),
+            ),
+        )
+    )
+    first_request = _decision_request(status)
+    assert first_request.actor_id == "player-b"
+    first_proposal_status = _submit_option(
+        lifecycle,
+        request=first_request,
+        option_id="scout_move:army-beta:scout-unit-1",
+        result_id="phase16b-skip-empty-scout-select-b-1",
+    )
+    first_proposal = _decision_request(first_proposal_status)
+    assert lifecycle.state is not None
+    follow_up = _submit_scout_move(
+        lifecycle,
+        request=first_proposal,
+        result_id="phase16b-skip-empty-scout-apply-b-1",
+        witness=_scout_move_witness(lifecycle.state, request=first_proposal, dx=-1.0),
+    )
+
+    next_request = _decision_request(follow_up)
+    assert next_request.actor_id == "player-b"
+    assert "scout_move:army-beta:scout-unit-2" in _option_ids(next_request)
 
 
 def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors() -> None:

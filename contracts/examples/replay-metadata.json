@@ -15567,6 +15567,7 @@
         "player-b"
       ],
       "prebattle_action_records": [],
+      "prebattle_alternation_cursor": null,
       "primary_battlefield_departure_states": [],
       "primary_mission_progress_state": {
         "condemned_selections": [],
