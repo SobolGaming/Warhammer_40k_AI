@@ -54,7 +54,10 @@ def _disembark_candidate_for_movement_unit(
     movement_state: MovementPhaseState,
     unit_instance_id: str,
     transport_unit_instance_id: str,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> DisembarkCandidate | None:
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Disembark candidate requires a RulesetDescriptor.")
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     transport_id = _validate_identifier(
         "transport_unit_instance_id",
@@ -134,7 +137,7 @@ def _disembark_candidate_for_movement_unit(
         disembark_mode = DisembarkModeKind.SHOCK_DISEMBARK
         start_engaged_enemy_unit_instance_ids = scenario_physically_engaged_enemy_rules_unit_ids(
             scenario=_battlefield_scenario(state),
-            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            ruleset_descriptor=ruleset_descriptor,
             unit_instance_id=transport_id,
         )
     elif normal_move_states:

@@ -449,6 +449,8 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "transport_disembark_permission_effect" in shared_permission_source
     assert "shock_disembark_restriction_overrides" in candidate_source
     assert "start_engaged_enemy_unit_instance_ids" in candidate_source
+    assert "ruleset_descriptor=ruleset_descriptor" in candidate_source
+    assert "RulesetDescriptor.warhammer_40000_eleventh()" not in candidate_source
     assert "proposal_start_engagement_drift" in proposal_source
     assert "_start_shock_disembark_forced_fight_activations" in placement_source
     assert "ForcedFightActivationContext" in fight_order_source
@@ -459,6 +461,8 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "forced_activation_context" in fight_hook_source
     assert "advance_forced_fight_activations_if_needed" in lifecycle_source
     assert "_validate_shock_disembark_fight_history" in restore_source
+    assert "_authenticated_forced_fight_selections" in restore_source
+    assert "omitted mandatory forced-Fight activations" in restore_source
     assert "shock_disembark" in adapter_contract
     for forbidden_display_name in (
         "Assault Ramp",

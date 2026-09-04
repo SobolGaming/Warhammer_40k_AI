@@ -2071,12 +2071,14 @@ effect payload validation for both Assault and Shock consumers. A `shock_disemba
 effect binds one permitting source, owner, battlefield Transport, battle round, and exact eligible
 canonical passenger IDs. When that Transport has Advanced, movement-owned candidate enumeration
 emits only `shock_disembark`, captures the sorted canonical enemy rules-unit IDs physically engaged
-with the Transport, and carries the exact permission override and engagement snapshot into the
-public placement request. The submission must echo both unchanged before queue pop. The grouped
-resolver requires every living passenger model wholly within 3″, rejects engagement with any enemy
-outside the snapshot, and proves every starting enemy engagement still exists after the atomic
-placement. The committed `DisembarkedUnitState` records the Core 18.07 source, permitting source,
-and engagement snapshot while prohibiting further movement, Remain Stationary, and charging.
+with the Transport under the active handler's configured ruleset descriptor, and carries the exact
+permission override and engagement snapshot into the public placement request. Candidate creation
+and resolution use that same descriptor. The submission must echo both unchanged before queue pop.
+The grouped resolver requires every living passenger model wholly within 3″, rejects engagement
+with any enemy outside the snapshot, and proves every starting enemy engagement still exists after
+the atomic placement. The committed `DisembarkedUnitState` records the Core 18.07 source,
+permitting source, and engagement snapshot while prohibiting further movement, Remain Stationary,
+and charging.
 
 Each starting enemy not already selected to fight in the current phase enters one transient
 `ForcedFightActivationContext` owned by the existing Fight state. It binds the triggering
@@ -2087,7 +2089,11 @@ selected-to-fight hooks, melee declaration/attack execution, `fight_activation_s
 `unit_has_fought` paths run unchanged. The selected-unit hook context accepts a non-Fight source
 phase only when the active state contains the matching typed forced context. Movement resumes only
 after every still-eligible affected enemy resolves and the queue-completion event clears that
-transient state.
+transient state. Restore reconstructs the exact outstanding rules-unit lineage set from the
+authenticated disembark snapshot, prior and queue-local Fight selection decision/event chains, and
+authoritative model-destruction history. A skipped or completed queue is accepted only when that
+history proves no mandatory activation remains, and an active queue must retain the exact derived
+eligibility context and exact authenticated selections.
 
 Specific authoritative maintained direct App-data mirror statement and source ID: Game
 Datamissions App-data v931 section 18.07, `SHOCK DISEMBARK MOVE`, requires setup as in Set Up when
@@ -2111,8 +2117,8 @@ provider-audit observation
 Transports package hash is
 `62c267ae792834ddd371541f177e78056492656db964cfdcaaa1a3de6581472f`, and its canonical artifact
 byte SHA-256 is `a5d78f54c1507625a7911397f181e0f6466cb6f168d78febf0412628408287c5`.
-The engine build ID at implementation is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:78e8d74e1f926a835b88da067893cbdd1878cc3e882915c2ead13d16b3160cbd`.
+The engine build ID after review hardening is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:28d59472904daff9573b89d6cffd76d24fba2c7555cf34c6cae915896fe6e4d4`.
 
 Load and execution support: the 18.07 rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -2146,15 +2152,18 @@ battlefield-information scope through shared adapter redaction. Adapters cannot 
 alter ordering, pass, or mutate Fight state.
 
 Regression scenarios and same-bug-class search: focused tests cover missing permission, wrong
-snapshot, broken preserved engagement, 3″ grouped setup, no-charge/no-further-move state, canonical
-attached enemy identity, malformed omission before queue pop, deterministic option selection,
-opponent ownership, no pass, canonical selected-to-fight hooks, queue completion, both-viewer
-request/event projection, active and completed restore, event-source drift, and payload round-trip.
-The same-bug-class audit binds the new mode/snapshot through every standard candidate, proposal,
+snapshot, configured-descriptor engagement calculation, broken preserved engagement, 3″ grouped
+setup, no-charge/no-further-move state, canonical attached enemy identity, malformed omission
+before queue pop, deterministic option selection, opponent ownership, no pass, canonical
+selected-to-fight hooks, queue completion, both-viewer request/event projection, active and
+completed restore, forged queue skip, forged empty completion, reduced active eligibility, forged
+completion selection summary, malformed selection/context/request authority, missing selection
+decision authority, decision/event authority drift, event-source drift, and payload round-trip. The
+same-bug-class audit binds the new mode/snapshot through every standard candidate, proposal,
 selection, state, event, and lifecycle restore path, factors duplicated Assault/ Shock permission
-parsing into one fail-closed service, and pins reuse of the canonical Fight activation constant and
-handler. No behavioral test file was added, removed, moved, or renamed, so the four-shard inventory
-does not change.
+parsing into one fail-closed service, pins use of the configured descriptor, and pins reuse of the
+canonical Fight activation constant and handler. No behavioral test file was added, removed,
+moved, or renamed, so the four-shard inventory does not change.
 
 Generated artifacts/documentation: P18E expands the existing
 `core_transports_2026_09/artifacts/package.json`, typed loader/source package, authority registry,
@@ -2163,10 +2172,11 @@ engine build identity and affected external-contract examples; and updates READM
 `ARCHITECTURE_V2.md`, `docs/ADAPTER_DECISION_CONTRACT.md`, and this finding record.
 
 Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
-Pyright, the exact xdist/work-stealing full suite (`6419 passed`), the four-shard fail-closed check,
+Pyright, the exact xdist/work-stealing full suite (`6420 passed`), the four-shard fail-closed check,
 all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
-coverage run passes `--cov-fail-under=85` at `85.000128%` across `195753` statements and `77376`
-branches. All seven Core source-package generator checks, engine-build identity verification,
+coverage run passes `--cov-fail-under=85` with `6071 passed` at `85.000567%` across `195861`
+statements and `77436` branches. All seven Core source-package generator checks, engine-build
+identity verification,
 base-ref external-contract verification, installed-wheel smoke, generated TypeScript contract
 check, TypeScript typecheck, five TypeScript unit tests, and the 342-assertion external conformance
 scenario also pass.

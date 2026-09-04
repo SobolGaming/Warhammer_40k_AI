@@ -110,7 +110,6 @@ def _movement_action_options_for_selected_unit(
                 unit_instance_id=unit_instance_id,
             ),
         )
-
     remain_stationary = DecisionOption(
         option_id=MovementPhaseActionKind.REMAIN_STATIONARY.value,
         label="Remain Stationary",
@@ -159,6 +158,7 @@ def _movement_action_options_for_selected_unit(
         movement_state=movement_state,
         unit_instance_id=unit_instance_id,
         transport_unit_instance_id=candidate.transport_unit_instance_id,
+        ruleset_descriptor=ruleset_descriptor,
     )
     if disembark_candidate is None:
         return (remain_stationary,)
@@ -304,6 +304,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             movement_state=movement_state,
             unit_instance_id=active_selection.unit_instance_id,
             transport_unit_instance_id=candidate.transport_unit_instance_id,
+            ruleset_descriptor=ruleset_descriptor,
         )
         if disembark_candidate is None:
             raise GameLifecycleError("Disembark is not currently legal for the selected unit.")
