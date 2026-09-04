@@ -2299,7 +2299,8 @@ packaged resources and `27` schemas. The repository-pinned TypeScript generated-
 typechecks pass, all five client unit tests pass, and the two-server HTTP conformance scenario
 passes all `342` assertions for contract version `11.1.0`.
 
-PR URL and merge commit: pending publication and review.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/419`; merge commit
+pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
