@@ -2196,6 +2196,112 @@ scenario also pass.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/418`; merge commit
 pending review.
 
+### P24F — C24-06
+
+Status: Implemented in Order 14; local validation and publication details are recorded in the PR.
+
+Finding IDs: `C24-06`.
+
+Dependencies and evidence gate: P05A/PR #413 and S-MIRRORS/PR #416 are merged on `main`. The
+corrected 24.08 text is retained as a reviewed transcription and a separately classified,
+project-authoritative Game Datamissions v931 App-data mirror observation authenticated against
+the S-MIRRORS provider audit. This satisfies `APP-DRIFT`; no co-versioned contrary observation is
+retained, so no `EXCEPTION-PAUSE` applies.
+
+Violated invariant: a rule owned by a bearer model must retain that model identity from the source
+boundary through timing classification and runtime dispatch. Deadly Demise triggers each time a
+model with the ability is destroyed. A unit-owned description and `after_unit_destroyed` timing
+can suppress non-last-model triggers and conflates model destruction with the distinct event in
+which the rules unit ceases to exist.
+
+How it was done before P24F: the runtime destruction-reaction path already materialized one Deadly
+Demise source per bearer model and consumed it before that model's removal, but the inline Core
+Abilities row said `when this unit is destroyed` and indexed the handler under
+`after_unit_destroyed`. The generic RuleIR catalog builder also mapped both `MODEL_DESTROYED` and
+`UNIT_DESTROYED` clauses to that unit timing. Return-on-death runtime consumers depended on the
+collapsed index even though their semantic classifier supported both trigger kinds.
+
+How it is done after P24F: the reviewed Core Abilities JSON artifact is the source of the stable
+Deadly Demise ability ID, handler ID, source ID, exact descriptors, and
+`after_model_destroyed` timing. `TimingTriggerKind` now represents model destruction separately;
+both the single-clause and compound-clause RuleIR catalog paths use one shared destruction-timing
+mapper. The default Deadly Demise handler is bound only to the model event. Generic
+return-on-death lookup deliberately reads both model- and unit-destruction indexes, preserving
+valid semantics for either source shape without restoring the old conflation. Existing per-model
+source materialization, `model_destroyed` events, mandatory trigger roll, collateral resolution,
+and before-removal ordering remain the authoritative mutation path.
+
+Specific authoritative maintained direct App-data mirror statement and source ID: Game
+Datamissions App-data v931 changed section 24.08 to state that each model with the ability triggers
+Deadly Demise when that model is destroyed, after any embarked units make their Emergency
+Disembark moves. The stable source ID remains
+`gw-11e-core-abilities:core:deadly-demise`; runtime behavior gates on typed ability, handler,
+timing, and model-source identities, never on the display name or reparsed source text.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog`, App-data version `931`, reviewed
+at `2026-09-02T12:30:09-04:00`; transcription
+`a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4`;
+reviewed-transcription observation
+`18455fe967731b81b8ceacbe9e0121c3750b6bf648e4ec3a781113aaf5b12511`;
+authoritative-mirror observation
+`3b3c615e97dab76873c0ab7974cf593480baa4a028eb88a1312254d0c3a6252b`; authenticated
+provider-audit observation
+`1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`. The Core Abilities package
+hash is `805db3a2131ceef3e4a120dd1bfa2605dc9a1e4cc1508619e02ed9bc1ec72d4a`, and its canonical
+artifact byte SHA-256 is
+`bd3dda22e3b39c18fa50c76e3131563feaa887ea25807bf8c67cd6e895e6ff6f`. The engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:872a1bfe4a99032de422434aebc29e21ae0dcfa05cd206dec45e2c1f63eaea18`.
+
+Load and execution support: the 24.08 rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation carries
+project authority. The fail-fast loader pins the source document, rule and runtime identity,
+descriptors, timing, evidence inventory, runtime consumers, package hash, and artifact byte hash.
+
+Scope and owning path: P24F owns the 24.08 source package, Core Abilities catalog correction,
+distinct shared timing identity, the generic destruction-timing bug-class correction, deliberate
+dual-index return-on-death lookup, documentation, and focused regressions. The path is reviewed
+JSON and typed loader -> stable ability catalog record -> per-model destruction-reaction source ->
+model destruction validation -> mandatory Deadly Demise resolution -> collateral damage -> model
+removal and deterministic event/replay records. P24F adds no named handler, faction content,
+decision type, proposal kind, mutation path, or out-of-scope content.
+
+Decision and viewer-visibility impact: none. This correction changes an internal ability timing
+token and source descriptor, not a player-facing choice or adapter payload family. Existing
+DecisionRequest/DecisionResult routing and shared viewer redaction are unchanged, so
+`docs/ADAPTER_DECISION_CONTRACT.md` already covers all affected surfaces and requires no update.
+
+Regression scenarios and same-bug-class search: source tests pin the v931 wording, model trigger,
+evidence tuple, package identity, runtime consumers, and text/timing/byte tamper rejection. Catalog
+tests prove Deadly Demise rejects unit timing and accepts model timing, and prove generic
+single-clause model destruction stays distinct from compound unit destruction. The behavior
+regression destroys a bearer while another model in its unit remains alive and on the battlefield,
+then proves the mandatory per-model Deadly Demise reaction resolves before removal. Existing
+coverage continues to prove one registered source per bearer, successful collateral damage,
+Emergency Disembark ordering, secondary casualties, chained explosions, state round-trip, and
+replay-safe records. Return-on-death tests prove model-triggered records remain discoverable after
+the split; unit-triggered catalog consumers remain indexed only as unit destruction. No behavioral
+test file was added, removed, moved, or renamed, so the four-shard inventory does not change.
+
+Generated artifacts/documentation: P24F adds
+`core_abilities_2026_09/artifacts/package.json`, its typed loader/source package and offline builder;
+updates the source-authority registry; regenerates the engine build identity and affected external
+contract examples; and updates README and this finding record.
+
+Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
+Pyright, the exact xdist/work-stealing full suite (`6425 passed`), the four-shard fail-closed
+check, all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
+coverage run passes `6075` tests and the `--fail-under=85` gate across `196138` statements and
+`77494` branches. All eight Core source-package generator checks, engine-build identity
+verification, base-ref external-contract verification, and installed-wheel smoke pass with `2502`
+packaged resources and `27` schemas. The repository-pinned TypeScript generated-client and
+typechecks pass, all five client unit tests pass, and the two-server HTTP conformance scenario
+passes all `342` assertions for contract version `11.1.0`.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/419`; merge commit
+pending review and merge.
+
 ### Post-P18C v931/v946 findings
 
 Status: This section was introduced as planning documentation in PR #414. The P18D and P18E
@@ -2213,8 +2319,8 @@ owns C18-04; P18E follows P18D and owns C18-05; P20 owns C18-06 together with C2
 artifact, evidence-tuple validation, co-version mismatch rejection, and retained two-provider
 review evidence satisfy the acceptance criteria in the canonical sequence row.
 
-The remaining v931 obligations are closure gates, not deferred audit suggestions. Nine new scoped
-PRs own C24-06/P24F, C15-06/P15F, C24-07/P24G, C22-02/P22B, C01-02/P01B,
+The remaining v931 obligations are closure gates, not deferred audit suggestions. Eight new scoped
+PRs own C15-06/P15F, C24-07/P24G, C22-02/P22B, C01-02/P01B,
 C01-03/P01C, C02-04/P02D, C05-04/P05D, and C04-02+C04-03/P04B. Existing future PRs are expanded
 atomically: P14 adds C14-02; P12 adds C12-03; P04 widens only C04-01 as the generic target-lifecycle
 and reselection service; P11A adds C11-03;

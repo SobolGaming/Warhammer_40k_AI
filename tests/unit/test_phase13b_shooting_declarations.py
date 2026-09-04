@@ -13097,30 +13097,31 @@ def test_phase13e_mixed_fight_on_death_target_replays_geometry_and_living_alloca
 
 
 def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=_catalog_with_deadly_demise_datasheet(token="1"),
+    )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
+    defender = replace(
+        defender,
+        own_models=(
+            replace(defender.own_models[0], wounds_remaining=1),
+            *defender.own_models[1:],
+        ),
+    )
+    _replace_unit_instance_in_state(state=state, replacement=defender)
     defender_model = defender.own_models[0]
     battlefield = state.battlefield_state
     assert battlefield is not None
+    surviving_model = defender.own_models[1]
     state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+        tuple(model.model_instance_id for model in defender.own_models[2:])
     )
-    deadly_demise_source = DestructionReactionSource(
-        source_id="phase13e-deadly-demise",
-        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
-        source_rule_id="phase13e-deadly-demise-rule",
-        payload={
-            "trigger_roll_threshold": 6,
-            "range_inches": 6.0,
-            "mortal_wounds": {"kind": "fixed", "value": 1},
-        },
-        optional=False,
-    )
-    state.record_model_destruction_reaction_sources(
+    deadly_demise_source = _single_deadly_demise_source(
+        state=state,
         model_instance_id=defender_model.model_instance_id,
-        sources=(deadly_demise_source,),
     )
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
@@ -13200,7 +13201,7 @@ def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
     assert updated_battlefield is not None
 
     assert remaining_sequence is None
-    assert allocated_ids == (defender_model.model_instance_id,)
+    assert defender_model.model_instance_id in allocated_ids
     assert status is None
     assert lifecycle.decision_controller.queue.pending_requests == ()
     assert not any(
@@ -13217,6 +13218,11 @@ def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
     assert deadly_demise_payload["triggered"] is False
     assert _event_payloads(lifecycle, "deadly_demise_mortal_wounds_applied") == ()
     assert defender_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    assert surviving_model.model_instance_id in updated_battlefield.placed_model_ids()
+    assert model_by_id(
+        state=state,
+        model_instance_id=surviving_model.model_instance_id,
+    ).is_alive
     event_types = tuple(
         event.event_type for event in lifecycle.decision_controller.event_log.records
     )

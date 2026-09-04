@@ -7,6 +7,9 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.build_core_abilities_source import (
+    build_payload as build_core_abilities_source_payload,
+)
 from tools.build_core_attached_units_source import (
     build_payload as build_attached_units_source_payload,
 )
@@ -52,6 +55,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     app_core_rules_hidden_2026_08_09,
     chapter_approved_2026_27,
     core_abilities,
+    core_abilities_2026_09,
     core_attached_units_2026_09,
     core_attack_sequence_2026_09,
     core_command_phase_2026_08,
@@ -190,6 +194,68 @@ def test_p19_attached_units_source_loader_rejects_schema_and_byte_drift() -> Non
         match="bytes drifted",
     ):
         core_attached_units_2026_09.validate_core_attached_units_source_artifact_bytes(raw + b"\n")
+
+
+def test_p24f_deadly_demise_source_artifact_is_pinned_typed_and_executable() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_abilities_2026_09/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    package = core_abilities_2026_09.source_package()
+    rule = core_abilities_2026_09.source_rule_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert hashlib.sha256(raw).hexdigest() == core_abilities_2026_09.EXPECTED_ARTIFACT_SHA256
+    assert json.loads(raw) == build_core_abilities_source_payload()
+    assert rule.section_id == "24.08"
+    assert rule.source_id == core_abilities_2026_09.DEADLY_DEMISE_SOURCE_ID
+    assert rule.transcription_sha256 == core_abilities_2026_09.TRANSCRIPTION_SHA256
+    assert "Each time a model with this ability is destroyed" in rule.source_text
+    assert "when this unit is destroyed" not in rule.source_text.lower()
+    assert rule.when_descriptor.startswith("Each time a model with this ability is destroyed")
+    assert rule.trigger_kind == "after_model_destroyed"
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    mirror = next(
+        record for record in evidence if record.authority == "project_authoritative_app_mirror"
+    )
+    assert mirror.provider_name == "Game Datamissions"
+    assert mirror.app_version == "931"
+    assert mirror.review_audit_source_observation_sha256 == (
+        "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
+    )
+    assert all(record.runtime_consumer_ids for record in evidence)
+    assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
+        package.source_catalog.to_payload()
+    )
+
+
+def test_p24f_deadly_demise_source_loader_rejects_timing_and_byte_drift() -> None:
+    artifact_path = Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "core_abilities_2026_09/artifacts/package.json"
+    )
+    raw = artifact_path.read_bytes()
+    payload = json.loads(raw)
+    payload["rules"][0]["trigger_kind"] = "after_unit_destroyed"
+
+    with pytest.raises(
+        core_abilities_2026_09.CoreAbilitiesSourceArtifactError,
+        match="reviewed identity",
+    ):
+        core_abilities_2026_09.core_abilities_source_artifact_from_json_bytes(
+            json.dumps(payload).encode()
+        )
+    with pytest.raises(
+        core_abilities_2026_09.CoreAbilitiesSourceArtifactError,
+        match="bytes drifted",
+    ):
+        core_abilities_2026_09.validate_core_abilities_source_artifact_bytes(raw + b"\n")
 
 
 def test_p05a_destroyed_source_artifact_is_pinned_typed_and_executable() -> None:
@@ -1103,7 +1169,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 9
+    assert len(scope.source_packages) == 10
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 

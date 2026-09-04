@@ -1,0 +1,110 @@
+{
+  "artifact_schema": "core-v2-core-abilities-source-v1",
+  "evidence": [
+    {
+      "app_build": null,
+      "app_version": null,
+      "authority": "unverified_transcription_only",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "core-v2-core-abilities-source-review:deadly-demise",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "load_support_status": "loaded",
+      "observation_sha256": "18455fe967731b81b8ceacbe9e0121c3750b6bf648e4ec3a781113aaf5b12511",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": null,
+      "provider_name": "CORE V2 Source Review",
+      "provider_non_affiliation_recorded": false,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "rule_source_id": "gw-11e-core-abilities:core:deadly-demise",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
+        "warhammer40k_core.engine.abilities:default_ability_handler_registry",
+        "warhammer40k_core.engine.attack_sequence_damage_resolution:_resolve_deadly_demise_before_removal",
+        "warhammer40k_core.engine.catalog_rule_consumption:record_core_deadly_demise_sources_for_unit",
+        "warhammer40k_core.engine.deadly_demise:resolve_deadly_demise_trigger",
+        "warhammer40k_core.engine.rule_model_destruction:destroy_model_with_rule_reactions"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Repository",
+      "source_title": "Reviewed transcription of 24.08 Deadly Demise",
+      "source_url": null,
+      "transcription_sha256": "a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4",
+      "verification_status": "unverified"
+    },
+    {
+      "app_build": null,
+      "app_version": "931",
+      "authority": "project_authoritative_app_mirror",
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "evidence_id": "game-datamissions-core-rules-data-931:deadly-demise",
+      "evidence_kind": "third_party_mirror",
+      "load_support_status": "loaded",
+      "observation_sha256": "3b3c615e97dab76873c0ab7974cf593480baa4a028eb88a1312254d0c3a6252b",
+      "observed_at": null,
+      "official_corroborating_source_ids": [],
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "Game Datamissions",
+      "provider_non_affiliation_recorded": true,
+      "review_audit_id": "core-rules-maintained-app-mirrors-2026-09-02",
+      "review_audit_row_id": "game-datamissions-core-rules-data-931",
+      "review_audit_source_observation_sha256": "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668",
+      "rule_source_id": "gw-11e-core-abilities:core:deadly-demise",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
+        "warhammer40k_core.engine.abilities:default_ability_handler_registry",
+        "warhammer40k_core.engine.attack_sequence_damage_resolution:_resolve_deadly_demise_before_removal",
+        "warhammer40k_core.engine.catalog_rule_consumption:record_core_deadly_demise_sources_for_unit",
+        "warhammer40k_core.engine.deadly_demise:resolve_deadly_demise_trigger",
+        "warhammer40k_core.engine.rule_model_destruction:destroy_model_with_rule_reactions"
+      ],
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_platform": "Web",
+      "source_title": "Game Datamissions Core Rules 24.08 Deadly Demise",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "transcription_sha256": "a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4",
+      "verification_status": "authoritative_app_mirror"
+    }
+  ],
+  "package_hash": "805db3a2131ceef3e4a120dd1bfa2605dc9a1e4cc1508619e02ed9bc1ec72d4a",
+  "rules": [
+    {
+      "effect_descriptor": "roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").",
+      "load_support_status": "loaded",
+      "restrictions_descriptor": "This ability always takes the form Deadly Demise X.",
+      "rule_id": "deadly-demise",
+      "runtime_ability_id": "core-deadly-demise",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
+        "warhammer40k_core.engine.abilities:default_ability_handler_registry",
+        "warhammer40k_core.engine.attack_sequence_damage_resolution:_resolve_deadly_demise_before_removal",
+        "warhammer40k_core.engine.catalog_rule_consumption:record_core_deadly_demise_sources_for_unit",
+        "warhammer40k_core.engine.deadly_demise:resolve_deadly_demise_trigger",
+        "warhammer40k_core.engine.rule_model_destruction:destroy_model_with_rule_reactions"
+      ],
+      "runtime_handler_id": "core:deadly-demise",
+      "section_heading": "DEADLY DEMISE",
+      "section_id": "24.08",
+      "semantic_execution_status": "executable_engine_runtime",
+      "source_id": "gw-11e-core-abilities:core:deadly-demise",
+      "source_text": "This ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\").",
+      "transcription_sha256": "a5ca19362fe04090968372fe83f3398cfa1236d52d69a2a87ad6ca555f429ff4",
+      "trigger_kind": "after_model_destroyed",
+      "when_descriptor": "Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves"
+    }
+  ],
+  "source_document": {
+    "app_version": "931",
+    "document_id": "game-datamissions-core-rules-data-931",
+    "observed_at": "2026-09-02T12:30:09-04:00",
+    "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+    "source_title": "Game Datamissions Core Rules Data Changelog v931",
+    "source_url": "https://game-datamissions.com/11th/rules/changelog"
+  },
+  "source_package_id": "gw-11e-core-abilities",
+  "source_version": "game-datamissions-v931-observed-2026-09-02"
+}

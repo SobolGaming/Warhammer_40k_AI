@@ -1633,6 +1633,36 @@ def test_phase17d_catalog_builder_emits_clause_records_for_compound_ability() ->
     )
 
 
+def test_p24f_catalog_builder_keeps_model_and_unit_destruction_timings_distinct() -> None:
+    model_descriptor = _generic_catalog_descriptor(
+        "The first time this model is destroyed, at the end of the phase, roll one D6: on "
+        "a 2+, set this model back up on the battlefield as close as possible to where it "
+        "was destroyed and not within Engagement Range of one or more enemy units, with "
+        "3 wounds remaining.",
+        ability_id="p24f-first-death-return",
+    )
+    model_records = tuple(
+        record
+        for record in catalog_ability_records_from_catalog(
+            _catalog_with_descriptor(model_descriptor)
+        )
+        if record.definition.ability_id == "p24f-first-death-return"
+    )
+    unit_records = tuple(
+        record
+        for record in catalog_ability_records_from_catalog(_catalog_with_champion_slayer_ability())
+        if record.definition.ability_id == "champion-slayer"
+    )
+
+    assert tuple(record.definition.timing.trigger_kind for record in model_records) == (
+        TimingTriggerKind.AFTER_MODEL_DESTROYED,
+    )
+    assert tuple(record.definition.timing.trigger_kind for record in unit_records) == (
+        TimingTriggerKind.AFTER_DICE_ROLL,
+        TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    )
+
+
 @pytest.mark.parametrize(
     ("raw_text", "expected_trigger_kind"),
     [

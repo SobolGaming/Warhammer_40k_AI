@@ -1260,7 +1260,7 @@ def _return_on_death_record(*, wounds_remaining: int = 3) -> AbilityCatalogRecor
             when_descriptor="First destroyed model.",
             effect_descriptor="Set back up at phase end.",
             restrictions_descriptor="Not within Engagement Range.",
-            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED),
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_MODEL_DESTROYED),
             handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
             replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
         ),

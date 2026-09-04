@@ -293,6 +293,10 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
         if fight_selected_timing is not None:
             return fight_selected_timing
     for clause in rule_ir.clauses:
+        destruction_timing = _catalog_destruction_timing_descriptor_for_clause(clause)
+        if destruction_timing is not None:
+            return destruction_timing
+    for clause in rule_ir.clauses:
         phase_timing = _catalog_phase_timing_descriptor_for_clause(clause)
         if phase_timing is not None:
             return phase_timing
@@ -385,11 +389,9 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     phase_timing = _catalog_phase_timing_descriptor_for_clause(clause)
     if phase_timing is not None:
         return phase_timing
-    if clause.trigger is not None and clause.trigger.kind in {
-        RuleTriggerKind.UNIT_DESTROYED,
-        RuleTriggerKind.MODEL_DESTROYED,
-    }:
-        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED)
+    destruction_timing = _catalog_destruction_timing_descriptor_for_clause(clause)
+    if destruction_timing is not None:
+        return destruction_timing
     if any(
         _effect_is_passive_rule_exception_grant(effect)
         or _effect_is_shadow_of_chaos_status(effect)
@@ -414,6 +416,18 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _catalog_destruction_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    if clause.trigger is None:
+        return None
+    if clause.trigger.kind is RuleTriggerKind.MODEL_DESTROYED:
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_MODEL_DESTROYED)
+    if clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED:
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED)
+    return None
 
 
 def _catalog_movement_end_reactive_timing_descriptor_for_clause(

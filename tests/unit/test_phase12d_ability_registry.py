@@ -139,6 +139,11 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     assert hazardous.definition.handler_id == "core:hazardous"
     assert deadly_demise.source_kind is AbilitySourceKind.CORE
     assert deadly_demise.definition.handler_id == CORE_DEADLY_DEMISE_HANDLER_ID
+    assert deadly_demise.definition.timing.trigger_kind is TimingTriggerKind.AFTER_MODEL_DESTROYED
+    assert deadly_demise.definition.when_descriptor.startswith(
+        "Each time a model with this ability is destroyed"
+    )
+    assert "when this unit is destroyed" not in deadly_demise.definition.when_descriptor.lower()
     assert feel_no_pain.source_kind is AbilitySourceKind.CORE
     assert feel_no_pain.definition.handler_id == CORE_FEEL_NO_PAIN_HANDLER_ID
     assert infiltrators.source_kind is AbilitySourceKind.CORE
@@ -1001,6 +1006,34 @@ def test_weapon_ability_execution_enforces_weapon_event_keywords() -> None:
         "resolved_by": "attack_sequence",
     }
     assert replay_payload["source_keywords"] == ["HAZARDOUS"]
+
+
+def test_p24f_deadly_demise_handler_uses_model_destroyed_timing() -> None:
+    deadly_demise = _record_by_ability_id(
+        eleventh_edition_ability_catalog_records(),
+        "core-deadly-demise",
+    )
+    registry = default_ability_handler_registry()
+    unit_destroyed = registry.execute(
+        record=deadly_demise,
+        context=_context(
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+            source_keywords=("Deadly Demise",),
+        ),
+    )
+    model_destroyed = registry.execute(
+        record=deadly_demise,
+        context=_context(
+            trigger_kind=TimingTriggerKind.AFTER_MODEL_DESTROYED,
+            source_keywords=("Deadly Demise",),
+        ),
+    )
+
+    assert unit_destroyed.status is AbilityResolutionStatus.INVALID
+    assert unit_destroyed.reason == "timing_window_mismatch"
+    assert model_destroyed.status is AbilityResolutionStatus.APPLIED
+    replay_payload = cast(dict[str, object], model_destroyed.replay_payload)
+    assert replay_payload["trigger_kind"] == "after_model_destroyed"
 
 
 def test_ability_records_context_and_results_round_trip_as_json_payloads() -> None:

@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a3cd9040fcc9307042de99a317f26b40900b227054c707aa940b343b39ed1a74",
-  "fingerprint": "a3cd9040fcc9307042de99a317f26b40900b227054c707aa940b343b39ed1a74",
-  "resource_count": 2499,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:872a1bfe4a99032de422434aebc29e21ae0dcfa05cd206dec45e2c1f63eaea18",
+  "fingerprint": "872a1bfe4a99032de422434aebc29e21ae0dcfa05cd206dec45e2c1f63eaea18",
+  "resource_count": 2502,
   "resources": [
     {
       "byte_length": 113,
@@ -540,14 +540,14 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "byte_length": 49429,
+      "byte_length": 49430,
       "path": "warhammer40k_core/engine/abilities.py",
-      "sha256": "2d7d01557e8a1187ce2923e0bf34efbd2d9898461bf3e4e782119a31285c7285"
+      "sha256": "ffd6512adbbf7669aa2b91af17d82f97d56c24c489e8eade34035c59cbdf9406"
     },
     {
-      "byte_length": 31225,
+      "byte_length": 31836,
       "path": "warhammer40k_core/engine/ability_catalog.py",
-      "sha256": "ebb41c49c34d531330a524d293c421faf3ac7d8b7184e8c38bc14c9226cf3708"
+      "sha256": "606b470518571b8a4c9bb40d5828616ef46b82bd3450c8e2cf2c4b49969f454d"
     },
     {
       "byte_length": 49932,
@@ -1090,9 +1090,9 @@
       "sha256": "3c9f35991824a17edccf854e4808607d17e6520ae9b7ddda1d97277159f3b3ef"
     },
     {
-      "byte_length": 17839,
+      "byte_length": 18013,
       "path": "warhammer40k_core/engine/catalog_return_on_death_runtime.py",
-      "sha256": "818dc7ead38fdf5049e9ff9185e14d3c1f273110d368ef7a30191188f5157e1a"
+      "sha256": "147fc44c7ffa631c2245f98d3e939b119cd9be989e5d197cf4a55695342d3143"
     },
     {
       "byte_length": 263797,
@@ -10925,9 +10925,9 @@
       "sha256": "3a8889795873ec2e60749be8a3f3fc8bb0712d45ddd5e09a1f5152c0ad257c0e"
     },
     {
-      "byte_length": 14189,
+      "byte_length": 14241,
       "path": "warhammer40k_core/engine/timing_windows.py",
-      "sha256": "1764a1b80525a3c2f91cf6091df6285c8c00fd7b0485a6808d2c27749b3c92c4"
+      "sha256": "85f7ec8df376d6965557b2d2f6f346ed8ad28e3f609d0eb4ea6c26136f7b2a8b"
     },
     {
       "byte_length": 5815,
@@ -11445,14 +11445,14 @@
       "sha256": "78cb8b0a5fa15dcbfe5b30b36ae1d7fb06fc7d7a2a0b0b75db2761363f765d3f"
     },
     {
-      "byte_length": 26947,
+      "byte_length": 27233,
       "path": "warhammer40k_core/rules/source_authority_registry.json",
-      "sha256": "75fa94ef221c3417304e83e4b8785f4033cc09c51fbf489d40bed9d5e7404374"
+      "sha256": "c8197270f481dd07da309a9a1596cd969b58ccc5524d69dfe2fa9b0de455d6dc"
     },
     {
       "byte_length": 18572,
       "path": "warhammer40k_core/rules/source_authority_registry.py",
-      "sha256": "fa7cf91b5b1359f55dc6a67baac6e9f2c2dcc03142a0306b098c3926f37e2465"
+      "sha256": "3958731a24d5d650277dac02dadfed634133a6897671e3a6c2ca1edf120ac2c8"
     },
     {
       "byte_length": 19594,
@@ -11555,9 +11555,24 @@
       "sha256": "06293a2dd4c22831ee946efb19104c88c68504300aeb24d9d4a8835e4f78a7af"
     },
     {
-      "byte_length": 15686,
+      "byte_length": 15979,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities.py",
-      "sha256": "c1ca13120caecedf8dc5ac7214a3b1140b8f3980a4c836724bf7a8c3ae2f22c0"
+      "sha256": "9df511e7988f96e0d8fb831b112be7698dc612221a32dc8e8824d28812d2833a"
+    },
+    {
+      "byte_length": 4805,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities_2026_09/__init__.py",
+      "sha256": "32409f17373395cb900797dbca774cd7d7652d82f98d97f9b0adc9cb4247d73c"
+    },
+    {
+      "byte_length": 9071,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities_2026_09/_artifacts.py",
+      "sha256": "2fbb8e85092050ee5292e3d81618c485cdc35232db4319a27708e30abfa474bd"
+    },
+    {
+      "byte_length": 6607,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_abilities_2026_09/artifacts/package.json",
+      "sha256": "bd3dda22e3b39c18fa50c76e3131563feaa887ea25807bf8c67cd6e895e6ff6f"
     },
     {
       "byte_length": 4835,
