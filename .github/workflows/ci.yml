@@ -28,6 +28,57 @@ env:
 jobs:
   quality-fast:
     name: quality-fast
+    if: always()
+    needs: [lint, contract-conformance, code-quality, semantic-audit-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful quality lanes
+        if: >-
+          ${{
+            needs.lint.result != 'success' ||
+            needs.contract-conformance.result != 'success' ||
+            needs.code-quality.result != 'success' ||
+            needs.semantic-audit-macos.result != 'success'
+          }}
+        run: |
+          echo "One or more quality lanes did not succeed."
+          exit 1
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync lint dependencies
+        run: uv sync --locked --no-default-groups --group lint
+
+      - name: Ruff check
+        run: uv run --no-sync ruff check .
+
+      - name: Ruff format check
+        run: uv run --no-sync ruff format --check .
+
+      - name: Import boundary contracts
+        run: uv run --no-sync lint-imports
+
+      - name: Verify behavioral shard manifests
+        run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
+
+  contract-conformance:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -53,24 +104,12 @@ jobs:
           cache: npm
           cache-dependency-path: conformance/typescript/package-lock.json
 
-      - name: Sync quality dependencies
-        run: uv sync --locked --no-default-groups --group lint --group test
+      - name: Sync contract dependencies
+        run: uv sync --locked --no-default-groups --group test
 
       - name: Install TypeScript conformance dependencies
         working-directory: conformance/typescript
         run: npm ci
-
-      - name: Ruff check
-        run: uv run --no-sync ruff check .
-
-      - name: Ruff format check
-        run: uv run --no-sync ruff format --check .
-
-      - name: Import boundary contracts
-        run: uv run --no-sync lint-imports
-
-      - name: Verify behavioral shard manifests
-        run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
 
       - name: Verify external contract bundle against pull request base
         if: github.event_name == 'pull_request'
@@ -89,12 +128,50 @@ jobs:
         working-directory: conformance/typescript
         run: npm run check
 
+      - name: Execute TypeScript unit tests
+        working-directory: conformance/typescript
+        run: npm run test:unit
+
       - name: Run Phase 18M-A conformance scenario
         working-directory: conformance/typescript
         run: npm run conformance
 
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Sync test dependencies
+        run: uv sync --locked --no-default-groups --group test
+
       - name: Code-quality tests
-        run: uv run --no-sync pytest tests/code_quality -q -n0 --no-cov
+        env:
+          TEST_TIMING_DIR: reports/quality-timing
+        run: >-
+          uv run --no-sync pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
+          --durations=100 --junitxml=reports/code-quality.xml
+
+      - name: Upload quality timing evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: code-quality-report
+          path: reports/
+          if-no-files-found: warn
 
   semantic-audit-macos:
     name: semantic-audit-macos
@@ -191,6 +268,14 @@ jobs:
             manifest: ci/test_shards/shard-3.txt
           - shard_id: "4"
             manifest: ci/test_shards/shard-4.txt
+          - shard_id: "5"
+            manifest: ci/test_shards/shard-5.txt
+          - shard_id: "6"
+            manifest: ci/test_shards/shard-6.txt
+          - shard_id: "7"
+            manifest: ci/test_shards/shard-7.txt
+          - shard_id: "8"
+            manifest: ci/test_shards/shard-8.txt
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -216,6 +301,7 @@ jobs:
 
       - name: Run behavioral coverage shard
         env:
+          TEST_TIMING_DIR: reports/behavior-timing
           COVERAGE_FILE: .coverage.${{ matrix.shard_id }}
           SHARD_ID: ${{ matrix.shard_id }}
           SHARD_MANIFEST: ${{ matrix.manifest }}
@@ -237,7 +323,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: behavior-report-${{ matrix.shard_id }}
-          path: reports/behavior-shard-${{ matrix.shard_id }}.xml
+          path: reports/
           if-no-files-found: warn
 
       - name: Upload shard coverage
@@ -293,5 +379,8 @@ jobs:
 
       - name: Combine coverage and enforce branch threshold
         run: |
+          for shard in {1..8}; do
+            test -s "coverage-data/.coverage.${shard}"
+          done
           uv run --no-sync coverage combine coverage-data
           uv run --no-sync coverage report --fail-under=85

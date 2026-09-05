@@ -2149,16 +2149,9 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
     assert len(checked_component_ids) == 12
 
 
-def test_phase17n_battlefield_builder_reproduces_committed_artifact(
-    tmp_path: Path,
-) -> None:
+def test_phase17n_battlefield_builder_reproduces_committed_artifact() -> None:
     repository_root = Path(__file__).resolve().parents[2]
     builder_path = repository_root / "tools/build_event_companion_battlefields.py"
-    extraction_path = (
-        repository_root
-        / "data/source_audits/event_companion_2026_06"
-        / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
-    )
     artifact_path = (
         repository_root
         / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
@@ -2181,6 +2174,21 @@ def test_phase17n_battlefield_builder_reproduces_committed_artifact(
     assert result.returncode == 0, result.stdout + result.stderr
     assert artifact_path.stat().st_mtime_ns == modified_at_before_check
 
+
+def test_phase17n_battlefield_builder_rejects_stale_output_without_writing(tmp_path: Path) -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    builder_path = repository_root / "tools/build_event_companion_battlefields.py"
+    extraction_path = (
+        repository_root
+        / "data/source_audits/event_companion_2026_06"
+        / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
+    )
+    artifact_path = (
+        repository_root
+        / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
+        / "event_companion_layouts_2026_06/artifacts"
+        / "event-companion-battlefields.json"
+    )
     stale_output = tmp_path / "stale-battlefields.json"
     stale_output.write_bytes(artifact_path.read_bytes() + b"\n")
     stale_bytes = stale_output.read_bytes()
@@ -2201,6 +2209,15 @@ def test_phase17n_battlefield_builder_reproduces_committed_artifact(
     assert "battlefield artifact is stale" in stale_result.stderr
     assert stale_output.read_bytes() == stale_bytes
 
+
+def test_phase17n_battlefield_builder_rejects_source_drift_without_writing(tmp_path: Path) -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    builder_path = repository_root / "tools/build_event_companion_battlefields.py"
+    extraction_path = (
+        repository_root
+        / "data/source_audits/event_companion_2026_06"
+        / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
+    )
     modified_extraction = tmp_path / "modified-extraction.json"
     modified_extraction.write_bytes(extraction_path.read_bytes() + b"\n")
     guarded_output = tmp_path / "must-not-be-written.json"

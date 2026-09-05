@@ -18,7 +18,7 @@ CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID = (
 )
 CORE_RULES_SOURCE_AUTHORITY_SCOPE: SourceAuthorityScope = "warhammer_40000_11th_core_rules"
 EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256 = (
-    "78b96059f2bb2aed28768e93b54d238ff4567b54a328c3cd7d2659dc2d964abd"
+    "19bd1891e5519473cb431f09b1a472f30ef30a3ed883f615e3817a4356985ece"
 )
 
 _REGISTRY_PATH = Path(__file__).with_name("source_authority_registry.json")

@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from tests.code_quality.source_index import ast_for
+
 ROOT = Path(__file__).resolve().parents[2]
 
 FORBIDDEN_STUB_CALLS = frozenset(("MagicMock", "Mock", "SimpleNamespace"))
@@ -20,7 +22,7 @@ def test_no_stubs_in_integration_tests() -> None:
         if not directory.exists():
             continue
         for path in sorted(directory.rglob("*.py")):
-            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            tree = ast_for(path)
             for node in ast.walk(tree):
                 if not isinstance(node, ast.Call):
                     continue

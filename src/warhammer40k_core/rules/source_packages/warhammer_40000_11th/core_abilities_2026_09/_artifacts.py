@@ -45,6 +45,16 @@ EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY: Final = (
     "before_battle",
     "e2e4740b73d2ea159eecb42da7246c399dc157bef038a623f9ecd94d07ba1296",
 )
+EXPECTED_HAZARDOUS_RULE_IDENTITY: Final = (
+    "hazardous",
+    "core-hazardous",
+    "core:hazardous",
+    "gw-11e-core-abilities:core:hazardous",
+    "24.15",
+    "HAZARDOUS",
+    "after_unit_attacks_resolved",
+    "2ecefae469a748d8f5b337dcbbb4a1c3211bfa4c3555626fbbd05ee6fbde3832",
+)
 EXPECTED_DESCRIPTORS: Final = (
     "Each time a model with this ability is destroyed, after the units embarked within it "
     "(if any) have made their emergency disembark moves",
@@ -59,13 +69,23 @@ EXPECTED_SCOUT_ALTERNATION_DESCRIPTORS: Final = (
     "turn",
     "skip a player only when that player has no unresolved pre-battle rule",
 )
+EXPECTED_HAZARDOUS_DESCRIPTORS: Final = (
+    "Each time a unit is selected to shoot or selected to fight, after that unit has resolved "
+    "all of its attacks",
+    "make a number of hazard rolls for that unit equal to the number of Hazardous weapons "
+    "selected in the Select Weapons step",
+    "each selected physical Hazardous weapon instance contributes one roll; make all hazard "
+    "rolls simultaneously under 06.03",
+)
 EXPECTED_OBSERVATION_SHA256S: Final = (
     "18455fe967731b81b8ceacbe9e0121c3750b6bf648e4ec3a781113aaf5b12511",
     "3b3c615e97dab76873c0ab7974cf593480baa4a028eb88a1312254d0c3a6252b",
     "4df59af220872b1b09a3dcd36acef6b792b5e8c11245bd6ca2bea2f12433e9fe",
     "cb6c3244b50cff6017b30f269dff2530f1a8c8a461627710cc149064034d1453",
+    "a80ec4f83e554f7004a396a7363977db41f9ca0e3a8675df1c0163bab3967ffd",
+    "8292a0b2aaa7640ee6b82b2dca9e822aa2ce26d59759dfb72a276a9e63b77e1b",
 )
-EXPECTED_PACKAGE_HASH: Final = "37e11c8e58049b5a0804c131e84714dba9c4fd192cbaac63eab915b8ca638f0e"
+EXPECTED_PACKAGE_HASH: Final = "ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb"
 
 
 class CoreAbilitiesSourceArtifactError(ValueError):
@@ -196,7 +216,7 @@ def core_abilities_source_artifact_from_json_bytes(
         raise CoreAbilitiesSourceArtifactError(
             "Core Abilities source artifact schema is invalid."
         ) from exc
-    if len(artifact.rules) != 2:
+    if len(artifact.rules) != 3:
         raise CoreAbilitiesSourceArtifactError(
             "Core Abilities source artifact drifted from its reviewed identity."
         )
@@ -234,13 +254,22 @@ def core_abilities_source_artifact_from_json_bytes(
         or artifact.source_version != EXPECTED_SOURCE_VERSION
         or actual_document_identity != EXPECTED_DOCUMENT_IDENTITY
         or actual_rule_identities
-        != (EXPECTED_RULE_IDENTITY, EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY)
-        or actual_descriptors != (EXPECTED_DESCRIPTORS, EXPECTED_SCOUT_ALTERNATION_DESCRIPTORS)
+        != (
+            EXPECTED_RULE_IDENTITY,
+            EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY,
+            EXPECTED_HAZARDOUS_RULE_IDENTITY,
+        )
+        or actual_descriptors
+        != (
+            EXPECTED_DESCRIPTORS,
+            EXPECTED_SCOUT_ALTERNATION_DESCRIPTORS,
+            EXPECTED_HAZARDOUS_DESCRIPTORS,
+        )
         or any(
             hashlib.sha256(rule.source_text.encode()).hexdigest() != rule.transcription_sha256
             for rule in artifact.rules
         )
-        or len(artifact.evidence) != 4
+        or len(artifact.evidence) != 6
         or any(
             evidence.rule_source_id not in rules_by_source_id
             or evidence.transcription_sha256
@@ -276,6 +305,8 @@ def core_abilities_source_artifact_from_json_bytes(
 __all__ = (
     "EXPECTED_DESCRIPTORS",
     "EXPECTED_DOCUMENT_IDENTITY",
+    "EXPECTED_HAZARDOUS_DESCRIPTORS",
+    "EXPECTED_HAZARDOUS_RULE_IDENTITY",
     "EXPECTED_OBSERVATION_SHA256S",
     "EXPECTED_PACKAGE_HASH",
     "EXPECTED_RULE_IDENTITY",

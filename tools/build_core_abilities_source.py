@@ -43,6 +43,19 @@ SCOUT_ALTERNATION_EFFECT_DESCRIPTOR = (
 SCOUT_ALTERNATION_RESTRICTIONS_DESCRIPTOR = (
     "skip a player only when that player has no unresolved pre-battle rule"
 )
+HAZARDOUS_SOURCE_TEXT = """Each time a unit is selected to shoot or selected to fight, after that unit has resolved all of its attacks, make a number of hazard rolls (06.03) for that unit equal to the number of [HAZARDOUS] weapons you selected in the Select Weapons step."""
+HAZARDOUS_WHEN_DESCRIPTOR = (
+    "Each time a unit is selected to shoot or selected to fight, after that unit has "
+    "resolved all of its attacks"
+)
+HAZARDOUS_EFFECT_DESCRIPTOR = (
+    "make a number of hazard rolls for that unit equal to the number of Hazardous weapons "
+    "selected in the Select Weapons step"
+)
+HAZARDOUS_RESTRICTIONS_DESCRIPTOR = (
+    "each selected physical Hazardous weapon instance contributes one roll; make all hazard "
+    "rolls simultaneously under 06.03"
+)
 
 DEADLY_DEMISE_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
@@ -62,6 +75,16 @@ SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
     "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
     "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions",
+]
+HAZARDOUS_RUNTIME_CONSUMER_IDS = [
+    "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
+    "warhammer40k_core.engine.abilities:default_ability_handler_registry",
+    "warhammer40k_core.engine.attack_sequence_dispatch:resolve_attack_sequence_until_blocked",
+    "warhammer40k_core.engine.attack_sequence_group_selection:_continue_hazardous_after_mortal_wound_feel_no_pain",
+    "warhammer40k_core.engine.attack_sequence_hazardous:_resolve_hazardous_tests",
+    "warhammer40k_core.engine.attack_sequence_hazardous:validate_hazardous_mortal_wound_source_context",
+    "warhammer40k_core.engine.attack_sequence_hazardous:validate_pending_hazardous_mortal_wound_requests",
+    "warhammer40k_core.engine.weapon_declaration:RangedAttackPool",
 ]
 
 
@@ -149,6 +172,7 @@ def _evidence_rows(
 def build_payload() -> dict[str, object]:
     deadly_demise_transcription_sha256 = _sha256_text(DEADLY_DEMISE_SOURCE_TEXT)
     scout_alternation_transcription_sha256 = _sha256_text(SCOUT_ALTERNATION_SOURCE_TEXT)
+    hazardous_transcription_sha256 = _sha256_text(HAZARDOUS_SOURCE_TEXT)
     payload: dict[str, object] = {
         "artifact_schema": "core-v2-core-abilities-source-v1",
         "source_package_id": "gw-11e-core-abilities",
@@ -196,6 +220,23 @@ def build_payload() -> dict[str, object]:
                 "semantic_execution_status": "executable_engine_runtime",
                 "runtime_consumer_ids": SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS,
             },
+            {
+                "rule_id": "hazardous",
+                "runtime_ability_id": "core-hazardous",
+                "runtime_handler_id": "core:hazardous",
+                "source_id": "gw-11e-core-abilities:core:hazardous",
+                "section_id": "24.15",
+                "section_heading": "HAZARDOUS",
+                "source_text": HAZARDOUS_SOURCE_TEXT,
+                "when_descriptor": HAZARDOUS_WHEN_DESCRIPTOR,
+                "effect_descriptor": HAZARDOUS_EFFECT_DESCRIPTOR,
+                "restrictions_descriptor": HAZARDOUS_RESTRICTIONS_DESCRIPTOR,
+                "trigger_kind": "after_unit_attacks_resolved",
+                "transcription_sha256": hazardous_transcription_sha256,
+                "load_support_status": "loaded",
+                "semantic_execution_status": "executable_engine_runtime",
+                "runtime_consumer_ids": HAZARDOUS_RUNTIME_CONSUMER_IDS,
+            },
         ],
         "evidence": [
             *_evidence_rows(
@@ -215,6 +256,15 @@ def build_payload() -> dict[str, object]:
                 source_url=SOURCE_URL,
                 transcription_sha256=scout_alternation_transcription_sha256,
                 runtime_consumer_ids=SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS,
+            ),
+            *_evidence_rows(
+                rule_source_id="gw-11e-core-abilities:core:hazardous",
+                evidence_slug="hazardous",
+                review_source_title="Reviewed transcription of 24.15 Hazardous",
+                mirror_source_title="Game Datamissions Core Rules 24.15 Hazardous",
+                source_url=SOURCE_URL,
+                transcription_sha256=hazardous_transcription_sha256,
+                runtime_consumer_ids=HAZARDOUS_RUNTIME_CONSUMER_IDS,
             ),
         ],
         "package_hash": "",

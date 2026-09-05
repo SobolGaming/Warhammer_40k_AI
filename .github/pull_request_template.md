@@ -30,8 +30,9 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/
-uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
 uv run lint-imports
 uv run pre-commit run --all-files
 ```

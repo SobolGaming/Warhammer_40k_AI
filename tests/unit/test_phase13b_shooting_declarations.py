@@ -142,6 +142,7 @@ from warhammer40k_core.engine.attack_sequence import (
     PendingGroupedDamage,
     SaveDieEntryPayload,
     WoundRoll,
+    _resolve_hazardous_tests,
     apply_allocation_order_decision,
     apply_damage_allocation_model_decision,
     apply_destroyed_transport_disembark_proposal_decision,
@@ -168,6 +169,10 @@ from warhammer40k_core.engine.attack_sequence_destroyed_transport import (
 )
 from warhammer40k_core.engine.attack_sequence_destruction_boundary import (
     CORE_DESTROYED_TIMING_RULE_ID,
+)
+from warhammer40k_core.engine.attack_sequence_hazardous import (
+    _hazardous_source_context_from_payload,
+    _hazardous_source_context_payload,
 )
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import (
@@ -7553,7 +7558,7 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
     )
     hazardous_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
-        reason=f"Hazardous test for {attacker.unit_instance_id} after shooting",
+        reason=f"Hazardous tests for {attacker.unit_instance_id} after shooting",
         roll_type="hazardous_test",
         actor_id=attacker.unit_instance_id,
     )
@@ -7603,11 +7608,22 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
     )
 
     hazardous_payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
+    event_types = [event.event_type for event in lifecycle.decision_controller.event_log.records]
     assert remaining_sequence is None
     assert status is None
+    assert event_types.index("attack_sequence_completed") < event_types.index(
+        "hazardous_test_resolved"
+    )
     assert hazardous_payload["successful"] is expected_successful
     assert hazardous_payload["mortal_wounds"] == expected_mortal_wounds
+    assert hazardous_payload["source_phase"] == BattlePhase.SHOOTING.value
+    assert hazardous_payload["hazardous_weapon_instance_ids"] == [
+        "weapon-instance:test:phase13d-hazardous"
+    ]
     assert hazardous_payload["hazardous_weapon_profile_ids"] == ["phase13d-hazardous"]
+    assert hazardous_payload["failed_hazardous_weapon_instance_ids"] == (
+        [] if expected_successful else ["weapon-instance:test:phase13d-hazardous"]
+    )
     if expected_successful:
         assert hazardous_payload["mortal_wound_application"] is None
         assert hazardous_payload["pending_mortal_wound_request_id"] is None
@@ -7683,7 +7699,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     )
     hazardous_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
-        reason=f"Hazardous test for {attacker.unit_instance_id} after shooting",
+        reason=f"Hazardous tests for {attacker.unit_instance_id} after shooting",
         roll_type="hazardous_test",
         actor_id=attacker.unit_instance_id,
     )
@@ -7757,6 +7773,39 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
         attack_sequence=remaining_sequence,
         allocated_model_ids_this_phase=allocated_ids,
     )
+    checkpoint = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    phase_drift = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(checkpoint, sort_keys=True)),
+    )
+    decisions_payload = cast(dict[str, Any], phase_drift["decisions"])
+    pending_request = cast(
+        list[dict[str, Any]],
+        cast(dict[str, Any], decisions_payload["queue"])["pending_requests"],
+    )[0]
+    pending_payload = cast(dict[str, Any], pending_request["payload"])
+    lost_wound_context = cast(dict[str, Any], pending_payload["lost_wound_context"])
+    source_context = cast(dict[str, Any], lost_wound_context["source_context"])
+    source_context["source_phase"] = BattlePhase.FIGHT.value
+    request_event = next(
+        event
+        for event in cast(list[dict[str, Any]], decisions_payload["event_log"])
+        if event["event_type"] == "decision_requested"
+        and cast(dict[str, Any], event["payload"])["request_id"] == pending_request["request_id"]
+    )
+    request_event["payload"] = json.loads(json.dumps(pending_request, sort_keys=True))
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"Pending mortal-wound start authority drift|Hazardous.*phase drift",
+    ):
+        GameLifecycle.from_payload(phase_drift)
+
+    lifecycle = GameLifecycle.from_payload(checkpoint)
+    state = _state(lifecycle)
+    request = lifecycle.decision_controller.queue.peek_next()
     lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase14c-hazardous-fnp-decline",
@@ -7774,6 +7823,165 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     assert applications[0]["model_instance_id"] == attacker_model.model_instance_id
     assert updated_model.wounds_remaining == attacker_model.wounds_remaining - 1
     assert state.shooting_phase_state is None
+
+
+@pytest.mark.parametrize(
+    "weapon_profile_ids",
+    [
+        pytest.param(("profile:shared",) * 3, id="shared-profile"),
+        pytest.param(("profile:0", "profile:1", "profile:2"), id="distinct-profiles"),
+    ],
+)
+@pytest.mark.parametrize("pending_fnp", [False, True])
+def test_p24d_hazardous_preserves_order_through_completion_and_restore(
+    pending_fnp: bool, weapon_profile_ids: tuple[str, ...]
+) -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    _retain_only_placed_model(
+        state=state,
+        unit=attacker,
+        model_instance_id=attacker.own_models[0].model_instance_id,
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="p24d-shared-hazardous-profile",
+        keywords=(WeaponKeyword.HAZARDOUS,),
+    )
+    base_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=weapon_profile,
+        attacks=1,
+    )
+    weapon_instance_ids = (
+        "weapon-instance:p24d:zeta",
+        "weapon-instance:p24d:mu",
+        "weapon-instance:p24d:alpha",
+    )
+    sequence = AttackSequence.start(
+        sequence_id="p24d-hazardous-fight-origin",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            *tuple(
+                replace(
+                    base_pool,
+                    weapon_instance_id=weapon_instance_id,
+                    weapon_profile=replace(weapon_profile, profile_id=weapon_profile_ids[index]),
+                    weapon_profile_id=weapon_profile_ids[index],
+                )
+                for index, weapon_instance_id in enumerate(weapon_instance_ids)
+            ),
+            # A split target allocation for the same physical weapon remains one test.
+            replace(
+                base_pool,
+                weapon_instance_id=weapon_instance_ids[1],
+                weapon_profile=replace(weapon_profile, profile_id=weapon_profile_ids[1]),
+                weapon_profile_id=weapon_profile_ids[1],
+            ),
+        ),
+        source_phase=BattlePhase.SHOOTING if pending_fnp else BattlePhase.FIGHT,
+    )
+    if pending_fnp:
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=attacker.own_models[0].model_instance_id,
+            sources=(FeelNoPainSource(source_id="p24d-fnp", threshold=5),),
+            decline_allowed=True,
+        )
+        sequence = replace(
+            sequence, pool_index=len(sequence.attack_pools), used_pool_indices=(0, 1, 2, 3)
+        )
+        state.shooting_phase_state = ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            shot_unit_ids=(attacker.unit_instance_id,),
+            attack_pools=sequence.attack_pools,
+            attack_sequence=sequence,
+        )
+    hazardous_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=3, sides=6),
+        reason=(
+            f"Hazardous tests for {attacker.unit_instance_id} after {sequence.source_phase.value}"
+        ),
+        roll_type="hazardous_test",
+        actor_id=attacker.unit_instance_id,
+    )
+    values = (1, 6, 6) if pending_fnp else (1, 2, 6)
+    failure_count = 1 if pending_fnp else 2
+    manager = DiceRollManager(
+        sequence.sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            DiceRollResult.from_values(
+                roll_id="p24d-hazardous-rolls",
+                spec=hazardous_spec,
+                values=values,
+                source="fixed",
+            ),
+        ),
+    )
+
+    status = _resolve_hazardous_tests(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        manager=manager,
+        attack_sequence=sequence,
+    )
+
+    payload = _last_event_payload(lifecycle, "hazardous_test_resolved")
+    roll_state = cast(dict[str, object], payload["roll_state"])
+    original_result = cast(dict[str, object], roll_state["original_result"])
+    roll_spec = cast(dict[str, object], original_result["spec"])
+    expression = cast(dict[str, object], roll_spec["expression"])
+    assert expression["quantity"] == 3
+    assert roll_state["current_values"] == list(values)
+    assert payload["source_phase"] == sequence.source_phase.value
+    assert payload["hazardous_weapon_instance_ids"] == list(weapon_instance_ids)
+    assert payload["hazardous_weapon_profile_ids"] == list(weapon_profile_ids)
+    assert payload["failed_hazardous_weapon_instance_ids"] == list(
+        weapon_instance_ids[:failure_count]
+    )
+    assert payload["successful"] is False
+    assert payload["mortal_wounds_per_failed_roll"] == 1
+    assert payload["mortal_wounds"] == failure_count
+    context = _hazardous_source_context_payload(
+        attack_sequence=sequence,
+        hazardous_weapon_instance_ids=weapon_instance_ids,
+        hazardous_weapon_profile_ids=weapon_profile_ids,
+        failed_hazardous_weapon_instance_ids=weapon_instance_ids[:failure_count],
+        roll_state=DiceRollState.from_payload(cast(DiceRollStatePayload, roll_state)),
+        mortal_wounds_per_failed_roll=1,
+        mortal_wounds=failure_count,
+    )
+    assert _hazardous_source_context_from_payload(json.loads(json.dumps(context))) == context
+    if pending_fnp:
+        assert status is not None
+        assert not _event_payloads(lifecycle, "hazardous_mortal_wounds_applied")
+        lifecycle = GameLifecycle.from_payload(
+            cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle.to_payload())))
+        )
+        # Each lost wound offers its own real optional Feel No Pain choice.
+        for index in range(failure_count):
+            request = lifecycle.decision_controller.queue.peek_next()
+            assert request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+            lifecycle.submit_decision(
+                DecisionResult.for_request(
+                    result_id=f"p24d-decline:{index}", request=request, selected_option_id="decline"
+                )
+            )
+    else:
+        assert status is None
+    applied = _last_event_payload(lifecycle, "hazardous_mortal_wounds_applied")
+    assert applied["source_phase"] == sequence.source_phase.value
+    assert applied["hazardous_weapon_instance_ids"] == list(weapon_instance_ids)
+    assert applied["hazardous_weapon_profile_ids"] == list(weapon_profile_ids)
+    assert applied["failed_hazardous_weapon_instance_ids"] == list(
+        weapon_instance_ids[:failure_count]
+    )
 
 
 def test_phase13c_wound_roll_table_uses_integer_safe_boundaries() -> None:

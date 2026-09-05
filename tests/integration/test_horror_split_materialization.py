@@ -570,7 +570,7 @@ def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() ->
     )
     hazardous_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
-        reason=(f"Hazardous test for {scenario.attached_unit_instance_id} after shooting"),
+        reason=(f"Hazardous tests for {scenario.attached_unit_instance_id} after shooting"),
         roll_type="hazardous_test",
         actor_id=scenario.attached_unit_instance_id,
     )

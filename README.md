@@ -8,8 +8,7 @@ Start here:
 uv python install 3.14.5
 uv lock
 uv sync
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
-  uv run pytest -n auto --dist=worksteal tests/
+uv run pytest tests/unit/test_polygon_geometry.py -q --no-cov
 ```
 
 ## Test commands
@@ -17,19 +16,22 @@ PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:
 Pytest defaults are intentionally lightweight: narrow local and IDE runs do not start xdist
 workers or collect coverage unless requested.
 
-Fast local feedback excludes benchmarks and tests marked `slow`:
+Fast local feedback names the affected test files explicitly, for example:
 
 ```bash
-uv run pytest -m "not benchmark and not slow" -q -n0 --no-cov
+uv run pytest tests/unit/test_polygon_geometry.py -q --no-cov
+uv run pytest tests/unit/test_phase13b_shooting_declarations.py -k hazardous -q --no-cov
 ```
 
-Architecture and source-shape audits run serially without behavioral coverage:
+Architecture and source-shape audits run independently without behavioral coverage:
 
 ```bash
-uv run pytest tests/code_quality -q -n0 --no-cov
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
 ```
 
-The unsharded full behavioral coverage gate is:
+For final validation, run the behavioral suite once with coverage and the code-quality
+suite above once without coverage. A second no-coverage behavioral run is unnecessary.
+Focused subsets and `--lf` are for iteration, never replacements for this final gate:
 
 ```bash
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
@@ -48,21 +50,54 @@ gate after every shard succeeds. Full type checking and architecture checks also
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
 
-The four behavioral manifests in `ci/test_shards/` are generated from historical JUnit file
-durations with deterministic largest-processing-time balancing. Verify that every behavioral test
-file appears exactly once with:
+The eight behavioral manifests in `ci/test_shards/` use deterministic
+largest-processing-time balancing of median per-file durations from complete
+successful Linux CI runs. Verify that every behavioral file appears exactly once:
 
 ```bash
-uv run python scripts/build_test_shards.py --check --shard-count 4
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
 ```
 
-After collecting a representative full-suite profile, rebalance the manifests with:
+Download the `behavior-report-*` artifacts from each chosen successful run into a
+separate directory, then regenerate (repeat both options for additional runs):
 
 ```bash
-uv run python scripts/build_test_shards.py \
-  --junit reports/full-behavior-profile.xml \
-  --shard-count 4
+uv run --no-sync python scripts/build_test_shards.py \
+  --junit reports/run-one \
+  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
+  --junit reports/run-two \
+  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
+  --shard-count 8
 ```
+
+A single complete local JUnit XML is also accepted; label its host accurately and
+do not mix local and hosted-runner timings in one representative CI profile.
+Every supplied run must cover the current behavioral file inventory. Missing files,
+duplicate cases, failed/skipped cases, invalid durations, and truncated suite counts
+are rejected. New test files require a fresh complete profile; timings are never
+filled with zero. `durations.json` preserves report SHA-256 hashes and run descriptions.
+Historical profiles measure their recorded case inventory; changed cases within an
+existing file require refreshed successful CI reports to reflect their new cost.
+
+Both Python CI lanes upload JUnit, slowest-test output, and per-worker JSON timing
+artifacts containing collection node IDs, collection time, setup/call/teardown times,
+outcomes, Python/platform/CPU/memory metadata, and commit/run IDs. Enable the same
+local evidence with `TEST_TIMING_DIR=reports/timing`. These artifacts distinguish
+collection overhead and long individual cases from aggregate file costs.
+
+`quality-fast` now aggregates concurrent lint, contract/conformance, code-quality,
+and the existing macOS semantic audit. Every child must succeed, including on draft
+PRs; failed, cancelled, and unexpectedly skipped children fail the aggregate.
+The contract lane executes TypeScript unit tests as well as generated-client checks,
+live conformance, base-ref compatibility, and installed-wheel smoke. Code-quality
+workers share read-only source/AST data within each process; mutable test fixtures
+and generated temporary output remain independently validated.
+
+Eight standard runners increase behavioral parallel capacity without changing test
+selection or the 85% combined branch-coverage gate. Compare several successful CI
+runs before claiming a wall-time reduction: added capacity can increase total runner
+minutes, and cold caches or queued jobs can offset the idealized speedup. Keep main
+and merge-candidate verification; no previously tested tree is reused as authority.
 
 ## Battlefield viewer
 
@@ -97,7 +132,7 @@ CI uploads each shard's JUnit report for future median-duration profiles. Full b
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
 faster quality and parallel type-check feedback without repeatedly running the complete suite.
 The stable `coverage-gate` aggregate fails closed when any behavioral shard does not succeed, then
-combines all four coverage artifacts and enforces the branch-coverage threshold. Repositories that
+combines all eight coverage artifacts and enforces the branch-coverage threshold. Repositories that
 enable branch protection can require `quality-fast`, `mypy`, `pyright`, and `coverage-gate` without
 encoding matrix shard names in the protection rule.
 
@@ -458,8 +493,9 @@ Current status:
   offline with `uv run python tools/build_core_transports_source.py` and the
   same command plus `--check`.
 - P24F's reviewed App-data v931 24.08 Deadly Demise wording and model-destruction
-  timing, together with P24G's v931 FAQ ordering for alternating Scout and other
-  pre-battle unit rules from the first-turn player, are pinned in
+  timing, P24G's v931 FAQ ordering for alternating Scout and other pre-battle
+  unit rules from the first-turn player, and P24D's 24.15 physical-weapon
+  Hazardous accounting are pinned in
   `core_abilities_2026_09/artifacts/package.json`; refresh and verify it offline
   with `uv run python tools/build_core_abilities_source.py` and the same command
   plus `--check`.
@@ -551,8 +587,9 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest -n auto --dist=worksteal tests/
-uv run --no-sync python scripts/build_test_shards.py --check --shard-count 4
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=85
+uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
+uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8
 uv run lint-imports
 uv run pre-commit run --all-files
 ```

@@ -854,7 +854,9 @@ def default_ability_handler_registry() -> AbilityHandlerRegistry:
         )
         .with_handler(
             handler_id=CORE_HAZARDOUS_HANDLER_ID,
-            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED
+            ),
             handler=_hazardous_keyword_handler,
         )
         .with_handler(

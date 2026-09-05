@@ -3,7 +3,10 @@ from __future__ import annotations
 import math
 
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
+from warhammer40k_core.geometry import polygons
 from warhammer40k_core.geometry.polygons import (
     convex_polygon_intersection_area,
     point_intersects_polygon,
@@ -15,6 +18,61 @@ from warhammer40k_core.geometry.polygons import (
     triangulate_polygon,
 )
 from warhammer40k_core.geometry.pose import GeometryError
+
+
+@pytest.mark.stubbed
+def test_overlap_triangulates_each_input_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Repeated triangles must not multiply the input-validation/triangulation work."""
+    triangulations: list[tuple[polygons.Point2D, ...]] = []
+    original = polygons.triangulate_polygon
+
+    def measured(
+        vertices: tuple[polygons.Point2D, ...],
+    ) -> tuple[tuple[polygons.Point2D, ...], ...]:
+        triangulations.append(vertices)
+        return original(vertices)
+
+    monkeypatch.setattr(polygons, "triangulate_polygon", measured)
+    concave = ((0.0, 0.0), (4.0, 0.0), (4.0, 4.0), (2.0, 2.0), (0.0, 4.0))
+    rectangle = ((0.0, 0.0), (4.0, 0.0), (4.0, 4.0), (0.0, 4.0))
+
+    assert polygon_overlap_area(concave, rectangle) == 12.0
+    assert triangulations == [concave, rectangle]
+
+
+@given(
+    x=st.integers(-100, 100),
+    y=st.integers(-100, 100),
+    width=st.integers(1, 20),
+    height=st.integers(1, 20),
+    offset=st.integers(0, 25),
+)
+def test_overlap_preserves_exact_rectangle_area_and_winding(
+    x: int, y: int, width: int, height: int, offset: int
+) -> None:
+    first = ((x, y), (x + width, y), (x + width, y + height), (x, y + height))
+    second = tuple((px + offset, py) for px, py in first)
+    expected = max(width - offset, 0) * height
+
+    assert math.isclose(polygon_overlap_area(first, second), expected, abs_tol=1e-9)
+    assert math.isclose(
+        polygon_overlap_area(tuple(reversed(first)), second), expected, abs_tol=1e-9
+    )
+    assert math.isclose(polygon_overlap_area(second, first), expected, abs_tol=1e-9)
+
+
+@pytest.mark.parametrize("invalid", [math.nan, math.inf, -math.inf, True])
+@pytest.mark.parametrize("invalid_first", [False, True])
+def test_overlap_validates_both_inputs_even_after_repeated_valid_calls(
+    invalid: float, invalid_first: bool
+) -> None:
+    valid = ((0.0, 0.0), (2.0, 0.0), (0.0, 2.0))
+    malformed = ((0.0, 0.0), (invalid, 0.0), (0.0, 2.0))
+    assert polygon_overlap_area(valid, valid) == 2.0
+    with pytest.raises(GeometryError):
+        polygon_overlap_area(malformed, valid) if invalid_first else polygon_overlap_area(
+            valid, malformed
+        )
 
 
 def test_signed_area_bounds_and_reversed_winding() -> None:

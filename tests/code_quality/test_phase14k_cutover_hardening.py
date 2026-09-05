@@ -25,6 +25,8 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_stratagem
 ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = SRC_ROOT / "engine" / "attack_sequence.py"
+ATTACK_SEQUENCE_DISPATCH_PATH = SRC_ROOT / "engine" / "attack_sequence_dispatch.py"
+ATTACK_SEQUENCE_HAZARDOUS_PATH = SRC_ROOT / "engine" / "attack_sequence_hazardous.py"
 DAMAGE_ALLOCATION_PATH = SRC_ROOT / "engine" / "damage_allocation.py"
 DECISION_PATH = SRC_ROOT / "engine" / "decision.py"
 DIRECT_MORTAL_WOUND_PATH = SRC_ROOT / "engine" / "direct_mortal_wound_application.py"
@@ -81,6 +83,27 @@ def test_phase14k_retired_attack_save_choice_surfaces_absent_from_runtime() -> N
         "Phase 14K rejects retired attack save/allocation decision surfaces:\n"
         + "\n".join(violations)
     )
+
+
+def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_boundary() -> None:
+    hazardous_source = source_for(ATTACK_SEQUENCE_HAZARDOUS_PATH)
+    dispatch_source = source_for(ATTACK_SEQUENCE_DISPATCH_PATH)
+
+    assert "_hazardous_weapon_identity_pairs(" in hazardous_source
+    assert "quantity=len(hazardous_weapon_instance_ids)" in hazardous_source
+    assert "failed_hazard_roll_indices(roll_state)" in hazardous_source
+    assert 'source_context["source_phase"] != attack_sequence.source_phase.value' in (
+        hazardous_source
+    )
+    assert "validated_weapon_instance_ids = _validate_ordered_identifier_tuple(" in hazardous_source
+    assert (
+        "validated_failed_weapon_instance_ids = _validate_ordered_identifier_tuple("
+        in hazardous_source
+    )
+    assert "sorted({pool.weapon_profile_id" not in hazardous_source
+    completion_index = dispatch_source.index('"attack_sequence_completed"')
+    hazardous_index = dispatch_source.index("hazardous_status = _resolve_hazardous_tests(")
+    assert completion_index < hazardous_index
 
 
 def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registered() -> None:

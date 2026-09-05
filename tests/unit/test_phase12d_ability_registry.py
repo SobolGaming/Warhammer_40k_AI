@@ -137,6 +137,7 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     assert firing_deck.definition.handler_id == CORE_FIRING_DECK_HANDLER_ID
     assert hazardous.source_kind is AbilitySourceKind.WEAPON
     assert hazardous.definition.handler_id == "core:hazardous"
+    assert hazardous.definition.timing.trigger_kind is TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED
     assert deadly_demise.source_kind is AbilitySourceKind.CORE
     assert deadly_demise.definition.handler_id == CORE_DEADLY_DEMISE_HANDLER_ID
     assert deadly_demise.definition.timing.trigger_kind is TimingTriggerKind.AFTER_MODEL_DESTROYED
@@ -987,12 +988,12 @@ def test_weapon_ability_execution_enforces_weapon_event_keywords() -> None:
     registry = default_ability_handler_registry()
     missing_keyword = registry.execute(
         record=hazardous,
-        context=_context(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+        context=_context(trigger_kind=TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED),
     )
     matching_keyword = registry.execute(
         record=hazardous,
         context=_context(
-            trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_ATTACKS_RESOLVED,
             source_keywords=("Hazardous",),
         ),
     )

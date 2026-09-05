@@ -93,7 +93,7 @@ expansion recorded above must land before a v931/v946 finding is implemented.
 Only an `EXCEPTION-PAUSE` stops an otherwise dependency-ready PR. There is
 still only one open roadmap PR.
 
-`T-TRANSPORT` is defined conservatively as P18A, P18C, P18D, P18E, and P18B all
+`T-TRANSPORT` is defined conservatively as P18A, P18C, P18D, P18E, P18F, and P18B all
 merged. The user may approve a narrower definition before P20, but it must be
 recorded in this document rather than inferred during implementation.
 
@@ -148,7 +148,7 @@ non-closable grouping label, not a finding ID or closure key.
   instance. Source-instance and component identity remain evidence only.
   `C24-06` owns model-scoped Deadly Demise source correction and certification,
   while `C24-07` owns alternating Scout resolution.
-- `C02-04` owns living-model keyword contribution and the model-level schema
+- `C02-04` owns model keyword contribution under P05B’s retained-presence contract and the model-level schema
   needed to stop destroyed models contributing keywords to a surviving unit.
 - `CAUDIT-01` owns the final all-category audit and certification gate. It is
   not an implementation finding and cannot close while any in-scope finding is
@@ -204,13 +204,13 @@ corroborate but is not required to begin that work.
 | 10 | P18C | C18-03 | Emergency Disembark placement is requested before hazard rolls and mortal-wound casualties. | Snapshot cargo, resolve hazard rolls/casualties first, then request placement only for survivors. | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): make the hazard rolls before moving surviving models. | P05A, P06B | APP-AUTHORITY |
 | 11 | S-MIRRORS | — (source-governance gate) | The committed P00 source policy names only 40k.app, so v931/v946 Game Datamissions observations have planning authority but cannot yet satisfy implementation evidence gates. | The repository source-governance owner must replace provider-specific policy with maintained-direct-App-data-mirror policy naming 40k.app and Game Datamissions; require provider, URL, App-data version or observation timestamp, transcription SHA-256, and immutable observation fingerprint; and fail closed when co-versioned mirrors disagree. Closure requires the updated policy artifact, validator/static evidence for complete tuples and mismatch rejection, and a retained review record showing both named providers without falsely presenting either as Games Workshop-owned. | Owner direction recorded in this roadmap; [40k.app](https://www.40k.app/) and the [Game Datamissions Core Rules Data Changelog](https://game-datamissions.com/11th/rules/changelog). | P18C | SOURCE-GOVERNANCE |
 | 12 | P18D | C18-04 | The engine has no Assault Disembark move type, source eligibility, 3″ placement path, or distinct post-disembark charge state. | Add a canonical Assault Disembark move for a rule that preserves charge eligibility after disembarking from a Transport that made a Normal Move; require an embarked unit in a battlefield Transport, prohibit a unit that embarked this phase, reject a Transport that Advanced or Fell Back, place the rules unit wholly within 3″, and carry the resulting charge permission through events, replay, decisions, and adapters. | [Game Datamissions App-data v931, 18.06 Assault Disembark Move](https://game-datamissions.com/11th/rules/changelog), independently introduced by the official August 26 Universal Rules Updates v1.1. | P18C, S-MIRRORS | APP-AUTHORITY |
-| 13 | P18E | C18-05 | The engine has no Shock Disembark move type and therefore cannot preserve start-of-move enemy engagements or force the opponent's required Fight selections. | Add a separate canonical Shock Disembark move when a rule permits disembarkation after the Transport Advanced, enforce its source eligibility and 3″ setup, preserve engagement with every enemy unit engaged at move start, and route each not-yet-selected engaged enemy unit through the opponent's canonical Fight selection/activation path, with complete event, replay, decision, and adapter coverage. | [Game Datamissions App-data v931, 18.07 Shock Disembark Move](https://game-datamissions.com/11th/rules/changelog), independently introduced by the official August 26 Universal Rules Updates v1.1. | P18D, S-MIRRORS | APP-AUTHORITY |
+| 13 | P18E | C18-05 | The engine has no Shock Disembark move type and therefore cannot preserve start-of-move enemy engagements or force the opponent's required Fight selections. | Provide source-authorized Shock Disembark eligibility and 3″ setup, preserve the source-defined prior engagements, and queue each affected unselected enemy for a canonical Fight activation. The merged implementation’s Advance-only eligibility and substitution of Transport engagements require P18F source resolution before semantic certification. | [Game Datamissions App-data v931, 18.07 Shock Disembark Move](https://game-datamissions.com/11th/rules/changelog), independently introduced by the official August 26 Universal Rules Updates v1.1. | P18D, S-MIRRORS | APP-AUTHORITY |
 | 14 | P24F | C24-06 | Deadly Demise runtime is substantially model-scoped, but the source catalog says “when this unit is destroyed” and uses `after_unit_destroyed`. | Correct and source-back the catalog row to trigger each time a model with the ability is destroyed; audit all consumers and preserve already-correct model-scoped runtime behavior. | [Game Datamissions App-data v931, changed 24.08 Deadly Demise](https://game-datamissions.com/11th/rules/changelog): the bearer model, not its unit, owns the trigger. | P05A, S-MIRRORS | APP-DRIFT |
 | 15 | P15F | C15-06 | Insane Bravery sets `allow_battle_shocked_targets=True`, permitting the controlling player to target an already Battle-shocked unit. | Reject an already Battle-shocked target before spend/mutation while retaining the canonical about-to-test decision path and once-per-battle restriction. | [Game Datamissions App-data v931, Insane Bravery FAQ](https://game-datamissions.com/11th/rules/changelog): a controlling player cannot target its Battle-shocked unit with the Stratagem. | P08B, S-MIRRORS | APP-DRIFT |
 | 16 | P24G | C24-07 | Pre-battle sequencing repeatedly returns the first unresolved player until that player completes every Scout action. | Persist an alternating player/unit-resolution cursor beginning with the first-turn player, skip only players with no unresolved pre-battle rule, and preserve decisions, restore, replay, and adapters. | [Game Datamissions App-data v931, alternating Scout moves FAQ](https://game-datamissions.com/11th/rules/changelog): players alternate resolving pre-battle rules, starting with the player taking the first turn. | P19, S-MIRRORS | APP-DRIFT |
 | 17 | P24D | C24-04 | Hazardous pools are deduplicated by profile ID and exactly one hazard roll is made. | Count selected physical Hazardous weapon instances and roll once per selected weapon after all of the unit’s attacks, preserving Shooting/Fight origin. | [24.15 Hazardous](https://www.40k.app/rules/24-core-abilities): roll once for each selected Hazardous weapon after the unit finishes its attacks. | P05A, P06B | APP-AUTHORITY |
 | 18 | P14 | C14-01, C14-02 | Objective consumers duplicate point-marker geometry and no data-boundary rule treats non-Core references to an “objective marker” as an “objective.” | Provide one model-group-aware geometry query for markers and terrain objectives, make Objective Control its first consumer, and normalize the non-Core terminology alias once at the source boundary without rewriting Core Rules text. | [14.01/14.01.01](https://www.40k.app/rules/14-objectives) and [v931 objective terminology FAQ](https://game-datamissions.com/11th/rules/changelog): use closest-part objective geometry, and outside Core Rules treat “objective marker” as “objective.” | S-MIRRORS | APP-AUTHORITY |
-| 19 | P12 | C12-01, C12-02, C12-03 | Objective Consolidation has incomplete geometry/final-position semantics; Ongoing Consolidation preserves prior engagements but does not queue every affected unselected enemy unit for opponent-controlled Fight selection. | Consume P14 geometry, complete per-model/final-unit movement rules, remove stale wording, and persist a one-at-a-time opponent selection queue that makes every affected not-yet-selected enemy unit eligible and selected to fight. | [12.08](https://www.40k.app/rules/12-fight-phase), [14.01.01](https://www.40k.app/rules/14-objectives), and [v931 Ongoing Consolidation erratum](https://game-datamissions.com/11th/rules/changelog). | P14, S-MIRRORS | APP-DRIFT |
+| 19 | P12 | C12-01, C12-02, C12-03 | Objective Consolidation has incomplete geometry/final-position semantics; Ongoing Consolidation preserves prior engagements but does not queue every affected unselected enemy unit for opponent-controlled Fight selection. | Consume P14 geometry and complete Engaging, Ongoing and Objective Consolidation per-model/final-unit rules. Extend P18E’s shared forced-Fight queue to suspend and resume ordinary Fight state, activation order and pending continuations; select each affected unselected enemy exactly once through the opponent’s decision path. | [12.08](https://www.40k.app/rules/12-fight-phase), [14.01.01](https://www.40k.app/rules/14-objectives), and [v931 Ongoing Consolidation erratum](https://game-datamissions.com/11th/rules/changelog). | P14, P18E, S-MIRRORS | APP-DRIFT |
 | 20 | P22 | C22-01 | Generic Aura resolution excludes the source unless each descriptor opts in and can apply the same Aura more than once through overlapping models. | Include a model in its own Aura by default and apply the same Aura to a target once, unless source-backed wording expressly excludes self-application. | [22.01 Aura Abilities](https://www.40k.app/rules/22-other-rules-and-abilities): a model is within its own Aura and duplicate applications do not accumulate. | — | APP-AUTHORITY |
 | 21 | P22B | C22-02 | Psychic abilities with levels have no authoritative same-ability-use ledger. | Key each use by canonical PSYKER rules-unit ID, canonical psychic ability identity, and phase. Derive ability identity from its stable source rule/descriptor rather than its physical source instance; retain the selected source-instance and component identities as audit evidence only. Reject a second use exposed by duplicate instances or different attached components, and validate the canonical key plus evidence against authoritative lineage on restore/replay. | [Game Datamissions App-data v931, 22.03.01 Psychic Abilities with a Psychic Level](https://game-datamissions.com/11th/rules/changelog): a PSYKER unit cannot use the same psychic ability more than once per phase. | P08A, P19, S-MIRRORS | APP-AUTHORITY |
 | 22 | P24C1 | C24-03A | Duplicate non-Anti weapon abilities are rejected; distinct source instances are not preserved. | Preserve stable source identity for every duplicate core/weapon ability instance without yet adding the player-facing selection. | [24.02 Duplicated Abilities](https://www.40k.app/rules/24-core-abilities): duplicate abilities do not accumulate and the controlling player chooses which instance applies. | — | APP-AUTHORITY |
@@ -218,44 +218,101 @@ corroborate but is not required to begin that work.
 | 24 | P01B | C01-02 | Only specialized faction/model materialization paths split units; no generic split preserves chosen model membership or applies the equal-as-possible attached fallback. | Add one canonical split decision and mutation path that records which models enter each successor, balances counts as equally as possible, and ignores an impossible source-specified strength when attached Leader/Support models require the generic fallback. | [Game Datamissions App-data v931, changed and errata 01.02.06 Splitting Units](https://game-datamissions.com/11th/rules/changelog); both changelog rows are one obligation. | P19, S-MIRRORS | APP-AUTHORITY |
 | 25 | P01C | C01-03 | Embarked units are often treated as having no generally active abilities, with no shared distinction between active rules and unsatisfied battlefield visibility/measurement conditions. | Keep an embarked unit's abilities active, evaluate each typed restriction normally, and make geometry-dependent requirements fail because the unit is Not On The Battlefield rather than through blanket ability suppression. | [Game Datamissions App-data v931, embarked abilities FAQ](https://game-datamissions.com/11th/rules/changelog): abilities remain active within their own restrictions, while off-battlefield visibility/measurement requirements fail. | P19, S-MIRRORS | APP-AUTHORITY |
 | 26 | P02A | C02-01 | The modifier service supports set, multiply, add, floor, and ceiling with integer operands, but not the complete ordered algebra. | Implement exact replacement → multiplication → addition → division → subtraction ordering, one final round-up, and terminal `0`, `-`, and `*` replacement values. | [02.02.01 Modifiers](https://www.40k.app/rules/02-datasheets): apply the listed operation groups in order and round remaining fractions only at the end. | — | APP-AUTHORITY |
-| 27 | P02B | C02-02 | Modified dice results can remain below 1, and raw, modified, and domain-limited values are not distinct. | Separate raw roll, post-reroll result, modifier trace, minimum-1 modified result, and any later rule-specific domain result. | [02.02.01 Modifiers](https://www.40k.app/rules/02-datasheets): after ordinary modifiers, a modified dice result below 1 becomes 1. | P02A | APP-AUTHORITY |
-| 28 | P02C | C02-03 | Detection Range permits 0, has no upper bound, and Lone Operative range handling does not share one terminal clamp. | Clamp Detection Range and Lone Operative ranges to 9″–30″ after modifiers in the owning modifier service. | [02.02.01 Modifiers](https://www.40k.app/rules/02-datasheets): these ranges have the stated terminal 9″ minimum and 30″ maximum. | P02A | APP-AUTHORITY |
-| 29 | P02D | C02-04 | `ModelInstance` has no keyword authority and `UnitInstance.keywords` is immutable, so a destroyed special model can keep contributing its keyword to a surviving unit. | Preserve source-backed model keywords, derive current unit and attached-unit keywords only from living member models/current living components, and validate model-keyword lineage through destruction, restore, replay, and adapters. | [Game Datamissions App-data v931, destroyed-model keyword FAQ](https://game-datamissions.com/11th/rules/changelog): destroyed models no longer contribute keywords to their prior unit. | P19, S-MIRRORS | APP-AUTHORITY |
-| 30 | P10 | C10-01, C10-02 | Unseen Indirect attacks add an obsolete `-1` to hit, newer restrictions are partial, and selecting Indirect removes non-Indirect weapons. | Remove the extra `-1`; apply Cover, reroll prohibition, and unmodified failure ranges per attack while retaining ordinary weapons against visible eligible targets. | [10.07 Indirect Shooting](https://www.40k.app/rules/10-shooting-phase): unseen Indirect attacks grant Cover, cannot reroll hits, normally fail on unmodified 1–5, or 1–3 when stationary with a friendly observer; its designer note permits mixed declarations. | P02B, P06A, P09A | APP-AUTHORITY |
-| 31 | P24A | C24-01 | Stealth applies `-1` to hit and activates if any attached component has it; stale wording is duplicated in generated data. | Require every living model in the rules unit to have Stealth and grant Benefit of Cover instead of a hit modifier; regenerate every in-scope record. | [24.33 Stealth](https://www.40k.app/rules/24-core-abilities): the whole target unit must have Stealth and receives Benefit of Cover. | P10 | APP-AUTHORITY |
-| 32 | P15A | C15-01 | Smokescreen triggers after target selection, grants Cover plus `-1` to hit, and affects only the selected Smoke unit. | Offer it at the start of the opponent’s Shooting phase; grant Benefit of Cover to the Smoke unit and to a target obscured by its Smoke models, without `-1` to hit. | [15.10 Smokescreen](https://www.40k.app/rules/15-stratagems): start-of-opponent-Shooting timing and the stated Smoke-obscuration Cover effect last until phase end. | P15D, P06A, P10 | APP-AUTHORITY |
-| 33 | P15B | C15-02 | Explosives is a start-phase, GRENADES-only unit action with no selected source model. | During the owner’s Shooting phase, select an unengaged, eligible-to-shoot, non-Advanced `EXPLOSIVES/GRENADES` unit, a matching model, and a visible unengaged enemy within 8″ of that model. | [15.06 Explosives](https://www.40k.app/rules/15-stratagems): the current App heading and complete model/target eligibility statement control. | P15D, P06A, P06B, P10 | APP-AUTHORITY |
-| 34 | P04 | C04-01 | Target replacement is shooting-local, so another action such as Charge cannot revalidate and replace a selected target through one authoritative lifecycle. | Provide one deterministic target-invalidation/replacement service reusable by shooting and Charge, preserving decisions, restore, replay, and adapter behavior without taking ownership of hit-roll resolution. | [04.03.03](https://www.40k.app/rules/04-making-attacks) and the [v931 modified-Charge target replacement FAQ](https://game-datamissions.com/11th/rules/changelog). | S-MIRRORS | APP-AUTHORITY |
-| 35 | P04B | C04-02, C04-03 | A lowered critical threshold can leave critical status/effects restricted to an unmodified 6, while generic minimum-hit thresholds can lower Snap Shooting below its absolute unmodified-6 requirement. | In the attack hit-roll resolver, make an unmodified roll meeting a source-backed critical threshold both successful and critical even when the ordinary hit value is worse; enforce Snap Shooting's unmodified-6 hit requirement unless a rule explicitly overrides Snap. Cover ordinary and Snap attacks, including lowered critical thresholds, raw/modified roll separation, and Indirect-fire consumers. | [Game Datamissions App-data v931, critical-hit and Snap Shooting FAQs](https://game-datamissions.com/11th/rules/changelog). | P02B, P10, S-MIRRORS | APP-DRIFT |
-| 36 | P11A | C11-01, C11-03 | Charge modifiers are embedded in the dice expression, one ambiguous value drives reachability, and post-selection modifier changes cannot trigger target replacement. | Separate raw 2D6, modified Charge result, and movement budget; select targets within the current modified maximum; after any later modifier changes that maximum, revalidate and route replacement through P04 before movement. | [02.02.01](https://www.40k.app/rules/02-datasheets), [11.02/11.04](https://www.40k.app/rules/11-charge-phase), and the [v931 modified-Charge target FAQ](https://game-datamissions.com/11th/rules/changelog). | P02A, P02B, P04, S-MIRRORS | APP-AUTHORITY |
-| 37 | P15E | C11-02, C15-05 | Ordinary Charges and Heroic Intervention mark Command Re-roll unavailable. | After the Charge roll, offer Command Re-roll through the normal CP/decision path and reroll the complete 2D6 before modifiers. | [15.02 Command Re-roll](https://www.40k.app/rules/15-stratagems): the entire Charge roll is an eligible reroll. | P15D, P11A | APP-AUTHORITY |
-| 38 | P15C | C15-03 | Heroic Intervention rolls bare 2D6 and caps that unmodified total at 6. | Use the ordinary Charge declaration, reroll, modifier, target, eligibility, and `PathWitness` pipeline; for Into the Fray apply its result cap after modifiers. | [15.11 Heroic Intervention](https://www.40k.app/rules/15-stratagems): Leap to Defend/Into the Fray use the stated Charge process and restrictions. | P15D, P11A, P15E | APP-AUTHORITY |
-| 39 | P21A | C21-01 | FLY automatically grants model/terrain transit for ordinary movement and Charges without selecting Take to the Skies. | Before each Normal, Fall Back, Advance, or Charge move, offer and commit Take to the Skies; for Advance and Charge this must occur before rolling. Only selection grants transit/ignored vertical distance and reduces the maximum by 2″ unless Hover applies. | [21.03 Flying Models](https://www.40k.app/rules/21-flying-and-surging) and [v931 Take to the Skies timing FAQ](https://game-datamissions.com/11th/rules/changelog). | P09A, P11A, S-MIRRORS | APP-AUTHORITY |
-| 40 | P21B | C21-02 | Surge has no target and omits closest-target ties, target-only Engagement, maximum approach, and the complete movement lock. | Choose the closest enemy, use a finite tie decision, require Engagement with that target if possible or maximum approach otherwise, forbid Engagement with others, and lock further movement that phase. | [21.02 Surge Move](https://www.40k.app/rules/21-flying-and-surging): closest-target, tie, maximal movement, Engagement, and phase-lock requirements. | P21A | APP-AUTHORITY |
-| 41 | P24E | C24-05 | Generic MOBILE geometry exists, but Super-Heavy Walker has no descriptor, movement behavior, choice, or post-move roll. | For Normal/Advance/Fall Back moves, allow transit through non-Titanic models and terrain sections at most 4″ high; offer the all-model MOBILE choice and apply Battle-shock on a post-move D6 roll of 1. | [24.35 Super-Heavy Walker](https://www.40k.app/rules/24-core-abilities): the stated transit and optional MOBILE/Battle-shock behavior. | P21A | APP-AUTHORITY |
-| 42 | P03A | C03-01 | Every deployment model must be wholly within its deployment zone, with no oversized-base fallback. | After proving the base cannot fit, require contact with the player’s battlefield edge and impose the same-turn Normal/Advance/Fall Back/Charge/ranged-attack lock. | [03.02.02 Set Up](https://www.40k.app/rules/03-moving): oversized deployment uses edge contact and the stated same-turn restrictions. | — | APP-AUTHORITY |
-| 43 | P03B | C03-02 | Every disembarking model must be wholly within the ordinary 3″/6″ distance. | Only after proving ordinary placement impossible, allow an oversized base within 1″ of the Transport base/hull and outside Engagement Range. | [03.02.02 Set Up](https://www.40k.app/rules/03-moving): the 1″ oversized-base exception applies to disembark placement after ordinary placement is impossible. | P03A | APP-AUTHORITY |
-| 44 | P24C2 | C24-03B | Only duplicate Anti instances have a player-selection path; other duplicate ability instances cannot be selected through adapters. | Add the controlling-player finite instance decision, validation, replay, and viewer-safe projection; weapon choices occur each time the unit attacks during Select Weapons. | [24.02 Duplicated Abilities](https://www.40k.app/rules/24-core-abilities): duplicate abilities do not accumulate and the controlling player selects the active instance. | P24C1, P04 | APP-AUTHORITY |
-| 45 | P05B | C05-02 | A model is recorded removed and emits `model_destroyed`, then is reconstructed if Fight On Death is accepted; the current contract denies it ordinary abilities and target geometry while retained. | At the P05A boundary, atomically enter a retained Fight On Death state without removal/re-add replay. Until the unit attacks or the phase ends, keep the fixed model present for all rules purposes, including measurement, visibility, datasheet abilities, Stratagem targeting, and enemy engagement, then clean it up exactly once. | [05.04.05](https://www.40k.app/rules/05-attack-sequence) and the [v931 Fight On Death presence FAQ](https://game-datamissions.com/11th/rules/changelog). | P05A, S-MIRRORS | APP-DRIFT |
-| 46 | P05C | C05-03 | Authenticated former placements exist, but no generic query can measure to a destroyed model or destroyed unit. | Add source-authorized measurement using the exact former base/hull; a destroyed-unit reference resolves to the last model destroyed and grants no living battlefield authority. | [05.04.06](https://www.40k.app/rules/05-attack-sequence): use the destroyed model’s former footprint, and the last destroyed model for a destroyed-unit reference. | P05B | APP-AUTHORITY |
-| 47 | P05D | C05-04 | The supported failed-save replacement path changes incoming Damage to 0 after the save, but the behavior is not certified against v931 across source, engine consumers, adapters, restore, and replay. | Pin the v931 FAQ, retain the correct post-save ordering, add an end-to-end regression, and audit every Damage-replacement consumer so no path changes Damage before the saving throw. | [Game Datamissions App-data v931, Damage-to-0 timing FAQ](https://game-datamissions.com/11th/rules/changelog): change Damage after saving throws. | S-MIRRORS | APP-AUTHORITY |
-| 48 | P18A | C18-01 | An empty Dedicated Transport receives a delayed unavailable/setup consequence associated with battle round 1. | At the end of Declare Battle Formations, immediately destroy/remove every empty Dedicated Transport without triggering destroyed-model rules. | [18.01 Transport Capacity](https://www.40k.app/rules/18-transports): empty Dedicated Transports are destroyed at the stated formation boundary without destruction triggers. | — | APP-AUTHORITY |
-| 49 | P18B | C18-02 | Emergency Disembark accepts an arbitrary subset, destroys omitted models without proof, and rejects engaged endpoints even when no unengaged placement exists. | Place the maximum possible survivors wholly within 6″ and as close as possible; prefer unengaged placements, allow an engaged endpoint only when no unengaged endpoint exists, and destroy only genuinely unplaceable models. | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): maximal placement, closest-possible positioning, unengaged preference, engaged fallback, and casualty rules. | P03B, P18C | APP-AUTHORITY |
-| 50 | P20 | C20-01, C18-06 | Reserve ingress rejects a Strategic Reserve Transport containing cargo as unsupported, and Rapid Disembark passengers do not inherit the ingress placement restrictions that governed their Transport. | Select and ingress the Transport as one reserve unit while cargo remains embarked; count cargo toward reserve limits but do not make it independently eligible for ingress. If a passenger then uses Rapid Disembark, apply the same ingress restrictions to every disembarking model. | [20.01/20.04 Strategic Reserves](https://www.40k.app/rules/20-strategic-reserves) and [Game Datamissions App-data v946, 18.04.01 Rapid Disembark And Limitations](https://game-datamissions.com/11th/rules/changelog). | P09A, T-TRANSPORT, S-MIRRORS | APP-AUTHORITY |
-| 51 | P24B | C24-02 | Firing Deck marks only contributing passenger units and stores the restriction in phase-local `shot_unit_ids`. | Snapshot every unit embarked when Firing Deck resolves and make all of them ineligible to shoot until turn end, including after disembarking. | [24.14 Firing Deck](https://www.40k.app/rules/24-core-abilities): every unit embarked at resolution is subject to the turn-long shooting restriction. | T-TRANSPORT | APP-AUTHORITY |
-| 52 | P23 | C23-01 | Aircraft make ordinary moves and enter reserves by crossing a battlefield edge. | Start Aircraft in Strategic Reserves, permit only ingress moves, and return every Aircraft still on the battlefield to Strategic Reserves at the end of its opponent’s turn. | [23.01–23.02 Aircraft](https://www.40k.app/rules/23-aircraft): reserve start, ingress-only movement, and opponent-turn-end return. | P20, P21A | APP-AUTHORITY |
-| 53 | P25A | C25-01, C25-02 | Incursion permits 4 Enhancements, ordinary duplicates of 3, Battleline duplicates of 6, and does not independently double Dedicated Transport limits. | Enforce Incursion at 1000 points, 2 DP, 2 Enhancements, ordinary limit 2, and independent Battleline/Dedicated Transport limit 4. | [25.03 Select Battle Size](https://www.40k.app/rules/25-muster-armies): the current Incursion table and duplicate exceptions. | — | APP-AUTHORITY |
-| 54 | P25B | C25-03 | Warlord and Enhancement selections carry unit IDs, and `WARLORD` is applied to the whole unit. | Select/persist a specific Character model as Warlord and a specific eligible model as Enhancement bearer; derive unit keywords from membership without changing ownership. | [25.04 Fill Your Army Roster](https://www.40k.app/rules/25-muster-armies): Warlord and Enhancement bearer selections are model-specific. | P02D | APP-AUTHORITY |
-| 55 | P25C | C25-04 | `DetachmentDefinition` cannot express generic required/prohibited units or required/prohibited other detachments. | Add typed source-neutral constraints and fail-closed roster validation, including duplicate-detachment prohibition; do not populate or evaluate faction-specific records here. | [25.04 Fill Your Army Roster](https://www.40k.app/rules/25-muster-armies): apply the stated unit/detachment requirements and prohibitions. | — | APP-AUTHORITY |
-| 56 | PFINAL | CAUDIT-01 | No post-remediation artifact certifies the complete Core Rules implementation against one selected maintained App-data snapshot; v931's 18 distinct obligations and v946's Rapid Disembark obligation are not yet collectively closed. | Re-audit all 25 categories after every implementation PR merges; verify source fingerprints, semantic execution, engine/adapters/replay/visibility coverage, all v931/v946 obligations, and cross-category dependencies. Insert and merge a canonical finding for any newly discovered gap before certification. | All category 01–25 locators, every exact operative row retained by P15D through P25C, and the complete pinned v931/v946 maintained direct App-data observations. | All 54 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
+| 27 | P02B | C02-02 | Modified dice results can remain below 1, and raw, modified, and domain-limited values are not distinct. | Separate raw dice, post-reroll result, modifier trace, minimum-1 modified result and rule-specific limits. Cap a Charge result at 12 after cumulative modifiers; subsequent move-distance effects remain distinct. | [02.02.01 Modifiers](https://www.40k.app/rules/02-datasheets): modified dice results have a minimum of 1, and Charge results have a maximum of 12 after cumulative modifiers. | P02A | APP-AUTHORITY |
+| 28 | P24I | C24-09 | Psychic modifier selection aggregates individual effects into net BS/WS and hit totals; canceling effects can suppress a legal choice. | Preserve each source-linked modifier and allow the controlling player to ignore any subset before combination and caps. Cover Cover/Plunging cancellation, positive and negative effects in the same bucket, deterministic option/proposal identity, stale rejection, restore and Shooting/Fight replay. P22B’s ability-use ledger remains separate. | [24.29 Psychic](https://www.40k.app/rules/24-core-abilities) and [02.02.02 Ignore Modifiers](https://www.40k.app/rules/02-datasheets). | P02A, P02B | APP-AUTHORITY |
+| 29 | P02C | C02-03 | Detection Range permits 0, has no upper bound, and Lone Operative range handling does not share one terminal clamp. | Clamp Detection Range and Lone Operative ranges to 9″–30″ after modifiers in the owning modifier service. | [02.02.01 Modifiers](https://www.40k.app/rules/02-datasheets): these ranges have the stated terminal 9″ minimum and 30″ maximum. | P02A | APP-AUTHORITY |
+| 30 | P05B | C05-02 | A model is recorded removed and emits `model_destroyed`, then is reconstructed if Fight On Death is accepted; the current contract denies it ordinary abilities and target geometry while retained. | At the P05A boundary, atomically enter a retained Fight On Death state without removal/re-add replay. Until the unit attacks or the phase ends, keep the fixed model present for all rules purposes, including measurement, visibility, datasheet abilities, Stratagem targeting, and enemy engagement, then clean it up exactly once. | [05.04.05](https://www.40k.app/rules/05-attack-sequence) and the [v931 Fight On Death presence FAQ](https://game-datamissions.com/11th/rules/changelog). | P05A, S-MIRRORS | APP-DRIFT |
+| 31 | P02D | C02-04 | `ModelInstance` has no keyword authority and `UnitInstance.keywords` is immutable, so a destroyed special model can keep contributing its keyword to a surviving unit. | Preserve source-backed model keywords and derive current rules-unit keywords from authoritative model presence. Consume P05B’s retained Fight On Death presence contract, distinguish it from ordinary removal and attached-ability expiry, and validate lineage through destruction, restore, replay and adapters. | [Game Datamissions App-data v931, destroyed-model keyword FAQ](https://game-datamissions.com/11th/rules/changelog): destroyed models no longer contribute keywords to their prior unit. | P19, P05B, S-MIRRORS | APP-AUTHORITY |
+| 32 | P06C | C06-03 | P06A fixes corridor width but retains seven-point model samples and treats all 49 observer/target rays being clear as full visibility. | Certify any-part visibility and every-facing-part full visibility against the supported model geometry, using narrow-opening and partial-occlusion counterexamples. Correct the shared geometry owner where sampling is not equivalent; do not claim complete visibility support from corridor width alone or introduce an unapproved approximate fallback. | [06.01 Visibility](https://www.40k.app/rules/06-other-concepts), including the v931 any-part FAQ. | P06A, S-MIRRORS | APP-AUTHORITY |
+| 33 | P10 | C10-01, C10-02 | Indirect restrictions are gated on target invisibility, include an obsolete -1 to hit, and can remove non-Indirect weapons from mixed declarations. | During Indirect Shooting, apply Cover, hit-reroll prohibition and unmodified failure ranges to each INDIRECT FIRE weapon attack, whether its target is visible or unseen. Remove the obsolete -1 and retain ordinary weapons against visible eligible targets. Distinguish the same weapon fired through Normal Shooting. | [10.07 Indirect Shooting](https://www.40k.app/rules/10-shooting-phase): the restrictions attach to INDIRECT FIRE weapon attacks in this shooting mode; stationary plus friendly-observer conditions change the failure range from 1–5 to 1–3. | P02B, P06A, P06C, P09A | APP-AUTHORITY |
+| 34 | P16 | C16-01, C16-02 | Action shooting restrictions and prior-shooting checks use ordinary Shooting-phase state despite turn-long and out-of-phase obligations. | Use authoritative rules-unit restriction records with explicit turn/phase expiry. Starting an Action locks non-TITANIC shooting and all charge declarations until turn end; every shooting type, including Snap, locks Action starts until phase end. Preserve ordinary already-shot rejection, and cover phase transitions, completion/cancellation, attached identity, restore, replay and facade consumers. | [16.01 Actions](https://www.40k.app/rules/16-actions), [10.04–10.07](https://www.40k.app/rules/10-shooting-phase), and [15.09 Snap Shooting](https://www.40k.app/rules/15-stratagems). | P19, S-MIRRORS | APP-AUTHORITY |
+| 35 | P15G | C15-07 | P15D records missing Rapid Ingress first-round and AIRCRAFT exclusions but assigns no runtime repair. | Reject first-battle-round use and AIRCRAFT targets before CP spend, queue mutation or ingress. Audit every eligibility and target-validation path and preserve canonical ingress proposals, placement restrictions and replay. | [15.07 Rapid Ingress](https://www.40k.app/rules/15-stratagems). | P15D, P09A, P02D | APP-DRIFT |
+| 36 | P24A | C24-01 | Stealth applies `-1` to hit and activates if any attached component has it; stale wording is duplicated in generated data. | Require every living model in the rules unit to have Stealth and grant Benefit of Cover instead of a hit modifier; regenerate every in-scope record. | [24.33 Stealth](https://www.40k.app/rules/24-core-abilities): the whole target unit must have Stealth and receives Benefit of Cover. | P10 | APP-AUTHORITY |
+| 37 | P15A | C15-01 | Smokescreen triggers after target selection, grants Cover plus `-1` to hit, and affects only the selected Smoke unit. | Offer it at the start of the opponent’s Shooting phase; grant Benefit of Cover to the Smoke unit and to a target obscured by its Smoke models, without `-1` to hit. | [15.10 Smokescreen](https://www.40k.app/rules/15-stratagems): start-of-opponent-Shooting timing and the stated Smoke-obscuration Cover effect last until phase end. | P15D, P06A, P10 | APP-AUTHORITY |
+| 38 | P15B | C15-02 | Explosives is a start-phase, GRENADES-only unit action with no selected source model. | During the owner’s Shooting phase, select an unengaged, eligible-to-shoot, non-Advanced `EXPLOSIVES/GRENADES` unit, a matching model, and a visible unengaged enemy within 8″ of that model. | [15.06 Explosives](https://www.40k.app/rules/15-stratagems): the current App heading and complete model/target eligibility statement control. | P15D, P06A, P06B, P10 | APP-AUTHORITY |
+| 39 | P04 | C04-01 | Target replacement is shooting-local, so another action such as Charge cannot revalidate and replace a selected target through one authoritative lifecycle. | Provide one deterministic target-invalidation/replacement service reusable by shooting and Charge, preserving decisions, restore, replay, and adapter behavior without taking ownership of hit-roll resolution. | [04.03.03](https://www.40k.app/rules/04-making-attacks) and the [v931 modified-Charge target replacement FAQ](https://game-datamissions.com/11th/rules/changelog). | S-MIRRORS | APP-AUTHORITY |
+| 40 | P04B | C04-02, C04-03 | A lowered critical threshold can leave critical status/effects restricted to an unmodified 6, while generic minimum-hit thresholds can lower Snap Shooting below its absolute unmodified-6 requirement. | In the attack hit-roll resolver, make an unmodified roll meeting a source-backed critical threshold both successful and critical even when the ordinary hit value is worse; enforce Snap Shooting's unmodified-6 hit requirement unless a rule explicitly overrides Snap. Cover ordinary and Snap attacks, including lowered critical thresholds, raw/modified roll separation, and Indirect-fire consumers. | [Game Datamissions App-data v931, critical-hit and Snap Shooting FAQs](https://game-datamissions.com/11th/rules/changelog). | P02B, P10, S-MIRRORS | APP-DRIFT |
+| 41 | P24H | C24-08 | Critical Lethal Hits unconditionally auto-wound without the controlling player’s legal decline option. | Offer the canonical finite auto-wound/roll-to-wound decision in the shared Shooting/Fight attack host. Cover Lethal plus Devastating Wounds, additional Sustained Hits, deterministic JSON-safe decisions, stale/malformed submissions, restore and adapter/replay equivalence. | [24.23 Lethal Hits](https://www.40k.app/rules/24-core-abilities): the player may decline automatic wounding to attempt a critical wound. | P04B | APP-AUTHORITY |
+| 42 | P15H | C15-08 | Phase-end Fire Overwatch still requires a triggering enemy and restricts the shooting declaration to that unit. | At opponent Movement-phase end, select an eligible friendly unengaged non-TITANIC unit and expose the canonical choice of one eligible visible enemy within 24″ through Snap Shooting. Preserve Snap hit/reroll requirements and P16’s Action lock, including phase-end continuation, CP, restore and replay. | [15.08–15.09 Fire Overwatch and Snap Shooting](https://www.40k.app/rules/15-stratagems). | P15D, P04B, P16 | APP-DRIFT |
+| 43 | P11A | C11-01, C11-03 | Charge modifiers are embedded in the dice expression, one ambiguous value drives reachability, and post-selection modifier changes cannot trigger target replacement. | Separate raw 2D6, the modified Charge result bounded to 1–12, and movement budget. Apply subsequent move-distance effects separately; select targets within the current permitted maximum and route later target invalidation through P04 before movement. | [02.02.01](https://www.40k.app/rules/02-datasheets), [11.02/11.04](https://www.40k.app/rules/11-charge-phase), and the [v931 modified-Charge target FAQ](https://game-datamissions.com/11th/rules/changelog). | P02A, P02B, P04, S-MIRRORS | APP-AUTHORITY |
+| 44 | P15I | C15-09 | P15D acknowledges Crushing Impact lifecycle/continuation work without a scheduled runtime owner. | Trace the charge-end trigger, enemy/model selections, Toughness-based roll, capped mortal wounds for both sides and suspended Charge continuation. Close the acknowledged gap with real facade, interruption, destruction and replay evidence; retain any already-correct runtime behavior. | [15.05 Crushing Impact](https://www.40k.app/rules/15-stratagems). | P15D, P11A, P06B, P05A | APP-AUTHORITY |
+| 45 | P15E | C11-02, C15-05 | Ordinary Charges and Heroic Intervention mark Command Re-roll unavailable. | After the Charge roll, offer Command Re-roll through the normal CP/decision path and reroll the complete 2D6 before modifiers. | [15.02 Command Re-roll](https://www.40k.app/rules/15-stratagems): the entire Charge roll is an eligible reroll. | P15D, P11A | APP-AUTHORITY |
+| 46 | P15C | C15-03 | Heroic Intervention rolls bare 2D6 and caps that unmodified total at 6. | Use the ordinary Charge declaration, reroll, modifier, target, eligibility, and `PathWitness` pipeline; for Into the Fray apply its result cap after modifiers. | [15.11 Heroic Intervention](https://www.40k.app/rules/15-stratagems): Leap to Defend/Into the Fray use the stated Charge process and restrictions. | P15D, P11A, P15E | APP-AUTHORITY |
+| 47 | P21A | C21-01 | FLY automatically grants model/terrain transit for ordinary movement and Charges without selecting Take to the Skies. | Before each Normal, Fall Back, Advance, or Charge move, offer and commit Take to the Skies; for Advance and Charge this must occur before rolling. Only selection grants transit/ignored vertical distance and reduces the maximum by 2″ unless Hover applies. | [21.03 Flying Models](https://www.40k.app/rules/21-flying-and-surging) and [v931 Take to the Skies timing FAQ](https://game-datamissions.com/11th/rules/changelog). | P09A, P11A, S-MIRRORS | APP-AUTHORITY |
+| 48 | P21B | C21-02 | Surge has no target and omits closest-target ties, target-only Engagement, maximum approach, and the complete movement lock. | Choose the closest enemy, use a finite tie decision, require Engagement with that target if possible or maximum approach otherwise, forbid Engagement with others, and lock further movement that phase. | [21.02 Surge Move](https://www.40k.app/rules/21-flying-and-surging): closest-target, tie, maximal movement, Engagement, and phase-lock requirements. | P21A | APP-AUTHORITY |
+| 49 | P24E | C24-05 | Generic MOBILE geometry exists, but Super-Heavy Walker has no descriptor, movement behavior, choice, or post-move roll. | For Normal/Advance/Fall Back moves, allow transit through non-Titanic models and terrain sections at most 4″ high; offer the all-model MOBILE choice and apply Battle-shock on a post-move D6 roll of 1. | [24.35 Super-Heavy Walker](https://www.40k.app/rules/24-core-abilities): the stated transit and optional MOBILE/Battle-shock behavior. | P21A | APP-AUTHORITY |
+| 50 | P03A | C03-01 | Every deployment model must be wholly within its deployment zone, with no oversized-base fallback. | After proving the base cannot fit, require contact with the player’s battlefield edge and impose the same-turn Normal/Advance/Fall Back/Charge/ranged-attack lock. Preserve the source-backed AIRCRAFT exception to the oversized setup restrictions. | [03.02.02 Set Up](https://www.40k.app/rules/03-moving): oversized deployment uses edge contact and the stated same-turn restrictions. | — | APP-AUTHORITY |
+| 51 | P03B | C03-02 | Every disembarking model must be wholly within the ordinary 3″/6″ distance. | Only after proving ordinary placement impossible, allow an oversized base within 1″ of the Transport base/hull and outside Engagement Range. | [03.02.02 Set Up](https://www.40k.app/rules/03-moving): the 1″ oversized-base exception applies to disembark placement after ordinary placement is impossible. | P03A | APP-AUTHORITY |
+| 52 | P24C2 | C24-03B | Only duplicate Anti instances have a player-selection path; other duplicate ability instances cannot be selected through adapters. | Add the controlling-player finite instance decision, validation, replay, and viewer-safe projection; weapon choices occur each time the unit attacks during Select Weapons. | [24.02 Duplicated Abilities](https://www.40k.app/rules/24-core-abilities): duplicate abilities do not accumulate and the controlling player selects the active instance. | P24C1, P04 | APP-AUTHORITY |
+| 53 | P05C | C05-03 | Authenticated former placements exist, but no generic query can measure to a destroyed model or destroyed unit. | Add source-authorized measurement using the exact former base/hull; a destroyed-unit reference resolves to the last model destroyed and grants no living battlefield authority. | [05.04.06](https://www.40k.app/rules/05-attack-sequence): use the destroyed model’s former footprint, and the last destroyed model for a destroyed-unit reference. | P05B | APP-AUTHORITY |
+| 54 | P05D | C05-04 | The supported failed-save replacement path changes incoming Damage to 0 after the save, but the behavior is not certified against v931 across source, engine consumers, adapters, restore, and replay. | Pin the v931 FAQ, retain the correct post-save ordering, add an end-to-end regression, and audit every Damage-replacement consumer so no path changes Damage before the saving throw. | [Game Datamissions App-data v931, Damage-to-0 timing FAQ](https://game-datamissions.com/11th/rules/changelog): change Damage after saving throws. | S-MIRRORS | APP-AUTHORITY |
+| 55 | P18A | C18-01 | An empty Dedicated Transport receives a delayed unavailable/setup consequence associated with battle round 1. | At the end of Declare Battle Formations, immediately destroy/remove every empty Dedicated Transport without triggering destroyed-model rules. | [18.01 Transport Capacity](https://www.40k.app/rules/18-transports): empty Dedicated Transports are destroyed at the stated formation boundary without destruction triggers. | — | APP-AUTHORITY |
+| 56 | P18B | C18-02 | Emergency Disembark accepts an arbitrary subset, destroys omitted models without proof, and rejects engaged endpoints even when no unengaged placement exists. | Place the maximum possible survivors wholly within 6″ and as close as possible; prefer unengaged placements, allow an engaged endpoint only when no unengaged endpoint exists, and destroy only genuinely unplaceable models. | [18.05 Emergency Disembark](https://www.40k.app/rules/18-transports): maximal placement, closest-possible positioning, unengaged preference, engaged fallback, and casualty rules. | P03B, P18C | APP-AUTHORITY |
+| 57 | P18F | C18-07 | Merged P18E infers Advance-only Shock eligibility and substitutes Transport engagements for the source’s moving-model engagement clause. | Resolve the exact granting-rule eligibility and ambiguous engagement owner before changing semantics. Record complete maintained-mirror or official-App evidence; do not infer that the Transport and passengers share prior engagements. Audit Assault/ Shock mode permission separately from Transport movement status, then reconcile P18E and certify forced enemy fights. | [18.06–18.07 Assault and Shock Disembark](https://www.40k.app/rules/18-transports). | P18D, P18E, S-MIRRORS | EXCEPTION-PAUSE |
+| 58 | P20 | C20-01, C18-06 | Reserve ingress rejects a Strategic Reserve Transport containing cargo as unsupported, and Rapid Disembark passengers do not inherit the ingress placement restrictions that governed their Transport. | Select and ingress the Transport as one reserve unit while cargo remains embarked; count cargo toward reserve limits but do not make it independently eligible for ingress. If a passenger then uses Rapid Disembark, apply the same ingress restrictions to every disembarking model. | [20.01/20.04 Strategic Reserves](https://www.40k.app/rules/20-strategic-reserves) and [Game Datamissions App-data v946, 18.04.01 Rapid Disembark And Limitations](https://game-datamissions.com/11th/rules/changelog). | P09A, T-TRANSPORT, S-MIRRORS | APP-AUTHORITY |
+| 59 | P24B | C24-02 | Firing Deck marks only contributing passenger units and stores the restriction in phase-local `shot_unit_ids`. | Snapshot every unit embarked when Firing Deck resolves and make all of them ineligible to shoot until turn end, including after disembarking. | [24.14 Firing Deck](https://www.40k.app/rules/24-core-abilities): every unit embarked at resolution is subject to the turn-long shooting restriction. | T-TRANSPORT, P16 | APP-AUTHORITY |
+| 60 | P23 | C23-01 | Aircraft make ordinary moves and enter reserves by crossing a battlefield edge. | Start Aircraft in Strategic Reserves, permit only ingress moves, and return every Aircraft still on the battlefield to Strategic Reserves at the end of its opponent’s turn. | [23.01–23.02 Aircraft](https://www.40k.app/rules/23-aircraft): reserve start, ingress-only movement, and opponent-turn-end return. | P20, P21A | APP-AUTHORITY |
+| 61 | P25A | C25-01, C25-02 | Incursion permits 4 Enhancements, ordinary duplicates of 3, Battleline duplicates of 6, and does not independently double Dedicated Transport limits. | Enforce Incursion at 1000 points, 2 DP, 2 Enhancements, ordinary limit 2, and independent Battleline/Dedicated Transport limit 4. Preserve the explicit permission to select a single 3-DP detachment at Incursion; it is not a general 3-DP allowance. | [25.03 Select Battle Size](https://www.40k.app/rules/25-muster-armies): the current Incursion table and duplicate exceptions. | — | APP-AUTHORITY |
+| 62 | P25B | C25-03 | Warlord and Enhancement selections carry unit IDs, and `WARLORD` is applied to the whole unit. | Select/persist a specific Character model as Warlord and a specific eligible model as Enhancement bearer; derive unit keywords from membership without changing ownership. | [25.04 Fill Your Army Roster](https://www.40k.app/rules/25-muster-armies): Warlord and Enhancement bearer selections are model-specific. | P02D | APP-AUTHORITY |
+| 63 | P25C | C25-04 | `DetachmentDefinition` cannot express generic required/prohibited units or required/prohibited other detachments. | Add typed source-neutral constraints and fail-closed roster validation, including duplicate-detachment prohibition; do not populate or evaluate faction-specific records here. | [25.04 Fill Your Army Roster](https://www.40k.app/rules/25-muster-armies): apply the stated unit/detachment requirements and prohibitions. | — | APP-AUTHORITY |
+| 64 | PFINAL | CAUDIT-01 | No complete operative-clause inventory certifies the Core Rules; closing recent changelog deltas alone leaves the newly identified gaps unowned. | Re-audit all 25 categories after every implementation PR merges. Require a complete rule-clause/FAQ → immutable source observation → engine owner → facade regression inventory, including older operative updates, all v931/v946 obligations, reopened certification findings and cross-category lifetimes. Verify exact source fingerprints, semantics, adapters, replay and visibility before claiming compliance. | All category 01–25 locators, every exact operative row retained by P15D through P25C, and the complete pinned v931/v946 maintained direct App-data observations. | All 62 implementation PRs; S-MIRRORS | FINAL-CERTIFICATION |
 
-Categories 07, 13, 16, and 17 have no standalone remediation PR in this
+Categories 07, 13, and 17 have no standalone remediation PR in this
 sequence. Category 13’s current Light/Dense Hidden wording is governed by the
 maintained App mirror and supersedes the older PDF’s Dense-only wording; it is
-immediately usable without separate confirmation. PFINAL re-audits all four as
+immediately usable without separate confirmation. PFINAL re-audits all three as
 part of the complete 25-category gate. If that audit finds a gameplay gap, the
 gap receives a canonical finding ID and a new one-at-a-time remediation PR
 inserted before PFINAL.
+
+## September 5 review refinements
+
+The owner authorized these planning corrections in PR #422 after review of
+`01033287a7997c2e9cdca4605574f8c08683b868`. Orders 1–17 keep their published
+identity; only the future sequence is renumbered. There are now 62 implementation
+PRs plus S-MIRRORS and PFINAL. The reviewed live locators above and App-data
+v946 (September 2) are planning evidence; each future semantic change still
+requires the complete immutable source tuple specified by the source policy.
+
+New closure keys are C24-08/P24H (optional Lethal Hits), C24-09/P24I
+(individual Psychic modifiers), C15-07/P15G (Rapid Ingress eligibility),
+C15-08/P15H (phase-end Overwatch targeting), C15-09/P15I (Crushing Impact
+continuation), C16-01 and C16-02/P16 (Action restriction lifetimes),
+C06-03/P06C (visibility geometry certification), and C18-07/P18F
+(Assault/Shock source interpretation). Each occurs in exactly one canonical
+row. P15D's historical exclusions are assigned to these owners rather than
+left for PFINAL to discover again.
+
+P06A's merged corridor-width work remains recorded, but does not close
+C06-03. P18E's merged implementation remains recorded, but its full semantic
+certification is reopened pending C18-07. Its historical Transport-engagement
+interpretation is not new source evidence. Only P18F's affected semantics
+pause for the unresolved wording; this does not require guessing an answer
+or pausing the independent planned repairs.
+
+P12 depends explicitly on P18E's queue abstraction, with ordinary Fight state
+suspended and restored rather than cleared at queue completion. P05B moves
+before P02D so model-keyword authority consumes the retained Fight On Death
+presence contract. Regression lifetimes must distinguish ordinary removal,
+retained models, and attached abilities that persist until the attacker has
+finished all attacks. P16 supplies the shared restriction owner for Snap
+Shooting and Firing Deck. Every new/changed decision still updates or explicitly
+confirms the adapter decision contract in its implementation PR.
+
+PFINAL's inventory must cover every operative clause and FAQ, including those
+unchanged in v931/v946. A merged PR, passing tests or source load status alone
+is not evidence of complete semantic execution.
+
+The PR #422 follow-up also corrects an ordered-identity codec defect in P24D:
+continuation deserialization must preserve declaration order for both physical
+weapon IDs and failed-weapon IDs. Sorting either list changes positional die
+ownership and can misalign the parallel profile list. The regression uses
+non-lexicographic IDs, distinct profiles and mixed results, checks exact JSON
+source-context round-trip and immediate completion, and restores/submits a
+pending Feel No Pain choice through `GameLifecycle`. The existing adapter
+contract already requires ordered identity; this correction changes no payload
+shape or player-facing choice. Historical four-shard validation records below
+remain historical; current PR policy and CI use the eight-shard inventory.
 
 ## Exception-only user disambiguation workflow
 
@@ -303,10 +360,10 @@ Resolution rules:
   merely because they exist in an older repository row: the retained mirror
   did not show the complete statements. Ask only if a planned PR requires one
   of those unobserved claims.
-- For Charge, no routine question remains: raw 2D6 is at most 12, then Charge
-  modifiers apply and may produce a modified result above 12. A distinct rule
-  modifying or capping the Charge Move applies to the movement budget, not
-  retroactively to the dice.
+- For Charge, apply cumulative modifiers after rerolls, then bound the result
+  to 1–12 under 02.02.01. A raw 12 with +2 therefore yields a Charge result of
+  12. Apply the additional Into the Fray cap and separate move-distance
+  effects at their source-defined boundaries; never conflate them with raw dice.
 
 ## Required contents of every implementation remediation PR
 
@@ -2537,6 +2594,150 @@ conformance scenario passes all `342` assertions for contract version `11.1.0`.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/421`; merge commit
 pending review and merge.
 
+### P24D — C24-04
+
+Status: Implemented in Order 17; required local validation and remote PR publication are complete;
+review and merge are pending.
+
+Finding IDs: `C24-04`.
+
+Dependencies and evidence gate: P05A/PR #413 and P06B are merged on `main`. The exact 24.15
+Hazardous statement is retained in the reviewed Core Abilities artifact with a separately
+classified, project-authoritative Game Datamissions v931 App-data mirror observation authenticated
+against the S-MIRRORS provider audit and authorized source package. The retained 40k.app category
+24 observation independently locates the same rule. This satisfies `APP-AUTHORITY`; no
+`EXCEPTION-PAUSE` applies.
+
+Violated invariant: after a unit resolves all attacks in Shooting or Fight, the engine must make
+one Hazard Roll for every physical Hazardous weapon selected in the Select Weapons step. Physical
+weapon identity, profile identity, the simultaneous roll packet, failure-to-weapon mapping,
+phase origin, and any paused mortal-wound continuation must remain deterministic, serializable,
+source-linked, and engine-owned.
+
+How it was done before P24D: the shared attack-sequence boundary filtered Hazardous pools, reduced
+them to a sorted set of `weapon_profile_id` values, and requested exactly one D6. Multiple physical
+weapons using the same profile therefore collapsed into one test. The reason string always said
+"after shooting" even when the shared resolver was completing Fight attacks. Resolution and
+mortal-wound events retained only deduplicated profile IDs, one roll, and no explicit phase or
+physical weapon identity, so replay could not prove which selected weapons produced or failed the
+rolls.
+
+How it is done after P24D: every selected attack pool already carries its canonical physical
+`weapon_instance_id`, selected `weapon_profile_id`, full typed profile, and `AttackSequence`
+`source_phase`. At the existing post-attack boundary, the engine keeps Hazardous pools in their
+deterministic declaration order, collapses repeated pools for one physical weapon that split
+attacks across targets, rejects one physical weapon selecting multiple profiles, and makes one
+simultaneous unmodified D6 expression whose quantity equals the unique physical weapon count. Each
+die is positionally bound to one weapon instance. Values of 1 or 2 identify the failed physical
+weapons; the shared Hazardous keyword policy determines mortal wounds per failed roll, and the
+engine routes their aggregate through the existing progressive P06B
+mortal-wound/model-allocation/Feel No Pain service. Nothing rolls or mutates in an adapter.
+
+Both Hazardous events now preserve `source_phase`, ordered physical weapon IDs, aligned profile
+IDs (including intentional repeated values), failed physical weapon IDs, complete roll state,
+mortal wounds per failure, and the aggregate wound total. A paused P06B continuation stores the
+same fields. Typed parsing verifies D6 shape, roll count, ordered failure mapping, and wound
+arithmetic; continuation and lifecycle restore additionally close those values against the active
+attack sequence and its Shooting/Fight origin. Pre-submission validation returns a typed invalid
+status before queue pop or mutation if a pending Hazardous mortal-wound context drifts.
+
+Specific authoritative maintained App-data mirror statement and source ID: 24.15 Hazardous states,
+"Each time a unit is selected to shoot or selected to fight, after that unit has resolved all of
+its attacks, make a number of hazard rolls (06.03) for that unit equal to the number of
+[HAZARDOUS] weapons you selected in the Select Weapons step." The stable source ID is
+`gw-11e-core-abilities:core:hazardous`; runtime events, ability-catalog identity, evidence, and
+continuations use that source ID rather than a display name or locally normalized source text.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog?v=931`, App-data version `931`,
+reviewed at `2026-09-02T12:30:09-04:00`; transcription
+`2ecefae469a748d8f5b337dcbbb4a1c3211bfa4c3555626fbbd05ee6fbde3832`;
+reviewed-transcription observation
+`a80ec4f83e554f7004a396a7363977db41f9ca0e3a8675df1c0163bab3967ffd`;
+authoritative-mirror observation
+`8292a0b2aaa7640ee6b82b2dca9e822aa2ce26d59759dfb72a276a9e63b77e1b`; authenticated
+provider-audit observation
+`1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`.
+The extended Core Abilities package hash is
+`ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb`, its canonical artifact
+byte SHA-256 is `fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7`,
+and the source-authority registry byte SHA-256 is
+`19bd1891e5519473cb431f09b1a472f30ef30a3ed883f615e3817a4356985ece`.
+The final PR #422 engine build ID after the ordered-decoder and polygon follow-ups is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:98875fd2bc5f327b840909de61fd3bbc625c92292ae2c518682d96b7c2763d39`.
+
+Load and execution support: the Hazardous rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation carries
+project authority. The fail-fast loader pins all three Core Abilities rules, descriptors, timing,
+evidence inventory, runtime consumers, package hash, and artifact byte hash. The source-backed
+ability row consumes the exact Hazardous source ID and descriptors.
+
+Scope and owning path: P24D owns physical selected-weapon Hazardous accounting at the shared
+attack-sequence completion boundary, simultaneous roll/failure mapping, Shooting/Fight provenance,
+P06B continuation authority, source/catalog identity, adapter-visible event documentation, and
+focused regressions. The authoritative path is reviewed JSON and typed loader -> selected typed
+attack pools -> shared attack completion -> simultaneous engine dice -> failed physical weapon
+mapping -> shared mortal-wound routing -> events/replay/adapter deltas. P24D adds no named handler,
+player-facing decision type, option family, proposal kind, faction branch, or out-of-scope content.
+The source-backed `after_unit_attacks_resolved` timing descriptor is a real 24.15 consumer marker;
+it does not introduce an alternate lifecycle dispatch or mutation path.
+
+Decision and viewer-visibility impact: no new choice is introduced. Existing
+`select_mortal_wound_model` and `select_feel_no_pain` requests may pause the aggregate Hazardous
+packet, now with stronger replay-safe source context. Hazardous rolls, selected weapon identities,
+and phase origin are public battlefield information after weapon selection in the current rules
+scope, so shared projection/event redaction does not gain a hidden type. Adapters must preserve
+repeated profile IDs and must not deduplicate, reroll, map failures, or apply wounds locally.
+
+Regression scenarios and same-bug-class search: the direct Order 17 regression gives one rules
+unit three distinct physical Hazardous weapon IDs in non-lexicographic declaration order
+(`zeta`, `mu`, `alpha`), parameterized over one shared profile and three distinct profiles. Both
+profile cases repeat the second weapon pool to model split targeting and require exactly three
+rolls, proving that shared profiles do not collapse separate weapons and split pools do not count
+one weapon twice. Each profile case covers immediate Fight completion with `(1, 2, 6)` and pending
+Shooting/Feel No Pain resolution with `(1, 6, 6)`. The mixed pass/fail results map positionally to
+the original weapons, apply the expected aggregate mortal wounds, and preserve phase origin and
+aligned physical/profile order in both Hazardous events. Exact source-context JSON round-trips and
+full lifecycle checkpoint/restore/submission retain those identities. Existing end-to-end attack
+coverage proves the roll occurs only after the unit's attacks resolve and covers Infantry,
+Vehicle, Monster, and mixed-keyword wound values. The existing optional Feel No Pain regression
+now checkpoint-restores the full pending lifecycle, resumes through `GameLifecycle.submit_decision`,
+and rejects a tampered phase/source-authority payload. Source/catalog tests pin the exact 24.15
+text, timing, evidence and runtime consumers. The same-bug-class search found destroyed-Transport
+and other hazard services already issue one roll per physical model; only the attack-sequence
+Hazardous path deduplicated profile identity. The follow-up codec search found that both physical
+identity collections require ordered, duplicate-rejecting validation; the static audit protects
+that choice as well as physical-weapon counting. These regression follow-ups add cases within an
+existing behavioral test file; they do not change file membership in the eight-shard inventory.
+
+Generated artifacts/documentation: P24D extends
+`core_abilities_2026_09/artifacts/package.json` and its typed loader/offline builder, updates the
+source-authority registry and source-backed core ability catalog, regenerates engine and external
+contract identities, and updates README, both adapter/decision contract documents, and this
+finding record.
+
+Initial Order 17 validation (before the PR #422 follow-ups): the focused Hazardous regressions pass
+`12` tests; the focused source-package and ability-catalog regressions pass `6` tests; and the P24D
+static audit passes. The exact required
+xdist/work-stealing full suite passes `6445` tests in `675.69s`. The unsharded behavioral coverage
+run passes `6093` tests with `10` pre-existing resource warnings and reaches the
+`--cov-fail-under=85` threshold at `85.00%` across `196662` statements and `77714` branches. Ruff
+check and format pass; mypy reports no issues across `2670` source files; Pyright reports zero
+errors or warnings; all `11` import-linter contracts are kept; and the four-shard inventory is
+current. The Core Abilities package, engine build identity, and generated external contract are
+current, including the external-contract base-ref check against `origin/main`. A clean installed
+wheel validates `2504` packaged resources, `27` schemas, and all six request families. The
+TypeScript generated-client check and typecheck pass, all `5` client tests pass, and the clean
+two-reference-server conformance scenario passes all `342` assertions for contract version
+`11.1.0`. This Windows environment exposes the bundled `node.exe` but no `npm` executable, so
+`npm ci` could not be run; the equivalent generated, type, unit, and conformance commands were run
+directly through the repository's existing locked `node_modules` tools. The all-files pre-commit
+run passes both configured hooks.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/422`; merge
+commit pending review and merge.
+
 ### Post-P18C v931/v946 findings
 
 Status: This section was introduced as planning documentation in PR #414. The P18D and P18E
@@ -2621,7 +2822,7 @@ The project may claim only:
 
 That claim requires:
 
-- all 54 implementation remediation PRs, S-MIRRORS, and PFINAL merged, plus every
+- all 62 implementation remediation PRs, S-MIRRORS, and PFINAL merged, plus every
   additional remediation PR inserted by the PFINAL fail-closed audit;
 - every governing operative statement, stable source ID, provider, URL,
   App-data version or observation timestamp, transcription SHA-256, and
@@ -2629,7 +2830,7 @@ That claim requires:
 - no unresolved `EXCEPTION-PAUSE`, source drift, internal App inconsistency, or
   partially executed/unsupported in-scope Core Rules semantic;
 - all 25 categories re-audited against the selected maintained App snapshot, including
-  `REVALIDATE` categories 07, 13, 16, and 17;
+  `REVALIDATE` categories 07, 13, and 17;
 - every closed finding covered through engine, adapter, replay, determinism,
   and visibility layers where applicable;
 - support reporting still distinguishes loaded source data from certified
@@ -2644,8 +2845,8 @@ and every other scope prohibited by `AGENTS.md`.
 
 ## Exception decisions to record only if encountered
 
-There are no routine source confirmations during the current 56-step
-one-PR-at-a-time sequence (54 implementation PRs, S-MIRRORS, and PFINAL).
+There are no routine source confirmations during the current 64-step
+one-PR-at-a-time sequence (62 implementation PRs, S-MIRRORS, and PFINAL).
 Record a user decision only when implementation encounters one of these
 concrete exceptions:
 
@@ -2658,7 +2859,7 @@ concrete exceptions:
 5. The repository owner withdraws or narrows the source-authority policy.
 6. 40k.app and Game Datamissions disagree for the same App-data version.
 
-The default `T-TRANSPORT` milestone is now P18A+P18C+P18D+P18E+P18B. P15D is
+The default `T-TRANSPORT` milestone is now P18A+P18C+P18D+P18E+P18F+P18B. P15D is
 the source-first P00 successor and remains one source-only APP-INTERNAL-DRIFT
 PR; P12 remains one atomic APP-DRIFT PR immediately after P14. The numbered
 one-PR-at-a-time order is fixed except for fail-closed insertion of newly found

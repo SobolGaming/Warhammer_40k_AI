@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from functools import cache
 from pathlib import Path
 
@@ -24,14 +25,24 @@ def combined_source_for(paths: tuple[Path, ...]) -> str:
 def function_sources_for(paths: tuple[Path, ...]) -> dict[str, str]:
     functions: dict[str, str] = {}
     for path in paths:
-        module_source = source_for(path)
+        # AST columns are UTF-8 byte offsets; split only Python physical newlines.
+        # ast.get_source_segment re-splits the entire file for every function.
+        lines = re.split(rb"(?<=\n)|(?<=\r)(?!\n)", source_for(path).encode("utf-8"))
         for node in ast_for(path).body:
             if not isinstance(node, ast.FunctionDef):
                 continue
-            function_source = ast.get_source_segment(module_source, node)
-            if function_source is None:
+            if node.end_lineno is None or node.end_col_offset is None:
                 raise AssertionError(f"Function {node.name} has no source segment in {path}.")
-            functions[node.name] = function_source
+            first, last = node.lineno - 1, node.end_lineno - 1
+            if first == last:
+                segment = lines[first][node.col_offset : node.end_col_offset]
+            else:
+                segment = (
+                    lines[first][node.col_offset :]
+                    + b"".join(lines[first + 1 : last])
+                    + lines[last][: node.end_col_offset]
+                )
+            functions[node.name] = segment.decode("utf-8")
     return functions
 
 

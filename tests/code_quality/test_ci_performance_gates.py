@@ -138,3 +138,99 @@ def _write_sample_shards(
     output_dir = repository_root / "ci" / "test_shards"
     sharding._write_manifests(output_dir=output_dir, shards=shards, durations=durations)
     return output_dir
+
+
+def test_junit_profiles_use_file_medians_and_preserve_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _write_sample_shards(tmp_path=tmp_path, monkeypatch=monkeypatch)
+    profiles: list[Path] = []
+    for index, duration in enumerate((1, 9, 2)):
+        profile = tmp_path / f"run-{index}"
+        profile.mkdir()
+        for name in ("first", "second"):
+            (profile / f"{name}.xml").write_text(
+                f'<testsuite tests="1"><testcase classname="tests.unit.test_{name}" '
+                f'name="test_{name}" time="{duration}" /></testsuite>',
+                encoding="utf-8",
+            )
+        profiles.append(profile)
+    durations, evidence = sharding._profile_medians(tuple(profiles), ("run-0", "run-1", "run-2"))
+    assert set(durations.values()) == {2.0}
+    assert len(evidence) == 3
+    assert all(len(item["junit_sha256"]) == 2 for item in evidence)
+    assert evidence[0]["source"] == "run-0"
+
+
+@pytest.mark.parametrize(
+    "invalid", ["duplicate", "missing", "failed", "skipped", "truncated", "nan"]
+)
+def test_junit_profiles_reject_incomplete_or_invalid_runs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    invalid: str,
+) -> None:
+    _write_sample_shards(tmp_path=tmp_path, monkeypatch=monkeypatch)
+    cases = [
+        f'<testcase classname="tests.unit.test_{name}" name="test_{name}" time="1" />'
+        for name in ("first", "second")
+    ]
+    if invalid == "duplicate":
+        cases.append(cases[0])
+    elif invalid == "missing":
+        cases.pop()
+    elif invalid in ("failed", "skipped"):
+        tag = "failure" if invalid == "failed" else "skipped"
+        cases[0] = cases[0].replace(" />", f"><{tag} /></testcase>")
+    elif invalid == "nan":
+        cases[0] = cases[0].replace('time="1"', 'time="nan"')
+    declared = len(cases) + (1 if invalid == "truncated" else 0)
+    report = tmp_path / "profile.xml"
+    report.write_text(
+        f'<testsuite tests="{declared}">{"".join(cases)}</testsuite>', encoding="utf-8"
+    )
+    with pytest.raises(SystemExit):
+        sharding._durations_from_junit(report)
+
+
+def test_quality_gate_requires_every_independent_lane_even_when_skipped() -> None:
+    workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
+    aggregate = workflow.partition("\n  quality-fast:\n")[2].partition("\n  lint:\n")[0]
+    assert "if: always()" in aggregate
+    assert "needs: [lint, contract-conformance, code-quality, semantic-audit-macos]" in aggregate
+    for lane in ("lint", "contract-conformance", "code-quality", "semantic-audit-macos"):
+        assert f"needs.{lane}.result != 'success'" in aggregate
+    assert "exit 1" in aggregate
+    assert "run: npm run test:unit" in workflow
+    assert workflow.count("pytest tests/code_quality -q -n auto --dist=worksteal --no-cov") == 1
+    for shard in range(1, 9):
+        assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
+    assert 'test -s "coverage-data/.coverage.${shard}"' in workflow
+
+
+@pytest.mark.parametrize("newline", ["\n", "\r\n", "\r"])
+def test_cached_function_spans_match_python_ast_with_unicode(newline: str, tmp_path: Path) -> None:
+    import ast
+
+    from tests.code_quality.source_index import ast_for, function_sources_for, source_for
+
+    source = newline.join(
+        (
+            "@decorator",
+            'def first(): return "é" # trailing comment',
+            "",
+            "def second():",
+            '    """λ\fretained"""',
+            '    return "好"',
+            "",
+        )
+    )
+    path = tmp_path / "source.py"
+    path.write_bytes(source.encode("utf-8"))
+    expected = {
+        node.name: ast.get_source_segment(source_for(path), node)
+        for node in ast_for(path).body
+        if isinstance(node, ast.FunctionDef)
+    }
+    assert function_sources_for((path,)) == expected

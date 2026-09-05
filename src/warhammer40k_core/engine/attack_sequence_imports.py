@@ -14,6 +14,7 @@ from warhammer40k_core.core.dice import (
     DiceRollResult,
     DiceRollResultPayload,
     DiceRollSpec,
+    DiceRollSpecError,
     DiceRollState,
     DiceRollStatePayload,
     RandomCharacteristicRoll,
@@ -142,6 +143,7 @@ from warhammer40k_core.engine.fight_on_death import (
     restore_selected_model_awaiting_fight_on_death,
 )
 from warhammer40k_core.engine.hazard import (
+    failed_hazard_roll_indices,
     hazard_mortal_wounds_per_failed_roll,
     hazard_roll_failed,
     hazard_roll_spec,
@@ -349,6 +351,7 @@ __all__ = (
     "DiceRollResult",
     "DiceRollResultPayload",
     "DiceRollSpec",
+    "DiceRollSpecError",
     "DiceRollState",
     "DiceRollStatePayload",
     "DestructionAttackKind",
@@ -487,6 +490,7 @@ __all__ = (
     "geometry_model_for_placement",
     "geometry_models_for_unit_placements",
     "has_weapon_keyword",
+    "failed_hazard_roll_indices",
     "hazard_mortal_wounds_per_failed_roll",
     "hazard_roll_failed",
     "hazard_roll_spec",

@@ -26,6 +26,7 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 from ._artifacts import (
     EXPECTED_DOCUMENT_IDENTITY,
+    EXPECTED_HAZARDOUS_RULE_IDENTITY,
     EXPECTED_PACKAGE_HASH,
     EXPECTED_RULE_IDENTITY,
     EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY,
@@ -36,7 +37,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "4a33e49c5d7c0c043a0f074ae3c89fce9dae688452da4e752593dc7a76a1ad12"
+EXPECTED_ARTIFACT_SHA256: Final = "fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7"
 
 
 def _load_artifact() -> CoreAbilitiesSourcePackageArtifact:
@@ -69,6 +70,8 @@ DEADLY_DEMISE_SOURCE_ID: Final = EXPECTED_RULE_IDENTITY[3]
 TRANSCRIPTION_SHA256: Final = EXPECTED_RULE_IDENTITY[7]
 SCOUT_ALTERNATION_FAQ_SOURCE_ID: Final = EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY[3]
 SCOUT_ALTERNATION_TRANSCRIPTION_SHA256: Final = EXPECTED_SCOUT_ALTERNATION_RULE_IDENTITY[7]
+HAZARDOUS_SOURCE_ID: Final = EXPECTED_HAZARDOUS_RULE_IDENTITY[3]
+HAZARDOUS_TRANSCRIPTION_SHA256: Final = EXPECTED_HAZARDOUS_RULE_IDENTITY[7]
 
 
 def source_rule_record() -> CoreAbilitiesSourceRuleArtifact:
@@ -77,6 +80,10 @@ def source_rule_record() -> CoreAbilitiesSourceRuleArtifact:
 
 def scout_alternation_faq_record() -> CoreAbilitiesSourceRuleArtifact:
     return _ARTIFACT.rules[1]
+
+
+def hazardous_rule_record() -> CoreAbilitiesSourceRuleArtifact:
+    return _ARTIFACT.rules[2]
 
 
 def source_evidence_records() -> tuple[RuleEvidenceRecord, ...]:
@@ -130,6 +137,7 @@ def source_package() -> RuleSourcePackage:
         source_evidence_catalog=SourceEvidenceCatalog(records=source_evidence_records()),
         evidence_required_source_ids=(
             DEADLY_DEMISE_SOURCE_ID,
+            HAZARDOUS_SOURCE_ID,
             SCOUT_ALTERNATION_FAQ_SOURCE_ID,
         ),
         source_authority_scope=CORE_RULES_SOURCE_AUTHORITY_SCOPE,
@@ -140,6 +148,8 @@ __all__ = (
     "APP_VERSION",
     "DEADLY_DEMISE_SOURCE_ID",
     "EXPECTED_ARTIFACT_SHA256",
+    "HAZARDOUS_SOURCE_ID",
+    "HAZARDOUS_TRANSCRIPTION_SHA256",
     "OBSERVED_AT",
     "PACKAGE_HASH",
     "SCOUT_ALTERNATION_FAQ_SOURCE_ID",
@@ -150,6 +160,7 @@ __all__ = (
     "TRANSCRIPTION_SHA256",
     "CoreAbilitiesSourceArtifactError",
     "core_abilities_source_artifact_from_json_bytes",
+    "hazardous_rule_record",
     "scout_alternation_faq_record",
     "source_evidence_records",
     "source_package",

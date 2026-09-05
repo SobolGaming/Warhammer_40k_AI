@@ -77,6 +77,7 @@ def source_package_identity_payload() -> dict[str, str]:
 def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
     source_prefix = f"{SOURCE_PACKAGE_ID}:core"
     deadly_demise_source = app_source.source_rule_record()
+    hazardous_source = app_source.hazardous_rule_record()
     return tuple(
         sorted(
             (
@@ -218,13 +219,13 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     ability_id="core-hazardous",
                     name="Hazardous",
                     source_kind="weapon",
-                    source_id=f"{source_prefix}:hazardous",
-                    when_descriptor="after attacks are resolved with this weapon",
-                    effect_descriptor="make a hazardous test for each affected model or unit",
-                    restrictions_descriptor="hazardous weapon test rules apply",
-                    trigger_kind="after_dice_roll",
+                    source_id=hazardous_source.source_id,
+                    when_descriptor=hazardous_source.when_descriptor,
+                    effect_descriptor=hazardous_source.effect_descriptor,
+                    restrictions_descriptor=hazardous_source.restrictions_descriptor,
+                    trigger_kind=hazardous_source.trigger_kind,
                     phase=None,
-                    handler_id="core:hazardous",
+                    handler_id=hazardous_source.runtime_handler_id,
                     required_keywords=("HAZARDOUS",),
                 ),
                 SourceAbilityRow(
