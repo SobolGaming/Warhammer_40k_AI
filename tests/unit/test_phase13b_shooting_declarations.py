@@ -7825,8 +7825,17 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
     assert state.shooting_phase_state is None
 
 
+@pytest.mark.parametrize(
+    "weapon_profile_ids",
+    [
+        pytest.param(("profile:shared",) * 3, id="shared-profile"),
+        pytest.param(("profile:0", "profile:1", "profile:2"), id="distinct-profiles"),
+    ],
+)
 @pytest.mark.parametrize("pending_fnp", [False, True])
-def test_p24d_hazardous_preserves_order_through_completion_and_restore(pending_fnp: bool) -> None:
+def test_p24d_hazardous_preserves_order_through_completion_and_restore(
+    pending_fnp: bool, weapon_profile_ids: tuple[str, ...]
+) -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
@@ -7861,8 +7870,8 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(pending_f
                 replace(
                     base_pool,
                     weapon_instance_id=weapon_instance_id,
-                    weapon_profile=replace(weapon_profile, profile_id=f"profile:{index}"),
-                    weapon_profile_id=f"profile:{index}",
+                    weapon_profile=replace(weapon_profile, profile_id=weapon_profile_ids[index]),
+                    weapon_profile_id=weapon_profile_ids[index],
                 )
                 for index, weapon_instance_id in enumerate(weapon_instance_ids)
             ),
@@ -7870,8 +7879,8 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(pending_f
             replace(
                 base_pool,
                 weapon_instance_id=weapon_instance_ids[1],
-                weapon_profile=replace(weapon_profile, profile_id="profile:1"),
-                weapon_profile_id="profile:1",
+                weapon_profile=replace(weapon_profile, profile_id=weapon_profile_ids[1]),
+                weapon_profile_id=weapon_profile_ids[1],
             ),
         ),
         source_phase=BattlePhase.SHOOTING if pending_fnp else BattlePhase.FIGHT,
@@ -7932,7 +7941,7 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(pending_f
     assert roll_state["current_values"] == list(values)
     assert payload["source_phase"] == sequence.source_phase.value
     assert payload["hazardous_weapon_instance_ids"] == list(weapon_instance_ids)
-    assert payload["hazardous_weapon_profile_ids"] == ["profile:0", "profile:1", "profile:2"]
+    assert payload["hazardous_weapon_profile_ids"] == list(weapon_profile_ids)
     assert payload["failed_hazardous_weapon_instance_ids"] == list(
         weapon_instance_ids[:failure_count]
     )
@@ -7942,7 +7951,7 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(pending_f
     context = _hazardous_source_context_payload(
         attack_sequence=sequence,
         hazardous_weapon_instance_ids=weapon_instance_ids,
-        hazardous_weapon_profile_ids=("profile:0", "profile:1", "profile:2"),
+        hazardous_weapon_profile_ids=weapon_profile_ids,
         failed_hazardous_weapon_instance_ids=weapon_instance_ids[:failure_count],
         roll_state=DiceRollState.from_payload(cast(DiceRollStatePayload, roll_state)),
         mortal_wounds_per_failed_roll=1,
@@ -7969,7 +7978,7 @@ def test_p24d_hazardous_preserves_order_through_completion_and_restore(pending_f
     applied = _last_event_payload(lifecycle, "hazardous_mortal_wounds_applied")
     assert applied["source_phase"] == sequence.source_phase.value
     assert applied["hazardous_weapon_instance_ids"] == list(weapon_instance_ids)
-    assert applied["hazardous_weapon_profile_ids"] == ["profile:0", "profile:1", "profile:2"]
+    assert applied["hazardous_weapon_profile_ids"] == list(weapon_profile_ids)
     assert applied["failed_hazardous_weapon_instance_ids"] == list(
         weapon_instance_ids[:failure_count]
     )

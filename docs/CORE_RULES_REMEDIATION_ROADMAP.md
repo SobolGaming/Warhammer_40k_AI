@@ -2663,8 +2663,8 @@ The extended Core Abilities package hash is
 byte SHA-256 is `fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7`,
 and the source-authority registry byte SHA-256 is
 `19bd1891e5519473cb431f09b1a472f30ef30a3ed883f615e3817a4356985ece`.
-The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:8fa74bd3b644897419f68f05e85cb8c58d911ebf3b535438d7097de2ef49bff9`.
+The final PR #422 engine build ID after the ordered-decoder and polygon follow-ups is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:98875fd2bc5f327b840909de61fd3bbc625c92292ae2c518682d96b7c2763d39`.
 
 Load and execution support: the Hazardous rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -2691,18 +2691,25 @@ scope, so shared projection/event redaction does not gain a hidden type. Adapter
 repeated profile IDs and must not deduplicate, reroll, map failures, or apply wounds locally.
 
 Regression scenarios and same-bug-class search: the direct Order 17 regression gives one rules
-unit three distinct physical Hazardous weapon IDs that share the same profile, repeats one weapon
-pool to model split targeting, injects the simultaneous three-die packet `(1, 2, 6)`, and proves
-the two failed dice map to the first two weapons, apply two aggregate mortal wounds, and preserve
-Fight origin in both Hazardous events. Existing end-to-end attack
+unit three distinct physical Hazardous weapon IDs in non-lexicographic declaration order
+(`zeta`, `mu`, `alpha`), parameterized over one shared profile and three distinct profiles. Both
+profile cases repeat the second weapon pool to model split targeting and require exactly three
+rolls, proving that shared profiles do not collapse separate weapons and split pools do not count
+one weapon twice. Each profile case covers immediate Fight completion with `(1, 2, 6)` and pending
+Shooting/Feel No Pain resolution with `(1, 6, 6)`. The mixed pass/fail results map positionally to
+the original weapons, apply the expected aggregate mortal wounds, and preserve phase origin and
+aligned physical/profile order in both Hazardous events. Exact source-context JSON round-trips and
+full lifecycle checkpoint/restore/submission retain those identities. Existing end-to-end attack
 coverage proves the roll occurs only after the unit's attacks resolve and covers Infantry,
 Vehicle, Monster, and mixed-keyword wound values. The existing optional Feel No Pain regression
 now checkpoint-restores the full pending lifecycle, resumes through `GameLifecycle.submit_decision`,
 and rejects a tampered phase/source-authority payload. Source/catalog tests pin the exact 24.15
 text, timing, evidence and runtime consumers. The same-bug-class search found destroyed-Transport
 and other hazard services already issue one roll per physical model; only the attack-sequence
-Hazardous path deduplicated profile identity. No behavioral test file was added, removed, moved, or
-renamed, so the four-shard inventory does not change.
+Hazardous path deduplicated profile identity. The follow-up codec search found that both physical
+identity collections require ordered, duplicate-rejecting validation; the static audit protects
+that choice as well as physical-weapon counting. These regression follow-ups add cases within an
+existing behavioral test file; they do not change file membership in the eight-shard inventory.
 
 Generated artifacts/documentation: P24D extends
 `core_abilities_2026_09/artifacts/package.json` and its typed loader/offline builder, updates the
@@ -2710,8 +2717,9 @@ source-authority registry and source-backed core ability catalog, regenerates en
 contract identities, and updates README, both adapter/decision contract documents, and this
 finding record.
 
-Validation results: the focused Hazardous regressions pass `12` tests; the focused source-package
-and ability-catalog regressions pass `6` tests; and the P24D static audit passes. The exact required
+Initial Order 17 validation (before the PR #422 follow-ups): the focused Hazardous regressions pass
+`12` tests; the focused source-package and ability-catalog regressions pass `6` tests; and the P24D
+static audit passes. The exact required
 xdist/work-stealing full suite passes `6445` tests in `675.69s`. The unsharded behavioral coverage
 run passes `6093` tests with `10` pre-existing resource warnings and reaches the
 `--cov-fail-under=85` threshold at `85.00%` across `196662` statements and `77714` branches. Ruff
