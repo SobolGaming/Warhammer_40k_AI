@@ -45,7 +45,10 @@ from warhammer40k_core.engine.objective_geometry_sources import (
     terrain_objective_geometry,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_is_battle_shocked,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
@@ -539,6 +542,7 @@ class ObjectiveControlContext:
                 or self.battle_round != self.state.battle_round
                 or self.active_player_id != self.state.active_player_id
                 or self.terrain_features != self.state.battlefield_state.terrain_features
+                or self.battle_shocked_unit_ids != tuple(sorted(self.state.battle_shocked_unit_ids))
             ):
                 raise GameLifecycleError(
                     "ObjectiveControlContext runtime state drifted from GameState."
@@ -848,7 +852,13 @@ def _objective_control_contribution(
     state: GameState | None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ObjectiveControlContribution:
-    battle_shocked = measurement.unit_instance_id in battle_shocked_unit_ids
+    battle_shocked = (
+        rules_unit_is_battle_shocked(
+            state=state, unit_instance_id=measurement.rules_unit_instance_id
+        )
+        if state is not None
+        else measurement.rules_unit_instance_id in battle_shocked_unit_ids
+    )
     objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=False,

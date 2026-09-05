@@ -22,12 +22,18 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockResult,
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldScenario,
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.endpoint_placement import (
     ObjectiveMarkerEndpointPlacementViolation,
     ObjectiveMarkerEndpointPlacementViolationPayload,
@@ -35,6 +41,7 @@ from warhammer40k_core.engine.endpoint_placement import (
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -59,6 +66,8 @@ from warhammer40k_core.engine.objective_control import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.movement import resolve_normal_move
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -324,6 +333,78 @@ def test_battle_shocked_unit_contributes_oc_zero() -> None:
     )
     assert shocked_characteristic.value_kind is CharacteristicValueKind.REPLACEMENT_DASH
     assert shocked_characteristic.applied_modifier_ids == ("battle_shock",)
+
+
+@pytest.mark.parametrize("terrain_objective", [False, True], ids=["marker", "terrain"])
+@pytest.mark.parametrize("state_backed", [False, True], ids=["scenario", "state"])
+def test_p14_battle_shocked_attached_unit_has_no_oc_for_any_component(
+    *, terrain_objective: bool, state_backed: bool
+) -> None:
+    state, marker = _battle_shocked_attached_objective_state(terrain_objective=terrain_objective)
+    formation = state.army_definitions[0].attached_units[0]
+    assert state.battle_shocked_unit_ids == [formation.attached_unit_instance_id]
+    assert formation.attached_unit_instance_id not in formation.component_unit_instance_ids
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+    )
+    assert bool(context.objective_terrain_areas) is terrain_objective
+    if not state_backed:
+        context = replace(context, state=None)
+    record = resolve_objective_control(context)
+    result = record.result_by_objective_id(marker.objective_marker_id)
+
+    assert {row.unit_instance_id for row in result.contributors} == set(
+        formation.component_unit_instance_ids
+    )
+    assert len(result.contributors) == 6
+    assert all(row.objective_control > 0 for row in result.contributors)
+    assert all(row.battle_shocked for row in result.contributors)
+    assert all(row.effective_objective_control == 0 for row in result.contributors)
+    assert result.status is ObjectiveControlStatus.UNCONTROLLED
+    assert result.controlled_by_player_id is None
+    assert result.scores == ()
+    payload = cast(
+        ObjectiveControlRecordPayload, json.loads(json.dumps(record.to_payload(), sort_keys=True))
+    )
+    assert ObjectiveControlRecord.from_payload(payload).to_payload() == record.to_payload()
+    assert resolve_objective_control(context).to_payload() == record.to_payload()
+
+
+def test_p14_state_backed_objective_context_rejects_battle_shock_identity_drift() -> None:
+    state, _marker = _battle_shocked_attached_objective_state(terrain_objective=False)
+    formation = state.army_definitions[0].attached_units[0]
+    context = ObjectiveControlContext.from_game_state(
+        state, timing=ObjectiveControlTiming.PHASE_END, phase=BattlePhase.COMMAND
+    )
+    for drifted_ids in ((), formation.component_unit_instance_ids, ("unknown-unit",)):
+        with pytest.raises(GameLifecycleError, match="runtime state drifted"):
+            replace(context, battle_shocked_unit_ids=drifted_ids)
+    state.replace_battle_shock_state(([], []))
+    with pytest.raises(GameLifecycleError, match="runtime state drifted"):
+        replace(context)
+
+
+@pytest.mark.parametrize("component_index", [0, 1])
+def test_p14_state_backed_objective_control_resolves_battle_shock_component_aliases(
+    component_index: int,
+) -> None:
+    state, _marker = _battle_shocked_attached_objective_state(terrain_objective=False)
+    formation = state.army_definitions[0].attached_units[0]
+    state.battle_shocked_unit_ids = [formation.component_unit_instance_ids[component_index]]
+    result = _center_result(
+        resolve_objective_control(
+            ObjectiveControlContext.from_game_state(
+                state, timing=ObjectiveControlTiming.PHASE_END, phase=BattlePhase.COMMAND
+            )
+        )
+    )
+    assert len(result.contributors) == 6
+    assert all(row.battle_shocked for row in result.contributors)
+    assert all(row.effective_objective_control == 0 for row in result.contributors)
+    assert result.controlled_by_player_id is None
 
 
 def test_contested_objective_has_deterministic_uncontrolled_result() -> None:
@@ -1187,14 +1268,14 @@ def _phase17n_linked_objective_state(layout_number: int) -> GameState:
     return _phase17n_layout_state(f"purge-the-foe-vs-purge-the-foe-layout-{layout_number}")
 
 
-def _phase17n_layout_state(layout_id: str) -> GameState:
+def _phase17n_layout_mission_setup(layout_id: str) -> MissionSetup:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     mission_pool_entry = next(
         entry
         for entry in mission_pack.mission_pool_entries
         if layout_id in entry.terrain_layout_ids
     )
-    mission_setup = MissionSetup.from_mission_pack(
+    return MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         attacker_player_id="player-a",
@@ -1202,6 +1283,10 @@ def _phase17n_layout_state(layout_id: str) -> GameState:
         defender_player_id="player-b",
         defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
+
+
+def _phase17n_layout_state(layout_id: str) -> GameState:
+    mission_setup = _phase17n_layout_mission_setup(layout_id)
     config = _config(mission_setup=mission_setup)
     armies = _mustered_armies(config)
     state = GameState.from_config(config)
@@ -1217,6 +1302,101 @@ def _phase17n_layout_state(layout_id: str) -> GameState:
     state.record_battlefield_state(scenario.battlefield_state)
     _force_battle_for_objective_fixture(state)
     return state
+
+
+def _battle_shocked_attached_objective_state(
+    *, terrain_objective: bool
+) -> tuple[GameState, ObjectiveMarkerDefinition]:
+    mission_setup = (
+        _phase17n_layout_mission_setup("priority-assets-vs-priority-assets-layout-1")
+        if terrain_objective
+        else _mission_setup()
+    )
+    config = _config(mission_setup=mission_setup)
+    alpha_request = config.army_muster_requests[0]
+    alpha_request = replace(
+        alpha_request,
+        unit_selections=(
+            *alpha_request.unit_selections,
+            UnitMusterSelection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(model_profile_id="core-character-leader", model_count=1),
+                ),
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id=alpha_request.unit_selections[0].unit_selection_id,
+            ),
+        ),
+    )
+    config = replace(config, army_muster_requests=(alpha_request, config.army_muster_requests[1]))
+    state = GameState.from_config(config)
+    for muster_request in config.army_muster_requests:
+        state.record_army_definition(
+            muster_army(catalog=config.army_catalog, request=muster_request)
+        )
+    marker = (
+        next(
+            marker
+            for marker in mission_setup.objective_markers
+            if marker.objective_marker_id
+            == mission_setup.objective_terrain_areas[0].objective_marker_id
+        )
+        if terrain_objective
+        else _center_marker_definition(state)
+    )
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="attached-unit-objective-battlefield",
+        armies=tuple(state.army_definitions),
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+    )
+    battlefield = scenario.battlefield_state
+    formation = state.army_definitions[0].attached_units[0]
+    for index, component_id in enumerate(formation.component_unit_instance_ids):
+        placement = battlefield.unit_placement_by_id(component_id)
+        battlefield = battlefield.with_unit_placement(
+            _with_model_offsets(
+                placement,
+                marker,
+                offsets=tuple(
+                    (-2.0 + model_index, -1.0 + 2.0 * index)
+                    for model_index in range(len(placement.model_placements))
+                ),
+            )
+        )
+    state.record_battlefield_state(battlefield)
+    _force_battle_for_objective_fixture(state)
+    rules_unit = rules_unit_view_by_id(
+        state=state, unit_instance_id=formation.attached_unit_instance_id
+    )
+    request = BattleShockTestRequest.for_unit(
+        request_id="attached-objective-battle-shock-request",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=rules_unit.owner_player_id,
+        unit_instance_id=rules_unit.unit_instance_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=6,
+        below_half_strength_context=BelowHalfStrengthContext.from_rules_unit(
+            rules_unit=rules_unit,
+            starting_strength=state.starting_strength_record_for_unit(rules_unit.unit_instance_id),
+            current_model_ids=tuple(model.model_instance_id for model in rules_unit.alive_models()),
+        ),
+    )
+    state.record_battle_shock_result(
+        BattleShockResult.from_roll_state(
+            result_id="attached-objective-battle-shock-result",
+            request=request,
+            roll_state=DiceRollManager(state.game_id).roll_fixed(request.spec, [1, 1]),
+        )
+    )
+    return state, marker
 
 
 def _battle_state_with_center_objective_positions(

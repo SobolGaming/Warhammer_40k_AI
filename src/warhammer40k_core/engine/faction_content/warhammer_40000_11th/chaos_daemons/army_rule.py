@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import replace
+from copy import copy
 from enum import StrEnum
 from typing import cast
 
@@ -1006,20 +1006,19 @@ def shadow_regions_for_player(
         raise GameLifecycleError("Shadow of Chaos requires battlefield_state.")
     requested_player_id = _validate_identifier("player_id", player_id)
     regions: list[ShadowRegion] = [ShadowRegion.OWN_DEPLOYMENT_ZONE]
+    objective_state = state
+    if battle_shocked_unit_ids is not None:
+        # This read-only query uses phase-start Battle-shock while retaining runtime OC effects.
+        objective_state = copy(state)
+        objective_state.battle_shocked_unit_ids = list(
+            _validate_identifier_tuple("battle_shocked_unit_ids", battle_shocked_unit_ids)
+        )
     objective_context = ObjectiveControlContext.from_game_state(
-        state,
+        objective_state,
         timing=ObjectiveControlTiming.PHASE_END,
         phase=state.current_battle_phase or BattlePhase.COMMAND,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
     )
-    if battle_shocked_unit_ids is not None:
-        objective_context = replace(
-            objective_context,
-            battle_shocked_unit_ids=_validate_identifier_tuple(
-                "battle_shocked_unit_ids",
-                battle_shocked_unit_ids,
-            ),
-        )
     objective_record = resolve_objective_control(objective_context)
     objective_record = apply_sticky_objective_control(
         record=objective_record,

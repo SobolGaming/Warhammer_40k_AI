@@ -108,6 +108,16 @@ def test_p14_objective_consumers_share_group_geometry_and_boundary_terminology()
         assert "normalize_objective_rule_text(" not in source_for(path)
 
 
+def test_p14_objective_control_and_projection_use_rules_unit_battle_shock_authority() -> None:
+    objective_source = source_for(SRC_ROOT / "engine" / "objective_control.py")
+    projection_source = source_for(SRC_ROOT / "adapters" / "projection.py")
+    for source in (objective_source, projection_source):
+        assert "rules_unit_is_battle_shocked(" in source
+        assert "measurement.unit_instance_id in battle_shocked_unit_ids" not in source
+        assert "unit.unit_instance_id in state.battle_shocked_unit_ids" not in source
+    assert "unit_instance_id=measurement.rules_unit_instance_id" in objective_source
+
+
 def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_boundary() -> None:
     hazardous_source = source_for(ATTACK_SEQUENCE_HAZARDOUS_PATH)
     dispatch_source = source_for(ATTACK_SEQUENCE_DISPATCH_PATH)

@@ -3756,6 +3756,13 @@ component identity. Historical witnesses use their authenticated snapshot models
 including an explicitly included model being destroyed, rather than recomputing
 membership from the current living models.
 
+Objective Control and displayed current OC resolve Battle-shock through the shared
+rules-unit identity authority, including Attached Unit and component aliases. Physical
+component IDs remain on model contributions. State-backed objective contexts reject
+Battle-shock ID collections that differ from GameState; scenario-only contexts use
+canonical rules-unit IDs. Base-characteristic displays and existing viewer redaction
+remain unchanged.
+
 This change adds no decision type, option family, proposal kind, transport field,
 or visibility rule. Existing finite/parameterized submissions, engine validation,
 event records, replay, and shared viewer redaction remain the authority. The runtime

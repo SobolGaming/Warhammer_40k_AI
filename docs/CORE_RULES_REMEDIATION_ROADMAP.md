@@ -2775,6 +2775,17 @@ remain with their owners. The generic reroll and Primary position/destruction wi
 use the same geometry. Historical evidence measures its authenticated physical snapshot, including
 an explicitly included destroyed model, rather than substituting current living-model membership.
 
+Attached Unit Battle-shock is evaluated through `rules_unit_is_battle_shocked` using the
+measurement's canonical rules-unit ID. Component ownership remains available for model modifiers
+and contribution payloads. State-backed OC contexts reject a Battle-shock ID collection that
+differs from GameState, including substituted component aliases; scenario-only contexts use
+canonical rules-unit IDs. The same physical-ID defect was found in adapter current-OC display
+and now uses the shared authority there as well. Mission-action eligibility/history already
+used that helper. Geometry, mutation ownership and decision/visibility schemas are unchanged.
+The Shadow of Chaos phase-start OC caller now evaluates its recorded Battle-shock IDs through
+a read-only state copy, retaining generic runtime OC effects without mixing a historical ID
+collection with live-state context fields. It does not mutate the authoritative GameState.
+
 `RuleSourceText` now requires and serializes `objective_scope`: `core_rules`, `non_core_rules`,
 or `historical_text`. Non-Core 11th Edition singular/plural marker references normalize before
 tokens and RuleIR are built; Core text stays literal. Raw text, source IDs and evidence remain
@@ -2863,35 +2874,42 @@ static audit prevents local objective geometry from returning to these four cons
 prevents runtime text substitution. All regression additions extend existing test files; the
 eight-shard inventory has no membership change.
 
+Attached/Battle-shocked regressions muster a real bodyguard and Leader, record a failed
+Battle-shock result under only the synthetic attached ID, and require all six model contributions
+to be Battle-shocked with zero effective OC and no controller. Marker and source-linked Event
+Companion terrain objectives exercise both state-backed and scenario-only queries. Component
+alias queries, missing/substituted/extra context IDs, deterministic OC payload round-trips, and
+facade projections for both players are covered. A static audit prevents physical-ID membership
+checks from returning to OC and adapter display.
+The phase-start consumer regression distinguishes current Battle-shock from its recorded
+snapshot, preserves an executed RuleIR OC modifier, and checks that live state is unchanged.
+
 Generated artifacts and documentation: offline P14 source builder and JSON/audit, eager loader,
 source-authority registry/pin, engine build manifest, external contract examples/manifest, README,
 adapter contract and this finding. Explicit producer classifications preserve historical generated
 content; generator checks must prove committed output remains current. No faction generated
 content or support inventory is expanded.
 
-Validation: the final complete behavioral suite passes `6128` tests in `508.28s`, with `9`
-pre-existing resource warnings, using the required Node PATH prefix, xdist work stealing and
+Validation: the final complete behavioral suite passes `6139` tests in `458.37s`, with `10`
+SQLite resource warnings, using the required Node PATH prefix, xdist work stealing and
 coverage command. Branch-inclusive coverage is `85.01%`, above the required 85% threshold.
-The behavioral suite was not repeated without coverage. Focused objective/source/parser
-coverage passes 293 tests; the objective/normalization subset with invalid-shape/scope cases
-passes 71 tests; and the boundary extraction/module-budget subset passes 72 tests.
-The consumer static audit passes 12 tests. The initial aggregate run exposed an older audit
-validator comparing all observations under one policy rather than its own audit ID; the scoped
-audit comparison now passes all 19 reporting regressions. Revised objective witnesses also
-change deterministic event history: the return-on-death ordering fixture uses a verified
-successful seed with its original 2+ threshold, preserving the full capture/return/restore path.
+The behavioral suite was not repeated without coverage. The focused OC, projection, Chaos
+Daemons consumer and static/module-budget run passes 163 tests. The extended historical-query
+regression also passes with a real executed RuleIR OC modifier. The first review-fix aggregate
+run exposed four phase-start consumers mixing historical Battle-shock IDs with live context;
+the read-only query-state correction resolves them, and the complete coverage gate was rerun
+after that production change. The final complete code-quality suite passes `365` tests in
+`103.10s` with xdist work stealing and no coverage, including generated ability-support/semantic
+audit checks on macOS.
 Ruff check/format, mypy (`2677` source files), Pyright (zero errors/warnings), all 11 import
 contracts, the exact eight-shard inventory check and all-files pre-commit pass. The P14 source
 builder and runtime build check pass. Generated external contracts pass with `--base-ref
 origin/main` at `52673fa184673ee59a8f30cad40c8dba4e027c79`. Installed-wheel smoke passes with
 `2511` packaged resources, `27` schemas and all six request families. Node 24.18 with temporary
 pinned npm 11.6.2 runs a clean `npm ci`, generated-client/type checks, all `5` TypeScript unit
-tests, and the two-server conformance scenario (`342` assertions, contract `11.1.0`). Historical
-Stratagem generation compares exactly in memory; Aeldari, Chaos Maulerfiend and Emperor's Children
-RuleIR generator checks pass without changing their content. The final complete code-quality suite passes `364` tests in `108.00s` with xdist work stealing
-and no coverage, including generated ability-support/semantic audit checks on macOS.
+tests, and the two-server conformance scenario (`342` assertions, contract `11.1.0`).
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:ad74bf8ea928d6ad80d930d22f97aebaacdc390b2038fb884acda10c71af03b1`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:7dc0c749b1780145d7cf63d0698e3ece56fad385c765a6d0b0770d691a95310a`.
 
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/423`; merge
 commit pending review and merge.
