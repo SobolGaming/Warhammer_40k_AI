@@ -42,6 +42,7 @@ class TimingTriggerKind(StrEnum):
     MODEL_PLACED_ON_BATTLEFIELD = "model_placed_on_battlefield"
     JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT = "just_after_enemy_unit_has_fought"
     JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT = "just_after_friendly_unit_selected_to_fight"
+    AFTER_UNIT_ATTACKS_RESOLVED = "after_unit_attacks_resolved"
     AFTER_DICE_ROLL = "after_dice_roll"
 
 

@@ -13,9 +13,10 @@ def hazard_roll_spec(
     reason: str,
     roll_type: str,
     actor_id: str,
+    quantity: int = 1,
 ) -> DiceRollSpec:
     return DiceRollSpec(
-        expression=DiceExpression(quantity=1, sides=6),
+        expression=DiceExpression(quantity=quantity, sides=6),
         reason=reason,
         roll_type=roll_type,
         actor_id=actor_id,
@@ -26,6 +27,19 @@ def hazard_roll_failed(roll_state: DiceRollState) -> bool:
     if type(roll_state) is not DiceRollState:
         raise GameLifecycleError("Hazard roll failure check requires DiceRollState.")
     return roll_state.current_total <= HAZARD_ROLL_FAILURE_THRESHOLD
+
+
+def failed_hazard_roll_indices(roll_state: DiceRollState) -> tuple[int, ...]:
+    if type(roll_state) is not DiceRollState:
+        raise GameLifecycleError("Hazard roll failure check requires DiceRollState.")
+    expression = roll_state.original_result.spec.expression
+    if expression.sides != 6 or expression.modifier != 0:
+        raise GameLifecycleError("Hazard rolls require unmodified D6 values.")
+    return tuple(
+        index
+        for index, value in enumerate(roll_state.current_values)
+        if value <= HAZARD_ROLL_FAILURE_THRESHOLD
+    )
 
 
 def hazard_mortal_wounds_per_failed_roll(unit: UnitInstance) -> int:

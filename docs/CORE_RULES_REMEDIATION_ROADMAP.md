@@ -2537,6 +2537,141 @@ conformance scenario passes all `342` assertions for contract version `11.1.0`.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/421`; merge commit
 pending review and merge.
 
+### P24D — C24-04
+
+Status: Implemented in Order 17; required local validation is complete and remote PR publication
+is in progress.
+
+Finding IDs: `C24-04`.
+
+Dependencies and evidence gate: P05A/PR #413 and P06B are merged on `main`. The exact 24.15
+Hazardous statement is retained in the reviewed Core Abilities artifact with a separately
+classified, project-authoritative Game Datamissions v931 App-data mirror observation authenticated
+against the S-MIRRORS provider audit and authorized source package. The retained 40k.app category
+24 observation independently locates the same rule. This satisfies `APP-AUTHORITY`; no
+`EXCEPTION-PAUSE` applies.
+
+Violated invariant: after a unit resolves all attacks in Shooting or Fight, the engine must make
+one Hazard Roll for every physical Hazardous weapon selected in the Select Weapons step. Physical
+weapon identity, profile identity, the simultaneous roll packet, failure-to-weapon mapping,
+phase origin, and any paused mortal-wound continuation must remain deterministic, serializable,
+source-linked, and engine-owned.
+
+How it was done before P24D: the shared attack-sequence boundary filtered Hazardous pools, reduced
+them to a sorted set of `weapon_profile_id` values, and requested exactly one D6. Multiple physical
+weapons using the same profile therefore collapsed into one test. The reason string always said
+"after shooting" even when the shared resolver was completing Fight attacks. Resolution and
+mortal-wound events retained only deduplicated profile IDs, one roll, and no explicit phase or
+physical weapon identity, so replay could not prove which selected weapons produced or failed the
+rolls.
+
+How it is done after P24D: every selected attack pool already carries its canonical physical
+`weapon_instance_id`, selected `weapon_profile_id`, full typed profile, and `AttackSequence`
+`source_phase`. At the existing post-attack boundary, the engine keeps Hazardous pools in their
+deterministic declaration order, collapses repeated pools for one physical weapon that split
+attacks across targets, rejects one physical weapon selecting multiple profiles, and makes one
+simultaneous unmodified D6 expression whose quantity equals the unique physical weapon count. Each
+die is positionally bound to one weapon instance. Values of 1 or 2 identify the failed physical
+weapons; the shared Hazardous keyword policy determines mortal wounds per failed roll, and the
+engine routes their aggregate through the existing progressive P06B
+mortal-wound/model-allocation/Feel No Pain service. Nothing rolls or mutates in an adapter.
+
+Both Hazardous events now preserve `source_phase`, ordered physical weapon IDs, aligned profile
+IDs (including intentional repeated values), failed physical weapon IDs, complete roll state,
+mortal wounds per failure, and the aggregate wound total. A paused P06B continuation stores the
+same fields. Typed parsing verifies D6 shape, roll count, ordered failure mapping, and wound
+arithmetic; continuation and lifecycle restore additionally close those values against the active
+attack sequence and its Shooting/Fight origin. Pre-submission validation returns a typed invalid
+status before queue pop or mutation if a pending Hazardous mortal-wound context drifts.
+
+Specific authoritative maintained App-data mirror statement and source ID: 24.15 Hazardous states,
+"Each time a unit is selected to shoot or selected to fight, after that unit has resolved all of
+its attacks, make a number of hazard rolls (06.03) for that unit equal to the number of
+[HAZARDOUS] weapons you selected in the Select Weapons step." The stable source ID is
+`gw-11e-core-abilities:core:hazardous`; runtime events, ability-catalog identity, evidence, and
+continuations use that source ID rather than a display name or locally normalized source text.
+
+Provider, URL, App-data version, transcription SHA-256, and source-observation fingerprint: Game
+Datamissions, `https://game-datamissions.com/11th/rules/changelog?v=931`, App-data version `931`,
+reviewed at `2026-09-02T12:30:09-04:00`; transcription
+`2ecefae469a748d8f5b337dcbbb4a1c3211bfa4c3555626fbbd05ee6fbde3832`;
+reviewed-transcription observation
+`a80ec4f83e554f7004a396a7363977db41f9ca0e3a8675df1c0163bab3967ffd`;
+authoritative-mirror observation
+`8292a0b2aaa7640ee6b82b2dca9e822aa2ce26d59759dfb72a276a9e63b77e1b`; authenticated
+provider-audit observation
+`1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668`.
+The extended Core Abilities package hash is
+`ceda170f6ff51083eb2976ea97ee4d9096095dc3276d25ff7335d1cacabb9bfb`, its canonical artifact
+byte SHA-256 is `fbfb7dae154292d33963a9c81d5c14025aa6c44873b7ee7a60c1fce754909bf7`,
+and the source-authority registry byte SHA-256 is
+`19bd1891e5519473cb431f09b1a472f30ef30a3ed883f615e3817a4356985ece`.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:8fa74bd3b644897419f68f05e85cb8c58d911ebf3b535438d7097de2ef49bff9`.
+
+Load and execution support: the Hazardous rule and both evidence rows are `loaded` and
+`executable_engine_runtime`. The reviewed-transcription row remains
+`unverified_transcription_only`/`unverified`; only the linked Game Datamissions observation carries
+project authority. The fail-fast loader pins all three Core Abilities rules, descriptors, timing,
+evidence inventory, runtime consumers, package hash, and artifact byte hash. The source-backed
+ability row consumes the exact Hazardous source ID and descriptors.
+
+Scope and owning path: P24D owns physical selected-weapon Hazardous accounting at the shared
+attack-sequence completion boundary, simultaneous roll/failure mapping, Shooting/Fight provenance,
+P06B continuation authority, source/catalog identity, adapter-visible event documentation, and
+focused regressions. The authoritative path is reviewed JSON and typed loader -> selected typed
+attack pools -> shared attack completion -> simultaneous engine dice -> failed physical weapon
+mapping -> shared mortal-wound routing -> events/replay/adapter deltas. P24D adds no named handler,
+player-facing decision type, option family, proposal kind, faction branch, or out-of-scope content.
+The source-backed `after_unit_attacks_resolved` timing descriptor is a real 24.15 consumer marker;
+it does not introduce an alternate lifecycle dispatch or mutation path.
+
+Decision and viewer-visibility impact: no new choice is introduced. Existing
+`select_mortal_wound_model` and `select_feel_no_pain` requests may pause the aggregate Hazardous
+packet, now with stronger replay-safe source context. Hazardous rolls, selected weapon identities,
+and phase origin are public battlefield information after weapon selection in the current rules
+scope, so shared projection/event redaction does not gain a hidden type. Adapters must preserve
+repeated profile IDs and must not deduplicate, reroll, map failures, or apply wounds locally.
+
+Regression scenarios and same-bug-class search: the direct Order 17 regression gives one rules
+unit three distinct physical Hazardous weapon IDs that share the same profile, repeats one weapon
+pool to model split targeting, injects the simultaneous three-die packet `(1, 2, 6)`, and proves
+the two failed dice map to the first two weapons, apply two aggregate mortal wounds, and preserve
+Fight origin in both Hazardous events. Existing end-to-end attack
+coverage proves the roll occurs only after the unit's attacks resolve and covers Infantry,
+Vehicle, Monster, and mixed-keyword wound values. The existing optional Feel No Pain regression
+now checkpoint-restores the full pending lifecycle, resumes through `GameLifecycle.submit_decision`,
+and rejects a tampered phase/source-authority payload. Source/catalog tests pin the exact 24.15
+text, timing, evidence and runtime consumers. The same-bug-class search found destroyed-Transport
+and other hazard services already issue one roll per physical model; only the attack-sequence
+Hazardous path deduplicated profile identity. No behavioral test file was added, removed, moved, or
+renamed, so the four-shard inventory does not change.
+
+Generated artifacts/documentation: P24D extends
+`core_abilities_2026_09/artifacts/package.json` and its typed loader/offline builder, updates the
+source-authority registry and source-backed core ability catalog, regenerates engine and external
+contract identities, and updates README, both adapter/decision contract documents, and this
+finding record.
+
+Validation results: the focused Hazardous regressions pass `12` tests; the focused source-package
+and ability-catalog regressions pass `6` tests; and the P24D static audit passes. The exact required
+xdist/work-stealing full suite passes `6445` tests in `675.69s`. The unsharded behavioral coverage
+run passes `6093` tests with `10` pre-existing resource warnings and reaches the
+`--cov-fail-under=85` threshold at `85.00%` across `196662` statements and `77714` branches. Ruff
+check and format pass; mypy reports no issues across `2670` source files; Pyright reports zero
+errors or warnings; all `11` import-linter contracts are kept; and the four-shard inventory is
+current. The Core Abilities package, engine build identity, and generated external contract are
+current, including the external-contract base-ref check against `origin/main`. A clean installed
+wheel validates `2504` packaged resources, `27` schemas, and all six request families. The
+TypeScript generated-client check and typecheck pass, all `5` client tests pass, and the clean
+two-reference-server conformance scenario passes all `342` assertions for contract version
+`11.1.0`. This Windows environment exposes the bundled `node.exe` but no `npm` executable, so
+`npm ci` could not be run; the equivalent generated, type, unit, and conformance commands were run
+directly through the repository's existing locked `node_modules` tools. The all-files pre-commit
+run passes both configured hooks.
+
+PR URL and merge commit: pending remote publication; merge commit pending review and merge.
+
 ### Post-P18C v931/v946 findings
 
 Status: This section was introduced as planning documentation in PR #414. The P18D and P18E

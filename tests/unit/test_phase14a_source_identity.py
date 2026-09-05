@@ -273,7 +273,39 @@ def test_p24g_scout_alternation_faq_is_pinned_source_backed_and_executable() -> 
     assert mirror.app_version == "931"
     assert package.evidence_required_source_ids == (
         core_abilities_2026_09.DEADLY_DEMISE_SOURCE_ID,
+        core_abilities_2026_09.HAZARDOUS_SOURCE_ID,
         core_abilities_2026_09.SCOUT_ALTERNATION_FAQ_SOURCE_ID,
+    )
+
+
+def test_p24d_hazardous_is_pinned_source_backed_and_catalog_consumed() -> None:
+    package = core_abilities_2026_09.source_package()
+    rule = core_abilities_2026_09.hazardous_rule_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+    catalog_row = next(
+        row for row in core_abilities.core_ability_rows() if row.ability_id == "core-hazardous"
+    )
+
+    assert rule.source_id == core_abilities_2026_09.HAZARDOUS_SOURCE_ID
+    assert rule.transcription_sha256 == core_abilities_2026_09.HAZARDOUS_TRANSCRIPTION_SHA256
+    assert rule.section_id == "24.15"
+    assert rule.trigger_kind == "after_unit_attacks_resolved"
+    assert "equal to the number of [HAZARDOUS] weapons you selected" in rule.source_text
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert catalog_row.source_id == rule.source_id
+    assert catalog_row.when_descriptor == rule.when_descriptor
+    assert catalog_row.effect_descriptor == rule.effect_descriptor
+    assert catalog_row.restrictions_descriptor == rule.restrictions_descriptor
+    assert catalog_row.trigger_kind == rule.trigger_kind
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    assert all(
+        "warhammer40k_core.engine.attack_sequence_hazardous:_resolve_hazardous_tests"
+        in record.runtime_consumer_ids
+        for record in evidence
     )
 
 
