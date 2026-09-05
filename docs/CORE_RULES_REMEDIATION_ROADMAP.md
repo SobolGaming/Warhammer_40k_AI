@@ -6,6 +6,12 @@ This roadmap covers only Warhammer 40,000 11th Edition Core Rules categories
 01–25. Factions, faction detachments, faction datasheets, and the out-of-scope
 content listed in `AGENTS.md` are excluded.
 
+The separate [Faction Rules Remediation Roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md)
+covers faction rules, detachments, datasheets, points and model/equipment fields.
+Its [readable faction guides](FACTION_SUPPORT.md) distinguish source, execution,
+fieldability and playability evidence. Shared Core Rules prerequisites remain
+owned by this roadmap.
+
 The retained 40k.app snapshot is the exhaustive Core Rules corpus for the
 completed portion of this audit. Its immutable observations retain historical
 policy ID

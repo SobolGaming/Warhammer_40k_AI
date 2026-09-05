@@ -2,6 +2,11 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+For faction coverage, start with the [faction support guides](docs/FACTION_SUPPORT.md).
+They list current army rules, detachments and unit costs, separate historical
+implementation evidence from fieldability/playability, and link the
+[faction remediation roadmap](docs/FACTION_RULES_REMEDIATION_ROADMAP.md).
+
 Start here:
 
 ```bash
