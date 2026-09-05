@@ -34,7 +34,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine import stratagems_generic_metadata, stratagems_selection
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -131,7 +131,12 @@ from warhammer40k_core.engine.primary_historical_events import (
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_destroyed_model_departures,
 )
-from warhammer40k_core.engine.rule_execution import RuleExecutionResult
+from warhammer40k_core.engine.rule_execution import (
+    RuleExecutionContext,
+    RuleExecutionResult,
+    RuleExecutionStatus,
+    execute_rule_ir,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.sequencing import (
@@ -164,6 +169,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleConditionKind
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -205,6 +211,69 @@ def test_shadow_of_chaos_marks_no_mans_land_when_daemons_control_half_objectives
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
     )
+
+
+def test_shadow_of_chaos_snapshot_battle_shock_does_not_mutate_live_state() -> None:
+    state = battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0), (-1.5, -13.5)),
+        player_b_offsets=((8.0, 0.0),),
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    state.battle_shocked_unit_ids = ["army-alpha:intercessor-unit-1"]
+    before = state.to_payload()
+
+    live_regions = army_rule.shadow_regions_for_player(state=state, player_id="player-a")
+    snapshot_regions = army_rule.shadow_regions_for_player(
+        state=state, player_id="player-a", battle_shocked_unit_ids=()
+    )
+
+    assert army_rule.ShadowRegion.NO_MANS_LAND not in live_regions
+    assert army_rule.ShadowRegion.NO_MANS_LAND in snapshot_regions
+    assert state.to_payload() == before
+
+    assert state.battlefield_state is not None
+    opponent = state.battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-3")
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            opponent, center_marker_definition(state), offsets=((1.5, 0.0), (0.0, -13.5))
+        )
+    )
+    assert army_rule.ShadowRegion.NO_MANS_LAND not in army_rule.shadow_regions_for_player(
+        state=state, player_id="player-a", battle_shocked_unit_ids=()
+    )
+    compiled = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+            source_id="phase17g:test:shadow-snapshot-oc-modifier",
+            raw_text=(
+                "Until the end of the turn, add 1 to the Objective Control characteristic "
+                "of models in this unit."
+            ),
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    )
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=RuleExecutionContext(
+            game_id=state.game_id,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.COMMAND,
+            active_player_id=state.active_player_id,
+            source_unit_instance_id="army-alpha:intercessor-unit-1",
+            target_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+            state=state,
+            event_log=DecisionController().event_log,
+        ),
+    )
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert len(result.created_persisting_effects) == 1
+    modified_before = state.to_payload()
+    modified_regions = army_rule.shadow_regions_for_player(
+        state=state, player_id="player-a", battle_shocked_unit_ids=()
+    )
+    assert army_rule.ShadowRegion.NO_MANS_LAND in modified_regions
+    assert state.to_payload() == modified_before
 
 
 def test_shadow_of_chaos_marks_and_reaches_controlled_opponent_deployment_zone() -> None:
@@ -3026,6 +3095,7 @@ def _datasheet_ability(ability_id: str) -> DatasheetAbilityDescriptor:
 def _semantic_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescriptor:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id=f"phase17g:test:semantic-shadow-aura:{allegiance.lower()}",
             raw_text=(
                 f"Daemonic Shadow (Aura): While a friendly {allegiance} Legiones Daemonica "

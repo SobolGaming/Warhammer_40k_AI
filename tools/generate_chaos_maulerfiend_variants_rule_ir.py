@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+
 if TYPE_CHECKING or __package__:
     from tools.canonical_json_hash import canonical_json_sha256
     from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
@@ -206,6 +208,7 @@ def _generated_artifact_payload(spec: _FactionSpec) -> dict[str, object]:
     rule_irs = {
         source_row_id: spec.rule_ir_builder_by_source_row_id[source_row_id](
             RuleSourceText.from_raw(
+                objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
                 source_id=f"{spec.source_package_id}:datasheet:{source_row_id}",
                 raw_text=current_text_by_source_row_id[source_row_id],
             ).normalized_text,

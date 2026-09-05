@@ -29,6 +29,10 @@ from warhammer40k_core.rules.hit_success_threshold_parser import (
     has_hit_success_threshold,
     hit_success_threshold_effects,
 )
+from warhammer40k_core.rules.objective_rule_patterns import (
+    DISTANCE_RELATION_RE,
+    OBJECTIVE_REROLL_INSTEAD_RE,
+)
 from warhammer40k_core.rules.parsed_tokens import DistancePredicateToken, ParsedRuleText, TextSpan
 from warhammer40k_core.rules.rule_characteristic_parser import (
     parse_characteristic_effects as _parse_characteristic_effects,
@@ -319,12 +323,6 @@ _REROLL_RE = re.compile(
     r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+(?:unit|model))?",
     re.IGNORECASE,
 )
-_OBJECTIVE_REROLL_INSTEAD_RE = re.compile(
-    r"\bif\s+the\s+target\s+of\s+that\s+attack\s+is\s+within\s+range\s+of\s+"
-    r"an?\s+objective\s+marker,\s+you\s+can\s+(?:re-roll|reroll)\s+"
-    r"(?:the\s+)?(?P<roll>hit|wound|damage|save)\s+roll\s+instead\b",
-    re.IGNORECASE,
-)
 _SELECTED_UNIT_MAKES_ATTACK_RE = re.compile(
     r"\b(?:a\s+model|models?)\s+in\s+"
     r"(?:this\s+model's\s+unit|that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
@@ -474,22 +472,6 @@ _PER_MODEL_MORTAL_WOUNDS_RE = re.compile(
     r"in\s+this\s+unit:\s+for\s+each\s+(?P<success_threshold>[2-6])\+,\s+"
     r"(?P<target>that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
     r"suffers\s+(?P<mortal_wounds>D6|D3|\d+)\s+mortal\s+wounds\b",
-    re.IGNORECASE,
-)
-_DISTANCE_RELATION_RE = re.compile(
-    r"\b(?:(?P<subject>this\s+unit|this\s+model|that\s+unit|selected\s+unit|"
-    r"target\s+unit)\s+is\s+)?"
-    r"(?P<negated>not\s+)?"
-    r"(?P<predicate>wholly\s+within|within)\s+"
-    r"(?P<range>Engagement\s+Range|Objective\s+Marker\s+Range|\d+(?:\.\d+)?\")\s+"
-    r"of\s+(?:and\s+visible\s+to\s+)?"
-    r"(?:(?P<quantity>one\s+or\s+more|any|a|an)\s+)?"
-    r"(?:(?P<allegiance>enemy|friendly)\s+)?"
-    r"(?:(?P<object_reference>this|that|selected|target)\s+)?"
-    r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
-    r"(?P<object_kind>units?|models?|objective\s+markers?|fortifications?)"
-    r"(?:\s+from\s+(?P<object_owner>your\s+army)"
-    r"(?:\s+with\s+(?P<object_ability_scope>this\s+ability))?)?\b",
     re.IGNORECASE,
 )
 _RESIDUAL_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_+'-]*")
@@ -1732,7 +1714,7 @@ def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...
     effects: list[RuleEffectSpec] = []
     list_spans: list[tuple[int, int]] = []
     tracked_target_pairs = _tracked_target_reroll_parameter_pairs(clause_text)
-    objective_instead_matches = tuple(_OBJECTIVE_REROLL_INSTEAD_RE.finditer(clause_text.text))
+    objective_instead_matches = tuple(OBJECTIVE_REROLL_INSTEAD_RE.finditer(clause_text.text))
     objective_instead_spans = tuple(
         (match.start(), match.end()) for match in objective_instead_matches
     )
@@ -2699,7 +2681,7 @@ def _distance_relation_match_for_token(
 ) -> re.Match[str] | None:
     token_start = token.span.start - clause_text.span.start
     token_end = token.span.end - clause_text.span.start
-    for match in _DISTANCE_RELATION_RE.finditer(clause_text.text):
+    for match in DISTANCE_RELATION_RE.finditer(clause_text.text):
         if match.start("predicate") <= token_start and token_end <= match.end("range"):
             return match
     return None

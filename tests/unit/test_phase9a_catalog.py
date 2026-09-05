@@ -64,6 +64,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import (
     SourceCatalog,
     SourceCatalogError,
@@ -88,6 +89,7 @@ def test_source_catalog_round_trips_source_package_identity_without_object_reprs
         document_id="canonical-datasheets",
     )
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="datasheet:core-deep-strike-unit:ability:deep-strike",
         raw_text="deep strike: this unsupported deployment rule is source-linked.",
     )
@@ -131,7 +133,13 @@ def test_source_catalog_rejects_inconsistent_package_links() -> None:
     document = SourceDocument(
         document_id=SourceDocumentId(package_id=other_package_id, document_id="doc"),
         title="Wrong package",
-        source_texts=(RuleSourceText.from_raw(source_id="rule:one", raw_text="Blast."),),
+        source_texts=(
+            RuleSourceText.from_raw(
+                objective_scope=ObjectiveRuleScope.CORE_RULES,
+                source_id="rule:one",
+                raw_text="Blast.",
+            ),
+        ),
     )
 
     with pytest.raises(SourceCatalogError, match="packages"):
@@ -148,7 +156,9 @@ def test_source_catalog_rejects_inconsistent_package_links() -> None:
 def test_source_catalog_rejects_ambiguous_source_documents() -> None:
     package_id = DataPackageId(namespace="core-v2", package_name="primary", version="1")
     document_id = SourceDocumentId(package_id=package_id, document_id="doc")
-    source_text = RuleSourceText.from_raw(source_id="rule:one", raw_text="Blast.")
+    source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES, source_id="rule:one", raw_text="Blast."
+    )
     document = SourceDocument(
         document_id=document_id,
         title="Primary",

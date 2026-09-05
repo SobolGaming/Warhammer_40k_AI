@@ -158,6 +158,7 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -3782,7 +3783,11 @@ def test_phase17d_ability_bridge_passes_state_for_leading_model_condition() -> N
 
 def _compiled(raw_text: str) -> CompiledRuleSource:
     return compile_rule_source_text(
-        RuleSourceText.from_raw(source_id=f"phase17d:{raw_text.lower()}", raw_text=raw_text),
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+            source_id=f"phase17d:{raw_text.lower()}",
+            raw_text=raw_text,
+        ),
         source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     )
 
@@ -3857,6 +3862,7 @@ def _command_point_spend_rule_ir() -> RuleIR:
 def _champion_slayer_rule_ir() -> RuleIR:
     return compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17d:test:champion-slayer",
             raw_text=(
                 "Each time this model makes a melee attack that targets a Character or Monster "
@@ -3925,6 +3931,7 @@ def _generic_catalog_descriptor(
     source_suffix = hashlib.sha256(raw_text.encode()).hexdigest()[:12]
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id=f"phase17d:test:generic-catalog:{source_suffix}",
             raw_text=raw_text,
         ),

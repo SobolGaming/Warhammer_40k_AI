@@ -11,6 +11,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
@@ -125,6 +126,7 @@ def _build_source_catalog() -> SourceCatalog:
         document_id=_ARTIFACT.faq_source_document.document_id,
     )
     provenance = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:p15d-source-provenance",
         raw_text=(
             "P15D records reviewed Core Stratagem source rows 15.05 through 15.09 from "
@@ -137,6 +139,7 @@ def _build_source_catalog() -> SourceCatalog:
         ),
     )
     faq_provenance = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:p15f-source-provenance",
         raw_text=(
             "P15F records the reviewed Insane Bravery FAQ from the project-authoritative "
@@ -157,6 +160,7 @@ def _build_source_catalog() -> SourceCatalog:
                     provenance,
                     *tuple(
                         RuleSourceText.from_raw(
+                            objective_scope=ObjectiveRuleScope.CORE_RULES,
                             source_id=rule.source_id,
                             raw_text=rule.source_text,
                         )
@@ -171,6 +175,7 @@ def _build_source_catalog() -> SourceCatalog:
                 source_texts=(
                     faq_provenance,
                     RuleSourceText.from_raw(
+                        objective_scope=ObjectiveRuleScope.CORE_RULES,
                         source_id=source_rule_by_id("insane-bravery").source_id,
                         raw_text=source_rule_by_id("insane-bravery").source_text,
                     ),

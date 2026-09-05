@@ -8,6 +8,7 @@ from warhammer40k_core.rules.command_point_parser import (
     STRATAGEM_COST_EFFECT_CONTINUATION_RE,
     STRATAGEM_COST_TRIGGER_RE,
 )
+from warhammer40k_core.rules.objective_rule_patterns import OBJECTIVE_REROLL_INSTEAD_RE
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_frequency_parser import (
     OPTIONAL_ABILITY_ACTIVATION_RE,
@@ -117,12 +118,6 @@ _THOSE_ATTACKS_PROXIMITY_HIT_SUCCESS_THRESHOLD_RE = re.compile(
 _UNMODIFIED_VALUE_REROLL_RE = re.compile(
     r"\byou\s+can\s+(?:re-roll|reroll)\s+(?:an?\s+|the\s+)?"
     r"(?P<roll>hit|wound|damage|save)\s+roll\s+of\s+[1-6]\b",
-    re.IGNORECASE,
-)
-_OBJECTIVE_REROLL_INSTEAD_RE = re.compile(
-    r"\bif\s+the\s+target\s+of\s+that\s+attack\s+is\s+within\s+range\s+of\s+"
-    r"an?\s+objective\s+marker,\s+you\s+can\s+(?:re-roll|reroll)\s+"
-    r"(?:the\s+)?(?P<roll>hit|wound|damage|save)\s+roll\s+instead\b",
     re.IGNORECASE,
 )
 
@@ -257,7 +252,7 @@ def _merge_adjacent_reroll_objective_instead_spans(
             index += 1
             continue
         current_match = _UNMODIFIED_VALUE_REROLL_RE.search(current.text)
-        next_match = _OBJECTIVE_REROLL_INSTEAD_RE.search(spans[index + 1].text)
+        next_match = OBJECTIVE_REROLL_INSTEAD_RE.search(spans[index + 1].text)
         if (
             current_match is not None
             and next_match is not None

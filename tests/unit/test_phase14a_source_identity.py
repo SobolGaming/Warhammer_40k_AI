@@ -728,7 +728,7 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_preserves_identity() -
         hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest()
-        == "5dc3a27783541c49a3ffbd90c4deab9874f364c5bf3a2237133d7af2d6188d59"
+        == "f5a913e42a80c0efdf9ad94466c7d785ea67304087b02910b49949157190169e"
     )
 
     for relative_path, expected_sha256 in (
@@ -1243,9 +1243,50 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 10
+    assert len(scope.source_packages) == 11
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
+
+
+def test_p14_objective_source_package_pins_geometry_alias_and_provider_observations() -> None:
+    from tools.build_core_objectives_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
+
+    from warhammer40k_core.rules.objective_terminology import (
+        OBJECTIVE_TERMINOLOGY_SOURCE_ID,
+        ObjectiveRuleScope,
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_objectives_2026_09 as source,
+    )
+
+    package = source.source_package()
+    payload, audit = build_payloads()
+    assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
+    assert json.loads(AUDIT_PATH.read_bytes()) == audit
+    assert source.TERMINOLOGY_SOURCE_ID == OBJECTIVE_TERMINOLOGY_SOURCE_ID
+    assert len(package.evidence_required_source_ids) == 4
+    assert len(source.source_evidence_records()) == 8
+    assert {row.provider_name for row in source.source_evidence_records()} == {
+        "40k.app",
+        "Game Datamissions",
+        "CORE V2 Source Review",
+    }
+    for rule in source.source_rules():
+        text = package.source_catalog.source_text_by_id(rule.source_id)
+        assert text.objective_scope is ObjectiveRuleScope.CORE_RULES
+        assert text.raw_text == rule.source_text
+        assert hashlib.sha256(text.raw_text.encode()).hexdigest() == rule.transcription_sha256
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "executable_engine_runtime"
+        assert rule.runtime_consumer_ids
+    marker = package.source_catalog.source_text_by_id(source.MARKER_SOURCE_ID)
+    assert "objective marker" in marker.normalized_text
+    assert "closest part" in marker.normalized_text
+    assert "40 mm" in marker.raw_text
+    alias = package.source_catalog.source_text_by_id(source.TERMINOLOGY_SOURCE_ID)
+    assert "excluding rules in the Core Rules" in alias.raw_text
+    with pytest.raises(source.ObjectiveSourceError, match="reviewed pin"):
+        source.validate_objective_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
 
 
 def test_maintained_mirror_evidence_accepts_either_provider_with_complete_tuple() -> None:

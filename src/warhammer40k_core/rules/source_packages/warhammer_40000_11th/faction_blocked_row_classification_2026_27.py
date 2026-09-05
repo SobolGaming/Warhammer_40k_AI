@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleEffectKind,
@@ -627,6 +628,7 @@ def _classification_row(
         )
 
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.HISTORICAL_TEXT,
         source_id=f"{SOURCE_PACKAGE_ID}:{record.coverage_descriptor_id}:source-text",
         raw_text=source_text.raw_text,
     )

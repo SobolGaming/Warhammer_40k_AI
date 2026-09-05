@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.objective_geometry import measure_rules_unit_to_objective
+from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
 from warhammer40k_core.engine.dice_result_overrides import (
     DICE_RESULT_OVERRIDE_EVENT_TYPE,
     request_dice_result_override_if_available,
@@ -1192,36 +1194,15 @@ def _target_unit_within_any_objective_marker_range(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    alive_model_ids = {model.model_instance_id for model in rules_unit.alive_models()}
-    removed_model_ids = set(state.battlefield_state.removed_model_ids)
-    target_models = tuple(
-        geometry_model_for_placement(
-            model=model_by_id(state=state, model_instance_id=placement.model_instance_id),
-            placement=placement,
-        )
-        for component in rules_unit.components
-        for unit_placement in (
-            state.battlefield_state.unit_placement_or_none(component.unit.unit_instance_id),
-        )
-        if unit_placement is not None
-        for placement in unit_placement.model_placements
-        if placement.model_instance_id in alive_model_ids
-        and placement.model_instance_id not in removed_model_ids
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions), battlefield_state=state.battlefield_state
     )
     return any(
-        objective_marker_controls_model(
-            marker_pose=Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
-            model=target_model,
-            marker_id=marker.objective_marker_id,
-            horizontal_inches=marker.control_horizontal_inches,
-            vertical_inches=marker.control_vertical_inches,
-            marker_diameter_inches=marker.marker_diameter_inches,
+        measurement.within_control_range
+        for objective in mission_objective_geometries(state)
+        for measurement in measure_rules_unit_to_objective(
+            scenario=scenario, rules_unit=rules_unit, objective=objective
         )
-        for marker in (
-            mission_marker.to_objective_marker()
-            for mission_marker in state.mission_setup.objective_markers
-        )
-        for target_model in target_models
     )
 
 
