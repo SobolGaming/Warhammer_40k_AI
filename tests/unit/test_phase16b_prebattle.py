@@ -21,6 +21,7 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, Terrain
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldPlacementKind,
     ModelDisplacementKind,
     ModelPlacement,
     UnitPlacement,
@@ -47,6 +48,10 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalRequest,
+    PlacementProposalPayload,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
@@ -54,6 +59,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     SetupStep,
 )
+from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.prebattle import (
     SCOUT_MOVE_PROPOSAL_KIND,
     SELECT_PREBATTLE_ACTION_DECISION_TYPE,
@@ -78,6 +84,7 @@ from warhammer40k_core.engine.prebattle import (
     redeploy_timing_state_for_state,
     resolve_prebattle_proposal,
     scout_distance_inches_for_model_ids,
+    scout_move_candidates_for_player,
 )
 from warhammer40k_core.engine.prebattle_integrity import (
     validate_prebattle_alternation_restore,
@@ -92,7 +99,12 @@ from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
-from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
+from warhammer40k_core.engine.transport_disembark_state import DisembarkModeKind
+from warhammer40k_core.engine.transports import (
+    TransportCapacityProfile,
+    TransportCargoState,
+    TransportMovementStatus,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -751,6 +763,150 @@ def test_phase16b_configless_restore_requires_catalog_only_during_live_scout_win
         decision_records=(),
         pending_decision_requests=(),
     )
+
+
+def test_phase16b_battle_restore_does_not_recompute_scouts_from_disembarked_unit() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {
+            "core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS"),
+            "core-transport": ("Transport", "Vehicle"),
+        }
+    )
+    config = _config(
+        catalog=catalog,
+        player_a_unit_selections=(
+            _unit_selection(unit_selection_id="scout-unit-1"),
+            _unit_selection(
+                unit_selection_id="transport-unit-1",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        ),
+        player_b_unit_selections=(_vehicle_unit_selection(unit_selection_id="enemy-unit-1"),),
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    first_secondary_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    second_secondary_status = _submit_option(
+        lifecycle,
+        request=first_secondary_request,
+        option_id="fixed:assassination:bring_it_down",
+        result_id="phase16b-later-scout-secondary-a",
+    )
+    if lifecycle.state is None:
+        raise GameLifecycleError("Later Scout restore regression requires GameState.")
+    state = lifecycle.state
+    state.record_transport_cargo_state(
+        TransportCargoState(
+            player_id="player-a",
+            transport_unit_instance_id="army-alpha:transport-unit-1",
+            capacity_profile=TransportCapacityProfile(
+                transport_datasheet_id="core-transport",
+                max_model_count=10,
+                allowed_keywords=("Infantry",),
+            ),
+            embarked_unit_instance_ids=("army-alpha:scout-unit-1",),
+            phase_battle_round=None,
+            started_phase_embarked_unit_instance_ids=("army-alpha:scout-unit-1",),
+            disembarked_this_phase_unit_instance_ids=(),
+        )
+    )
+    deployment_status = _submit_option(
+        lifecycle,
+        request=_decision_request(second_secondary_status),
+        option_id="fixed:assassination:bring_it_down",
+        result_id="phase16b-later-scout-secondary-b",
+    )
+    movement_status = submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase16b-later-scout-deploy",
+    )
+
+    assert state.stage is GameLifecycleStage.BATTLE
+    assert state.prebattle_alternation_cursor is not None
+    assert state.prebattle_alternation_cursor.next_player_id is None
+    assert state.prebattle_alternation_cursor.resolved_action_count == 0
+    assert not state.prebattle_action_records_for_step(
+        player_id="player-a",
+        setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS,
+    )
+    movement_selection_request = _decision_request(movement_status)
+    movement_action_status = _submit_option(
+        lifecycle,
+        request=movement_selection_request,
+        option_id="army-alpha:scout-unit-1",
+        result_id="phase16b-later-scout-select-passenger",
+    )
+    placement_status = _submit_option(
+        lifecycle,
+        request=_decision_request(movement_action_status),
+        option_id=MovementPhaseActionKind.DISEMBARK.value,
+        result_id="phase16b-later-scout-select-disembark",
+    )
+    placement_request = _decision_request(placement_status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        placement_request.payload
+    )
+    army, scout_unit = _unit_source_for_id(
+        state=state,
+        unit_instance_id="army-alpha:scout-unit-1",
+    )
+    disembark_poses = (
+        Pose.at(6.1, 22.5),
+        Pose.at(7.0, 23.8),
+        Pose.at(7.0, 25.2),
+        Pose.at(6.1, 26.5),
+        Pose.at(5.8, 24.5),
+    )
+    attempted_placement = UnitPlacement(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_instance_id=scout_unit.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_instance_id=scout_unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=pose,
+            )
+            for model, pose in zip(scout_unit.own_models, disembark_poses, strict=True)
+        ),
+    )
+    disembark_payload = PlacementProposalPayload(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=scout_unit.unit_instance_id,
+        placement_kind=BattlefieldPlacementKind.DISEMBARK,
+        attempted_placement=attempted_placement,
+        transport_unit_instance_id="army-alpha:transport-unit-1",
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.NOT_MOVED,
+    ).to_payload()
+    post_disembark_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase16b-later-scout-place-disembark",
+            request_id=placement_request.request_id,
+            decision_type=placement_request.decision_type,
+            actor_id=placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(disembark_payload),
+        )
+    )
+
+    assert post_disembark_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    current_candidates = scout_move_candidates_for_player(
+        state=state,
+        army_catalog=catalog,
+        player_id="player-a",
+    )
+    assert tuple(candidate.unit_instance_id for candidate in current_candidates) == (
+        scout_unit.unit_instance_id,
+    )
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored.to_payload() == lifecycle.to_payload()
 
 
 def test_phase16b_scout_cursor_skips_only_player_without_unresolved_rule() -> None:

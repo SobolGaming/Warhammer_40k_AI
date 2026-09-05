@@ -579,14 +579,16 @@ def _validate_derived_cursor(
     verified: tuple[_VerifiedPreBattleAction, ...],
     pending_request: DecisionRequest | None,
 ) -> None:
-    unresolved_player_ids: set[str] = (
-        set()
-        if army_catalog is None
-        else _current_unresolved_player_ids(
+    unresolved_player_ids: set[str]
+    if army_catalog is not None and _is_live_prebattle_window(state):
+        live_prebattle_window = True
+        unresolved_player_ids = _current_unresolved_player_ids(
             state=state,
             army_catalog=army_catalog,
         )
-    )
+    else:
+        live_prebattle_window = False
+        unresolved_player_ids = set()
     derived = PreBattleAlternationCursor.start(
         game_id=state.game_id,
         ordered_player_ids=state.turn_order,
@@ -620,7 +622,7 @@ def _validate_derived_cursor(
             completed_player_ids.add(action.player_id)
 
     final_player_id: str | None = None
-    if army_catalog is not None and _is_live_prebattle_window(state):
+    if live_prebattle_window:
         final_player_id = _next_unresolved_player_id(
             cursor=derived,
             unresolved_player_ids=unresolved_player_ids - completed_player_ids,
@@ -636,10 +638,6 @@ def _validate_derived_cursor(
     elif pending_request is not None:
         raise GameLifecycleError(
             "Completed pre-battle alternation must not retain a pending Scout decision."
-        )
-    elif unresolved_player_ids - completed_player_ids:
-        raise GameLifecycleError(
-            "Completed pre-battle alternation retains unresolved Scout actions."
         )
     derived = derived.aligned_to(final_player_id)
     if cursor != derived:

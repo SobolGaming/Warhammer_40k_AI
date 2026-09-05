@@ -2443,7 +2443,10 @@ requires unique request/result ownership for every action, closes the set of ter
 decisions against the action ledger, and validates completion records or the complete
 selection -> proposal -> accepted transition chain. It then derives the cursor history from those
 verified actions and current engine candidates instead of trusting the stored count and final
-metadata. Pending-actor, semantic, ownership, and transition-order drift all fail closed.
+metadata while the lifecycle remains in `SETUP` / `RESOLVE_PREBATTLE_ACTIONS`. After that timing
+window closes, restore validates the finalized cursor from the immutable verified action/decision
+ledger and does not recompute eligibility from evolved battlefield, reserve, or transport state.
+Pending-actor, semantic, ownership, and transition-order drift all fail closed.
 
 Specific authoritative maintained direct App-data mirror statement and source ID: Game
 Datamissions App-data v931 asks whether players with Scouts units alternate resolving Scout moves
@@ -2467,7 +2470,7 @@ its canonical artifact byte SHA-256 is
 `4a33e49c5d7c0c043a0f074ae3c89fce9dae688452da4e752593dc7a76a1ad12`, the source-authority
 registry byte SHA-256 is `78b96059f2bb2aed28768e93b54d238ff4567b54a328c3cd7d2659dc2d964abd`,
 and the engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:b4cf54ddd939ffb5166ebb2e0187b127f2436d5de97cefa83bf0e72275b0c6a6`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:aec768dc93f5bc8e2716a7829b0f3c76dc3f5db5afab8ce395987593ded803b2`.
 
 Load and execution support: the FAQ rule and both evidence rows are `loaded` and
 `executable_engine_runtime`. The reviewed-transcription row remains
@@ -2505,8 +2508,16 @@ order; positive restore coverage includes Scout Move, Scout reserve setup, and c
 same-bug-class search found that redeploy shares `PreBattleActionRecord` storage, so request/result
 uniqueness is enforced by the shared state owner for both setup steps; semantic cursor
 reconstruction remains scoped to `RESOLVE_PREBATTLE_ACTIONS`, while redeploy keeps its valid
-generic sequencing subsystem. No behavioral test file was added, removed, moved, or renamed, so
-the four-shard inventory does not change.
+generic sequencing subsystem. [GitHub re-review
+5118357793](https://github.com/SobolGaming/Warhammer_40k_AI/pull/421#pullrequestreview-5118357793)
+identified that the corrected validator still recomputed live Scout candidates after setup. The
+new full-lifecycle regression makes a Scouts unit legitimately unavailable during pre-battle by
+embarking it in a non-Dedicated Transport, completes setup without a completion record, disembarks
+the unit through the real movement decision path so it becomes Scout-candidate-shaped in battle,
+and proves that the later lifecycle payload restores exactly. Candidate recomputation is now
+restricted to the live pre-battle timing window; the same-bug-class search found no other restore
+validator coupling a persisted setup cursor to these live Scout candidate helpers. No behavioral
+test file was added, removed, moved, or renamed, so the four-shard inventory does not change.
 
 Generated artifacts/documentation: P24G extends
 `core_abilities_2026_09/artifacts/package.json` and its typed loader/offline builder, updates the
@@ -2514,9 +2525,9 @@ source-authority registry, regenerates the engine build identity and affected ex
 examples, and updates README, the adapter/decision submission contracts, and this finding record.
 
 Validation results: all required `AGENTS.md` gates pass: Ruff check, Ruff format check, mypy,
-Pyright, the exact xdist/work-stealing full suite (`6441 passed`), the four-shard fail-closed
+Pyright, the exact xdist/work-stealing full suite (`6442 passed`), the four-shard fail-closed
 check, all 11 import-linter contracts, and the all-files pre-commit suite. The separate behavioral
-coverage run passes `6090` tests and the `--cov-fail-under=85` gate at `85.00%` across `196556`
+coverage run passes `6091` tests and the `--cov-fail-under=85` gate at `85.01%` across `196558`
 statements and `77668` branches. The Core Abilities source generator, engine-build identity,
 PR-base external-contract verification, and installed-wheel smoke pass with `2504` packaged
 resources and `27` schemas. A clean Node 24.18 `npm ci`, the repository-pinned generated-client

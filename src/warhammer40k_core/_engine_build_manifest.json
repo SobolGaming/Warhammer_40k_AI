@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4cf54ddd939ffb5166ebb2e0187b127f2436d5de97cefa83bf0e72275b0c6a6",
-  "fingerprint": "b4cf54ddd939ffb5166ebb2e0187b127f2436d5de97cefa83bf0e72275b0c6a6",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aec768dc93f5bc8e2716a7829b0f3c76dc3f5db5afab8ce395987593ded803b2",
+  "fingerprint": "aec768dc93f5bc8e2716a7829b0f3c76dc3f5db5afab8ce395987593ded803b2",
   "resource_count": 2504,
   "resources": [
     {
@@ -9990,9 +9990,9 @@
       "sha256": "3980c5782da0c756d9c73bb789fab18ddce83fc9be6ff7482ad4492a1a40d230"
     },
     {
-      "byte_length": 28708,
+      "byte_length": 28644,
       "path": "warhammer40k_core/engine/prebattle_integrity.py",
-      "sha256": "f7c22cff5d973e36b6a083a1d844c0d8d61ada471200cd0e7e6e6fdf980f11e7"
+      "sha256": "b4ef344ba9bbe3f88cb7ff431d54ebf0ef70b5899181778695512266455a1b17"
     },
     {
       "byte_length": 12725,
