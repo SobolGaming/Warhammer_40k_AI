@@ -95,6 +95,11 @@ def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_bound
     assert 'source_context["source_phase"] != attack_sequence.source_phase.value' in (
         hazardous_source
     )
+    assert "validated_weapon_instance_ids = _validate_ordered_identifier_tuple(" in hazardous_source
+    assert (
+        "validated_failed_weapon_instance_ids = _validate_ordered_identifier_tuple("
+        in hazardous_source
+    )
     assert "sorted({pool.weapon_profile_id" not in hazardous_source
     completion_index = dispatch_source.index('"attack_sequence_completed"')
     hazardous_index = dispatch_source.index("hazardous_status = _resolve_hazardous_tests(")

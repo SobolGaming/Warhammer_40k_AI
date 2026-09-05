@@ -5,6 +5,8 @@ import io
 import tokenize
 from pathlib import Path
 
+from tests.code_quality.source_index import ast_for
+
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DIRS = [ROOT / "src", ROOT / "tests"]
 ENGINE_DIR = ROOT / "src" / "warhammer40k_core" / "engine"
@@ -44,7 +46,7 @@ def test_no_broad_exceptions() -> None:
     violations: list[str] = []
 
     for path in _python_files():
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        tree = ast_for(path)
         parents = _parent_map(tree)
         rel = path.relative_to(ROOT).as_posix()
 
@@ -72,7 +74,7 @@ def test_no_except_pass_blocks() -> None:
     violations: list[str] = []
 
     for path in _python_files():
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        tree = ast_for(path)
         parents = _parent_map(tree)
         rel = path.relative_to(ROOT).as_posix()
 
@@ -126,7 +128,7 @@ def test_no_placement_error_default_fallback_handlers_in_engine() -> None:
     violations: list[str] = []
 
     for path in sorted(ENGINE_DIR.rglob("*.py")):
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        tree = ast_for(path)
         parents = _parent_map(tree)
         rel = path.relative_to(ROOT).as_posix()
 

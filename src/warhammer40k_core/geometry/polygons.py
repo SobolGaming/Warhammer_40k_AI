@@ -12,6 +12,11 @@ GEOMETRY_EPSILON = 1e-6
 
 def signed_polygon_area(vertices: tuple[Point2D, ...]) -> float:
     points = _validate_polygon_vertices("vertices", vertices)
+    return _signed_polygon_area(points)
+
+
+def _signed_polygon_area(points: tuple[Point2D, ...]) -> float:
+    """Area of already validated vertices; public entry points own validation."""
     area = 0.0
     previous = points[-1]
     for current in points:
@@ -21,10 +26,14 @@ def signed_polygon_area(vertices: tuple[Point2D, ...]) -> float:
 
 
 def polygon_overlap_area(first: tuple[Point2D, ...], second: tuple[Point2D, ...]) -> float:
+    first_triangles = triangulate_polygon(first)
+    second_triangles = triangulate_polygon(second)
     total_area = 0.0
-    for first_triangle in triangulate_polygon(first):
-        for second_triangle in triangulate_polygon(second):
-            total_area += convex_polygon_intersection_area(first_triangle, second_triangle)
+    for first_triangle in first_triangles:
+        for second_triangle in second_triangles:
+            total_area += _validated_convex_polygon_intersection_area(
+                first_triangle, second_triangle
+            )
     return total_area
 
 
@@ -59,7 +68,7 @@ def polygon_distance(first: tuple[Point2D, ...], second: tuple[Point2D, ...]) ->
 
 def triangulate_polygon(vertices: tuple[Point2D, ...]) -> tuple[tuple[Point2D, ...], ...]:
     remaining = list(_validate_polygon_vertices("vertices", vertices))
-    if signed_polygon_area(tuple(remaining)) < 0.0:
+    if _signed_polygon_area(tuple(remaining)) < 0.0:
         remaining.reverse()
 
     triangles: list[tuple[Point2D, ...]] = []
@@ -84,8 +93,18 @@ def convex_polygon_intersection_area(
     first: tuple[Point2D, ...],
     second: tuple[Point2D, ...],
 ) -> float:
-    clipped = list(_ensure_counter_clockwise(_validate_polygon_vertices("first", first)))
-    clip_polygon = _ensure_counter_clockwise(_validate_polygon_vertices("second", second))
+    first_points = _validate_polygon_vertices("first", first)
+    second_points = _validate_polygon_vertices("second", second)
+    return _validated_convex_polygon_intersection_area(first_points, second_points)
+
+
+def _validated_convex_polygon_intersection_area(
+    first: tuple[Point2D, ...],
+    second: tuple[Point2D, ...],
+) -> float:
+    """Clip validated inputs, retaining validation of newly calculated coordinates."""
+    clipped = list(_ensure_counter_clockwise(first))
+    clip_polygon = _ensure_counter_clockwise(second)
     clip_edges = zip(clip_polygon, (*clip_polygon[1:], clip_polygon[0]), strict=True)
     for clip_start, clip_end in clip_edges:
         clipped = _clip_convex_polygon(clipped, clip_start, clip_end)
@@ -193,7 +212,7 @@ def _line_intersection(
 
 
 def _ensure_counter_clockwise(vertices: tuple[Point2D, ...]) -> tuple[Point2D, ...]:
-    if signed_polygon_area(vertices) < 0.0:
+    if _signed_polygon_area(vertices) < 0.0:
         return tuple(reversed(vertices))
     return vertices
 

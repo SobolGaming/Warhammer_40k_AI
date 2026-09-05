@@ -29,7 +29,7 @@ repos:
         stages: [pre-push]
       - id: pytest-code-quality
         name: code quality tests
-        entry: uv run pytest tests/code_quality -q -n0 --no-cov
+        entry: uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov
         language: system
         pass_filenames: false
         stages: [pre-push]

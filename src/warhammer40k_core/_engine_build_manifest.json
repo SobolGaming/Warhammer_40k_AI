@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8fa74bd3b644897419f68f05e85cb8c58d911ebf3b535438d7097de2ef49bff9",
-  "fingerprint": "8fa74bd3b644897419f68f05e85cb8c58d911ebf3b535438d7097de2ef49bff9",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:98875fd2bc5f327b840909de61fd3bbc625c92292ae2c518682d96b7c2763d39",
+  "fingerprint": "98875fd2bc5f327b840909de61fd3bbc625c92292ae2c518682d96b7c2763d39",
   "resource_count": 2504,
   "resources": [
     {
@@ -700,9 +700,9 @@
       "sha256": "18393c944c1a0d28f79e8ada99257639d790a1fb5cf0320e2df0c1cab5ad0340"
     },
     {
-      "byte_length": 40015,
+      "byte_length": 40031,
       "path": "warhammer40k_core/engine/attack_sequence_hazardous.py",
-      "sha256": "ce745c408b1bd43a744a93a86c4a5b47f4d19ce89a4adb711b828dfb380a5f65"
+      "sha256": "a1b2d9746f2580eac7f3088f65a511efef24b01c3cfee2712007f746e7612721"
     },
     {
       "byte_length": 40026,
@@ -11155,9 +11155,9 @@
       "sha256": "6767ba8379471a41778c47b73a5ae15f1a4c244dbf022e18bd72148dd453063d"
     },
     {
-      "byte_length": 11581,
+      "byte_length": 12241,
       "path": "warhammer40k_core/geometry/polygons.py",
-      "sha256": "ddac2182072834ff385706e5953abf4d73a347d06a4a279d6897540df46ae057"
+      "sha256": "6b987b278194fdecfc1687c263f1dbc2b046ff5da91598e2a862854d5790e809"
     },
     {
       "byte_length": 4331,

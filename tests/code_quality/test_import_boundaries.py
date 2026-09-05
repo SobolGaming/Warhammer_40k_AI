@@ -4,6 +4,8 @@ import ast
 import tomllib
 from pathlib import Path
 
+from tests.code_quality.source_index import ast_for
+
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src" / "warhammer40k_core"
 PYPROJECT = ROOT / "pyproject.toml"
@@ -35,7 +37,7 @@ LEGACY_GEOMETRY_CORE_IMPORTS = frozenset(
 
 
 def _imports(path: Path) -> list[str]:
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    tree = ast_for(path)
     found: list[str] = []
 
     for node in ast.walk(tree):

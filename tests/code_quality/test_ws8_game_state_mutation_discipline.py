@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from tests.code_quality.source_index import ast_for
+
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 GAME_STATE_PATH = ENGINE_ROOT / "game_state.py"
@@ -21,7 +23,7 @@ def test_engine_game_state_mutations_go_through_game_state_methods() -> None:
     for path in sorted(ENGINE_ROOT.rglob("*.py")):
         if path == GAME_STATE_PATH:
             continue
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        tree = ast_for(path)
         visitor = _GameStateAssignmentVisitor(path.relative_to(ROOT).as_posix())
         visitor.visit(tree)
         violations.extend(visitor.violations)
@@ -37,7 +39,7 @@ def test_direct_rule_model_destruction_uses_shared_reaction_host() -> None:
     for path in sorted(ENGINE_ROOT.rglob("*.py")):
         if path in {RULE_MODEL_DESTRUCTION_PATH, RULE_MODEL_DESTRUCTION_UNPLACED_PATH}:
             continue
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        tree = ast_for(path)
         violations.extend(
             f"{path.relative_to(ROOT).as_posix()}:{node.lineno}"
             for node in ast.walk(tree)

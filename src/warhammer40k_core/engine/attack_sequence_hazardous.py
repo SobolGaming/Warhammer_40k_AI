@@ -299,7 +299,7 @@ def _hazardous_source_context_from_payload(
         raise GameLifecycleError(
             "Hazardous mortal wound source context roll state must be an object."
         )
-    validated_weapon_instance_ids = _validate_identifier_tuple(
+    validated_weapon_instance_ids = _validate_ordered_identifier_tuple(
         "Hazardous mortal wound weapon_instance_ids",
         tuple(weapon_instance_ids),
     )
@@ -307,7 +307,7 @@ def _hazardous_source_context_from_payload(
         _validate_identifier("Hazardous mortal wound weapon_profile_id", value)
         for value in weapon_profile_ids
     )
-    validated_failed_weapon_instance_ids = _validate_identifier_tuple(
+    validated_failed_weapon_instance_ids = _validate_ordered_identifier_tuple(
         "Hazardous mortal wound failed weapon_instance_ids",
         tuple(failed_weapon_instance_ids),
     )

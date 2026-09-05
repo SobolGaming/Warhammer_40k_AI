@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from tests.code_quality.source_index import ast_for
+
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE = ROOT / "src" / "warhammer40k_core" / "engine"
 SOURCE = ROOT / "src" / "warhammer40k_core"
@@ -36,7 +38,7 @@ def test_engine_modules_do_not_normalize_raw_rule_text() -> None:
     violations: list[str] = []
 
     for path in sorted(ENGINE.rglob("*.py")):
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        tree = ast_for(path)
         rel = path.relative_to(ROOT).as_posix()
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
