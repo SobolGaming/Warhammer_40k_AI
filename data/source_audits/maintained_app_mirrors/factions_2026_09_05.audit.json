@@ -1,0 +1,134 @@
+{
+  "audit_schema": "core-v2-faction-source-audit-v1",
+  "audit_id": "faction-maintained-app-mirror-2026-09-05",
+  "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+  "edition": "warhammer_40000_11th",
+  "app_version": "946",
+  "locale": "en",
+  "selected_source_ids": [
+    "faction-app:adepta-sororitas:army-rules",
+    "faction-app:adepta-sororitas:detachment:sanctified-orators",
+    "faction-app:adepta-sororitas:datasheet:exorcist"
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-09-05T22:36:11+00:00",
+    "statement": "Version 946\nReleased 2026-09-02.",
+    "transcription_sha256": "eed53ac3d90a92a50ad447c6332fe6fd2bc182400796649620176b029cf13b91"
+  },
+  "official_sources": [
+    {
+      "source_id": "gw-11e-adepta-sororitas-faction-pack-2026-07",
+      "provider_name": "Games Workshop",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_adepta_sororitas-kbko8lsd8p-ptxieipyp8.pdf",
+      "source_date": "2026-07-22",
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_adepta_sororitas-kbko8lsd8p-ptxieipyp8.pdf",
+      "sha256": "bdf10b0744b26d6353270419d04c34bc43db5273d1845ab18f8383f03734ea3b",
+      "relationship": "historical_primary_not_current_corroboration"
+    }
+  ],
+  "geometry_authority": {
+    "base_authority": "explicit_maintained_app_or_official_model_evidence",
+    "volume_authority": "accepted_model_geometry_catalog_evidence_required",
+    "missing_data": "blocks_fieldability",
+    "variants": "exact_model_profile_and_variant_required"
+  },
+  "observations": [
+    {
+      "observation_id": "f00:faction:adepta-sororitas",
+      "source_id": "faction-app:adepta-sororitas:army-rules",
+      "content_kind": "faction",
+      "owning_faction_source_id": "faction-app:adepta-sororitas",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "source_url": "https://www.40k.app/factions/adepta-sororitas/army-rules",
+      "source_title": "Adepta Sororitas army rules",
+      "app_version": "946",
+      "observed_at": "2026-09-05T22:36:11+00:00",
+      "locale": "en",
+      "scope_classification": "matched_play",
+      "identity_status": "resolved",
+      "scope_review": "Exact current 11th Edition faction navigation and complete page reviewed; admitted in the 5 September faction audit. No historical-name identity transfer.",
+      "completeness": "complete_page",
+      "capture_method": "main.innerText",
+      "captured_text": "40K.APP\nFACTIONS\nAdepta Sororitas\nDATASHEETS\nARMY RULES\nDETACHMENTS\nUPDATES\nCREATE LIST\nACTS OF FAITH\n\nIf your Army Faction is ADEPTA SORORITAS, each unit from your army with this ability can perform one Act of Faith per phase. This is done using Miracle dice.\n\nGAINING MIRACLE DICE\n\nIf your Army Faction is ADEPTA SORORITAS, you gain 1 Miracle dice:\n\nAt the start of each turn.\nEach time an ADEPTA SORORITAS unit from your army is destroyed.\n\nEach time you gain a Miracle dice, roll one D6. The number you roll is the value of that Miracle dice. This value cannot be changed or re‐rolled, unless a rule specifically states otherwise. Keep your Miracle dice to one side – this is your Miracle dice pool.\n\nPERFORMING AN ACT OF FAITH\n\nBefore making a dice roll for a model or unit from your army with the Acts of Faith ability, if you have one or more dice in your Miracle dice pool, that unit can perform an Act of Faith. If it does, select one of the dice from your Miracle dice pool to substitute that dice roll (if a roll involves more than one dice, e.g. a Charge roll or Battle-shock test, only a single dice can be substituted). The dice that is being substituted is not rolled; instead, the value of the selected Miracle dice is used as if it had been rolled (this counts as an unmodified dice roll of that value for all rules purposes). Each Miracle dice can only be selected for substitution once. Once all Miracle dice substitutions have been made, remove the chosen Miracle dice from your Miracle dice pool, and roll all remaining, unsubstituted dice that are apart of the dice roll. You can use Miracle dice when a unit performs an Act of Faith for any of the following types of dice roll:\n\nAdvance roll\nBattle-shock test\nCharge roll\nDamage roll\nHit roll\nSaving throw\nWound roll\n\n***Example:** Instead of rolling 2D6 to take a Battle-shock test for a unit, you could use one dice from your Miracle dice pool. If the value of that dice was 4, the unit’s Battle-shock test would be determined by rolling one D6 and adding 4 to it (i.e. it would be D6+4).*",
+      "capture_sha256": "bc341858b0d1da394d82c885fce94dff9bdda095afa63f935798194d7b9240f6",
+      "operative_start": "ACTS OF FAITH",
+      "operative_text": "ACTS OF FAITH\n\nIf your Army Faction is ADEPTA SORORITAS, each unit from your army with this ability can perform one Act of Faith per phase. This is done using Miracle dice.\n\nGAINING MIRACLE DICE\n\nIf your Army Faction is ADEPTA SORORITAS, you gain 1 Miracle dice:\n\nAt the start of each turn.\nEach time an ADEPTA SORORITAS unit from your army is destroyed.\n\nEach time you gain a Miracle dice, roll one D6. The number you roll is the value of that Miracle dice. This value cannot be changed or re‐rolled, unless a rule specifically states otherwise. Keep your Miracle dice to one side – this is your Miracle dice pool.\n\nPERFORMING AN ACT OF FAITH\n\nBefore making a dice roll for a model or unit from your army with the Acts of Faith ability, if you have one or more dice in your Miracle dice pool, that unit can perform an Act of Faith. If it does, select one of the dice from your Miracle dice pool to substitute that dice roll (if a roll involves more than one dice, e.g. a Charge roll or Battle-shock test, only a single dice can be substituted). The dice that is being substituted is not rolled; instead, the value of the selected Miracle dice is used as if it had been rolled (this counts as an unmodified dice roll of that value for all rules purposes). Each Miracle dice can only be selected for substitution once. Once all Miracle dice substitutions have been made, remove the chosen Miracle dice from your Miracle dice pool, and roll all remaining, unsubstituted dice that are apart of the dice roll. You can use Miracle dice when a unit performs an Act of Faith for any of the following types of dice roll:\n\nAdvance roll\nBattle-shock test\nCharge roll\nDamage roll\nHit roll\nSaving throw\nWound roll\n\n***Example:** Instead of rolling 2D6 to take a Battle-shock test for a unit, you could use one dice from your Miracle dice pool. If the value of that dice was 4, the unit’s Battle-shock test would be determined by rolling one D6 and adding 4 to it (i.e. it would be D6+4).*",
+      "transcription_sha256": "d0069b26884f4d8512b895abc780a8e7a97acb7742841bed3b5e52116e84a81e",
+      "objective_scope": "non_core_rules",
+      "official_source_ids": [
+        "gw-11e-adepta-sororitas-faction-pack-2026-07"
+      ],
+      "geometry": [],
+      "source_observation_sha256": "b6b959e996a5616b29e9595889a0501b7d3d49891a194a170eb05e5d8f063091"
+    },
+    {
+      "observation_id": "f00:detachment:adepta-sororitas",
+      "source_id": "faction-app:adepta-sororitas:detachment:sanctified-orators",
+      "content_kind": "detachment",
+      "owning_faction_source_id": "faction-app:adepta-sororitas",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "source_url": "https://www.40k.app/factions/adepta-sororitas/detachments/sanctified-orators",
+      "source_title": "Sanctified Orators",
+      "app_version": "946",
+      "observed_at": "2026-09-05T22:36:11+00:00",
+      "locale": "en",
+      "scope_classification": "matched_play",
+      "identity_status": "resolved",
+      "scope_review": "Exact current 11th Edition faction navigation and complete page reviewed; admitted in the 5 September faction audit. No historical-name identity transfer.",
+      "completeness": "complete_page",
+      "capture_method": "main.innerText",
+      "captured_text": "40K.APP\nFACTIONS\nADEPTA SORORITAS\nDETACHMENTS\nSanctified Orators\n1DP · Disruption\nDETACHMENT\nUNITS\nUPDATES\nCREATE LIST\nHYMNS OF BATTLE\n\nEnhancements selected from this detachment do not count towards the total number of enhancements in your army.\n\nFriendly ADEPTA SORORITAS CHARACTER units have +1 Ld.\n\nENHANCEMENTS\nHAGIOMNIFEX (UPGRADE)\n25 pts\n\nADEPTA SORORITAS CHARACTER model only (excluding PENITENT units). (Once per turn, per unit) At the start of a phase, you can use this ability. If you do, select one of the abilities below:\n\nRite of Revelation: While this unit is shooting, enemy units have +6\" detection range.\n\nSermon of Intolerance: This unit’s battle‑shock rolls automatically succeed.\n\nCatechism of Raging Fervour: This unit has +1\" M.\n\nPsalm of Righteous Smiting: This unit’s attacks have +1 S.\n\nChorus of Repudiation: Attacks that target this unit with a S greater than this unit’s T have ‑1 to wound rolls.",
+      "capture_sha256": "b877ffd047daeaf2fae4be66394053a73c52d37f93e1d43f1a4dd0c24813abff",
+      "operative_start": "Sanctified Orators",
+      "operative_text": "Sanctified Orators\n1DP · Disruption\nDETACHMENT\nUNITS\nUPDATES\nCREATE LIST\nHYMNS OF BATTLE\n\nEnhancements selected from this detachment do not count towards the total number of enhancements in your army.\n\nFriendly ADEPTA SORORITAS CHARACTER units have +1 Ld.\n\nENHANCEMENTS\nHAGIOMNIFEX (UPGRADE)\n25 pts\n\nADEPTA SORORITAS CHARACTER model only (excluding PENITENT units). (Once per turn, per unit) At the start of a phase, you can use this ability. If you do, select one of the abilities below:\n\nRite of Revelation: While this unit is shooting, enemy units have +6\" detection range.\n\nSermon of Intolerance: This unit’s battle‑shock rolls automatically succeed.\n\nCatechism of Raging Fervour: This unit has +1\" M.\n\nPsalm of Righteous Smiting: This unit’s attacks have +1 S.\n\nChorus of Repudiation: Attacks that target this unit with a S greater than this unit’s T have ‑1 to wound rolls.",
+      "transcription_sha256": "ceec63e04348e50a4a6be27de1ee4c85241174faac4d242ecb597a9fd60ff651",
+      "objective_scope": "non_core_rules",
+      "official_source_ids": [
+        "gw-11e-adepta-sororitas-faction-pack-2026-07"
+      ],
+      "geometry": [],
+      "source_observation_sha256": "f69f04398ac2b49ffd999e74e6003ddc3b5d4229dda0c0bcbeddf087363c9fa6"
+    },
+    {
+      "observation_id": "f00:datasheet:adepta-sororitas",
+      "source_id": "faction-app:adepta-sororitas:datasheet:exorcist",
+      "content_kind": "datasheet",
+      "owning_faction_source_id": "faction-app:adepta-sororitas",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "source_url": "https://www.40k.app/factions/adepta-sororitas/units/exorcist",
+      "source_title": "Exorcist",
+      "app_version": "946",
+      "observed_at": "2026-09-05T22:36:11+00:00",
+      "locale": "en",
+      "scope_classification": "matched_play",
+      "identity_status": "resolved",
+      "scope_review": "Exact current 11th Edition faction navigation and complete page reviewed; admitted in the 5 September faction audit. No historical-name identity transfer.",
+      "completeness": "complete_page",
+      "capture_method": "main.innerText",
+      "captured_text": "40K.APP\nFACTIONS\nADEPTA SORORITAS\nExorcist\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nExorcist Hull\n\nInvulnerable save: 6+\n\n10\"\n10\n3+\n11\n7+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nExorcist conflagration rockets\nBLAST\nIGNORES COVER\nINDIRECT FIRE\n36\"\n3D6\n3+\n6\n-1\n1\nExorcist missile launcher\nINDIRECT FIRE\n36\"\nD6+2\n3+\n10\n-3\nD6\nHeavy bolter\nSUSTAINED HITS 1\n36\"\n3\n3+\n5\n-1\n2\nHunter-killer missile\nONE SHOT\n48\"\n1\n2+\n14\n-3\nD6\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nArmoured tracks\n3\n4+\n6\n0\n1\nKEYWORDS\nEXORCIST\nFRAME\nIMPERIUM\nSMOKE\nVEHICLE\nCOSTS\n1 model\n180 pts\n2nd+ in your army\n+40 pts\nUNIT COMPOSITION\n1 Exorcist\n\nThis model is equipped with: Exorcist missile launcher; heavy bolter; armoured tracks.\n\nWARGEAR OPTIONS\nThis model’s Exorcist missile launcher can be replaced with 1 Exorcist conflagration rockets.\nThis model can be equipped with 1 hunter-killer missile.\nCORE ABILITIES\nDEADLY DEMISE D3\nFACTION ABILITIES\nACTS OF FAITH\nUNIT ABILITIES\nDevastating Refrain\n\nIn your Shooting phase, after this model has shot, if one or more of those attacks made with an Indirect Fire weapon scored a hit against an enemy unit, that unit must take a Battle-shock test. Each time such an attack destroys an enemy model that has the Deadly Demise ability, that models Deadly Demise ability inflicts mortal wounds on a D6 roll of 5+ instead of on a 6.\n\nDAMAGED: 1-4 WOUNDS REMAINING\n\nWhile this model has 1-4 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.",
+      "capture_sha256": "c7ff532838bd6bb328683f05469c4901004f2cee361e4073465f758a2da1516b",
+      "operative_start": "Exorcist\nDATASHEET\nUPDATES\nMODELS",
+      "operative_text": "Exorcist\nDATASHEET\nUPDATES\nMODELS\nM\nT\nSV\nW\nLD\nOC\nExorcist Hull\n\nInvulnerable save: 6+\n\n10\"\n10\n3+\n11\n7+\n3\nRANGED WEAPONS\nRNG\nA\nBS\nS\nAP\nD\nExorcist conflagration rockets\nBLAST\nIGNORES COVER\nINDIRECT FIRE\n36\"\n3D6\n3+\n6\n-1\n1\nExorcist missile launcher\nINDIRECT FIRE\n36\"\nD6+2\n3+\n10\n-3\nD6\nHeavy bolter\nSUSTAINED HITS 1\n36\"\n3\n3+\n5\n-1\n2\nHunter-killer missile\nONE SHOT\n48\"\n1\n2+\n14\n-3\nD6\nMELEE WEAPONS\nA\nWS\nS\nAP\nD\nArmoured tracks\n3\n4+\n6\n0\n1\nKEYWORDS\nEXORCIST\nFRAME\nIMPERIUM\nSMOKE\nVEHICLE\nCOSTS\n1 model\n180 pts\n2nd+ in your army\n+40 pts\nUNIT COMPOSITION\n1 Exorcist\n\nThis model is equipped with: Exorcist missile launcher; heavy bolter; armoured tracks.\n\nWARGEAR OPTIONS\nThis model’s Exorcist missile launcher can be replaced with 1 Exorcist conflagration rockets.\nThis model can be equipped with 1 hunter-killer missile.\nCORE ABILITIES\nDEADLY DEMISE D3\nFACTION ABILITIES\nACTS OF FAITH\nUNIT ABILITIES\nDevastating Refrain\n\nIn your Shooting phase, after this model has shot, if one or more of those attacks made with an Indirect Fire weapon scored a hit against an enemy unit, that unit must take a Battle-shock test. Each time such an attack destroys an enemy model that has the Deadly Demise ability, that models Deadly Demise ability inflicts mortal wounds on a D6 roll of 5+ instead of on a 6.\n\nDAMAGED: 1-4 WOUNDS REMAINING\n\nWhile this model has 1-4 wounds remaining, each time this model makes an attack, subtract 1 from the Hit roll.",
+      "transcription_sha256": "2cd7bc2aca1a8de5a8fa7d1a4f48a0179e4db42757f4c6365eed831d8c0b9afc",
+      "objective_scope": "non_core_rules",
+      "official_source_ids": [
+        "gw-11e-adepta-sororitas-faction-pack-2026-07"
+      ],
+      "geometry": [
+        {
+          "model_role": "Exorcist",
+          "base_statement": "Hull",
+          "base_status": "observed",
+          "height_status": "not_observed",
+          "volume_authority": "accepted_model_geometry_catalog_evidence_required",
+          "fieldability_certified": false
+        }
+      ],
+      "source_observation_sha256": "549cee4dfb3ad4bba0ffa8d4be6c65c4fce8610a6766ea5f6b90fd8a1fc8beda"
+    }
+  ]
+}

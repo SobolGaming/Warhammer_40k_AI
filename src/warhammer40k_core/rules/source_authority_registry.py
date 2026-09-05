@@ -7,8 +7,15 @@ from functools import cache
 from pathlib import Path
 from typing import Literal, cast
 
-SourceAuthorityScope = Literal["warhammer_40000_11th_core_rules"]
-AuditIdentityKind = Literal["legacy_inventory", "app_version", "observed_at"]
+from warhammer40k_core.rules.faction_source_governance import (
+    FACTION_SOURCE_AUTHORITY_SCOPE,
+    FACTION_SOURCE_POLICY_ID,
+)
+
+SourceAuthorityScope = Literal["warhammer_40000_11th_core_rules", "warhammer_40000_11th_factions"]
+AuditIdentityKind = Literal[
+    "legacy_inventory", "app_version", "observed_at", "versioned_observation"
+]
 
 CORE_RULES_MAINTAINED_MIRROR_POLICY_ID = (
     "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02"
@@ -18,7 +25,7 @@ CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID = (
 )
 CORE_RULES_SOURCE_AUTHORITY_SCOPE: SourceAuthorityScope = "warhammer_40000_11th_core_rules"
 EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256 = (
-    "7ae2913a6ff6ccacd894b1e112e652d60a9b8e0aff8283730f75e7d8a871a2cf"
+    "93ae1c0371b95ea2affe1b6145c40ba3e7569dd9b802c609696f79ca97b4bcfa"
 )
 
 _REGISTRY_PATH = Path(__file__).with_name("source_authority_registry.json")
@@ -151,6 +158,14 @@ class SourceAuthorityRegistry:
             raise SourceAuthorityRegistryError(
                 "A timestamp-indexed audit row cannot authenticate an App-data version."
             )
+        if row.identity_kind == "versioned_observation" and (
+            app_version is None
+            or observed_at is None
+            or row.identity_value != f"{app_version}@{observed_at}"
+        ):
+            raise SourceAuthorityRegistryError(
+                "Versioned faction observation must match its version and timestamp."
+            )
         return scope.scope_id
 
     def authorize_legacy_observation(
@@ -263,10 +278,10 @@ def _scope(payload: dict[str, object]) -> SourceAuthorityScopeRegistry:
         context="scope",
     )
     scope_id = _text(row, "scope_id")
-    if scope_id != CORE_RULES_SOURCE_AUTHORITY_SCOPE:
+    if scope_id not in {CORE_RULES_SOURCE_AUTHORITY_SCOPE, FACTION_SOURCE_AUTHORITY_SCOPE}:
         raise SourceAuthorityRegistryError("Source-authority scope ID is unsupported.")
     return SourceAuthorityScopeRegistry(
-        scope_id=scope_id,
+        scope_id=cast(SourceAuthorityScope, scope_id),
         edition=_text(row, "edition"),
         corpus=_text(row, "corpus"),
         policy_ids=_text_tuple(row, "policy_ids"),
@@ -275,7 +290,12 @@ def _scope(payload: dict[str, object]) -> SourceAuthorityScopeRegistry:
         ),
         legacy_observations=tuple(
             _legacy_observation(item)
-            for item in _object_rows(row, "legacy_observations", context="legacy observations")
+            for item in _object_rows(
+                row,
+                "legacy_observations",
+                context="legacy observations",
+                allow_empty=scope_id == FACTION_SOURCE_AUTHORITY_SCOPE,
+            )
         ),
         source_packages=tuple(
             _source_package(item)
@@ -300,7 +320,12 @@ def _audit_row(payload: dict[str, object]) -> AuditRowAuthorization:
         context="audit row",
     )
     identity_kind = _text(row, "identity_kind")
-    if identity_kind not in {"legacy_inventory", "app_version", "observed_at"}:
+    if identity_kind not in {
+        "legacy_inventory",
+        "app_version",
+        "observed_at",
+        "versioned_observation",
+    }:
         raise SourceAuthorityRegistryError("Audit-row identity kind is unsupported.")
     identity_value = _optional_text(row, "identity_value")
     if (identity_kind == "legacy_inventory") != (identity_value is None):
@@ -348,19 +373,34 @@ def _source_package(payload: dict[str, object]) -> SourcePackageAuthorization:
 
 def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
     for scope in registry.scopes:
+        faction_scope = scope.scope_id == FACTION_SOURCE_AUTHORITY_SCOPE
         if scope.edition != "warhammer_40000_11th" or scope.corpus != (
-            "core_rules_categories_01_25"
+            "matched_play_factions_detachments_datasheets"
+            if faction_scope
+            else "core_rules_categories_01_25"
         ):
             raise SourceAuthorityRegistryError(
                 "Source-authority scope edition or corpus is unsupported."
             )
-        if set(scope.policy_ids) != {
-            CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID,
-            CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
-        }:
+        expected_policies = (
+            {FACTION_SOURCE_POLICY_ID}
+            if faction_scope
+            else {
+                CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID,
+                CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
+            }
+        )
+        if set(scope.policy_ids) != expected_policies:
+            raise SourceAuthorityRegistryError("Source-authority policies are incomplete.")
+        if faction_scope and scope.legacy_observations:
             raise SourceAuthorityRegistryError(
-                "Core Rules source-authority policies are incomplete."
+                "Faction scope cannot authorize legacy observations."
             )
+        if any(
+            (row.identity_kind == "versioned_observation") != faction_scope
+            for row in scope.audit_rows
+        ):
+            raise SourceAuthorityRegistryError("Versioned observations belong to faction scope.")
         audit_keys = tuple((row.audit_id, row.row_id) for row in scope.audit_rows)
         if len(audit_keys) != len(set(audit_keys)):
             raise SourceAuthorityRegistryError("Audit registry row identities must be unique.")
@@ -427,9 +467,10 @@ def _object_rows(
     field_name: str,
     *,
     context: str,
+    allow_empty: bool = False,
 ) -> tuple[dict[str, object], ...]:
     value = payload.get(field_name)
-    if type(value) is not list or not value:
+    if type(value) is not list or (not value and not allow_empty):
         raise SourceAuthorityRegistryError(
             f"Source-authority registry {context} must be a non-empty list."
         )

@@ -132,4 +132,7 @@ equivalence itself is disputed. Until the exception is resolved, mark the row
 as conflicting and block semantic certification.
 
 This policy does not authorize faction, faction-detachment, or faction-datasheet
-review and does not expand any scope prohibited by `AGENTS.md`.
+review and does not expand any scope prohibited by `AGENTS.md`. Order F00 defines
+the separate [Faction Rules Source Policy](FACTION_RULES_SOURCE_POLICY.md), with
+its own registered observations and exact package inventory; Core Rules tuples
+cannot authorize that scope.

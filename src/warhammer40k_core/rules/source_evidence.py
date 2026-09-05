@@ -8,6 +8,14 @@ from pathlib import PurePosixPath
 from typing import Literal, Self, TypedDict, cast
 from urllib.parse import urlsplit
 
+from warhammer40k_core.rules.faction_source_governance import (
+    FACTION_SOURCE_AUTHORITY_SCOPE,
+    FACTION_SOURCE_POLICY_ID,
+    FactionSourceError,
+    authorize_faction_observation,
+    faction_source_url_identity,
+)
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_authority_registry import (
     CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID,
     CORE_RULES_MAINTAINED_MIRROR_POLICY_ID,
@@ -496,7 +504,10 @@ class RuleSourcePackage:
             raise RuleEvidenceError(
                 "RuleSourcePackage source_evidence_catalog must be a SourceEvidenceCatalog."
             )
-        if self.source_authority_scope != CORE_RULES_SOURCE_AUTHORITY_SCOPE:
+        if self.source_authority_scope not in {
+            CORE_RULES_SOURCE_AUTHORITY_SCOPE,
+            FACTION_SOURCE_AUTHORITY_SCOPE,
+        }:
             raise RuleEvidenceError("RuleSourcePackage source-authority scope is unsupported.")
         required_source_ids = _validate_text_tuple(
             "evidence_required_source_ids",
@@ -511,6 +522,18 @@ class RuleSourcePackage:
                 "RuleSourcePackage evidence_required_source_ids must be sorted."
             )
         required_source_id_set = set(required_source_ids)
+        if (
+            self.source_authority_scope == FACTION_SOURCE_AUTHORITY_SCOPE
+            and {
+                source.source_id
+                for document in self.source_catalog.documents
+                for source in document.source_texts
+            }
+            != required_source_id_set
+        ):
+            raise RuleEvidenceError(
+                "Faction catalog source inventory must exactly match its reviewed evidence."
+            )
         evidenced_source_ids = {
             record.rule_source_id for record in self.source_evidence_catalog.records
         }
@@ -552,6 +575,17 @@ class RuleSourcePackage:
                     "RuleSourcePackage required evidence source ID is absent from its catalog."
                 ) from exc
             records = self.source_evidence_catalog.records_for_source_id(source_id)
+            if self.source_authority_scope == FACTION_SOURCE_AUTHORITY_SCOPE and (
+                source_text.objective_scope is not ObjectiveRuleScope.NON_CORE_RULES
+                or not any(
+                    record.project_authority_policy_id == FACTION_SOURCE_POLICY_ID
+                    and record.verification_status == "authoritative_app_mirror"
+                    for record in records
+                )
+            ):
+                raise RuleEvidenceError(
+                    "Faction source packages require reviewed faction evidence and non-Core scope."
+                )
             if not any(
                 record.evidence_kind
                 in {
@@ -700,6 +734,14 @@ def _validate_mirror_provider(
 ) -> None:
     if provider_name not in _MAINTAINED_APP_MIRROR_PROVIDERS:
         raise RuleEvidenceError("A maintained App-mirror provider is unsupported.")
+    if project_authority_policy_id == FACTION_SOURCE_POLICY_ID:
+        if provider_name != "40k.app":
+            raise RuleEvidenceError("Faction policy only authorizes reviewed 40k.app observations.")
+        try:
+            faction_source_url_identity(source_url)
+        except FactionSourceError as exc:
+            raise RuleEvidenceError(str(exc)) from exc
+        return
     if authority == "project_authoritative_app_mirror":
         if project_authority_policy_id == CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID:
             if provider_name != "40k.app":
@@ -736,7 +778,17 @@ def _validate_project_authoritative_mirror_registry(record: RuleEvidenceRecord) 
                 rule_source_id=record.rule_source_id,
                 observation_sha256=record.observation_sha256,
             )
-    except SourceAuthorityRegistryError as exc:
+        if policy_id == FACTION_SOURCE_POLICY_ID:
+            authorize_faction_observation(
+                audit_id=audit_id,
+                row_id=audit_row_id,
+                source_id=record.rule_source_id,
+                transcription_sha256=record.transcription_sha256,
+                source_title=record.source_title,
+                observed_at=record.observed_at,
+                app_version=record.app_version,
+            )
+    except (SourceAuthorityRegistryError, FactionSourceError) as exc:
         raise RuleEvidenceError(str(exc)) from exc
 
 

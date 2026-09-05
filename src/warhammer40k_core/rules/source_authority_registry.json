@@ -561,6 +561,59 @@
           ]
         }
       ]
+    },
+    {
+      "scope_id": "warhammer_40000_11th_factions",
+      "edition": "warhammer_40000_11th",
+      "corpus": "matched_play_factions_detachments_datasheets",
+      "policy_ids": [
+        "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05"
+      ],
+      "audit_rows": [
+        {
+          "audit_id": "faction-maintained-app-mirror-2026-09-05",
+          "row_id": "f00:faction:adepta-sororitas",
+          "source_observation_sha256": "b6b959e996a5616b29e9595889a0501b7d3d49891a194a170eb05e5d8f063091",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/adepta-sororitas/army-rules",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-05T22:36:11+00:00"
+        },
+        {
+          "audit_id": "faction-maintained-app-mirror-2026-09-05",
+          "row_id": "f00:detachment:adepta-sororitas",
+          "source_observation_sha256": "f69f04398ac2b49ffd999e74e6003ddc3b5d4229dda0c0bcbeddf087363c9fa6",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/adepta-sororitas/detachments/sanctified-orators",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-05T22:36:11+00:00"
+        },
+        {
+          "audit_id": "faction-maintained-app-mirror-2026-09-05",
+          "row_id": "f00:datasheet:adepta-sororitas",
+          "source_observation_sha256": "549cee4dfb3ad4bba0ffa8d4be6c65c4fce8610a6766ea5f6b90fd8a1fc8beda",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/adepta-sororitas/units/exorcist",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-05T22:36:11+00:00"
+        }
+      ],
+      "legacy_observations": [],
+      "source_packages": [
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-faction-app-observations",
+          "version": "app-data-946-observed-2026-09-05",
+          "allowed_rule_source_ids": [
+            "faction-app:adepta-sororitas:army-rules",
+            "faction-app:adepta-sororitas:datasheet:exorcist",
+            "faction-app:adepta-sororitas:detachment:sanctified-orators"
+          ]
+        }
+      ]
     }
   ]
 }
