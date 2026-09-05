@@ -2539,8 +2539,8 @@ pending review and merge.
 
 ### P24D — C24-04
 
-Status: Implemented in Order 17; required local validation is complete and remote PR publication
-is in progress.
+Status: Implemented in Order 17; required local validation and remote PR publication are complete;
+review and merge are pending.
 
 Finding IDs: `C24-04`.
 
@@ -2670,7 +2670,8 @@ two-reference-server conformance scenario passes all `342` assertions for contra
 directly through the repository's existing locked `node_modules` tools. The all-files pre-commit
 run passes both configured hooks.
 
-PR URL and merge commit: pending remote publication; merge commit pending review and merge.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/422`; merge
+commit pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
