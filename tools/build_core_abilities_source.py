@@ -30,18 +30,38 @@ REVIEW_AUDIT_ID = "core-rules-maintained-app-mirrors-2026-09-02"
 REVIEW_AUDIT_ROW_ID = "game-datamissions-core-rules-data-931"
 REVIEW_AUDIT_OBSERVATION_SHA256 = "1c4cdfada35a93ef2773cbed06d9267175edb321423316d5f9dac29dc23b8668"
 
-SOURCE_TEXT = """This ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\")."""
-WHEN_DESCRIPTOR = "Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves"
-EFFECT_DESCRIPTOR = 'roll one D6. On a 6, that model suffers a deadly demise; each unit within 6" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6").'
-RESTRICTIONS_DESCRIPTOR = "This ability always takes the form Deadly Demise X."
+DEADLY_DEMISE_SOURCE_TEXT = """This ability always takes the form Deadly Demise X. Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves, roll one D6. On a 6, that model suffers a deadly demise; each unit within 6\" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6\")."""
+DEADLY_DEMISE_WHEN_DESCRIPTOR = "Each time a model with this ability is destroyed, after the units embarked within it (if any) have made their emergency disembark moves"
+DEADLY_DEMISE_EFFECT_DESCRIPTOR = 'roll one D6. On a 6, that model suffers a deadly demise; each unit within 6" of that model suffers a number of mortal wounds denoted by X (if this is a random number, roll separately for each unit within 6").'
+DEADLY_DEMISE_RESTRICTIONS_DESCRIPTOR = "This ability always takes the form Deadly Demise X."
+SCOUT_ALTERNATION_SOURCE_TEXT = """If both players have units with the Scouts ability, do they alternate resolving scout moves?
+Yes, players alternate resolving any pre-battle rules units from their army may have, starting with the player who will take the first turn."""
+SCOUT_ALTERNATION_WHEN_DESCRIPTOR = "If both players have units with pre-battle rules to resolve"
+SCOUT_ALTERNATION_EFFECT_DESCRIPTOR = (
+    "players alternate resolving those units, starting with the player who will take the first turn"
+)
+SCOUT_ALTERNATION_RESTRICTIONS_DESCRIPTOR = (
+    "skip a player only when that player has no unresolved pre-battle rule"
+)
 
-RUNTIME_CONSUMER_IDS = [
+DEADLY_DEMISE_RUNTIME_CONSUMER_IDS = [
     "warhammer40k_core.engine.ability_catalog:eleventh_edition_core_ability_catalog_records",
     "warhammer40k_core.engine.abilities:default_ability_handler_registry",
     "warhammer40k_core.engine.attack_sequence_damage_resolution:_resolve_deadly_demise_before_removal",
     "warhammer40k_core.engine.catalog_rule_consumption:record_core_deadly_demise_sources_for_unit",
     "warhammer40k_core.engine.deadly_demise:resolve_deadly_demise_trigger",
     "warhammer40k_core.engine.rule_model_destruction:destroy_model_with_rule_reactions",
+]
+SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS = [
+    "warhammer40k_core.engine.game_state:GameState.record_prebattle_action",
+    "warhammer40k_core.engine.game_state:GameState.set_prebattle_alternation_cursor",
+    "warhammer40k_core.engine.prebattle:_timing_state_for_step",
+    "warhammer40k_core.engine.prebattle:prebattle_action_selection_request",
+    "warhammer40k_core.engine.prebattle:prebattle_next_player_id_for_timing_state",
+    "warhammer40k_core.engine.prebattle_alternation:align_prebattle_alternation_cursor",
+    "warhammer40k_core.engine.prebattle_alternation:validate_prebattle_alternation_restore",
+    "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
+    "warhammer40k_core.engine.setup_flow:SetupFlow._advance_resolve_prebattle_actions",
 ]
 
 
@@ -63,9 +83,18 @@ def _evidence_observation_sha256(evidence: dict[str, object]) -> str:
     return _sha256_payload(observation)
 
 
-def _evidence_rows(*, transcription_sha256: str) -> list[dict[str, object]]:
+def _evidence_rows(
+    *,
+    rule_source_id: str,
+    evidence_slug: str,
+    review_source_title: str,
+    mirror_source_title: str,
+    source_url: str,
+    transcription_sha256: str,
+    runtime_consumer_ids: list[str],
+) -> list[dict[str, object]]:
     shared: dict[str, object] = {
-        "rule_source_id": "gw-11e-core-abilities:core:deadly-demise",
+        "rule_source_id": rule_source_id,
         "app_version": APP_VERSION,
         "app_build": None,
         "capture_artifact_path": None,
@@ -75,12 +104,12 @@ def _evidence_rows(*, transcription_sha256: str) -> list[dict[str, object]]:
         "observation_sha256": "",
         "load_support_status": "loaded",
         "semantic_execution_status": "executable_engine_runtime",
-        "runtime_consumer_ids": RUNTIME_CONSUMER_IDS,
+        "runtime_consumer_ids": runtime_consumer_ids,
     }
     review = {
         **shared,
         "app_version": None,
-        "evidence_id": "core-v2-core-abilities-source-review:deadly-demise",
+        "evidence_id": f"core-v2-core-abilities-source-review:{evidence_slug}",
         "evidence_kind": "project_reviewed_app_transcription",
         "authority": "unverified_transcription_only",
         "project_authority_policy_id": None,
@@ -88,7 +117,7 @@ def _evidence_rows(*, transcription_sha256: str) -> list[dict[str, object]]:
         "review_audit_row_id": None,
         "review_audit_source_observation_sha256": None,
         "provider_name": "CORE V2 Source Review",
-        "source_title": "Reviewed transcription of 24.08 Deadly Demise",
+        "source_title": review_source_title,
         "source_platform": "Repository",
         "source_url": None,
         "observed_at": None,
@@ -98,7 +127,7 @@ def _evidence_rows(*, transcription_sha256: str) -> list[dict[str, object]]:
     review["observation_sha256"] = _evidence_observation_sha256(review)
     mirror = {
         **shared,
-        "evidence_id": "game-datamissions-core-rules-data-931:deadly-demise",
+        "evidence_id": f"game-datamissions-core-rules-data-931:{evidence_slug}",
         "evidence_kind": "third_party_mirror",
         "authority": "project_authoritative_app_mirror",
         "project_authority_policy_id": PROJECT_AUTHORITY_POLICY_ID,
@@ -106,9 +135,9 @@ def _evidence_rows(*, transcription_sha256: str) -> list[dict[str, object]]:
         "review_audit_row_id": REVIEW_AUDIT_ROW_ID,
         "review_audit_source_observation_sha256": REVIEW_AUDIT_OBSERVATION_SHA256,
         "provider_name": "Game Datamissions",
-        "source_title": "Game Datamissions Core Rules 24.08 Deadly Demise",
+        "source_title": mirror_source_title,
         "source_platform": "Web",
-        "source_url": SOURCE_URL,
+        "source_url": source_url,
         "observed_at": None,
         "verification_status": "authoritative_app_mirror",
         "provider_non_affiliation_recorded": True,
@@ -118,7 +147,8 @@ def _evidence_rows(*, transcription_sha256: str) -> list[dict[str, object]]:
 
 
 def build_payload() -> dict[str, object]:
-    transcription_sha256 = _sha256_text(SOURCE_TEXT)
+    deadly_demise_transcription_sha256 = _sha256_text(DEADLY_DEMISE_SOURCE_TEXT)
+    scout_alternation_transcription_sha256 = _sha256_text(SCOUT_ALTERNATION_SOURCE_TEXT)
     payload: dict[str, object] = {
         "artifact_schema": "core-v2-core-abilities-source-v1",
         "source_package_id": "gw-11e-core-abilities",
@@ -139,18 +169,54 @@ def build_payload() -> dict[str, object]:
                 "source_id": "gw-11e-core-abilities:core:deadly-demise",
                 "section_id": "24.08",
                 "section_heading": "DEADLY DEMISE",
-                "source_text": SOURCE_TEXT,
-                "when_descriptor": WHEN_DESCRIPTOR,
-                "effect_descriptor": EFFECT_DESCRIPTOR,
-                "restrictions_descriptor": RESTRICTIONS_DESCRIPTOR,
+                "source_text": DEADLY_DEMISE_SOURCE_TEXT,
+                "when_descriptor": DEADLY_DEMISE_WHEN_DESCRIPTOR,
+                "effect_descriptor": DEADLY_DEMISE_EFFECT_DESCRIPTOR,
+                "restrictions_descriptor": DEADLY_DEMISE_RESTRICTIONS_DESCRIPTOR,
                 "trigger_kind": "after_model_destroyed",
-                "transcription_sha256": transcription_sha256,
+                "transcription_sha256": deadly_demise_transcription_sha256,
                 "load_support_status": "loaded",
                 "semantic_execution_status": "executable_engine_runtime",
-                "runtime_consumer_ids": RUNTIME_CONSUMER_IDS,
-            }
+                "runtime_consumer_ids": DEADLY_DEMISE_RUNTIME_CONSUMER_IDS,
+            },
+            {
+                "rule_id": "alternating-scout-moves-faq",
+                "runtime_ability_id": "core-scouts",
+                "runtime_handler_id": "core:scouts",
+                "source_id": "gw-11e-core-abilities:faq:alternating-scout-moves",
+                "section_id": "FAQ",
+                "section_heading": "ALTERNATING SCOUT MOVES",
+                "source_text": SCOUT_ALTERNATION_SOURCE_TEXT,
+                "when_descriptor": SCOUT_ALTERNATION_WHEN_DESCRIPTOR,
+                "effect_descriptor": SCOUT_ALTERNATION_EFFECT_DESCRIPTOR,
+                "restrictions_descriptor": SCOUT_ALTERNATION_RESTRICTIONS_DESCRIPTOR,
+                "trigger_kind": "before_battle",
+                "transcription_sha256": scout_alternation_transcription_sha256,
+                "load_support_status": "loaded",
+                "semantic_execution_status": "executable_engine_runtime",
+                "runtime_consumer_ids": SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS,
+            },
         ],
-        "evidence": _evidence_rows(transcription_sha256=transcription_sha256),
+        "evidence": [
+            *_evidence_rows(
+                rule_source_id="gw-11e-core-abilities:core:deadly-demise",
+                evidence_slug="deadly-demise",
+                review_source_title="Reviewed transcription of 24.08 Deadly Demise",
+                mirror_source_title="Game Datamissions Core Rules 24.08 Deadly Demise",
+                source_url=SOURCE_URL,
+                transcription_sha256=deadly_demise_transcription_sha256,
+                runtime_consumer_ids=DEADLY_DEMISE_RUNTIME_CONSUMER_IDS,
+            ),
+            *_evidence_rows(
+                rule_source_id="gw-11e-core-abilities:faq:alternating-scout-moves",
+                evidence_slug="alternating-scout-moves",
+                review_source_title="Reviewed transcription of Core Rules FAQ Alternating Scout Moves",
+                mirror_source_title="Game Datamissions Core Rules FAQ Alternating Scout Moves",
+                source_url=SOURCE_URL,
+                transcription_sha256=scout_alternation_transcription_sha256,
+                runtime_consumer_ids=SCOUT_ALTERNATION_RUNTIME_CONSUMER_IDS,
+            ),
+        ],
         "package_hash": "",
     }
     payload["package_hash"] = _sha256_payload(payload)
@@ -159,7 +225,7 @@ def build_payload() -> dict[str, object]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build the reviewed 24.08 Deadly Demise source artifact."
+        description="Build the reviewed Core Abilities source artifact."
     )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()

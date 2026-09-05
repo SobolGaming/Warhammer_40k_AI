@@ -159,19 +159,12 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
         observed_decision_types=observed_decision_types,
     )
 
-    status = _submit_ordering(
-        session,
-        status=status,
-        setup_prefix="prebattle:resolve_prebattle_actions",
-        result_id="setup-smoke-prebattle-sequencing",
-        observed_decision_types=observed_decision_types,
-    )
     status = _submit_finite(
         session,
         status=status,
         expected_decision_type=SELECT_PREBATTLE_ACTION_DECISION_TYPE,
-        option_id="scout_move:army-beta:scout-redeploy-unit",
-        result_id="setup-smoke-select-scout-b",
+        option_id="scout_move:army-alpha:scout-redeploy-unit",
+        result_id="setup-smoke-select-scout-a",
         observed_decision_types=observed_decision_types,
     )
     scout_request = _projected_request(
@@ -180,7 +173,7 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
         expected_decision_type=SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         observed_decision_types=observed_decision_types,
     )
-    _assert_pending_proposal(session.view(viewer_player_id="player-b"), SCOUT_MOVE_PROPOSAL_KIND)
+    _assert_pending_proposal(session.view(viewer_player_id="player-a"), SCOUT_MOVE_PROPOSAL_KIND)
     status = session.submit_parameterized_payload(
         request_id=scout_request.request_id,
         payload=_scout_move_payload(
@@ -188,14 +181,14 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
             request=scout_request,
             dx=1.0,
         ),
-        result_id="setup-smoke-submit-scout-b",
+        result_id="setup-smoke-submit-scout-a",
     )
     status = _submit_finite(
         session,
         status=status,
         expected_decision_type=SELECT_PREBATTLE_ACTION_DECISION_TYPE,
         option_id="complete_prebattle_actions",
-        result_id="setup-smoke-complete-prebattle-a",
+        result_id="setup-smoke-complete-prebattle-b",
         observed_decision_types=observed_decision_types,
     )
 

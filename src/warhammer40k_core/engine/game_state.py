@@ -171,6 +171,7 @@ from warhammer40k_core.engine.phases.shooting import (
 )
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionRecord,
+    PreBattleAlternationCursor,
 )
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -1254,6 +1255,7 @@ class GameState:
     prebattle_action_records: list[PreBattleActionRecord] = field(
         default_factory=_new_prebattle_action_records
     )
+    prebattle_alternation_cursor: PreBattleAlternationCursor | None = None
     secondary_mission_card_states: list[SecondaryMissionCardState] = field(
         default_factory=_new_secondary_mission_card_states
     )
@@ -1628,6 +1630,12 @@ class GameState:
             self.prebattle_action_records,
             game_id=self.game_id,
             player_ids=self.player_ids,
+        )
+        self.prebattle_alternation_cursor = _validate_prebattle_alternation_cursor(
+            self.prebattle_alternation_cursor,
+            records=self.prebattle_action_records,
+            game_id=self.game_id,
+            turn_order=self.turn_order,
         )
         self.secondary_mission_card_states = _validate_secondary_mission_card_states(
             self.secondary_mission_card_states,
@@ -3582,8 +3590,31 @@ class GameState:
             raise GameLifecycleError("PreBattleActionRecord setup_step is not in this game.")
         if any(stored.action_id == record.action_id for stored in self.prebattle_action_records):
             raise GameLifecycleError("PreBattleActionRecord action_id already exists.")
+        if any(stored.request_id == record.request_id for stored in self.prebattle_action_records):
+            raise GameLifecycleError("PreBattleActionRecord request_id already exists.")
+        if any(stored.result_id == record.result_id for stored in self.prebattle_action_records):
+            raise GameLifecycleError("PreBattleActionRecord result_id already exists.")
+        if record.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+            if self.prebattle_alternation_cursor is None:
+                raise GameLifecycleError(
+                    "Pre-battle actions require an initialized alternation cursor."
+                )
+            self.prebattle_alternation_cursor = self.prebattle_alternation_cursor.after_action(
+                record
+            )
         self.prebattle_action_records.append(record)
         self.prebattle_action_records.sort(key=lambda stored: stored.action_id)
+
+    def set_prebattle_alternation_cursor(
+        self,
+        cursor: PreBattleAlternationCursor,
+    ) -> None:
+        self.prebattle_alternation_cursor = _validate_prebattle_alternation_cursor(
+            cursor,
+            records=self.prebattle_action_records,
+            game_id=self.game_id,
+            turn_order=self.turn_order,
+        )
 
     def prebattle_action_records_for_step(
         self,
@@ -4786,6 +4817,11 @@ class GameState:
             "prebattle_action_records": [
                 record.to_payload() for record in self.prebattle_action_records
             ],
+            "prebattle_alternation_cursor": (
+                None
+                if self.prebattle_alternation_cursor is None
+                else self.prebattle_alternation_cursor.to_payload()
+            ),
             "secondary_mission_card_states": [
                 state.to_payload() for state in self.secondary_mission_card_states
             ],
@@ -5187,6 +5223,13 @@ class GameState:
                 PreBattleActionRecord.from_payload(record)
                 for record in payload["prebattle_action_records"]
             ],
+            prebattle_alternation_cursor=(
+                None
+                if payload["prebattle_alternation_cursor"] is None
+                else PreBattleAlternationCursor.from_payload(
+                    payload["prebattle_alternation_cursor"]
+                )
+            ),
             secondary_mission_card_states=[
                 SecondaryMissionCardState.from_payload(state)
                 for state in payload["secondary_mission_card_states"]
@@ -6637,7 +6680,9 @@ def _validate_prebattle_action_records(
         raise GameLifecycleError("GameState prebattle_action_records must be a list.")
     validated_game_id = _validate_identifier("game_id", game_id)
     validated: list[PreBattleActionRecord] = []
-    seen: set[str] = set()
+    seen_action_ids: set[str] = set()
+    seen_request_ids: set[str] = set()
+    seen_result_ids: set[str] = set()
     for record in cast(list[object], records):
         if type(record) is not PreBattleActionRecord:
             raise GameLifecycleError(
@@ -6647,11 +6692,55 @@ def _validate_prebattle_action_records(
             raise GameLifecycleError("PreBattleActionRecord game_id drift.")
         if record.player_id not in player_ids:
             raise GameLifecycleError("PreBattleActionRecord player_id is not in this game.")
-        if record.action_id in seen:
-            raise GameLifecycleError("GameState prebattle_action_records must be unique.")
-        seen.add(record.action_id)
+        if record.action_id in seen_action_ids:
+            raise GameLifecycleError("GameState prebattle_action_records action_id must be unique.")
+        if record.request_id in seen_request_ids:
+            raise GameLifecycleError(
+                "GameState prebattle_action_records request_id must be unique."
+            )
+        if record.result_id in seen_result_ids:
+            raise GameLifecycleError("GameState prebattle_action_records result_id must be unique.")
+        seen_action_ids.add(record.action_id)
+        seen_request_ids.add(record.request_id)
+        seen_result_ids.add(record.result_id)
         validated.append(record)
     return sorted(validated, key=lambda stored: stored.action_id)
+
+
+def _validate_prebattle_alternation_cursor(
+    cursor: object | None,
+    *,
+    records: list[PreBattleActionRecord],
+    game_id: str,
+    turn_order: tuple[str, ...],
+) -> PreBattleAlternationCursor | None:
+    prebattle_records = tuple(
+        record for record in records if record.setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS
+    )
+    if cursor is None:
+        if prebattle_records:
+            raise GameLifecycleError(
+                "GameState pre-battle action records require an alternation cursor."
+            )
+        return None
+    if type(cursor) is not PreBattleAlternationCursor:
+        raise GameLifecycleError(
+            "GameState prebattle_alternation_cursor must be a PreBattleAlternationCursor."
+        )
+    if cursor.game_id != game_id:
+        raise GameLifecycleError("PreBattleAlternationCursor game_id drift.")
+    if cursor.ordered_player_ids != turn_order:
+        raise GameLifecycleError("PreBattleAlternationCursor turn order drift.")
+    if cursor.resolved_action_count != len(prebattle_records):
+        raise GameLifecycleError("PreBattleAlternationCursor resolution count drift.")
+    if prebattle_records:
+        last_record = prebattle_records[-1]
+        if (
+            cursor.last_action_id != last_record.action_id
+            or cursor.last_unit_instance_id != last_record.unit_instance_id
+        ):
+            raise GameLifecycleError("PreBattleAlternationCursor last action drift.")
+    return cursor
 
 
 def _unit_owner_by_id(army_definitions: list[ArmyDefinition]) -> dict[str, str]:

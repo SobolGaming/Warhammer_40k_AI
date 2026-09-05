@@ -24,6 +24,9 @@ class PreBattleActionKind(StrEnum):
     DEDICATED_TRANSPORT_SCOUT_MOVE = "dedicated_transport_scout_move"
 
 
+SCOUT_ALTERNATION_FAQ_SOURCE_RULE_ID = "gw-11e-core-abilities:faq:alternating-scout-moves"
+
+
 class PreBattleActionRecordPayload(TypedDict):
     action_id: str
     game_id: str
@@ -35,6 +38,139 @@ class PreBattleActionRecordPayload(TypedDict):
     request_id: str
     result_id: str
     payload: JsonValue
+
+
+class PreBattleAlternationCursorPayload(TypedDict):
+    game_id: str
+    source_rule_id: str
+    ordered_player_ids: list[str]
+    next_player_id: str | None
+    resolved_action_count: int
+    last_action_id: str | None
+    last_unit_instance_id: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class PreBattleAlternationCursor:
+    game_id: str
+    ordered_player_ids: tuple[str, ...]
+    next_player_id: str | None
+    resolved_action_count: int
+    last_action_id: str | None
+    last_unit_instance_id: str | None
+    source_rule_id: str = SCOUT_ALTERNATION_FAQ_SOURCE_RULE_ID
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "game_id",
+            _validate_identifier("PreBattleAlternationCursor game_id", self.game_id),
+        )
+        ordered_player_ids = tuple(
+            _validate_identifier("PreBattleAlternationCursor player_id", player_id)
+            for player_id in self.ordered_player_ids
+        )
+        if not ordered_player_ids:
+            raise GameLifecycleError("PreBattleAlternationCursor requires ordered players.")
+        if len(set(ordered_player_ids)) != len(ordered_player_ids):
+            raise GameLifecycleError("PreBattleAlternationCursor ordered players must be unique.")
+        object.__setattr__(self, "ordered_player_ids", ordered_player_ids)
+        next_player_id = _validate_optional_identifier(
+            "PreBattleAlternationCursor next_player_id",
+            self.next_player_id,
+        )
+        if next_player_id is not None and next_player_id not in ordered_player_ids:
+            raise GameLifecycleError(
+                "PreBattleAlternationCursor next player is outside the ordered players."
+            )
+        object.__setattr__(self, "next_player_id", next_player_id)
+        if type(self.resolved_action_count) is not int or self.resolved_action_count < 0:
+            raise GameLifecycleError(
+                "PreBattleAlternationCursor resolved_action_count must be a non-negative integer."
+            )
+        last_action_id = _validate_optional_identifier(
+            "PreBattleAlternationCursor last_action_id",
+            self.last_action_id,
+        )
+        object.__setattr__(self, "last_action_id", last_action_id)
+        object.__setattr__(
+            self,
+            "last_unit_instance_id",
+            _validate_optional_identifier(
+                "PreBattleAlternationCursor last_unit_instance_id",
+                self.last_unit_instance_id,
+            ),
+        )
+        if (self.resolved_action_count == 0) != (last_action_id is None):
+            raise GameLifecycleError(
+                "PreBattleAlternationCursor last action must match its resolution count."
+            )
+        if self.source_rule_id != SCOUT_ALTERNATION_FAQ_SOURCE_RULE_ID:
+            raise GameLifecycleError("PreBattleAlternationCursor source rule identity drift.")
+
+    @classmethod
+    def start(cls, *, game_id: str, ordered_player_ids: tuple[str, ...]) -> Self:
+        return cls(
+            game_id=game_id,
+            ordered_player_ids=ordered_player_ids,
+            next_player_id=ordered_player_ids[0] if ordered_player_ids else None,
+            resolved_action_count=0,
+            last_action_id=None,
+            last_unit_instance_id=None,
+        )
+
+    def aligned_to(self, player_id: str | None) -> Self:
+        return type(self)(
+            game_id=self.game_id,
+            ordered_player_ids=self.ordered_player_ids,
+            next_player_id=player_id,
+            resolved_action_count=self.resolved_action_count,
+            last_action_id=self.last_action_id,
+            last_unit_instance_id=self.last_unit_instance_id,
+            source_rule_id=self.source_rule_id,
+        )
+
+    def after_action(self, record: PreBattleActionRecord) -> Self:
+        if record.game_id != self.game_id:
+            raise GameLifecycleError("PreBattleAlternationCursor action game_id drift.")
+        if record.setup_step is not SetupStep.RESOLVE_PREBATTLE_ACTIONS:
+            raise GameLifecycleError("PreBattleAlternationCursor requires a pre-battle action.")
+        if record.player_id != self.next_player_id:
+            raise GameLifecycleError("Pre-battle action actor drifted from the alternation cursor.")
+        player_index = self.ordered_player_ids.index(record.player_id)
+        next_player_id = self.ordered_player_ids[(player_index + 1) % len(self.ordered_player_ids)]
+        return type(self)(
+            game_id=self.game_id,
+            ordered_player_ids=self.ordered_player_ids,
+            next_player_id=next_player_id,
+            resolved_action_count=self.resolved_action_count + 1,
+            last_action_id=record.action_id,
+            last_unit_instance_id=record.unit_instance_id,
+            source_rule_id=self.source_rule_id,
+        )
+
+    def to_payload(self) -> PreBattleAlternationCursorPayload:
+        return {
+            "game_id": self.game_id,
+            "source_rule_id": self.source_rule_id,
+            "ordered_player_ids": list(self.ordered_player_ids),
+            "next_player_id": self.next_player_id,
+            "resolved_action_count": self.resolved_action_count,
+            "last_action_id": self.last_action_id,
+            "last_unit_instance_id": self.last_unit_instance_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PreBattleAlternationCursorPayload) -> Self:
+        return cls(
+            game_id=payload["game_id"],
+            source_rule_id=payload["source_rule_id"],
+            ordered_player_ids=tuple(payload["ordered_player_ids"]),
+            next_player_id=payload["next_player_id"],
+            resolved_action_count=payload["resolved_action_count"],
+            last_action_id=payload["last_action_id"],
+            last_unit_instance_id=payload["last_unit_instance_id"],
+        )
 
 
 @dataclass(frozen=True, slots=True)

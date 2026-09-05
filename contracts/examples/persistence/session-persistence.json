@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "aba2e25788bfe981d3010f44224cae161663bbc41f56f54762c19d3b4215148d",
+  "content_hash": "197657f95c3513353894cc38a2c555f88b8cbc9efaea0129fd1b986cb08aadbb",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,7 +92,7 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:316e9503a93552cd8560c0cadb24c088303e1bb822fb496fa9259dd80a5d7641",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aec768dc93f5bc8e2716a7829b0f3c76dc3f5db5afab8ce395987593ded803b2",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "11.0.0",
@@ -106,7 +106,7 @@
   "sessions": [
     {
       "adapter_session": {
-        "content_hash": "b643531bd72512a5a7bf2b796ac897b6521e1a2abadc7422098241f0fedb41b6",
+        "content_hash": "83f27a7f639859615da9ce697cf2d1d03696c193ee3645fda27ef6c15a97ba62",
         "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
         "initial_replay_lifecycle": {
@@ -4705,6 +4705,7 @@
               "player-b"
             ],
             "prebattle_action_records": [],
+            "prebattle_alternation_cursor": null,
             "primary_battlefield_departure_states": [],
             "primary_mission_progress_state": {
               "condemned_selections": [],
@@ -9399,6 +9400,7 @@
               "player-b"
             ],
             "prebattle_action_records": [],
+            "prebattle_alternation_cursor": null,
             "primary_battlefield_departure_states": [],
             "primary_mission_progress_state": {
               "condemned_selections": [],
@@ -9497,7 +9499,7 @@
             ]
           }
         },
-        "lifecycle_hash": "492f2f9e867434504d0828c8cb110a5e6d8432c60b613a00a49b4978e0311f36",
+        "lifecycle_hash": "ee61299eb2094cf38e2f14758e162de4a2a319a2bf450cff09e09ca1ce802545",
         "replay_artifact": {
           "artifact_id": "session-persistence:phase18l-contract-persistence",
           "decision_records": [],
@@ -14098,6 +14100,7 @@
                 "player-b"
               ],
               "prebattle_action_records": [],
+              "prebattle_alternation_cursor": null,
               "primary_battlefield_departure_states": [],
               "primary_mission_progress_state": {
                 "condemned_selections": [],
@@ -14317,7 +14320,7 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:316e9503a93552cd8560c0cadb24c088303e1bb822fb496fa9259dd80a5d7641",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aec768dc93f5bc8e2716a7829b0f3c76dc3f5db5afab8ce395987593ded803b2",
               "engine_version": "0.1.0",
               "event_cursor": "388W53mqNJ9kUCV-Fj9fODjzD11j4q3iMJSAvsKPs-8cRXX5bVPD1YUATMEGNWi2",
               "game_id": "phase18l-contract-persistence",
@@ -14364,7 +14367,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
-      "history_head": "b314b29eeaec935e455a3665485d9192595d679461facc520a75ed0c55c99021",
+      "history_head": "f9bacf210eb2aa84372821837f1995d602e7dc53536f0854b4bfae4cfa672d95",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -14436,8 +14439,8 @@
       "revision_history": [
         {
           "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
-          "authoritative_state_hash": "87dba7046f64b1c90c111e8f5203afb9761791edc47a129a883e8e1d333d23bb",
-          "checkpoint_hash": "99a8307d0e09b6e796e1de6cd78fb978165504b304c2e27bf2032eb4f4618b32",
+          "authoritative_state_hash": "0ad45398b34f9f4cdd9020d40a16bdae5dfe3c81d9e6edc46f32588b1b6afd3b",
+          "checkpoint_hash": "e27121a7443de929bfcf339508e49f6a4626340fe4ae59ed6747eb1fe2dde212",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -14453,7 +14456,7 @@
           },
           "previous_revision_commitment": null,
           "response_hash": null,
-          "revision_commitment": "a146eee3b8df4c4e45aa944708512919d33de284edee3642c0f3831b007353dc",
+          "revision_commitment": "9e1cf1399aadb585973c47d40d0547339e2e2d1a19fcae533459d3eb66ba9731",
           "rng_draw_count": 0,
           "rng_history_count": 1,
           "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
@@ -14466,8 +14469,8 @@
         },
         {
           "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
-          "authoritative_state_hash": "492f2f9e867434504d0828c8cb110a5e6d8432c60b613a00a49b4978e0311f36",
-          "checkpoint_hash": "1fb28a3d100066a12e20c4d2220dd44c056a4662b9f67ff0e6dcde1718901185",
+          "authoritative_state_hash": "ee61299eb2094cf38e2f14758e162de4a2a319a2bf450cff09e09ca1ce802545",
+          "checkpoint_hash": "c4091a9245c620749f22c1d85a52ab44d3458c4a281566f4639fa61762bcaef4",
           "closed": false,
           "decision_count": 0,
           "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
@@ -14486,7 +14489,7 @@
             },
             "token": "YZJA38OJu5UyOZl4J5q7ELsstxFF_7eq5djAo-dtBx66u9ie5C6doHWxiFyJT5O1"
           },
-          "journal_entry_hash": "36ff381feeacd6429c7e608846796ec5dc0d9990afc47c111793cca8cc364a12",
+          "journal_entry_hash": "90b3c2b1c7228e2ae0beb6c85171e9926038d5ab8daa20deb543e3a1f212cfc8",
           "origin": {
             "command_envelope": {
               "command_id": "phase18l-contract-start-000001",
@@ -14503,9 +14506,9 @@
             "operation": "start_session",
             "origin_kind": "protocol_command"
           },
-          "previous_revision_commitment": "a146eee3b8df4c4e45aa944708512919d33de284edee3642c0f3831b007353dc",
-          "response_hash": "05f1973b7e6a9e3d64e736814c155c6b7f999d8eee3b17ebf1e1e31e40209785",
-          "revision_commitment": "b314b29eeaec935e455a3665485d9192595d679461facc520a75ed0c55c99021",
+          "previous_revision_commitment": "9e1cf1399aadb585973c47d40d0547339e2e2d1a19fcae533459d3eb66ba9731",
+          "response_hash": "edf756ec3e5e5ac9bc9d58490265f6da7da1295c3fd081e5125282c168525688",
+          "revision_commitment": "f9bacf210eb2aa84372821837f1995d602e7dc53536f0854b4bfae4cfa672d95",
           "rng_draw_count": 0,
           "rng_history_count": 10,
           "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",
@@ -14533,7 +14536,7 @@
       "revision_snapshots": [
         {
           "adapter_session": {
-            "content_hash": "75cd4745f068d9304c1e0e12577979ccca24d0d814c996413754d2e1e88e9b6f",
+            "content_hash": "622c6f452b95c0b971de0fb0488ea439a49aee795e782d70ef72ef1fd8f634a8",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "5cdef2eabf7518e2abf3976239e13cbd51731553a1c5c4fd64dee7a18b529d54",
             "initial_replay_lifecycle": null,
@@ -16852,6 +16855,7 @@
                   "player-b"
                 ],
                 "prebattle_action_records": [],
+                "prebattle_alternation_cursor": null,
                 "primary_battlefield_departure_states": [],
                 "primary_mission_progress_state": {
                   "condemned_selections": [],
@@ -16921,7 +16925,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "87dba7046f64b1c90c111e8f5203afb9761791edc47a129a883e8e1d333d23bb",
+            "lifecycle_hash": "0ad45398b34f9f4cdd9020d40a16bdae5dfe3c81d9e6edc46f32588b1b6afd3b",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -19241,6 +19245,7 @@
                     "player-b"
                   ],
                   "prebattle_action_records": [],
+                  "prebattle_alternation_cursor": null,
                   "primary_battlefield_departure_states": [],
                   "primary_mission_progress_state": {
                     "condemned_selections": [],
@@ -19377,7 +19382,7 @@
         },
         {
           "adapter_session": {
-            "content_hash": "b643531bd72512a5a7bf2b796ac897b6521e1a2abadc7422098241f0fedb41b6",
+            "content_hash": "83f27a7f639859615da9ce697cf2d1d03696c193ee3645fda27ef6c15a97ba62",
             "decision_records_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
             "event_log_hash": "8becbb7f78b1843d48c69a76552bacd23e27e3953d45a0d753a8d39203a41904",
             "initial_replay_lifecycle": {
@@ -23976,6 +23981,7 @@
                   "player-b"
                 ],
                 "prebattle_action_records": [],
+                "prebattle_alternation_cursor": null,
                 "primary_battlefield_departure_states": [],
                 "primary_mission_progress_state": {
                   "condemned_selections": [],
@@ -28670,6 +28676,7 @@
                   "player-b"
                 ],
                 "prebattle_action_records": [],
+                "prebattle_alternation_cursor": null,
                 "primary_battlefield_departure_states": [],
                 "primary_mission_progress_state": {
                   "condemned_selections": [],
@@ -28768,7 +28775,7 @@
                 ]
               }
             },
-            "lifecycle_hash": "492f2f9e867434504d0828c8cb110a5e6d8432c60b613a00a49b4978e0311f36",
+            "lifecycle_hash": "ee61299eb2094cf38e2f14758e162de4a2a319a2bf450cff09e09ca1ce802545",
             "replay_artifact": {
               "artifact_id": "session-persistence:phase18l-contract-persistence",
               "decision_records": [],
@@ -33369,6 +33376,7 @@
                     "player-b"
                   ],
                   "prebattle_action_records": [],
+                  "prebattle_alternation_cursor": null,
                   "primary_battlefield_departure_states": [],
                   "primary_mission_progress_state": {
                     "condemned_selections": [],

@@ -30,6 +30,7 @@ from tools.build_core_transports_source import (
 
 from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.prebattle_records import SCOUT_ALTERNATION_FAQ_SOURCE_RULE_ID
 from warhammer40k_core.rules import source_evidence as source_evidence_module
 from warhammer40k_core.rules.source_authority_registry import (
     EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256,
@@ -235,6 +236,44 @@ def test_p24f_deadly_demise_source_artifact_is_pinned_typed_and_executable() -> 
     assert all(record.runtime_consumer_ids for record in evidence)
     assert SourceCatalog.from_payload(package.source_catalog.to_payload()).to_payload() == (
         package.source_catalog.to_payload()
+    )
+
+
+def test_p24g_scout_alternation_faq_is_pinned_source_backed_and_executable() -> None:
+    package = core_abilities_2026_09.source_package()
+    rule = core_abilities_2026_09.scout_alternation_faq_record()
+    evidence = package.source_evidence_catalog.records_for_source_id(rule.source_id)
+
+    assert rule.source_id == SCOUT_ALTERNATION_FAQ_SOURCE_RULE_ID
+    assert rule.source_id == core_abilities_2026_09.SCOUT_ALTERNATION_FAQ_SOURCE_ID
+    assert rule.transcription_sha256 == (
+        core_abilities_2026_09.SCOUT_ALTERNATION_TRANSCRIPTION_SHA256
+    )
+    assert rule.section_id == "FAQ"
+    assert rule.trigger_kind == "before_battle"
+    assert rule.source_text == (
+        "If both players have units with the Scouts ability, do they alternate resolving "
+        "scout moves?\nYes, players alternate resolving any pre-battle rules units from "
+        "their army may have, starting with the player who will take the first turn."
+    )
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert {
+        "warhammer40k_core.engine.prebattle:_timing_state_for_step",
+        "warhammer40k_core.engine.prebattle_records:PreBattleAlternationCursor",
+    }.issubset(rule.runtime_consumer_ids)
+    assert {record.evidence_kind for record in evidence} == {
+        "project_reviewed_app_transcription",
+        "third_party_mirror",
+    }
+    mirror = next(
+        record for record in evidence if record.authority == "project_authoritative_app_mirror"
+    )
+    assert mirror.source_url == "https://game-datamissions.com/11th/rules/changelog"
+    assert mirror.app_version == "931"
+    assert package.evidence_required_source_ids == (
+        core_abilities_2026_09.DEADLY_DEMISE_SOURCE_ID,
+        core_abilities_2026_09.SCOUT_ALTERNATION_FAQ_SOURCE_ID,
     )
 
 

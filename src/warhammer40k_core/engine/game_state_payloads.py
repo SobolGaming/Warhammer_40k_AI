@@ -45,7 +45,10 @@ from warhammer40k_core.engine.phases.shooting import (
     OutOfPhaseShootingStatePayload,
     ShootingPhaseStatePayload,
 )
-from warhammer40k_core.engine.prebattle_records import PreBattleActionRecordPayload
+from warhammer40k_core.engine.prebattle_records import (
+    PreBattleActionRecordPayload,
+    PreBattleAlternationCursorPayload,
+)
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureStatePayload,
 )
@@ -233,6 +236,7 @@ class GameStatePayload(TypedDict):
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
     prebattle_action_records: list[PreBattleActionRecordPayload]
+    prebattle_alternation_cursor: PreBattleAlternationCursorPayload | None
     secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
     tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContextPayload]
     tactical_secondary_discard_cp_reward_window_ids: list[str]

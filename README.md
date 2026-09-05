@@ -458,9 +458,11 @@ Current status:
   offline with `uv run python tools/build_core_transports_source.py` and the
   same command plus `--check`.
 - P24F's reviewed App-data v931 24.08 Deadly Demise wording and model-destruction
-  timing are pinned in `core_abilities_2026_09/artifacts/package.json`; refresh
-  and verify it offline with `uv run python tools/build_core_abilities_source.py`
-  and the same command plus `--check`.
+  timing, together with P24G's v931 FAQ ordering for alternating Scout and other
+  pre-battle unit rules from the first-turn player, are pinned in
+  `core_abilities_2026_09/artifacts/package.json`; refresh and verify it offline
+  with `uv run python tools/build_core_abilities_source.py` and the same command
+  plus `--check`.
 - P15F's reviewed App-data v931 Insane Bravery FAQ is pinned alongside the
   maintained Core Stratagem source rows in
   `core_stratagems_2026_08/artifacts/package.json`; refresh and verify it
