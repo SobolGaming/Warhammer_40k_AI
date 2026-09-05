@@ -373,6 +373,7 @@ def _validate_audit(audit: CoreRulesMaintainedMirrorAudit) -> None:
             )
             for row in registry_scope.audit_rows
             if row.policy_id == CORE_RULES_MAINTAINED_MIRROR_POLICY_ID
+            and row.audit_id == audit.audit_id
         )
     )
     audited_rows = tuple(

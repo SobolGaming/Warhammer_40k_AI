@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+
 if TYPE_CHECKING or __package__:
     from tools.canonical_json_hash import canonical_json_sha256
     from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
@@ -557,7 +559,9 @@ def _scuttling_horrors_rule_ir(text: str) -> RuleIR:
     source_row_id = SCUTTLING_HORRORS_ROW_ID
     source_id = f"{SOURCE_PACKAGE_ID}:datasheet:{source_row_id}"
     compiled = compile_rule_source_text(
-        RuleSourceText.from_raw(source_id=source_id, raw_text=text),
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.NON_CORE_RULES, source_id=source_id, raw_text=text
+        ),
         source_keyword_sequence_parts=(
             datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
         ),

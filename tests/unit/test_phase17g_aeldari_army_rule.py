@@ -159,6 +159,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 
@@ -1652,6 +1653,7 @@ def _aspect_shrine_token_wargear_option() -> DatasheetWargearOption:
 def _aspect_shrine_token_ability() -> DatasheetAbilityDescriptor:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="source:aeldari:aspect-shrine-token",
             raw_text=(
                 "Once per battle for each Aspect Shrine token this unit has, you can change "

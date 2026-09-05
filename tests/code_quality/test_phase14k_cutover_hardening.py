@@ -85,6 +85,29 @@ def test_phase14k_retired_attack_save_choice_surfaces_absent_from_runtime() -> N
     )
 
 
+def test_p14_objective_consumers_share_group_geometry_and_boundary_terminology() -> None:
+    consumer_paths = (
+        "objective_control.py",
+        "primary_position_membership.py",
+        "primary_destruction_evidence.py",
+        "attack_sequence_dice_rerolls.py",
+    )
+    for name in consumer_paths:
+        source = source_for(SRC_ROOT / "engine" / name)
+        assert "warhammer40k_core.engine.objective_geometry" in source
+        assert "objective_marker_controls_model(" not in source
+        assert "from_objective_marker_to_model(" not in source
+        assert "base_footprint_distance_to_polygon(" not in source
+    query = source_for(SRC_ROOT / "engine" / "objective_geometry.py")
+    assert "rules_unit.alive_models()" in query
+    assert "rules_unit.component_unit_id_for_model(" in query
+    assert "model_placement_or_none(" in query
+    boundary = source_for(SRC_ROOT / "rules" / "source_data.py")
+    assert "normalize_objective_rule_text(raw_text, scope=objective_scope)" in boundary
+    for path in python_files(SRC_ROOT / "engine"):
+        assert "normalize_objective_rule_text(" not in source_for(path)
+
+
 def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_boundary() -> None:
     hazardous_source = source_for(ATTACK_SEQUENCE_HAZARDOUS_PATH)
     dispatch_source = source_for(ATTACK_SEQUENCE_DISPATCH_PATH)

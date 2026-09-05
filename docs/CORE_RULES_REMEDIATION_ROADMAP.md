@@ -2738,6 +2738,164 @@ run passes both configured hooks.
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/422`; merge
 commit pending review and merge.
 
+### P14 — C14-01, C14-02
+
+Status: Implemented in Order 18; all required local validation and remote PR publication are
+complete in PR #423. Review and merge are pending.
+
+Finding IDs: `C14-01`, `C14-02`. Dependencies and evidence gate: S-MIRRORS and APP-AUTHORITY
+are merged on `main`; the preceding Order 17 is merged in PR #422, commit `52673fa1`.
+The two maintained App-data providers were inspected directly, with the v931 changelog selected
+through its version navigation. The provider audit records that these are separate observations,
+not a claimed co-version comparison. No conflicting co-version source was observed and no
+EXCEPTION-PAUSE applies. Provider non-affiliation is explicit. The existing policy is
+`core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02`.
+
+Violated invariant: every generic objective-range consumer must use the closest part of the
+actual objective and retain canonical rules-unit/model ownership. An objective linked to terrain
+must use its complete footprint, not the point marker's radius. Outside the 11th Edition Core
+Rules, the v931 terminology alias must be applied at source ingestion before parsing, without
+altering raw provenance or literal Core Rules marker mechanics.
+
+Before: Objective Control independently implemented point-marker and terrain calculations;
+generic conditional rerolls and Primary historical witnesses always used point-marker disks.
+A model occupying a long linked terrain objective could control it while being omitted from
+reroll eligibility or the historical scoring evidence. `RuleSourceText` carried no objective
+scope and left non-Core marker wording unchanged. Clause merging duplicated the parser's
+literal marker-only conditional-reroll pattern.
+
+After: `objective_geometry` returns deterministic per-model distances to a marker disk or the
+union of the objective's actual polygons, including concave and separately placed footprint
+pieces. Horizontal and vertical distances stay paired to the same model. The group query resolves
+canonical `RulesUnitView.alive_models()`, retains attached component ownership, rejects identity
+drift, and uses the battlefield's explicit presence query for absent models. Source-linked
+geometry is resolved once through the same mission/ruleset authority used by Objective Control.
+OC modifiers, Battle-shock, score aggregation, and the existing terrain vertical-occupancy policy
+remain with their owners. The generic reroll and Primary position/destruction witness consumers
+use the same geometry. Historical evidence measures its authenticated physical snapshot, including
+an explicitly included destroyed model, rather than substituting current living-model membership.
+
+`RuleSourceText` now requires and serializes `objective_scope`: `core_rules`, `non_core_rules`,
+or `historical_text`. Non-Core 11th Edition singular/plural marker references normalize before
+tokens and RuleIR are built; Core text stays literal. Raw text, source IDs and evidence remain
+unchanged. Explicit historical producers retain the legacy reference corpus. There is no
+implicit/unclassified scope. Scope and normalized payload drift fail closed on restore. Parser
+clause merging and effect parsing share the objective conditional-reroll expression. Historical
+row conversion was extracted from both bridge modules, keeping the oversized bridge below its
+frozen module budget and avoiding a second local normalization path.
+
+Source authority: the exact reviewed statements are committed under the four stable IDs below
+in `core_objectives_2026_09/artifacts/package.json`. Sections 14.01 and 14.01.01 require
+"measure to and from the closest part of it." Section 14.01.01 specifies a disk "40 mm in diameter"
+and a model range of 3 inches horizontally and 5 inches vertically. Section 14.02 requires terrain
+objective range "while it is within that terrain area." The selected v931 FAQ states:
+"If a rule refers to an 'objective marker', does this mean an 'objective'?"
+"Yes (excluding rules in the Core Rules)'." The final apostrophe is retained from the observed
+provider text, not silently edited. The historical official Core PDF remains recorded as
+`gw-11e-core-rules`, SHA-256 `f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`;
+it is not presented as independent official corroboration of this newer App wording.
+
+All four source IDs have prefix `gw-11e-core-objectives:`. The complete 40k.app URL is
+`https://www.40k.app/rules/14-objectives`, observed at `2026-09-05T08:38:21-04:00` without a
+published App version. The Game Datamissions version locator is
+`https://game-datamissions.com/11th/rules/changelog?v=931`; the canonical evidence URL is
+`https://game-datamissions.com/11th/rules/changelog`, App-data `931`, reviewed at the same timestamp.
+The typed evidence selects version 931 rather than pretending the provider exposes a second
+independent same-version observation.
+
+| Source ID suffix | Provider | Transcription SHA-256 | Provider-audit observation SHA-256 |
+| --- | --- | --- | --- |
+| `terrain-objectives` | 40k.app | `99e2404a6648e40162a7703012d4283218ce5601c79b2afa5a49e7a259037d66` | `0d48eb98a9be49808743e1c2e75163093163ee177a1d8818836ddf0f854ac189` |
+| `objectives-not-within-a-terrain-area` | 40k.app | `f2d880bb3b9df994d34faca73ea716f003f995eb751b291e404603ad9f0cdc0d` | `0c4c710383443babf10c595244156d0b374ddae5ae5c7ce0dc29c6e25184278a` |
+| `terrain-objective-control-range` | 40k.app | `df777fe4fb14a8d482eccb72b78644872819b65b4fccaed4507a30ea157bf257` | `a35eeb99c8a34665eb1cd42d1e0a1a878e588e7610fd9ba446897985fe72d451` |
+| `objective-marker-terminology-faq` | Game Datamissions | `7c16a67d7d2835bdfac943b3bebad62e415cac68b9028c5da64ce04a677b831e` | `d4679f1c484d3c3f38ba8fd9f1a557060563ef8cebfad807fd41c9e1fad961c4` |
+
+Reviewed-transcription and authoritative-mirror observation fingerprints are separately recorded:
+
+| Source ID suffix | Reviewed transcription observation | Authoritative mirror observation |
+| --- | --- | --- |
+| `terrain-objectives` | `1b93141c8d3b007520a844d0850bfd0364f663e2767582333571693424340909` | `7d06eccb9332134ebf951fe18b1c6ff7187451c2b8f459dea31f31dfb91cd2ea` |
+| `objectives-not-within-a-terrain-area` | `273c421e3a9bb19a1e9f2e779fea14845dbe4bcd2032a268a765b2c5eb0a563b` | `5b7fbbc37099ea1ed50e06d9aae53955b0a7d191b79a0791e2ad293a7864118d` |
+| `terrain-objective-control-range` | `e93fd9a04b1e574d85482cc2d02337502f48d495702663b4fab1deafb720161c` | `00170a92b84cb09e0ab863a90e0a0675ca8b8bf87e71a8d38f4119de0827bb0b` |
+| `objective-marker-terminology-faq` | `35bec9596ad53cade4ce8aa48698dfeed7eff4729175a895539e5979dbc547eb` | `9edb6e6a0ceefba7a4e88a6079ff0deef8b41de0580ab1ab77618fb470f9f515` |
+
+Package hash: `864a6a549fb3260004bee04146c0d2de885955adbbac534d380b61c4a235dfec`.
+Artifact byte SHA-256: `184a3fe08b6da5ce85dc2bfd99c72d1d0bbd3b7b2a136d4f0c374d31de374be1`.
+Provider-audit byte SHA-256: `562de20e2f8cc5229a162b87c808c75f9a61f857f67f3fdac99560be3fe30cb6`.
+Source-authority registry byte SHA-256: `7ae2913a6ff6ccacd894b1e112e652d60a9b8e0aff8283730f75e7d8a871a2cf`.
+
+Load and execution status are distinct fields: all four rules and their evidence are `loaded`
+and `executable_engine_runtime`, with explicit geometry/OC or source-normalizer consumers. The
+reviewed transcription remains `unverified_transcription_only`; only its authenticated maintained
+mirror row receives project authority. The eager typed loader pins bytes, schema, source IDs,
+transcriptions, execution inventory and provider evidence. No source-only placeholder is claimed
+as gameplay support.
+
+Scope and owning path: reviewed JSON/evidence -> typed source boundary or mission objective links
+-> immutable objective geometry -> canonical model-group query -> engine OC, generic reroll, and
+historical witness owners -> existing decisions/events/replay/viewer projections. The extraction
+adds no mutation service, named handler, faction branch, speculative hook, or support for excluded
+content. P12 separately owns Objective Consolidation consumption and movement/final-position
+semantics; P13's broader terrain/visibility work and faction-specific aura policies are excluded.
+The consumer search reviewed `models_controlling_objective_marker`,
+`objective_marker_controls_model`, `from_objective_marker_to_model`, and polygon-distance calls.
+Literal Core marker endpoint mechanics, low-level geometry primitives, Cult Ambush markers, and
+P12 consolidation are separate policies. Chaos Daemons' corrupted-realspace marker aura is a
+faction source-review follow-up, not certified by this Core finding. Existing source-backed
+mission geometry selection still rejects unknown links and unsupported source combinations.
+
+Decision and visibility impact: no new choice, finite option family, proposal kind, or payload
+field is added. Existing `objective_marker_id`/`objective_marker_witnesses` fields identify the
+mission objective, including terrain, as clarified in `ADAPTER_DECISION_CONTRACT.md`. Engine
+geometry is read-only; canonical submissions and mutation remain unchanged. Historical public
+mission evidence follows existing viewer-scoped projection/event redaction and delayed spectator
+rules. The runtime fingerprint changes, preserving the existing incompatible-build restore gate.
+
+Regression coverage: marker-edge versus center distance, terrain occupancy beyond marker radius,
+concave notches and separated polygons, rectangular bases, exact upper/lower vertical boundaries,
+attached component IDs, absent models, deterministic ordering, drifted identities, invalid shapes,
+source-byte tampering, source/catalog JSON round-trip, explicit/invalid scopes, singular/plural
+case/word boundaries, and normalized conditional-reroll compilation. Three real Event Companion
+layouts require OC, generic reroll, destruction evidence and turn-start witnesses to agree at a
+terrain vertex more than seven inches from the marker center. Existing facade-driven mission
+certification exercises lifecycle submission, restore, replay and viewer evidence. The focused
+static audit prevents local objective geometry from returning to these four consumers and
+prevents runtime text substitution. All regression additions extend existing test files; the
+eight-shard inventory has no membership change.
+
+Generated artifacts and documentation: offline P14 source builder and JSON/audit, eager loader,
+source-authority registry/pin, engine build manifest, external contract examples/manifest, README,
+adapter contract and this finding. Explicit producer classifications preserve historical generated
+content; generator checks must prove committed output remains current. No faction generated
+content or support inventory is expanded.
+
+Validation: the final complete behavioral suite passes `6128` tests in `508.28s`, with `9`
+pre-existing resource warnings, using the required Node PATH prefix, xdist work stealing and
+coverage command. Branch-inclusive coverage is `85.01%`, above the required 85% threshold.
+The behavioral suite was not repeated without coverage. Focused objective/source/parser
+coverage passes 293 tests; the objective/normalization subset with invalid-shape/scope cases
+passes 71 tests; and the boundary extraction/module-budget subset passes 72 tests.
+The consumer static audit passes 12 tests. The initial aggregate run exposed an older audit
+validator comparing all observations under one policy rather than its own audit ID; the scoped
+audit comparison now passes all 19 reporting regressions. Revised objective witnesses also
+change deterministic event history: the return-on-death ordering fixture uses a verified
+successful seed with its original 2+ threshold, preserving the full capture/return/restore path.
+Ruff check/format, mypy (`2677` source files), Pyright (zero errors/warnings), all 11 import
+contracts, the exact eight-shard inventory check and all-files pre-commit pass. The P14 source
+builder and runtime build check pass. Generated external contracts pass with `--base-ref
+origin/main` at `52673fa184673ee59a8f30cad40c8dba4e027c79`. Installed-wheel smoke passes with
+`2511` packaged resources, `27` schemas and all six request families. Node 24.18 with temporary
+pinned npm 11.6.2 runs a clean `npm ci`, generated-client/type checks, all `5` TypeScript unit
+tests, and the two-server conformance scenario (`342` assertions, contract `11.1.0`). Historical
+Stratagem generation compares exactly in memory; Aeldari, Chaos Maulerfiend and Emperor's Children
+RuleIR generator checks pass without changing their content. The final complete code-quality suite passes `364` tests in `108.00s` with xdist work stealing
+and no coverage, including generated ability-support/semantic audit checks on macOS.
+The final engine build ID is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:ad74bf8ea928d6ad80d930d22f97aebaacdc390b2038fb884acda10c71af03b1`.
+
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/423`; merge
+commit pending review and merge.
+
 ### Post-P18C v931/v946 findings
 
 Status: This section was introduced as planning documentation in PR #414. The P18D and P18E

@@ -11,6 +11,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
@@ -145,6 +146,7 @@ def _build_source_catalog() -> SourceCatalog:
                 ),
                 source_texts=(
                     RuleSourceText.from_raw(
+                        objective_scope=ObjectiveRuleScope.CORE_RULES,
                         source_id=f"{SOURCE_PACKAGE_ID}:manifest:universal-rules-update",
                         raw_text=(
                             "Local Universal Rules Updates PDF: "
@@ -154,6 +156,7 @@ def _build_source_catalog() -> SourceCatalog:
                     ),
                     *tuple(
                         RuleSourceText.from_raw(
+                            objective_scope=ObjectiveRuleScope.CORE_RULES,
                             source_id=rule.source_id,
                             raw_text=rule.source_text,
                         )
@@ -169,6 +172,7 @@ def _build_source_catalog() -> SourceCatalog:
                 ),
                 source_texts=(
                     RuleSourceText.from_raw(
+                        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
                         source_id=f"{SOURCE_PACKAGE_ID}:manifest:event-companion-v1-1",
                         raw_text=(
                             "Local Warhammer Event Companion v1.1 PDF: "
@@ -178,6 +182,7 @@ def _build_source_catalog() -> SourceCatalog:
                     ),
                     *tuple(
                         RuleSourceText.from_raw(
+                            objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
                             source_id=rule.source_id,
                             raw_text=rule.source_text,
                         )
@@ -185,6 +190,7 @@ def _build_source_catalog() -> SourceCatalog:
                     ),
                     *tuple(
                         RuleSourceText.from_raw(
+                            objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
                             source_id=row.source_id,
                             raw_text=(
                                 f"Event Companion v1.1 page {row.source_page} revises terrain "
@@ -205,6 +211,7 @@ def _build_source_catalog() -> SourceCatalog:
                 ),
                 source_texts=tuple(
                     RuleSourceText.from_raw(
+                        objective_scope=ObjectiveRuleScope.CORE_RULES,
                         source_id=rule.source_id,
                         raw_text=rule.source_text,
                     )

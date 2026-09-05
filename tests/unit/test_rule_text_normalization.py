@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.parsed_tokens import (
     DiceExpressionToken,
     DistancePredicateKind,
@@ -368,6 +369,7 @@ def test_parsed_tokens_fail_explicitly_for_invalid_inputs() -> None:
 
 def test_rule_source_text_normalizes_and_parses_once_at_boundary() -> None:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="datasheet:intercessors:bolt-rifle",
         raw_text="assault weapon: roll d6 attacks within 24 inches.",
     )
@@ -383,8 +385,107 @@ def test_rule_source_text_normalizes_and_parses_once_at_boundary() -> None:
     assert source.parsed_tokens.keywords[0].keyword == "Assault"
 
 
+def test_p14_objective_terminology_is_scoped_and_survives_source_round_trip() -> None:
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+
+    raw = "Within 3 inches of an objective marker or OBJECTIVE MARKERS."
+    non_core = RuleSourceText.from_raw(
+        source_id="mission:objective-reference",
+        raw_text=raw,
+        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+    )
+    core = RuleSourceText.from_raw(
+        source_id="core:objective-reference",
+        raw_text=raw,
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
+    )
+    assert non_core.raw_text == core.raw_text == raw
+    assert non_core.normalized_text == 'Within 3" of an objective or OBJECTIVES.'
+    assert core.normalized_text == 'Within 3" of an objective marker or OBJECTIVE MARKERS.'
+    assert non_core.parsed_tokens.normalized_text == non_core.normalized_text
+    payload = cast(RuleSourceTextPayload, json.loads(json.dumps(non_core.to_payload())))
+    assert RuleSourceText.from_payload(payload) == non_core
+    payload["objective_scope"] = "core_rules"
+    with pytest.raises(SourceDataError, match="normalized source data"):
+        RuleSourceText.from_payload(payload)
+
+
+def test_p14_non_core_objective_alias_compiles_through_the_source_boundary() -> None:
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
+    from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
+
+    source = RuleSourceText.from_raw(
+        source_id="p14:non-core-objective-reroll",
+        raw_text=(
+            "Each time a model in this model's unit makes an attack, you can re-roll a Hit "
+            "roll of 1. If the target of that attack is within range of an objective marker, "
+            "you can re-roll the Hit roll instead."
+        ),
+        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+    )
+    compiled = compile_rule_source_text(source, source_keyword_sequence_parts=("INFANTRY",))
+    assert compiled.rule_ir.is_supported
+    assert "objective marker" in source.raw_text
+    assert "objective marker" not in compiled.rule_ir.normalized_text
+    effects = tuple(effect for clause in compiled.rule_ir.clauses for effect in clause.effects)
+    assert len(effects) == 1
+    assert effects[0].kind is RuleEffectKind.REROLL_PERMISSION
+    assert (
+        parameter_payload(effects[0].parameters).get("full_reroll_if_target_within_objective_range")
+        is True
+    )
+    assert (
+        CompiledRuleSource.from_payload(
+            compiled.to_payload(), source_keyword_sequence_parts=("INFANTRY",)
+        )
+        == compiled
+    )
+
+
+@pytest.mark.parametrize("value", [None, True, "", "unclassified", "unknown"])
+def test_p14_objective_scope_rejects_missing_or_unknown_classification(value: object) -> None:
+    from warhammer40k_core.rules.objective_terminology import objective_rule_scope_from_token
+
+    with pytest.raises(TextNormalizationError):
+        objective_rule_scope_from_token(value)
+    for scope in ObjectiveRuleScope:
+        assert objective_rule_scope_from_token(scope) is scope
+        assert objective_rule_scope_from_token(scope.value) is scope
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("objective marker's range", "objective's range"),
+        ("Objective Markers and objective", "Objectives and objective"),
+        (
+            "nonobjective marker and objective markersman",
+            "nonobjective marker and objective markersman",
+        ),
+        ("objective\u00a0marker", "objective"),
+    ],
+)
+def test_p14_objective_alias_has_word_boundaries_and_is_idempotent(raw: str, expected: str) -> None:
+    from warhammer40k_core.rules.objective_terminology import (
+        ObjectiveRuleScope,
+        normalize_objective_rule_text,
+    )
+
+    result = normalize_objective_rule_text(raw, scope=ObjectiveRuleScope.NON_CORE_RULES)
+    assert result == expected
+    assert normalize_objective_rule_text(result, scope=ObjectiveRuleScope.NON_CORE_RULES) == result
+    assert normalize_objective_rule_text(
+        raw, scope=ObjectiveRuleScope.HISTORICAL_TEXT
+    ) == normalize_rule_text(raw)
+
+
 def test_rule_source_text_payload_round_trips_and_rejects_mismatch() -> None:
-    source = RuleSourceText.from_raw(source_id="rule:blast", raw_text="blast: D6 attacks.")
+    source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
+        source_id="rule:blast",
+        raw_text="blast: D6 attacks.",
+    )
     payload = cast(
         RuleSourceTextPayload,
         json.loads(json.dumps(source.to_payload(), sort_keys=True)),
@@ -399,7 +500,9 @@ def test_rule_source_text_payload_round_trips_and_rejects_mismatch() -> None:
 
 def test_rule_source_text_rejects_invalid_source_id() -> None:
     with pytest.raises(SourceDataError):
-        RuleSourceText.from_raw(source_id=" ", raw_text="Blast")
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES, source_id=" ", raw_text="Blast"
+        )
 
 
 def test_wahapedia_rule_source_unicode_characters_have_normalization_decisions() -> None:

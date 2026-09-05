@@ -38,7 +38,6 @@ from warhammer40k_core.rules.attachment_wargear_requirements import (
 )
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
@@ -100,6 +99,7 @@ from warhammer40k_core.rules.wahapedia_replacement_option_bridge import (
     append_extended_replacement_rows,
     replacement_choices,
 )
+from warhammer40k_core.rules.wahapedia_rule_source import historical_rule_source_text_from_row_field
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -835,7 +835,7 @@ def _bridge_abilities(
                 else f"{datasheet_id}:{_slug(name)}"
             )
         if source_kind in {CatalogAbilitySourceKind.DATASHEET, CatalogAbilitySourceKind.WARGEAR}:
-            source_text = _rule_source_text_from_row_field(
+            source_text = historical_rule_source_text_from_row_field(
                 row=description_source_row,
                 column_name="description",
             )
@@ -1719,32 +1719,6 @@ def _normalized_or_field(row: NormalizedSourceRow, column_name: str) -> str:
         if text_field.column_name == column_name:
             return text_field.normalized_text
     return row.runtime_fields_payload().get(column_name, "")
-
-
-def _rule_source_text_from_row_field(
-    *,
-    row: NormalizedSourceRow,
-    column_name: str,
-) -> RuleSourceText:
-    for text_field in row.text_fields:
-        if text_field.column_name == column_name:
-            return RuleSourceText(
-                source_id=text_field.source_text_id,
-                raw_text=text_field.sanitized_text,
-                normalized_text=text_field.normalized_text,
-                parsed_tokens=text_field.parsed_tokens,
-            )
-    return RuleSourceText.from_raw(
-        source_id=_source_text_id(row=row, column_name=column_name),
-        raw_text=row.runtime_fields_payload().get(column_name, ""),
-    )
-
-
-def _source_text_id(*, row: NormalizedSourceRow, column_name: str) -> str:
-    for text_field in row.text_fields:
-        if text_field.column_name == column_name:
-            return text_field.source_text_id
-    return f"{row.stable_source_id()}:{column_name}"
 
 
 def ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:

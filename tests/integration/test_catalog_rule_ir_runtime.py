@@ -154,6 +154,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 
@@ -1869,6 +1870,7 @@ def _record_daemonic_patrons_effect(
 
 def _daemonic_patrons_records(*, source: UnitInstance) -> tuple[AbilityCatalogRecord, ...]:
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="test:emperors-children:daemonic-patrons",
         raw_text=(
             "Each time this unit is selected to fight, it can call upon daemonic patrons. "

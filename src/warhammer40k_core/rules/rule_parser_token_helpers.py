@@ -78,6 +78,8 @@ def object_kind_token(value: str) -> str:
         return "unit"
     if normalized in {"models", "model"}:
         return "model"
+    if normalized in {"objectives", "objective"}:
+        return "objective"
     if normalized in {"objective_markers", "objective_marker"}:
         return "objective_marker"
     if normalized in {"fortifications", "fortification"}:

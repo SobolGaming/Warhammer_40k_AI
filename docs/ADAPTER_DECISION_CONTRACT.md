@@ -3745,6 +3745,32 @@ were in range. Units that began the turn off the battlefield retain explicit
 empty position sets. Adapters may display this evidence for scoring audit but
 must not recalculate it from current positions.
 
+Order 18 (P14) uses the shared engine objective geometry for Objective Control,
+conditional objective rerolls, destruction proximity evidence, and these historical
+turn-start witnesses. Existing `objective_marker_id` and `objective_marker_witnesses`
+fields identify mission objectives, including source-linked terrain objectives.
+The engine measures the closest part of the marker disk or the union of its
+actual terrain footprint polygons; terrain occupancy does not inherit the point
+marker's 3-inch radius. Attached rules-unit evidence retains each model's physical
+component identity. Historical witnesses use their authenticated snapshot models,
+including an explicitly included model being destroyed, rather than recomputing
+membership from the current living models.
+
+This change adds no decision type, option family, proposal kind, transport field,
+or visibility rule. Existing finite/parameterized submissions, engine validation,
+event records, replay, and shared viewer redaction remain the authority. The runtime
+build fingerprint changes, so persisted sessions from another runtime tree remain
+subject to the existing fail-closed build-identity check.
+
+At catalog ingestion, `RuleSourceText` and its payload require an explicit
+`objective_scope`: `core_rules`, `non_core_rules`, or `historical_text`. For
+11th Edition non-Core rules only, the v931 FAQ aliases “objective marker(s)” to
+“objective(s)” before token parsing and RuleIR compilation. Raw source text and
+provenance remain intact, Core Rules retain literal marker terminology, and
+historical reference snapshots retain their own edition's wording. There is no
+implicit scope or runtime text substitution. Payload restore validates scope,
+normalized text, and parsed tokens together.
+
 Phase 17N Step 4 progress is public tabletop mission state. Both player views,
 role-scoped event deltas, reconnect projections, and replay expose the same
 rows at the same visible revision; delayed spectators receive those rows only

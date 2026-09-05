@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
-from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
@@ -13,14 +12,17 @@ from warhammer40k_core.engine.mission_terrain import (
     mission_logical_terrain_areas,
     model_intersects_logical_terrain_area,
 )
+from warhammer40k_core.engine.objective_geometry import (
+    ObjectiveGeometry,
+    measure_model_to_objective,
+)
+from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryComponentTurnStartMembership,
     PrimaryObjectiveMarkerWitness,
     PrimaryRulesUnitTurnStartMembership,
 )
-from warhammer40k_core.geometry.measurement import objective_marker_controls_model
-from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -96,9 +98,7 @@ def build_primary_rules_unit_membership_from_model_placements(
         component_units=tuple(component_units),
         placements_by_id=placements_by_id,
         logical_terrain_areas=mission_logical_terrain_areas(mission_setup),
-        objective_markers=tuple(
-            definition.to_objective_marker() for definition in mission_setup.objective_markers
-        ),
+        objectives=mission_objective_geometries(state),
     )
 
 
@@ -109,7 +109,7 @@ def _build_membership(
     component_units: tuple[UnitInstance, ...],
     placements_by_id: dict[str, ModelPlacement],
     logical_terrain_areas: tuple[MissionLogicalTerrainArea, ...],
-    objective_markers: tuple[ObjectiveMarker, ...],
+    objectives: tuple[ObjectiveGeometry, ...],
 ) -> PrimaryRulesUnitTurnStartMembership:
     component_memberships: list[PrimaryComponentTurnStartMembership] = []
     for unit in component_units:
@@ -138,27 +138,18 @@ def _build_membership(
         )
         objective_witnesses = tuple(
             PrimaryObjectiveMarkerWitness(
-                objective_marker_id=marker.objective_marker_id,
+                objective_marker_id=objective.objective_id,
                 model_instance_ids=model_ids,
             )
-            for marker in objective_markers
+            for objective in objectives
             for model_ids in (
                 tuple(
                     sorted(
                         model_id
                         for model_id, geometry_model in geometry_models_by_id.items()
-                        if objective_marker_controls_model(
-                            marker_pose=Pose.at(
-                                marker.x_inches,
-                                marker.y_inches,
-                                marker.z_inches,
-                            ),
-                            model=geometry_model,
-                            marker_id=marker.objective_marker_id,
-                            horizontal_inches=marker.control_horizontal_inches,
-                            vertical_inches=marker.control_vertical_inches,
-                            marker_diameter_inches=marker.marker_diameter_inches,
-                        )
+                        if measure_model_to_objective(
+                            model=geometry_model, objective=objective
+                        ).within_control_range
                     )
                 ),
             )

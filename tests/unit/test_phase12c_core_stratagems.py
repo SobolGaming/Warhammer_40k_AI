@@ -249,6 +249,7 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -7059,6 +7060,7 @@ def _skull_altar_battle_shock_reroll_record(
     source_unit: UnitInstance,
 ) -> AbilityCatalogRecord:
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase12c:source:skull-altar-battle-shock-reroll",
         raw_text=(
             'While a friendly Khorne Legiones Daemonica unit is within 6" of this '

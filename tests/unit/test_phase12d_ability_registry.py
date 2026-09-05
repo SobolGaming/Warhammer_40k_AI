@@ -77,6 +77,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -508,6 +509,7 @@ def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_cont
     current_model_instance_ids = unit.own_model_ids()
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase12d:test:move-over-friendly-monster-vehicle-terrain",
             raw_text=(
                 "Each time this model makes a Normal or Advance move, it can move over "
@@ -706,6 +708,7 @@ def test_generic_rule_ir_move_through_models_and_terrain_permissions_are_consume
     current_model_instance_ids = unit.own_model_ids()
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase12d:test:move-through-models-terrain-auto-pass",
             raw_text=(
                 "Each time this unit makes a Normal, Advance or Fall Back move, it can move "
@@ -799,6 +802,7 @@ def test_malformed_passive_query_movement_transit_ir_fails_closed_at_runtime() -
     current_model_instance_ids = unit.own_model_ids()
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase12d:test:malformed-move-over-friendly-monster-vehicle-terrain",
             raw_text=(
                 "Each time this model makes a Normal or Advance move, it can move over "

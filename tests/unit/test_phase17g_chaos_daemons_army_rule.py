@@ -164,6 +164,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleConditionKind
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -3026,6 +3027,7 @@ def _datasheet_ability(ability_id: str) -> DatasheetAbilityDescriptor:
 def _semantic_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescriptor:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id=f"phase17g:test:semantic-shadow-aura:{allegiance.lower()}",
             raw_text=(
                 f"Daemonic Shadow (Aura): While a friendly {allegiance} Legiones Daemonica "

@@ -138,6 +138,18 @@ encoding matrix shard names in the protection rule.
 
 ## External adapter contract
 
+Order 18 (P14) provides shared closest-part objective geometry for point markers
+and source-linked terrain footprints. Objective Control, generic objective
+rerolls, and historical mission witnesses consume the same engine query with
+explicit attached-model ownership. Source ingestion requires an objective scope
+and applies the v931 non-Core “objective marker” alias before parsing; Core Rules
+and historical text keep their original terminology. The reviewed source package
+and provider audit can be checked offline with
+`uv run --no-sync python tools/build_core_objectives_source.py --check`.
+See the P14 finding in
+[the remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) for evidence,
+scope, and validation; Objective Consolidation remains owned by P12.
+
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,
 interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).

@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+
 if TYPE_CHECKING or __package__:
     from tools.faction_rule_ir_bundle import generate_registered_rule_ir_shard
 else:
@@ -179,7 +181,11 @@ def _rule_ir(source_row_id: str, text: str) -> RuleIR:
     source_id = f"{SOURCE_PACKAGE_ID}:datasheet:{source_row_id}"
     if source_row_id in {"000000572:5", "000003909:5"}:
         compiled = compile_rule_source_text(
-            RuleSourceText.from_raw(source_id=source_id, raw_text=text),
+            RuleSourceText.from_raw(
+                objective_scope=ObjectiveRuleScope.HISTORICAL_TEXT,
+                source_id=source_id,
+                raw_text=text,
+            ),
             source_keyword_sequence_parts=("AELDARI",),
         ).rule_ir
         if not compiled.is_supported:
