@@ -116,6 +116,10 @@ def test_p14_objective_control_and_projection_use_rules_unit_battle_shock_author
         assert "measurement.unit_instance_id in battle_shocked_unit_ids" not in source
         assert "unit.unit_instance_id in state.battle_shocked_unit_ids" not in source
     assert "unit_instance_id=measurement.rules_unit_instance_id" in objective_source
+    assert "rules_unit_views_from_armies(armies=self.scenario.armies)" in objective_source
+    assert (
+        "set(self.battle_shocked_unit_ids).issubset(canonical_rules_unit_ids)" in objective_source
+    )
 
 
 def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_boundary() -> None:

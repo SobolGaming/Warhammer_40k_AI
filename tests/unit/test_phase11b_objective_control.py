@@ -373,6 +373,41 @@ def test_p14_battle_shocked_attached_unit_has_no_oc_for_any_component(
     assert resolve_objective_control(context).to_payload() == record.to_payload()
 
 
+@pytest.mark.parametrize(
+    "inventory_kind",
+    [
+        "bodyguard",
+        "leader",
+        "all_components",
+        "unknown",
+        "canonical_and_alias",
+        "canonical_and_unknown",
+    ],
+)
+def test_p14_scenario_only_objective_context_rejects_noncanonical_battle_shock_ids(
+    inventory_kind: str,
+) -> None:
+    state, _marker = _battle_shocked_attached_objective_state(terrain_objective=False)
+    formation = state.army_definitions[0].attached_units[0]
+    context = ObjectiveControlContext.from_game_state(
+        state, timing=ObjectiveControlTiming.PHASE_END, phase=BattlePhase.COMMAND
+    )
+    inventories = {
+        "bodyguard": (formation.bodyguard_unit_instance_id,),
+        "leader": formation.leader_unit_instance_ids,
+        "all_components": formation.component_unit_instance_ids,
+        "unknown": ("unknown-unit",),
+        "canonical_and_alias": (
+            formation.attached_unit_instance_id,
+            formation.bodyguard_unit_instance_id,
+        ),
+        "canonical_and_unknown": (formation.attached_unit_instance_id, "unknown-unit"),
+    }
+
+    with pytest.raises(GameLifecycleError, match=r"canonical rules-unit IDs from scenario\.armies"):
+        replace(context, state=None, battle_shocked_unit_ids=inventories[inventory_kind])
+
+
 def test_p14_state_backed_objective_context_rejects_battle_shock_identity_drift() -> None:
     state, _marker = _battle_shocked_attached_objective_state(terrain_objective=False)
     formation = state.army_definitions[0].attached_units[0]

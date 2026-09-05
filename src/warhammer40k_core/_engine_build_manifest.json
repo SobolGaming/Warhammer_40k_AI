@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7dc0c749b1780145d7cf63d0698e3ece56fad385c765a6d0b0770d691a95310a",
-  "fingerprint": "7dc0c749b1780145d7cf63d0698e3ece56fad385c765a6d0b0770d691a95310a",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1913b07d46dc949d86269aa10574f004bd0234fa28e5550b07aa7f502acc4534",
+  "fingerprint": "1913b07d46dc949d86269aa10574f004bd0234fa28e5550b07aa7f502acc4534",
   "resource_count": 2511,
   "resources": [
     {
@@ -9690,9 +9690,9 @@
       "sha256": "78eb4807c47caeed18844670a80dafdb2c05ce0160394aee7d2ba9dd0539a29d"
     },
     {
-      "byte_length": 49669,
+      "byte_length": 50207,
       "path": "warhammer40k_core/engine/objective_control.py",
-      "sha256": "32d98a689ffa9c942436efcf22f54ad71c7aef8e2455c46a28e2d2964606baa4"
+      "sha256": "bce8b11f085b3b7fe2f8e335deec9a054fb684c15da685c44606bad12798c208"
     },
     {
       "byte_length": 22007,

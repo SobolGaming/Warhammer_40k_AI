@@ -526,6 +526,16 @@ class ObjectiveControlContext:
         )
         if self.state is not None and type(self.state) is not GameState:
             raise GameLifecycleError("ObjectiveControlContext state must be GameState.")
+        if self.state is None:
+            canonical_rules_unit_ids = {
+                rules_unit.unit_instance_id
+                for rules_unit in rules_unit_views_from_armies(armies=self.scenario.armies)
+            }
+            if not set(self.battle_shocked_unit_ids).issubset(canonical_rules_unit_ids):
+                raise GameLifecycleError(
+                    "Scenario-only ObjectiveControlContext battle_shocked_unit_ids must contain "
+                    "canonical rules-unit IDs from scenario.armies."
+                )
         if self.state is not None:
             if self.state.mission_setup is None:
                 raise GameLifecycleError(

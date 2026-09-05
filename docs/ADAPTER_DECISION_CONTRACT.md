@@ -3760,7 +3760,9 @@ Objective Control and displayed current OC resolve Battle-shock through the shar
 rules-unit identity authority, including Attached Unit and component aliases. Physical
 component IDs remain on model contributions. State-backed objective contexts reject
 Battle-shock ID collections that differ from GameState; scenario-only contexts use
-canonical rules-unit IDs. Base-characteristic displays and existing viewer redaction
+canonical rules-unit IDs from `scenario.armies`. Their constructor rejects component
+aliases and unknown IDs with `GameLifecycleError`, including mixed inventories that also
+contain valid canonical IDs. Base-characteristic displays and existing viewer redaction
 remain unchanged.
 
 This change adds no decision type, option family, proposal kind, transport field,

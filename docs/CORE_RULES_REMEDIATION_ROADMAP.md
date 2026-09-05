@@ -2756,6 +2756,8 @@ actual objective and retain canonical rules-unit/model ownership. An objective l
 must use its complete footprint, not the point marker's radius. Outside the 11th Edition Core
 Rules, the v931 terminology alias must be applied at source ingestion before parsing, without
 altering raw provenance or literal Core Rules marker mechanics.
+Every Battle-shock ID accepted by a scenario-only OC context must be canonical in its army
+inventory; component aliases and unknown IDs must fail validation rather than be ignored.
 
 Before: Objective Control independently implemented point-marker and terrain calculations;
 generic conditional rerolls and Primary historical witnesses always used point-marker disks.
@@ -2779,8 +2781,10 @@ Attached Unit Battle-shock is evaluated through `rules_unit_is_battle_shocked` u
 measurement's canonical rules-unit ID. Component ownership remains available for model modifiers
 and contribution payloads. State-backed OC contexts reject a Battle-shock ID collection that
 differs from GameState, including substituted component aliases; scenario-only contexts use
-canonical rules-unit IDs. The same physical-ID defect was found in adapter current-OC display
-and now uses the shared authority there as well. Mission-action eligibility/history already
+canonical rules-unit IDs derived from `scenario.armies`. Their constructor rejects component
+aliases, unknown IDs and mixed valid/invalid inventories before OC resolution. The same physical-ID
+defect was found in adapter current-OC display and now uses the shared authority there as well.
+Mission-action eligibility/history already
 used that helper. Geometry, mutation ownership and decision/visibility schemas are unchanged.
 The Shadow of Chaos phase-start OC caller now evaluates its recorded Battle-shock IDs through
 a read-only state copy, retaining generic runtime OC effects without mixing a historical ID
@@ -2881,6 +2885,9 @@ Companion terrain objectives exercise both state-backed and scenario-only querie
 alias queries, missing/substituted/extra context IDs, deterministic OC payload round-trips, and
 facade projections for both players are covered. A static audit prevents physical-ID membership
 checks from returning to OC and adapter display.
+Scenario-only constructor regressions reject each attached component alias, the complete
+component tuple, an unknown ID, and canonical IDs mixed with either an alias or an unknown ID.
+Existing marker/terrain regressions continue to accept canonical IDs with and without state.
 The phase-start consumer regression distinguishes current Battle-shock from its recorded
 snapshot, preserves an executed RuleIR OC modifier, and checks that live state is unchanged.
 
@@ -2890,16 +2897,14 @@ adapter contract and this finding. Explicit producer classifications preserve hi
 content; generator checks must prove committed output remains current. No faction generated
 content or support inventory is expanded.
 
-Validation: the final complete behavioral suite passes `6139` tests in `458.37s`, with `10`
-SQLite resource warnings, using the required Node PATH prefix, xdist work stealing and
+Validation: the final complete behavioral suite passes `6145` tests in `468.15s`, with `9`
+reported SQLite resource warnings, using the required Node PATH prefix, xdist work stealing and
 coverage command. Branch-inclusive coverage is `85.01%`, above the required 85% threshold.
-The behavioral suite was not repeated without coverage. The focused OC, projection, Chaos
-Daemons consumer and static/module-budget run passes 163 tests. The extended historical-query
-regression also passes with a real executed RuleIR OC modifier. The first review-fix aggregate
-run exposed four phase-start consumers mixing historical Battle-shock IDs with live context;
-the read-only query-state correction resolves them, and the complete coverage gate was rerun
-after that production change. The final complete code-quality suite passes `365` tests in
-`103.10s` with xdist work stealing and no coverage, including generated ability-support/semantic
+The behavioral suite was not repeated without coverage. The focused OC, scenario-only inventory,
+historical checkpoint and static audit run passes 77 tests. All six new invalid-inventory cases
+failed before the constructor guard and pass after it; existing canonical-ID and state-backed
+alias queries remain covered. The final complete code-quality suite passes `365` tests in
+`103.76s` with xdist work stealing and no coverage, including generated ability-support/semantic
 audit checks on macOS.
 Ruff check/format, mypy (`2677` source files), Pyright (zero errors/warnings), all 11 import
 contracts, the exact eight-shard inventory check and all-files pre-commit pass. The P14 source
@@ -2909,7 +2914,7 @@ origin/main` at `52673fa184673ee59a8f30cad40c8dba4e027c79`. Installed-wheel smok
 pinned npm 11.6.2 runs a clean `npm ci`, generated-client/type checks, all `5` TypeScript unit
 tests, and the two-server conformance scenario (`342` assertions, contract `11.1.0`).
 The final engine build ID is
-`warhammer40k-core-v2:runtime-tree-sha256-v1:7dc0c749b1780145d7cf63d0698e3ece56fad385c765a6d0b0770d691a95310a`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:1913b07d46dc949d86269aa10574f004bd0234fa28e5550b07aa7f502acc4534`.
 
 PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/423`; merge
 commit pending review and merge.
