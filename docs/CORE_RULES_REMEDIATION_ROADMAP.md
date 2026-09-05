@@ -2740,8 +2740,8 @@ commit pending review and merge.
 
 ### P14 — C14-01, C14-02
 
-Status: Implemented in Order 18; all required local validation passes; remote PR publication
-pending. Review and merge are pending.
+Status: Implemented in Order 18; all required local validation and remote PR publication are
+complete in PR #423. Review and merge are pending.
 
 Finding IDs: `C14-01`, `C14-02`. Dependencies and evidence gate: S-MIRRORS and APP-AUTHORITY
 are merged on `main`; the preceding Order 17 is merged in PR #422, commit `52673fa1`.
@@ -2893,7 +2893,8 @@ and no coverage, including generated ability-support/semantic audit checks on ma
 The final engine build ID is
 `warhammer40k-core-v2:runtime-tree-sha256-v1:ad74bf8ea928d6ad80d930d22f97aebaacdc390b2038fb884acda10c71af03b1`.
 
-PR URL and merge commit: publication pending; merge pending review.
+PR URL and merge commit: `https://github.com/SobolGaming/Warhammer_40k_AI/pull/423`; merge
+commit pending review and merge.
 
 ### Post-P18C v931/v946 findings
 
