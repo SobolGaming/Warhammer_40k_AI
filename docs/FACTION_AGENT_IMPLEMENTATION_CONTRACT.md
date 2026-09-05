@@ -3,6 +3,15 @@
 This contract applies to agent-authored faction-content PRs after the generated
 Phase 17G runtime scaffold exists.
 
+Before selecting work, read the [faction support guide](FACTION_SUPPORT.md),
+the assigned faction's detailed audit, and the
+[Faction Rules Remediation Roadmap](FACTION_RULES_REMEDIATION_ROADMAP.md).
+Those documents identify the current source obligations and distinguish
+historical execution evidence from current fieldability and playability.
+The source-governance prerequisites and generic-first rules in `AGENTS.md`
+still control implementation; the audit does not authorize source ingestion
+or new named handlers by itself.
+
 ## Scope
 
 Each agent PR must modify only the assigned faction or detachment scaffold files
