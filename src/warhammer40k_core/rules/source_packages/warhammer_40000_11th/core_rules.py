@@ -9,6 +9,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 
@@ -36,6 +37,7 @@ def source_catalog() -> SourceCatalog:
         document_id="eng_01-06_warhammer40k_new40k_core_rules",
     )
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:local-core-rules-pdf",
         raw_text=f"Local 11th Edition Core Rules PDF: {LOCAL_CORE_RULES_PDF}",
     )

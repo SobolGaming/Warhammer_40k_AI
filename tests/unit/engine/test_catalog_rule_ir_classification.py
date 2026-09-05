@@ -89,6 +89,7 @@ from warhammer40k_core.engine.phases.movement import (
     _validate_ability_index_mapping,
 )
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleEffectKind,
@@ -240,6 +241,7 @@ def test_phase17k_catalog_ir_roll_reroll_effect_helpers_are_strict() -> None:
 def test_phase17k_catalog_ir_shadow_of_chaos_aura_classifies_contextual_status() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17k:test:shadow-of-chaos-aura",
             raw_text=(
                 "Daemonic Shadow (Aura): While a friendly Khorne Legiones Daemonica unit "
@@ -289,7 +291,9 @@ def test_phase17k_structural_shield_rule_ir_is_fully_consumed(
     expected_consumers: tuple[str, ...],
 ) -> None:
     rule_ir = compile_rule_source_text(
-        RuleSourceText.from_raw(source_id=source_id, raw_text=raw_text),
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES, source_id=source_id, raw_text=raw_text
+        ),
         source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
 

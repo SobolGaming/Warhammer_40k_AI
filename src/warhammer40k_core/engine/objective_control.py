@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.missions import ObjectiveTerrainAreaDefinition
 from warhammer40k_core.core.objectives import (
-    DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES,
     Objective,
     ObjectiveAnchorKind,
     ObjectiveMarker,
@@ -36,18 +35,24 @@ from warhammer40k_core.engine.objective_control_sources import (
     validate_placed_terrain_area_tuple,
     validate_terrain_feature_tuple,
 )
+from warhammer40k_core.engine.objective_geometry import (
+    ObjectiveGeometry,
+    ObjectiveModelMeasurement,
+    measure_rules_unit_to_objective,
+)
+from warhammer40k_core.engine.objective_geometry_sources import (
+    linked_objective_geometry,
+    terrain_objective_geometry,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
-from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
-from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -736,30 +741,10 @@ def resolve_objective_control(context: ObjectiveControlContext) -> ObjectiveCont
     if type(context) is not ObjectiveControlContext:
         raise GameLifecycleError("resolve_objective_control requires an ObjectiveControlContext.")
     scenario = context.scenario
-    spatial_index = scenario.spatial_index()
-    placement_by_model_id = _model_placement_by_id(scenario)
-    model_instance_by_id = _model_instance_by_id(scenario)
-    results: list[ObjectiveControlResult] = []
-    for marker in context.objective_markers:
-        contributors = tuple(
-            _objective_control_contribution(
-                marker=marker,
-                geometry_model=geometry_model,
-                placement=placement_by_model_id[geometry_model.model_id],
-                model_instance=model_instance_by_id[geometry_model.model_id],
-                battle_shocked_unit_ids=context.battle_shocked_unit_ids,
-                state=context.state,
-                runtime_modifier_registry=context.runtime_modifier_registry,
-            )
-            for geometry_model in spatial_index.models_controlling_objective_marker(marker)
-            if model_instance_by_id[geometry_model.model_id].is_alive
-        )
-        results.append(
-            ObjectiveControlResult.from_contributors(
-                objective_id=marker.objective_marker_id,
-                contributors=contributors,
-            )
-        )
+    results = [
+        _objective_geometry_result(context=context, objective=ObjectiveGeometry.from_marker(marker))
+        for marker in context.objective_markers
+    ]
     for objective in context.terrain_objectives:
         results.append(_terrain_objective_result(context=context, objective=objective))
     for objective_terrain_area in context.objective_terrain_areas:
@@ -857,46 +842,61 @@ def _battle_phase_value(phase: BattlePhase | str) -> str:
 
 def _objective_control_contribution(
     *,
-    marker: ObjectiveMarker,
-    geometry_model: GeometryModel,
-    placement: ModelPlacement,
+    measurement: ObjectiveModelMeasurement,
     model_instance: ModelInstance,
     battle_shocked_unit_ids: tuple[str, ...],
     state: GameState | None,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ObjectiveControlContribution:
-    context = DistanceMeasurementContext.from_objective_marker_to_model(
-        marker_id=marker.objective_marker_id,
-        marker_pose=Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
-        model=geometry_model,
-        marker_diameter_inches=marker.marker_diameter_inches,
-    )
-    battle_shocked = placement.unit_instance_id in battle_shocked_unit_ids
+    battle_shocked = measurement.unit_instance_id in battle_shocked_unit_ids
     objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=False,
         state=state,
-        unit_instance_id=placement.unit_instance_id,
+        unit_instance_id=measurement.unit_instance_id,
         runtime_modifier_registry=runtime_modifier_registry,
-        model_instance_id=placement.model_instance_id,
+        model_instance_id=measurement.model_instance_id,
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
         state=state,
-        unit_instance_id=placement.unit_instance_id,
+        unit_instance_id=measurement.unit_instance_id,
         runtime_modifier_registry=runtime_modifier_registry,
-        model_instance_id=placement.model_instance_id,
+        model_instance_id=measurement.model_instance_id,
     )
     return ObjectiveControlContribution(
-        player_id=placement.player_id,
-        unit_instance_id=placement.unit_instance_id,
-        model_instance_id=placement.model_instance_id,
+        player_id=measurement.player_id,
+        unit_instance_id=measurement.unit_instance_id,
+        model_instance_id=measurement.model_instance_id,
         objective_control=objective_control_characteristic.final,
         effective_objective_control=effective_objective_control_characteristic.final,
         battle_shocked=battle_shocked,
-        horizontal_distance_inches=context.horizontal_distance_inches(),
-        vertical_gap_inches=context.vertical_gap_inches(),
+        horizontal_distance_inches=measurement.horizontal_distance_inches,
+        vertical_gap_inches=measurement.vertical_gap_inches,
+    )
+
+
+def _objective_geometry_result(
+    *, context: ObjectiveControlContext, objective: ObjectiveGeometry
+) -> ObjectiveControlResult:
+    model_instance_by_id = _model_instance_by_id(context.scenario)
+    contributors = tuple(
+        _objective_control_contribution(
+            measurement=measurement,
+            model_instance=model_instance_by_id[measurement.model_instance_id],
+            battle_shocked_unit_ids=context.battle_shocked_unit_ids,
+            state=context.state,
+            runtime_modifier_registry=context.runtime_modifier_registry,
+        )
+        for rules_unit in rules_unit_views_from_armies(armies=context.scenario.armies)
+        for measurement in measure_rules_unit_to_objective(
+            scenario=context.scenario, rules_unit=rules_unit, objective=objective
+        )
+        if measurement.within_control_range
+    )
+    return ObjectiveControlResult.from_contributors(
+        objective_id=objective.objective_id, contributors=contributors
     )
 
 
@@ -921,33 +921,9 @@ def _terrain_objective_result(
         raise GameLifecycleError("Unsupported terrain objective control policy.")
     if type(objective.anchor) is not TerrainObjectiveAnchor:
         raise GameLifecycleError("terrain_objectives must contain terrain-anchored objectives.")
-    feature = _terrain_feature_by_id(
-        context.terrain_features,
-        terrain_id=objective.anchor.terrain_id,
-    )
-    scenario = context.scenario
-    placement_by_model_id = _model_placement_by_id(scenario)
-    model_instance_by_id = _model_instance_by_id(scenario)
-    contributors = tuple(
-        contribution
-        for geometry_model in scenario.placed_geometry_models()
-        if model_instance_by_id[geometry_model.model_id].is_alive
-        for contribution in (
-            _terrain_objective_contribution(
-                footprint_polygons=(feature.rules_footprint_points(),),
-                geometry_model=geometry_model,
-                placement=placement_by_model_id[geometry_model.model_id],
-                model_instance=model_instance_by_id[geometry_model.model_id],
-                battle_shocked_unit_ids=context.battle_shocked_unit_ids,
-                state=context.state,
-                runtime_modifier_registry=context.runtime_modifier_registry,
-            ),
-        )
-        if contribution is not None
-    )
-    return ObjectiveControlResult.from_contributors(
-        objective_id=objective.objective_id,
-        contributors=contributors,
+    return _objective_geometry_result(
+        context=context,
+        objective=terrain_objective_geometry(objective, terrain_features=context.terrain_features),
     )
 
 
@@ -966,111 +942,12 @@ def _mission_terrain_objective_result(
         )
     if policy is not TerrainObjectiveControlPolicy.TERRAIN_AREA_OCCUPANCY:
         raise GameLifecycleError("Unsupported terrain objective control policy.")
-    terrain_areas_by_id = {area.terrain_area_id: area for area in context.terrain_areas}
-    footprint_polygons = tuple(
-        tuple(
-            (point.x_inches, point.y_inches)
-            for point in terrain_areas_by_id[terrain_area_id].footprint_polygon
-        )
-        for terrain_area_id in objective_terrain_area.terrain_area_ids
+    return _objective_geometry_result(
+        context=context,
+        objective=linked_objective_geometry(
+            objective_terrain_area, terrain_areas=context.terrain_areas
+        ),
     )
-    scenario = context.scenario
-    placement_by_model_id = _model_placement_by_id(scenario)
-    model_instance_by_id = _model_instance_by_id(scenario)
-    contributors = tuple(
-        contribution
-        for geometry_model in scenario.placed_geometry_models()
-        if model_instance_by_id[geometry_model.model_id].is_alive
-        for contribution in (
-            _terrain_objective_contribution(
-                footprint_polygons=footprint_polygons,
-                geometry_model=geometry_model,
-                placement=placement_by_model_id[geometry_model.model_id],
-                model_instance=model_instance_by_id[geometry_model.model_id],
-                battle_shocked_unit_ids=context.battle_shocked_unit_ids,
-                state=context.state,
-                runtime_modifier_registry=context.runtime_modifier_registry,
-            ),
-        )
-        if contribution is not None
-    )
-    return ObjectiveControlResult.from_contributors(
-        objective_id=objective_terrain_area.objective_marker_id,
-        contributors=contributors,
-    )
-
-
-def _terrain_objective_contribution(
-    *,
-    footprint_polygons: tuple[tuple[tuple[float, float], ...], ...],
-    geometry_model: GeometryModel,
-    placement: ModelPlacement,
-    model_instance: ModelInstance,
-    battle_shocked_unit_ids: tuple[str, ...],
-    state: GameState | None,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> ObjectiveControlContribution | None:
-    horizontal_distance = min(
-        shapely_backend.base_footprint_distance_to_polygon(
-            geometry_model.base,
-            geometry_model.pose,
-            polygon,
-        )
-        for polygon in footprint_polygons
-    )
-    vertical_gap = _vertical_gap_to_terrain_area(geometry_model)
-    if horizontal_distance > 0.0:
-        return None
-    if vertical_gap > DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES:
-        return None
-    battle_shocked = placement.unit_instance_id in battle_shocked_unit_ids
-    objective_control_characteristic = model_objective_control_characteristic(
-        model_instance,
-        battle_shocked=False,
-        state=state,
-        unit_instance_id=placement.unit_instance_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-        model_instance_id=placement.model_instance_id,
-    )
-    effective_objective_control_characteristic = model_objective_control_characteristic(
-        model_instance,
-        battle_shocked=battle_shocked,
-        state=state,
-        unit_instance_id=placement.unit_instance_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-        model_instance_id=placement.model_instance_id,
-    )
-    return ObjectiveControlContribution(
-        player_id=placement.player_id,
-        unit_instance_id=placement.unit_instance_id,
-        model_instance_id=placement.model_instance_id,
-        objective_control=objective_control_characteristic.final,
-        effective_objective_control=effective_objective_control_characteristic.final,
-        battle_shocked=battle_shocked,
-        horizontal_distance_inches=horizontal_distance,
-        vertical_gap_inches=vertical_gap,
-    )
-
-
-def _vertical_gap_to_terrain_area(model: GeometryModel) -> float:
-    bottom, top = model.volume.vertical_interval(model.pose)
-    if top < 0.0:
-        return abs(top)
-    if bottom > 0.0:
-        return bottom
-    return 0.0
-
-
-def _terrain_feature_by_id(
-    terrain_features: tuple[TerrainFeatureDefinition, ...],
-    *,
-    terrain_id: str,
-) -> TerrainFeatureDefinition:
-    requested_id = _validate_identifier("terrain_id", terrain_id)
-    for feature in terrain_features:
-        if feature.feature_id == requested_id:
-            return feature
-    raise GameLifecycleError("Terrain objective references an unknown terrain feature.")
 
 
 def _record_id_for_context(context: ObjectiveControlContext) -> str:

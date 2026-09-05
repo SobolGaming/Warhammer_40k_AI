@@ -112,6 +112,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -2097,6 +2098,7 @@ def _battle_shock_reroll_ability() -> DatasheetAbilityDescriptor:
     )
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17g:tyranids:test:enemy-battle-shock-reroll",
             raw_text=text,
         ),

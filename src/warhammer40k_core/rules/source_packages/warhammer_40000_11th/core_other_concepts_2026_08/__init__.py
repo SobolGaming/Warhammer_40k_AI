@@ -11,6 +11,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
@@ -110,6 +111,7 @@ def source_package() -> RuleSourcePackage:
                 title=_ARTIFACT.source_document.source_title,
                 source_texts=tuple(
                     RuleSourceText.from_raw(
+                        objective_scope=ObjectiveRuleScope.CORE_RULES,
                         source_id=rule.source_id,
                         raw_text=rule.source_text,
                     )

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -841,7 +842,11 @@ def _compiled_stratagem_rule_ir_payload_or_none(
     effect_descriptor: str,
 ) -> RuleIRPayload | None:
     compiled = compile_rule_source_text(
-        RuleSourceText.from_raw(source_id=source_id, raw_text=effect_descriptor),
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.HISTORICAL_TEXT,
+            source_id=source_id,
+            raw_text=effect_descriptor,
+        ),
         source_keyword_sequence_parts=(
             datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
         ),

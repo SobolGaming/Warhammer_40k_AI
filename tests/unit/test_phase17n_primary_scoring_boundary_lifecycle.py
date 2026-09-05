@@ -233,6 +233,7 @@ from warhammer40k_core.engine.turn_end_hooks import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -5048,6 +5049,7 @@ def _registered_phase11f_cap_probe_award() -> VictoryPointAward:
 def _compiled_generic_vp_rule_ir() -> RuleIR:
     return compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17n:generic-vp-score",
             raw_text="When this unit is destroyed, score 5VP.",
         ),

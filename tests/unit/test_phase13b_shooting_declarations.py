@@ -405,6 +405,7 @@ from warhammer40k_core.geometry.terrain import (
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -4850,6 +4851,7 @@ def test_grouped_allocation_splits_real_shimmershield_bearer_before_save_rolls()
     _replace_unit_instance_in_state(state=state, replacement=defender)
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id=source_id,
             raw_text="The bearer has a 4+ invulnerable save.",
         ),

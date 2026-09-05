@@ -11,6 +11,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
@@ -80,6 +81,7 @@ def _build_source_catalog() -> SourceCatalog:
         document_id="warhammer-40000-app-hidden-transcription-observed-2026-08-09",
     )
     provenance_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:provenance",
         raw_text=(
             "Project-owner-supplied transcription attributed to the Warhammer 40,000 "
@@ -105,6 +107,7 @@ def _build_source_catalog() -> SourceCatalog:
                 source_texts=(
                     provenance_text,
                     RuleSourceText.from_raw(
+                        objective_scope=ObjectiveRuleScope.CORE_RULES,
                         source_id=RULE_SOURCE_ID,
                         raw_text=_ARTIFACT.rule.source_text,
                     ),

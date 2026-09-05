@@ -95,6 +95,195 @@ def test_objective_control_sums_oc_by_player_from_current_runtime_models() -> No
     assert all(contribution.effective_objective_control > 0 for contribution in result.contributors)
 
 
+def test_p14_shared_query_measures_marker_edge_and_terrain_without_marker_radius() -> None:
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        measure_rules_unit_to_objective,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+
+    state = _battle_state_with_center_objective_positions(player_a_offsets=((5.0, 0.0),))
+    context = ObjectiveControlContext.from_game_state(
+        state, timing=ObjectiveControlTiming.PHASE_END, phase=BattlePhase.COMMAND
+    )
+    marker = _center_marker_definition(state).to_objective_marker()
+    rules_unit = rules_unit_views_from_armies(armies=context.scenario.armies)[0]
+    point = ObjectiveGeometry.from_marker(marker)
+    terrain = ObjectiveGeometry.from_terrain(
+        objective_id=marker.objective_marker_id,
+        footprint_polygons=(
+            (
+                (marker.x_inches - 6, marker.y_inches - 1),
+                (marker.x_inches + 6, marker.y_inches - 1),
+                (marker.x_inches + 6, marker.y_inches + 1),
+                (marker.x_inches - 6, marker.y_inches + 1),
+            ),
+        ),
+    )
+    point_measurements = measure_rules_unit_to_objective(
+        scenario=context.scenario, rules_unit=rules_unit, objective=point
+    )
+    terrain_measurements = measure_rules_unit_to_objective(
+        scenario=context.scenario, rules_unit=rules_unit, objective=terrain
+    )
+    nearest_point = min(point_measurements, key=lambda row: row.closest_distance_inches)
+    nearest_terrain = min(terrain_measurements, key=lambda row: row.closest_distance_inches)
+    model = rules_unit.component_unit_for_model(nearest_point.model_instance_id).own_models[0]
+    assert model.base_size.diameter_mm is not None
+    assert math.isclose(
+        nearest_point.horizontal_distance_inches,
+        5 - marker.marker_diameter_inches / 2 - model.base_size.diameter_mm / 25.4 / 2,
+        abs_tol=1e-12,
+    )
+    assert not nearest_point.within_control_range
+    assert nearest_terrain.horizontal_distance_inches == 0
+    assert nearest_terrain.within_control_range
+    assert nearest_terrain.model_instance_id == nearest_point.model_instance_id
+
+
+@pytest.mark.parametrize(
+    ("z", "expected"), [(5.0, True), (5.00001, False), (-7.0, True), (-7.00001, False)]
+)
+def test_p14_objective_query_uses_closest_vertical_part(z: float, expected: bool) -> None:
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        measure_model_to_objective,
+    )
+    from warhammer40k_core.geometry.base import CircularBase
+    from warhammer40k_core.geometry.volume import ModelVolume
+
+    model = GeometryModel("model", Pose.at(0, 0, z), CircularBase(0.5), ModelVolume(2))
+    for objective in (
+        ObjectiveGeometry.from_marker(ObjectiveMarker("marker", "Marker", 0, 0)),
+        ObjectiveGeometry.from_terrain(
+            objective_id="terrain",
+            footprint_polygons=(((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)),),
+        ),
+    ):
+        result = measure_model_to_objective(model=model, objective=objective)
+        assert result.within_control_range is expected
+        assert result.closest_distance_inches == result.vertical_gap_inches
+
+
+def test_p14_terrain_query_preserves_concavity_and_separate_footprint_parts() -> None:
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        measure_model_to_objective,
+    )
+    from warhammer40k_core.geometry.base import RectangularBase
+    from warhammer40k_core.geometry.volume import ModelVolume
+
+    objective = ObjectiveGeometry.from_terrain(
+        objective_id="terrain",
+        footprint_polygons=(
+            ((0.0, 0.0), (4.0, 0.0), (4.0, 1.0), (1.0, 1.0), (1.0, 4.0), (0.0, 4.0)),
+            ((8.0, 0.0), (9.0, 0.0), (9.0, 4.0), (8.0, 4.0)),
+        ),
+    )
+    model = GeometryModel("hull", Pose.at(3, 3), RectangularBase(1, 1), ModelVolume(2))
+    notch = measure_model_to_objective(model=model, objective=objective)
+    assert math.isclose(notch.horizontal_distance_inches, 1.5, abs_tol=1e-12)
+    assert not notch.within_control_range
+    gap = measure_model_to_objective(model=replace(model, pose=Pose.at(6, 3)), objective=objective)
+    assert math.isclose(gap.horizontal_distance_inches, 1.5, abs_tol=1e-12)
+    assert not gap.within_control_range
+    second_part = measure_model_to_objective(
+        model=replace(model, pose=Pose.at(8, 3)), objective=objective
+    )
+    assert second_part.within_control_range
+
+
+def test_p14_group_query_includes_attached_components_and_rejects_stale_identity() -> None:
+    from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        measure_rules_unit_to_objective,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+
+    state = _battle_state_with_center_objective_positions(player_a_offsets=((5.0, 0.0),))
+    config = _config(mission_setup=state.mission_setup)
+    request = _army_muster_request(
+        catalog=config.army_catalog,
+        player_id="player-a",
+        army_id="army-alpha",
+        unit_selection_ids=("bodyguard", "leader"),
+        mission_setup=state.mission_setup,
+    )
+    army = muster_army(catalog=config.army_catalog, request=request)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="p14-attached",
+        armies=(army,),
+    )
+    bodyguard, leader = army.units[:2]
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=f"attached-unit:{army.army_id}:p14",
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="p14:attachment",
+        attachment_source_ids=("p14:attachment",),
+    )
+    attached_army = replace(army, attached_units=(formation,))
+    scenario = replace(scenario, armies=(attached_army, *scenario.armies[1:]))
+    group = rules_unit_view_from_armies(
+        armies=scenario.armies, unit_instance_id=leader.unit_instance_id
+    )
+    objective = ObjectiveGeometry.from_marker(
+        _center_marker_definition(state).to_objective_marker()
+    )
+    rows = measure_rules_unit_to_objective(scenario=scenario, rules_unit=group, objective=objective)
+    assert {row.model_instance_id for row in rows} == {
+        model.model_instance_id for model in group.alive_models()
+    }
+    assert {row.unit_instance_id for row in rows} == set(formation.component_unit_instance_ids)
+    assert {row.rules_unit_instance_id for row in rows} == {formation.attached_unit_instance_id}
+    assert rows == measure_rules_unit_to_objective(
+        scenario=scenario, rules_unit=group, objective=objective
+    )
+    with pytest.raises(GameLifecycleError, match="identity drifted"):
+        measure_rules_unit_to_objective(
+            scenario=scenario,
+            rules_unit=replace(group, owner_player_id="wrong"),
+            objective=objective,
+        )
+    model_id = rows[0].model_instance_id
+    absent = replace(
+        scenario, battlefield_state=scenario.battlefield_state.with_removed_models((model_id,))
+    )
+    assert model_id not in {
+        row.model_instance_id
+        for row in measure_rules_unit_to_objective(
+            scenario=absent, rules_unit=group, objective=objective
+        )
+    }
+
+
+def test_p14_objective_query_rejects_missing_shape_and_drifted_marker_identity() -> None:
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        ObjectiveModelDistance,
+    )
+
+    marker = ObjectiveMarker("p14:marker", "Marker", 10, 10)
+    with pytest.raises(GameLifecycleError, match="complete footprint"):
+        ObjectiveGeometry.from_terrain(objective_id="p14:terrain", footprint_polygons=())
+    with pytest.raises(GameLifecycleError, match="identity or shape drifted"):
+        ObjectiveGeometry(objective_id="p14:other", marker=marker, footprint_polygons=())
+    with pytest.raises(GameLifecycleError, match="identity or shape drifted"):
+        ObjectiveGeometry(
+            objective_id=marker.objective_marker_id,
+            marker=marker,
+            footprint_polygons=(((0.0, 0.0), (1.0, 0.0), (0.0, 1.0)),),
+        )
+    with pytest.raises(GameLifecycleError, match="non-negative"):
+        ObjectiveModelDistance(
+            horizontal_distance_inches=-1, vertical_gap_inches=0, within_control_range=False
+        )
+
+
 def test_battle_shocked_unit_contributes_oc_zero() -> None:
     state = _battle_state_with_center_objective_positions(
         player_a_offsets=((2.0, 0.0), (-2.0, 0.0)),
@@ -363,6 +552,16 @@ def test_terrain_objective_control_requires_terrain_area_containment_not_marker_
 def test_phase17n_opponent_home_control_uses_source_linked_area_not_marker_radius(
     layout_number: int,
 ) -> None:
+    from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
+        _target_unit_within_any_objective_marker_range,
+    )
+    from warhammer40k_core.engine.primary_destruction_evidence import (
+        rules_unit_objective_proximity_witness_from_placements,
+    )
+    from warhammer40k_core.engine.primary_position_membership import (
+        build_primary_rules_unit_membership_from_model_placements,
+    )
+
     state = _phase17n_linked_objective_state(layout_number)
     assert state.mission_setup is not None
     assert state.battlefield_state is not None
@@ -443,6 +642,28 @@ def test_phase17n_opponent_home_control_uses_source_linked_area_not_marker_radiu
         selected.model_instance_id,
     )
     assert result.contributors[0].horizontal_distance_inches == 0.0
+    assert _target_unit_within_any_objective_marker_range(
+        state=state, target_unit_instance_id=player_a.unit_instance_id
+    )
+    placements = (battlefield.model_placement_by_id(selected.model_instance_id),)
+    proximity = rules_unit_objective_proximity_witness_from_placements(
+        state=state,
+        rules_unit_instance_id=player_a.unit_instance_id,
+        model_placements=placements,
+    )
+    assert defender_home.objective_marker_id in proximity.objective_marker_ids
+    membership = build_primary_rules_unit_membership_from_model_placements(
+        state=state,
+        rules_unit_instance_id=player_a.unit_instance_id,
+        owner_player_id="player-a",
+        component_unit_instance_ids=(player_a.unit_instance_id,),
+        model_placements=placements,
+    )
+    assert defender_home.objective_marker_id in {
+        witness.objective_marker_id
+        for component in membership.component_memberships
+        for witness in component.objective_marker_witnesses
+    }
 
 
 def test_source_linked_and_explicit_terrain_objectives_are_mutually_exclusive() -> None:

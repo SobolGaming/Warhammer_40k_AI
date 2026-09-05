@@ -174,6 +174,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
@@ -2856,6 +2857,7 @@ def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePh
 
 def _selected_target_battle_shock_then_modifier_record() -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17g:test:selected-target-battle-shock-then-modifier",
         raw_text=(
             "In your Shooting phase, after this model has shot, select one enemy unit that "
@@ -2891,6 +2893,7 @@ def _selected_target_battle_shock_then_modifier_record() -> AbilityCatalogRecord
 
 def _selected_target_two_battle_shocks_then_modifier_record() -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17g:test:selected-target-two-battle-shocks-then-modifier",
         raw_text=(
             "In your Shooting phase, after this model has shot, select one enemy unit that "
@@ -2941,6 +2944,7 @@ def _selected_target_two_battle_shocks_then_modifier_record() -> AbilityCatalogR
 
 def _selected_target_battle_shock_then_mortal_record() -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17g:test:selected-target-battle-shock-then-mortal-wounds",
         raw_text=(
             "In your Shooting phase, after this model has shot, select one enemy unit that "

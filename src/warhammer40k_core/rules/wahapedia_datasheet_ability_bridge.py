@@ -18,7 +18,6 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
-from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
@@ -31,6 +30,7 @@ from warhammer40k_core.rules.wahapedia_bridge_rows import (
     bridge_rows_by_table,
     resolve_bridge_ability_source_row,
 )
+from warhammer40k_core.rules.wahapedia_rule_source import historical_rule_source_text_from_row_field
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 from warhammer40k_core.rules.wahapedia_static_rule_ir import payload_by_source_row_id
 
@@ -145,7 +145,9 @@ def _bridge_ability(
         ability_id = f"{datasheet_id}:{_slug(name)}"
     ability_type = _required_field(source_row, "type")
     source_kind = _ability_source_kind(ability_type)
-    source_text = _rule_source_text_from_row_field(row=resolved_row, column_name="description")
+    source_text = historical_rule_source_text_from_row_field(
+        row=resolved_row, column_name="description"
+    )
     support = CatalogAbilitySupport.DESCRIPTOR_ONLY
     rule_ir_payload: CatalogJsonObject | None = None
     diagnostics: tuple[CatalogJsonObject, ...] = ()
@@ -260,25 +262,6 @@ def _rule_ir_diagnostics(rule_ir: RuleIR) -> tuple[CatalogJsonObject, ...]:
                 }
             )
     return tuple(diagnostics)
-
-
-def _rule_source_text_from_row_field(
-    *,
-    row: NormalizedSourceRow,
-    column_name: str,
-) -> RuleSourceText:
-    for text_field in row.text_fields:
-        if text_field.column_name == column_name:
-            return RuleSourceText(
-                source_id=text_field.source_text_id,
-                raw_text=text_field.sanitized_text,
-                normalized_text=text_field.normalized_text,
-                parsed_tokens=text_field.parsed_tokens,
-            )
-    return RuleSourceText.from_raw(
-        source_id=f"{row.stable_source_id()}:{column_name}",
-        raw_text=row.runtime_fields_payload().get(column_name, ""),
-    )
 
 
 def _mustering_warlord_value(normalized_description: str) -> str | None:

@@ -3,12 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.rules.objective_terminology import (
+    ObjectiveRuleScope,
+    normalize_objective_rule_text,
+    objective_rule_scope_from_token,
+)
 from warhammer40k_core.rules.parsed_tokens import (
     ParsedRuleText,
     ParsedRuleTextPayload,
     parse_normalized_tokens,
 )
-from warhammer40k_core.rules.text_normalization import normalize_rule_text
 
 
 class SourceDataError(ValueError):
@@ -20,6 +24,7 @@ class RuleSourceTextPayload(TypedDict):
     raw_text: str
     normalized_text: str
     parsed_tokens: ParsedRuleTextPayload
+    objective_scope: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,8 +33,11 @@ class RuleSourceText:
     raw_text: str
     normalized_text: str
     parsed_tokens: ParsedRuleText
+    objective_scope: ObjectiveRuleScope
 
     def __post_init__(self) -> None:
+        if type(self.objective_scope) is not ObjectiveRuleScope:
+            raise SourceDataError("RuleSourceText objective_scope must be ObjectiveRuleScope.")
         object.__setattr__(self, "source_id", _validate_source_id(self.source_id))
         if type(self.raw_text) is not str:
             raise SourceDataError("RuleSourceText raw_text must be a string.")
@@ -39,15 +47,28 @@ class RuleSourceText:
             raise SourceDataError("RuleSourceText parsed_tokens must be ParsedRuleText.")
         if self.parsed_tokens.normalized_text != self.normalized_text:
             raise SourceDataError("RuleSourceText parsed tokens must match normalized_text.")
+        if (
+            self.objective_scope is not ObjectiveRuleScope.HISTORICAL_TEXT
+            and normalize_objective_rule_text(self.raw_text, scope=self.objective_scope)
+            != self.normalized_text
+        ):
+            raise SourceDataError("RuleSourceText scope does not match normalized source data.")
 
     @classmethod
-    def from_raw(cls, *, source_id: object, raw_text: object) -> RuleSourceText:
-        normalized_text = normalize_rule_text(raw_text)
+    def from_raw(
+        cls,
+        *,
+        source_id: object,
+        raw_text: object,
+        objective_scope: ObjectiveRuleScope,
+    ) -> RuleSourceText:
+        normalized_text = normalize_objective_rule_text(raw_text, scope=objective_scope)
         return cls(
             source_id=_validate_source_id(source_id),
             raw_text=_validate_raw_text(raw_text),
             normalized_text=normalized_text,
             parsed_tokens=parse_normalized_tokens(normalized_text),
+            objective_scope=objective_scope,
         )
 
     def to_payload(self) -> RuleSourceTextPayload:
@@ -56,6 +77,7 @@ class RuleSourceText:
             "raw_text": self.raw_text,
             "normalized_text": self.normalized_text,
             "parsed_tokens": self.parsed_tokens.to_payload(),
+            "objective_scope": self.objective_scope.value,
         }
 
     @classmethod
@@ -65,8 +87,13 @@ class RuleSourceText:
             raw_text=payload["raw_text"],
             normalized_text=payload["normalized_text"],
             parsed_tokens=ParsedRuleText.from_payload(payload["parsed_tokens"]),
+            objective_scope=objective_rule_scope_from_token(payload["objective_scope"]),
         )
-        expected = cls.from_raw(source_id=source.source_id, raw_text=source.raw_text)
+        expected = cls.from_raw(
+            source_id=source.source_id,
+            raw_text=source.raw_text,
+            objective_scope=source.objective_scope,
+        )
         if source.to_payload() != expected.to_payload():
             raise SourceDataError("RuleSourceText payload does not match normalized source data.")
         return source

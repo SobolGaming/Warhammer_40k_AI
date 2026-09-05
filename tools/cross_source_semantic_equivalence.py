@@ -26,6 +26,7 @@ from warhammer40k_core.engine.semantic_equivalence import (
     semantic_member_from_rule_ir,
     semantic_member_without_source_text,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -709,6 +710,7 @@ def _compile_source_text(
     source_row_id: str | None = None,
 ) -> tuple[RuleIR, str]:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.HISTORICAL_TEXT,
         source_id=f"cross-source-semantic-audit:{member_id}",
         raw_text=source_text.raw_text,
     )
