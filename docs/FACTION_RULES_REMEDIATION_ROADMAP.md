@@ -202,6 +202,13 @@ disembark, movement paths, Hazardous weapon instances, attached groups, and
 damage allocation need their shared owners' evidence. Copying a local faction
 implementation would create divergent rules paths.
 
+After integration with `main` at `94972c20`, Order 18/P14 supplies the shared
+objective-geometry query and explicit source `objective_scope` classification.
+New faction source ingestion and objective effects must reuse those owners.
+Faction-specific effects such as the Chaos Daemons corrupted-realspace aura
+still require their own source and consumer review; the merged Core Rules work
+does not close those F07 obligations.
+
 ## Evidence required to close an implementation slice
 
 Record the source version, faction/detachment/datasheet IDs, exact clauses,

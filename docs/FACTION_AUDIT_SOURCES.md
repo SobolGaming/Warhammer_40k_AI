@@ -59,6 +59,8 @@ All owned unit and detachment source URLs are linked in the [40 detailed audits]
 
 Baseline commit: **`52673fa1`**, the `main` revision selected when the documentation worktree was created. These hashes are over committed file bytes and are reproducible from that revision. No generated evidence was edited in this PR.
 
+Integration was rechecked after merging `main` at **`94972c20`** (Order 18, PR #423). All four faction evidence artifacts below are byte-identical to the observation baseline, so their hashes and historical coverage counts remain valid. The new shared objective geometry and explicit source terminology scope are implementation prerequisites to reuse; they do not certify the remaining faction-specific objective effects. The original source-observation date and baseline are preserved rather than relabeled as a new audit.
+
 | Artifact | Purpose | SHA-256 |
 | --- | --- | --- |
 | [data/generated/ability_coverage/datasheet_support_rows.json](../data/generated/ability_coverage/datasheet_support_rows.json) | 59 component-status rows | `027d430f04a0c6ccc16d35d357ab5a7f8500390e6191c5af73e11767c9ddd71b` |
