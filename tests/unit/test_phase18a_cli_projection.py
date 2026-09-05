@@ -27,6 +27,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -350,17 +351,26 @@ def test_live_projection_reports_engine_resolved_characteristic_modifiers() -> N
     ]
 
 
-def test_live_projection_reports_battle_shock_objective_control_modifier() -> None:
+@pytest.mark.parametrize("attached_alpha", [False, True], ids=["standalone", "attached"])
+@pytest.mark.parametrize("viewer_player_id", ["player-a", "player-b"])
+def test_live_projection_reports_battle_shock_objective_control_modifier(
+    *, attached_alpha: bool, viewer_player_id: str
+) -> None:
     session, _status = _local_session_at_movement_unit_selection(
-        game_id="phase18a-battle-shock-game"
+        game_id="phase18a-battle-shock-game", attached_alpha=attached_alpha
     )
     state = _session_state(session)
     model_id = _first_model(state).model_instance_id
-    unit_id = state.army_definitions[0].units[0].unit_instance_id
-    before = project_game_view(lifecycle=session.lifecycle, viewer_player_id="player-a")
+    army = state.army_definitions[0]
+    unit_id = (
+        army.attached_units[0].attached_unit_instance_id
+        if attached_alpha
+        else army.units[0].unit_instance_id
+    )
+    before = session.view(viewer_player_id=viewer_player_id)
 
     state.battle_shocked_unit_ids = [unit_id]
-    after = project_game_view(lifecycle=session.lifecycle, viewer_player_id="player-a")
+    after = session.view(viewer_player_id=viewer_player_id)
     model_display = after["model_display_by_id"][model_id]
     base_oc = model_display["base_characteristics"]["OC"]
     current_oc = model_display["current_characteristics"]["OC"]
@@ -368,6 +378,19 @@ def test_live_projection_reports_battle_shock_objective_control_modifier() -> No
     assert before["projection_state_hash"] != after["projection_state_hash"]
     assert before["model_display_by_id"][model_id]["current_characteristics"]["OC"]["final"] == 2
     assert base_oc["final"] == 2
+    for unit in army.units:
+        for model in unit.own_models:
+            displayed = after["model_display_by_id"][model.model_instance_id]
+            assert displayed["current_characteristics"]["OC"]["final"] == 0
+            assert displayed["current_characteristics"]["OC"]["applied_modifier_ids"] == [
+                "battle_shock"
+            ]
+            assert (
+                displayed["base_characteristics"]["OC"]
+                == before["model_display_by_id"][model.model_instance_id]["base_characteristics"][
+                    "OC"
+                ]
+            )
     assert current_oc == {
         "characteristic": "objective_control",
         "label": "OC",
@@ -459,9 +482,10 @@ def test_non_owner_predeployment_projection_exposes_roster_but_conceals_formatio
 def _local_session_at_movement_unit_selection(
     *,
     game_id: str,
+    attached_alpha: bool = False,
 ) -> tuple[LocalGameSession, LifecycleStatus]:
     session = LocalGameSession()
-    session.start(_config(game_id=game_id))
+    session.start(_config(game_id=game_id, attached_alpha=attached_alpha))
     first_status = session.advance_until_decision_or_terminal()
     first_request = _decision_request(first_status)
     assert first_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
@@ -486,7 +510,7 @@ def _local_session_at_movement_unit_selection(
     return session, movement_status
 
 
-def _config(*, game_id: str) -> GameConfig:
+def _config(*, game_id: str, attached_alpha: bool = False) -> GameConfig:
     source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     mission_pack = chapter_approved_2026_27_mission_pack()
     force_disposition_ids = tuple(
@@ -515,6 +539,7 @@ def _config(*, game_id: str) -> GameConfig:
                 army_id="army-alpha",
                 unit_selection_id="intercessor-unit-1",
                 force_disposition_id="take-and-hold",
+                attached_leader=attached_alpha,
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -546,6 +571,7 @@ def _army_muster_request(
     army_id: str,
     unit_selection_id: str,
     force_disposition_id: str,
+    attached_leader: bool = False,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -569,6 +595,31 @@ def _army_muster_request(
                     ),
                 ),
             ),
+        )
+        + (
+            (
+                UnitMusterSelection(
+                    unit_selection_id="leader-unit",
+                    datasheet_id="core-character-leader",
+                    model_profile_selections=(
+                        ModelProfileSelection(
+                            model_profile_id="core-character-leader", model_count=1
+                        ),
+                    ),
+                ),
+            )
+            if attached_leader
+            else ()
+        ),
+        attachment_declarations=(
+            (
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader-unit",
+                    bodyguard_unit_selection_id=unit_selection_id,
+                ),
+            )
+            if attached_leader
+            else ()
         ),
     )
 

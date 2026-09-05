@@ -46,6 +46,7 @@ from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 
@@ -227,6 +228,7 @@ def _unit_placement(army: ArmyDefinition, unit: UnitInstance, *, x: float) -> Un
 
 def _selected_to_fight_risk_records(*, datasheet_id: str) -> tuple[AbilityCatalogRecord, ...]:
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="test:emperors-children:attached-daemonic-patrons",
         raw_text=(
             "Each time this unit is selected to fight, it can call upon daemonic patrons. "

@@ -50,6 +50,7 @@ from warhammer40k_core.engine.primary_mission_state import (
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_starting_total,
@@ -924,7 +925,10 @@ def _model_display_characteristic(
         return model_objective_control_characteristic(
             model,
             battle_shocked=(
-                False if use_base_values else unit.unit_instance_id in state.battle_shocked_unit_ids
+                not use_base_values
+                and rules_unit_is_battle_shocked(
+                    state=state, unit_instance_id=unit.unit_instance_id
+                )
             ),
         )
     value = by_characteristic.get(characteristic)

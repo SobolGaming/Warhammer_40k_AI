@@ -434,6 +434,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
@@ -4131,7 +4132,11 @@ def test_catalog_datasheet_runtime_executes_scoped_shield_wargear_rule_ir() -> N
 
     def runtime_for(*, source_id: str, raw_text: str) -> CatalogDatasheetRuleRuntime:
         rule_ir = compile_rule_source_text(
-            RuleSourceText.from_raw(source_id=source_id, raw_text=raw_text),
+            RuleSourceText.from_raw(
+                objective_scope=ObjectiveRuleScope.CORE_RULES,
+                source_id=source_id,
+                raw_text=raw_text,
+            ),
             source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
         ).rule_ir
         record = _ability_record(
@@ -4286,6 +4291,7 @@ def test_catalog_bearer_unit_invulnerable_save_includes_attached_leader() -> Non
     state.battlefield_state = scenario.battlefield_state
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="000000590:serpent-shield:attached-test",
             raw_text="Models in the bearer's unit have a 5+ invulnerable save.",
         ),
@@ -9310,6 +9316,7 @@ def _command_point_record(
     trigger_kind: TimingTriggerKind,
 ) -> AbilityCatalogRecord:
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"source:{record_id}",
         raw_text=raw_text,
     )
@@ -9520,6 +9527,7 @@ def _cost_modifier_context(
 
 def _desperate_escape_record(*, source_unit: UnitInstance) -> AbilityCatalogRecord:
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="test:chaos-daemons:desperate-escape",
         raw_text=(
             "Each time an enemy unit (excluding Monsters and Vehicles) that is within "
@@ -9556,6 +9564,7 @@ def _desperate_escape_record(*, source_unit: UnitInstance) -> AbilityCatalogReco
 def _once_per_battle_record(*, source_unit: UnitInstance) -> AbilityCatalogRecord:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="wahapedia:datasheet-ability:finest-hour",
             raw_text=ONCE_PER_BATTLE_FIGHT_BOOST_TEXT,
         ),
@@ -10035,6 +10044,7 @@ def test_catalog_movement_end_reactive_normal_move_runtime_enforces_range(
     )
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="test:aeldari:rangers:path-of-the-outcast",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
@@ -10096,6 +10106,7 @@ def test_catalog_movement_end_reactive_runtime_ignores_disabled_records_before_p
     source_unit = source_army.units[0]
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="test:movement-end-reactive-normal-move:disabled",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
@@ -10145,6 +10156,7 @@ def test_catalog_movement_end_reactive_normal_move_bundle_loads_without_manual_b
     source_unit = source_army.units[0]
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id=f"test:movement-end-reactive-normal-move:bundle:{expected_kind}",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "

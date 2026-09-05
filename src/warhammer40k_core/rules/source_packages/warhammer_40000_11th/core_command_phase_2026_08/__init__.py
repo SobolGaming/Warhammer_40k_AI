@@ -11,6 +11,7 @@ from warhammer40k_core.rules.data_package import (
     RulesetBundle,
     SourceDocumentId,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceDocument
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
@@ -128,6 +129,7 @@ def _build_source_catalog() -> SourceCatalog:
         document_id=_ARTIFACT.source_document.document_id,
     )
     provenance = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"{SOURCE_PACKAGE_ID}:manifest:p08ab-source-provenance",
         raw_text=(
             "P08A and P08B pair reviewed Command-phase section headings with the retained "
@@ -149,10 +151,12 @@ def _build_source_catalog() -> SourceCatalog:
         source_texts.extend(
             (
                 RuleSourceText.from_raw(
+                    objective_scope=ObjectiveRuleScope.CORE_RULES,
                     source_id=rule.source_id,
                     raw_text=rule.source_text,
                 ),
                 RuleSourceText.from_raw(
+                    objective_scope=ObjectiveRuleScope.CORE_RULES,
                     source_id=f"{rule.source_id}:official-pdf-body",
                     raw_text=rule.official_pdf_source_text,
                 ),

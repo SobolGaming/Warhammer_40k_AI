@@ -60,6 +60,7 @@ def is_structural_target_keyword(value: str) -> bool:
         " within " in f" {token} "
         or " engagement range" in token
         or " objective marker range" in token
+        or " objective range" in token
         or " hit by " in f" {token} "
     )
 

@@ -104,6 +104,7 @@ from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, Starti
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -2188,6 +2189,7 @@ def _tracked_target_catalog_record(
     include_reselection: bool = True,
 ) -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=source_id,
         raw_text=raw_text,
     )

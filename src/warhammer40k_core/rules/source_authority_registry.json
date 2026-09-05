@@ -230,6 +230,46 @@
           "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
           "identity_kind": "app_version",
           "identity_value": "946"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "terrain-objectives",
+          "source_observation_sha256": "0d48eb98a9be49808743e1c2e75163093163ee177a1d8818836ddf0f854ac189",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T08:38:21-04:00"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "objectives-not-within-a-terrain-area",
+          "source_observation_sha256": "0c4c710383443babf10c595244156d0b374ddae5ae5c7ce0dc29c6e25184278a",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T08:38:21-04:00"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "terrain-objective-control-range",
+          "source_observation_sha256": "a35eeb99c8a34665eb1cd42d1e0a1a878e588e7610fd9ba446897985fe72d451",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/14-objectives",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-05T08:38:21-04:00"
+        },
+        {
+          "audit_id": "core-objectives-maintained-app-mirrors-2026-09-05",
+          "row_id": "objective-marker-terminology-faq",
+          "source_observation_sha256": "d4679f1c484d3c3f38ba8fd9f1a557060563ef8cebfad807fd41c9e1fad961c4",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
         }
       ],
       "legacy_observations": [
@@ -507,6 +547,17 @@
             "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
             "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
             "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance"
+          ]
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-objectives",
+          "version": "maintained-app-mirrors-observed-2026-09-05",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-objectives:objective-marker-terminology-faq",
+            "gw-11e-core-objectives:objectives-not-within-a-terrain-area",
+            "gw-11e-core-objectives:terrain-objective-control-range",
+            "gw-11e-core-objectives:terrain-objectives"
           ]
         }
       ]

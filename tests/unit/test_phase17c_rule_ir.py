@@ -98,6 +98,7 @@ from warhammer40k_core.engine.dice_result_override_descriptors import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.hit_success_threshold_parser import hit_success_threshold_effects
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.parsed_tokens import (
     ParsedRuleText,
     ParsedRuleTextPayload,
@@ -311,6 +312,7 @@ SETUP_REACTIVE_SHOOT_CHARGE_TEXT = (
 
 def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17c:rule:combined",
         raw_text=(
             "At the start of your Command phase, select one friendly INFANTRY unit "
@@ -363,6 +365,7 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
 def test_phase17c_once_per_battle_optional_activation_compiles_to_generic_ir() -> None:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="wahapedia:datasheet-ability:finest-hour",
             raw_text=(
                 "Once per battle, at the start of the Fight phase, this model can use this "
@@ -455,6 +458,7 @@ def test_phase17c_once_per_battle_optional_activation_compiles_to_generic_ir() -
 def test_phase17c_once_per_battle_without_runtime_timing_is_not_execution_supported() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17c:once-per-battle:shooting-start",
             raw_text=(
                 "Once per battle, at the start of the Shooting phase, this model can use "
@@ -472,6 +476,7 @@ def test_phase17c_once_per_battle_without_runtime_timing_is_not_execution_suppor
 def test_phase17c_once_per_battle_when_it_does_continuation_merges() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17c:once-per-battle:when-it-does",
             raw_text=(
                 "Once per battle, at the start of the Fight phase, this model can use this "
@@ -491,6 +496,7 @@ def test_phase17c_once_per_battle_when_it_does_continuation_merges() -> None:
 def test_phase17c_setup_reactive_shoot_charge_compiles_to_generic_out_of_phase_actions() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17c:test:setup-reactive-shoot-charge",
             raw_text=SETUP_REACTIVE_SHOOT_CHARGE_TEXT,
         )
@@ -531,6 +537,7 @@ def test_phase17c_setup_reactive_shoot_charge_compiles_to_generic_out_of_phase_a
 def test_phase17c_movement_end_reactive_normal_move_compiles_to_generic_rule_ir() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17c:test:movement-end-reactive-normal-move",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
@@ -606,6 +613,7 @@ def test_phase17c_movement_end_reactive_normal_move_compiles_to_generic_rule_ir(
 def test_phase17c_fixed_movement_end_reactive_normal_move_compiles_fail_closed_union() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17c:test:fixed-movement-end-reactive-normal-move",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
@@ -652,6 +660,7 @@ def test_phase17c_fixed_movement_end_reactive_normal_move_compiles_fail_closed_u
 def test_phase17c_movement_end_reactive_parser_rejects_semantic_drift() -> None:
     rule_ir = compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17c:test:movement-end-reactive-fall-back",
             raw_text=(
                 "In your opponent's Movement phase, if an enemy unit ends a move within 8\" "
@@ -671,6 +680,7 @@ def test_phase17c_movement_end_reactive_parser_rejects_semantic_drift() -> None:
 
 def test_phase17c_unsupported_clauses_preserve_source_span_and_reason() -> None:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17c:rule:unsupported",
         raw_text="Roll a scatter die and consult the legacy table.",
     )
@@ -2781,10 +2791,18 @@ def test_phase17c_equivalent_roll_modifier_forms_compile_to_same_semantics() -> 
 def test_phase17c_semantic_hash_excludes_source_provenance_but_preserves_rule_parameters() -> None:
     raw_text = "You can re-roll Advance and Charge rolls made for this model."
     first = compile_rule_source_text(
-        RuleSourceText.from_raw(source_id="phase17c:test:semantic-source-a", raw_text=raw_text)
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+            source_id="phase17c:test:semantic-source-a",
+            raw_text=raw_text,
+        )
     ).rule_ir
     second = compile_rule_source_text(
-        RuleSourceText.from_raw(source_id="phase17c:test:semantic-source-b", raw_text=raw_text)
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+            source_id="phase17c:test:semantic-source-b",
+            raw_text=raw_text,
+        )
     ).rule_ir
     different = _compiled("You can re-roll Charge rolls made for this model.").rule_ir
 
@@ -4265,7 +4283,11 @@ def test_phase17c_enemy_aura_target_keyword_compiles_to_keyword_gate() -> None:
 
 
 def test_phase17c_compiler_rejects_stale_or_duplicate_source_inputs() -> None:
-    source = RuleSourceText.from_raw(source_id="phase17c:rule:stale", raw_text="Gain 1CP.")
+    source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
+        source_id="phase17c:rule:stale",
+        raw_text="Gain 1CP.",
+    )
 
     with pytest.raises(RuleCompilerError, match="stale"):
         compile_normalized_rule_text(
@@ -4279,11 +4301,13 @@ def test_phase17c_compiler_rejects_stale_or_duplicate_source_inputs() -> None:
 
 def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17c:rule:payload-boundary",
         raw_text="Gain 1CP.",
     )
     compiled = compile_rule_source_text(source)
     second_source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="phase17c:rule:payload-boundary:second",
         raw_text="Score 1VP.",
     )
@@ -4358,6 +4382,7 @@ def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
     with pytest.raises(RuleCompilerError, match="source_id must match"):
         CompiledRuleSource(
             source_text=RuleSourceText.from_raw(
+                objective_scope=ObjectiveRuleScope.CORE_RULES,
                 source_id="phase17c:rule:different-source",
                 raw_text="Gain 1CP.",
             ),
@@ -4366,6 +4391,7 @@ def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
     with pytest.raises(RuleCompilerError, match="normalized_text must match"):
         CompiledRuleSource(
             source_text=RuleSourceText.from_raw(
+                objective_scope=ObjectiveRuleScope.CORE_RULES,
                 source_id=source.source_id,
                 raw_text="Gain 2CP.",
             ),
@@ -4611,7 +4637,11 @@ def test_phase17c_rule_ir_token_converters_reject_invalid_tokens(
 def _compiled(raw_text: str) -> CompiledRuleSource:
     source_suffix = hashlib.sha256(raw_text.encode()).hexdigest()[:12]
     return compile_rule_source_text(
-        RuleSourceText.from_raw(source_id=f"phase17c:test:{source_suffix}", raw_text=raw_text)
+        RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
+            source_id=f"phase17c:test:{source_suffix}",
+            raw_text=raw_text,
+        )
     )
 
 

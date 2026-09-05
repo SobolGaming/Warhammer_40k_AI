@@ -103,6 +103,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -1074,6 +1075,7 @@ def _compiled_record(
     trigger_kind: TimingTriggerKind,
 ) -> AbilityCatalogRecord:
     source_text = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id=f"source:{record_id}",
         raw_text=raw_text,
     )

@@ -72,6 +72,7 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -1241,6 +1242,7 @@ def _set_model_wounds(
 
 def _return_on_death_record(*, wounds_remaining: int = 3) -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
         source_id="rule:first-death-return",
         raw_text=FIRST_DEATH_RETURN_TEXT.replace(
             "3 wounds remaining",

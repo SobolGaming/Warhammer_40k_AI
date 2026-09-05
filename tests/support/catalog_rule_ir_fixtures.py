@@ -30,6 +30,7 @@ from warhammer40k_core.engine.unit_factory import (
     ModelInstance,
     UnitInstance,
 )
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
@@ -332,6 +333,7 @@ def multi_clause_post_shoot_cover_denial_record(
 def charge_end_mortal_wounds_rule_ir() -> RuleIR:
     return compile_rule_source_text(
         RuleSourceText.from_raw(
+            objective_scope=ObjectiveRuleScope.CORE_RULES,
             source_id="phase17k:test:charge-end-mortal-wounds",
             raw_text=(
                 "Each time this unit ends a Charge move, select one enemy unit within "

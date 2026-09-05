@@ -15,6 +15,8 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
+from warhammer40k_core.engine.objective_geometry import measure_model_to_objective
+from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -22,8 +24,6 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
-from warhammer40k_core.geometry.measurement import objective_marker_controls_model
-from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -348,26 +348,20 @@ def _objective_proximity_witness_from_geometry_models(
             objective_marker_witnesses=(),
         )
     marker_witnesses: list[ObjectiveMarkerModelWitness] = []
-    for marker_definition in mission_setup.objective_markers:
-        marker = marker_definition.to_objective_marker()
+    for objective in mission_objective_geometries(state):
         qualifying_model_ids = tuple(
             sorted(
                 model_id
                 for model_id, geometry_model in geometry_models_by_id.items()
-                if objective_marker_controls_model(
-                    marker_pose=Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
-                    model=geometry_model,
-                    marker_id=marker.objective_marker_id,
-                    horizontal_inches=marker.control_horizontal_inches,
-                    vertical_inches=marker.control_vertical_inches,
-                    marker_diameter_inches=marker.marker_diameter_inches,
-                )
+                if measure_model_to_objective(
+                    model=geometry_model, objective=objective
+                ).within_control_range
             )
         )
         if qualifying_model_ids:
             marker_witnesses.append(
                 ObjectiveMarkerModelWitness(
-                    objective_marker_id=marker.objective_marker_id,
+                    objective_marker_id=objective.objective_id,
                     model_instance_ids=qualifying_model_ids,
                 )
             )

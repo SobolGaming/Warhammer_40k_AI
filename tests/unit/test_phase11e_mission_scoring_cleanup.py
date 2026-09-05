@@ -2824,7 +2824,7 @@ def test_purge_and_secure_real_attack_from_objective_scores_through_lifecycle() 
 def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> None:
     config = replace(
         _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup()),
-        game_id="phase11e-meatgrinder-overwatch-return-auth-0",
+        game_id="phase11e-meatgrinder-overwatch-return-auth-1",
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
