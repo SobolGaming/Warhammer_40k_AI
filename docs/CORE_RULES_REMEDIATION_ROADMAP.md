@@ -3285,8 +3285,8 @@ PR URL and merge commit:
 
 ## P24C1 implementation evidence — Order 22
 
-Status: Source-instance identity/schema implementation complete; all final local
-gates pass. Remote publication pending. This closes only `C24-03A` after review/merge.
+Status: Source-instance identity/schema implementation complete and published in
+PR #428; all final local gates pass. This closes only `C24-03A` after review/merge.
 `C24-03B` / P24C2 (Order 52), the parent `C24-03` family and category 24 remain open.
 
 Finding IDs: `C24-03A`.
@@ -3424,4 +3424,5 @@ conformance scenario pass (`342` assertions, contract `11.2.0`). Windows client
 validation uses the bundled Node runtime and npm from the local Node environment.
 The final architecture/scope audit and `git diff --check` pass.
 
-PR URL and merge commit: Pending publication; merge remains an owner action.
+PR URL and merge commit:
+[PR #428](https://github.com/SobolGaming/Warhammer_40k_AI/pull/428); not merged.
