@@ -165,6 +165,15 @@ remain outside public event projections. Check the reviewed 12.07/12.08 and v931
 source artifact with `uv run --no-sync python tools/build_core_fight_source.py --check`.
 The P12 roadmap entry records the conservative reachability diagnostic and scope.
 
+Orders 20–21 apply Aura self-inclusion and non-stacking through shared rules-unit
+queries, and enforce Psychic-level ability use once per canonical PSYKER unit,
+stable source ability and phase occurrence. Physical source/component/model IDs
+remain replay evidence. The existing finite activation path rejects exhausted uses
+before recording or mutation. Check the reviewed 22.01/22.03.01 source package with
+`uv run --no-sync python tools/build_core_aura_psychic_source.py --check`; this
+offline builder reproduces both the versioned JSON and maintained-mirror audit.
+The source loader and authority registry pin their bytes and observation identities.
+
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,
 interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).

@@ -62,6 +62,7 @@ type AttackRole = Literal["attacker", "target"]
 
 _ATTACKER_TARGET_KINDS = frozenset(
     {
+        RuleTargetKind.AURA_UNITS,
         RuleTargetKind.FRIENDLY_UNIT,
         RuleTargetKind.PLAYER,
         RuleTargetKind.SELECTED_UNIT,
@@ -73,6 +74,7 @@ _ATTACKER_TARGET_KINDS = frozenset(
 _TARGET_TARGET_KINDS = frozenset({RuleTargetKind.ENEMY_UNIT, RuleTargetKind.SELECTED_TARGET})
 _LEGACY_SELF_TARGET_KINDS = frozenset(
     {
+        RuleTargetKind.AURA_UNITS,
         RuleTargetKind.FRIENDLY_UNIT,
         RuleTargetKind.SELECTED_UNIT,
         RuleTargetKind.THIS_MODEL,

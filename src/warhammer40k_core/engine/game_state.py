@@ -3239,12 +3239,9 @@ class GameState:
         self.persisting_effects.sort(key=lambda stored: stored.effect_id)
 
     def persisting_effects_for_unit(self, unit_instance_id: str) -> tuple[PersistingEffect, ...]:
-        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-        return tuple(
-            effect
-            for effect in self.persisting_effects
-            if effect.applies_to_unit(requested_unit_id)
-        )
+        from warhammer40k_core.engine.aura_applications import persisting_effects_for_target
+
+        return persisting_effects_for_target(self.persisting_effects, unit_instance_id)
 
     def record_tracked_target(self, record: TrackedTargetRecord) -> None:
         if type(record) is not TrackedTargetRecord:

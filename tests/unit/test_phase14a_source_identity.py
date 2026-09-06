@@ -1243,7 +1243,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 12
+    assert len(scope.source_packages) == 13
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -2912,3 +2912,44 @@ def test_p12_source_package_records_current_consolidation_and_ongoing_erratum() 
     assert audit["observed_at"]
     with pytest.raises(source.FightSourceError, match="reviewed pin"):
         source.validate_fight_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
+
+
+def test_p22_p22b_source_package_pins_aura_and_psychic_use_authority() -> None:
+    from tools.build_core_aura_psychic_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_aura_psychic_2026_09 as source,
+    )
+
+    payload, audit = build_payloads()
+    assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
+    assert json.loads(AUDIT_PATH.read_bytes()) == audit
+    package = source.source_package()
+    assert package.evidence_required_source_ids == (source.AURA_SOURCE_ID, source.PSYCHIC_SOURCE_ID)
+    for rule in source.source_rules():
+        text = package.source_catalog.source_text_by_id(rule.source_id)
+        assert text.raw_text == rule.source_text
+        assert hashlib.sha256(text.raw_text.encode()).hexdigest() == rule.transcription_sha256
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "executable_engine_runtime"
+    mirrors = tuple(
+        row
+        for row in source.source_evidence_records()
+        if row.provider_name in {"40k.app", "Game Datamissions"}
+    )
+    assert len(mirrors) == 3
+    assert all(row.provider_non_affiliation_recorded for row in mirrors)
+    assert (
+        next(row for row in mirrors if row.provider_name == "Game Datamissions").app_version
+        == "931"
+    )
+    assert (
+        "always within range of its own aura"
+        in package.source_catalog.source_text_by_id(source.AURA_SOURCE_ID).raw_text
+    )
+    assert (
+        "more than once per phase"
+        in package.source_catalog.source_text_by_id(source.PSYCHIC_SOURCE_ID).raw_text
+    )
+    with pytest.raises(source.AuraPsychicSourceError, match="reviewed pin"):
+        source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")

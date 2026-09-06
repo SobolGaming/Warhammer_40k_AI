@@ -18,6 +18,13 @@ from warhammer40k_core.rules.attack_target_parser import (
     parse_this_model_attack_target_trigger,
     this_model_attack_target_match_ranges,
 )
+from warhammer40k_core.rules.aura_parser import (
+    AURA_TAG_RE as _AURA_RE,
+)
+from warhammer40k_core.rules.aura_parser import (
+    aura_excludes_source_unit,
+    parse_aura_conditions,
+)
 from warhammer40k_core.rules.command_point_parser import (
     command_point_target,
     parse_command_point_conditions,
@@ -255,7 +262,6 @@ _SETUP_RE = re.compile(r"\b(?:deployment|before\s+the\s+battle|set\s+up)\b", re.
 _DICE_TRIGGER_RE = re.compile(
     rf"\b(?:after|when|each\s+time)\s+.*\b(?P<roll>{_ROLL_TYPES})\s+roll", re.IGNORECASE
 )
-_AURA_RE = re.compile(r"(?:\bAura\b|^\s*Aura\s*:)", re.IGNORECASE)
 _LEADING_UNIT_RE = re.compile(
     r"\bwhile\s+this\s+model\s+is\s+leading\s+a\s+unit\b",
     re.IGNORECASE,
@@ -800,7 +806,7 @@ def _compile_clause(
     trigger = _parse_trigger(clause_text)
     conditions = _dedupe_conditions(
         (
-            *_parse_aura_conditions(clause_text),
+            *parse_aura_conditions(clause_text.span),
             *_parse_leading_unit_conditions(clause_text),
             *_parse_tracked_target_conditions(clause_text),
             *_selected_target_extensions.parse_selected_target_attack_conditions(
@@ -1202,21 +1208,6 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
             kind=RuleTriggerKind.SETUP, source_span=_span_from_match(clause_text, setup_match)
         )
     return None
-
-
-def _parse_aura_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
-    match = _AURA_RE.search(clause_text.text)
-    if match is None:
-        match = _selected_target_extensions.shadow_of_chaos_area_match(clause_text.text)
-    if match is None:
-        return ()
-    return (
-        RuleCondition(
-            kind=RuleConditionKind.AURA,
-            source_span=_span_from_match(clause_text, match),
-            parameters=parameters_from_pairs((("source", "aura"),)),
-        ),
-    )
 
 
 def _parse_leading_unit_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
@@ -1658,6 +1649,8 @@ def _aura_target_parameter_pairs(
     parser_context: _RuleParserContext,
 ) -> tuple[tuple[str, RuleParameterValue], ...]:
     pairs: list[tuple[str, RuleParameterValue]] = [("eligible_target", "aura_units")]
+    if aura_excludes_source_unit(clause_text.text):
+        pairs.append(("include_source_unit", False))
     match = _TARGET_RE.search(clause_text.text)
     if match is None:
         pairs.append(("allegiance", "any"))

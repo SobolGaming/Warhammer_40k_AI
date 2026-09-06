@@ -4654,6 +4654,58 @@ movement decisions and allocation events. Queue snapshots must equal that comple
 state. Resumption adds only authenticated forced selections, allocations and
 Overrun completions; matching altered suspended/resumed copies are insufficient.
 
+## Orders 20–21 (P22/P22B): Aura scope and Psychic ability use
+
+Aura evaluation includes the source rules unit by default when its living emitter
+is placed on the battlefield and the ordinary allegiance/keyword restrictions
+match. A source-bound `include_source_unit: false` excludes that unit; adapters
+cannot override it. Model-anchored Auras measure from the actual selected model.
+The `rule_execution_aura_evaluated` event adds `core_rule_source_id`, referencing
+`gw-11e-core-aura-psychic:aura-abilities`. Its affected IDs are canonical rules-unit
+IDs. Overlapping instances retain their individual persisted evidence, but one
+source/clause/effect slot applies once to each queried rules unit across component
+aliases. Distinct source Auras and distinct sub-effects remain independent.
+
+Psychic-level ability use reuses existing finite catalog activation decisions and
+their `activate`, `catalog_record_id`, source-unit/model, round, active-player and
+phase payloads. No decision family, option family or proposal kind is added.
+The engine validates the source-bound `psychic_ability_use` frequency descriptor,
+PSYKER ownership, living source and canonical component/model lineage. It rejects
+a repeated use with `invalid_reason: psychic_ability_used_this_phase` before
+removing the request, recording the result or mutating state. Fresh candidate
+enumeration omits exhausted sources. An already queued duplicate remains
+declinable. Invalid and declined submissions do not consume a use.
+
+Successful execution appends one `psychic_ability_used` event. Its closed payload
+contains `usage_key`, `restriction_source_id`, `game_id`, `player_id`,
+`rules_unit_instance_id`, `ability_source_id`, `battle_round`, `active_player_id`,
+`phase`, `psychic_level`, `source_rule_id`, `source_rule_ir_hash`,
+`source_instance_id`, `source_component_unit_instance_id`,
+`source_model_instance_id`, `component_unit_instance_ids`, `catalog_record_id`,
+`request_id` and `result_id`. The restriction source is
+`gw-11e-core-aura-psychic:psychic-abilities-with-a-psychic-level`.
+The content-addressed usage key includes game, canonical rules-unit, stable
+ability source, battle round, active player and phase. Physical model/component,
+catalog-record instance, display label and selected level do not split the limit.
+Those fields remain source evidence. Different units, source abilities and phase
+occurrences have independent limits. Existing once-per-battle limits still apply.
+
+Restore validates the descriptor/hash/provider against the loaded catalog, the
+canonical starting attached-unit lineage, selected component/model ownership and
+the corresponding accepted decision preceding the use. It rejects missing,
+duplicated, malformed or drifted use records. Starting lineage remains valid after
+bodyguard, caster or complete rules-unit destruction; current physical survival
+does not erase historical use. Replay resubmits the same recorded decisions.
+
+These battle ability choices and events are public to both players under the
+existing shared viewer policy. They carry no hidden setup, mission or opponent
+choice inventory. Existing hidden-decision redaction is unchanged. The current
+JSON-safe event/finite-option envelopes cover these payloads; no external schema
+or contract-version change is required. Runtime build identity and the generated
+external examples are regenerated together. This certifies the Core restriction
+for supported source-backed ability effects, not additional faction spell effects
+or catalogue support.
+
 ## Summary Rule
 
 The adapter boundary is a choice boundary, not a rules boundary.

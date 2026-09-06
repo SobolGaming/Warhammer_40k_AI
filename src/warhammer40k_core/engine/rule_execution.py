@@ -8,9 +8,8 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
-    battle_phase_kind_from_token,
 )
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.aura_execution import aura_handler as _aura_handler
 from warhammer40k_core.engine.command_point_rule_execution import (
     apply_command_point_rule_mutation,
     command_point_operation_and_delta,
@@ -34,10 +33,41 @@ from warhammer40k_core.engine.generic_rule_effect_identity import (
     generic_rule_persisting_effect_id,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
+from warhammer40k_core.engine.psychic_ability_usage import (
+    psychic_ability_unavailable_reason,
+    psychic_use_for_context,
+    record_psychic_ability_use,
+)
 from warhammer40k_core.engine.rule_duration_execution import (
     expiration_for_duration,
     rule_duration_unavailable_reason,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    json_object as _json_object,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_effect_kind_tuple as _validate_effect_kind_tuple,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_identifier as _validate_identifier,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_identifier_tuple as _validate_identifier_tuple,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_json_object_tuple as _validate_json_object_tuple,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_optional_identifier as _validate_optional_identifier,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_optional_phase as _validate_optional_phase,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_positive_int as _validate_positive_int,
+)
+from warhammer40k_core.engine.rule_execution_validation import (
+    validate_rule_ir as _validate_rule_ir,
 )
 from warhammer40k_core.engine.rule_frequency import (
     consume_optional_ability_frequency,
@@ -657,6 +687,9 @@ def execute_rule_ir(
                 {"diagnostics": _diagnostic_payloads(resolved_rule_ir)}
             ),
         )
+    psychic_reason = psychic_ability_unavailable_reason(rule_ir=resolved_rule_ir, context=context)
+    if psychic_reason is not None:
+        return RuleExecutionResult.invalid(resolved_rule_ir, reason=psychic_reason)
     preflight = _preflight_rule_ir(
         rule_ir=resolved_rule_ir,
         context=context,
@@ -664,11 +697,16 @@ def execute_rule_ir(
     )
     if preflight is not None:
         return preflight
-    return _execute_preflighted_rule_ir(
+    psychic_use = psychic_use_for_context(rule_ir=resolved_rule_ir, context=context)
+    result = _execute_preflighted_rule_ir(
         rule_ir=resolved_rule_ir,
         context=context,
         registry=resolved_registry,
     )
+    if result.status is not RuleExecutionStatus.APPLIED:
+        return result
+    events = record_psychic_ability_use(use=psychic_use, event_log=context.event_log)
+    return replace(result, event_records=(*result.event_records, *events))
 
 
 def rule_ir_from_execution_payload(payload: JsonValue) -> RuleIR:
@@ -848,7 +886,7 @@ def _generic_effect_handler(
     context: RuleExecutionContext,
 ) -> RuleExecutionResult:
     resolved_effect = _require_effect(effect)
-    effect_payload = _effect_payload(
+    effect_payload = rule_effect_payload(
         rule_ir=rule_ir,
         clause=clause,
         effect=resolved_effect,
@@ -861,11 +899,11 @@ def _generic_effect_handler(
         effect_payload=effect_payload,
         context=context,
     )
-    event = _emit_event(
+    event = emit_rule_execution_event(
         context=context,
         event_type="rule_execution_effect_applied",
         payload=effect_payload,
-        fallback_id=_fallback_event_id(rule_ir, clause, resolved_effect, "effect"),
+        fallback_id=rule_execution_event_id(rule_ir, clause, resolved_effect, "effect"),
     )
     return RuleExecutionResult.applied(
         rule_ir,
@@ -901,7 +939,7 @@ def _command_point_handler(
     context: RuleExecutionContext,
 ) -> RuleExecutionResult:
     resolved_effect = _require_effect(effect)
-    state = _require_state(context)
+    state = require_execution_state(context)
     operation, delta = command_point_operation_and_delta(resolved_effect)
     mutation = apply_command_point_rule_mutation(
         state=state,
@@ -915,17 +953,17 @@ def _command_point_handler(
     payload = mutation.transaction_payload
     if payload is None:
         raise GameLifecycleError("Applied command-point rule mutation is missing payload.")
-    event = _emit_event(
+    event = emit_rule_execution_event(
         context=context,
         event_type="rule_execution_command_points_modified",
         payload=payload,
-        fallback_id=_fallback_event_id(rule_ir, clause, resolved_effect, "cp"),
+        fallback_id=rule_execution_event_id(rule_ir, clause, resolved_effect, "cp"),
     )
     return RuleExecutionResult.applied(
         rule_ir,
         applied_clause_ids=(clause.clause_id,),
         effect_payloads=(
-            _effect_payload(
+            rule_effect_payload(
                 rule_ir=rule_ir,
                 clause=clause,
                 effect=resolved_effect,
@@ -959,11 +997,11 @@ def _target_binding_handler(
         "target_unit_instance_ids": list(target_unit_instance_ids),
         "target_player_id": context.target_player_id,
     }
-    event = _emit_event(
+    event = emit_rule_execution_event(
         context=context,
         event_type="rule_execution_target_bound",
         payload=payload,
-        fallback_id=_fallback_event_id(rule_ir, clause, None, "target"),
+        fallback_id=rule_execution_event_id(rule_ir, clause, None, "target"),
     )
     return RuleExecutionResult.applied(
         rule_ir,
@@ -973,59 +1011,7 @@ def _target_binding_handler(
     )
 
 
-def _aura_handler(
-    rule_ir: RuleIR,
-    clause: RuleClause,
-    effect: RuleEffectSpec | None,
-    context: RuleExecutionContext,
-) -> RuleExecutionResult:
-    if effect is not None:
-        raise GameLifecycleError("Aura handler does not accept a single effect.")
-    source_unit_instance_id = context.source_unit_instance_id
-    if source_unit_instance_id is None:
-        raise GameLifecycleError("Aura evaluation requires source_unit_instance_id.")
-    affected_unit_ids = aura_affected_unit_ids(
-        clause=clause,
-        state=_require_state(context),
-        source_unit_instance_id=source_unit_instance_id,
-        source_model_instance_id=context.source_model_instance_id,
-    )
-    aura_payload = _json_object(
-        {
-            "rule_id": rule_ir.rule_id,
-            "source_id": rule_ir.source_id,
-            "clause_id": clause.clause_id,
-            "source_unit_instance_id": context.source_unit_instance_id,
-            "affected_unit_instance_ids": list(affected_unit_ids),
-            "conditions": [condition.to_payload() for condition in clause.conditions],
-        }
-    )
-    effect_payloads = tuple(
-        _effect_payload(
-            rule_ir=rule_ir,
-            clause=clause,
-            effect=effect_spec,
-            context=context,
-            target_unit_instance_ids=affected_unit_ids,
-        )
-        for effect_spec in clause.effects
-    )
-    event = _emit_event(
-        context=context,
-        event_type="rule_execution_aura_evaluated",
-        payload=aura_payload,
-        fallback_id=_fallback_event_id(rule_ir, clause, None, "aura"),
-    )
-    return RuleExecutionResult.applied(
-        rule_ir,
-        applied_clause_ids=(clause.clause_id,),
-        effect_payloads=effect_payloads,
-        aura_evaluations=(aura_payload,),
-        event_records=(event,),
-    )
-
-
-def _effect_payload(
+def rule_effect_payload(
     *,
     rule_ir: RuleIR,
     clause: RuleClause,
@@ -1075,7 +1061,7 @@ def generic_rule_effect_payload(
     target_unit_instance_ids: tuple[str, ...] | None = None,
     effect_index: int | None = None,
 ) -> dict[str, JsonValue]:
-    return _effect_payload(
+    return rule_effect_payload(
         rule_ir=_validate_rule_ir(rule_ir),
         clause=clause,
         effect=effect,
@@ -1442,7 +1428,7 @@ def _is_aura_clause(clause: RuleClause) -> bool:
     )
 
 
-def _emit_event(
+def emit_rule_execution_event(
     *,
     context: RuleExecutionContext,
     event_type: str,
@@ -1462,7 +1448,7 @@ def _emit_event(
     )
 
 
-def _fallback_event_id(
+def rule_execution_event_id(
     rule_ir: RuleIR,
     clause: RuleClause,
     effect: RuleEffectSpec | None,
@@ -1495,103 +1481,7 @@ def _require_effect(effect: RuleEffectSpec | None) -> RuleEffectSpec:
     return effect
 
 
-def _require_state(context: RuleExecutionContext) -> GameState:
+def require_execution_state(context: RuleExecutionContext) -> GameState:
     if context.state is None:
         raise GameLifecycleError("Rule execution requires GameState.")
     return context.state
-
-
-def _validate_rule_ir(value: object) -> RuleIR:
-    if type(value) is not RuleIR:
-        raise GameLifecycleError("Rule execution requires a compiled RuleIR.")
-    return value
-
-
-def _validate_effect_kind_tuple(
-    field_name: str,
-    values: object,
-) -> tuple[RuleEffectKind, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    validated: list[RuleEffectKind] = []
-    seen: set[RuleEffectKind] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not RuleEffectKind:
-            raise GameLifecycleError(f"{field_name} values must be RuleEffectKind.")
-        if value in seen:
-            raise GameLifecycleError(f"{field_name} values must not be duplicated.")
-        seen.add(value)
-        validated.append(value)
-    return tuple(sorted(validated, key=lambda kind: kind.value))
-
-
-def _validate_json_object_tuple(
-    field_name: str,
-    values: object,
-) -> tuple[dict[str, JsonValue], ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    validated: list[dict[str, JsonValue]] = []
-    for value in cast(tuple[object, ...], values):
-        validated.append(_json_object(value))
-    return tuple(validated)
-
-
-def _json_object(value: object) -> dict[str, JsonValue]:
-    validated = validate_json_value(value)
-    if not isinstance(validated, dict):
-        raise GameLifecycleError("Rule execution payload must be a JSON object.")
-    return validated
-
-
-_validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
-
-
-def _validate_identifier_tuple(
-    field_name: str,
-    values: object,
-    *,
-    min_length: int,
-    sort_values: bool,
-) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GameLifecycleError(f"{field_name} must not contain duplicate values.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    if len(identifiers) < min_length:
-        raise GameLifecycleError(f"{field_name} must contain at least {min_length} values.")
-    if sort_values:
-        return tuple(sorted(identifiers))
-    return tuple(identifiers)
-
-
-def _validate_positive_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"{field_name} must be an integer.")
-    if value < 1:
-        raise GameLifecycleError(f"{field_name} must be positive.")
-    return value
-
-
-def _validate_optional_phase(
-    field_name: str,
-    value: object | None,
-) -> BattlePhaseKind | None:
-    if value is None:
-        return None
-    try:
-        return battle_phase_kind_from_token(value)
-    except ValueError as exc:
-        raise GameLifecycleError(f"{field_name} must be a BattlePhaseKind.") from exc

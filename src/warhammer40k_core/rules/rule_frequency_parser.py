@@ -4,6 +4,7 @@ import re
 
 from warhammer40k_core.rules.command_point_parser import command_point_frequency_span_end
 from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.psychic_ability_identity import parse_psychic_level_condition
 from warhammer40k_core.rules.rule_ir import (
     RuleCondition,
     RuleConditionKind,
@@ -29,7 +30,7 @@ _ONCE_PER_RE = re.compile(
 def parse_frequency_conditions(clause_span: TextSpan) -> tuple[RuleCondition, ...]:
     activation_match = OPTIONAL_ABILITY_ACTIVATION_RE.search(clause_span.text)
     activation_range: tuple[int, int] | None = None
-    conditions: list[RuleCondition] = []
+    conditions: list[RuleCondition] = list(parse_psychic_level_condition(clause_span))
     if activation_match is not None:
         continuation_match = OPTIONAL_ABILITY_EFFECT_CONTINUATION_RE.search(
             clause_span.text[activation_match.end() :]

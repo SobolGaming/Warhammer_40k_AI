@@ -201,6 +201,12 @@ from warhammer40k_core.engine.lifecycle_payload_consistency import (
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
 )
+from warhammer40k_core.engine.lifecycle_runtime_payloads import (
+    payload_bool as _payload_bool,
+)
+from warhammer40k_core.engine.lifecycle_runtime_payloads import (
+    runtime_mortal_wound_source_context_phase as _runtime_mortal_wound_source_context_phase,
+)
 from warhammer40k_core.engine.lifecycle_setup_reactive import (
     apply_setup_reactive_lifecycle_decision_if_applicable,
     invalid_setup_reactive_lifecycle_status,
@@ -305,6 +311,8 @@ from warhammer40k_core.engine.prebattle_integrity import (
 from warhammer40k_core.engine.primary_mission_choices import (
     locate_and_deny_start_battle_binding,
 )
+from warhammer40k_core.engine.psychic_ability_decisions import invalid_psychic_activation_status
+from warhammer40k_core.engine.psychic_ability_restore import validate_psychic_usage_history
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
     ReactionQueue,
@@ -842,6 +850,15 @@ class GameLifecycle:
             invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:
                 return invalid_status
+            psychic_invalid = invalid_psychic_activation_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=pending_request,
+                result=result,
+                bundle=self._runtime_content_bundle,
+            )
+            if psychic_invalid is not None:
+                return psychic_invalid
             _bsa.validate_pre_submission_outcome_request(
                 state=state,
                 decisions=self.decision_controller,
@@ -952,6 +969,11 @@ class GameLifecycle:
             None
             if refreshed_bundle is None
             else runtime_rule_ir_authority_index_from_bundle(refreshed_bundle)
+        )
+        validate_psychic_usage_history(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            authority=rule_ir_authority_index,
         )
         faction_rule_execution_registry = (
             None if refreshed_bundle is None else refreshed_bundle.faction_rule_execution_registry
@@ -3330,30 +3352,6 @@ class GameLifecycle:
             decisions=self.decision_controller,
         )
         return status
-
-
-def _payload_bool(field_name: str, value: object) -> bool:
-    if type(value) is not bool:
-        raise GameLifecycleError(f"{field_name} must be a bool.")
-    return value
-
-
-def _runtime_mortal_wound_source_context_phase(source_context: JsonValue) -> BattlePhase:
-    if not isinstance(source_context, dict):
-        raise GameLifecycleError("Runtime mortal wound FNP source context must be an object.")
-    phase_value = source_context.get("phase")
-    if phase_value is None:
-        resolution_payload = source_context.get("resolution_payload")
-        if isinstance(resolution_payload, dict):
-            phase_value = resolution_payload.get("phase")
-    if type(phase_value) is not str:
-        raise GameLifecycleError("Runtime mortal wound FNP source context is missing phase.")
-    try:
-        return BattlePhase(phase_value)
-    except ValueError as exc:
-        raise GameLifecycleError(
-            f"Unsupported runtime mortal wound FNP phase: {phase_value}."
-        ) from exc
 
 
 def _runtime_content_audit_from_payload(value: object) -> Mapping[str, JsonValue] | None:

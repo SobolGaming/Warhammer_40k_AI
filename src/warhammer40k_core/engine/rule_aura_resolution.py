@@ -222,7 +222,7 @@ def _aura_allegiance(clause: RuleClause) -> str:
 def _aura_includes_source_unit(clause: RuleClause) -> bool:
     if clause.target is None or clause.target.kind is not RuleTargetKind.AURA_UNITS:
         raise GameLifecycleError("Aura clause requires an aura_units target.")
-    value = parameter_payload(clause.target.parameters).get("include_source_unit", False)
+    value = parameter_payload(clause.target.parameters).get("include_source_unit", True)
     if type(value) is not bool:
         raise GameLifecycleError("Aura include_source_unit must be a boolean.")
     return value

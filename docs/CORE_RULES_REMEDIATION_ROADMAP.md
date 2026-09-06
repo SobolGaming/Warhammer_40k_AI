@@ -3141,3 +3141,144 @@ validates `2529` resources and `27` schemas. TypeScript dependency installation,
 generated-client/type checks, all five client unit tests, and the two-server HTTP
 conformance scenario pass (`342` assertions, contract `11.1.0`). Windows validation
 uses the bundled Node runtime on PATH and a local integrity-verified npm package.
+
+## P22 + P22B implementation evidence — Orders 20 and 21
+
+Status: Implemented together at the owner's explicit request and published in
+PR #427. All final local gates pass. Merge remains an owner action.
+
+Finding IDs: `C22-01`, `C22-02`.
+
+Dependencies and evidence gate: `P00`, `P08A`, `P19` and `S-MIRRORS` are merged.
+The branch starts at `a44dc2fa` (Order 19, PR #426), equal to fetched `origin/main`.
+`APP-AUTHORITY` applies. No source-policy exception or observed mirror divergence
+was encountered. The requested combined PR preserves one open roadmap PR.
+
+Violated invariant: A placed model is in range of its own Aura and duplicate
+instances of the same Aura cannot accumulate on a target. A canonical PSYKER
+rules unit cannot use the same Psychic-level ability twice in one phase,
+including through different models or attached components.
+
+How it is currently done: Before this change generic Aura resolution required
+per-descriptor self-inclusion, persisted instances could remain independently
+applicable, and the Stealth consumer used separate range/keyword logic. Psychic
+level had no shared unit/ability/phase use authority. Existing optional
+once-per-battle limits were physical-source limits and could not enforce 22.03.01.
+
+How it should be done: Shared Aura targeting defaults to self-inclusion while
+retaining allegiance, keywords, alive/placed geometry and explicit source
+exclusions. Persisted source/clause/effect slots apply once across canonical and
+component aliases without deleting physical evidence or suppressing distinct
+Auras/sub-effects. Psychic use keys contain game, canonical rules-unit ID, stable
+ability source ID, round, active player and phase. Level, physical instance,
+catalog record, component and model are evidence rather than independent uses.
+
+Specific authoritative maintained direct App-data mirror rule/statement and
+source ID: Complete 22.01 Aura Abilities is retained as
+`gw-11e-core-aura-psychic:aura-abilities`. It establishes own-range inclusion on the
+battlefield and one application of the same Aura. Complete 22.03.01 is retained as
+`gw-11e-core-aura-psychic:psychic-abilities-with-a-psychic-level`; it prohibits a
+PSYKER unit from using the same Psychic ability more than once per phase.
+
+Provider, URL, App-data version or observation timestamp, transcription SHA-256,
+and source-observation fingerprint:
+
+| Statement | Provider and retained URL | Version / observation | Transcription SHA-256 | Source-observation fingerprint |
+|---|---|---|---|---|
+| 22.01 | [40k.app](https://www.40k.app/rules/22-other-rules-and-abilities) | `2026-09-06T12:57:51Z` | `930015bed3490c7c24cf3e3952d925a17dd6144874dc9a56c2ab68d3fd452b60` | `c0a99fff77e5c50a9c81a359e878aba62ec8bf045dc53963982cec416487fe30` |
+| 22.03.01 | [Game Datamissions](https://game-datamissions.com/11th/rules/changelog) | App data `931`, dated 2026-08-26; observed `2026-09-06T12:57:51Z` | `e94feeb3d390500884ff9ceba0c0717087303e578d182efa444a7ad1f41906c4` | `a79192183fa0e5ebb080a145d335c6b363e6a84bea650f9ce74f68215aa3a9d2` |
+| 22.03.01 corroboration | [40k.app](https://www.40k.app/rules/22-other-rules-and-abilities) | `2026-09-06T12:57:51Z` | `e94feeb3d390500884ff9ceba0c0717087303e578d182efa444a7ad1f41906c4` | `b4b6e75ae6463e3d10a4a7e177b83560bc4ce804c6e31e174fb54a7c6ff81374` |
+
+Both providers are explicitly recorded as non-affiliated under the maintained
+direct App-data mirror policy. Matching Psychic text does not establish matching
+App-data versions: 40k.app exposes no version for this observation. The retained
+official PDF remains historical evidence, SHA-256
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+Scope and explicit exclusions: Category 22 shared Aura and Psychic-use semantics,
+source artifacts, catalog activation eligibility, adapter/replay integrity and
+tests. No new faction/catalog content, spell effects, named handlers, movement
+paths, AI, architecture boundary, compatibility shim or out-of-scope content is
+added. The restriction applies to supported structured Psychic-level RuleIR;
+unsupported effect semantics remain unsupported. Named-handler budgets do not
+change. Small extractions keep frozen modules within their existing caps and
+remove `rule_execution.py` from the oversized allowlist.
+
+Owning state/validation/mutation/event/replay path: Source-bound parsing produces
+typed Aura scope and Psychic frequency conditions. `rule_aura_resolution` owns
+physical Aura targeting; `aura_applications` owns shared non-stacking queries;
+catalog Stealth and numeric persisted modifiers consume those shared surfaces.
+`execute_rule_ir` validates Psychic use before effect mutation and appends one
+`psychic_ability_used` event after successful execution. That event-backed ledger
+retains the pre-mutation canonical lineage. Catalog enumeration and lifecycle
+pre-submission validation consult the same authority. Restore verifies the
+canonical key, authoritative RuleIR hash/provider, historical attached lineage,
+component/model ownership and accepted decision ordering; deletion of a use event
+cannot unlock a recorded activation. Replay uses ordinary decision submission.
+
+Decision and viewer-visibility impact: Existing finite catalog activation
+families and option IDs remain authoritative. A queued duplicate returns typed
+invalid before queue pop, record creation or mutation and remains declinable.
+Declines and invalid attempts consume nothing. Added Aura provenance and Psychic
+use events are public battle ability evidence under the existing shared viewer
+policy. JSON-safe round-trips and both player event streams are covered. The
+adapter contract documents the payloads; its existing opaque event/option schemas
+cover them without a new contract version.
+
+Regression scenarios and same-bug-class search: Failing tests first demonstrated
+missing Aura self-inclusion and duplicate Psychic use across attached components.
+Additional regressions cover source exclusion, keyword/allegiance/model anchors,
+persisted numeric consumption, overlapping attached aliases, distinct source and
+effect slots, conflicting Aura semantics, duplicate levels/models/components,
+independent abilities/units/phase occurrences, malformed context, pre-pop repeat
+rejection, accepted/declined decisions, save/restore, replay, JSON safety, deleted
+or altered history, and bodyguard/caster/full-unit loss. Repository searches traced
+Aura targeting, persisted queries, Stealth, charged weapon-characteristic Auras,
+enhancement grants, battle-shock rerolls and contextual-status consumers. Existing
+weapon source-ID and boolean grant/reroll consumers already apply once. Physical
+source-specific once-per-battle limits remain additional restrictions. Static
+audits prohibit physical/display identity in the Psychic key and runtime parsing
+in the new authority modules.
+
+The test-only follow-up also drives one `LocalGameSession` naturally from
+round-one Command through Movement, the opponent's turn and round-two Command.
+The same unit uses the same Psychic ability in all three selected phase
+occurrences through three physical sources. A persistence checkpoint restores
+the earlier phase/round use records unchanged, preserves both viewers' event
+history and reproduces the complete decision/event history exactly through
+replay. This covers historical-time validation without changing engine behavior.
+
+Generated artifacts/documentation: Versioned
+`core_aura_psychic_2026_09/artifacts/package.json`, typed pinned loader, maintained
+mirror audit, source-authority registry/pin, package classification, engine-build
+manifest, generated external-contract examples/manifest, README, adapter contract
+and this finding record. `tools/build_core_aura_psychic_source.py --check`
+reproduces the source and audit offline. Behavioral tests extend existing files;
+the eight-shard membership remains unchanged and is checked fail-closed.
+
+Validation results: The complete behavioral suite passes once with coverage:
+`6333 passed`, `85.03%`, `805.94s`, using xdist work stealing and the bundled
+Node runtime on PATH. The final no-coverage code-quality suite passes with
+`373 passed` in `309.51s`, also using xdist work stealing.
+Ruff check and format check, mypy (`2705` source files), pyright (zero errors or
+warnings), all `11` import-linter contracts, the exact eight-shard inventory check,
+and all-files pre-commit pass. The final focused invariant subset passes
+(`34 passed`); an earlier broader focused pass covered `281` tests.
+
+The new source/audit builder, engine-build identity check and external-contract
+`--base-ref origin/main` check pass at base
+`a44dc2fa295012d9c5dd8e26eebf4e793efe8e22`. Installed-wheel smoke validates
+`2540` engine resources and `27` schemas. TypeScript dependency installation,
+generated-client/type checks, all `5` client unit tests and the two-server HTTP
+conformance scenario pass (`342` assertions, contract `11.1.0`). Windows client
+validation uses the bundled Node runtime and the local integrity-verified npm
+package. The final scope/architecture audit and `git diff --check` pass.
+
+Follow-up validation: all `16` Psychic-selected behavioral tests pass (`88.94s`),
+as do `10` focused test-policy/RuleIR quality audits, Ruff check/format, full mypy
+and pyright, all-files pre-commit and the exact eight-shard check. These are
+additional focused results for the test-only historical-time scenario; the
+runtime build identity remains unchanged from the aggregate gates above.
+
+PR URL and merge commit:
+[PR #427](https://github.com/SobolGaming/Warhammer_40k_AI/pull/427); not merged.
