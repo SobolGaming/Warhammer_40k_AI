@@ -483,6 +483,7 @@ def _model_placements_from_authority(
             army.army_id,
             army.player_id,
             unit.unit_instance_id,
+            unit.split_origin,
         )
         for army in state.army_definitions
         for unit in army.units
@@ -499,7 +500,7 @@ def _model_placements_from_authority(
             raise GameLifecycleError(
                 "Primary scoring position history battlefield model lacks a pose."
             )
-        army_id, player_id, unit_instance_id = identity
+        army_id, player_id, unit_instance_id, split_origin = identity
         placements.append(
             ModelPlacement(
                 army_id=army_id,
@@ -507,6 +508,7 @@ def _model_placements_from_authority(
                 unit_instance_id=unit_instance_id,
                 model_instance_id=model_instance_id,
                 pose=row.pose,
+                split_origin=split_origin,
             )
         )
     return tuple(placements)
@@ -1367,6 +1369,10 @@ def _initial_model_ids(*, state: GameState) -> frozenset[str]:
     initial_ids: set[str] = set()
     for army in state.army_definitions:
         for unit in army.units:
+            if unit.split_origin is not None:
+                source = army.source_unit_by_id(unit.split_origin.source_unit_instance_id)
+                initial_ids.update(set(source.own_model_ids()).intersection(unit.own_model_ids()))
+                continue
             if unit.unit_instance_id not in attached_component_ids:
                 record = starting_strength_by_unit_id.get(unit.unit_instance_id)
                 if record is None:

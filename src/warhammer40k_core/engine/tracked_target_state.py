@@ -3,7 +3,10 @@ from __future__ import annotations
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_from_armies,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.tracked_targets import (
     TrackedTargetOwnerScope,
     TrackedTargetRecord,
@@ -134,37 +137,30 @@ def tracked_targets_for_destroyed_unit(
 
 def attached_rules_unit_ids(armies: tuple[ArmyDefinition, ...]) -> set[str]:
     return {
-        attached_unit.attached_unit_instance_id
-        for army in armies
-        for attached_unit in army.attached_units
+        view.unit_instance_id
+        for view in rules_unit_views_from_armies(armies=armies)
+        if view.is_attached_rules_unit
     }
 
 
 def attached_rules_unit_owner_ids(armies: tuple[ArmyDefinition, ...]) -> dict[str, str]:
     return {
-        attached_unit.attached_unit_instance_id: army.player_id
-        for army in armies
-        for attached_unit in army.attached_units
+        view.unit_instance_id: view.owner_player_id
+        for view in rules_unit_views_from_armies(armies=armies)
+        if view.is_attached_rules_unit
     }
 
 
 def destroyed_attached_rules_unit_ids(
-    *,
-    armies: tuple[ArmyDefinition, ...],
-    removed_model_ids: set[str],
+    *, armies: tuple[ArmyDefinition, ...], removed_model_ids: set[str]
 ) -> set[str]:
-    destroyed: set[str] = set()
-    for army in armies:
-        for attached_unit in army.attached_units:
-            model_ids = {
-                model.model_instance_id
-                for unit in army.units
-                if unit.unit_instance_id in attached_unit.component_unit_instance_ids
-                for model in unit.own_models
-            }
-            if model_ids and model_ids <= removed_model_ids:
-                destroyed.add(attached_unit.attached_unit_instance_id)
-    return destroyed
+    return {
+        view.unit_instance_id
+        for view in rules_unit_views_from_armies(armies=armies)
+        if view.is_attached_rules_unit
+        and view.own_models
+        and {m.model_instance_id for m in view.own_models} <= removed_model_ids
+    }
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

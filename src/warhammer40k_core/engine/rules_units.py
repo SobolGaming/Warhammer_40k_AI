@@ -10,11 +10,28 @@ from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormati
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_split_records import UnitSplitRecord
+from warhammer40k_core.engine.unit_split_views import (
+    historical_split_successor_ids,
+    split_rules_unit_views,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 RulesUnitComponentRole = Literal["bodyguard", "leader", "support", "unit"]
+
+
+def rules_unit_identity_maps_from_armies(
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[dict[str, str], dict[str, tuple[str, ...]]]:
+    """Current physical and canonical identities share one authoritative inventory."""
+    owners = {unit.unit_instance_id: army.player_id for army in armies for unit in army.units}
+    components: dict[str, tuple[str, ...]] = {unit_id: (unit_id,) for unit_id in owners}
+    for view in rules_unit_views_from_armies(armies=armies):
+        owners[view.unit_instance_id] = view.owner_player_id
+        components[view.unit_instance_id] = tuple(sorted(view.component_unit_instance_ids))
+    return owners, components
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,6 +52,8 @@ class RulesUnitView:
     owner_player_id: str
     components: tuple[RulesUnitComponent, ...]
     attached_unit: AttachedUnitFormation | None = None
+    split_record: UnitSplitRecord | None = None
+    split_index: int | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -62,8 +81,21 @@ class RulesUnitView:
             raise GameLifecycleError(
                 "RulesUnitView attached_unit must be an AttachedUnitFormation."
             )
-        if self.attached_unit is None and len(self.components) != 1:
+        if self.attached_unit is None and self.split_record is None and len(self.components) != 1:
             raise GameLifecycleError("Physical RulesUnitView requires exactly one component.")
+
+        if self.split_record is not None:
+            if type(self.split_record) is not UnitSplitRecord or type(self.split_index) is not int:
+                raise GameLifecycleError("Split rules-unit view requires exact recorded lineage.")
+            if self.unit_instance_id != self.split_record.successor_id(self.split_index):
+                raise GameLifecycleError("Split rules-unit view identity drift.")
+            expected = self.split_record.component_origins(self.split_index)
+            if self.component_unit_instance_ids != tuple(row.unit_instance_id for row in expected):
+                raise GameLifecycleError("Split rules-unit view component drift.")
+            if self.attached_unit is not None:
+                raise GameLifecycleError("Split rules-unit view has conflicting formation owners.")
+        elif self.split_index is not None:
+            raise GameLifecycleError("Split rules-unit index lacks a split record.")
 
     @property
     def component_unit_instance_ids(self) -> tuple[str, ...]:
@@ -100,7 +132,9 @@ class RulesUnitView:
 
     @property
     def is_attached_rules_unit(self) -> bool:
-        return self.attached_unit is not None
+        return self.attached_unit is not None or (
+            self.split_record is not None and self.split_record.source_formation is not None
+        )
 
     def component_unit_id_for_model(self, model_instance_id: str) -> str:
         requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
@@ -133,7 +167,7 @@ class RulesUnitView:
         return tuple(model for model in self.own_models if model.is_alive)
 
     def bodyguard_model_ids(self, models: Iterable[ModelInstance]) -> tuple[str, ...]:
-        if self.attached_unit is None:
+        if not self.is_attached_rules_unit:
             return ()
         return tuple(
             sorted(
@@ -144,7 +178,7 @@ class RulesUnitView:
         )
 
     def character_model_ids(self, models: Iterable[ModelInstance]) -> tuple[str, ...]:
-        if self.attached_unit is None:
+        if not self.is_attached_rules_unit:
             return ()
         return tuple(
             sorted(
@@ -256,6 +290,13 @@ def rules_unit_view_from_armies(
 ) -> RulesUnitView:
     requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in armies:
+        for view in split_rules_unit_views(army):
+            if (
+                requested_id == view.unit_instance_id
+                or requested_id in view.component_unit_instance_ids
+            ):
+                return view
+    for army in armies:
         attached_unit = _attached_unit_for_id(army=army, unit_instance_id=requested_id)
         if attached_unit is not None:
             return _attached_rules_unit_view(army=army, attached_unit=attached_unit)
@@ -283,6 +324,11 @@ def rules_unit_views_from_armies(
             raise GameLifecycleError(
                 "Rules-unit enumeration armies must contain ArmyDefinition values."
             )
+        split_components = {
+            unit.unit_instance_id for unit in army.units if unit.split_origin is not None
+        }
+        retired_rules_ids = {record.source_unit_instance_id for record in army.unit_splits}
+        views.extend(split_rules_unit_views(army))
         attached_component_ids = {
             component_id
             for attached_unit in army.attached_units
@@ -291,6 +337,7 @@ def rules_unit_views_from_armies(
         views.extend(
             _attached_rules_unit_view(army=army, attached_unit=attached_unit)
             for attached_unit in army.attached_units
+            if attached_unit.attached_unit_instance_id not in retired_rules_ids
         )
         views.extend(
             RulesUnitView(
@@ -300,7 +347,7 @@ def rules_unit_views_from_armies(
                 attached_unit=None,
             )
             for unit in army.units
-            if unit.unit_instance_id not in attached_component_ids
+            if unit.unit_instance_id not in attached_component_ids | split_components
         )
     view_ids = [view.unit_instance_id for view in views]
     if len(view_ids) != len(set(view_ids)):
@@ -346,6 +393,12 @@ def current_rules_unit_views_for_identity(
     """Resolve one current rules-unit identity, including a component alias."""
     requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
     current_views = rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+    successor_ids = historical_split_successor_ids(
+        armies=tuple(state.army_definitions),
+        identity=requested_id,
+    )
+    if successor_ids:
+        return tuple(view for view in current_views if view.unit_instance_id in successor_ids)
     direct_matches = tuple(
         view
         for view in current_views
@@ -369,6 +422,12 @@ def current_rules_unit_views_for_canonical_identity(
         state=state,
         unit_instance_id=requested_id,
     )
+    if any(
+        requested_id == record.source_unit_instance_id
+        for army in state.army_definitions
+        for record in army.unit_splits
+    ):
+        return current_views
     if any(view.unit_instance_id == requested_id for view in current_views):
         return current_views
     if any(
@@ -608,6 +667,11 @@ def _attached_unit_for_id(
     unit_instance_id: str,
 ) -> AttachedUnitFormation | None:
     for attached_unit in army.attached_units:
+        if any(
+            record.source_unit_instance_id == attached_unit.attached_unit_instance_id
+            for record in army.unit_splits
+        ):
+            continue
         if attached_unit.attached_unit_instance_id == unit_instance_id:
             return attached_unit
         if unit_instance_id in attached_unit.component_unit_instance_ids:

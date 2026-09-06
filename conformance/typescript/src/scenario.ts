@@ -211,6 +211,7 @@ export async function runCertifiedScenario(
   const proposalPayload = deploymentPayload(
     placementProjection.projection.pending_proposal,
     armyIdsByPlayer,
+    placementProjection.projection.battlefield_view,
   );
   registry.validate<DeploymentPlacementPayload>("proposal-payload.schema.json", proposalPayload);
   const placementClient = clientForActor(clients, placementRequest.actor_id);
@@ -694,6 +695,7 @@ function playerArmyIds(createBody: SessionCreate): ReadonlyMap<string, string> {
 function deploymentPayload(
   value: JsonValue,
   armyIdsByPlayer: ReadonlyMap<string, string>,
+  battlefieldValue: SessionProjection["projection"]["battlefield_view"],
 ): DeploymentPlacementPayload {
   const proposal = jsonObject(value, "pending deployment proposal");
   const playerId = requiredString(proposal, "player_id");
@@ -723,15 +725,33 @@ function deploymentPayload(
   const minimumX = Math.min(...xs);
   const minimumY = Math.min(...ys);
   const modelIds = jsonArray(proposal.model_instance_ids, "deployment model IDs");
-  const modelPlacements = modelIds.map((modelId, index) => {
+  const battlefield = jsonObject(battlefieldValue, "deployment battlefield");
+  const entities = jsonObject(battlefield.authoritative, "battlefield entities");
+  const models = jsonObject(entities.models_by_id, "battlefield models");
+  const modelPlacements = modelIds.map((modelId, index): DeploymentPlacementPayload["model_placements"][number] => {
     if (typeof modelId !== "string" || modelId.length === 0) {
       throw new Error("Deployment model ID must be a non-empty string.");
+    }
+    const model = jsonObject(models[modelId], "deployment model");
+    const splitOrigin = model.split_origin === undefined
+      ? undefined : jsonObject(model.split_origin, "split origin");
+    const successorIndex = splitOrigin === undefined
+      ? undefined : requiredNumber(splitOrigin, "successor_index");
+    if (successorIndex !== undefined && successorIndex !== 0 && successorIndex !== 1) {
+      throw new Error("Split successor index must be 0 or 1.");
     }
     return {
       army_id: armyId,
       player_id: playerId,
-      unit_instance_id: unitInstanceId,
+      unit_instance_id: requiredString(model, "unit_instance_id"),
       model_instance_id: modelId,
+      ...(splitOrigin === undefined || successorIndex === undefined ? {} : {
+        split_origin: {
+          source_unit_instance_id: requiredString(splitOrigin, "source_unit_instance_id"),
+          split_id: requiredString(splitOrigin, "split_id"),
+          successor_index: successorIndex,
+        },
+      }),
       pose: {
         position: {
           x: minimumX + 3 + Math.floor(index / 3) * 1.8,

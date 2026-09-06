@@ -15,6 +15,7 @@ from warhammer40k_core.engine.generic_rule_effect_payloads import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_identity,
     rules_unit_identities_share_lineage,
     rules_unit_view_by_id,
 )
@@ -101,50 +102,51 @@ class FightsFirstRegistry:
                 continue
             base_effect_kind = effect_payload.get("effect_kind")
             for unit_instance_id in effect.target_unit_instance_ids:
-                rules_unit = rules_unit_view_by_id(
+                for rules_unit in current_rules_unit_views_for_identity(
                     state=state,
                     unit_instance_id=unit_instance_id,
-                )
-                effect_kind = base_effect_kind
-                if (
-                    effect_payload.get("descriptor_id") == CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID
-                    and generic_rule_effect_payload_grants_ability(
-                        effect_payload,
-                        ability="fights_first",
-                    )
-                    and conditional_leader_grant_effect_applies(
-                        state=state,
-                        effect=effect,
-                        rules_unit_instance_id=rules_unit.unit_instance_id,
-                    )
                 ):
-                    effect_kind = FIGHTS_FIRST_EFFECT_KIND
-                if (
-                    effect_payload.get("descriptor_id")
-                    == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
-                    and generic_rule_effect_payload_grants_ability(
-                        effect_payload,
-                        ability="fights_first",
+                    effect_kind = base_effect_kind
+                    if (
+                        effect_payload.get("descriptor_id")
+                        == CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID
+                        and generic_rule_effect_payload_grants_ability(
+                            effect_payload,
+                            ability="fights_first",
+                        )
+                        and conditional_leader_grant_effect_applies(
+                            state=state,
+                            effect=effect,
+                            rules_unit_instance_id=rules_unit.unit_instance_id,
+                        )
+                    ):
+                        effect_kind = FIGHTS_FIRST_EFFECT_KIND
+                    if (
+                        effect_payload.get("descriptor_id")
+                        == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
+                        and generic_rule_effect_payload_grants_ability(
+                            effect_payload,
+                            ability="fights_first",
+                        )
+                        and conditional_not_leading_grant_effect_applies(effect=effect)
+                    ):
+                        effect_kind = FIGHTS_FIRST_EFFECT_KIND
+                    if effect_kind not in {
+                        FIGHTS_FIRST_EFFECT_KIND,
+                        CHARGE_FIGHTS_FIRST_EFFECT_KIND,
+                    }:
+                        continue
+                    source = FightsFirstSource(
+                        unit_instance_id=rules_unit.unit_instance_id,
+                        effect_id=effect.effect_id,
+                        source_rule_id=effect.source_rule_id,
+                        effect_kind=effect_kind,
                     )
-                    and conditional_not_leading_grant_effect_applies(effect=effect)
-                ):
-                    effect_kind = FIGHTS_FIRST_EFFECT_KIND
-                if effect_kind not in {
-                    FIGHTS_FIRST_EFFECT_KIND,
-                    CHARGE_FIGHTS_FIRST_EFFECT_KIND,
-                }:
-                    continue
-                source = FightsFirstSource(
-                    unit_instance_id=rules_unit.unit_instance_id,
-                    effect_id=effect.effect_id,
-                    source_rule_id=effect.source_rule_id,
-                    effect_kind=effect_kind,
-                )
-                identity = (source.unit_instance_id, source.effect_id)
-                existing = sources_by_identity.get(identity)
-                if existing is not None and existing != source:
-                    raise GameLifecycleError("Canonical Fights First source identity drifted.")
-                sources_by_identity[identity] = source
+                    identity = (source.unit_instance_id, source.effect_id)
+                    existing = sources_by_identity.get(identity)
+                    if existing is not None and existing != source:
+                        raise GameLifecycleError("Canonical Fights First source identity drifted.")
+                    sources_by_identity[identity] = source
         return cls(tuple(sources_by_identity.values()))
 
     def has_unit(self, unit_instance_id: str) -> bool:

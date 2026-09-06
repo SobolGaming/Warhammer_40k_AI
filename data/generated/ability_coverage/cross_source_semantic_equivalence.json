@@ -7011,7 +7011,7 @@
     }
   ],
   "equivalent_group_count": 322,
-  "exact_text_only_member_count": 3177,
+  "exact_text_only_member_count": 3176,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -8699,12 +8699,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1f925894f1080280064de771e2f4ffc9cac1b7fdd0d9300a6b24e57954ef9b69",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "8bc7eb3429362f25786e1c7284e98c0d06b1fe80c40dc4c756ec86bade938b56",
+      "execution_status": "engine_consumed",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "datasheet-ability:000000070:2",
@@ -8714,16 +8712,18 @@
       "rule_id": "000000070:2",
       "rule_name": "Combat Squads",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:prebattle-unit-split"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "581025e9c30807962f9768d9e80f9eb66fcce1a09feaffa8107e7429768a1001",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000070:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000070:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -121988,8 +121988,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "83bd75c51d17f377cc26462dadceccb3f88fbb928e6197b801ecfb051de356b0",
+  "source_payload_checksum_sha256": "2a0d7bc5eda6d53d4e32b99f235dc0845f1899eca247b41179b041ef6c335211",
   "source_text_unavailable_member_count": 111,
-  "structured_member_count": 806,
+  "structured_member_count": 807,
   "upstream_execution_checksum_sha256": "834125acc90177293fe986b60d1caa75c6fb47bef2aa6d9bf0571d0a54fd9347"
 }

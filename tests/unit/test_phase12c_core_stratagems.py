@@ -101,6 +101,7 @@ from warhammer40k_core.engine.lifecycle import (
     GameLifecyclePayload,
 )
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -237,7 +238,6 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -4114,9 +4114,28 @@ def test_phase13d_explosives_enemy_effect_does_not_block_opponent_targeting() ->
 
 
 def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> None:
-    attached_id = "attached-unit:army-beta:enemy-command-unit"
+    attached_id = "attached-unit:army-beta:enemy-unit"
+    base = _config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+    alpha, beta = base.army_muster_requests
+    leader = replace(
+        beta.unit_selections[1],
+        datasheet_id="core-character-leader",
+        model_profile_selections=(
+            ModelProfileSelection(model_profile_id="core-character-leader", model_count=1),
+        ),
+    )
+    beta = replace(
+        beta,
+        unit_selections=(beta.unit_selections[0], leader),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="enemy-unit-2",
+                bodyguard_unit_selection_id="enemy-unit",
+            ),
+        ),
+    )
     lifecycle = _battle_lifecycle(
-        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2")),
+        config=replace(base, army_muster_requests=(alpha, beta)),
         pose_replacements=(
             (
                 "army-beta:enemy-unit",
@@ -4124,6 +4143,7 @@ def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> 
                     Pose.at(x=20.0 + index * 2.0, y=6.0, facing_degrees=180.0) for index in range(5)
                 ),
             ),
+            ("army-beta:enemy-unit-2", (Pose.at(x=30.0, y=6.0, facing_degrees=180.0),)),
         ),
     )
     state = _state(lifecycle)
@@ -4133,12 +4153,6 @@ def test_phase13d_explosives_canonicalizes_attached_enemy_component_target() -> 
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         keywords=("Infantry", "Battleline", "Grenades"),
-    )
-    _mark_attached_unit_join(
-        state,
-        player_id="player-b",
-        attached_unit_instance_id=attached_id,
-        component_unit_instance_ids=("army-beta:enemy-unit", "army-beta:enemy-unit-2"),
     )
     _grant_cp(state, player_id="player-a", amount=1)
 
@@ -6428,40 +6442,6 @@ def _first_model_id(state: GameState, *, unit_instance_id: str) -> str:
     raise AssertionError(f"Missing unit {unit_instance_id}.")
 
 
-def _mark_attached_unit_join(
-    state: GameState,
-    *,
-    player_id: str,
-    attached_unit_instance_id: str,
-    component_unit_instance_ids: tuple[str, ...],
-) -> None:
-    source_id = f"attached-unit-join:{attached_unit_instance_id}"
-    component_id_set = set(component_unit_instance_ids)
-    component_starting_model_count = 0
-    updated_records: list[StartingStrengthRecord] = []
-    for record in state.starting_strength_records:
-        if record.unit_instance_id not in component_id_set:
-            updated_records.append(record)
-            continue
-        component_starting_model_count += record.starting_model_count
-        updated_records.append(replace(record, source_id=source_id))
-    if component_starting_model_count == 0:
-        raise AssertionError("Attached-unit test fixture did not find component records.")
-    updated_records.append(
-        StartingStrengthRecord(
-            player_id=player_id,
-            unit_instance_id=attached_unit_instance_id,
-            starting_model_count=component_starting_model_count,
-            single_model_starting_wounds=None,
-            source_id=source_id,
-        )
-    )
-    state.starting_strength_records = sorted(
-        updated_records,
-        key=lambda record: record.unit_instance_id,
-    )
-
-
 def _attach_test_units(
     state: GameState,
     *,
@@ -6767,7 +6747,6 @@ def _unadvanced_battle_lifecycle(
     keyword_replacements: tuple[tuple[str, tuple[str, ...]], ...] = (),
     pose_replacements: tuple[tuple[str, tuple[Pose, ...]], ...] = (),
     clear_terrain: bool = False,
-    attached_unit_joins: tuple[tuple[str, str, tuple[str, ...]], ...] = (),
 ) -> GameLifecycle:
     config = _config() if config is None else config
     decisions = DecisionController()
@@ -6777,7 +6756,6 @@ def _unadvanced_battle_lifecycle(
         keyword_replacements=keyword_replacements,
         pose_replacements=pose_replacements,
         clear_terrain=clear_terrain,
-        attached_unit_joins=attached_unit_joins,
     )
     return GameLifecycle.from_payload(
         {
@@ -6802,7 +6780,6 @@ def _battle_lifecycle(
         tuple[str, tuple[FeelNoPainSource, ...], bool], ...
     ] = (),
     clear_terrain: bool = False,
-    attached_unit_joins: tuple[tuple[str, str, tuple[str, ...]], ...] = (),
 ) -> GameLifecycle:
     if battle_round < 1:
         raise AssertionError("Battle lifecycle fixture round must be positive.")
@@ -6810,7 +6787,6 @@ def _battle_lifecycle(
         config,
         pose_replacements=pose_replacements,
         clear_terrain=clear_terrain,
-        attached_unit_joins=attached_unit_joins,
     )
     state = _state(lifecycle)
     for unit_instance_id, keywords in keyword_replacements:
@@ -7415,7 +7391,6 @@ def _battle_state(
     keyword_replacements: tuple[tuple[str, tuple[str, ...]], ...] = (),
     pose_replacements: tuple[tuple[str, tuple[Pose, ...]], ...] = (),
     clear_terrain: bool = False,
-    attached_unit_joins: tuple[tuple[str, str, tuple[str, ...]], ...] = (),
 ) -> GameState:
     resolved_config = _config() if config is None else config
     armies = _mustered_armies(resolved_config)
@@ -7441,13 +7416,6 @@ def _battle_state(
         )
     if clear_terrain:
         _clear_terrain(state)
-    for player_id, attached_unit_instance_id, component_unit_instance_ids in attached_unit_joins:
-        _mark_attached_unit_join(
-            state,
-            player_id=player_id,
-            attached_unit_instance_id=attached_unit_instance_id,
-            component_unit_instance_ids=component_unit_instance_ids,
-        )
     enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state

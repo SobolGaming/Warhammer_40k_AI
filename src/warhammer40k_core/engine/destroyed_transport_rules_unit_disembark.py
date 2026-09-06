@@ -528,6 +528,8 @@ def _placed_survivor_rules_unit(
         owner_player_id=rules_unit.owner_player_id,
         components=components,
         attached_unit=rules_unit.attached_unit,
+        split_record=rules_unit.split_record,
+        split_index=rules_unit.split_index,
     )
     if tuple(sorted(model.model_instance_id for model in view.alive_models())) != (
         placed_model_instance_ids

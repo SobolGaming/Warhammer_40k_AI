@@ -25,6 +25,7 @@ from warhammer40k_core.engine.primary_scoring_action_policy import (
 from warhammer40k_core.engine.primary_scoring_history_evidence import (
     validate_primary_scoring_destruction_history_authority,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_identity_maps_from_armies
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.actions import MissionActionState
@@ -791,26 +792,14 @@ def _validate_authoritative_position_identities(
 ) -> None:
     if state.mission_setup is None:
         raise GameLifecycleError("Primary scoring position authority requires MissionSetup.")
-    unit_owner: dict[str, str] = {}
-    model_ids_by_unit: dict[str, frozenset[str]] = {}
-    group_components: dict[str, tuple[str, ...]] = {}
-    for army in state.army_definitions:
-        for unit in army.units:
-            unit_owner[unit.unit_instance_id] = army.player_id
-            model_ids_by_unit[unit.unit_instance_id] = frozenset(
-                model.model_instance_id for model in unit.own_models
-            )
-            group_components[unit.unit_instance_id] = (unit.unit_instance_id,)
-        for formation in army.attached_units:
-            group_components[formation.attached_unit_instance_id] = (
-                formation.component_unit_instance_ids
-            )
-            unit_owner[formation.attached_unit_instance_id] = army.player_id
-    for starting_formation in state.starting_attached_unit_records:
-        group_components[starting_formation.attached_unit_instance_id] = (
-            starting_formation.component_unit_instance_ids
-        )
-        unit_owner[starting_formation.attached_unit_instance_id] = starting_formation.player_id
+    unit_owner, group_components = rules_unit_identity_maps_from_armies(
+        tuple(state.army_definitions)
+    )
+    model_ids_by_unit = {
+        unit.unit_instance_id: frozenset(unit.own_model_ids())
+        for army in state.army_definitions
+        for unit in army.units
+    }
 
     witnessed_components: list[str] = []
     objective_ids = {marker.objective_marker_id for marker in state.mission_setup.objective_markers}

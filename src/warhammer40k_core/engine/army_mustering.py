@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attachment_eligibility import (
@@ -62,6 +62,11 @@ from warhammer40k_core.engine.unit_factory import (
     UnitFactoryError,
     UnitInstance,
     UnitInstancePayload,
+)
+from warhammer40k_core.engine.unit_split_records import (
+    UnitSplitRecord,
+    UnitSplitRecordPayload,
+    validate_army_split_lineage,
 )
 
 
@@ -212,6 +217,7 @@ class ArmyMusterRequestPayload(TypedDict):
 
 
 class ArmyDefinitionPayload(TypedDict):
+    unit_splits: NotRequired[list[UnitSplitRecordPayload]]
     army_id: str
     player_id: str
     catalog_id: str
@@ -820,6 +826,8 @@ class ArmyDefinition:
     )
     battle_size: BattleSize = BattleSize.STRIKE_FORCE
 
+    unit_splits: tuple[UnitSplitRecord, ...] = ()
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -861,17 +869,20 @@ class ArmyDefinition:
             ),
         )
         units = _validate_unit_instance_tuple("ArmyDefinition units", self.units)
-        _validate_unique_unit_instance_ids(units)
-        _validate_unit_ids_scoped_to_army(army_id=self.army_id, units=units)
+        _attachment_mustering.validate_physical_unit_ids(
+            army_id=self.army_id, units=units, error_type=ArmyMusteringError
+        )
         object.__setattr__(self, "units", units)
+        validate_army_split_lineage(units=units, records=self.unit_splits)
         attached_units = _validate_attached_unit_formation_tuple(
             "ArmyDefinition attached_units",
             self.attached_units,
         )
-        _validate_attached_unit_formations_reference_units(
+        _attachment_mustering.validate_attached_unit_references(
             army_id=self.army_id,
-            units=units,
+            units=self.source_units(),
             attached_units=attached_units,
+            error_type=ArmyMusteringError,
         )
         object.__setattr__(self, "attached_units", attached_units)
         points_source_package_id = _validate_optional_identifier(
@@ -902,7 +913,7 @@ class ArmyDefinition:
             owner="ArmyDefinition",
             points_source_package_id=points_source_package_id,
             unit_selection_ids=tuple(
-                unit.unit_instance_id.removeprefix(army_unit_prefix) for unit in units
+                unit.unit_instance_id.removeprefix(army_unit_prefix) for unit in self.source_units()
             ),
             unit_points=unit_points,
             enhancement_assignments=tuple(
@@ -936,6 +947,24 @@ class ArmyDefinition:
         if self.roster_legality_report.battle_size is not self.battle_size:
             raise ArmyMusteringError("ArmyDefinition roster_legality_report battle_size drift.")
 
+    def source_units(self) -> tuple[UnitInstance, ...]:
+        """The immutable physical-source inventory plus unsplit live units."""
+        return tuple(
+            sorted(
+                (
+                    *(unit for unit in self.units if unit.split_origin is None),
+                    *(unit for record in self.unit_splits for unit in record.source_units),
+                ),
+                key=lambda unit: unit.unit_instance_id,
+            )
+        )
+
+    def source_unit_by_id(self, unit_instance_id: str) -> UnitInstance:
+        for unit in self.source_units():
+            if unit.unit_instance_id == unit_instance_id:
+                return unit
+        raise ArmyMusteringError("Original source unit identity was not found.")
+
     def stable_identity(self) -> str:
         return f"army:{self.army_id}"
 
@@ -951,7 +980,7 @@ class ArmyDefinition:
         raise ArmyMusteringError("ArmyDefinition unit_instance_id was not found.")
 
     def to_payload(self) -> ArmyDefinitionPayload:
-        return {
+        payload: ArmyDefinitionPayload = {
             "army_id": self.army_id,
             "player_id": self.player_id,
             "catalog_id": self.catalog_id,
@@ -979,9 +1008,18 @@ class ArmyDefinition:
             "battle_size": self.battle_size.value,
         }
 
+        if self.unit_splits:
+            payload["unit_splits"] = [record.to_payload() for record in self.unit_splits]
+        return payload
+
     @classmethod
     def from_payload(cls, payload: ArmyDefinitionPayload) -> Self:
         return cls(
+            unit_splits=(
+                tuple(UnitSplitRecord.from_payload(row) for row in payload["unit_splits"])
+                if "unit_splits" in payload
+                else ()
+            ),
             army_id=payload["army_id"],
             player_id=payload["player_id"],
             catalog_id=payload["catalog_id"],
@@ -3537,48 +3575,6 @@ def _validate_attached_unit_formation_tuple(
         seen_ids.add(value.attached_unit_instance_id)
         validated.append(value)
     return tuple(sorted(validated, key=lambda formation: formation.attached_unit_instance_id))
-
-
-def _validate_unique_unit_instance_ids(units: tuple[UnitInstance, ...]) -> None:
-    seen: set[str] = set()
-    for unit in units:
-        if unit.unit_instance_id in seen:
-            raise ArmyMusteringError("ArmyDefinition units must have unique IDs.")
-        seen.add(unit.unit_instance_id)
-
-
-def _validate_attached_unit_formations_reference_units(
-    *,
-    army_id: str,
-    units: tuple[UnitInstance, ...],
-    attached_units: tuple[AttachedUnitFormation, ...],
-) -> None:
-    requested_army_id = _validate_unprefixed_identifier("army_id", army_id, "army:")
-    unit_ids = {unit.unit_instance_id for unit in units}
-    claimed_component_ids: set[str] = set()
-    for attached_unit in attached_units:
-        if not attached_unit.attached_unit_instance_id.startswith(
-            f"attached-unit:{requested_army_id}:"
-        ):
-            raise ArmyMusteringError("AttachedUnitFormation attached ID must be scoped to army_id.")
-        if attached_unit.attached_unit_instance_id in unit_ids:
-            raise ArmyMusteringError("AttachedUnitFormation identity must not be a physical unit.")
-        for component_id in attached_unit.component_unit_instance_ids:
-            if component_id not in unit_ids:
-                raise ArmyMusteringError("AttachedUnitFormation references an unknown unit.")
-            if component_id in claimed_component_ids:
-                raise ArmyMusteringError("AttachedUnitFormation component units must not overlap.")
-            claimed_component_ids.add(component_id)
-
-
-def _validate_unit_ids_scoped_to_army(
-    *,
-    army_id: str,
-    units: tuple[UnitInstance, ...],
-) -> None:
-    for unit in units:
-        if not unit.unit_instance_id.startswith(f"{army_id}:"):
-            raise ArmyMusteringError("ArmyDefinition unit IDs must be scoped to army_id.")
 
 
 def _validate_identifier_tuple(

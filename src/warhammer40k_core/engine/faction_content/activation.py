@@ -16,6 +16,7 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 
@@ -269,7 +270,9 @@ class RuntimeContentActivation:
                 for assignment in army.enhancement_assignments
             )
             unit_ids.update(unit.unit_instance_id for unit in army.units)
-            unit_ids.update(attached.attached_unit_instance_id for attached in army.attached_units)
+            unit_ids.update(
+                view.unit_instance_id for view in rules_unit_views_from_armies(armies=(army,))
+            )
             for unit in army.units:
                 datasheet_ids.add(unit.datasheet_id)
                 for model in unit.own_models:

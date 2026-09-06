@@ -287,6 +287,16 @@
       "required": ["position", "facing"],
       "type": "object"
     },
+    "split_origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_unit_instance_id": {"$ref": "#/$defs/identifier"},
+        "split_id": {"$ref": "#/$defs/identifier"},
+        "successor_index": {"type": "integer", "enum": [0, 1]}
+      },
+      "required": ["source_unit_instance_id", "split_id", "successor_index"]
+    },
     "model_placement": {
       "additionalProperties": false,
       "properties": {
@@ -294,6 +304,7 @@
         "model_instance_id": {"$ref": "#/$defs/identifier"},
         "player_id": {"$ref": "#/$defs/identifier"},
         "pose": {"$ref": "#/$defs/pose"},
+        "split_origin": {"$ref": "#/$defs/split_origin"},
         "unit_instance_id": {"$ref": "#/$defs/identifier"}
       },
       "required": [

@@ -774,6 +774,16 @@ class SetupFlow:
             raise GameLifecycleError(
                 "DECLARE_BATTLE_FORMATIONS requires mustered armies for every player."
             )
+        from warhammer40k_core.engine.unit_split_runtime import next_unit_split_request
+
+        split_request = next_unit_split_request(state=state, decisions=decisions)
+        if split_request is not None:
+            decisions.request_decision(split_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=state.stage,
+                decision_request=split_request,
+                payload={"setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value},
+            )
         apply_mandatory_aircraft_reserve_declarations(
             state=state,
             config=config,

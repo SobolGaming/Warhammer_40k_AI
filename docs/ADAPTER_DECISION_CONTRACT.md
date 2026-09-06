@@ -1,5 +1,64 @@
 # Adapter Decision Contract
 
+## Order 24: source-authorized unit splitting
+
+External contract 11.3.0 adds the finite `select_unit_split_membership`
+family, rendered as `finite_option_list`. A structured catalog RuleIR
+`split_unit` effect authorizes the supported window at the start of Declare
+Battle Formations, before placements, reserve declarations or embarkation.
+The Core splitting rule alone never creates a permission. The data-boundary
+compiler recognizes the current Combat Squads wording; runtime dispatch uses
+the compiled trigger, target and effect, not the ability's display name.
+
+The first request offers `split` and, for optional sources, `decline`.
+Subsequent requests assign each engine-enumerated model to `successor:0` or
+`successor:1`. Only assignments within the remaining count limits appear.
+This is one canonical decision family with linear request growth, not an
+enumeration of every possible partition. Clients must select the exact
+pending option ID through `FiniteOptionSubmission`; option payloads cannot
+be edited. The request binds the source rule and source unit, canonical
+rules-unit identity, ordered model inventory, partial assignment, sequence
+step and source-army fingerprint. Actor, stale request, source, membership,
+count and payload drift are rejected before queue pop or engine mutation.
+
+The final assignment atomically installs both successors and emits
+`unit_split_applied`. It preserves model IDs, model data and physical-source
+provenance, records the chosen partition and source-specified count fallback,
+and sets each pre-battle successor's Starting Strength to its model count.
+Already subdivided models cannot be split again. Original attached formations
+remain source-history records; current physical fragments and rules-unit
+IDs describe independent successors. A successor retains its attached
+component roles even when all models of one component are subsequently lost.
+
+`UnitInstance`, `ModelPlacement` and `DesperateEscapeRequirement` payloads
+may include the closed `split_origin` object: `source_unit_instance_id`,
+`split_id`, and `successor_index` (0 or 1). Ordinary units omit it. The engine
+validates this proof against the recorded partition and current model owner.
+The battlefield view's `authoritative.models_by_id` publishes the same
+optional proof. Placement clients copy the visible model's current
+`unit_instance_id` and `split_origin`; they must not infer ownership from
+the immutable model-ID prefix. Existing placement and PathWitness proposal
+families remain the only physical-operation submission paths.
+
+Split requests, decision records and the application event are owner-secret
+during declarations. Opponent projections retain the original source
+inventory until declarations are resolved, when current membership becomes
+visible. Historical secret events remain owner-scoped. Shared adapter
+redaction owns this policy for projections and event streams. Checkpoint
+restore authenticates both the partition and its application event against
+the original muster configuration and canonical decision transcript;
+session persistence additionally replays the same submissions.
+
+Existing Stratagem component-target aliases resolve to current rules-unit IDs
+before mortal-wound application and its continuation. The finite/proposal
+families and payload shapes are unchanged; damage records retain canonical
+rules-unit targets, including split successors.
+
+This family executes the source-backed pre-battle permission shape. Other
+timings, conditional permission shapes and re-splitting raise explicit
+domain errors. It does not grant arbitrary mid-battle splitting or change
+source-backed reserve points, transport capacities or roster construction.
+
 Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog once-per-battle ability choices, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, Phase 18E-18H formal session, command, reconnect, and authorization semantics, Phase 18I interaction metadata, Phase 18J battlefield coordinates, Phase 18L persistence/recovery semantics, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
 This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, Phase 18E-18H formal session semantics, Phase 18I interaction metadata, Phase 18J battlefield coordinates, Phase 18L persistence/recovery semantics, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.

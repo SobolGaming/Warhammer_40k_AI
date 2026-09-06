@@ -541,7 +541,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         CatalogWeaponKeywordGrantRuntime(ability_indexes_by_player_id={}, armies=(army,))
     with pytest.raises(GameLifecycleError, match="requires context"):
         runtime.weapon_profile_modifier(cast(WeaponProfileModifierContext, object()))
-    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+    with pytest.raises(GameLifecycleError, match="unit_instance_id is unknown"):
         runtime.weapon_profile_modifier(
             WeaponProfileModifierContext(
                 state=battle_state_with_army(

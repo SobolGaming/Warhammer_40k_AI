@@ -37,7 +37,6 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     ArmyMusterRequestPayload,
 )
-from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,
@@ -336,6 +335,12 @@ from warhammer40k_core.engine.unit_resource_state import (
 from warhammer40k_core.engine.unit_resources import UnitResourceLedger
 from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecord,
+)
+from warhammer40k_core.engine.unit_strength_inventory import (
+    starting_strength_records_for_army as starting_strength_records_for_army,
+)
+from warhammer40k_core.engine.unit_strength_inventory import (
+    validate_starting_strength_records,
 )
 from warhammer40k_core.engine.victory_point_policy_validation import (
     validate_victory_point_ledger_policy_sources,
@@ -1345,7 +1350,7 @@ class GameState:
             player_ids=self.player_ids,
             army_definitions=self.army_definitions,
         )
-        self.starting_strength_records = _validate_starting_strength_records(
+        self.starting_strength_records = validate_starting_strength_records(
             self.starting_strength_records,
             army_definitions=self.army_definitions,
             player_ids=self.player_ids,
@@ -2190,6 +2195,20 @@ class GameState:
             army_definitions=validated_armies,
         )
         self.army_definitions = validated_armies
+
+    def replace_armies_after_unit_split(self, army_definitions: list[ArmyDefinition]) -> None:
+        """Install validated membership and its Starting Strength together."""
+        candidate = replace(
+            self,
+            army_definitions=army_definitions,
+            starting_strength_records=[
+                record
+                for army in army_definitions
+                for record in starting_strength_records_for_army(army)
+            ],
+        )
+        self.army_definitions = candidate.army_definitions
+        self.starting_strength_records = candidate.starting_strength_records
 
     def replace_unit_resource_ledgers(self, ledgers: list[UnitResourceLedger]) -> None:
         self.unit_resource_ledgers = validate_unit_resource_ledgers(
@@ -3239,9 +3258,16 @@ class GameState:
         self.persisting_effects.sort(key=lambda stored: stored.effect_id)
 
     def persisting_effects_for_unit(self, unit_instance_id: str) -> tuple[PersistingEffect, ...]:
-        from warhammer40k_core.engine.aura_applications import persisting_effects_for_target
+        from warhammer40k_core.engine.aura_applications import persisting_effects_for_lineage
+        from warhammer40k_core.engine.unit_split_views import split_effect_predecessor_ids
 
-        return persisting_effects_for_target(self.persisting_effects, unit_instance_id)
+        return persisting_effects_for_lineage(
+            self.persisting_effects,
+            split_effect_predecessor_ids(
+                armies=tuple(self.army_definitions),
+                unit_instance_id=unit_instance_id,
+            ),
+        )
 
     def record_tracked_target(self, record: TrackedTargetRecord) -> None:
         if type(record) is not TrackedTargetRecord:
@@ -5292,7 +5318,7 @@ class GameState:
         self,
         army_definition: ArmyDefinition,
     ) -> None:
-        records = _starting_strength_records_for_army(army_definition)
+        records = starting_strength_records_for_army(army_definition)
         existing_unit_ids = {record.unit_instance_id for record in self.starting_strength_records}
         for record in records:
             if record.unit_instance_id in existing_unit_ids:
@@ -6112,120 +6138,6 @@ def _validate_faction_rule_states(
         seen.add(value.state_id)
         validated.append(value)
     return sorted(validated, key=lambda state: state.state_id)
-
-
-def _validate_starting_strength_records(
-    values: object,
-    *,
-    army_definitions: list[ArmyDefinition],
-    player_ids: tuple[str, ...],
-) -> list[StartingStrengthRecord]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState starting_strength_records must be a list.")
-    if not values and army_definitions:
-        derived: list[StartingStrengthRecord] = []
-        for army_definition in army_definitions:
-            derived.extend(_starting_strength_records_for_army(army_definition))
-        return sorted(derived, key=lambda record: record.unit_instance_id)
-
-    expected_record_owner_by_id = _starting_strength_record_owner_by_id(army_definitions)
-    validated: list[StartingStrengthRecord] = []
-    seen: set[str] = set()
-    for value in cast(list[object], values):
-        if type(value) is not StartingStrengthRecord:
-            raise GameLifecycleError(
-                "GameState starting_strength_records must contain StartingStrengthRecord values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("StartingStrengthRecord player_id is not in this game.")
-        owner = expected_record_owner_by_id.get(value.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("StartingStrengthRecord unit is unknown.")
-        if owner != value.player_id:
-            raise GameLifecycleError("StartingStrengthRecord player_id drift.")
-        if value.unit_instance_id in seen:
-            raise GameLifecycleError("GameState starting_strength_records must be unique.")
-        seen.add(value.unit_instance_id)
-        validated.append(value)
-    if set(expected_record_owner_by_id) != seen:
-        raise GameLifecycleError("GameState starting_strength_records must include every unit.")
-    return sorted(validated, key=lambda record: record.unit_instance_id)
-
-
-def _starting_strength_records_for_army(
-    army_definition: ArmyDefinition,
-) -> tuple[StartingStrengthRecord, ...]:
-    if type(army_definition) is not ArmyDefinition:
-        raise GameLifecycleError("StartingStrengthRecord derivation requires an ArmyDefinition.")
-    attached_component_ids = {
-        component_id
-        for attached_unit in army_definition.attached_units
-        for component_id in attached_unit.component_unit_instance_ids
-    }
-    records = [
-        StartingStrengthRecord.from_unit(player_id=army_definition.player_id, unit=unit)
-        for unit in army_definition.units
-        if unit.unit_instance_id not in attached_component_ids
-    ]
-    unit_by_id = {unit.unit_instance_id: unit for unit in army_definition.units}
-    for attached_unit in army_definition.attached_units:
-        records.append(
-            _starting_strength_record_for_attached_unit(
-                player_id=army_definition.player_id,
-                attached_unit=attached_unit,
-                unit_by_id=unit_by_id,
-            )
-        )
-    return tuple(sorted(records, key=lambda record: record.unit_instance_id))
-
-
-def starting_strength_records_for_army(
-    army_definition: ArmyDefinition,
-) -> tuple[StartingStrengthRecord, ...]:
-    """Build the canonical static Starting Strength inventory for one army."""
-
-    return _starting_strength_records_for_army(army_definition)
-
-
-def _starting_strength_record_for_attached_unit(
-    *,
-    player_id: str,
-    attached_unit: AttachedUnitFormation,
-    unit_by_id: dict[str, UnitInstance],
-) -> StartingStrengthRecord:
-    if type(attached_unit) is not AttachedUnitFormation:
-        raise GameLifecycleError("Attached starting strength requires an AttachedUnitFormation.")
-    starting_model_count = 0
-    for unit_id in attached_unit.component_unit_instance_ids:
-        unit = unit_by_id.get(unit_id)
-        if unit is None:
-            raise GameLifecycleError("Attached starting strength component unit is unknown.")
-        starting_model_count += len(unit.own_models)
-    return StartingStrengthRecord(
-        player_id=player_id,
-        unit_instance_id=attached_unit.attached_unit_instance_id,
-        starting_model_count=starting_model_count,
-        single_model_starting_wounds=None,
-        source_id=attached_unit.source_id,
-    )
-
-
-def _starting_strength_record_owner_by_id(
-    army_definitions: list[ArmyDefinition],
-) -> dict[str, str]:
-    owner_by_id: dict[str, str] = {}
-    for army_definition in army_definitions:
-        attached_component_ids = {
-            component_id
-            for attached_unit in army_definition.attached_units
-            for component_id in attached_unit.component_unit_instance_ids
-        }
-        for unit in army_definition.units:
-            if unit.unit_instance_id not in attached_component_ids:
-                owner_by_id[unit.unit_instance_id] = army_definition.player_id
-        for attached_unit in army_definition.attached_units:
-            owner_by_id[attached_unit.attached_unit_instance_id] = army_definition.player_id
-    return owner_by_id
 
 
 def _validate_reserve_states(

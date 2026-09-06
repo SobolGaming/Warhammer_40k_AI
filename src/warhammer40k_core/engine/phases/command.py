@@ -1022,15 +1022,10 @@ def _resolve_gain_core_command_points_step(
 
 def _rules_unit_id_exists(*, state: GameState, unit_instance_id: str) -> bool:
     requested_id = _validate_player_id("rules_unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        if any(unit.unit_instance_id == requested_id for unit in army.units):
-            return True
-        for attached_unit in army.attached_units:
-            if attached_unit.attached_unit_instance_id == requested_id:
-                return True
-            if requested_id in attached_unit.component_unit_instance_ids:
-                return True
-    return False
+    return any(
+        requested_id in (view.unit_instance_id, *view.component_unit_instance_ids)
+        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+    )
 
 
 def _resolve_command_phase_scoring_hooks(

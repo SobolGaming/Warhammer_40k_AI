@@ -8,6 +8,7 @@ from warhammer40k_core.adapters.capability_manifest import project_capability_ma
 from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_VERSION
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import (
     EventRecordPayload,
@@ -58,6 +59,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
     VictoryPointTransactionPayload,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 HIDDEN_DECISION_TYPE = "hidden_decision"
 HIDDEN_REQUEST_ID = "hidden-request"
@@ -105,6 +107,23 @@ def battle_formation_declarations_are_unresolved(state: GameState) -> bool:
         return False
     declaration_index = state.setup_sequence.index(declaration_step)
     return state.setup_step_index <= declaration_index
+
+
+def visible_army_units(
+    *,
+    state: GameState,
+    army: ArmyDefinition,
+    viewer_player_id: str | None,
+    omniscient: bool,
+) -> tuple[UnitInstance, ...]:
+    """Public roster membership remains unchanged until split declarations reveal."""
+    if (
+        battle_formation_declarations_are_unresolved(state)
+        and not omniscient
+        and viewer_player_id != army.player_id
+    ):
+        return army.source_units()
+    return army.units
 
 
 def public_primary_rules_unit_turn_start_snapshots(

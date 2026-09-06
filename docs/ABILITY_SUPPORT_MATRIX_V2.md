@@ -351,6 +351,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Daemonic Poisons<br>Doom Siren<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Lethal Obsession<br>Monofilament Web<br>Terrifying Crescendo |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
+| `catalog-ir:prebattle-unit-split` | No current generated rows |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:range-characteristic-query` | No current generated rows |
 | `catalog-ir:reserve-arrival-restriction` | Aethersense (Psychic) |

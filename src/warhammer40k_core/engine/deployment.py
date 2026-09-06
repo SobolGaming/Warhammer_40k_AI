@@ -57,6 +57,7 @@ from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_id_for_unit_id,
     rules_unit_view_from_armies,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
@@ -1453,29 +1454,7 @@ def _rules_unit_views_for_army(*, state: GameState, player_id: str) -> tuple[Rul
     army = state.army_definition_for_player(player_id)
     if army is None:
         raise GameLifecycleError("Deployment requires a mustered army.")
-    attached_component_ids = {
-        unit_id
-        for attached in army.attached_units
-        for unit_id in attached.component_unit_instance_ids
-    }
-    views: list[RulesUnitView] = []
-    for attached in army.attached_units:
-        views.append(
-            rules_unit_view_from_armies(
-                armies=tuple(state.army_definitions),
-                unit_instance_id=attached.attached_unit_instance_id,
-            )
-        )
-    for unit in army.units:
-        if unit.unit_instance_id in attached_component_ids:
-            continue
-        views.append(
-            rules_unit_view_from_armies(
-                armies=tuple(state.army_definitions),
-                unit_instance_id=unit.unit_instance_id,
-            )
-        )
-    return tuple(sorted(views, key=lambda view: view.unit_instance_id))
+    return rules_unit_views_from_armies(armies=(army,))
 
 
 def _deployed_rules_unit_count_by_player(state: GameState) -> dict[str, int]:

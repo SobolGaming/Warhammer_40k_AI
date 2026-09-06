@@ -17,6 +17,7 @@ from warhammer40k_core.engine.prebattle import (
     PreBattleProposalRequest,
     is_prebattle_proposal_request,
 )
+from warhammer40k_core.engine.unit_split_runtime import validate_unit_split_checkpoint
 
 
 def validate_config_state_payload_consistency(
@@ -70,7 +71,13 @@ def validate_pending_battlefield_request_consistency(
     *,
     state: GameState,
     pending_request: DecisionRequest | None,
+    decision_records: tuple[DecisionRecord, ...],
 ) -> None:
+    validate_unit_split_checkpoint(
+        state=state,
+        decision_records=decision_records,
+        pending_request=pending_request,
+    )
     if pending_request is None:
         return
     if is_deployment_placement_request(pending_request):

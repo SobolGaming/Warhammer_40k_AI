@@ -10,6 +10,7 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -291,39 +292,17 @@ def _component_destruction_completion_records(
 
 
 def _logical_completion_model_ids_by_unit(state: GameState) -> dict[str, tuple[str, ...]]:
-    historical_by_component = {
-        component_id: record
-        for record in state.starting_attached_unit_records
-        for component_id in record.component_unit_instance_ids
+    return {
+        row.rules_unit_instance_id: row.model_ids for row in starting_rules_unit_inventory(state)
     }
-    completion_ids = {
-        record.attached_unit_instance_id: record.starting_model_instance_ids()
-        for record in state.starting_attached_unit_records
-    }
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id in historical_by_component:
-                continue
-            completion_ids[unit.unit_instance_id] = unit.own_model_ids()
-    return completion_ids
 
 
 def _component_completion_model_ids_by_unit(state: GameState) -> dict[str, tuple[str, ...]]:
-    historical_by_component = {
-        component_id: record
-        for record in state.starting_attached_unit_records
-        for component_id in record.component_unit_instance_ids
+    return {
+        component_id: model_ids
+        for row in starting_rules_unit_inventory(state)
+        for component_id, model_ids in row.component_models
     }
-    completion_ids: dict[str, tuple[str, ...]] = {}
-    for army in state.army_definitions:
-        for unit in army.units:
-            historical = historical_by_component.get(unit.unit_instance_id)
-            completion_ids[unit.unit_instance_id] = (
-                unit.own_model_ids()
-                if historical is None
-                else historical.starting_model_instance_ids_for_component(unit.unit_instance_id)
-            )
-    return completion_ids
 
 
 def _destruction_completion_records_by_identity(
@@ -743,9 +722,9 @@ def _validate_healing_effect_event_identity(
         raise GameLifecycleError("Healing restoration references an unknown model.")
     valid_target_ids = {component_id}
     valid_target_ids.update(
-        record.attached_unit_instance_id
-        for record in state.starting_attached_unit_records
-        if component_id in record.component_unit_instance_ids
+        record.rules_unit_instance_id
+        for record in starting_rules_unit_inventory(state)
+        if component_id in record.component_ids
     )
     if target_unit_id not in valid_target_ids:
         raise GameLifecycleError("Healing restoration target identity drift.")
@@ -993,8 +972,8 @@ def _validate_model_destroyed_event_interval(
     }
     historical_by_component = {
         component_id: record
-        for record in state.starting_attached_unit_records
-        for component_id in record.component_unit_instance_ids
+        for record in starting_rules_unit_inventory(state)
+        for component_id in record.component_ids
     }
     validated: list[tuple[int, str, dict[str, JsonValue]]] = []
     seen_event_ids: set[str] = set()
@@ -1026,7 +1005,7 @@ def _validate_model_destroyed_event_interval(
         historical = historical_by_component.get(component_id)
         valid_target_ids = {component_id}
         if historical is not None:
-            valid_target_ids.add(historical.attached_unit_instance_id)
+            valid_target_ids.add(historical.rules_unit_instance_id)
         if target_unit_id not in valid_target_ids:
             raise GameLifecycleError("Unit-destruction event target identity drift.")
         validated.append((event_order, event_id, dict(payload)))

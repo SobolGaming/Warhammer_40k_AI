@@ -27,6 +27,7 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
 )
 from warhammer40k_core.engine.rules_units import (
     current_rules_unit_views_for_identity,
+    rules_unit_identity_maps_from_armies,
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.scoring import PrimaryObjectiveTurnStartState
@@ -491,19 +492,8 @@ def _previous_turn_destroyer_evidence(
 
 
 def _component_ids_by_rules_unit_identity(state: GameState) -> dict[str, frozenset[str]]:
-    result = {
-        unit.unit_instance_id: frozenset({unit.unit_instance_id})
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    for army in state.army_definitions:
-        for formation in army.attached_units:
-            result[formation.attached_unit_instance_id] = frozenset(
-                formation.component_unit_instance_ids
-            )
-    for record in state.starting_attached_unit_records:
-        result[record.attached_unit_instance_id] = frozenset(record.component_unit_instance_ids)
-    return result
+    _, components = rules_unit_identity_maps_from_armies(tuple(state.army_definitions))
+    return {unit_id: frozenset(values) for unit_id, values in components.items()}
 
 
 def _previous_turn_key_or_none(

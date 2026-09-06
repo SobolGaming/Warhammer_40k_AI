@@ -18,10 +18,11 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
     physical_model_authority_before_event,
 )
+from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
-    from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
+    from warhammer40k_core.engine.rules_unit_starting_inventory import RulesUnitStartingMembership
 
 
 _BATTLE_SHOCK_RESOLVED_EVENT = "battle_shock_test_resolved"
@@ -72,9 +73,9 @@ def validate_battle_shock_state_history(
         stop_index=len(event_records),
     )
     final_active_attached_ids = {
-        attached.attached_unit_instance_id
-        for army in state.army_definitions
-        for attached in army.attached_units
+        row.rules_unit_instance_id
+        for row in starting_rules_unit_inventory(state)
+        if row.is_attached
     }
     if active_attached_ids != final_active_attached_ids:
         raise GameLifecycleError("Attached rules-unit identity history drifted.")
@@ -121,7 +122,8 @@ def _replay_battle_shock_state_until(
     owner_by_unit_id, model_ids_by_unit_id = _historical_unit_inventory(state=state)
     attached_by_identity = _starting_attached_records_by_identity(state=state)
     active_attached_ids = {
-        record.attached_unit_instance_id for record in state.starting_attached_unit_records
+        record.rules_unit_instance_id
+        for record in (row for row in starting_rules_unit_inventory(state) if row.is_attached)
     }
     replayed_states: dict[str, BattleShockedUnitState] = {}
     seen_result_ids: set[str] = set()
@@ -162,7 +164,7 @@ def _apply_resolved_event(
     seen_request_ids: set[str],
     owner_by_unit_id: dict[str, str],
     model_ids_by_unit_id: dict[str, tuple[str, ...]],
-    attached_by_identity: dict[str, StartingAttachedUnitRecord],
+    attached_by_identity: dict[str, RulesUnitStartingMembership],
     active_attached_ids: set[str],
 ) -> None:
     from warhammer40k_core.engine.battle_shock_event_authority import (
@@ -207,8 +209,8 @@ def _apply_resolved_event(
     attached_record = attached_by_identity.get(request.unit_instance_id)
     if (
         attached_record is not None
-        and attached_record.attached_unit_instance_id in active_attached_ids
-        and request.unit_instance_id != attached_record.attached_unit_instance_id
+        and attached_record.rules_unit_instance_id in active_attached_ids
+        and request.unit_instance_id != attached_record.rules_unit_instance_id
     ):
         raise GameLifecycleError("Battle-shock event must target the canonical attached-unit ID.")
     auto_passed = payload.get("auto_passed")
@@ -298,13 +300,11 @@ def _historical_unit_inventory(
         for army in state.army_definitions
         for unit in army.units
     }
-    for record in state.starting_attached_unit_records:
-        if record.attached_unit_instance_id in owner_by_unit_id:
-            raise GameLifecycleError("Battle-shock attached identity collides with a unit.")
-        owner_by_unit_id[record.attached_unit_instance_id] = record.player_id
-        model_ids_by_unit_id[record.attached_unit_instance_id] = tuple(
+    for record in (row for row in starting_rules_unit_inventory(state) if row.is_attached):
+        owner_by_unit_id[record.rules_unit_instance_id] = record.player_id
+        model_ids_by_unit_id[record.rules_unit_instance_id] = tuple(
             model_id
-            for component_id in record.component_unit_instance_ids
+            for component_id in record.component_ids
             for model_id in model_ids_by_unit_id[component_id]
         )
     return owner_by_unit_id, model_ids_by_unit_id
@@ -313,10 +313,10 @@ def _historical_unit_inventory(
 def _starting_attached_records_by_identity(
     *,
     state: GameState,
-) -> dict[str, StartingAttachedUnitRecord]:
-    records: dict[str, StartingAttachedUnitRecord] = {}
-    for record in state.starting_attached_unit_records:
-        for unit_id in (record.attached_unit_instance_id, *record.component_unit_instance_ids):
+) -> dict[str, RulesUnitStartingMembership]:
+    records: dict[str, RulesUnitStartingMembership] = {}
+    for record in (row for row in starting_rules_unit_inventory(state) if row.is_attached):
+        for unit_id in dict.fromkeys((record.rules_unit_instance_id, *record.component_ids)):
             if unit_id in records:
                 raise GameLifecycleError("Battle-shock attached lineage is ambiguous.")
             records[unit_id] = record
@@ -327,21 +327,21 @@ def _active_state_ids_for_request(
     *,
     unit_instance_id: str,
     replayed_states: dict[str, BattleShockedUnitState],
-    attached_by_identity: dict[str, StartingAttachedUnitRecord],
+    attached_by_identity: dict[str, RulesUnitStartingMembership],
     active_attached_ids: set[str],
 ) -> set[str]:
     record = attached_by_identity.get(unit_instance_id)
     if record is None:
         return {unit_instance_id}.intersection(replayed_states)
-    if record.attached_unit_instance_id not in active_attached_ids:
+    if record.rules_unit_instance_id not in active_attached_ids:
         raise GameLifecycleError("Attached rules-unit identity is not active.")
-    return {record.attached_unit_instance_id}.intersection(replayed_states)
+    return {record.rules_unit_instance_id}.intersection(replayed_states)
 
 
 def _current_state_target_ids_for_request(
     *,
     unit_instance_id: str,
-    attached_by_identity: dict[str, StartingAttachedUnitRecord],
+    attached_by_identity: dict[str, RulesUnitStartingMembership],
     active_attached_ids: set[str],
     model_ids_by_unit_id: dict[str, tuple[str, ...]],
     alive_model_ids: set[str],
@@ -353,14 +353,14 @@ def _current_state_target_ids_for_request(
             return ()
         return (unit_instance_id,)
     if (
-        record.attached_unit_instance_id not in active_attached_ids
-        or unit_instance_id != record.attached_unit_instance_id
+        record.rules_unit_instance_id not in active_attached_ids
+        or unit_instance_id != record.rules_unit_instance_id
     ):
         return ()
-    model_ids = model_ids_by_unit_id.get(record.attached_unit_instance_id)
+    model_ids = model_ids_by_unit_id.get(record.rules_unit_instance_id)
     if model_ids is None or not set(model_ids).intersection(alive_model_ids):
         return ()
-    return (record.attached_unit_instance_id,)
+    return (record.rules_unit_instance_id,)
 
 
 def _has_command_required_clear_authority(

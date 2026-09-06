@@ -181,6 +181,13 @@ replay. Player instance selection remains P24C2; source evidence records partial
 runtime support. Verify the pinned 24.02 source and audit offline with
 `uv run --no-sync python tools/build_core_duplicated_abilities_source.py --check`.
 
+Order 24 (P01B) adds source-authorized pre-battle unit splitting through finite
+membership decisions. The engine preserves model IDs and attached-component
+lineage, records two balanced successors, and authenticates their ownership
+through placement, damage and checkpoint/replay. See the
+[adapter contract](docs/ADAPTER_DECISION_CONTRACT.md#order-24-source-authorized-unit-splitting)
+and [scope record](docs/ORDER_24_SCOPE_PLAN.md).
+
 Order 23 (P01) resolves Command-phase Battle-shock for embarked and Strategic
 Reserve rules units through the existing candidate, sequencing, reroll and event
 path. Living model authority is independent of battlefield geometry and is

@@ -22,6 +22,7 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     current_primary_rules_unit_turn_start_membership_for_lineage,
 )
+from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 
 if TYPE_CHECKING:
@@ -618,36 +619,17 @@ def _destruction_identity(
         "destroyed_unit_instance_id",
         rules_unit_instance_id,
     )
-    historical = tuple(
-        record
-        for record in state.starting_attached_unit_records
-        if record.attached_unit_instance_id == requested_id
+    identities = tuple(
+        row
+        for row in starting_rules_unit_inventory(state)
+        if row.rules_unit_instance_id == requested_id
     )
-    if len(historical) > 1:
-        raise GameLifecycleError("Primary destruction historical Attached Unit is ambiguous.")
-    if historical:
-        record = historical[0]
-        return (
-            record.player_id,
-            record.component_unit_instance_ids,
-            tuple(
-                sorted(
-                    model_id
-                    for _component_id, model_ids in (
-                        record.starting_model_instance_ids_by_component
-                    )
-                    for model_id in model_ids
-                )
-            ),
+    if len(identities) != 1:
+        raise GameLifecycleError(
+            "Primary unit destruction requires one canonical starting identity."
         )
-    unit = physical_units_by_id.get(requested_id)
-    if unit is None:
-        raise GameLifecycleError("Primary unit destruction references an unknown unit.")
-    owner_id = owner_by_unit_id.get(requested_id)
-    if owner_id is None:
-        raise GameLifecycleError("Primary unit destruction references an unowned unit.")
-    own_model_ids = unit.own_model_ids()
-    return owner_id, (requested_id,), tuple(sorted(own_model_ids))
+    identity = identities[0]
+    return identity.player_id, identity.component_ids, identity.model_ids
 
 
 def _scoring_identity_for_component(
@@ -661,35 +643,22 @@ def _scoring_identity_for_component(
         "component_unit_instance_id",
         component_unit_instance_id,
     )
-    historical = tuple(
-        record
-        for record in state.starting_attached_unit_records
-        if requested_component_id in record.component_unit_instance_ids
+    identities = tuple(
+        row
+        for row in starting_rules_unit_inventory(state)
+        if requested_component_id in row.component_ids
     )
-    if len(historical) > 1:
-        raise GameLifecycleError("Primary destruction Attached Unit lineage is ambiguous.")
-    if historical:
-        record = historical[0]
-        starting_model_ids = tuple(
-            sorted(
-                model_id
-                for _component_id, model_ids in record.starting_model_instance_ids_by_component
-                for model_id in model_ids
-            )
+    if len(identities) != 1:
+        raise GameLifecycleError(
+            "Primary destruction component requires one starting rules-unit identity."
         )
-        return (
-            record.attached_unit_instance_id,
-            record.player_id,
-            record.component_unit_instance_ids,
-            starting_model_ids,
-        )
-    owner_id, component_ids, starting_model_ids = _destruction_identity(
-        state=state,
-        rules_unit_instance_id=requested_component_id,
-        physical_units_by_id=physical_units_by_id,
-        owner_by_unit_id=owner_by_unit_id,
+    identity = identities[0]
+    return (
+        identity.rules_unit_instance_id,
+        identity.player_id,
+        identity.component_ids,
+        identity.model_ids,
     )
-    return requested_component_id, owner_id, component_ids, starting_model_ids
 
 
 def _unconsumed_destroyed_departures_for_components(

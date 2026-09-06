@@ -1,6 +1,13 @@
 # CORE V2 external contract
 
-Contract version: `11.2.0`
+Contract version: `11.3.0`
+
+Order 24 adds the finite `select_unit_split_membership` family and optional
+`split_origin` ownership proof on projected models and placement payloads.
+Clients copy the visible model's current physical unit ID and proof rather
+than deriving ownership from its immutable model ID. Existing ordinary
+payloads omit the optional field. See the Order 24 section of
+[`docs/ADAPTER_DECISION_CONTRACT.md`](../docs/ADAPTER_DECISION_CONTRACT.md).
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F

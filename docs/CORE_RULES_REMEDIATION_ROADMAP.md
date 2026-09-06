@@ -3552,3 +3552,148 @@ The architecture/scope audit and `git diff --check` pass.
 
 PR URL and merge commit:
 [PR #429](https://github.com/SobolGaming/Warhammer_40k_AI/pull/429); not merged.
+
+## P01B implementation evidence — Order 24
+
+Status: implemented and all required local validation gates pass. This closes only
+`C01-02` after review/merge. The changed and errata v931 rows are one obligation;
+P01C and other category 01 findings remain separate.
+
+Dependencies and approved scope: P19 and S-MIRRORS are merged at the reviewed
+base `b8805911de434f9b53b4c209e896012998e0e95f`. The user approved the shared
+ownership/history expansion documented in `docs/ORDER_24_SCOPE_PLAN.md`.
+
+Violated invariant: an authorized split must partition the existing models
+exactly once into two independent rules units, record the player's chosen
+membership, and preserve physical identity and source provenance. Model-ID
+prefixes formerly required the original physical owner, attached formations
+were treated as the live inventory, and no generic decision represented this
+partition. Renaming models or leaving both successors with the original
+unpartitioned components would invalidate that authority.
+
+Implemented ownership and execution path: the data-boundary compiler emits a
+typed `split_unit` RuleIR effect for the real pre-battle Combat Squads wording.
+`unit_split_permissions` validates the source, trigger and target;
+`unit_split_decisions` emits a linear sequence of finite membership choices;
+the lifecycle dispatch validates the complete request and candidate state
+before queue pop. `unit_split_runtime` atomically installs both successors
+and their Starting Strength records and emits `unit_split_applied`.
+`UnitSplitRecord` archives the original components, formation and partition;
+`SplitUnitOrigin` proves each fragment's physical ownership while retaining
+the original model IDs. A model cannot be subdivided again. Feasible specified
+strengths apply; otherwise the two counts differ by at most one, including
+attached Leader/Support models.
+
+Shared consumers distinguish original source identity, current rules-unit
+identity and frozen battle membership. Placement, movement ownership,
+destruction, Battle-shock and scoring history consume that authority. Original
+attached component roles survive bodyguard loss within each successor.
+Existing unit effects resolve through historical aliases, conditional Leader
+effects stay with their source models, and unit resources retain one original
+account rather than creating extra uses. Runtime lifecycle code remains
+content-neutral; no named handler or import-boundary exception was added.
+
+Source authority: the registered package `gw-11e-core-unit-splitting`, version
+`maintained-app-mirrors-observed-2026-09-06`, retains only the reviewed 01.02.06
+baseline and balancing clauses as loaded/executable. Core regulates a split;
+it does not grant every unit permission. The supported permission window is
+the start of Declare Battle Formations before placements, reserves or cargo
+declarations. Other source/timing shapes fail explicitly. No arbitrary
+mid-battle split permission or additional faction support is claimed.
+
+Provider and retained evidence, observed `2026-09-06T17:29:03Z`:
+
+- [40k.app category 01](https://www.40k.app/rules/01-core-concepts), search-index
+  observation, direct retrieval HTTP 403, no inferred App-data version.
+  Source ID `gw-11e-core-unit-splitting:unit-splitting`; transcription SHA-256
+  `cfbc728ec6c5d07a9d6497db3f37754bb7b0c227d4194ee13a2e2f7cdf40793f`;
+  audit-row fingerprint
+  `5fb98bc5cfbaac54399e77eff6cb25006fdc2dcbb93ff3a605f4090ad540face`;
+  RuleEvidence fingerprint
+  `a16c905b92d71c18ce0b660b756614f404f2e47ab22fbd22be97be24d4ad8ecf`.
+- [Game Datamissions v931 changelog](https://game-datamissions.com/11th/rules/changelog?v=931),
+  complete embedded v931 change and erratum entries; the default rendered v946
+  page alone is not the evidence. Source ID
+  `gw-11e-core-unit-splitting:balanced-unit-splitting`; transcription SHA-256
+  `0c9515272839227cdd4070b2e7fca961f2892388992adf9db80c6345f667edca`;
+  audit-row fingerprint
+  `19d99e87b14fd7f286ade01e8a70ee64759b5f685ac7dc27f0ec303fbfd7ddd8`;
+  RuleEvidence fingerprint
+  `435db305787a7eb1fa519346e1ba2ffaa38f2ad861bed5bee987dc495ee2f06b`.
+- Package hash
+  `741dba74d805647ae5317f91dc914d7e60779abe748af9496533fee81a8a413d`;
+  byte-level artifact SHA-256
+  `c8e2d5ff82146cf127ef890e32e9c946251c549c03efdc2398a7326627915ecc`.
+  The existing official PDF remains historical evidence with SHA-256
+  `f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+Decision, adapters and replay: external contract 11.3.0 documents
+`select_unit_split_membership` and optional closed `split_origin` payloads.
+Finite submissions use the existing common engine path. Actor, option,
+payload, source, membership and checkpoint drift are rejected before mutation.
+The shared redaction module keeps choices, records, events and successor
+membership owner-secret during declarations. Opponents see the original
+inventory until reveal. Checkpoints authenticate original muster configuration,
+decision transcript and the application event; session persistence replays the
+same submissions. The TypeScript placement client uses published current
+ownership and its optional proof instead of deriving unit IDs from model IDs.
+
+Regression and bug-class evidence: real-domain tests cover ordinary and attached
+facade setup, both viewers, deployment and battle entry, exact checkpoint and
+persistence replay, independent successor damage, even/odd partitions,
+10/11/12-model source-count fallback, duplicate/foreign/repeated membership,
+once-only lineage, unsupported permission shapes, stale and malformed
+submissions, source/event/checkpoint drift, retained effects/resources and
+Leader effects confined to the correct successor. The shared ownership AST
+audit prevents local model-prefix validation from bypassing the new authority.
+The search also replaced duplicated live-group reconstruction in physical,
+history and scoring consumers rather than patching only split construction.
+Two older Stratagem fixtures inferred attachments from Starting Strength
+source strings; they now muster real Leader attachments. That regression
+exposed component IDs reaching canonical mortal-wound target freezing.
+Explosives and Crushing Impact now resolve current rules-unit IDs before
+damage application and continuation; frozen lineage remains strict.
+
+Quality-gate corrections keep physical/attached ownership validation in the
+existing `attachment_mustering_validation` owner and leave the mustering
+module below its frozen size budget. Split application installs membership
+and Starting Strength together through a validating `GameState` mutator.
+The decision submission catalog includes the new finite family, and the
+attachment/strength audit follows the extracted shared owners.
+
+Scope boundary: reserve point allocation and transport capacity still require
+their existing source-backed configuration. P01B does not invent prices or
+capacities for split fragments; source points keyed only to the original unit
+do not supply successor reserve valuation. The executable split window occurs
+before reserve/cargo declarations. General embarked-ability behavior is P01C.
+
+Generated artifacts: offline source/audit builder and typed hash-pinned loader,
+source authority registry, semantic-support artifacts, engine build identity,
+contract schemas/examples/manifest and generated TypeScript client. The complete
+behavioral JUnit profile supplies the eight-shard inventory before publication.
+
+Validation results: the final complete behavioral suite passes with coverage:
+`6405 passed`, `85.05%`, `820.06s`, with 64 xdist workers and work stealing.
+The bundled Node runtime is on PATH. The run emitted 10 ResourceWarnings for
+unclosed SQLite connections. No production code changed after this run.
+All eight shards and the duration inventory were regenerated from its complete
+successful JUnit profile, and the exact eight-shard inventory check passes.
+
+Ruff check and format check (`2814` files), mypy (`2726` source files), pyright
+(zero errors or warnings), all `11` import-linter contracts and all-files
+pre-commit pass. The source/audit builder and engine-build identity check pass;
+the validated runtime-tree SHA-256 is
+`35c2605a21dfeddb60e19290c62dc3b63296cd9a07db66c0e89666ffa8079c70`.
+External-contract `--check --base-ref origin/main` passes at base
+`b8805911de434f9b53b4c209e896012998e0e95f`. TypeScript generated-client/type
+checks, all `5` client unit tests and two-server HTTP conformance pass
+(`342` assertions, contract `11.3.0`). Installed-wheel smoke verifies
+`2560` engine resources and `27` schemas against the same build identity.
+Windows validation uses bundled Node `24.19.0` and a local npm executable.
+The architecture/scope audit and `git diff --check` pass.
+
+The complete no-coverage code-quality suite passes: `378 passed`, `318.78s`,
+with 64 xdist workers and work stealing. Its earlier failures were corrected
+without relaxing the mutation, module-size or decision-documentation gates.
+
+PR URL and merge commit: pending publication; not merged.
