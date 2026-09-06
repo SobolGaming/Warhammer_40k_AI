@@ -8,6 +8,7 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -4534,7 +4535,7 @@ def test_phase15d_grouped_fight_resolution_payload_round_trips_and_rejects_tampe
     )
     assert isinstance(no_move, RulesUnitFightMovementResolution)
     assert RulesUnitFightMovementResolution.from_payload(no_move.to_payload()) == no_move
-    with pytest.raises(GameLifecycleError, match="no-move resolution must not include a witness"):
+    with pytest.raises(GameLifecycleError, match="witness endpoint pose drifted"):
         replace(no_move, witness=resolution.witness)
     with pytest.raises(
         GameLifecycleError,
@@ -4614,7 +4615,7 @@ def test_phase15d_grouped_fight_resolution_payload_round_trips_and_rejects_tampe
     malformed_payloads.append((coherency_identity_drift, "coherency identity drifted"))
     no_move_witness = dict(no_move.to_payload())
     no_move_witness["witness"] = witness_payload
-    malformed_payloads.append((no_move_witness, "no-move resolution must not include a witness"))
+    malformed_payloads.append((no_move_witness, "witness endpoint pose drifted"))
 
     for tampered, message in malformed_payloads:
         with pytest.raises(GameLifecycleError, match=message):
@@ -6922,6 +6923,429 @@ def test_phase15d_resolve_fight_movement_fails_fast_on_wrong_context() -> None:
             ruleset_descriptor=ruleset,
             proposal=targeted_without_witness,
         )
+
+
+def test_p12_objective_consolidation_uses_closest_parts_for_eligibility() -> None:
+    _catalog, ruleset, scenario, attacker, _a, _b = _melee_fixture(
+        target_a_pose=Pose.at(30.0, 30.0), target_b_pose=Pose.at(40.0, 30.0)
+    )
+    marker = ObjectiveMarker(
+        objective_marker_id="p12:marker", name="P12 marker", x_inches=14.0, y_inches=10.0
+    )
+    assert legal_consolidation_modes(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        objective_markers=(marker,),
+    ) == (ConsolidationModeKind.OBJECTIVE,)
+
+
+def test_p12_objective_consolidation_allows_moving_within_range_without_getting_closer() -> None:
+    _catalog, ruleset, scenario, attacker, _a, _b = _melee_fixture(
+        target_a_pose=Pose.at(30.0, 30.0), target_b_pose=Pose.at(40.0, 30.0)
+    )
+    marker = ObjectiveMarker(
+        objective_marker_id="p12:marker", name="P12 marker", x_inches=12.0, y_inches=10.0
+    )
+    request = _fight_movement_request(
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        attacker=attacker,
+        context={"objective_markers": [marker.to_payload()]},
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.OBJECTIVE,
+        objective_id=marker.objective_marker_id,
+        witness=_movement_witness_for_unit(
+            scenario=scenario,
+            unit_instance_id=attacker.unit_instance_id,
+            dx=-0.5,
+            endpoint_only=False,
+        ),
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+    )
+    # A model already in range can move within range without needing to move closer.
+    assert (
+        fight_movement_resolution_violation(
+            proposal_request=request,
+            proposal=proposal,
+            resolution=resolution,
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize("mode", [ConsolidationModeKind.ENGAGING, ConsolidationModeKind.OBJECTIVE])
+def test_p12_each_moved_model_must_reach_its_required_endpoint_when_possible(
+    mode: ConsolidationModeKind,
+) -> None:
+    _catalog, ruleset, scenario, attacker, target, _other = _melee_fixture(
+        attacker_datasheet_id="core-intercessor-like-infantry",
+        attacker_model_profile_id="core-intercessor-like",
+        attacker_wargear_ids=("core-leader-blade",),
+        attacker_model_count=5,
+        target_a_pose=Pose.at(13.0, 10.0)
+        if mode is ConsolidationModeKind.ENGAGING
+        else Pose.at(30.0, 30.0),
+        target_b_pose=Pose.at(40.0, 30.0),
+    )
+    placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    # One model satisfies the unit-level endpoint. The other can reach it too,
+    # but proposes only a token movement towards the required destination.
+    starts = (
+        Pose.at(10.3, 8.9),
+        Pose.at(10.0, 12.0),
+        Pose.at(8.0, 8.9),
+        Pose.at(8.0, 11.0),
+        Pose.at(10.0, 6.9),
+    )
+    placement = placement.with_model_placements(
+        tuple(
+            item.with_pose(pose)
+            for item, pose in zip(placement.model_placements, starts, strict=True)
+        )
+    )
+    scenario = replace(
+        scenario, battlefield_state=scenario.battlefield_state.with_unit_placement(placement)
+    )
+    marker = ObjectiveMarker(
+        objective_marker_id="p12:model-goal", name="Model goal", x_inches=14.5, y_inches=10.0
+    )
+    request = _fight_movement_request(
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        attacker=attacker,
+        context={"objective_markers": [marker.to_payload()]},
+    )
+    destinations = (Pose.at(11.2, 8.9), Pose.at(10.1, 12.0), *starts[2:])
+    witness = PathWitness.for_paths(
+        tuple(
+            (
+                item.model_instance_id,
+                (start, Pose.at((start.position.x + end.position.x) / 2, start.position.y), end),
+            )
+            for item, start, end in zip(
+                placement.model_placements, starts, destinations, strict=True
+            )
+        )
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=mode,
+        consolidate_target_unit_instance_ids=(target.unit_instance_id,)
+        if mode is ConsolidationModeKind.ENGAGING
+        else (),
+        objective_id=marker.objective_marker_id
+        if mode is ConsolidationModeKind.OBJECTIVE
+        else None,
+        witness=witness,
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    assert resolution.is_valid
+    violation = fight_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+    )
+    assert violation is not None
+    assert (
+        violation.violations[0].violation_code == "consolidation_model_must_reach_required_endpoint"
+    )
+
+
+@pytest.mark.parametrize("path_kind", ["detour", "rotation", "stationary"])
+@pytest.mark.parametrize("base_contact", [False, True])
+def test_p12_fight_closed_loop_witnesses_cannot_disguise_movement(
+    path_kind: str, base_contact: bool
+) -> None:
+    from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
+
+    _catalog, ruleset, scenario, attacker, target, _other = _melee_fixture(
+        target_a_pose=Pose.at(12.0, 10.0), target_b_pose=Pose.at(40.0, 30.0)
+    )
+    before = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    source_placement = before.model_placements[0]
+    if base_contact:
+        target_placement = scenario.battlefield_state.unit_placement_by_id(target.unit_instance_id)
+        target_model = target_placement.model_placements[0]
+        source_geometry = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(source_placement),
+            placement=source_placement,
+        )
+        target_geometry = geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(target_model), placement=target_model
+        )
+        target_placement = target_placement.with_model_placements(
+            (
+                target_model.with_pose(
+                    Pose.at(
+                        source_placement.pose.position.x
+                        + source_geometry.base.max_radius()
+                        + target_geometry.base.max_radius(),
+                        source_placement.pose.position.y,
+                    )
+                ),
+            )
+        )
+        scenario = replace(
+            scenario,
+            battlefield_state=scenario.battlefield_state.with_unit_placement(target_placement),
+        )
+    start = source_placement.pose
+    middle = start
+    if path_kind == "detour":
+        middle = Pose.at(start.position.x - 0.1, start.position.y, start.position.z)
+    elif path_kind == "rotation":
+        middle = Pose.at(start.position.x, start.position.y, start.position.z, facing_degrees=15.0)
+    request = _fight_movement_request(proposal_kind=ProposalKind.CONSOLIDATE, attacker=attacker)
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ONGOING,
+        consolidate_target_unit_instance_ids=(target.unit_instance_id,),
+        witness=PathWitness.for_paths(
+            ((source_placement.model_instance_id, (start, middle, start)),)
+        ),
+    )
+    validation = proposal.validation_result_for_request(request)
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    if path_kind == "stationary":
+        assert validation.is_valid
+        assert resolution.is_valid
+        assert resolution.endpoint_witness["moved_model_instance_ids"] == []
+        assert resolution.transition_batch(before=before).displacements == ()
+    else:
+        assert not validation.is_valid
+        assert validation.violations[0].violation_code == "closed_loop_fight_movement"
+        assert not resolution.is_valid
+        with pytest.raises(GameLifecycleError, match="Invalid fight movement"):
+            resolution.transition_batch(before=before)
+
+
+@pytest.mark.parametrize("path_kind", ["detour", "rotation", "stationary"])
+def test_p12_attached_fight_witness_shape_precedes_group_mutation(path_kind: str) -> None:
+    ruleset, scenario, state, _unit, request, proposal, _resolution = (
+        _resolved_attached_pile_in_fixture()
+    )
+    assert proposal.witness is not None
+    paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for model_id in proposal.witness.model_ids():
+        start = proposal.witness.poses_for_model(model_id)[0]
+        middle = start
+        if path_kind == "detour":
+            middle = Pose.at(start.position.x - 0.1, start.position.y, start.position.z)
+        elif path_kind == "rotation":
+            middle = Pose.at(
+                start.position.x, start.position.y, start.position.z, facing_degrees=15.0
+            )
+        paths.append((model_id, (start, middle, start)))
+    proposal = replace(proposal, witness=PathWitness.for_paths(tuple(paths)))
+    resolution = resolve_rules_unit_fight_movement(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        maximum_distance_inches=3.0,
+        state=state,
+    )
+    assert isinstance(resolution, RulesUnitFightMovementResolution)
+    violation = fight_rules_unit_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        state=state,
+    )
+    if path_kind == "stationary":
+        assert resolution.is_valid
+        assert violation is None
+        assert (
+            fight_rules_unit_movement_transition_batch(
+                scenario=scenario, resolution=resolution
+            ).displacements
+            == ()
+        )
+    else:
+        assert not resolution.is_valid
+        assert violation is not None
+        assert violation.violations[0].violation_code == "closed_loop_fight_movement"
+        with pytest.raises(GameLifecycleError):
+            fight_rules_unit_movement_transition_batch(scenario=scenario, resolution=resolution)
+
+
+@pytest.mark.parametrize(
+    "base_size",
+    [
+        BaseSizeDefinition.oval(length_mm=50.8, width_mm=25.4),
+        BaseSizeDefinition.rectangular(length_mm=50.8, width_mm=25.4),
+    ],
+)
+@pytest.mark.parametrize("flying", [False, True])
+@pytest.mark.parametrize("can_reach", [False, True])
+def test_p12_non_circular_closer_consolidation_uses_sound_distance_bound(
+    base_size: BaseSizeDefinition,
+    flying: bool,
+    can_reach: bool,
+) -> None:
+    from warhammer40k_core.geometry.model_geometry import ModelGeometry
+
+    _catalog, ruleset, scenario, attacker, target, _other = _melee_fixture(
+        attacker_datasheet_id="core-intercessor-like-infantry",
+        attacker_model_profile_id="core-intercessor-like",
+        attacker_model_count=5,
+        target_a_pose=Pose.at(15.0, 10.0),
+        target_b_pose=Pose.at(40.0, 30.0),
+    )
+    attacker = replace(
+        attacker,
+        keywords=(*attacker.keywords, "fly") if flying else attacker.keywords,
+        own_models=tuple(
+            replace(
+                model,
+                base_size=base_size,
+                geometry=ModelGeometry.from_base_size(
+                    base_size,
+                    geometry_source_id="p12-supported-base",
+                    keywords=attacker.keywords,
+                ),
+            )
+            for model in attacker.own_models
+        ),
+    )
+    placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    starts = (
+        Pose.at(15.0, 12.0),
+        Pose.at(10.0 if can_reach else 7.0, 10.0),
+        Pose.at(9.0, 8.0),
+        Pose.at(9.0, 12.0),
+        Pose.at(11.1, 12.0),
+    )
+    placement = placement.with_model_placements(
+        tuple(
+            model.with_pose(pose)
+            for model, pose in zip(placement.model_placements, starts, strict=True)
+        )
+    )
+    scenario = replace(
+        scenario,
+        armies=(replace(scenario.armies[0], units=(attacker,)), scenario.armies[1]),
+        battlefield_state=scenario.battlefield_state.with_unit_placement(placement),
+    )
+    ruleset = replace(
+        ruleset,
+        descriptor_hash="",
+        fly_policy=replace(ruleset.fly_policy, ignores_vertical_distance=flying),
+    )
+    request = _fight_movement_request(proposal_kind=ProposalKind.CONSOLIDATE, attacker=attacker)
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ONGOING,
+        consolidate_target_unit_instance_ids=(target.unit_instance_id,),
+        witness=PathWitness.for_paths(
+            tuple(
+                (
+                    model.model_instance_id,
+                    (
+                        start,
+                        Pose.at(start.position.x + (0.05 if can_reach else 1.5), start.position.y),
+                        Pose.at(start.position.x + (0.1 if can_reach else 3.0), start.position.y),
+                    )
+                    if index == 1
+                    else (start, start, start),
+                )
+                for index, (model, start) in enumerate(
+                    zip(placement.model_placements, starts, strict=True)
+                )
+            )
+        ),
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    assert resolution.is_valid, resolution.to_payload()
+    violation = fight_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+    )
+    if can_reach:
+        assert violation is not None
+        assert (
+            violation.violations[0].violation_code
+            == "consolidation_model_must_reach_required_endpoint"
+        )
+    else:
+        assert violation is None
+
+
+def test_p12_consolidation_cannot_switch_which_selected_unit_was_closest() -> None:
+    _catalog, ruleset, scenario, attacker, first, second = _melee_fixture(
+        target_a_pose=Pose.at(12.9, 10.0), target_b_pose=Pose.at(10.0, 13.0)
+    )
+    request = _fight_movement_request(proposal_kind=ProposalKind.CONSOLIDATE, attacker=attacker)
+    placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    item = placement.model_placements[0]
+    end = Pose.at(item.pose.position.x, item.pose.position.y + 0.2)
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ONGOING,
+        consolidate_target_unit_instance_ids=(first.unit_instance_id, second.unit_instance_id),
+        witness=PathWitness.for_paths(
+            (
+                (
+                    item.model_instance_id,
+                    (item.pose, Pose.at(item.pose.position.x, item.pose.position.y + 0.1), end),
+                ),
+            )
+        ),
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    assert resolution.is_valid
+    violation = fight_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+    )
+    assert violation is not None
+    assert (
+        violation.violations[0].violation_code == "moved_model_not_closer_to_closest_selected_unit"
+    )
 
 
 def _melee_fixture(

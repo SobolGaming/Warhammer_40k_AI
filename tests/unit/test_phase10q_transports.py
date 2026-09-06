@@ -3521,6 +3521,18 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
         ),
     )
     state = _battle_state(scenario, game_id="phase18e-shock-disembark")
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="phase18e:fights-first",
+            source_rule_id="phase18e:fights-first-source",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(enemy.unit_instance_id,),
+            started_battle_round=1,
+            started_phase=BattlePhase.MOVEMENT,
+            expiration=EffectExpiration.end_turn(battle_round=1, player_id="player-a"),
+            effect_payload={"effect_kind": "fights_first"},
+        )
+    )
     assert state.battlefield_state is not None
     state.replace_battlefield_state(
         state.battlefield_state.without_unit_placement(passenger.unit_instance_id)
@@ -3682,6 +3694,10 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     assert disembarked_state is not None
     assert disembarked_state.start_engaged_enemy_unit_instance_ids == engaged_enemy_ids
     queue_start = _last_event_payload(decisions, "forced_fight_activation_queue_started")
+    assert (
+        queue_start["fights_first_registry"] == FightsFirstRegistry.from_state(state).to_payload()
+    )
+    assert FightsFirstRegistry.from_state(state).sources
     forced_context = cast(dict[str, JsonValue], queue_start["forced_activation_context"])
     assert forced_context["selecting_player_id"] == "player-b"
     assert forced_context["eligible_unit_instance_ids"] == list(engaged_enemy_ids)
@@ -3696,6 +3712,18 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     restored = GameLifecycle.from_payload(lifecycle_payload)
     assert restored.to_payload() == lifecycle_payload
     assert restored.state is not None
+
+    malformed_registries: tuple[JsonValue, ...] = (None, [], {}, {"sources": "malformed"})
+    for registry_value in malformed_registries:
+        malformed_registry = cast(GameLifecyclePayload, json.loads(json.dumps(lifecycle_payload)))
+        queue_event = next(
+            event
+            for event in malformed_registry["decisions"]["event_log"]
+            if event["event_type"] == "forced_fight_activation_queue_started"
+        )
+        cast(dict[str, JsonValue], queue_event["payload"])["fights_first_registry"] = registry_value
+        with pytest.raises(GameLifecycleError):
+            GameLifecycle.from_payload(malformed_registry)
 
     forged_skip_payload = cast(
         GameLifecyclePayload,
@@ -4352,7 +4380,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
     orphaned_start_context["trigger_event_id"] = "event-999999"
     with pytest.raises(
         GameLifecycleError,
-        match="requires one forced-Fight queue disposition",
+        match="requires one exact queue-start event",
     ):
         GameLifecycle.from_payload(orphaned_start_payload)
 
@@ -4392,7 +4420,7 @@ def test_shock_disembark_routes_opponent_through_canonical_fight_activation_and_
         reordered_completion["payload"],
         reordered_start["payload"],
     )
-    with pytest.raises(GameLifecycleError, match="completion ordering drift"):
+    with pytest.raises(GameLifecycleError, match="requires one exact queue-start event"):
         GameLifecycle.from_payload(reordered_completion_payload)
 
 
@@ -4418,6 +4446,7 @@ def test_shock_disembark_forced_fight_queue_event_is_public_to_both_players() ->
                 "active_player_id": "player-a",
                 "phase_body_status": "forced_fight_activation_queue_started",
                 "forced_activation_context": forced_context,
+                "fights_first_registry": {"sources": []},
             }
         ),
     )
@@ -4430,6 +4459,7 @@ def test_shock_disembark_forced_fight_queue_event_is_public_to_both_players() ->
         event = cast(dict[str, JsonValue], delta["events"][0])
         payload = cast(dict[str, JsonValue], event["payload"])
         assert payload["forced_activation_context"] == forced_context
+        assert "fights_first_registry" not in payload
 
 
 def test_shock_disembark_without_start_engagements_records_a_skipped_fight_queue() -> None:

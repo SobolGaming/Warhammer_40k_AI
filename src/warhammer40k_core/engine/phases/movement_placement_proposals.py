@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.forced_fight_queue import install_forced_fight_queue
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -463,26 +464,11 @@ def _start_shock_disembark_forced_fight_activations(
         selecting_player_id=selecting_player_id,
         eligible_unit_instance_ids=pending_ids,
     )
-    fight_state = FightPhaseState.for_forced_activations(
-        battle_round=state.battle_round,
-        active_player_id=_active_player_id(state),
-        policy=ruleset_descriptor.fight_policy,
+    install_forced_fight_queue(
+        state=state,
+        decisions=decisions,
         context=context,
-        fights_first_registry=FightsFirstRegistry.from_state(state),
-    )
-    state.replace_fight_phase_state(fight_state)
-    decisions.event_log.append(
-        "forced_fight_activation_queue_started",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.MOVEMENT.value,
-                "active_player_id": _active_player_id(state),
-                "phase_body_status": "forced_fight_activation_queue_started",
-                "forced_activation_context": context.to_payload(),
-            }
-        ),
+        policy=ruleset_descriptor.fight_policy,
     )
 
 

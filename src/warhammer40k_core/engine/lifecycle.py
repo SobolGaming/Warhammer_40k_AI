@@ -3630,7 +3630,11 @@ def _validate_payload_consistency(
     )
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
-    validate_fight_phase_state_consistency(state=state, event_records=event_records)
+    validate_fight_phase_state_consistency(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     _ash.validate_pending_hazardous_mortal_wound_requests(
         state=state,
         attack_sequence=_lsq.active_attack_sequence_for_state(state),

@@ -3,10 +3,14 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import sys
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
 from typing import cast
+
+if sys.platform == "win32":
+    import _winapi
 
 import pytest
 from tools import build_faction_source_governance as governance_builder
@@ -448,13 +452,21 @@ def test_f00_official_artifact_rejects_symlink_escape(
 ) -> None:
     payload = _payload()
     official = cast(list[dict[str, object]], payload["official_sources"])[0]
-    outside = tmp_path / "outside.pdf"
+    filename = Path(str(official["artifact_path"])).name
+    official["source_url"] = f"https://assets.warhammer-community.com/linked/{filename}"
+    official["artifact_path"] = f"data/raw/faction_packs/linked/{filename}"
+    outside = tmp_path / "outside" / filename
+    outside.parent.mkdir()
     outside.write_bytes(b"outside artifact root")
     official["sha256"] = hashlib.sha256(outside.read_bytes()).hexdigest()
     candidate = validate_faction_source_audit_bytes(_bytes(payload))
     artifact = tmp_path / candidate.official_sources[0].artifact_path
-    artifact.parent.mkdir(parents=True)
-    artifact.symlink_to(outside)
+    artifact.parent.parent.mkdir(parents=True)
+    if sys.platform == "win32":
+        # Junctions exercise real resolved containment without symlink privileges.
+        _winapi.CreateJunction(str(outside.parent), str(artifact.parent))
+    else:
+        artifact.parent.symlink_to(outside.parent, target_is_directory=True)
     monkeypatch.setattr(governance_builder, "ROOT", tmp_path)
     with pytest.raises(FactionSourceError, match="inside root"):
         governance_builder.validate_official_artifacts(candidate)

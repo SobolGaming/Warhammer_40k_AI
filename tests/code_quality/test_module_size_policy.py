@@ -19,7 +19,6 @@ LEGACY_OVERSIZED_MODULE_LIMITS = {
     "src/warhammer40k_core/engine/cult_ambush.py": 1864,
     "src/warhammer40k_core/engine/damage_allocation.py": 3094,
     "src/warhammer40k_core/engine/deployment.py": 1750,
-    "src/warhammer40k_core/engine/fight_order.py": 2000,
     "src/warhammer40k_core/engine/fight_resolution.py": 3324,
     "src/warhammer40k_core/engine/game_state.py": 7360,
     "src/warhammer40k_core/engine/lifecycle.py": 3921,

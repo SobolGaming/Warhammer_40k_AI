@@ -171,6 +171,61 @@ def test_desperate_escape_battle_shock_preserves_nested_outcome_status() -> None
     assert "execution.resolution.pending_status" not in movement_source
 
 
+def test_fight_witness_shapes_share_one_validation_owner() -> None:
+    engine = FIGHT_RESOLUTION.parent
+    owners = (
+        (FIGHT_RESOLUTION, "fight_movement_resolution_violation"),
+        (engine / "fight_rules_unit_movement.py", "fight_rules_unit_movement_resolution_violation"),
+    )
+    for path, function_name in owners:
+        _source, function = _function_by_name(path, function_name)
+        calls = {_call_name(node) for node in ast.walk(function) if isinstance(node, ast.Call)}
+        assert "fight_movement_path_violation" in calls
+    for name in ("fight_resolution.py", "fight_rules_unit_movement_types.py"):
+        tree = ast.parse((engine / name).read_text(encoding="utf-8"))
+        assert _module_imports_name(tree, "closed_loop_fight_model_id")
+
+
+def test_forced_fight_live_and_historical_actors_share_canonical_ownership() -> None:
+    engine = FIGHT_RESOLUTION.parent
+    for name in (
+        "consolidation_fight_queue.py",
+        "consolidation_fight_history.py",
+        "fight_historical_eligibility.py",
+    ):
+        tree = ast.parse((engine / name).read_text(encoding="utf-8"))
+        assert _module_imports_name(tree, "forced_fight_selecting_player_id")
+
+
+def test_historical_fight_builders_use_frozen_time_and_effect_context() -> None:
+    engine = FIGHT_RESOLUTION.parent
+    for name, functions in (
+        (
+            "fight_activation_requests.py",
+            (
+                "build_fight_activation_request",
+                "fight_activation_selection_requested_payload",
+                "request_fight_activation",
+            ),
+        ),
+        ("fight_order.py", ("fight_activation_option_payload", "eligible_pass_option_payload")),
+    ):
+        for function_name in functions:
+            _path, function = _function_by_name(engine / name, function_name)
+            current_round_reads = tuple(
+                node
+                for node in ast.walk(function)
+                if isinstance(node, ast.Attribute)
+                and node.attr == "battle_round"
+                and isinstance(node.value, ast.Name)
+                and node.value.id == "state"
+            )
+            assert not current_round_reads, function_name
+    for name in ("fight_historical_eligibility.py", "lifecycle_state_validation.py"):
+        tree = ast.parse((engine / name).read_text(encoding="utf-8"))
+        assert "FightsFirstRegistry.from_state" not in ast.unparse(tree)
+
+
 def _function_by_name(path: Path, name: str) -> tuple[Path, ast.FunctionDef]:
     for source_path, tree in _parsed_sources(path):
         for node in ast.walk(tree):

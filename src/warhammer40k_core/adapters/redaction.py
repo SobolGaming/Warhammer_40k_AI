@@ -542,6 +542,18 @@ def _public_event_payload(
     payload: JsonValue,
     viewer: ViewerContext,
 ) -> JsonValue:
+    if event_type in {
+        "forced_fight_activation_queue_started",
+        "forced_fight_activation_queue_completed",
+    } and isinstance(payload, dict):
+        # These are internal continuation snapshots, not a viewer projection.
+        return validate_json_value(
+            {
+                key: value
+                for key, value in payload.items()
+                if key not in {"suspended_state", "resumed_state", "fights_first_registry"}
+            }
+        )
     if event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:
         return _public_primary_mission_boundary_checkpoint_payload(payload, viewer=viewer)
     if event_type == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:

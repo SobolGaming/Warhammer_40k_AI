@@ -4575,6 +4575,85 @@ AI:
 - Reserve-placement search creates attempted placement payload.
 - Engine validates Strategic Reserves restrictions, coherency, and battlefield placement before mutation.
 
+## Order 19 (P12): Consolidation and forced opponent responses
+
+P12 reuses `submit_movement_proposal`, `proposal_kind: "consolidate"`, the existing
+modes, canonical target IDs or `objective_id`, and `PathWitness`. No new decision
+type or adapter mutation is introduced. Objective eligibility measures closest
+parts within 3 inches; final range uses the marker disk or complete mission terrain
+footprint. Each moved model must reach the closest selected enemy unit in
+Ongoing/Engaging mode if possible. Objective mode requires each moved model to
+reach objective range if possible, or move closer when impossible. Ongoing
+base-contact/prior-engagement constraints, Engaging all-target engagement,
+Objective final unengaged/in-range state, path legality and rules-unit coherency
+also apply. Closest selected units are determined before movement, including ties.
+
+Mandatory-endpoint queries use immutable, bounded-cache geometry/policy snapshots.
+Successful queries contain a witness checked by the ordinary path and terrain
+validators. Only a proven distance bound grants an unreachable exemption. A
+rotation-conservative circumscribed-radius bound covers circular, oval and
+rectangular bases; horizontal-only policies omit the vertical cost. The shared
+512-entry cache includes the complete geometry and movement policy. A
+bounded search that cannot establish either answer returns typed invalid
+`consolidation_reachability_unresolved`, never an impossibility verdict. A caller
+may retry with a compliant endpoint or decline. Other new per-model diagnostics are
+`consolidation_model_must_reach_required_endpoint`,
+`moved_model_not_closer_to_closest_selected_unit`, and
+`objective_consolidation_model_not_closer`. Existing rule-invalid recording and
+fresh-request retry semantics apply. Queries use peers' proposed final positions
+and the submitted path's movement permissions; adapters cannot supply verdicts.
+
+Accepted Ongoing/Engaging consolidation freezes the physically engaged, living,
+not-yet-selected enemy rules-unit inventory and requests `select_fight_activation`
+from its owner one unit at a time. That owner is the consolidating player's
+opponent, including when the inactive player consolidates. Existing Normal/Overrun
+options, attack decisions and continuations remain authoritative; passing a forced
+selection is unavailable. Resolved selections enter ordinary Fight history and
+cannot be selected twice.
+
+Forced eligibility is recorded as `eligibility_reasons: [ ..., "forced_activation" ]`.
+It does not imply `engaged_at_fight_step_start`: consolidation responses retain the
+original Fight snapshot. A newly engaged unit can choose Normal or Overrun, while a
+unit engaged at the original start and still engaged has Normal only. An eligible
+forced unit that subsequently loses engagement retains its Overrun activation.
+Restore derives the response actor from canonical unit ownership before rebuilding
+options, and rejects unknown, friendly or mixed-owner response inventories.
+
+All Fight movement rejects a path that leaves its initial pose and returns to it
+with `closed_loop_fight_movement`, including rotation away and back. Repeated
+identical poses remain valid stationary evidence for standalone and attached units.
+Adapters must preserve the full witness; endpoint equality cannot hide movement.
+
+`ForcedFightActivationContext.source_phase` is `fight` for these responses, and
+`transport_unit_instance_id` is null only in that context. Shock Disembark retains
+its required Transport identity. Source IDs are
+`gw-11e-core-fight:consolidation-move` and
+`gw-11e-core-fight:ongoing-consolidation-erratum`, with the completed movement event
+as `trigger_event_id`.
+
+Internal `FightPhaseState` persistence may carry one `suspended_state`, only for a
+Fight-phase forced queue; nested forced suspension is invalid. Queue-start and
+completion engine events carry `suspended_state` and `resumed_state` for restore
+authentication. Shared redaction removes both from public event projections. Public
+source contexts/options/selection records keep their existing viewer policy.
+Request, option, request-event and waiting-status round fields come from the
+owning Fight state, including historical reconstruction after later turns or rounds.
+Consolidation responses retain the suspended Fight state's Fights First registry.
+A forced queue that starts a new Fight step (Shock Disembark) records its initial
+`fights_first_registry` in the internal queue-start event; shared redaction removes
+this snapshot too. Restore uses these frozen registries rather than current
+persisting effects, which may have expired. Exact historical round/context and
+request comparisons remain mandatory; completed earlier-round queues are validated.
+Completion preserves the original step, next player, ordering band, movement
+completion and attack continuations, while retaining forced selections and
+allocation history. Restore authenticates the movement, queue inventory, decision
+ordering, suspension and completion snapshots.
+The ordinary continuation is reconstructed from the preceding phase-start and
+Fight-step history, accepted selections/passes/interrupts, completed activations,
+movement decisions and allocation events. Queue snapshots must equal that complete
+state. Resumption adds only authenticated forced selections, allocations and
+Overrun completions; matching altered suspended/resumed copies are insufficient.
+
 ## Summary Rule
 
 The adapter boundary is a choice boundary, not a rules boundary.

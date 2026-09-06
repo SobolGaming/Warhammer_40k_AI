@@ -7,6 +7,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256, validate_sha256_hex
+from warhammer40k_core.core.fight_eligibility import FightEligibilityKind as FightEligibilityKind
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
 from warhammer40k_core.core.ruleset import RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -45,12 +46,6 @@ class FightPhaseStepKind(StrEnum):
     FIGHT = "fight"
     CONSOLIDATE = "consolidate"
     END = "end"
-
-
-class FightEligibilityKind(StrEnum):
-    CHARGED_THIS_TURN = "charged_this_turn"
-    CURRENTLY_ENGAGED = "currently_engaged"
-    ENGAGED_AT_FIGHT_STEP_START = "engaged_at_fight_step_start"
 
 
 class FightOrderingBandKind(StrEnum):

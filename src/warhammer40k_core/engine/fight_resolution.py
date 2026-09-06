@@ -24,6 +24,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.consolidation_objectives import legal_consolidation_objective_ids
 from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
     parameterized_decision_option,
@@ -79,6 +80,11 @@ from warhammer40k_core.engine.fight_geometry import (
 from warhammer40k_core.engine.fight_movement_target_authority import (
     selectable_enemy_unit_ids_in_canonical_inventory,
 )
+from warhammer40k_core.engine.fight_movement_witness import (
+    closed_loop_fight_model_id,
+    fight_movement_path_violation,
+    validate_fight_witness_shape,
+)
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
@@ -129,7 +135,6 @@ from warhammer40k_core.geometry.pathing import (
     PathWitness,
     PathWitnessPayload,
     TerrainPathLegalityResult,
-    is_degenerate_endpoint_only_real_movement_path,
 )
 from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
@@ -403,19 +408,7 @@ class FightMovementProposal:
                 message="Fight movement target submissions require a PathWitness.",
                 field="witness",
             )
-        endpoint_only_model_id = _endpoint_only_model_id(self.witness)
-        if endpoint_only_model_id is not None:
-            return ProposalValidationResult.invalid(
-                proposal_request_id=request.request_id,
-                proposal_kind=request.proposal_kind,
-                violation_code="endpoint_only_path",
-                message="Fight movement PathWitness must not repeat only endpoint poses.",
-                field="witness",
-            )
-        return ProposalValidationResult.valid(
-            proposal_request_id=request.request_id,
-            proposal_kind=request.proposal_kind,
-        )
+        return validate_fight_witness_shape(request, self.witness)
 
     def to_payload(self) -> FightMovementProposalPayload:
         payload: FightMovementProposalPayload = {
@@ -547,6 +540,7 @@ class FightMovementResolution:
             all(result.is_valid for result in self.path_validation_results)
             and all(result.is_valid for result in self.terrain_path_legality_results)
             and self.rollback_record is None
+            and closed_loop_fight_model_id(self.witness) is None
         )
 
     def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
@@ -1173,34 +1167,15 @@ def fight_movement_resolution_violation(
     ruleset_descriptor: RulesetDescriptor,
     state: GameState | None = None,
 ) -> ProposalValidationResult | None:
-    for path_result in resolution.path_validation_results:
-        if not path_result.is_valid:
-            path_violation = path_result.violations[0]
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code=path_violation.violation_code,
-                message=path_violation.message,
-                field="witness",
-            )
-    for terrain_result in resolution.terrain_path_legality_results:
-        if not terrain_result.is_valid:
-            terrain_violation = terrain_result.violations[0]
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code=terrain_violation.violation_code,
-                message=terrain_violation.message,
-                field="witness",
-            )
-    if resolution.rollback_record is not None:
-        return ProposalValidationResult.invalid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-            violation_code="unit_coherency_invalid",
-            message="Fight movement endpoint violates unit coherency.",
-            field="witness",
-        )
+    path_violation = fight_movement_path_violation(
+        request=proposal_request,
+        witness=resolution.witness,
+        path_results=resolution.path_validation_results,
+        terrain_results=resolution.terrain_path_legality_results,
+        coherency_invalid=resolution.rollback_record is not None,
+    )
+    if path_violation is not None:
+        return path_violation
     if proposal.is_no_move_choice:
         return None
     if proposal.proposal_kind is ProposalKind.PILE_IN:
@@ -1293,10 +1268,11 @@ def legal_consolidation_modes(
         state=state,
     ):
         return (ConsolidationModeKind.ENGAGING,)
-    if _objective_markers_within_distance(
-        unit_placement=unit_placement,
-        objective_markers=objective_markers,
-        distance_inches=CONSOLIDATE_DISTANCE_INCHES,
+    if legal_consolidation_objective_ids(
+        scenario=scenario,
+        placements=unit_placement.model_placements,
+        markers=objective_markers,
+        state=state,
     ):
         return (ConsolidationModeKind.OBJECTIVE,)
     return ()
@@ -1816,105 +1792,14 @@ def _consolidate_rule_validation(
     proposal: FightMovementProposal,
     state: GameState | None,
 ) -> ProposalValidationResult:
-    if proposal.consolidation_mode is None:
-        return ProposalValidationResult.invalid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-            violation_code="consolidation_mode_required",
-            message="Consolidation movement requires a consolidation mode.",
-            field="consolidation_mode",
-        )
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    physically_engaged_ids = scenario_physically_engaged_enemy_rules_unit_ids(
+    from warhammer40k_core.engine.consolidation_validation import validate_consolidation
+
+    return validate_consolidation(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        unit_instance_id=proposal.unit_instance_id,
-    )
-    selectable_enemy_ids = _enemy_unit_ids_for_placement(
-        scenario=scenario,
-        unit_placement=unit_placement,
-    )
-    engaged = selectable_enemy_unit_ids_in_canonical_inventory(
-        scenario=scenario,
-        selectable_enemy_ids=selectable_enemy_ids,
-        canonical_inventory=physically_engaged_ids,
-    )
-    if physically_engaged_ids:
-        if not engaged:
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="consolidation_no_selectable_engaged_target",
-                message="Destroyed-only physical Engagement grants no Consolidation target.",
-                field="consolidation_mode",
-            )
-        if proposal.consolidation_mode is not ConsolidationModeKind.ONGOING:
-            return _invalid_consolidation_mode(proposal_request, "ongoing")
-        if set(proposal.consolidate_target_unit_instance_ids) != set(engaged):
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="ongoing_consolidation_targets_must_be_complete",
-                message="Ongoing Consolidation must select every engaged enemy unit.",
-                field="consolidate_target_unit_instance_ids",
-            )
-        return ProposalValidationResult.valid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-        )
-    enemies_within_3 = _enemy_unit_ids_within_distance(
-        scenario=scenario,
-        unit_placement=unit_placement,
-        distance_inches=CONSOLIDATE_ENEMY_DISTANCE_INCHES,
+        proposal_request=proposal_request,
+        proposal=proposal,
         state=state,
-    )
-    if enemies_within_3:
-        if proposal.consolidation_mode is not ConsolidationModeKind.ENGAGING:
-            return _invalid_consolidation_mode(proposal_request, "engaging")
-        selected = set(proposal.consolidate_target_unit_instance_ids)
-        if not selected or selected - set(enemies_within_3):
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="engaging_consolidation_target_not_legal",
-                message=(
-                    "Engaging Consolidation requires one or more enemy targets within 3 inches."
-                ),
-                field="consolidate_target_unit_instance_ids",
-            )
-        return ProposalValidationResult.valid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-        )
-    objective_ids = {
-        marker.objective_marker_id
-        for marker in _objective_markers_from_context(proposal_request)
-        if _unit_within_objective_marker(
-            unit_placement=unit_placement,
-            objective_marker=marker,
-        )
-    }
-    if objective_ids:
-        if proposal.consolidation_mode is not ConsolidationModeKind.OBJECTIVE:
-            return _invalid_consolidation_mode(proposal_request, "objective")
-        if proposal.objective_id not in objective_ids:
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code="objective_consolidation_target_not_legal",
-                message="Objective Consolidation requires one objective marker within range.",
-                field="objective_id",
-            )
-        return ProposalValidationResult.valid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-        )
-    return ProposalValidationResult.invalid(
-        proposal_request_id=proposal_request.request_id,
-        proposal_kind=proposal_request.proposal_kind,
-        violation_code="consolidation_no_legal_mode",
-        message="Consolidation proposal has no legal mode.",
-        field="consolidation_mode",
     )
 
 
@@ -1928,7 +1813,7 @@ def _pile_in_endpoint_validation(
     state: GameState | None,
 ) -> ProposalValidationResult | None:
     before = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    base_contact_violation = _base_contact_movement_violation(
+    base_contact_violation = fight_base_contact_movement_violation(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         before=before,
@@ -1936,8 +1821,8 @@ def _pile_in_endpoint_validation(
         state=state,
     )
     if base_contact_violation is not None:
-        return _endpoint_invalid(proposal_request, base_contact_violation, "witness")
-    closer_violation = _moved_models_closer_to_targets_violation(
+        return fight_movement_endpoint_invalid(proposal_request, base_contact_violation, "witness")
+    closer_violation = fight_moved_models_closer_to_targets_violation(
         scenario=scenario,
         before=before,
         after=after,
@@ -1945,16 +1830,18 @@ def _pile_in_endpoint_validation(
         state=state,
     )
     if closer_violation is not None:
-        return _endpoint_invalid(proposal_request, closer_violation, "witness")
-    if not _unit_is_engaged_with_any(
+        return fight_movement_endpoint_invalid(proposal_request, closer_violation, "witness")
+    if not fight_unit_is_engaged_with_any(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=after,
         target_unit_instance_ids=proposal.pile_in_target_unit_instance_ids,
         state=state,
     ):
-        return _endpoint_invalid(proposal_request, "pile_in_unit_not_engaged_after", "witness")
-    continuing_violation = _continuing_engagement_violation(
+        return fight_movement_endpoint_invalid(
+            proposal_request, "pile_in_unit_not_engaged_after", "witness"
+        )
+    continuing_violation = fight_continuing_engagement_violation(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         before=before,
@@ -1962,7 +1849,7 @@ def _pile_in_endpoint_validation(
         state=state,
     )
     if continuing_violation is not None:
-        return _endpoint_invalid(proposal_request, continuing_violation, "witness")
+        return fight_movement_endpoint_invalid(proposal_request, continuing_violation, "witness")
     return None
 
 
@@ -1975,77 +1862,16 @@ def _consolidate_endpoint_validation(
     after: UnitPlacement,
     state: GameState | None,
 ) -> ProposalValidationResult | None:
-    before = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    base_contact_violation = _base_contact_movement_violation(
+    from warhammer40k_core.engine.consolidation_validation import validate_consolidation_endpoint
+
+    return validate_consolidation_endpoint(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
-        before=before,
+        proposal_request=proposal_request,
+        proposal=proposal,
         after=after,
         state=state,
     )
-    if base_contact_violation is not None:
-        return _endpoint_invalid(proposal_request, base_contact_violation, "witness")
-    if proposal.consolidation_mode in {
-        ConsolidationModeKind.ONGOING,
-        ConsolidationModeKind.ENGAGING,
-    }:
-        closer_violation = _moved_models_closer_to_targets_violation(
-            scenario=scenario,
-            before=before,
-            after=after,
-            target_unit_instance_ids=proposal.consolidate_target_unit_instance_ids,
-            state=state,
-        )
-        if closer_violation is not None:
-            return _endpoint_invalid(proposal_request, closer_violation, "witness")
-        if proposal.consolidation_mode is ConsolidationModeKind.ONGOING:
-            continuing_violation = _continuing_engagement_violation(
-                scenario=scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                before=before,
-                after=after,
-                state=state,
-            )
-            if continuing_violation is not None:
-                return _endpoint_invalid(proposal_request, continuing_violation, "witness")
-        if proposal.consolidation_mode is ConsolidationModeKind.ENGAGING:
-            for target_id in proposal.consolidate_target_unit_instance_ids:
-                if not _unit_is_engaged_with_any(
-                    scenario=scenario,
-                    ruleset_descriptor=ruleset_descriptor,
-                    unit_placement=after,
-                    target_unit_instance_ids=(target_id,),
-                    state=state,
-                ):
-                    return _endpoint_invalid(
-                        proposal_request,
-                        "engaging_consolidation_target_not_engaged_after",
-                        "witness",
-                    )
-    if proposal.consolidation_mode is ConsolidationModeKind.OBJECTIVE:
-        attempted_scenario = _scenario_with_unit_placement(
-            scenario=scenario,
-            placement=after,
-        )
-        if scenario_physically_engaged_enemy_rules_unit_ids(
-            scenario=attempted_scenario,
-            ruleset_descriptor=ruleset_descriptor,
-            unit_instance_id=proposal.unit_instance_id,
-        ):
-            return _endpoint_invalid(
-                proposal_request,
-                "objective_consolidation_unit_engaged_after",
-                "witness",
-            )
-        marker = _objective_marker_by_id(
-            proposal_request=proposal_request,
-            objective_id=proposal.objective_id,
-        )
-        if not _unit_within_objective_marker(unit_placement=after, objective_marker=marker):
-            return _endpoint_invalid(
-                proposal_request, "objective_consolidation_not_in_range", "witness"
-            )
-    return None
 
 
 def _validate_fight_paths(
@@ -2062,7 +1888,7 @@ def _validate_fight_paths(
     path_results: list[PathValidationResult] = []
     terrain_results: list[TerrainPathLegalityResult] = []
     terrain_features = scenario.battlefield_state.terrain_features
-    terrain_volumes = _terrain_volumes_for_features(terrain_features)
+    terrain_volumes = fight_terrain_volumes_for_features(terrain_features)
     unit = scenario.unit_instance_for_placement(before)
     for placement in before.model_placements:
         moving_model = geometry_model_for_placement(
@@ -2187,7 +2013,7 @@ def _endpoint_witness(
         ),
         "engaged_after_unit_ids": list(
             _engaged_enemy_unit_ids(
-                scenario=_scenario_with_unit_placement(scenario=scenario, placement=after),
+                scenario=fight_scenario_with_unit_placement(scenario=scenario, placement=after),
                 ruleset_descriptor=ruleset_descriptor,
                 unit_placement=after,
                 state=state,
@@ -2196,7 +2022,7 @@ def _endpoint_witness(
     }
 
 
-def _scenario_with_unit_placement(
+def fight_scenario_with_unit_placement(
     *,
     scenario: BattlefieldScenario,
     placement: UnitPlacement,
@@ -2208,7 +2034,7 @@ def _scenario_with_unit_placement(
     )
 
 
-def _base_contact_movement_violation(
+def fight_base_contact_movement_violation(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -2238,7 +2064,7 @@ def _base_contact_movement_violation(
     return None
 
 
-def _moved_models_closer_to_targets_violation(
+def fight_moved_models_closer_to_targets_violation(
     *,
     scenario: BattlefieldScenario,
     before: UnitPlacement,
@@ -2248,7 +2074,7 @@ def _moved_models_closer_to_targets_violation(
 ) -> str | None:
     if not target_unit_instance_ids:
         return "target_unit_required"
-    after_scenario = _scenario_with_unit_placement(scenario=scenario, placement=after)
+    after_scenario = fight_scenario_with_unit_placement(scenario=scenario, placement=after)
     for placement in after.model_placements:
         before_pose = _model_pose(before, placement.model_instance_id)
         if placement.pose == before_pose:
@@ -2272,7 +2098,7 @@ def _moved_models_closer_to_targets_violation(
     return None
 
 
-def _continuing_engagement_violation(
+def fight_continuing_engagement_violation(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -2280,7 +2106,7 @@ def _continuing_engagement_violation(
     after: UnitPlacement,
     state: GameState | None,
 ) -> str | None:
-    after_scenario = _scenario_with_unit_placement(scenario=scenario, placement=after)
+    after_scenario = fight_scenario_with_unit_placement(scenario=scenario, placement=after)
     for before_model in _geometry_models_for_unit_placement(
         scenario=scenario, unit_placement=before, state=state
     ):
@@ -2317,7 +2143,7 @@ def _continuing_engagement_violation(
     return None
 
 
-def _unit_is_engaged_with_any(
+def fight_unit_is_engaged_with_any(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -2691,63 +2517,7 @@ def _required_primary_melee_model_ids(
     return required
 
 
-def _objective_markers_within_distance(
-    *,
-    unit_placement: UnitPlacement,
-    objective_markers: tuple[ObjectiveMarker, ...],
-    distance_inches: float,
-) -> tuple[str, ...]:
-    return tuple(
-        marker.objective_marker_id
-        for marker in objective_markers
-        if _unit_distance_to_objective_marker(
-            unit_placement=unit_placement,
-            objective_marker=marker,
-        )
-        <= distance_inches
-    )
-
-
-def _unit_within_objective_marker(
-    *,
-    unit_placement: UnitPlacement,
-    objective_marker: ObjectiveMarker,
-) -> bool:
-    return (
-        _unit_distance_to_objective_marker(
-            unit_placement=unit_placement,
-            objective_marker=objective_marker,
-        )
-        <= objective_marker.control_horizontal_inches
-    )
-
-
-def _unit_distance_to_objective_marker(
-    *,
-    unit_placement: UnitPlacement,
-    objective_marker: ObjectiveMarker,
-) -> float:
-    return min(
-        placement.pose.position.distance_2d_to(
-            Pose.at(objective_marker.x_inches, objective_marker.y_inches).position
-        )
-        for placement in unit_placement.model_placements
-    )
-
-
-def _objective_marker_by_id(
-    *,
-    proposal_request: MovementProposalRequest,
-    objective_id: str | None,
-) -> ObjectiveMarker:
-    requested_id = _validate_identifier("objective_id", objective_id)
-    for marker in _objective_markers_from_context(proposal_request):
-        if marker.objective_marker_id == requested_id:
-            return marker
-    raise GameLifecycleError("Consolidation objective_id is not in request context.")
-
-
-def _objective_markers_from_context(
+def fight_objective_markers_from_context(
     proposal_request: MovementProposalRequest,
 ) -> tuple[ObjectiveMarker, ...]:
     context = _proposal_context(proposal_request)
@@ -3071,7 +2841,7 @@ def _invalid_melee_validation(
     )
 
 
-def _invalid_consolidation_mode(
+def invalid_consolidation_mode(
     proposal_request: MovementProposalRequest,
     expected_mode: str,
 ) -> ProposalValidationResult:
@@ -3084,7 +2854,7 @@ def _invalid_consolidation_mode(
     )
 
 
-def _endpoint_invalid(
+def fight_movement_endpoint_invalid(
     proposal_request: MovementProposalRequest,
     violation_code: str,
     field: str,
@@ -3182,15 +2952,7 @@ def _validate_fight_witness_matches_unit(
             raise GameLifecycleError("Fight movement witness must start at current model poses.")
 
 
-def _endpoint_only_model_id(witness: PathWitness) -> str | None:
-    for model_id in witness.model_ids():
-        path = witness.poses_for_model(model_id)
-        if is_degenerate_endpoint_only_real_movement_path(path):
-            return model_id
-    return None
-
-
-def _terrain_volumes_for_features(
+def fight_terrain_volumes_for_features(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> tuple[TerrainVolume, ...]:
     volumes: list[TerrainVolume] = []

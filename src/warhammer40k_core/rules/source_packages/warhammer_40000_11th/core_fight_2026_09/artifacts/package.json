@@ -1,0 +1,223 @@
+{
+  "artifact_schema": "core-v2-core-fight-source-v1",
+  "source_package_id": "gw-11e-core-fight",
+  "source_version": "maintained-app-mirrors-observed-2026-09-05",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-fight:consolidation-move",
+      "section_id": "12.08",
+      "source_text": "When eligible: It is the Fight phase and your unit was eligible to fight this phase.\nMaximum distance: 3\"\nEffect: Your unit moves as described in Moving (03).\nBefore moving: Select consolidation mode:\nOngoing Consolidation: If your unit is engaged, you must select this mode and select every enemy unit it is engaged with.\nEngaging Consolidation: Otherwise, if your unit is within 3\" of one or more enemy units, you must select this mode and select one or more of those enemy units.\nObjective Consolidation: Otherwise, if your unit is within 3\" of one or more objectives, you must select this mode and select one of those objectives.\nWhile moving:\nOngoing Consolidation: Models in base‑contact with one or more enemy models cannot be moved. Each model that is moved must end its move closer to the closest selected enemy unit, and engaged with it if possible.\nEngaging Consolidation: Each model that is moved must end its move closer to the closest selected enemy unit, and engaged with it if possible.\nObjective Consolidation: Each model that is moved must end its move within range of the selected objective if possible, or closer to it if not.\nAfter moving:\nOngoing Consolidation: Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit.\nEngaging Consolidation: Your unit must be engaged with all of the selected enemy units. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight (12.04).\nObjective Consolidation: Your unit must be unengaged and within range of the selected objective.",
+      "transcription_sha256": "cfcace8bd96251a0b11c8eb24ccb20ea64a69f72d33a9a7cc8a6993c17f7ae89",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_validation:validate_consolidation",
+        "warhammer40k_core.engine.consolidation_model_constraints:consolidation_model_violation",
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-fight:ongoing-consolidation-erratum",
+      "section_id": "Errata",
+      "source_text": "Each model that started this move engaged with an enemy unit must still be engaged with that enemy unit. If one or more enemy units engaged with your unit have not been selected to fight this phase, your opponent must select each of those units, one at a time; when each is selected, it becomes eligible to fight and is selected to fight",
+      "transcription_sha256": "97f1acc3a1e4eda12ffcb286908efb993ce95800ba33ad0a3d526964cb8aeafd",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-fight:consolidate-step",
+      "section_id": "12.07",
+      "source_text": "Both players make consolidation moves (12.08) with all of their eligible units they choose to move. The ‘Eligible If’ section describes which units are eligible to make such moves. The player whose turn it is resolves all of their moves first, followed by their opponent. Each unit cannot make more than one consolidation move during this step.",
+      "transcription_sha256": "4e538c9393f4a2d434ef61e4657be18687b4f45c5b20729015f97721c5a0ca0b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.fight:FightPhaseHandler"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-fight:consolidation-move",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cfcace8bd96251a0b11c8eb24ccb20ea64a69f72d33a9a7cc8a6993c17f7ae89",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "2c0ef0867210dfcca5cb9580b0e7eb680a60dfa159c65d5b88d4b109383acc88",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_validation:validate_consolidation",
+        "warhammer40k_core.engine.consolidation_model_constraints:consolidation_model_violation",
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ],
+      "evidence_id": "core-fight-review:consolidation-move",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P12 12.08 consolidation-move",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight:consolidation-move",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cfcace8bd96251a0b11c8eb24ccb20ea64a69f72d33a9a7cc8a6993c17f7ae89",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "25194f1eb4ba53e9bc431353e1dc921d3dd17c40a96d8cc4b3ee91c7e17dcfa3",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_validation:validate_consolidation",
+        "warhammer40k_core.engine.consolidation_model_constraints:consolidation_model_violation",
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ],
+      "evidence_id": "core-fight-mirror:consolidation-move",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
+      "review_audit_row_id": "consolidation-move",
+      "review_audit_source_observation_sha256": "8665696b9e9e4e57a4c2c6c4aa7e6dc4a9a4d2f0cfb8e1b6ac471068e6becc1e",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 12.08 consolidation-move",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/12-fight-phase",
+      "observed_at": "2026-09-05T18:32:47-04:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight:ongoing-consolidation-erratum",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "97f1acc3a1e4eda12ffcb286908efb993ce95800ba33ad0a3d526964cb8aeafd",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "761ea1f5d8cf9ce36bc34d34cf64d3db3621e093fe13cc33560071cfb59d2cb9",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ],
+      "evidence_id": "core-fight-review:ongoing-consolidation-erratum",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P12 Errata ongoing-consolidation-erratum",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight:ongoing-consolidation-erratum",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "97f1acc3a1e4eda12ffcb286908efb993ce95800ba33ad0a3d526964cb8aeafd",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "1f548d6c73dc3b9b2dc329a478b19d3561f0c5f7c1c3cb8049f26b7da40cdeee",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.consolidation_fight_queue:start_consolidation_fight_queue"
+      ],
+      "evidence_id": "core-fight-mirror:ongoing-consolidation-erratum",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
+      "review_audit_row_id": "ongoing-consolidation-erratum",
+      "review_audit_source_observation_sha256": "18192e0938a80171ca232388ba200ccc9e80973165518340bd4888e3e388e211",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions Errata ongoing-consolidation-erratum",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight:consolidate-step",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "4e538c9393f4a2d434ef61e4657be18687b4f45c5b20729015f97721c5a0ca0b",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "b8b6e8dfd0d47f3a7437f00dea83e4428f62edaa4a6ec2b9abd67f969f07b9b7",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.fight:FightPhaseHandler"
+      ],
+      "evidence_id": "core-fight-review:consolidate-step",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P12 12.07 consolidate-step",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight:consolidate-step",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "4e538c9393f4a2d434ef61e4657be18687b4f45c5b20729015f97721c5a0ca0b",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "801d08bc103452544daa2ff0c8cfabbbd373dc74b0501d7a572a51bab97d7b1c",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.fight:FightPhaseHandler"
+      ],
+      "evidence_id": "core-fight-mirror:consolidate-step",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
+      "review_audit_row_id": "consolidate-step",
+      "review_audit_source_observation_sha256": "d1298b6a5b4e9db03f27c9a77b0611d6129b203dfc9c9e031e64e3401ef6119c",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 12.07 consolidate-step",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/12-fight-phase",
+      "observed_at": "2026-09-05T18:32:47-04:00",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "c23bfa0f4e85c499b3736907db22bcf9ccf792ade1c4facf52482773da2e511e"
+}

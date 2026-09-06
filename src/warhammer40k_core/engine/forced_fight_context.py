@@ -17,7 +17,7 @@ class ForcedFightActivationContextPayload(TypedDict):
     trigger_event_id: str
     source_phase: str
     source_unit_instance_id: str
-    transport_unit_instance_id: str
+    transport_unit_instance_id: str | None
     selecting_player_id: str
     eligible_unit_instance_ids: list[str]
 
@@ -29,7 +29,7 @@ class ForcedFightActivationContext:
     trigger_event_id: str
     source_phase: BattlePhaseKind
     source_unit_instance_id: str
-    transport_unit_instance_id: str
+    transport_unit_instance_id: str | None
     selecting_player_id: str
     eligible_unit_instance_ids: tuple[str, ...]
 
@@ -53,14 +53,16 @@ class ForcedFightActivationContext:
                 self.source_unit_instance_id,
             ),
         )
-        object.__setattr__(
-            self,
-            "transport_unit_instance_id",
-            _validate_identifier(
+        if self.transport_unit_instance_id is not None:
+            object.__setattr__(
+                self,
                 "transport_unit_instance_id",
-                self.transport_unit_instance_id,
-            ),
-        )
+                _validate_identifier("transport_unit_instance_id", self.transport_unit_instance_id),
+            )
+        elif self.source_phase != BattlePhaseKind.FIGHT:
+            raise GameLifecycleError(
+                "Forced Fight outside the Fight phase requires Transport identity."
+            )
         object.__setattr__(
             self,
             "selecting_player_id",
