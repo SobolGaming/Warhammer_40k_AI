@@ -4,11 +4,15 @@ import copy
 import hashlib
 import json
 from dataclasses import replace
+from datetime import date
 from pathlib import Path
 from typing import cast
 
 import pytest
+from tools import build_faction_source_governance as governance_builder
 
+from warhammer40k_core.core.ruleset import RulesetId
+from warhammer40k_core.rules.data_package import CatalogVersion, RulesetBundle
 from warhammer40k_core.rules.faction_source_governance import (
     FACTION_SOURCE_POLICY_ID,
     FactionSourceError,
@@ -17,8 +21,18 @@ from warhammer40k_core.rules.faction_source_governance import (
     observation_fingerprint,
     validate_faction_source_audit_bytes,
 )
-from warhammer40k_core.rules.faction_source_package import faction_source_package
+from warhammer40k_core.rules.faction_source_package import (
+    faction_source_catalog,
+    faction_source_package,
+)
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+from warhammer40k_core.rules.source_authority_registry import (
+    SourceAuthorityRegistryError,
+    SourcePackageAuthorization,
+    source_authority_registry,
+)
+from warhammer40k_core.rules.source_catalog import SourceCatalog, SourceCatalogError
+from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_evidence import (
     RuleEvidenceError,
     RuleEvidenceRecord,
@@ -334,3 +348,221 @@ def test_f00_unknown_base_remains_an_explicit_unresolved_candidate() -> None:
     assert not candidate.observations[2].geometry[0].fieldability_certified
     with pytest.raises(FactionSourceError, match="pin"):
         load_faction_source_audit_bytes(_bytes(payload))
+
+
+@pytest.mark.parametrize("document_id", ["aaa-duplicate", "zzz-duplicate"])
+@pytest.mark.parametrize("alter_text", [False, True])
+def test_source_catalog_rejects_duplicate_source_ids_across_documents(
+    document_id: str, alter_text: bool
+) -> None:
+    catalog = faction_source_package().source_catalog
+    document = catalog.documents[0]
+    source = document.source_texts[0]
+    duplicate = replace(
+        document,
+        document_id=replace(document.document_id, document_id=document_id),
+        source_texts=(
+            RuleSourceText.from_raw(
+                source_id=source.source_id,
+                raw_text="Unreviewed duplicate text." if alter_text else source.raw_text,
+                objective_scope=source.objective_scope,
+            ),
+        ),
+    )
+    with pytest.raises(SourceCatalogError, match="duplicate source IDs"):
+        replace(catalog, documents=(*catalog.documents, duplicate))
+
+
+@pytest.mark.parametrize(
+    "mutation", ["catalog_version", "source_date", "document_id", "document_title", "bundle"]
+)
+def test_f00_rejects_catalog_identity_drift_with_unchanged_package_and_text(mutation: str) -> None:
+    package = faction_source_package()
+    catalog = package.source_catalog
+    document = catalog.documents[0]
+    if mutation == "catalog_version":
+        catalog = replace(
+            catalog, catalog_version=replace(catalog.catalog_version, version_id="drift")
+        )
+    elif mutation == "source_date":
+        catalog = replace(
+            catalog,
+            catalog_version=CatalogVersion.dated(
+                version_id=catalog.catalog_version.version_id, source_date=date(2026, 9, 6)
+            ),
+        )
+    elif mutation == "bundle":
+        catalog = replace(
+            catalog,
+            ruleset_bundles=(
+                RulesetBundle(
+                    bundle_id="unreviewed-bundle",
+                    ruleset_id=RulesetId.warhammer_40000_eleventh(version="f00-test"),
+                    package_id=catalog.package_id,
+                    catalog_version=catalog.catalog_version,
+                    source_document_ids=(document.document_id,),
+                ),
+            ),
+        )
+    else:
+        document = (
+            replace(document, title="Unreviewed title")
+            if mutation == "document_title"
+            else replace(
+                document,
+                document_id=replace(document.document_id, document_id="unreviewed-document"),
+            )
+        )
+        catalog = replace(catalog, documents=(document, *catalog.documents[1:]))
+    with pytest.raises(RuleEvidenceError, match="catalog"):
+        replace(package, source_catalog=catalog)
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "../../../../tmp/probe.pdf",
+        "./probe.pdf",
+        "one/../probe.pdf",
+        "one//probe.pdf",
+        "one\\probe.pdf",
+        "C:/probe.pdf",
+        "probe\x00.pdf",
+        "probe\n.pdf",
+        "probe\x7f.pdf",
+        "%2e%2e/probe.pdf",
+        "one%2f..%2fprobe.pdf",
+    ],
+)
+def test_f00_rejects_paired_official_url_and_artifact_path_escape(relative_path: str) -> None:
+    payload = _payload()
+    official = cast(list[dict[str, object]], payload["official_sources"])[0]
+    official["source_url"] = f"https://assets.warhammer-community.com/{relative_path}"
+    official["artifact_path"] = f"data/raw/faction_packs/{relative_path}"
+    with pytest.raises(FactionSourceError):
+        validate_faction_source_audit_bytes(_bytes(payload))
+
+
+def test_f00_official_artifact_rejects_symlink_escape(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _payload()
+    official = cast(list[dict[str, object]], payload["official_sources"])[0]
+    outside = tmp_path / "outside.pdf"
+    outside.write_bytes(b"outside artifact root")
+    official["sha256"] = hashlib.sha256(outside.read_bytes()).hexdigest()
+    candidate = validate_faction_source_audit_bytes(_bytes(payload))
+    artifact = tmp_path / candidate.official_sources[0].artifact_path
+    artifact.parent.mkdir(parents=True)
+    artifact.symlink_to(outside)
+    monkeypatch.setattr(governance_builder, "ROOT", tmp_path)
+    with pytest.raises(FactionSourceError, match="inside root"):
+        governance_builder.validate_official_artifacts(candidate)
+
+
+@pytest.mark.parametrize("latest_observation", ["version_evidence", "page"])
+def test_f00_future_audit_cannot_reuse_previous_package_authorization(
+    latest_observation: str,
+) -> None:
+    payload = _payload()
+    payload["app_version"] = "947"
+    version = cast(dict[str, object], payload["version_evidence"])
+    version["statement"] = "Version 947\nReleased 2026-09-06."
+    version["transcription_sha256"] = hashlib.sha256(str(version["statement"]).encode()).hexdigest()
+    version["observed_at"] = "2026-09-06T00:00:00+00:00"
+    for row in _rows(payload):
+        row["app_version"] = "947"
+        row["observed_at"] = "2026-09-06T00:00:00+00:00"
+    latest = version if latest_observation == "version_evidence" else _rows(payload)[0]
+    # The completion date is determined in UTC, including the version observation.
+    latest["observed_at"] = "2026-09-06T23:30:00-02:00"
+    for row in _rows(payload):
+        _rehash(row)
+    candidate = validate_faction_source_audit_bytes(_bytes(payload))
+    catalog = faction_source_catalog(candidate)
+    assert catalog.package_id.version == "app-data-947-observed-2026-09-07"
+    assert catalog.catalog_version.version_id == catalog.package_id.version
+    assert catalog.catalog_version.source_date == "2026-09-07"
+
+    registry = source_authority_registry()
+    scope = registry.scope("warhammer_40000_11th_factions")
+    observations = {row.observation_id: row for row in candidate.observations}
+    updated_scope = replace(
+        scope,
+        audit_rows=tuple(
+            replace(
+                row,
+                source_observation_sha256=observations[row.row_id].source_observation_sha256,
+                identity_value=f"947@{observations[row.row_id].observed_at}",
+            )
+            for row in scope.audit_rows
+        ),
+    )
+    updated_registry = replace(
+        registry,
+        scopes=tuple(
+            updated_scope if row.scope_id == scope.scope_id else row for row in registry.scopes
+        ),
+    )
+    # All audit-row registrations now agree, but the retained package registration is stale.
+    with pytest.raises(FactionSourceError, match="source-package authorization"):
+        governance_builder.validate_registry(candidate, registry=updated_registry)
+    with pytest.raises(SourceAuthorityRegistryError, match="identity is not authorized"):
+        updated_registry.authorize_source_package(
+            scope_id=scope.scope_id,
+            namespace=catalog.package_id.namespace,
+            package_name=catalog.package_id.package_name,
+            version=catalog.package_id.version,
+            rule_source_ids=candidate.selected_source_ids,
+            catalog_sha256=catalog.catalog_sha256(),
+        )
+
+
+@pytest.mark.parametrize("mutation", ["catalog_hash", "inventory", "missing", "extra"])
+def test_f00_generator_checks_entire_package_registration(mutation: str) -> None:
+    registry = source_authority_registry()
+    scope = registry.scope("warhammer_40000_11th_factions")
+    package = scope.source_packages[0]
+    packages: tuple[SourcePackageAuthorization, ...]
+    if mutation == "catalog_hash":
+        packages = (replace(package, catalog_sha256="0" * 64),)
+    elif mutation == "inventory":
+        packages = (replace(package, allowed_rule_source_ids=package.allowed_rule_source_ids[:-1]),)
+    elif mutation == "missing":
+        packages = ()
+    else:
+        packages = (*scope.source_packages, replace(package, package_name="unreviewed"))
+    drifted = replace(
+        registry,
+        scopes=tuple(
+            replace(row, source_packages=packages) if row.scope_id == scope.scope_id else row
+            for row in registry.scopes
+        ),
+    )
+    with pytest.raises(FactionSourceError, match="source-package authorization"):
+        governance_builder.validate_registry(faction_source_audit(), registry=drifted)
+
+
+def test_f00_catalog_hash_is_canonical_across_document_order_and_payload_round_trip() -> None:
+    catalog = faction_source_package().source_catalog
+    reordered = replace(catalog, documents=tuple(reversed(catalog.documents)))
+    restored = SourceCatalog.from_payload(json.loads(json.dumps(reordered.to_payload())))
+    expected_hash = hashlib.sha256(
+        json.dumps(catalog.to_payload(), sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert catalog.catalog_sha256() == reordered.catalog_sha256() == restored.catalog_sha256()
+    assert catalog.catalog_sha256() == expected_hash
+
+
+def test_source_authorization_rejects_duplicate_inventory_before_set_comparison() -> None:
+    catalog = faction_source_package().source_catalog
+    source_ids = faction_source_audit().selected_source_ids
+    with pytest.raises(SourceAuthorityRegistryError, match="source IDs must be unique"):
+        source_authority_registry().authorize_source_package(
+            scope_id="warhammer_40000_11th_factions",
+            namespace=catalog.package_id.namespace,
+            package_name=catalog.package_id.package_name,
+            version=catalog.package_id.version,
+            rule_source_ids=(*source_ids, source_ids[0]),
+            catalog_sha256=catalog.catalog_sha256(),
+        )

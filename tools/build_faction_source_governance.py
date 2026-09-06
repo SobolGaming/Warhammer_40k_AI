@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 from pathlib import Path
 
 from warhammer40k_core.rules.faction_source_governance import (
@@ -13,8 +12,16 @@ from warhammer40k_core.rules.faction_source_governance import (
     FactionSourceError,
     load_faction_source_audit_bytes,
 )
-from warhammer40k_core.rules.faction_source_package import faction_source_package
-from warhammer40k_core.rules.source_authority_registry import source_authority_registry
+from warhammer40k_core.rules.faction_source_package import (
+    faction_source_catalog,
+    faction_source_package,
+)
+from warhammer40k_core.rules.source_authority_registry import (
+    SourceAuthorityRegistry,
+    SourcePackageAuthorization,
+    source_authority_registry,
+)
+from warhammer40k_core.rules.source_catalog import SourceCatalogError, SourceFileChecksum
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT_PATH = ROOT / "data/source_audits/maintained_app_mirrors/factions_2026_09_05.audit.json"
@@ -30,6 +37,7 @@ def review_markdown(audit: FactionSourceAudit) -> str:
         f"Policy: `{audit.policy_id}`. Selected App-data: **{audit.app_version}**, "
         f"locale `{audit.locale}`.",
         f"Retained artifact SHA-256: `{EXPECTED_FACTION_AUDIT_SHA256}`.",
+        f"Canonical source-catalog SHA-256: `{faction_source_catalog(audit).catalog_sha256()}`.",
         "",
         "These three complete observations exercise faction, detachment and datasheet package "
         "governance. They are a bounded source selection, not the F01 corpus reconciliation. "
@@ -66,12 +74,20 @@ def review_markdown(audit: FactionSourceAudit) -> str:
             "the shared non-Core objective terminology boundary.",
             "",
             "The source invariant is enforced at observation parsing, the reviewed byte pin, the "
-            "authority registry, RuleEvidenceRecord, and RuleSourcePackage. Recomputed hashes "
-            "alone "
-            "cannot authorize new text, owners, URLs or source identities. Conflicts, ambiguous "
-            "identity, incomplete observations, mixed versions/locales and excluded "
-            "classifications "
+            "authority registry, RuleEvidenceRecord, and RuleSourcePackage. Source IDs are "
+            "globally unique across documents. Package version/date derive from the audit; "
+            "the registry authenticates the full canonical catalog hash. Recomputed hashes "
+            "alone cannot authorize new text, owners, URLs, source identities or catalog metadata. "
+            "Conflicts, ambiguous identity, mixed versions/locales and excluded classifications "
             "fail closed. No site is fetched by the loader.",
+            "",
+            "Candidate validation checks structural completeness: schema, declared review "
+            "status, capture/suffix relationship and hashes. Human review establishes actual "
+            "provider-page completeness, authenticated by the immutable byte pin. A mutually "
+            "truncated capture and suffix can pass structural validation after rehashing, but "
+            "cannot pass the reviewed pin. Official artifact paths must be normalized relative "
+            "POSIX paths, and the shared checksum reader requires resolved containment beneath "
+            "the artifact root, including symlink targets.",
             "",
             "## Remaining work",
             "",
@@ -86,13 +102,21 @@ def review_markdown(audit: FactionSourceAudit) -> str:
 
 def validate_official_artifacts(audit: FactionSourceAudit) -> None:
     for source in audit.official_sources:
-        raw = (ROOT / source.artifact_path).read_bytes()
-        if hashlib.sha256(raw).hexdigest() != source.sha256:
+        try:
+            checksum = SourceFileChecksum.from_path(
+                root=ROOT / "data/raw/faction_packs", path=ROOT / source.artifact_path
+            )
+        except (SourceCatalogError, OSError) as exc:
+            raise FactionSourceError(f"Faction historical primary artifact: {exc}") from exc
+        if checksum.checksum_sha256 != source.sha256:
             raise FactionSourceError("Faction historical primary artifact hash drifted.")
 
 
-def validate_registry(audit: FactionSourceAudit) -> None:
-    scope = source_authority_registry().scope("warhammer_40000_11th_factions")
+def validate_registry(
+    audit: FactionSourceAudit, *, registry: SourceAuthorityRegistry | None = None
+) -> None:
+    authority = source_authority_registry() if registry is None else registry
+    scope = authority.scope("warhammer_40000_11th_factions")
     retained = {
         (
             audit.audit_id,
@@ -121,6 +145,18 @@ def validate_registry(audit: FactionSourceAudit) -> None:
     }
     if retained != registered:
         raise FactionSourceError("Faction authority registry does not match retained observations.")
+    catalog = faction_source_catalog(audit)
+    expected_package = SourcePackageAuthorization(
+        namespace=catalog.package_id.namespace,
+        package_name=catalog.package_id.package_name,
+        version=catalog.package_id.version,
+        allowed_rule_source_ids=tuple(sorted(audit.selected_source_ids)),
+        catalog_sha256=catalog.catalog_sha256(),
+    )
+    if scope.source_packages != (expected_package,):
+        raise FactionSourceError(
+            "Faction source-package authorization does not match its audit catalog."
+        )
 
 
 def main() -> None:

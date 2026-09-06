@@ -25,11 +25,11 @@ CORE_RULES_LEGACY_FORTY_K_APP_POLICY_ID = (
 )
 CORE_RULES_SOURCE_AUTHORITY_SCOPE: SourceAuthorityScope = "warhammer_40000_11th_core_rules"
 EXPECTED_SOURCE_AUTHORITY_REGISTRY_SHA256 = (
-    "93ae1c0371b95ea2affe1b6145c40ba3e7569dd9b802c609696f79ca97b4bcfa"
+    "056d7e5eeb1b3d6e99d271a0a65a4379dbc2f4f31e904e196e76b8cb1ea8b38e"
 )
 
 _REGISTRY_PATH = Path(__file__).with_name("source_authority_registry.json")
-_REGISTRY_SCHEMA = "core-v2-source-authority-registry-v1"
+_REGISTRY_SCHEMA = "core-v2-source-authority-registry-v2"
 _REGISTRY_ID = "core-rules-source-authority-registry-2026-09-02"
 
 
@@ -62,6 +62,7 @@ class SourcePackageAuthorization:
     package_name: str
     version: str
     allowed_rule_source_ids: tuple[str, ...]
+    catalog_sha256: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -196,6 +197,7 @@ class SourceAuthorityRegistry:
         package_name: str,
         version: str,
         rule_source_ids: tuple[str, ...],
+        catalog_sha256: str,
     ) -> None:
         scope = self.scope(scope_id)
         package = next(
@@ -217,7 +219,13 @@ class SourceAuthorityRegistry:
             )
         supplied_source_ids = set(rule_source_ids)
         registered_source_ids = set(package.allowed_rule_source_ids)
+        if len(rule_source_ids) != len(supplied_source_ids):
+            raise SourceAuthorityRegistryError("Source-package source IDs must be unique.")
         if supplied_source_ids == registered_source_ids:
+            if package.catalog_sha256 is not None and package.catalog_sha256 != catalog_sha256:
+                raise SourceAuthorityRegistryError(
+                    "RuleSourcePackage catalog hash does not match its registered authorization."
+                )
             return
         if supplied_source_ids.difference(registered_source_ids):
             raise SourceAuthorityRegistryError(
@@ -360,7 +368,7 @@ def _legacy_observation(payload: dict[str, object]) -> LegacyObservationAuthoriz
 def _source_package(payload: dict[str, object]) -> SourcePackageAuthorization:
     row = _exact_dict(
         payload,
-        {"namespace", "package_name", "version", "allowed_rule_source_ids"},
+        {"namespace", "package_name", "version", "allowed_rule_source_ids", "catalog_sha256"},
         context="source package",
     )
     return SourcePackageAuthorization(
@@ -368,6 +376,7 @@ def _source_package(payload: dict[str, object]) -> SourcePackageAuthorization:
         package_name=_text(row, "package_name"),
         version=_text(row, "version"),
         allowed_rule_source_ids=_text_tuple(row, "allowed_rule_source_ids"),
+        catalog_sha256=None if row["catalog_sha256"] is None else _sha256(row, "catalog_sha256"),
     )
 
 
@@ -396,6 +405,10 @@ def _validate_registry_contents(registry: SourceAuthorityRegistry) -> None:
             raise SourceAuthorityRegistryError(
                 "Faction scope cannot authorize legacy observations."
             )
+        if faction_scope and any(
+            package.catalog_sha256 is None for package in scope.source_packages
+        ):
+            raise SourceAuthorityRegistryError("Faction source packages require a catalog hash.")
         if any(
             (row.identity_kind == "versioned_observation") != faction_scope
             for row in scope.audit_rows

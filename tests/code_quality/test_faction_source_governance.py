@@ -16,6 +16,7 @@ from warhammer40k_core.rules.faction_source_governance import (
     faction_source_audit,
 )
 from warhammer40k_core.rules.faction_source_package import faction_source_package
+from warhammer40k_core.rules.source_authority_registry import source_authority_registry
 
 
 def test_f00_retained_generated_and_registered_evidence_agrees() -> None:
@@ -24,7 +25,12 @@ def test_f00_retained_generated_and_registered_evidence_agrees() -> None:
     assert REPORT_PATH.read_text() == review_markdown(audit)
     validate_registry(audit)
     validate_official_artifacts(audit)
-    assert len(faction_source_package().evidence_required_source_ids) == 3
+    package = faction_source_package()
+    assert len(package.evidence_required_source_ids) == 3
+    scope = source_authority_registry().scope("warhammer_40000_11th_factions")
+    assert len(scope.source_packages) == 1
+    assert scope.source_packages[0].catalog_sha256 == package.source_catalog.catalog_sha256()
+    assert package.source_catalog.package_id.version == audit.package_version()
 
 
 def test_f00_source_governance_has_no_live_fetch_or_engine_dependency() -> None:
@@ -73,6 +79,10 @@ def test_f00_policy_preserves_holds_and_distinguishes_source_from_execution() ->
         "F01",
         "official_primary",
         "non-affiliated",
+        "structural completeness",
+        "Human review",
+        "provider-page completeness",
+        "globally unique source IDs",
     ):
         assert required in policy
     for record in faction_source_package().source_evidence_catalog.records:

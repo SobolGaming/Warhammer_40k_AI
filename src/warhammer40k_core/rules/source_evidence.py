@@ -524,12 +524,14 @@ class RuleSourcePackage:
         required_source_id_set = set(required_source_ids)
         if (
             self.source_authority_scope == FACTION_SOURCE_AUTHORITY_SCOPE
-            and {
-                source.source_id
-                for document in self.source_catalog.documents
-                for source in document.source_texts
-            }
-            != required_source_id_set
+            and tuple(
+                sorted(
+                    source.source_id
+                    for document in self.source_catalog.documents
+                    for source in document.source_texts
+                )
+            )
+            != required_source_ids
         ):
             raise RuleEvidenceError(
                 "Faction catalog source inventory must exactly match its reviewed evidence."
@@ -550,6 +552,7 @@ class RuleSourcePackage:
                 package_name=package_id.package_name,
                 version=package_id.version,
                 rule_source_ids=required_source_ids,
+                catalog_sha256=self.source_catalog.catalog_sha256(),
             )
             for record in self.source_evidence_catalog.records:
                 if record.authority != "project_authoritative_app_mirror":

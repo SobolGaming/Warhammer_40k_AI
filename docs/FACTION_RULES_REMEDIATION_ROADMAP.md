@@ -199,9 +199,13 @@ Sanctified Orators and Exorcist. The Exorcist Hull/missing-height obligation
 demonstrates the separate geometry-authority gate; fieldability remains blocked.
 
 The typed offline loader authenticates retained text, complete-scope fingerprints,
-owner/page identities, provenance and registered source-package inventory through
-`RuleEvidenceRecord` and `RuleSourcePackage`. It rejects incomplete, conflicting,
-ambiguous, excluded-classification and identity-drifted evidence. It reuses P14's
+owner/page identities, provenance and the full registered source-catalog hash through
+`RuleEvidenceRecord` and `RuleSourcePackage`. Candidate validation rejects structurally
+incomplete, conflicting, ambiguous and excluded-classification evidence. Human review
+establishes provider-page completeness; the immutable byte pin authenticates the
+reviewed capture and rejects even a structurally valid rehashed truncation. Catalog
+source IDs are globally unique, and package version/date derive from the audit;
+catalog metadata drift fails authorization. It reuses P14's
 non-Core source normalization. Regressions are in
 `tests/unit/test_faction_source_governance.py`; static artifact, provenance and
 offline-boundary checks are in `tests/code_quality/test_faction_source_governance.py`.

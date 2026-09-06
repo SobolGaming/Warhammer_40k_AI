@@ -5,9 +5,9 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from datetime import datetime
+from datetime import UTC, date, datetime
 from functools import cache
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Literal
 from urllib.parse import urlsplit
 
@@ -16,7 +16,6 @@ import msgspec
 FACTION_SOURCE_POLICY_ID = "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05"
 FACTION_SOURCE_AUTHORITY_SCOPE = "warhammer_40000_11th_factions"
 FACTION_SOURCE_PACKAGE_NAME = "reviewed-faction-app-observations"
-FACTION_SOURCE_VERSION = "app-data-946-observed-2026-09-05"
 EXPECTED_FACTION_AUDIT_SHA256 = "b24acc551927200dfc5562b509ce5138dddf7841dd2b5eb394ff4e2528f010b5"
 FACTION_AUDIT_PATH = Path(__file__).with_name("faction_source_observations.json")
 
@@ -106,6 +105,19 @@ class FactionSourceAudit(msgspec.Struct, frozen=True, forbid_unknown_fields=True
     geometry_authority: FactionGeometryAuthority
     observations: tuple[FactionSourceObservation, ...]
 
+    def observation_date(self) -> date:
+        """The latest UTC observation date identifies completion of the selected batch."""
+        return max(
+            datetime.fromisoformat(timestamp).astimezone(UTC).date()
+            for timestamp in (
+                self.version_evidence.observed_at,
+                *(row.observed_at for row in self.observations),
+            )
+        )
+
+    def package_version(self) -> str:
+        return f"app-data-{self.app_version}-observed-{self.observation_date().isoformat()}"
+
 
 def observation_fingerprint(payload: dict[str, object]) -> str:
     """Hash retained provenance and text; implementation status belongs elsewhere."""
@@ -147,8 +159,13 @@ def validate_faction_source_audit_bytes(raw: bytes) -> FactionSourceAudit:
             or split.fragment
             or not split.path.endswith(".pdf")
             or official.artifact_path != f"data/raw/faction_packs/{split.path.removeprefix('/')}"
+            or any(
+                ord(character) < 32 or ord(character) == 127 for character in official.source_url
+            )
         ):
             raise FactionSourceError("Faction historical primary provenance is invalid.")
+        _validate_relative_artifact_path(split.path.removeprefix("/"))
+        _validate_relative_artifact_path(official.artifact_path)
     for observation in audit.observations:
         _validate_observation(observation, audit)
     _validate_agreement(audit.observations)
@@ -317,3 +334,16 @@ def _hash_matches(text: str, expected: str) -> None:
     _sha256(expected)
     if not text or hashlib.sha256(text.encode()).hexdigest() != expected:
         raise FactionSourceError("Faction retained text hash drifted.")
+
+
+def _validate_relative_artifact_path(value: str) -> None:
+    path = PurePosixPath(value)
+    if (
+        not value
+        or path.is_absolute()
+        or path.as_posix() != value
+        or any(part in {".", ".."} for part in value.split("/"))
+        or any(character in value for character in ("\\", ":", "%"))
+        or any(ord(character) < 32 or ord(character) == 127 for character in value)
+    ):
+        raise FactionSourceError("Official artifact path must be normalized relative POSIX text.")

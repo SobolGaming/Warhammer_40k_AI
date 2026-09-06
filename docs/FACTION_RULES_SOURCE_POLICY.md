@@ -74,18 +74,35 @@ reused as the fingerprints of these new retained captures.
 
 ## Validation and scope exclusions
 
-`validate_faction_source_audit_bytes` validates candidates for review. It does
-not grant authority. `load_faction_source_audit_bytes` additionally requires the
-exact reviewed artifact SHA-256. The packaged authority registry binds the
-policy to an exact audit row, provider, URL, fingerprint, version/timestamp and
-source-package inventory. `RuleEvidenceRecord` additionally authenticates source
-ID, title and transcription against the retained observation. `RuleSourcePackage`
-requires exact source/evidence inventories and the non-Core normalization scope.
-Recomputing hashes or supplying a Core Rules audit cannot authorize a new row.
+`validate_faction_source_audit_bytes` checks structural completeness: schema,
+declared review status, capture/suffix relationship and hashes. It does not prove
+provider-page completeness or grant authority. A mutually truncated capture and
+operative suffix can pass those structural checks after rehashing. Human review
+establishes provider-page completeness; `load_faction_source_audit_bytes`
+authenticates that reviewed selection through the exact immutable artifact SHA-256.
+
+The packaged authority registry binds the policy to an exact audit row, provider,
+URL, fingerprint and version/timestamp. Package version and catalog source date
+are derived from the audit's App-data version and latest UTC observation date,
+including the version-feed observation. The registry also authenticates a SHA-256
+of the full canonical `SourceCatalog.to_payload()` (sorted compact JSON, ASCII
+escaping, UTF-8). This covers package and catalog versions, source date, document
+IDs/titles, document-to-source relationships, text and normalization, and ruleset
+bundles. Registry schema v2 requires this hash for faction packages; existing
+Core Rules registrations explicitly retain their inventory-only policy with a
+null catalog hash.
+
+`SourceCatalog` requires globally unique source IDs across all documents.
+`RuleEvidenceRecord` additionally authenticates source ID, title and transcription
+against the retained observation. `RuleSourcePackage` requires exact source/evidence
+inventories and the non-Core normalization scope. Recomputing hashes or supplying
+a Core Rules audit cannot authorize a new row or drifted catalog metadata.
 
 Missing, duplicate, unknown or cross-owner rows, unsupported schemas/fields,
-mixed versions/locales, malformed provenance, incomplete text and mismatched
-hashes fail closed. Co-versioned observations of one source ID must agree in
+mixed versions/locales, malformed provenance, structural incompleteness and
+mismatched hashes fail closed during candidate validation. Any changed capture,
+including a structurally valid truncation, fails the reviewed byte pin.
+Co-versioned observations of one source ID must agree in
 complete operative transcription. Duplicate agreement does not create a second
 identity. Do not resolve disagreement by provider preference, recency, row order,
 or fallback. Absent comparison evidence is not an agreement claim.
@@ -130,9 +147,14 @@ defaults; an Exorcist Hull obligation demonstrates that boundary.
 ## Build and verification
 
 Run `uv run python tools/build_faction_source_governance.py --check` offline.
-The builder verifies the retained official PDF bytes, the exact authority
-registry rows, the packaged observation copy, generated review and real shared
-source-package construction. It never fetches a provider. To update reviewed
+The builder verifies the retained official PDF bytes, the entire audit-derived
+source-package authorization and audit registry rows, the packaged observation
+copy, generated review and real shared source-package construction. Official URL
+and artifact paths must be normalized relative POSIX paths without dot segments,
+backslashes, colons, percent escapes or control characters. Before reading, the
+shared `SourceFileChecksum.from_path` resolves the candidate and artifact root and
+requires containment beneath `data/raw/faction_packs`, including symlink targets.
+The builder never fetches a provider. To update reviewed
 evidence, add a new versioned audit, review the complete selection and scope,
 update the authority registry and loader pins in the same PR, then generate the
 packaged JSON and report without `--check`. Runtime loaders use only packaged

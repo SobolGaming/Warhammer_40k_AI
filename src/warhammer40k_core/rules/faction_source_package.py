@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import date
 from functools import cache
 
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId, SourceDocumentId
 from warhammer40k_core.rules.faction_source_governance import (
     FACTION_SOURCE_PACKAGE_NAME,
     FACTION_SOURCE_POLICY_ID,
-    FACTION_SOURCE_VERSION,
+    FactionSourceAudit,
     FactionSourceObservation,
     faction_source_audit,
 )
@@ -29,33 +28,8 @@ from warhammer40k_core.rules.source_evidence import (
 @cache
 def faction_source_package() -> RuleSourcePackage:
     audit = faction_source_audit()
-    package_id = DataPackageId(
-        namespace="core-v2-reviewed-app-mirror",
-        package_name=FACTION_SOURCE_PACKAGE_NAME,
-        version=FACTION_SOURCE_VERSION,
-    )
     return RuleSourcePackage(
-        source_catalog=SourceCatalog(
-            package_id=package_id,
-            catalog_version=CatalogVersion.dated(
-                version_id=FACTION_SOURCE_VERSION, source_date=date(2026, 9, 5)
-            ),
-            documents=tuple(
-                SourceDocument(
-                    document_id=SourceDocumentId(package_id=package_id, document_id=row.source_id),
-                    title=row.source_title,
-                    source_texts=(
-                        RuleSourceText.from_raw(
-                            source_id=row.source_id,
-                            raw_text=row.operative_text,
-                            objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
-                        ),
-                    ),
-                )
-                for row in audit.observations
-            ),
-            ruleset_bundles=(),
-        ),
+        source_catalog=faction_source_catalog(audit),
         source_evidence_catalog=SourceEvidenceCatalog(
             records=tuple(
                 record for row in audit.observations for record in _evidence(row, audit.audit_id)
@@ -63,6 +37,37 @@ def faction_source_package() -> RuleSourcePackage:
         ),
         evidence_required_source_ids=tuple(sorted(audit.selected_source_ids)),
         source_authority_scope="warhammer_40000_11th_factions",
+    )
+
+
+def faction_source_catalog(audit: FactionSourceAudit) -> SourceCatalog:
+    """Derive the complete catalog from a validated audit, without granting authority."""
+    version = audit.package_version()
+    package_id = DataPackageId(
+        namespace="core-v2-reviewed-app-mirror",
+        package_name=FACTION_SOURCE_PACKAGE_NAME,
+        version=version,
+    )
+    return SourceCatalog(
+        package_id=package_id,
+        catalog_version=CatalogVersion.dated(
+            version_id=version, source_date=audit.observation_date()
+        ),
+        documents=tuple(
+            SourceDocument(
+                document_id=SourceDocumentId(package_id=package_id, document_id=row.source_id),
+                title=row.source_title,
+                source_texts=(
+                    RuleSourceText.from_raw(
+                        source_id=row.source_id,
+                        raw_text=row.operative_text,
+                        objective_scope=ObjectiveRuleScope.NON_CORE_RULES,
+                    ),
+                ),
+            )
+            for row in audit.observations
+        ),
+        ruleset_bundles=(),
     )
 
 

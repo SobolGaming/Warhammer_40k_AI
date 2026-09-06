@@ -1,5 +1,5 @@
 {
-  "registry_schema": "core-v2-source-authority-registry-v1",
+  "registry_schema": "core-v2-source-authority-registry-v2",
   "registry_id": "core-rules-source-authority-registry-2026-09-02",
   "scopes": [
     {
@@ -446,7 +446,8 @@
           "version": "observed-2026-08-09",
           "allowed_rule_source_ids": [
             "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -456,7 +457,8 @@
             "gw-11e-core-abilities:core:deadly-demise",
             "gw-11e-core-abilities:core:hazardous",
             "gw-11e-core-abilities:faq:alternating-scout-moves"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -464,7 +466,8 @@
           "version": "40k-app-attached-units-observed-2026-09-01",
           "allowed_rule_source_ids": [
             "gw-11e-core-rules:attached-units:bodyguard-unit-destroyed"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -472,7 +475,8 @@
           "version": "40k-app-attack-sequence-observed-2026-09-01",
           "allowed_rule_source_ids": [
             "core_rules_05_04_04_destroyed"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -482,7 +486,8 @@
             "gw-11e-core-rules:command-phase:battle-shock",
             "gw-11e-core-rules:command-phase:gain-core-cp",
             "gw-11e-core-rules:command-phase:start-of-command-phase"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -492,7 +497,8 @@
             "gw-11e-core-rules:movement-phase:fall-back-move",
             "gw-11e-core-rules:movement-phase:move-units-step",
             "gw-11e-core-rules:movement-phase:selecting-modes"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -501,7 +507,8 @@
           "allowed_rule_source_ids": [
             "gw-11e-core-rules:other-concepts:mortal-wounds",
             "gw-11e-core-rules:other-concepts:visibility"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -514,7 +521,8 @@
             "gw-11e-core-stratagems:core:insane-bravery",
             "gw-11e-core-stratagems:core:rapid-ingress",
             "gw-11e-core-stratagems:rule:snap-shooting"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -524,7 +532,8 @@
             "gw-11e-core-rules:transports:assault-disembark-move",
             "gw-11e-core-rules:transports:emergency-disembark-move",
             "gw-11e-core-rules:transports:shock-disembark-move"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -547,7 +556,8 @@
             "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:25.04-incursion-detachment",
             "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-hazardous-mixed-unit-keywords",
             "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:faq-heavy-fly-horizontal-distance"
-          ]
+          ],
+          "catalog_sha256": null
         },
         {
           "namespace": "games-workshop",
@@ -558,7 +568,8 @@
             "gw-11e-core-objectives:objectives-not-within-a-terrain-area",
             "gw-11e-core-objectives:terrain-objective-control-range",
             "gw-11e-core-objectives:terrain-objectives"
-          ]
+          ],
+          "catalog_sha256": null
         }
       ]
     },
@@ -611,7 +622,8 @@
             "faction-app:adepta-sororitas:army-rules",
             "faction-app:adepta-sororitas:datasheet:exorcist",
             "faction-app:adepta-sororitas:detachment:sanctified-orators"
-          ]
+          ],
+          "catalog_sha256": "81ab4a71ea5e22f4fae34a657c49e5abcbfce37977bb1a32ed72917d4532eb91"
         }
       ]
     }
