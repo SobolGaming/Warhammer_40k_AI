@@ -4,6 +4,11 @@
 
 Snapshot: 5 September 2026, 40k.app current view (latest published App-data version 946). Repository baseline: `52673fa1`.
 
+F00 now retains complete source observations for the army rules, Sanctified
+Orators and Exorcist under the [faction source contract](../../FACTION_RULES_SOURCE_POLICY.md).
+See the [source review and hashes](../../FACTION_SOURCE_GOVERNANCE_REVIEW.md).
+These source packages load; gameplay and geometry certification remain open.
+
 ## What can I use?
 
 The current listing contains **33 in-scope datasheet references** and **8 detachment references**. 0 listed units have matching historical component-report rows. Shared source URLs are counted once in the audit, even when several faction views list them.

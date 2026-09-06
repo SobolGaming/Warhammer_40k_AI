@@ -311,6 +311,10 @@ class SourceCatalog:
         for document in documents:
             if document.document_id.package_id != self.package_id:
                 raise SourceCatalogError("SourceCatalog document packages must match package_id.")
+        _validate_rule_source_text_tuple(
+            "SourceCatalog source_texts",
+            tuple(source for document in documents for source in document.source_texts),
+        )
         for ruleset_bundle in ruleset_bundles:
             if ruleset_bundle.package_id != self.package_id:
                 raise SourceCatalogError(
@@ -351,6 +355,10 @@ class SourceCatalog:
             "documents": [document.to_payload() for document in self.documents],
             "ruleset_bundles": [bundle.to_payload() for bundle in self.ruleset_bundles],
         }
+
+    def catalog_sha256(self) -> str:
+        """Commit to the complete canonical catalog, including metadata and ownership."""
+        return _sha256_payload(self.to_payload())
 
     @classmethod
     def from_payload(cls, payload: SourceCatalogPayload) -> Self:
