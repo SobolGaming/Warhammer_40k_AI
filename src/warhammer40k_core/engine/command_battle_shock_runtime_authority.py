@@ -22,6 +22,7 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     PhysicalModelAuthority,
     physical_model_authority_before_event,
 )
+from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 if TYPE_CHECKING:
@@ -164,39 +165,14 @@ def _historical_rules_unit_identity_rows(
     state: GameState,
     active_attached_ids: set[str],
 ) -> tuple[tuple[str, str, tuple[str, ...], tuple[str, ...]], ...]:
-    physical = {
-        unit.unit_instance_id: (
-            army.player_id,
-            tuple(model.model_instance_id for model in unit.own_models),
+    inventory = starting_rules_unit_inventory(state)
+    if {r.rules_unit_instance_id for r in inventory if r.is_attached} != active_attached_ids:
+        raise GameLifecycleError("Historical Command attached identity inventory drifted.")
+    return tuple(
+        sorted(
+            (r.rules_unit_instance_id, r.player_id, r.component_ids, r.model_ids) for r in inventory
         )
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    grouped_component_ids: set[str] = set()
-    rows: list[tuple[str, str, tuple[str, ...], tuple[str, ...]]] = []
-    for record in state.starting_attached_unit_records:
-        if record.attached_unit_instance_id not in active_attached_ids:
-            continue
-        grouped_component_ids.update(record.component_unit_instance_ids)
-        model_ids = tuple(
-            model_id
-            for component_id in record.component_unit_instance_ids
-            for model_id in physical[component_id][1]
-        )
-        rows.append(
-            (
-                record.attached_unit_instance_id,
-                record.player_id,
-                tuple(sorted(record.component_unit_instance_ids)),
-                model_ids,
-            )
-        )
-    rows.extend(
-        (unit_id, owner_id, (unit_id,), model_ids)
-        for unit_id, (owner_id, model_ids) in physical.items()
-        if unit_id not in grouped_component_ids
     )
-    return tuple(sorted(rows))
 
 
 def _candidate_from_historical_rows(

@@ -342,11 +342,18 @@ export interface components {
             unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
             witness?: components["schemas"]["proposal-payload--path_witness.schema"];
         };
+        "proposal-payload--split_origin.schema": {
+            source_unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            split_id: components["schemas"]["proposal-payload--identifier.schema"];
+            /** @enum {integer} */
+            successor_index: 0 | 1;
+        };
         "proposal-payload--model_placement.schema": {
             army_id: components["schemas"]["proposal-payload--identifier.schema"];
             model_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
             player_id: components["schemas"]["proposal-payload--identifier.schema"];
             pose: components["schemas"]["proposal-payload--pose.schema"];
+            split_origin?: components["schemas"]["proposal-payload--split_origin.schema"];
             unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
         };
         "proposal-payload--unit_placement.schema": {
@@ -676,6 +683,7 @@ export interface components {
             reserve_kind: string | null; transport_unit_instance_id: string | null;
         };
         "battlefield-view--model.schema": {
+            split_origin?: components["schemas"]["proposal-payload--split_origin.schema"];
             /** @constant */
             entity_kind: "model"; geometry: components["schemas"]["battlefield-view--model_geometry.schema"];
             model_instance_id: string; owner_player_id: string;

@@ -1,0 +1,35 @@
+{
+  "audit_id": "core-unit-splitting-maintained-app-mirrors-2026-09-06",
+  "observed_at": "2026-09-06T17:29:03Z",
+  "rows": [
+    {
+      "row_id": "unit-splitting:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/01-core-concepts",
+      "observed_at": "2026-09-06T17:29:03Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-unit-splitting:unit-splitting",
+      "transcription_sha256": "cfbc728ec6c5d07a9d6497db3f37754bb7b0c227d4194ee13a2e2f7cdf40793f",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "5fb98bc5cfbaac54399e77eff6cb25006fdc2dcbb93ff3a605f4090ad540face"
+    },
+    {
+      "row_id": "balanced-unit-splitting:gdm",
+      "provider_name": "Game Datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": "2026-09-06T17:29:03Z",
+      "app_version": "931",
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-unit-splitting:balanced-unit-splitting",
+      "transcription_sha256": "0c9515272839227cdd4070b2e7fca961f2892388992adf9db80c6345f667edca",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "19d99e87b14fd7f286ade01e8a70ee64759b5f685ac7dc27f0ec303fbfd7ddd8"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "01.02.06 baseline clauses retained from the 40k.app search-index observation. The direct fetch returned 403. The balancing addition is the complete GDM v931 erratum, also present in its changed row. No co-version comparison is asserted."
+}

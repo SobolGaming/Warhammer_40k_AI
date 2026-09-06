@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
@@ -234,11 +235,8 @@ def _selected_to_fight_enhancement_bearer(
             "Selected-to-fight Enhancement requires exactly one bearer assignment."
         )
     assignment = assignments[0]
-    bearer_unit_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
-    bearer_units = tuple(unit for unit in army.units if unit.unit_instance_id == bearer_unit_id)
-    if len(bearer_units) != 1:
-        raise GameLifecycleError("Selected-to-fight Enhancement bearer unit is missing.")
-    bearer_unit = bearer_units[0]
+    bearer_unit = enhancement_bearer_unit(army, assignment=assignment)
+    bearer_unit_id = bearer_unit.unit_instance_id
     if len(bearer_unit.own_models) != 1:
         raise GameLifecycleError(
             "Selected-to-fight Enhancement requires a single-model bearer unit."

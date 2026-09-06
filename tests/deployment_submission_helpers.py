@@ -18,6 +18,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, SetupStep
+from warhammer40k_core.engine.unit_ownership import SplitUnitOrigin
 from warhammer40k_core.geometry.pose import Pose
 
 DeploymentPoseFactory = Callable[[int, str, str], Pose]
@@ -158,6 +159,7 @@ def deployment_proposal_for_state(
                 unit_instance_id=source[2],
                 model_instance_id=model_instance_id,
                 pose=pose,
+                split_origin=source[3],
             )
         )
     return DeploymentPlacementProposal(
@@ -219,10 +221,10 @@ def _model_source_for_id(
     *,
     state: GameState,
     model_instance_id: str,
-) -> tuple[str, str, str]:
+) -> tuple[str, str, str, SplitUnitOrigin | None]:
     for army in state.army_definitions:
         for unit in army.units:
             for model in unit.own_models:
                 if model.model_instance_id == model_instance_id:
-                    return army.army_id, army.player_id, unit.unit_instance_id
+                    return army.army_id, army.player_id, unit.unit_instance_id, unit.split_origin
     raise GameLifecycleError("Deployment proposal model_instance_id is not mustered.")

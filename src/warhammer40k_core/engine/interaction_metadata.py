@@ -124,6 +124,7 @@ class InteractionSpec:
 
 _FINITE_INTERACTION_SPECS = MappingProxyType(
     {
+        "select_unit_split_membership": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "discard_tactical_secondary_mission": InteractionSpec(InteractionKind.CONFIRMATION),
         "draw_tactical_secondary_missions": InteractionSpec(InteractionKind.CONFIRMATION),
         "replace_tactical_secondary_mission": InteractionSpec(InteractionKind.CONFIRMATION),

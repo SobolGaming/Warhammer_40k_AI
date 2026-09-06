@@ -282,6 +282,7 @@ def _desperate_escape_requirements_for_fall_back(
             continue
         requirements.append(
             DesperateEscapeRequirement(
+                split_origin=placement.split_origin,
                 requirement_id=f"{unit_placement.unit_instance_id}:desperate-escape:{index:03d}",
                 player_id=unit_placement.player_id,
                 battle_round=requirement_battle_round,

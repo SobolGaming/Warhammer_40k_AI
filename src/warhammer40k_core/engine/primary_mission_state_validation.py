@@ -54,6 +54,7 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionMarkerStatus,
     PrimaryMissionProgressState,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_identity_maps_from_armies
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 
 if TYPE_CHECKING:
@@ -247,53 +248,7 @@ def _state_graph(*, state: GameState, require_mission: bool) -> _StateGraph | No
 def _rules_unit_identity_maps(
     state: GameState,
 ) -> tuple[dict[str, str], dict[str, tuple[str, ...]]]:
-    owner_by_id: dict[str, str] = {}
-    components_by_id: dict[str, tuple[str, ...]] = {}
-    for army in state.army_definitions:
-        for unit in army.units:
-            _record_rules_unit_identity(
-                rules_unit_id=unit.unit_instance_id,
-                owner_player_id=army.player_id,
-                component_unit_instance_ids=(unit.unit_instance_id,),
-                owner_by_id=owner_by_id,
-                components_by_id=components_by_id,
-            )
-        for formation in army.attached_units:
-            _record_rules_unit_identity(
-                rules_unit_id=formation.attached_unit_instance_id,
-                owner_player_id=army.player_id,
-                component_unit_instance_ids=formation.component_unit_instance_ids,
-                owner_by_id=owner_by_id,
-                components_by_id=components_by_id,
-            )
-    for record in state.starting_attached_unit_records:
-        _record_rules_unit_identity(
-            rules_unit_id=record.attached_unit_instance_id,
-            owner_player_id=record.player_id,
-            component_unit_instance_ids=record.component_unit_instance_ids,
-            owner_by_id=owner_by_id,
-            components_by_id=components_by_id,
-        )
-    return owner_by_id, components_by_id
-
-
-def _record_rules_unit_identity(
-    *,
-    rules_unit_id: str,
-    owner_player_id: str,
-    component_unit_instance_ids: tuple[str, ...],
-    owner_by_id: dict[str, str],
-    components_by_id: dict[str, tuple[str, ...]],
-) -> None:
-    components = tuple(sorted(component_unit_instance_ids))
-    existing_owner = owner_by_id.get(rules_unit_id)
-    existing_components = components_by_id.get(rules_unit_id)
-    if existing_owner is not None and existing_owner != owner_player_id:
-        raise GameLifecycleError("Primary mission rules-unit ownership is ambiguous.")
-    if existing_components is not None and existing_components != components:
-        raise GameLifecycleError("Primary mission rules-unit components are ambiguous.")
-    owner_by_id[rules_unit_id] = owner_player_id
-    components_by_id[rules_unit_id] = components
+    return rules_unit_identity_maps_from_armies(tuple(state.army_definitions))
 
 
 def _unique_typed_map[T](

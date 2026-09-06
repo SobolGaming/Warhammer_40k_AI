@@ -313,6 +313,9 @@
     "model": {
       "additionalProperties": false,
       "properties": {
+        "split_origin": {
+          "$ref": "https://warhammer40k-core.local/contracts/v2/proposal-payload.schema.json#/$defs/split_origin"
+        },
         "entity_kind": {
           "const": "model",
           "type": "string"

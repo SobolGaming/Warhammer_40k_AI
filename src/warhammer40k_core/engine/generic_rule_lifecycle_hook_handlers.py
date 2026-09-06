@@ -7,6 +7,7 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationResultHandler,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
@@ -96,7 +97,7 @@ def _enhancement_is_assigned_to_selected_rules_unit(
     for assignment in army.enhancement_assignments:
         if assignment.enhancement_id != enhancement_id:
             continue
-        bearer_unit_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
+        bearer_unit_id = enhancement_bearer_unit(army, assignment=assignment).unit_instance_id
         if bearer_unit_id in selected_component_ids:
             return True
     return False

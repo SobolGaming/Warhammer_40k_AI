@@ -1,0 +1,148 @@
+{
+  "artifact_schema": "core-v2-core-unit-splitting-source-v1",
+  "source_package_id": "gw-11e-core-unit-splitting",
+  "source_version": "maintained-app-mirrors-observed-2026-09-06",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-unit-splitting:unit-splitting",
+      "section_id": "01.02.06",
+      "source_text": "Some rules allow you to split units into smaller units (e.g. the Transport ability of Drukhari Venoms). When using such rules:\nThe same models can only be subdivided in this way once (e.g. those smaller units cannot themselves be split further).\nIf a rule is used to split a unit into multiple units before the battle, the starting strength of each individual unit is changed to be equal to the number of models in that unit.",
+      "transcription_sha256": "cfbc728ec6c5d07a9d6497db3f37754bb7b0c227d4194ee13a2e2f7cdf40793f",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.unit_splitting:build_split_army"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-unit-splitting:balanced-unit-splitting",
+      "section_id": "01.02.06",
+      "source_text": "A unit must be split into two units, each containing as equal a number of models as possible (when splitting a unit in this way, make a note of which models form each of the two new units). If a rule states a specific starting strength of the split units, but this is not possible based on the number of models in the unit being split (e.g. due to attached Leader/Support models), split the unit as stated above.",
+      "transcription_sha256": "0c9515272839227cdd4070b2e7fca961f2892388992adf9db80c6345f667edca",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.unit_splitting:build_split_army"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-unit-splitting:unit-splitting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cfbc728ec6c5d07a9d6497db3f37754bb7b0c227d4194ee13a2e2f7cdf40793f",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "9d6d3bd47451d8955d85e12c7dc04504b8cd37111280616a449331de233387de",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.unit_splitting:build_split_army"
+      ],
+      "evidence_id": "core-unit-splitting-review:unit-splitting",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01B 01.02.06 unit-splitting",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-unit-splitting:unit-splitting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "cfbc728ec6c5d07a9d6497db3f37754bb7b0c227d4194ee13a2e2f7cdf40793f",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "a16c905b92d71c18ce0b660b756614f404f2e47ab22fbd22be97be24d4ad8ecf",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.unit_splitting:build_split_army"
+      ],
+      "evidence_id": "core-unit-splitting-mirror:unit-splitting:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-unit-splitting-maintained-app-mirrors-2026-09-06",
+      "review_audit_row_id": "unit-splitting:40k-app",
+      "review_audit_source_observation_sha256": "5fb98bc5cfbaac54399e77eff6cb25006fdc2dcbb93ff3a605f4090ad540face",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 01.02.06 unit-splitting",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/01-core-concepts",
+      "observed_at": "2026-09-06T17:29:03Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-unit-splitting:balanced-unit-splitting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "0c9515272839227cdd4070b2e7fca961f2892388992adf9db80c6345f667edca",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "71c1c84a7e84154a3e0e00544da19803df74fcbf2eed456f8a2e46cd99de7963",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.unit_splitting:build_split_army"
+      ],
+      "evidence_id": "core-unit-splitting-review:balanced-unit-splitting",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01B 01.02.06 balanced-unit-splitting",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-unit-splitting:balanced-unit-splitting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "0c9515272839227cdd4070b2e7fca961f2892388992adf9db80c6345f667edca",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "435db305787a7eb1fa519346e1ba2ffaa38f2ad861bed5bee987dc495ee2f06b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.unit_splitting:build_split_army"
+      ],
+      "evidence_id": "core-unit-splitting-mirror:balanced-unit-splitting:gdm",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-unit-splitting-maintained-app-mirrors-2026-09-06",
+      "review_audit_row_id": "balanced-unit-splitting:gdm",
+      "review_audit_source_observation_sha256": "19d99e87b14fd7f286ade01e8a70ee64759b5f685ac7dc27f0ec303fbfd7ddd8",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions 01.02.06 balanced-unit-splitting",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "741dba74d805647ae5317f91dc914d7e60779abe748af9496533fee81a8a413d"
+}

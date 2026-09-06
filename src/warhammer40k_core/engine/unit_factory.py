@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, replace
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.ability_sources import (
     AbilitySourceError,
@@ -51,6 +51,12 @@ from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_ownership import (
+    SplitUnitOrigin,
+    SplitUnitOriginPayload,
+    UnitOwnershipError,
+    validate_physical_model_owner,
+)
 from warhammer40k_core.engine.unit_resource_entitlements import (
     UnitResourceEntitlementError,
     derive_starting_resource_allocations,
@@ -91,6 +97,7 @@ class ModelInstancePayload(TypedDict):
 
 
 class UnitInstancePayload(TypedDict):
+    split_origin: NotRequired[SplitUnitOriginPayload]
     unit_instance_id: str
     datasheet_id: str
     name: str
@@ -251,6 +258,8 @@ class UnitInstance:
     damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
     starting_resources: tuple[UnitStartingResourceAllocation, ...] = ()
 
+    split_origin: SplitUnitOrigin | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -347,6 +356,13 @@ class UnitInstance:
     def stable_identity(self) -> str:
         return f"unit:{self.unit_instance_id}"
 
+    @property
+    def source_unit_instance_id(self) -> str:
+        """Immutable physical source identity, distinct from the current owner."""
+        if self.split_origin is not None:
+            return self.split_origin.source_unit_instance_id
+        return self.unit_instance_id
+
     def ability_source_instances(self) -> tuple[AbilitySourceInstance, ...]:
         return datasheet_ability_sources(self.datasheet_abilities, owner_id=self.unit_instance_id)
 
@@ -357,7 +373,7 @@ class UnitInstance:
         return tuple(model for model in self.own_models if model.is_alive)
 
     def to_payload(self) -> UnitInstancePayload:
-        return {
+        payload: UnitInstancePayload = {
             "unit_instance_id": self.unit_instance_id,
             "datasheet_id": self.datasheet_id,
             "name": self.name,
@@ -376,9 +392,18 @@ class UnitInstance:
             ],
         }
 
+        if self.split_origin is not None:
+            payload["split_origin"] = self.split_origin.to_payload()
+        return payload
+
     @classmethod
     def from_payload(cls, payload: UnitInstancePayload) -> Self:
         return cls(
+            split_origin=(
+                SplitUnitOrigin.from_payload(payload["split_origin"])
+                if "split_origin" in payload
+                else None
+            ),
             unit_instance_id=payload["unit_instance_id"],
             datasheet_id=payload["datasheet_id"],
             name=payload["name"],
@@ -1238,8 +1263,14 @@ def _validate_model_instance_links(
     for model in own_models:
         if model.datasheet_id != unit_instance.datasheet_id:
             raise UnitFactoryError("UnitInstance own_models must match unit datasheet_id.")
-        if not model.model_instance_id.startswith(f"{unit_instance.unit_instance_id}:"):
-            raise UnitFactoryError("UnitInstance own_model IDs must be scoped to unit_instance_id.")
+        try:
+            validate_physical_model_owner(
+                unit_instance_id=unit_instance.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                split_origin=unit_instance.split_origin,
+            )
+        except UnitOwnershipError as exc:
+            raise UnitFactoryError(str(exc)) from exc
 
 
 def _validate_wargear_selection_tuple(

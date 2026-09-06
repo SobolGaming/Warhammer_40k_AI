@@ -100,10 +100,6 @@ def _attack_sequence_source() -> str:
     return combined_source_for(ATTACK_SEQUENCE_SPLIT_PATHS)
 
 
-def _stratagems_source() -> str:
-    return combined_source_for(STRATAGEMS_SPLIT_PATHS)
-
-
 def _phase_exception_imports(tree: ast.Module) -> tuple[set[str], set[str]]:
     direct_symbols: set[str] = set()
     module_aliases: set[str] = set()
@@ -238,7 +234,6 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     list_validation_source = source_for(LIST_VALIDATION_PATH)
     army_mustering_source = source_for(ARMY_MUSTERING_PATH)
     attached_unit_formation_source = source_for(ATTACHED_UNIT_FORMATION_PATH)
-    stratagems_source = _stratagems_source()
 
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source
@@ -278,10 +273,16 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     assert "AttachmentRole.LEADER" in army_mustering_source
     assert "AttachmentRole.SUPPORT" in army_mustering_source
     assert '"runtime-attached-unit:{role}"' in army_mustering_source
-    assert "def _starting_strength_records_for_army(" in game_state_source
-    assert "def _starting_strength_record_for_attached_unit(" in game_state_source
+    strength_inventory_source = source_for(ENGINE_ROOT / "unit_strength_inventory.py")
+    assert "starting_strength_records_for_army(army_definition)" in game_state_source
+    assert "def starting_strength_records_for_army(" in strength_inventory_source
+    assert "def _starting_strength_record_for_attached_unit(" in strength_inventory_source
     assert "def _remove_attached_unit_formation(" not in game_state_source
-    assert "attached_unit.component_unit_instance_ids" in stratagems_source
+    attachment_lookup_source = function_source_for(
+        STRATAGEMS_SPLIT_PATHS, "_attached_unit_id_for_component"
+    )
+    assert "rules_unit_views_from_armies" in attachment_lookup_source
+    assert "view.component_unit_instance_ids" in attachment_lookup_source
 
 
 def test_p18c_emergency_disembark_resolves_hazard_before_survivor_placement() -> None:

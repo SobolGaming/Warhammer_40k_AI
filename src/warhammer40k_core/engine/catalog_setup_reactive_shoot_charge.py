@@ -63,6 +63,7 @@ from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_id_for_unit_id,
     rules_unit_view_by_id,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
@@ -1201,26 +1202,7 @@ def _current_model_instance_ids_for_unit(
 
 def _player_rules_units(*, state: GameState, player_id: str) -> tuple[RulesUnitView, ...]:
     army = _army_for_player(state=state, player_id=player_id)
-    attached_component_ids = {
-        component_id
-        for attached_unit in army.attached_units
-        for component_id in attached_unit.component_unit_instance_ids
-    }
-    rules_units: list[RulesUnitView] = []
-    for attached_unit in army.attached_units:
-        rules_units.append(
-            rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=attached_unit.attached_unit_instance_id,
-            )
-        )
-    for unit in army.units:
-        if unit.unit_instance_id in attached_component_ids:
-            continue
-        rules_units.append(
-            rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
-        )
-    return tuple(sorted(rules_units, key=lambda view: view.unit_instance_id))
+    return rules_unit_views_from_armies(armies=(army,))
 
 
 def _setup_reactive_timing_window_id(candidate: _SetupReactiveCandidate) -> str:

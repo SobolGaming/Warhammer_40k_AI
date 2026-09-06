@@ -66,3 +66,23 @@ def persisting_effects_for_target(
             tuple((target_id, effect) for effect in effects if effect.applies_to_unit(target_id))
         )
     )
+
+
+def persisting_effects_for_lineage(
+    effects: list[PersistingEffect],
+    unit_instance_ids: tuple[str, ...],
+) -> tuple[PersistingEffect, ...]:
+    """Apply inherited effects once, including Auras bound to several source components."""
+    targets = tuple(_identifier("unit_instance_id", value) for value in unit_instance_ids)
+    if not targets:
+        raise GameLifecycleError("Persisting effect lineage requires a target identity.")
+    return tuple(
+        effect
+        for _, effect in non_stacking_aura_applications(
+            tuple(
+                (targets[0], effect)
+                for effect in effects
+                if any(effect.applies_to_unit(target) for target in targets)
+            )
+        )
+    )

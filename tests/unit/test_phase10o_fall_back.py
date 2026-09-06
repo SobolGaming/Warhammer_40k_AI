@@ -2045,7 +2045,7 @@ def test_desperate_escape_domain_validators_fail_fast() -> None:
         [4],
     )
 
-    with pytest.raises(GameLifecycleError, match="must belong to unit_instance_id"):
+    with pytest.raises(GameLifecycleError, match="scoped to unit_instance_id"):
         DesperateEscapeRequirement(
             requirement_id="phase10o-desperate-escape-invalid-000001",
             player_id="player-a",

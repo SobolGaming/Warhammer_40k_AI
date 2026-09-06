@@ -11,7 +11,6 @@ from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointLedger,
@@ -35,6 +34,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -89,7 +89,6 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindow,
     TimingWindowDescriptor,
 )
-from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -1066,18 +1065,11 @@ def test_stratagem_use_record_rejects_duplicate_affected_unit_ids() -> None:
 
 def test_attached_unit_components_share_one_stratagem_affected_key() -> None:
     bodyguard_id = "army-alpha:intercessor-unit-1"
-    leader_id = "army-alpha:captain-unit"
-    attached_id = "attached-unit:army-alpha:captain-intercessors"
+    attached_id = "attached-unit:army-alpha:intercessor-unit-1"
     lifecycle = _battle_lifecycle(config=_attached_unit_config())
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     _grant_cp(state, player_id="player-a", amount=3)
-    _mark_attached_unit_join(
-        state,
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        component_unit_instance_ids=(bodyguard_id, leader_id),
-    )
     context = _context(state=state, player_id="player-a")
     target_spec = StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT)
     first_catalog = (
@@ -1124,24 +1116,11 @@ def test_attached_unit_components_share_one_stratagem_affected_key() -> None:
 def test_battle_shocked_attached_unit_suppresses_every_component_target() -> None:
     bodyguard_id = "army-alpha:intercessor-unit-1"
     leader_id = "army-alpha:captain-unit"
-    attached_id = "attached-unit:army-alpha:captain-intercessors"
+    attached_id = "attached-unit:army-alpha:intercessor-unit-1"
     lifecycle = _battle_lifecycle(config=_attached_unit_config())
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     _grant_cp(state, player_id="player-a", amount=1)
-    _mark_attached_unit_join(
-        state,
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        component_unit_instance_ids=(bodyguard_id, leader_id),
-    )
-    _attach_test_units(
-        state,
-        player_id="player-a",
-        attached_unit_instance_id=attached_id,
-        bodyguard_unit_instance_id=bodyguard_id,
-        leader_unit_instance_id=leader_id,
-    )
     state.battle_shocked_unit_ids = [leader_id]
 
     options = stratagem_use_options(
@@ -2220,6 +2199,12 @@ def _attached_unit_config() -> GameConfig:
                     detachment_ids=("core-combined-arms",),
                 ),
                 force_disposition_id="take-and-hold",
+                attachment_declarations=(
+                    AttachmentDeclaration(
+                        source_unit_selection_id="captain-unit",
+                        bodyguard_unit_selection_id="intercessor-unit-1",
+                    ),
+                ),
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="intercessor-unit-1",
@@ -2358,69 +2343,6 @@ def _target_unit_id_for_option(option: DecisionOption) -> str:
     payload = cast(dict[str, JsonValue], option.payload)
     binding = cast(dict[str, JsonValue], payload["target_binding"])
     return cast(str, binding["target_unit_instance_id"])
-
-
-def _attach_test_units(
-    state: GameState,
-    *,
-    player_id: str,
-    attached_unit_instance_id: str,
-    bodyguard_unit_instance_id: str,
-    leader_unit_instance_id: str,
-) -> None:
-    formation = AttachedUnitFormation(
-        attached_unit_instance_id=attached_unit_instance_id,
-        bodyguard_unit_instance_id=bodyguard_unit_instance_id,
-        leader_unit_instance_ids=(leader_unit_instance_id,),
-        component_unit_instance_ids=tuple(
-            sorted((bodyguard_unit_instance_id, leader_unit_instance_id))
-        ),
-        source_id=f"phase12b:attachment:{attached_unit_instance_id}",
-        attachment_source_ids=(f"phase12b:attachment:{attached_unit_instance_id}:eligibility",),
-    )
-    for army_index, army in enumerate(state.army_definitions):
-        if army.player_id != player_id:
-            continue
-        state.army_definitions[army_index] = replace(
-            army,
-            attached_units=(*army.attached_units, formation),
-        )
-        return
-    raise AssertionError(f"Missing army for player {player_id}.")
-
-
-def _mark_attached_unit_join(
-    state: GameState,
-    *,
-    player_id: str,
-    attached_unit_instance_id: str,
-    component_unit_instance_ids: tuple[str, ...],
-) -> None:
-    source_id = f"attached-unit-join:{attached_unit_instance_id}"
-    component_id_set = set(component_unit_instance_ids)
-    component_starting_model_count = 0
-    updated_records: list[StartingStrengthRecord] = []
-    for record in state.starting_strength_records:
-        if record.unit_instance_id not in component_id_set:
-            updated_records.append(record)
-            continue
-        component_starting_model_count += record.starting_model_count
-        updated_records.append(replace(record, source_id=source_id))
-    if component_starting_model_count == 0:
-        raise AssertionError("Attached-unit test fixture did not find component records.")
-    updated_records.append(
-        StartingStrengthRecord(
-            player_id=player_id,
-            unit_instance_id=attached_unit_instance_id,
-            starting_model_count=component_starting_model_count,
-            single_model_starting_wounds=None,
-            source_id=source_id,
-        )
-    )
-    state.starting_strength_records = sorted(
-        updated_records,
-        key=lambda record: record.unit_instance_id,
-    )
 
 
 def _state(lifecycle: GameLifecycle) -> GameState:

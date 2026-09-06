@@ -273,17 +273,6 @@ def catalog_weapon_grant_source_index_and_rules_unit(
     context: WeaponProfileModifierContext,
 ) -> tuple[AbilityCatalogIndex, RulesUnitView]:
     requested_unit_id = context.attacking_unit_instance_id
-    if not any(
-        requested_unit_id == unit.unit_instance_id
-        or any(
-            requested_unit_id == attached_unit.attached_unit_instance_id
-            for attached_unit in army.attached_units
-            if unit.unit_instance_id in attached_unit.component_unit_instance_ids
-        )
-        for army in armies
-        for unit in army.units
-    ):
-        raise GameLifecycleError("Catalog weapon keyword grant unit is unknown.")
     rules_unit = rules_unit_view_by_id(
         state=context.state,
         unit_instance_id=requested_unit_id,

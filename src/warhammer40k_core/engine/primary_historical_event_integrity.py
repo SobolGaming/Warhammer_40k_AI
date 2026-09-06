@@ -36,6 +36,7 @@ from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT,
     PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
 )
+from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 from warhammer40k_core.engine.transports import (
     DisembarkModeKind,
@@ -201,61 +202,29 @@ def _scoring_identities_by_id(
     state: GameState,
     model_ids_by_unit_id: dict[str, tuple[str, ...]],
 ) -> dict[str, _ScoringRulesUnitIdentity]:
-    physical_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
+    return {
+        row.rules_unit_instance_id: _ScoringRulesUnitIdentity(
+            rules_unit_instance_id=row.rules_unit_instance_id,
+            owner_player_id=row.player_id,
+            component_unit_instance_ids=row.component_ids,
+            starting_model_instance_ids_by_component=row.component_models,
+        )
+        for row in starting_rules_unit_inventory(state)
     }
-    component_ids_in_starting_attached_units: set[str] = set()
-    identities: dict[str, _ScoringRulesUnitIdentity] = {}
-    for record in state.starting_attached_unit_records:
-        frozen_models = tuple(
-            (component_id, tuple(sorted(model_ids)))
-            for component_id, model_ids in record.starting_model_instance_ids_by_component
-        )
-        if tuple(component_id for component_id, _model_ids in frozen_models) != (
-            record.component_unit_instance_ids
-        ):
-            raise GameLifecycleError(
-                "Starting Attached Unit frozen model component identity drifted."
-            )
-        identities[record.attached_unit_instance_id] = _ScoringRulesUnitIdentity(
-            rules_unit_instance_id=record.attached_unit_instance_id,
-            owner_player_id=record.player_id,
-            component_unit_instance_ids=record.component_unit_instance_ids,
-            starting_model_instance_ids_by_component=frozen_models,
-        )
-        component_ids_in_starting_attached_units.update(record.component_unit_instance_ids)
-    for unit_id, model_ids in model_ids_by_unit_id.items():
-        if unit_id in component_ids_in_starting_attached_units:
-            continue
-        identities[unit_id] = _ScoringRulesUnitIdentity(
-            rules_unit_instance_id=unit_id,
-            owner_player_id=physical_owner_by_id[unit_id],
-            component_unit_instance_ids=(unit_id,),
-            starting_model_instance_ids_by_component=((unit_id, model_ids),),
-        )
-    return identities
 
 
 def _rules_unit_components_by_id(state: GameState) -> dict[str, tuple[str, ...]]:
-    components_by_id: dict[str, tuple[str, ...]] = {
-        unit.unit_instance_id: (unit.unit_instance_id,)
-        for army in state.army_definitions
-        for unit in army.units
+    return {
+        **{
+            unit.unit_instance_id: (unit.unit_instance_id,)
+            for army in state.army_definitions
+            for unit in army.units
+        },
+        **{
+            row.rules_unit_instance_id: row.component_ids
+            for row in starting_rules_unit_inventory(state)
+        },
     }
-    for record in state.starting_attached_unit_records:
-        components_by_id[record.attached_unit_instance_id] = tuple(
-            sorted(record.component_unit_instance_ids)
-        )
-    for army in state.army_definitions:
-        for formation in army.attached_units:
-            components = tuple(sorted(formation.component_unit_instance_ids))
-            existing = components_by_id.get(formation.attached_unit_instance_id)
-            if existing is not None and existing != components:
-                raise GameLifecycleError("Current rules-unit component identity is ambiguous.")
-            components_by_id[formation.attached_unit_instance_id] = components
-    return components_by_id
 
 
 def _validate_destroyed_departure_provenance(

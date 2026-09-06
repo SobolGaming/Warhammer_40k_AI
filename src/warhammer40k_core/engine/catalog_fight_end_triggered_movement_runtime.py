@@ -35,7 +35,7 @@ from warhammer40k_core.engine.fight_phase_end_hooks import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id, rules_unit_views_from_armies
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
@@ -291,8 +291,9 @@ def _has_supported_records_for_unattached_units(
 def _attached_component_unit_ids(army: ArmyDefinition) -> frozenset[str]:
     return frozenset(
         unit_id
-        for attached_unit in army.attached_units
-        for unit_id in attached_unit.component_unit_instance_ids
+        for view in rules_unit_views_from_armies(armies=(army,))
+        if view.is_attached_rules_unit
+        for unit_id in view.component_unit_instance_ids
     )
 
 

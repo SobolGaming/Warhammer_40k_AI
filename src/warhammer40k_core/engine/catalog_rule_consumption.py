@@ -47,6 +47,7 @@ from warhammer40k_core.engine import catalog_start_battle_keyword_choice_support
 from warhammer40k_core.engine import catalog_triggered_movement_support as _triggered_move
 from warhammer40k_core.engine import catalog_unit_move_completed_battle_shock_support as _ucbs
 from warhammer40k_core.engine import rules_units as _rules_units
+from warhammer40k_core.engine import unit_split_permissions as _unit_split
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -116,7 +117,11 @@ from warhammer40k_core.engine.physical_engagement import (
 from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_rules_unit,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
@@ -1308,6 +1313,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
+        _unit_split.UNIT_SPLIT_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         *_ucbs.registered_hook_ids(),
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
@@ -2478,24 +2484,11 @@ def _rules_unit_views_for_other_players(
 ) -> tuple[RulesUnitView, ...]:
     _validate_game_state(state)
     owning_player_id = _validate_identifier("player_id", player_id)
-    views: list[RulesUnitView] = []
-    for army in state.army_definitions:
-        if army.player_id == owning_player_id:
-            continue
-        attached_component_ids: set[str] = set()
-        for attached_unit in army.attached_units:
-            views.append(
-                rules_unit_view_by_id(
-                    state=state,
-                    unit_instance_id=attached_unit.attached_unit_instance_id,
-                )
-            )
-            attached_component_ids.update(attached_unit.component_unit_instance_ids)
-        for unit in army.units:
-            if unit.unit_instance_id in attached_component_ids:
-                continue
-            views.append(rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id))
-    return tuple(sorted(views, key=lambda view: view.unit_instance_id))
+    return tuple(
+        view
+        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        if view.owner_player_id != owning_player_id
+    )
 
 
 def _catalog_named_weapon_ability_choice_group_resolved(
@@ -3728,6 +3721,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _keyword_choice.clause_has_invalid_exact_start_battle_keyword_choice_shape(clause):
         return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
+    if _unit_split.clause_is_unit_split_permission(clause):
+        consumer_ids.add(_unit_split.UNIT_SPLIT_CONSUMER_ID)
     consumer_ids.update(_advance_eligibility.consumer_ids_for_clause(clause))
     consumer_ids.update(_extensions.consumer_ids_for_clause(clause))
     consumer_ids.update(_conditional_charge.consumer_ids_for_clause(clause))
@@ -3886,6 +3881,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_RESERVE_ARRIVAL_RESTRICTION_CONSUMER_ID)
     if _prebattle_redeploy.clause_is_prebattle_redeploy_permission(clause):
         hook_ids.add(CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID)
+    if _unit_split.clause_is_unit_split_permission(clause):
+        hook_ids.add(_unit_split.UNIT_SPLIT_CONSUMER_ID)
     hook_ids.update(_triggered_move.consumer_ids_for_clause(clause))
     hook_ids.update(_contextual.consumer_ids_for_clause(clause))
     return tuple(sorted(hook_ids))
@@ -5871,6 +5868,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         ):
             return (_datasheet.CATALOG_IR_FIGHT_ACTIVATION_MOVEMENT_DISTANCE_CONSUMER_ID,)
         return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
+    if effect.kind is RuleEffectKind.SPLIT_UNIT:
+        return (_unit_split.UNIT_SPLIT_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.OUT_OF_PHASE_ACTION:
         parameters = parameter_payload(effect.parameters)
         if triggered_movement_ids := _triggered_move.consumer_ids_for_effect(effect):

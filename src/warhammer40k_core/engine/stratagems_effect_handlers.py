@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -146,7 +148,9 @@ def _apply_explosives_handler(
     target_binding: StratagemTargetBinding,
     use_record: StratagemUseRecord,
 ) -> None:
-    target_unit_id = _explosives_target_unit_id(context)
+    target_unit_id = rules_unit_view_by_id(
+        state=state, unit_instance_id=_explosives_target_unit_id(context)
+    ).unit_instance_id
     context_error = _explosives_context_error(
         state=state,
         context=context,
@@ -409,6 +413,12 @@ def _apply_crushing_impact_handler(
     model_id = _crushing_impact_model_id_or_none(use_record.effect_selection)
     if enemy_unit_id is None or model_id is None:
         raise GameLifecycleError("Crushing Impact selection was not prevalidated.")
+    source_unit_id = rules_unit_view_by_id(
+        state=state, unit_instance_id=source_unit_id
+    ).unit_instance_id
+    enemy_unit_id = rules_unit_view_by_id(
+        state=state, unit_instance_id=enemy_unit_id
+    ).unit_instance_id
     toughness = _model_toughness(state=state, model_instance_id=model_id)
     if toughness is None:
         raise GameLifecycleError("Crushing Impact model Toughness was not prevalidated.")
@@ -509,6 +519,12 @@ def apply_crushing_impact_mortal_wound_decision(
         source_mortal_wounds,
         enemy_mortal_wounds,
     ) = _crushing_impact_details(source_context)
+    source_unit_id = rules_unit_view_by_id(
+        state=state, unit_instance_id=source_unit_id
+    ).unit_instance_id
+    enemy_unit_id = rules_unit_view_by_id(
+        state=state, unit_instance_id=enemy_unit_id
+    ).unit_instance_id
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_decision(
         state=state,

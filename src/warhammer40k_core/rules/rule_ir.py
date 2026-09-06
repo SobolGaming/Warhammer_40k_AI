@@ -162,6 +162,7 @@ class RuleEffectKind(StrEnum):
     REPLACE_UNIT_DATASHEET = "replace_unit_datasheet"
     RETURN_DESTROYED_TARGET = "return_destroyed_target"
     SELECT_TRACKED_TARGET = "select_tracked_target"
+    SPLIT_UNIT = "split_unit"
     SET_CONTEXTUAL_STATUS = "set_contextual_status"
     SET_CHARACTERISTIC = "set_characteristic"
 

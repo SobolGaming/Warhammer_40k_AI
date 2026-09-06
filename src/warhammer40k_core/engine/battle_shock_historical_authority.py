@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
 from warhammer40k_core.engine.battle_shock_model_authority import (
     command_test_allows_off_battlefield,
@@ -22,8 +21,9 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     physical_model_authority_before_event,
 )
 from warhammer40k_core.engine.rules_units import (
-    RulesUnitComponent,
     RulesUnitView,
+    rules_unit_view_from_armies,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
@@ -69,70 +69,27 @@ class HistoricalBattleShockAuthorityContext:
     def rules_unit(self, unit_instance_id: str) -> RulesUnitView:
         if type(unit_instance_id) is not str or not unit_instance_id:
             raise GameLifecycleError("Historical Battle-shock rules-unit ID is invalid.")
-        if unit_instance_id in self.active_attached_unit_ids:
-            record = self._starting_attached_record(unit_instance_id)
-            army = self.army_for_player(record.player_id)
-            unit_by_id = {unit.unit_instance_id: unit for unit in army.units}
-            try:
-                bodyguard = unit_by_id[record.bodyguard_unit_instance_id]
-                leaders = tuple(unit_by_id[value] for value in record.leader_unit_instance_ids)
-                support = tuple(unit_by_id[value] for value in record.support_unit_instance_ids)
-            except KeyError as exc:
-                raise GameLifecycleError(
-                    "Historical Battle-shock attached-unit component is unknown."
-                ) from exc
-            formation = AttachedUnitFormation(
-                attached_unit_instance_id=record.attached_unit_instance_id,
-                bodyguard_unit_instance_id=record.bodyguard_unit_instance_id,
-                leader_unit_instance_ids=record.leader_unit_instance_ids,
-                support_unit_instance_ids=record.support_unit_instance_ids,
-                component_unit_instance_ids=record.component_unit_instance_ids,
-                source_id=record.source_id,
-                attachment_source_ids=(record.source_id,),
+        try:
+            view = rules_unit_view_from_armies(
+                armies=self.armies, unit_instance_id=unit_instance_id
             )
-            return RulesUnitView(
-                unit_instance_id=record.attached_unit_instance_id,
-                owner_player_id=record.player_id,
-                components=(
-                    RulesUnitComponent(unit=bodyguard, role="bodyguard"),
-                    *(RulesUnitComponent(unit=value, role="leader") for value in leaders),
-                    *(RulesUnitComponent(unit=value, role="support") for value in support),
-                ),
-                attached_unit=formation,
-            )
-        unit, army = self.unit_and_army(unit_instance_id)
-        if any(
-            unit.unit_instance_id in record.component_unit_instance_ids
-            and record.attached_unit_instance_id in self.active_attached_unit_ids
-            for record in self.starting_attached_unit_records
-        ):
+        except GameLifecycleError as exc:
             raise GameLifecycleError(
-                "Historical Battle-shock component ID is not a canonical active rules unit."
+                "Historical Battle-shock rules-unit authority is invalid."
+            ) from exc
+        if view.unit_instance_id != unit_instance_id:
+            raise GameLifecycleError(
+                "Historical Battle-shock requires canonical rules-unit identity."
             )
-        return RulesUnitView(
-            unit_instance_id=unit.unit_instance_id,
-            owner_player_id=army.player_id,
-            components=(RulesUnitComponent(unit=unit, role="unit"),),
-        )
+        if view.is_attached_rules_unit and unit_instance_id not in self.active_attached_unit_ids:
+            raise GameLifecycleError("Historical Battle-shock attached identity is not active.")
+        return view
 
     def all_rules_units(self) -> tuple[RulesUnitView, ...]:
-        attached_component_ids = {
-            component_id
-            for record in self.starting_attached_unit_records
-            if record.attached_unit_instance_id in self.active_attached_unit_ids
-            for component_id in record.component_unit_instance_ids
-        }
-        views = [self.rules_unit(value) for value in self.active_attached_unit_ids]
-        views.extend(
-            self.rules_unit(unit.unit_instance_id)
-            for army in self.armies
-            for unit in army.units
-            if unit.unit_instance_id not in attached_component_ids
+        return tuple(
+            self.rules_unit(view.unit_instance_id)
+            for view in rules_unit_views_from_armies(armies=self.armies)
         )
-        ids = tuple(value.unit_instance_id for value in views)
-        if len(ids) != len(set(ids)):
-            raise GameLifecycleError("Historical Battle-shock rules-unit inventory is duplicated.")
-        return tuple(sorted(views, key=lambda value: value.unit_instance_id))
 
     def rules_unit_containing_unit(self, unit_instance_id: str) -> RulesUnitView:
         matches = tuple(
@@ -261,6 +218,7 @@ class HistoricalBattleShockAuthorityContext:
                         unit_instance_id=unit.unit_instance_id,
                         model_instance_id=model_id,
                         pose=row.pose,
+                        split_origin=unit.split_origin,
                     ),
                 )
             )
@@ -300,6 +258,7 @@ class HistoricalBattleShockAuthorityContext:
                         unit_instance_id=unit.unit_instance_id,
                         model_instance_id=model_id,
                         pose=row.pose,
+                        split_origin=unit.split_origin,
                     ),
                 )
             )

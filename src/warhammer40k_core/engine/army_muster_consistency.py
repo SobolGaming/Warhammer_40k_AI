@@ -27,6 +27,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_initializations_for_army,
 )
 from warhammer40k_core.engine.unit_resources import UnitResourceTransactionKind
+from warhammer40k_core.engine.unit_split_runtime import authenticated_split_armies
 
 
 def validate_mustered_army_consistency(
@@ -72,10 +73,16 @@ def validate_mustered_army_consistency(
     )
     if _state_requires_mustered_armies(state) and not state_armies:
         raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
+    split_armies = authenticated_split_armies(
+        state=state,
+        expected_armies=expected_armies,
+        decision_records=decision_records,
+        event_records=event_records,
+    )
     if state_armies and not _armies_match_muster_runtime_state(
         state=state,
         state_armies=state_armies,
-        expected_armies=expected_armies,
+        expected_armies=split_armies,
         materialized_model_payloads_by_unit_id=(materialized_model_payloads_by_unit_id),
     ):
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")

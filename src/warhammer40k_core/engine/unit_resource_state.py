@@ -33,7 +33,7 @@ def unit_resource_initializations_for_army(
     army_definition: ArmyDefinition,
 ) -> tuple[UnitResourceInitialization, ...]:
     initializations: list[UnitResourceInitialization] = []
-    for unit in army_definition.units:
+    for unit in army_definition.source_units():
         for allocation in unit.starting_resources:
             entitlement = dice_result_override_resource_entitlement(
                 abilities=unit.datasheet_abilities,
@@ -76,7 +76,7 @@ def unit_resource_ledger_for_unit(
     state: GameState,
     unit_instance_id: str,
 ) -> UnitResourceLedger | None:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_unit_id = _resource_owner_id(state=state, unit_instance_id=unit_instance_id)
     for ledger in state.unit_resource_ledgers:
         if ledger.unit_instance_id == requested_unit_id:
             return ledger
@@ -117,7 +117,7 @@ def initialize_unit_resource(
     source_rule_id: str,
 ) -> UnitResourceLedger:
     requested_player_id = _validate_player_id(state=state, player_id=player_id)
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_unit_id = _resource_owner_id(state=state, unit_instance_id=unit_instance_id)
     if (
         _owner_player_id_for_unit(state=state, unit_instance_id=requested_unit_id)
         != requested_player_id
@@ -150,7 +150,7 @@ def spend_unit_resource(
     decision_result_id: str,
 ) -> UnitResourceResult:
     requested_player_id = _validate_player_id(state=state, player_id=player_id)
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_unit_id = _resource_owner_id(state=state, unit_instance_id=unit_instance_id)
     if (
         _owner_player_id_for_unit(state=state, unit_instance_id=requested_unit_id)
         != requested_player_id
@@ -186,7 +186,9 @@ def validate_unit_resource_ledgers(
     if not isinstance(values, list):
         raise GameLifecycleError("GameState unit_resource_ledgers must be a list.")
     owner_by_unit_id = {
-        unit.unit_instance_id: army.player_id for army in army_definitions for unit in army.units
+        unit.unit_instance_id: army.player_id
+        for army in army_definitions
+        for unit in army.source_units()
     }
     validated: list[UnitResourceLedger] = []
     seen: set[str] = set()
@@ -226,6 +228,15 @@ def _validate_player_id(*, state: GameState, player_id: str) -> str:
 def _owner_player_id_for_unit(*, state: GameState, unit_instance_id: str) -> str:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in state.army_definitions:
-        if any(unit.unit_instance_id == requested_unit_id for unit in army.units):
+        if any(unit.unit_instance_id == requested_unit_id for unit in army.source_units()):
             return army.player_id
     raise GameLifecycleError("Unit resource unit_instance_id was not found.")
+
+
+def _resource_owner_id(*, state: GameState, unit_instance_id: str) -> str:
+    requested = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested:
+                return unit.source_unit_instance_id
+    return requested

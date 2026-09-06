@@ -55,6 +55,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
 )
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventContext,
@@ -1273,7 +1274,8 @@ def _enhancement_assignment_matches_unit(
     enhancement_id = record.definition.ability_id
     return any(
         assignment.enhancement_id == enhancement_id
-        and f"{army.army_id}:{assignment.target_unit_selection_id}" == unit.unit_instance_id
+        and enhancement_bearer_unit(army, assignment=assignment).unit_instance_id
+        == unit.unit_instance_id
         for assignment in army.enhancement_assignments
     )
 

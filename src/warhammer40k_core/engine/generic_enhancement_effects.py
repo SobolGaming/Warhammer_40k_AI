@@ -17,6 +17,7 @@ from warhammer40k_core.engine.effects import (
     EffectExpiration,
     generic_rule_persisting_effect,
 )
+from warhammer40k_core.engine.enhancement_bearers import current_enhancement_bearer
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectContext,
@@ -324,7 +325,7 @@ def _aura_weapon_profile(
             battle_round=max(1, context.state.battle_round),
             phase=context.source_phase,
             active_player_id=context.state.active_player_id,
-            source_unit_instance_id=binding_source.assignment.bearer_unit_instance_id,
+            source_unit_instance_id=bearer.unit_instance_id,
             source_model_instance_id=source_model_instance_id,
             target_player_id=binding_source.assignment.player_id,
             trigger_payload={
@@ -622,7 +623,7 @@ def _selected_assignment_for_context(
         raise GameLifecycleError("Generic enhancement assignment player drift.")
     if selected_assignment.source_id != context.assignment.source_id:
         raise GameLifecycleError("Generic enhancement assignment source drift.")
-    if selected_assignment.bearer_unit_instance_id != context.target_unit.unit_instance_id:
+    if selected_assignment.bearer_unit_instance_id != context.target_unit.source_unit_instance_id:
         raise GameLifecycleError("Generic enhancement assignment bearer drift.")
     return selected_assignment
 
@@ -733,12 +734,9 @@ def _bearer_unit_for_assignment(
         raise GameLifecycleError("Generic aura weapon assignment player has no army.")
     if army.army_id != assignment.army_id:
         raise GameLifecycleError("Generic aura weapon assignment army drift.")
-    matches = tuple(
-        unit for unit in army.units if unit.unit_instance_id == assignment.bearer_unit_instance_id
+    return current_enhancement_bearer(
+        army, source_unit_instance_id=assignment.bearer_unit_instance_id
     )
-    if len(matches) != 1:
-        raise GameLifecycleError("Generic aura weapon bearer unit is not unique.")
-    return matches[0]
 
 
 def _source_model_is_active(

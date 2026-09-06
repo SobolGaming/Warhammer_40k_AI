@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import (
@@ -19,6 +19,12 @@ from warhammer40k_core.engine.spatial_index_state import (
     SpatialIndexStatePayload as SpatialIndexStatePayload,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_ownership import (
+    SplitUnitOrigin,
+    SplitUnitOriginPayload,
+    UnitOwnershipError,
+    validate_physical_model_owner,
+)
 from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
@@ -99,6 +105,7 @@ class BattlefieldTransitionBatchPayload(TypedDict):
 
 
 class ModelPlacementPayload(TypedDict):
+    split_origin: NotRequired[SplitUnitOriginPayload]
     army_id: str
     player_id: str
     unit_instance_id: str
@@ -457,6 +464,8 @@ class ModelPlacement:
     model_instance_id: str
     pose: Pose
 
+    split_origin: SplitUnitOrigin | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -488,24 +497,33 @@ class ModelPlacement:
         )
         if not self.unit_instance_id.startswith(f"{self.army_id}:"):
             raise PlacementError("ModelPlacement unit_instance_id must be scoped to army_id.")
-        if not self.model_instance_id.startswith(f"{self.unit_instance_id}:"):
-            raise PlacementError(
-                "ModelPlacement model_instance_id must be scoped to unit_instance_id."
+        try:
+            validate_physical_model_owner(
+                unit_instance_id=self.unit_instance_id,
+                model_instance_id=self.model_instance_id,
+                split_origin=self.split_origin,
             )
+        except UnitOwnershipError as exc:
+            raise PlacementError(str(exc)) from exc
+
         if type(self.pose) is not Pose:
             raise PlacementError("ModelPlacement pose must be a Pose.")
 
     def to_payload(self) -> ModelPlacementPayload:
-        return {
+        payload: ModelPlacementPayload = {
             "army_id": self.army_id,
             "player_id": self.player_id,
             "unit_instance_id": self.unit_instance_id,
             "model_instance_id": self.model_instance_id,
             "pose": self.pose.to_payload(),
         }
+        if self.split_origin is not None:
+            payload["split_origin"] = self.split_origin.to_payload()
+        return payload
 
     def with_pose(self, pose: Pose) -> Self:
         return type(self)(
+            split_origin=self.split_origin,
             army_id=self.army_id,
             player_id=self.player_id,
             unit_instance_id=self.unit_instance_id,
@@ -516,6 +534,11 @@ class ModelPlacement:
     @classmethod
     def from_payload(cls, payload: ModelPlacementPayload) -> Self:
         return cls(
+            split_origin=(
+                SplitUnitOrigin.from_payload(payload["split_origin"])
+                if "split_origin" in payload
+                else None
+            ),
             army_id=payload["army_id"],
             player_id=payload["player_id"],
             unit_instance_id=payload["unit_instance_id"],
@@ -1327,6 +1350,8 @@ def _unit_for_placement(*, army: ArmyDefinition, placement: UnitPlacement) -> Un
 
 
 def _model_for_placement(*, unit: UnitInstance, placement: ModelPlacement) -> ModelInstance:
+    if placement.split_origin != unit.split_origin:
+        raise PlacementError("ModelPlacement split ownership proof disagrees with its unit.")
     for model in unit.own_models:
         if model.model_instance_id == placement.model_instance_id:
             return model

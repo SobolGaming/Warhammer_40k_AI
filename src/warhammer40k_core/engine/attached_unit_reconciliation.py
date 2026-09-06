@@ -35,6 +35,17 @@ def validate_attached_rules_unit_identity_after_destruction(
     )
     if not rules_unit.is_attached_rules_unit:
         return
+    if rules_unit.split_record is not None:
+        record = rules_unit.split_record
+        index = rules_unit.split_index
+        if index is None or set(record.model_ids(index)) != {
+            model.model_instance_id for model in rules_unit.own_models
+        }:
+            raise GameLifecycleError("Split Attached Unit membership drifted after destruction.")
+        strength = state.starting_strength_record_for_unit(rules_unit.unit_instance_id)
+        if strength.starting_model_count != len(record.model_ids(index)):
+            raise GameLifecycleError("Split Attached Unit Starting Strength drifted.")
+        return
     attached_id = rules_unit.unit_instance_id
     starting_matches = tuple(
         record

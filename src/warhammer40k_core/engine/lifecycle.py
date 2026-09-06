@@ -39,6 +39,7 @@ from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity a
 from warhammer40k_core.engine import reserve_state_integrity as _rsi
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine import transport_state_integrity as _tsi
+from warhammer40k_core.engine import unit_split_dispatch as _unit_split_dispatch
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
@@ -949,6 +950,7 @@ class GameLifecycle:
         validate_pending_battlefield_request_consistency(
             state=lifecycle._require_state(),
             pending_request=lifecycle._pending_decision_request(),
+            decision_records=lifecycle.decision_controller.records,
         )
         validate_reaction_queue_consistency(
             state=lifecycle._require_state(),
@@ -1170,6 +1172,7 @@ class GameLifecycle:
                     applier=self._apply_cult_ambush_marker_placement_decision,
                 ),
                 *_cmmd.decision_dispatch_handlers(self),
+                *_unit_split_dispatch.decision_dispatch_handlers(self),
                 *(
                     DecisionDispatchHandler(
                         decision_type=decision_type,

@@ -54,7 +54,11 @@ from warhammer40k_core.engine.primary_scoring_state_evidence_spatial_integrity i
     build_primary_scoring_spatial_rows,
     validate_primary_scoring_spatial_rows_context,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_identity_maps_from_armies,
+    rules_unit_views_from_armies,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatePayload
@@ -1188,62 +1192,7 @@ def _known_rules_unit_identity_maps(
     *,
     state: GameState,
 ) -> tuple[dict[str, str], dict[str, tuple[str, ...]]]:
-    owner_by_id: dict[str, str] = {}
-    components_by_id: dict[str, tuple[str, ...]] = {}
-    for army in state.army_definitions:
-        for unit in army.units:
-            _record_known_rules_unit(
-                rules_unit_instance_id=unit.unit_instance_id,
-                owner_player_id=army.player_id,
-                component_unit_instance_ids=(unit.unit_instance_id,),
-                owner_by_id=owner_by_id,
-                components_by_id=components_by_id,
-            )
-        for formation in army.attached_units:
-            _record_known_rules_unit(
-                rules_unit_instance_id=formation.attached_unit_instance_id,
-                owner_player_id=army.player_id,
-                component_unit_instance_ids=formation.component_unit_instance_ids,
-                owner_by_id=owner_by_id,
-                components_by_id=components_by_id,
-            )
-    for record in state.starting_attached_unit_records:
-        _record_known_rules_unit(
-            rules_unit_instance_id=record.attached_unit_instance_id,
-            owner_player_id=record.player_id,
-            component_unit_instance_ids=record.component_unit_instance_ids,
-            owner_by_id=owner_by_id,
-            components_by_id=components_by_id,
-        )
-    return owner_by_id, components_by_id
-
-
-def _record_known_rules_unit(
-    *,
-    rules_unit_instance_id: str,
-    owner_player_id: str,
-    component_unit_instance_ids: tuple[str, ...],
-    owner_by_id: dict[str, str],
-    components_by_id: dict[str, tuple[str, ...]],
-) -> None:
-    rules_unit_id = _validate_identifier(
-        "known rules_unit_instance_id",
-        rules_unit_instance_id,
-    )
-    owner_id = _validate_identifier("known owner_player_id", owner_player_id)
-    components = _validate_sorted_identifier_tuple(
-        "known component_unit_instance_ids",
-        component_unit_instance_ids,
-        require_non_empty=True,
-    )
-    existing_owner = owner_by_id.get(rules_unit_id)
-    existing_components = components_by_id.get(rules_unit_id)
-    if existing_owner is not None and existing_owner != owner_id:
-        raise GameLifecycleError("Primary scoring known rules-unit owner is ambiguous.")
-    if existing_components is not None and existing_components != components:
-        raise GameLifecycleError("Primary scoring known rules-unit components are ambiguous.")
-    owner_by_id[rules_unit_id] = owner_id
-    components_by_id[rules_unit_id] = components
+    return rules_unit_identity_maps_from_armies(tuple(state.army_definitions))
 
 
 def _reject_future_boundary(
@@ -1405,26 +1354,6 @@ def _validate_turn_order(value: object) -> tuple[str, ...]:
             "Primary scoring state turn_order must contain exactly two unique players."
         )
     return ordered
-
-
-def _validate_sorted_identifier_tuple(
-    label: str,
-    value: object,
-    *,
-    require_non_empty: bool,
-) -> tuple[str, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError(f"{label} must be a tuple.")
-    raw_values = cast(tuple[object, ...], value)
-    identifiers = tuple(_validate_identifier(f"{label} value", item) for item in raw_values)
-    if require_non_empty and not identifiers:
-        raise GameLifecycleError(f"{label} must not be empty.")
-    if len(set(identifiers)) != len(identifiers):
-        raise GameLifecycleError(f"{label} must not contain duplicates.")
-    expected = tuple(sorted(identifiers))
-    if identifiers != expected:
-        raise GameLifecycleError(f"{label} must be sorted.")
-    return expected
 
 
 def _required_payload_mapping(

@@ -2,8 +2,14 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NotRequired
 
+from warhammer40k_core.engine.unit_ownership import (
+    SplitUnitOrigin,
+    SplitUnitOriginPayload,
+    UnitOwnershipError,
+    validate_physical_model_owner,
+)
 from warhammer40k_core.engine.phases.movement_imports import *
 
 # fmt: off
@@ -252,6 +258,7 @@ class AdvancedUnitStatePayload(TypedDict):
 
 
 class DesperateEscapeRequirementPayload(TypedDict):
+    split_origin: NotRequired[SplitUnitOriginPayload]
     requirement_id: str
     player_id: str
     battle_round: int
@@ -816,6 +823,8 @@ class DesperateEscapeRequirement:
     reasons: tuple[DesperateEscapeRequirementReason, ...]
     enemy_model_ids: tuple[str, ...] = ()
 
+    split_origin: SplitUnitOrigin | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
@@ -851,10 +860,14 @@ class DesperateEscapeRequirement:
                 self.model_instance_id,
             ),
         )
-        if not self.model_instance_id.startswith(f"{self.unit_instance_id}:"):
-            raise GameLifecycleError(
-                "DesperateEscapeRequirement model_instance_id must belong to unit_instance_id."
+        try:
+            validate_physical_model_owner(
+                unit_instance_id=self.unit_instance_id,
+                model_instance_id=self.model_instance_id,
+                split_origin=self.split_origin,
             )
+        except UnitOwnershipError as exc:
+            raise GameLifecycleError(str(exc)) from exc
         object.__setattr__(
             self,
             "reasons",
@@ -888,7 +901,7 @@ class DesperateEscapeRequirement:
         )
 
     def to_payload(self) -> DesperateEscapeRequirementPayload:
-        return {
+        payload: DesperateEscapeRequirementPayload = {
             "requirement_id": self.requirement_id,
             "player_id": self.player_id,
             "battle_round": self.battle_round,
@@ -898,9 +911,18 @@ class DesperateEscapeRequirement:
             "enemy_model_ids": list(self.enemy_model_ids),
         }
 
+        if self.split_origin is not None:
+            payload["split_origin"] = self.split_origin.to_payload()
+        return payload
+
     @classmethod
     def from_payload(cls, payload: DesperateEscapeRequirementPayload) -> Self:
         return cls(
+            split_origin=(
+                SplitUnitOrigin.from_payload(payload["split_origin"])
+                if "split_origin" in payload
+                else None
+            ),
             requirement_id=payload["requirement_id"],
             player_id=payload["player_id"],
             battle_round=payload["battle_round"],

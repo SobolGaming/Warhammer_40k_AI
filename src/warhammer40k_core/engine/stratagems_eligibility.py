@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
@@ -499,7 +501,7 @@ def _canonical_stratagem_affected_unit_id(
         return requested_unit_id
     current_view = next(iter(current_views))
     if (
-        current_view.attached_unit is not None
+        current_view.is_attached_rules_unit
         and requested_unit_id in current_view.component_unit_instance_ids
     ):
         return current_view.unit_instance_id
@@ -852,40 +854,11 @@ def _rule_ir_from_stratagem_definition(definition: StratagemDefinition) -> RuleI
     return rule_ir_from_execution_payload(definition.effect_payload)
 
 
-def _attached_unit_id_for_component(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> str | None:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    matched_attached_ids = tuple(
-        attached_unit.attached_unit_instance_id
-        for army_definition in state.army_definitions
-        for attached_unit in army_definition.attached_units
-        if requested_unit_id in attached_unit.component_unit_instance_ids
-    )
-    if len(matched_attached_ids) > 1:
-        raise GameLifecycleError("Attached component has multiple attached identities.")
-    if matched_attached_ids:
-        return matched_attached_ids[0]
-    component_record = None
-    for record in state.starting_strength_records:
-        if record.unit_instance_id == requested_unit_id:
-            component_record = record
-            break
-    if component_record is None:
-        return None
-    attached_unit_ids = tuple(
-        record.unit_instance_id
-        for record in state.starting_strength_records
-        if record.player_id == component_record.player_id
-        and record.source_id == component_record.source_id
-        and record.unit_instance_id.startswith("attached-unit:")
-    )
-    if len(attached_unit_ids) > 1:
-        raise GameLifecycleError("Attached-unit source has multiple attached identities.")
-    if attached_unit_ids:
-        return attached_unit_ids[0]
+def _attached_unit_id_for_component(*, state: GameState, unit_instance_id: str) -> str | None:
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if view.is_attached_rules_unit and requested_id in view.component_unit_instance_ids:
+            return view.unit_instance_id
     return None
 
 

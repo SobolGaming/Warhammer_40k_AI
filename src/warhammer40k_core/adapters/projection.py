@@ -19,6 +19,7 @@ from warhammer40k_core.adapters.redaction import (
     public_primary_rules_unit_turn_start_snapshots,
     public_victory_point_ledger_payload,
     redacted_decision_type_for_hidden_viewer,
+    visible_army_units,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -654,7 +655,12 @@ def _live_display_maps(
             or viewer.owns_player(army.player_id)
             or not formation_declarations_unresolved
         )
-        for unit in army.units:
+        for unit in visible_army_units(
+            state=state,
+            army=army,
+            viewer_player_id=viewer.viewer_player_id,
+            omniscient=viewer.policy.omniscient,
+        ):
             # Army lists and datacards are public tabletop information. Declare
             # Battle Formations secrecy belongs to the declaration choices and
             # their state/events, not to the roster identities those choices

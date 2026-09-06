@@ -9,6 +9,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveOrigin
@@ -695,7 +696,8 @@ def validate_primary_reserve_entry_provider_registration(
     }
     if not any(
         assignment.enhancement_id == definition.content_id
-        and f"{army.army_id}:{assignment.target_unit_selection_id}" in component_unit_ids
+        and enhancement_bearer_unit(army, assignment=assignment).unit_instance_id
+        in component_unit_ids
         for assignment in army.enhancement_assignments
     ):
         raise GameLifecycleError(

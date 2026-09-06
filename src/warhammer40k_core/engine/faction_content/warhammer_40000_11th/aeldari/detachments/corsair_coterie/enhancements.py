@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
     EnhancementPersistingEffectGrant,
@@ -707,8 +708,7 @@ def _assigned_units(
     for assignment in army.enhancement_assignments:
         if assignment.enhancement_id != enhancement_id:
             continue
-        unit_instance_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
-        matches.append((assignment, _unit_in_army_by_id(army, unit_instance_id=unit_instance_id)))
+        matches.append((assignment, enhancement_bearer_unit(army, assignment=assignment)))
     return tuple(sorted(matches, key=lambda item: item[1].unit_instance_id))
 
 

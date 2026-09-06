@@ -9,10 +9,6 @@ from warhammer40k_core.engine.actions import (
     MissionActionStatePayload,
     MissionActionStatus,
 )
-from warhammer40k_core.engine.attached_unit_formation import (
-    AttachedUnitFormation,
-    AttachedUnitFormationPayload,
-)
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
@@ -71,6 +67,7 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionMarkerState,
     PrimaryMissionMarkerStatus,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     PrimaryUnitDestructionState,
@@ -155,9 +152,9 @@ def capture_primary_mission_boundary_checkpoint(
         battlefield_id=battlefield.battlefield_id,
         model_states=model_states,
         attached_unit_formation_jsons=tuple(
-            canonical_json(formation.to_payload())
-            for army in state.army_definitions
-            for formation in army.attached_units
+            canonical_json(view.attached_unit.to_payload())
+            for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+            if view.attached_unit is not None
         ),
         battle_shocked_unit_instance_ids=tuple(state.battle_shocked_unit_ids),
         advanced_unit_state_jsons=tuple(
@@ -1139,40 +1136,17 @@ def _is_generic_objective_control_effect(effect: PersistingEffect) -> bool:
 def _validate_attached_unit_inventory(
     *, state: GameState, checkpoint: PrimaryMissionBoundaryCheckpoint
 ) -> None:
-    formations = tuple(
-        AttachedUnitFormation.from_payload(cast(AttachedUnitFormationPayload, _json_object(value)))
-        for value in checkpoint.attached_unit_formation_jsons
-    )
-    starting = {
-        (
-            row.player_id,
-            row.attached_unit_instance_id,
-            row.component_unit_instance_ids,
+    expected = tuple(
+        sorted(
+            canonical_json(view.attached_unit.to_payload())
+            for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+            if view.attached_unit is not None
         )
-        for row in state.starting_attached_unit_records
-    }
-    owners = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    for formation in formations:
-        component_owners = {
-            owners.get(unit_id) for unit_id in formation.component_unit_instance_ids
-        }
-        if len(component_owners) != 1 or None in component_owners:
-            raise GameLifecycleError("Primary mission boundary attached-unit inventory drifted.")
-        owner = next(iter(component_owners))
-        if (
-            owner,
-            formation.attached_unit_instance_id,
-            formation.component_unit_instance_ids,
-        ) not in starting:
-            raise GameLifecycleError("Primary mission boundary attached-unit inventory drifted.")
-    rules_unit_ids = {row.rules_unit_instance_id for row in checkpoint.model_states}
-    formation_ids = {row.attached_unit_instance_id for row in formations}
-    if not formation_ids <= rules_unit_ids:
-        raise GameLifecycleError("Primary mission boundary attached-unit identity drifted.")
+    )
+    # Source-authorized pre-battle splits have their own immutable army lineage;
+    # model_states bind every successor model to that current rules-unit identity.
+    if checkpoint.attached_unit_formation_jsons != expected:
+        raise GameLifecycleError("Primary mission boundary attached-unit inventory drifted.")
 
 
 def _validate_marker_inventory(

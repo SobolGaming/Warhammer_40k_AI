@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_unit_starting_inventory import starting_rules_unit_inventory
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -22,9 +23,9 @@ def validate_historical_rules_unit_identity(
     else:
         valid = any(
             record.player_id == player_id
-            and record.attached_unit_instance_id == rules_unit_instance_id
-            and tuple(sorted(record.component_unit_instance_ids)) == components
-            for record in state.starting_attached_unit_records
+            and record.rules_unit_instance_id == rules_unit_instance_id
+            and record.component_ids == components
+            for record in starting_rules_unit_inventory(state)
         )
     if not valid or unit_identity_ids != tuple(sorted({rules_unit_instance_id, *components})):
         raise GameLifecycleError("Primary Mission Action historical rules-unit inventory drifted.")
@@ -40,10 +41,10 @@ def allowed_rules_unit_ids_for_component(
         {
             component_unit_instance_id,
             *(
-                record.attached_unit_instance_id
-                for record in state.starting_attached_unit_records
+                record.rules_unit_instance_id
+                for record in starting_rules_unit_inventory(state)
                 if record.player_id == player_id
-                and component_unit_instance_id in record.component_unit_instance_ids
+                and component_unit_instance_id in record.component_ids
             ),
         }
     )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Literal, cast
+from typing import cast
 
 from warhammer40k_core.core.attributes import (
     Characteristic,
@@ -32,6 +32,13 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_index_from_payload,
 )
+from warhammer40k_core.engine.generic_rule_effect_targets import (
+    AttackRole,
+    GenericAttackEffect,
+    attack_role_parameter,
+    generic_effect_role_applies,
+    generic_unit_effect_applies,
+)
 from warhammer40k_core.engine.generic_rule_save_modifiers import (
     generic_rule_save_option_with_roll_modifier,
     generic_rule_save_options_with_invulnerable_save,
@@ -43,7 +50,7 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_weapon_selector_applies,
 )
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
-from warhammer40k_core.engine.rules_unit_effects import rules_unit_persisting_effects
+from warhammer40k_core.engine.rules_unit_effects import rules_unit_effect_applications
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     DamageRollModifierContext,
@@ -58,30 +65,6 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.saves import SaveOption, save_option_with_armor_penetration_modifier
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
-type AttackRole = Literal["attacker", "target"]
-
-_ATTACKER_TARGET_KINDS = frozenset(
-    {
-        RuleTargetKind.AURA_UNITS,
-        RuleTargetKind.FRIENDLY_UNIT,
-        RuleTargetKind.PLAYER,
-        RuleTargetKind.SELECTED_UNIT,
-        RuleTargetKind.THIS_MODEL,
-        RuleTargetKind.THIS_UNIT,
-        RuleTargetKind.WEAPON,
-    }
-)
-_TARGET_TARGET_KINDS = frozenset({RuleTargetKind.ENEMY_UNIT, RuleTargetKind.SELECTED_TARGET})
-_LEGACY_SELF_TARGET_KINDS = frozenset(
-    {
-        RuleTargetKind.AURA_UNITS,
-        RuleTargetKind.FRIENDLY_UNIT,
-        RuleTargetKind.SELECTED_UNIT,
-        RuleTargetKind.THIS_MODEL,
-        RuleTargetKind.THIS_UNIT,
-    }
-)
-
 
 @dataclass(frozen=True, slots=True)
 class GenericRuleRerollPermissionContext:
@@ -95,22 +78,6 @@ class GenericRuleRerollPermissionContext:
         if not isinstance(source_payload, dict):
             raise GameLifecycleError("Generic RuleIR reroll source payload must be an object.")
         object.__setattr__(self, "source_payload", source_payload)
-
-
-@dataclass(frozen=True, slots=True)
-class _GenericAttackEffect:
-    persisting_effect: PersistingEffect
-    role: AttackRole
-    source_id: str
-    rule_id: str
-    rule_ir_hash: str
-    clause_id: str
-    effect_index: int
-    target_kind: RuleTargetKind | None
-    effect_kind: RuleEffectKind
-    parameters: dict[str, JsonValue]
-    conditions: tuple[dict[str, JsonValue], ...]
-    source_model_instance_id: str | None
 
 
 def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
@@ -326,7 +293,7 @@ def generic_rule_modified_save_options(
 
 
 def _generic_this_model_effect_targets_only_alive_model(
-    *, state: object, effect: _GenericAttackEffect, unit_instance_id: str
+    *, state: object, effect: GenericAttackEffect, unit_instance_id: str
 ) -> bool:
     if effect.target_kind is not RuleTargetKind.THIS_MODEL:
         return True
@@ -581,8 +548,8 @@ def _dice_roll_modifier_for_attack(
     target_unit_instance_id: str,
     source_phase: object,
     expected_roll_type: str,
-    legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
-    legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+    legacy_attacker_role_allowed: Callable[[GenericAttackEffect], bool],
+    legacy_target_role_allowed: Callable[[GenericAttackEffect], bool],
     weapon_profile: WeaponProfile | None = None,
     attack_strength: int | None = None,
     target_toughness: int | None = None,
@@ -612,24 +579,27 @@ def generic_rule_matching_unit_effects(
     state: object,
     unit_instance_id: str,
     effect_kind: RuleEffectKind,
-) -> tuple[_GenericAttackEffect, ...]:
+) -> tuple[GenericAttackEffect, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR unit hooks require GameState.")
-    matches_by_effect_slot: dict[str, _GenericAttackEffect] = {}
-    for effect_unit_id, persisting_effect in rules_unit_persisting_effects(
+    matches_by_effect_slot: dict[str, GenericAttackEffect] = {}
+    for application in rules_unit_effect_applications(
         state,
         _validate_identifier("unit_instance_id", unit_instance_id),
     ):
         generic_effect = _generic_attack_effect_or_none(
-            persisting_effect=persisting_effect,
+            persisting_effect=application.effect,
+            effective_target_unit_instance_ids=(application.unit_instance_id,),
             role="attacker",
             expected_effect_kind=effect_kind,
         )
         if generic_effect is None:
             continue
-        if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=effect_unit_id):
+        if not generic_unit_effect_applies(
+            effect=generic_effect, unit_instance_id=application.unit_instance_id
+        ):
             continue
         effect_slot = (
             f"{generic_rule_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
@@ -674,13 +644,13 @@ def _matching_generic_attack_effects(
     target_unit_instance_id: str | None,
     source_phase: object,
     effect_kind: RuleEffectKind,
-    legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
-    legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+    legacy_attacker_role_allowed: Callable[[GenericAttackEffect], bool],
+    legacy_target_role_allowed: Callable[[GenericAttackEffect], bool],
     target_unit_lookup_ids: tuple[str | None, ...] | None = None,
     weapon_profile: WeaponProfile | None = None,
     attack_strength: int | None = None,
     target_toughness: int | None = None,
-) -> tuple[_GenericAttackEffect, ...]:
+) -> tuple[GenericAttackEffect, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -738,22 +708,27 @@ def _matching_generic_attack_effects(
             *role_unit_ids,
             ("target", canonical_target_id),
         )
-    matches: list[_GenericAttackEffect] = []
+    matches: list[GenericAttackEffect] = []
     seen: set[tuple[str, AttackRole]] = set()
     for role, unit_id in role_unit_ids:
-        for effect_unit_id, persisting_effect in rules_unit_persisting_effects(state, unit_id):
+        for application in rules_unit_effect_applications(state, unit_id):
             generic_effect = _generic_attack_effect_or_none(
-                persisting_effect=persisting_effect,
+                persisting_effect=application.effect,
+                effective_target_unit_instance_ids=(application.unit_instance_id,),
                 role=role,
                 expected_effect_kind=effect_kind,
             )
             if generic_effect is None:
                 continue
-            if not _generic_effect_role_applies(
+            if not generic_effect_role_applies(
                 effect=generic_effect,
                 role=role,
-                attacking_unit_instance_id=(effect_unit_id if role == "attacker" else attacker_id),
-                target_unit_instance_id=(effect_unit_id if role == "target" else target_id),
+                attacking_unit_instance_id=(
+                    application.unit_instance_id if role == "attacker" else attacker_id
+                ),
+                target_unit_instance_id=(
+                    application.unit_instance_id if role == "target" else target_id
+                ),
                 legacy_attacker_role_allowed=legacy_attacker_role_allowed,
                 legacy_target_role_allowed=legacy_target_role_allowed,
             ):
@@ -783,7 +758,8 @@ def _generic_attack_effect_or_none(
     persisting_effect: PersistingEffect,
     role: AttackRole,
     expected_effect_kind: RuleEffectKind,
-) -> _GenericAttackEffect | None:
+    effective_target_unit_instance_ids: tuple[str, ...] | None = None,
+) -> GenericAttackEffect | None:
     payload = persisting_effect.effect_payload
     if not isinstance(payload, dict):
         return None
@@ -795,8 +771,13 @@ def _generic_attack_effect_or_none(
     effect_kind = _effect_kind_from_payload(effect_payload)
     if effect_kind is not expected_effect_kind:
         return None
-    return _GenericAttackEffect(
+    return GenericAttackEffect(
         persisting_effect=persisting_effect,
+        effective_target_unit_instance_ids=(
+            persisting_effect.target_unit_instance_ids
+            if effective_target_unit_instance_ids is None
+            else effective_target_unit_instance_ids
+        ),
         role=role,
         source_id=_required_identifier_payload(payload, "source_id"),
         rule_id=_required_identifier_payload(payload, "rule_id"),
@@ -811,58 +792,10 @@ def _generic_attack_effect_or_none(
     )
 
 
-def _generic_effect_role_applies(
-    *,
-    effect: _GenericAttackEffect,
-    role: AttackRole,
-    attacking_unit_instance_id: str,
-    target_unit_instance_id: str | None,
-    legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
-    legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
-) -> bool:
-    requested_role = _attack_role_parameter(effect.parameters)
-    target_ids = set(effect.persisting_effect.target_unit_instance_ids)
-    if requested_role is not None:
-        if requested_role != role:
-            return False
-        if role == "attacker":
-            return attacking_unit_instance_id in target_ids
-        if target_unit_instance_id is None:
-            return False
-        return target_unit_instance_id in target_ids
-    target_kind = effect.target_kind
-    if role == "attacker":
-        return (
-            attacking_unit_instance_id in target_ids
-            and (target_kind is None or target_kind in _ATTACKER_TARGET_KINDS)
-            and legacy_attacker_role_allowed(effect)
-        )
-    if target_unit_instance_id is None or target_unit_instance_id not in target_ids:
-        return False
-    if target_kind in _TARGET_TARGET_KINDS:
-        return True
-    if target_kind is None or target_kind in _LEGACY_SELF_TARGET_KINDS:
-        return legacy_target_role_allowed(effect)
-    return False
-
-
-def _generic_unit_effect_applies(
-    *,
-    effect: _GenericAttackEffect,
-    unit_instance_id: str,
-) -> bool:
-    if unit_instance_id not in effect.persisting_effect.target_unit_instance_ids:
-        return False
-    requested_role = _attack_role_parameter(effect.parameters)
-    if requested_role is not None and requested_role != "attacker":
-        return False
-    return effect.target_kind is None or effect.target_kind in _ATTACKER_TARGET_KINDS
-
-
 def _generic_effect_context_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     attacking_unit_instance_id: str,
     attacker_model_instance_id: str | None,
     target_unit_instance_id: str | None,
@@ -957,7 +890,7 @@ def _generic_effect_context_applies(
 
 def _generic_effect_source_phase_applies(
     *,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     source_phase: object,
 ) -> bool:
     required_phase = effect.parameters.get("source_phase")
@@ -974,7 +907,7 @@ def _generic_effect_source_phase_applies(
 def _generic_effect_selected_target_gate_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     target_unit_instance_id: str | None,
 ) -> bool:
     selected_target_id = effect.parameters.get("selected_target_unit_instance_id")
@@ -986,7 +919,7 @@ def _generic_effect_selected_target_gate_applies(
         )
     if (
         effect.target_kind is RuleTargetKind.SELECTED_UNIT
-        and _attack_role_parameter(effect.parameters) == "attacker"
+        and attack_role_parameter(effect.parameters) == "attacker"
     ):
         return True
     if target_unit_instance_id is None:
@@ -1016,7 +949,7 @@ def _generic_effect_selected_target_gate_applies(
 def _generic_effect_waaagh_gate_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     attacking_unit_instance_id: str,
 ) -> bool:
     required = effect.parameters.get("requires_waaagh_active_for_unit")
@@ -1037,7 +970,7 @@ def _generic_effect_waaagh_gate_applies(
 def _generic_effect_required_ability_gate_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     attacking_unit_instance_id: str,
 ) -> bool:
     required_ability = effect.parameters.get("ability_required")
@@ -1049,18 +982,14 @@ def _generic_effect_required_ability_gate_applies(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR ability_required gate requires GameState.")
-    for persisting_effect in state.persisting_effects_for_unit(attacking_unit_instance_id):
+    for application in rules_unit_effect_applications(state, attacking_unit_instance_id):
         generic_effect = _generic_attack_effect_or_none(
-            persisting_effect=persisting_effect,
+            persisting_effect=application.effect,
+            effective_target_unit_instance_ids=(application.unit_instance_id,),
             role="attacker",
             expected_effect_kind=RuleEffectKind.GRANT_ABILITY,
         )
         if generic_effect is None:
-            continue
-        if (
-            attacking_unit_instance_id
-            not in generic_effect.persisting_effect.target_unit_instance_ids
-        ):
             continue
         if _required_string_parameter(generic_effect.parameters, key="ability") == required_ability:
             return True
@@ -1070,7 +999,7 @@ def _generic_effect_required_ability_gate_applies(
 def _generic_effect_charge_move_gate_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     attacking_unit_instance_id: str,
 ) -> bool:
     required = effect.parameters.get("requires_charge_move_this_turn")
@@ -1095,7 +1024,7 @@ def _generic_effect_charge_move_gate_applies(
 def _generic_effect_target_keyword_gate_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     target_unit_instance_id: str | None,
 ) -> bool:
     required_keyword = effect.parameters.get("target_required_keyword")
@@ -1115,7 +1044,7 @@ def _generic_effect_target_keyword_gate_applies(
 def _generic_effect_required_keyword_sequence_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     attacking_unit_instance_id: str,
     target_unit_instance_id: str | None,
 ) -> bool:
@@ -1143,7 +1072,7 @@ def _generic_effect_required_keyword_sequence_applies(
 
 def _generic_effect_weapon_scope_applies(
     *,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     weapon_profile: WeaponProfile | None,
 ) -> bool:
     if not any(key in effect.parameters for key in ("weapon_scope", "weapon_name", "weapon_names")):
@@ -1159,7 +1088,7 @@ def _generic_effect_weapon_scope_applies(
 def _generic_effect_target_constraint_applies(
     *,
     state: object,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     attacking_unit_instance_id: str,
     attacker_model_instance_id: str | None,
     target_unit_instance_id: str | None,
@@ -1222,7 +1151,7 @@ def _timing_window_for_roll_type(
 def _profile_with_weapon_ability_grant(
     *,
     profile: WeaponProfile,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
 ) -> WeaponProfile:
     return rule_ir_weapon_ability_granted_profile(
         parameters=effect.parameters,
@@ -1235,7 +1164,7 @@ def _profile_with_weapon_ability_grant(
 def _profile_with_characteristic_modifier(
     *,
     profile: WeaponProfile,
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
 ) -> WeaponProfile:
     return rule_ir_modified_weapon_profile(
         parameters=effect.parameters,
@@ -1284,15 +1213,6 @@ def _target_kind_from_payload(payload: dict[str, JsonValue]) -> RuleTargetKind |
         raise GameLifecycleError("Generic RuleIR target kind is unsupported.") from exc
 
 
-def _attack_role_parameter(parameters: dict[str, JsonValue]) -> AttackRole | None:
-    value = parameters.get("attack_role")
-    if value is None:
-        return None
-    if value not in {"attacker", "target"}:
-        raise GameLifecycleError("Generic RuleIR attack_role must be attacker or target.")
-    return cast(AttackRole, value)
-
-
 def _required_string_parameter(parameters: dict[str, JsonValue], *, key: str) -> str:
     value = parameters.get(key)
     if type(value) is not str or not value.strip():
@@ -1336,7 +1256,7 @@ def _required_identifier_payload(payload: dict[str, JsonValue], key: str) -> str
     return _validate_identifier(key, value)
 
 
-def generic_rule_modifier_source_id(effect: _GenericAttackEffect) -> str:
+def generic_rule_modifier_source_id(effect: GenericAttackEffect) -> str:
     return _validate_identifier(
         "generic modifier source_id",
         f"{effect.source_id}:{effect.clause_id}:{effect.effect_kind.value}",
@@ -1344,7 +1264,7 @@ def generic_rule_modifier_source_id(effect: _GenericAttackEffect) -> str:
 
 
 def _generic_source_payload(
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
     target_unit_instance_id: str | None,
 ) -> dict[str, JsonValue]:
     payload: dict[str, JsonValue] = {
@@ -1373,7 +1293,7 @@ def _generic_source_payload(
 
 
 def _conditional_hit_reroll_payload(
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
 ) -> dict[str, JsonValue] | None:
     if effect.effect_kind is not RuleEffectKind.REROLL_PERMISSION:
         return None
@@ -1390,7 +1310,7 @@ def _conditional_hit_reroll_payload(
 
 
 def _conditional_wound_reroll_payload(
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
 ) -> dict[str, JsonValue] | None:
     reroll_values: list[JsonValue] = []
     reroll_value = effect.parameters.get("reroll_unmodified_value")
@@ -1437,7 +1357,7 @@ def _conditional_wound_reroll_payload(
 
 
 def _conditional_save_reroll_payload(
-    effect: _GenericAttackEffect,
+    effect: GenericAttackEffect,
 ) -> dict[str, JsonValue] | None:
     if effect.effect_kind is not RuleEffectKind.REROLL_PERMISSION:
         return None

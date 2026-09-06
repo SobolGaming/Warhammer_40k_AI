@@ -14,7 +14,10 @@ from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_identity,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.runtime_modifiers import HitRollModifierContext
 
 if TYPE_CHECKING:
@@ -199,11 +202,17 @@ def conditional_not_leading_source_applies(
     _require_game_state(state)
     if type(source_unit_instance_id) is not str or not source_unit_instance_id.strip():
         raise GameLifecycleError("Conditional not-leading source unit ID must be a string.")
-    view = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
+    views = current_rules_unit_views_for_identity(
+        state=state, unit_instance_id=source_unit_instance_id
+    )
+    if len(views) != 1:
+        raise GameLifecycleError("Conditional not-leading model source has ambiguous membership.")
+    (view,) = views
     source_components = tuple(
         component
         for component in view.components
-        if component.unit.unit_instance_id == source_unit_instance_id
+        if source_unit_instance_id
+        in {component.unit.unit_instance_id, component.unit.source_unit_instance_id}
         and any(model.is_alive for model in component.unit.own_models)
     )
     if len(source_components) != 1:
@@ -355,7 +364,8 @@ def conditional_leading_source_unit_applies(
     source_components = tuple(
         component
         for component in view.components
-        if component.unit.unit_instance_id == source_unit_id
+        if source_unit_id
+        in {component.unit.unit_instance_id, component.unit.source_unit_instance_id}
         and component.role in {"leader", "support"}
         and any(model.is_alive for model in component.unit.own_models)
     )

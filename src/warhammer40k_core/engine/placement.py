@@ -84,6 +84,7 @@ def _unit_placement_for_index(
         raise PlacementError("unit must belong to army.")
     model_placements = tuple(
         ModelPlacement(
+            split_origin=unit.split_origin,
             army_id=army.army_id,
             player_id=army.player_id,
             unit_instance_id=unit.unit_instance_id,

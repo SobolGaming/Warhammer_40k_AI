@@ -278,7 +278,7 @@ def starting_attached_unit_records_for_army(
         raise GameLifecycleError(
             "StartingAttachedUnitRecord derivation requires an ArmyDefinition."
         )
-    unit_by_id = {unit.unit_instance_id: unit for unit in army_definition.units}
+    unit_by_id = {unit.unit_instance_id: unit for unit in army_definition.source_units()}
     return tuple(
         sorted(
             (
@@ -310,7 +310,9 @@ def validate_starting_attached_unit_records(
         for record in starting_attached_unit_records_for_army(army_definition)
     }
     physical_owner_by_id = {
-        unit.unit_instance_id: army.player_id for army in army_definitions for unit in army.units
+        unit.unit_instance_id: army.player_id
+        for army in army_definitions
+        for unit in army.source_units()
     }
     starting_strength_by_unit_id = {
         record.unit_instance_id: record.starting_model_count for record in starting_strength_records

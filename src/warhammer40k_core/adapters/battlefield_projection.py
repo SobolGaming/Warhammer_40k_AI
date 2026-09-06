@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import hashlib
-from typing import Literal, TypedDict, cast
+from typing import Literal, NotRequired, TypedDict, cast
 
 from warhammer40k_core.adapters.redaction import (
     battle_formation_declarations_are_unresolved,
+    visible_army_units,
 )
 from warhammer40k_core.core.datasheet import BaseSizeKind
 from warhammer40k_core.core.deployment_zones import (
@@ -17,6 +18,7 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.unit_factory import ModelInstance
+from warhammer40k_core.engine.unit_ownership import SplitUnitOriginPayload
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
 from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
 from warhammer40k_core.geometry.pose import Pose
@@ -84,6 +86,7 @@ class BattlefieldModelEntityPayload(TypedDict):
     pose: BattlefieldPosePayload | None
     geometry: BattlefieldModelGeometryPayload
     state_context: BattlefieldModelStateContextPayload
+    split_origin: NotRequired[SplitUnitOriginPayload]
 
 
 class BattlefieldVolumePayload(TypedDict):
@@ -371,7 +374,12 @@ def _model_entities(
     projected: dict[str, BattlefieldModelEntityPayload] = {}
     formation_declarations_unresolved = battle_formation_declarations_are_unresolved(state)
     for army in state.army_definitions:
-        for unit in army.units:
+        for unit in visible_army_units(
+            state=state,
+            army=army,
+            viewer_player_id=viewer_player_id,
+            omniscient=omniscient,
+        ):
             reserve = reserve_by_unit_id.get(unit.unit_instance_id)
             transport_unit_id = transport_by_embarked_unit_id.get(unit.unit_instance_id)
             formation_hidden = (
@@ -415,6 +423,10 @@ def _model_entities(
                         ),
                     },
                 }
+                if unit.split_origin is not None:
+                    projected[model.model_instance_id]["split_origin"] = (
+                        unit.split_origin.to_payload()
+                    )
     return dict(sorted(projected.items()))
 
 

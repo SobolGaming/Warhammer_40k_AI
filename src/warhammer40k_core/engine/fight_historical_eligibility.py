@@ -250,7 +250,13 @@ def _historical_geometry_by_model_id(
     physical_rows: tuple[PhysicalModelAuthority, ...],
 ) -> dict[str, _HistoricalGeometry]:
     model_authority = {
-        model.model_instance_id: (army.army_id, army.player_id, unit.unit_instance_id, model)
+        model.model_instance_id: (
+            army.army_id,
+            army.player_id,
+            unit.unit_instance_id,
+            model,
+            unit.split_origin,
+        )
         for army in state.army_definitions
         for unit in army.units
         for model in unit.own_models
@@ -262,7 +268,7 @@ def _historical_geometry_by_model_id(
         identity = model_authority.get(row.model_instance_id)
         if identity is None or row.pose is None:
             raise GameLifecycleError("Historical Fight physical authority is incomplete.")
-        army_id, player_id, unit_instance_id, model = identity
+        army_id, player_id, unit_instance_id, model, split_origin = identity
         try:
             geometry_model = geometry_model_for_placement(
                 model=model,
@@ -272,6 +278,7 @@ def _historical_geometry_by_model_id(
                     unit_instance_id=unit_instance_id,
                     model_instance_id=row.model_instance_id,
                     pose=row.pose,
+                    split_origin=split_origin,
                 ),
             )
         except PlacementError as exc:
