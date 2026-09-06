@@ -68,12 +68,24 @@ from warhammer40k_core.build_identity import (
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.rules.faction_source_package import faction_source_package
 
 expected_schema_names = set(json.loads(__EXPECTED_SCHEMA_NAMES_JSON__))
 module_path = Path(external_contract.__file__).resolve()
 repository_candidate = module_path.parents[3] / "contracts" / "schemas"
 if repository_candidate.is_dir():
     raise RuntimeError("Installed-wheel smoke unexpectedly found a repository schema copy.")
+
+faction_sources = faction_source_package()
+if (
+    len(faction_sources.evidence_required_source_ids) != 3
+    or faction_sources.source_authority_scope != "warhammer_40000_11th_factions"
+    or any(
+        row.semantic_execution_status != "not_certified"
+        for row in faction_sources.source_evidence_catalog.records
+    )
+):
+    raise RuntimeError("Installed wheel faction source governance did not verify exactly.")
 
 schema_directory = files("warhammer40k_core").joinpath("contracts", "schemas")
 build_manifest_resource = files("warhammer40k_core").joinpath(

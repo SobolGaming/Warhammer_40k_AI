@@ -10,6 +10,13 @@ This documentation PR retains factual inventories, short review notes, links and
 
 The existing [Core Rules source policy](CORE_RULES_SOURCE_POLICY.md) is limited to categories 01–25. Applying its evidence discipline here for planning does not silently extend its approved package scope. Existing official source packages keep their provenance and authority until the faction source contract is established.
 
+**F00 follow-up:** the separate [faction source policy](FACTION_RULES_SOURCE_POLICY.md)
+now establishes that contract. Its [retained review](FACTION_SOURCE_GOVERNANCE_REVIEW.md)
+contains complete new observations for the Sororitas army page, Sanctified Orators
+and Exorcist, under App-data 946. Their retained text and fingerprints replace no
+historical inventory observations below. Remaining corpus retention and exact
+provider/catalog reconciliation belong to F01; gameplay certifications remain open.
+
 ## Observed version ledger
 
 | Version | Published | Use in this audit |

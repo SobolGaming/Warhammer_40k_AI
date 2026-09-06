@@ -188,6 +188,36 @@ workstream can supply a prerequisite for an earlier faction-specific slice.
 F08 depends on all selected content's field and rule gates. F09 depends on F08
 and closure of every in-scope obligation, not a percentage threshold.
 
+### F00 completion evidence
+
+F00 is implemented by the separate [faction source policy](FACTION_RULES_SOURCE_POLICY.md),
+[retained JSON audit](../data/source_audits/maintained_app_mirrors/factions_2026_09_05.audit.json)
+and [generated governance review](FACTION_SOURCE_GOVERNANCE_REVIEW.md). This closes
+F-SOURCE-01. The selected target is App-data 946, English, observed 5 September 2026.
+Three complete observations exercise all package kinds: Sororitas army rules,
+Sanctified Orators and Exorcist. The Exorcist Hull/missing-height obligation
+demonstrates the separate geometry-authority gate; fieldability remains blocked.
+
+The typed offline loader authenticates retained text, complete-scope fingerprints,
+owner/page identities, provenance and the full registered source-catalog hash through
+`RuleEvidenceRecord` and `RuleSourcePackage`. Candidate validation rejects structurally
+incomplete, conflicting, ambiguous and excluded-classification evidence. Human review
+establishes provider-page completeness; the immutable byte pin authenticates the
+reviewed capture and rejects even a structurally valid rehashed truncation. Catalog
+source IDs are globally unique, and package version/date derive from the audit;
+catalog metadata drift fails authorization. It reuses P14's
+non-Core source normalization. Regressions are in
+`tests/unit/test_faction_source_governance.py`; static artifact, provenance and
+offline-boundary checks are in `tests/code_quality/test_faction_source_governance.py`.
+The offline generator check is `uv run python tools/build_faction_source_governance.py --check`.
+
+Only source load support is established; all three observations remain
+`not_certified` for semantic execution and have no runtime consumer claims.
+F01 still owns corpus-wide retention, provider/catalog crosswalks and version
+reconciliation. F-SCOPE-01 remains held for exact identity review, with no
+Warbuggies admission. The Acts of Faith consumer correction remains F02.
+No adapter decision or payload contract changes are introduced by F00.
+
 Within F03/F05/F07, group reusable work by semantics: attack modifiers and
 rerolls; ability grants; resource/CP accounting; movement/reserve/setup hooks;
 restoration/destruction; objective control; targeting/eligibility; attachment

@@ -4,6 +4,11 @@
 
 Observed on 5 September 2026. This evidence index records source presence and historical implementation candidates; it does not certify current execution. The main guide is the normal starting point. Expand only the detachment or unit being worked on.
 
+F00 retains new complete observations of the army rules, Sanctified Orators and
+Exorcist in the [source governance review](../../FACTION_SOURCE_GOVERNANCE_REVIEW.md).
+Their stable page source IDs, complete text and provenance are independent of
+the original inventory fingerprints below. Clause execution remains uncertified.
+
 `E` = baseline report classifies the row as executable; `Source` = recorded without that classification; `Missing` = no matching row. These are separate from the source labels shown below; discrepancies require F-EVID-01 review. Each status still needs source-ID, current wording, lifecycle, and replay verification. All unit field gates remain open until the evidence required in the roadmap is recorded.
 
 ## Army-rule inventory
