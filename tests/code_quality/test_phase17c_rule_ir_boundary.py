@@ -144,3 +144,40 @@ def test_phase17c_rule_parser_regexes_trust_normalized_punctuation() -> None:
 
     assert not escaped_violations
     assert not literal_violations
+
+
+def test_psychic_usage_key_cannot_depend_on_a_physical_emitter_or_display_text() -> None:
+    tree = ast.parse((ENGINE / "psychic_ability_usage.py").read_text(encoding="utf-8"))
+    key = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "canonical_key"
+    )
+    identity_fields = {
+        node.attr
+        for node in ast.walk(key)
+        if isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "self"
+    }
+    assert identity_fields == {
+        "game_id",
+        "rules_unit_instance_id",
+        "ability_source_id",
+        "battle_round",
+        "active_player_id",
+        "phase",
+    }
+    for module in (
+        "psychic_ability_usage.py",
+        "psychic_ability_decisions.py",
+        "psychic_ability_restore.py",
+        "aura_applications.py",
+    ):
+        nodes = ast.walk(ast.parse((ENGINE / module).read_text(encoding="utf-8")))
+        assert not {
+            node.attr
+            for node in nodes
+            if isinstance(node, ast.Attribute)
+            and node.attr in {"normalized_text", "raw_text", "name", "lower", "casefold"}
+        }, module

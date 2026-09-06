@@ -35,6 +35,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.psychic_ability_usage import psychic_source_unavailable_reason
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionStatus,
@@ -139,6 +140,19 @@ class CatalogAnyPhaseOncePerBattleRuntime:
                 return RuntimeContentEventResult.applied(
                     subscription,
                     replay_payload={"available": False, "reason": "source_model_unavailable"},
+                )
+            psychic_reason = psychic_source_unavailable_reason(
+                rule_ir=source.rule_ir,
+                state=context.state,
+                event_log=context.decisions.event_log,
+                player_id=source.player_id,
+                source_unit_instance_id=source.unit.unit_instance_id,
+                source_model_instance_id=source.model_instance_id,
+            )
+            if psychic_reason is not None:
+                return RuntimeContentEventResult.applied(
+                    subscription,
+                    replay_payload={"available": False, "reason": psychic_reason},
                 )
             unavailable = optional_ability_frequency_unavailable_reason(
                 rule_ir=source.rule_ir,

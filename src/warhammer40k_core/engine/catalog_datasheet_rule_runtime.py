@@ -145,6 +145,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantBinding,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     rule_ir_from_execution_payload,
@@ -1072,19 +1073,14 @@ class CatalogDatasheetRuleRuntime:
                 state=context.state, unit_instance_id=context.target_unit_instance_id
             )
             for source in sources:
-                if (
-                    not _source_is_alive(context.state, source)
-                    or target.owner_player_id != source.player_id
-                    or not _rules_unit_has_required_aura_keyword(target, source.clause)
-                ):
-                    continue
-                if _rules_units_within(
-                    context.state,
-                    source.unit.unit_instance_id,
-                    target.unit_instance_id,
-                    _clause_distance(source.clause),
-                ):
-                    return -1
+                for model_id in _current_source_model_ids(state=context.state, source=source):
+                    if target.unit_instance_id in aura_affected_unit_ids(
+                        clause=source.clause,
+                        state=context.state,
+                        source_unit_instance_id=source.unit.unit_instance_id,
+                        source_model_instance_id=model_id,
+                    ):
+                        return -1
             return 0
 
         return handler
@@ -1288,10 +1284,6 @@ def _rules_unit_charged_this_turn(*, state: object, unit_instance_id: str) -> bo
     return False
 
 
-def _source_is_alive(state: object, source: _CatalogClauseSource) -> bool:
-    return bool(_current_source_model_ids(state=state, source=source))
-
-
 def _alive_source_model_id(state: object, source: _CatalogClauseSource) -> str:
     model_ids = _current_source_model_ids(state=state, source=source)
     if not model_ids:
@@ -1411,16 +1403,6 @@ def _friendly_keyworded_unit_within(*, source: _CatalogClauseSource, state: obje
         required_keyword_sequence=required,
         max_range_inches=_clause_distance(source.clause),
     )
-
-
-def _rules_unit_has_required_aura_keyword(view: RulesUnitView, clause: RuleClause) -> bool:
-    required = {
-        _required_string(parameter_payload(condition.parameters), "required_keyword")
-        for condition in clause.conditions
-        if condition.kind is RuleConditionKind.KEYWORD_GATE
-    }
-    keywords = {*view.keywords, *view.faction_keywords}
-    return required.issubset(keywords)
 
 
 def _rules_unit_has_any_keyword(view: RulesUnitView, required_keywords: tuple[str, ...]) -> bool:

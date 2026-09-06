@@ -300,6 +300,36 @@
           "audit_id": "core-fight-maintained-app-mirrors-2026-09-05",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-05T18:32:47-04:00"
+        },
+        {
+          "row_id": "aura-abilities:40k-app",
+          "source_observation_sha256": "c0a99fff77e5c50a9c81a359e878aba62ec8bf045dc53963982cec416487fe30",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/22-other-rules-and-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-aura-psychic-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T12:57:51Z"
+        },
+        {
+          "row_id": "psychic-abilities-with-a-psychic-level:40k-app",
+          "source_observation_sha256": "b4b6e75ae6463e3d10a4a7e177b83560bc4ce804c6e31e174fb54a7c6ff81374",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/22-other-rules-and-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-aura-psychic-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T12:57:51Z"
+        },
+        {
+          "row_id": "psychic-abilities-with-a-psychic-level:gdm",
+          "source_observation_sha256": "a79192183fa0e5ebb080a145d335c6b363e6a84bea650f9ce74f68215aa3a9d2",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-aura-psychic-maintained-app-mirrors-2026-09-06",
+          "identity_kind": "app_version",
+          "identity_value": "931"
         }
       ],
       "legacy_observations": [
@@ -609,6 +639,16 @@
             "gw-11e-core-fight:consolidate-step",
             "gw-11e-core-fight:consolidation-move",
             "gw-11e-core-fight:ongoing-consolidation-erratum"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-aura-psychic",
+          "version": "maintained-app-mirrors-observed-2026-09-06",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-aura-psychic:aura-abilities",
+            "gw-11e-core-aura-psychic:psychic-abilities-with-a-psychic-level"
           ],
           "catalog_sha256": null
         }

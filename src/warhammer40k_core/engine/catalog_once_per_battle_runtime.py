@@ -41,6 +41,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.psychic_ability_usage import psychic_source_unavailable_reason
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionStatus,
@@ -288,6 +289,16 @@ def _record_activations(
             clause=clause,
             current_model_instance_ids=current_model_instance_ids,
         ):
+            psychic_reason = psychic_source_unavailable_reason(
+                rule_ir=rule_ir,
+                state=context.state,
+                event_log=context.decisions.event_log,
+                player_id=player_id,
+                source_unit_instance_id=unit.unit_instance_id,
+                source_model_instance_id=source_model_id,
+            )
+            if psychic_reason is not None:
+                continue
             usage_key = optional_ability_frequency_usage_key(
                 rule_ir=rule_ir,
                 clause=clause,

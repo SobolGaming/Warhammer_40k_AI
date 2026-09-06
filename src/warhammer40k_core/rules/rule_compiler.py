@@ -9,6 +9,7 @@ from warhammer40k_core.rules.parsed_tokens import (
     ParsedRuleTextPayload,
     RuleTokenError,
 )
+from warhammer40k_core.rules.psychic_ability_identity import bind_psychic_level_at_source_boundary
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.rule_parser import RULE_PARSER_VERSION, parse_rule_ir
 from warhammer40k_core.rules.source_data import RuleSourceText, RuleSourceTextPayload
@@ -87,10 +88,12 @@ def compile_rule_source_text(
         raise RuleCompilerError("Rule compiler requires RuleSourceText.")
     return CompiledRuleSource(
         source_text=source_text,
-        rule_ir=parse_rule_ir(
-            source_id=source_text.source_id,
-            parsed_text=source_text.parsed_tokens,
-            source_keyword_sequence_parts=source_keyword_sequence_parts,
+        rule_ir=bind_psychic_level_at_source_boundary(
+            parse_rule_ir(
+                source_id=source_text.source_id,
+                parsed_text=source_text.parsed_tokens,
+                source_keyword_sequence_parts=source_keyword_sequence_parts,
+            )
         ),
     )
 
@@ -130,10 +133,12 @@ def compile_normalized_rule_text(
         )
     if parsed_tokens.normalized_text != normalized_text:
         raise RuleCompilerError("compile_normalized_rule_text parsed tokens are stale.")
-    return parse_rule_ir(
-        source_id=source_id,
-        parsed_text=parsed_tokens,
-        source_keyword_sequence_parts=source_keyword_sequence_parts,
+    return bind_psychic_level_at_source_boundary(
+        parse_rule_ir(
+            source_id=source_id,
+            parsed_text=parsed_tokens,
+            source_keyword_sequence_parts=source_keyword_sequence_parts,
+        )
     )
 
 

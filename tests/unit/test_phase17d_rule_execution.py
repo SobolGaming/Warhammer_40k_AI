@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -51,6 +53,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
 )
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_restore_lost_wounds_after_destroying_unit,
     catalog_wound_roll_reroll_permission_for_attack,
@@ -96,6 +99,7 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.generic_rule_attack_hooks import generic_rule_wound_roll_modifier
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
@@ -123,6 +127,7 @@ from warhammer40k_core.engine.phases.charge import (
     ChargeMoveProposal,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.psychic_ability_usage import psychic_uses
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.rule_execution import (
@@ -138,9 +143,12 @@ from warhammer40k_core.engine.rule_execution import (
     scoped_rule_ir_from_execution_payload,
 )
 from warhammer40k_core.engine.rule_frequency import RULE_FREQUENCY_LIMIT_CONSUMED_EVENT
+from warhammer40k_core.engine.rules_unit_effects import rules_unit_persisting_effects
 from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
+    WoundRollModifierContext,
 )
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
@@ -159,6 +167,7 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -167,8 +176,10 @@ from warhammer40k_core.rules.rule_ir import (
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
+    RuleIRError,
     RuleIRPayload,
     RuleParameter,
+    RuleTrigger,
     RuleTriggerKind,
     parameter_payload,
 )
@@ -192,6 +203,603 @@ ONCE_PER_BATTLE_FIGHT_BOOST_TEXT = (
     "If it does, until the end of the phase, add 3 to the Attacks characteristic of melee "
     "weapons equipped by this model and those weapons have the [DEVASTATING WOUNDS] ability."
 )
+
+
+def test_psychic_level_use_is_shared_by_attached_components() -> None:
+    state = _battle_state_with_attached_leader_support()
+    state = _with_unit_keywords(
+        state, unit_instance_id="army-alpha:leader-unit", keywords=("PSYKER",), faction_keywords=()
+    )
+    rule_ir = _compiled("Gain 1CP.").rule_ir
+    clause = rule_ir.clauses[0]
+    condition = RuleCondition(
+        kind=RuleConditionKind.FREQUENCY_LIMIT,
+        source_span=clause.source_span,
+        parameters=(
+            RuleParameter("activation_kind", "psychic_ability_use"),
+            RuleParameter("psychic_level", 1),
+            RuleParameter("scope", "phase"),
+            RuleParameter("max_uses", 1),
+        ),
+    )
+    rule_ir = replace(
+        rule_ir, clauses=(replace(clause, conditions=(*clause.conditions, condition)),)
+    )
+    event_log = EventLog()
+    leader = _unit_by_id(state, "army-alpha:leader-unit")
+    support = _unit_by_id(state, "army-alpha:support-unit")
+    context = _execution_context(
+        state=state,
+        event_log=event_log,
+        source_unit_instance_id=leader.unit_instance_id,
+        source_model_instance_id=leader.own_models[0].model_instance_id,
+    )
+    first = execute_rule_ir(rule_ir=rule_ir, context=context)
+    before = (state.to_payload(), event_log.to_payload())
+    repeated = execute_rule_ir(
+        rule_ir=replace(rule_ir, rule_id="duplicate-physical-instance"),
+        context=replace(
+            context,
+            source_unit_instance_id=support.unit_instance_id,
+            source_model_instance_id=support.own_models[0].model_instance_id,
+        ),
+    )
+    assert first.status is RuleExecutionStatus.APPLIED
+    assert repeated.status is RuleExecutionStatus.INVALID
+    assert repeated.reason == "psychic_ability_used_this_phase"
+    assert (state.to_payload(), event_log.to_payload()) == before
+
+
+def test_psychic_catalog_activation_uses_one_model_per_unit_and_restores() -> None:
+    session = _psychic_level_session()
+    status = session.advance_until_decision_or_terminal()
+    request = status.decision_request
+    assert request is not None
+    assert request.actor_id == "player-a"
+    use = next(option for option in request.options if _json_object(option.payload)["activate"])
+    malformed = replace(
+        DecisionResult.for_request(
+            result_id="psychic:malformed", request=request, selected_option_id=use.option_id
+        ),
+        payload={},
+    )
+    before = session.lifecycle.to_payload()
+    assert session.lifecycle.submit_decision(malformed).status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == before
+    status = session.submit_option(
+        request_id=request.request_id, option_id=use.option_id, result_id="psychic:first"
+    )
+    next_request = status.decision_request
+    assert next_request is not None
+    assert next_request.actor_id == "player-b"
+    uses = psychic_uses(session.lifecycle.decision_controller.event_log)
+    assert len(uses) == 1
+    assert uses[0].rules_unit_instance_id == "army-alpha:intercessor-unit-1"
+    payload = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(copy.deepcopy(payload))
+    assert restored.to_payload() == payload
+    for field, replacement in (
+        ("rules_unit_instance_id", "army-beta:intercessor-unit-2"),
+        ("source_component_unit_instance_id", "army-beta:intercessor-unit-2"),
+        ("source_model_instance_id", "unknown-model"),
+        ("catalog_record_id", "unknown-record"),
+        ("phase", "shooting"),
+        ("psychic_level", 2),
+    ):
+        altered = copy.deepcopy(payload)
+        event = next(
+            event
+            for event in altered["decisions"]["event_log"]
+            if event["event_type"] == "psychic_ability_used"
+        )
+        _json_object(event["payload"])[field] = replacement
+        with pytest.raises(GameLifecycleError, match="Psychic"):
+            GameLifecycle.from_payload(altered)
+    for viewer in ("player-a", "player-b"):
+        public = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        assert any(event["event_type"] == "psychic_ability_used" for event in public["events"])
+        json.dumps(public, allow_nan=False)
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:psychic-level")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+def _psychic_level_session(*, attached: bool = False, any_phase: bool = False) -> LocalGameSession:
+    text = ONCE_PER_BATTLE_FIGHT_BOOST_TEXT
+    if any_phase:
+        text = text.replace("at the start of the Fight phase", "at the start of any phase")
+    descriptor = _generic_catalog_descriptor(
+        "Might (Psychic level 1): " + text, ability_id="psychic-level-fight-boost"
+    )
+    if any_phase:
+        # The catalog can carry a typed any-phase trigger independently of text-parser coverage.
+        ir = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload))
+        phrase = "at the start of any phase"
+        start = ir.normalized_text.index(phrase)
+        trigger = RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=TextSpan(text=phrase, start=start, end=start + len(phrase)),
+            parameters=(RuleParameter("edge", "start"), RuleParameter("phase", "any")),
+        )
+        ir = replace(ir, clauses=tuple(replace(clause, trigger=trigger) for clause in ir.clauses))
+        descriptor = replace(descriptor, rule_ir_payload=cast(CatalogJsonObject, ir.to_payload()))
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_sheets = (
+        {"core-character-leader", "core-character-support"}
+        if attached
+        else {"core-intercessor-like-infantry"}
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                sheet,
+                keywords=replace(sheet.keywords, keywords=(*sheet.keywords.keywords, "PSYKER")),
+                abilities=(*sheet.abilities, descriptor),
+            )
+            if sheet.datasheet_id in source_sheets
+            else sheet
+            for sheet in catalog.datasheets
+        ),
+    )
+    config = _setup_reactive_config(catalog)
+    if attached:
+        config = replace(
+            config,
+            army_muster_requests=(
+                _attached_leader_support_muster_request(catalog),
+                replace(
+                    config.army_muster_requests[1],
+                    unit_selections=(
+                        UnitMusterSelection(
+                            unit_selection_id="enemy-psyker",
+                            datasheet_id="core-character-leader",
+                            model_profile_selections=(
+                                ModelProfileSelection(
+                                    model_profile_id="core-character-leader",
+                                    model_count=1,
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+    armies = tuple(
+        muster_army(catalog=catalog, request=request) for request in config.army_muster_requests
+    )
+    state = _battle_state()
+    for army in armies:
+        state.record_army_definition(army)
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="psychic-level",
+        armies=armies,
+    ).battlefield_state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    decisions = DecisionController()
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
+    return LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(
+            cast(
+                Any,
+                {
+                    "config": config.to_payload(),
+                    "parameterized_movement_proposals": True,
+                    "state": state.to_payload(),
+                    "decisions": decisions.to_payload(),
+                    "reaction_queue": ReactionQueue().to_payload(),
+                },
+            )
+        )
+    )
+
+
+def test_psychic_queued_duplicate_is_rejected_before_recording_and_can_be_declined() -> None:
+    session = _psychic_level_session(any_phase=True)
+    first = session.advance_until_decision_or_terminal().decision_request
+    assert first is not None
+    use = next(option for option in first.options if _json_object(option.payload)["activate"])
+    second = session.submit_option(
+        request_id=first.request_id, option_id=use.option_id, result_id="psychic:queued:first"
+    ).decision_request
+    assert second is not None
+    use = next(option for option in second.options if _json_object(option.payload)["activate"])
+    before = session.lifecycle.to_payload()
+    rejected = session.submit_option(
+        request_id=second.request_id, option_id=use.option_id, result_id="psychic:queued:repeat"
+    )
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    assert _json_object(rejected.payload)["invalid_reason"] == "psychic_ability_used_this_phase"
+    assert session.lifecycle.to_payload() == before
+    decline = next(
+        option for option in second.options if not _json_object(option.payload)["activate"]
+    )
+    session.submit_option(
+        request_id=second.request_id,
+        option_id=decline.option_id,
+        result_id="psychic:queued:decline",
+    )
+    assert len(psychic_uses(session.lifecycle.decision_controller.event_log)) == 1
+    restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
+    assert restored.to_payload() == session.lifecycle.to_payload()
+    assert (
+        ReplayRunner.from_payload(session.replay_artifact(artifact_id="psychic:queued"))
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+def test_psychic_attached_use_survives_bodyguard_and_source_model_loss() -> None:
+    session = _psychic_level_session(attached=True)
+    first = session.advance_until_decision_or_terminal().decision_request
+    assert first is not None
+    use = next(option for option in first.options if _json_object(option.payload)["activate"])
+    session.submit_option(
+        request_id=first.request_id, option_id=use.option_id, result_id="psychic:attached"
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    uses = psychic_uses(session.lifecycle.decision_controller.event_log)
+    assert len(uses) == 1
+    assert uses[0].rules_unit_instance_id == "attached-unit:army-alpha:bodyguard-unit"
+    assert uses[0].source_component_unit_instance_id == "army-alpha:leader-unit"
+    for unit_id in (
+        "army-alpha:bodyguard-unit",
+        "army-alpha:leader-unit",
+        "army-alpha:support-unit",
+    ):
+        for model_id in _unit_by_id(state, unit_id).own_model_ids():
+            destroy_model_by_rule(
+                state=state, model_instance_id=model_id, remove_from_battlefield=True
+            )
+        restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
+        assert restored.to_payload() == session.lifecycle.to_payload()
+
+
+def test_psychic_restore_rejects_missing_duplicate_and_invented_use_records() -> None:
+    session = _psychic_level_session()
+    first = session.advance_until_decision_or_terminal().decision_request
+    assert first is not None
+    use = next(option for option in first.options if _json_object(option.payload)["activate"])
+    session.submit_option(
+        request_id=first.request_id, option_id=use.option_id, result_id="psychic:integrity"
+    )
+    original = session.lifecycle.to_payload()
+    for alteration in ("missing", "duplicate", "unknown_field", "hash", "source", "decision"):
+        payload = copy.deepcopy(original)
+        events = payload["decisions"]["event_log"]
+        event = next(row for row in events if row["event_type"] == "psychic_ability_used")
+        evidence = _json_object(event["payload"])
+        if alteration == "missing":
+            events.remove(event)
+        elif alteration == "duplicate":
+            repeated = copy.deepcopy(event)
+            repeated["event_id"] = "psychic:duplicate"
+            events.append(repeated)
+        elif alteration == "hash":
+            evidence["source_rule_ir_hash"] = "0" * 64
+        elif alteration == "source":
+            evidence["restriction_source_id"] = "wrong-core-rule"
+        elif alteration == "decision":
+            evidence["result_id"] = "not-an-accepted-result"
+        else:
+            evidence["unrecognized"] = True
+        for index, row in enumerate(events, start=1):
+            row["event_id"] = f"event-{index:06d}"
+        with pytest.raises(GameLifecycleError):
+            GameLifecycle.from_payload(payload)
+
+
+def test_psychic_phase_identity_distinguishes_turns_rounds_units_and_source_abilities() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    for unit in state.army_definitions[0].units:
+        _with_unit_keywords(
+            state, unit_instance_id=unit.unit_instance_id, keywords=("PSYKER",), faction_keywords=()
+        )
+    ir = _compiled("Might (Psychic level 1): Add 1 to hit rolls.").rule_ir
+    assert ir.is_supported
+    log = EventLog()
+    context = _execution_context(
+        state=state, event_log=log, source_unit_instance_id=source.unit_instance_id
+    )
+    assert execute_rule_ir(rule_ir=ir, context=context).status is RuleExecutionStatus.APPLIED
+    # A higher-level copy of the same stable source is still the same ability.
+    higher = replace(
+        ir,
+        clauses=tuple(
+            replace(
+                clause,
+                conditions=tuple(
+                    replace(
+                        condition,
+                        parameters=tuple(
+                            replace(parameter, value=2)
+                            if parameter.key == "psychic_level"
+                            else parameter
+                            for parameter in condition.parameters
+                        ),
+                    )
+                    for condition in clause.conditions
+                ),
+            )
+            for clause in ir.clauses
+        ),
+    )
+    assert (
+        execute_rule_ir(rule_ir=higher, context=context).reason == "psychic_ability_used_this_phase"
+    )
+    distinct = replace(
+        ir, source_id="another-stable-source", rule_id="same-display-name-other-source"
+    )
+    assert execute_rule_ir(rule_ir=distinct, context=context).status is RuleExecutionStatus.APPLIED
+    other = next(
+        unit
+        for unit in state.army_definitions[0].units
+        if unit.unit_instance_id != source.unit_instance_id
+    )
+    assert (
+        execute_rule_ir(
+            rule_ir=ir, context=replace(context, source_unit_instance_id=other.unit_instance_id)
+        ).status
+        is RuleExecutionStatus.APPLIED
+    )
+    for phase, active, round_number in (
+        (BattlePhase.MOVEMENT, "player-a", 1),
+        (BattlePhase.COMMAND, "player-b", 1),
+        (BattlePhase.COMMAND, "player-a", 2),
+    ):
+        state.battle_phase_index = state.battle_phase_sequence.index(phase)
+        state.active_player_id = active
+        state.battle_round = round_number
+        context = replace(context, phase=phase, active_player_id=active, battle_round=round_number)
+        assert execute_rule_ir(rule_ir=ir, context=context).status is RuleExecutionStatus.APPLIED
+        assert (
+            execute_rule_ir(rule_ir=ir, context=context).reason == "psychic_ability_used_this_phase"
+        )
+    assert len(psychic_uses(EventLog.from_payload(log.to_payload()))) == 6
+
+
+@pytest.mark.parametrize(
+    "field", ["state", "event_log", "source", "model", "owner", "phase", "psyker"]
+)
+def test_psychic_invalid_source_and_phase_context_never_consumes_a_use(field: str) -> None:
+    state = _battle_state_with_attached_leader_support()
+    source_id = "army-alpha:leader-unit"
+    _with_unit_keywords(
+        state, unit_instance_id=source_id, keywords=("PSYKER",), faction_keywords=()
+    )
+    log = EventLog()
+    context = _execution_context(state=state, event_log=log, source_unit_instance_id=source_id)
+    if field == "state":
+        context = replace(context, state=None)
+    elif field == "event_log":
+        context = replace(context, event_log=None)
+    elif field == "source":
+        context = replace(context, source_unit_instance_id=None)
+    elif field == "model":
+        context = replace(context, source_model_instance_id="unknown-model")
+    elif field == "owner":
+        context = replace(context, player_id="player-b")
+    elif field == "phase":
+        context = replace(context, phase=BattlePhase.SHOOTING)
+    else:
+        _with_unit_keywords(state, unit_instance_id=source_id, keywords=(), faction_keywords=())
+    before = state.to_payload()
+    ir = _compiled("Might (Psychic level 1): Add 1 to hit rolls.").rule_ir
+    assert execute_rule_ir(rule_ir=ir, context=context).status is RuleExecutionStatus.INVALID
+    assert state.to_payload() == before
+    assert log.records == ()
+
+
+def test_psychic_malformed_descriptor_fails_closed() -> None:
+    from warhammer40k_core.rules.psychic_ability_identity import psychic_ability_level
+
+    ir = _compiled("Might (Psychic level 1): Add 1 to hit rolls.").rule_ir
+    clause = ir.clauses[0]
+    condition = next(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.FREQUENCY_LIMIT
+    )
+    invalid = replace(
+        condition,
+        parameters=tuple(
+            replace(parameter, value=True) if parameter.key == "psychic_level" else parameter
+            for parameter in condition.parameters
+        ),
+    )
+    with pytest.raises(RuleIRError, match="malformed"):
+        psychic_ability_level(replace(ir, clauses=(replace(clause, conditions=(invalid,)),)))
+
+
+def test_overlapping_aura_effect_instances_apply_once_without_erasing_evidence() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_id = "army-alpha:intercessor-unit-1"
+    rule_ir = _compiled(
+        'Aura: while a friendly unit is within 6" of this unit, subtract 1 from wound rolls.'
+    ).rule_ir
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_id,
+        ),
+    )
+    payload = result.effect_payloads[0]
+    for index in range(2):
+        state.record_persisting_effect(
+            generic_rule_persisting_effect(
+                effect_id=f"aura-emitter-{index}",
+                source_rule_id=rule_ir.source_id,
+                owner_player_id="player-a",
+                target_unit_instance_ids=(source_id,),
+                started_battle_round=1,
+                started_phase=BattlePhaseKind.COMMAND,
+                expiration=EffectExpiration.end_of_battle(),
+                effect_payload=payload,
+            )
+        )
+    assert len(state.persisting_effects) == 2
+    assert len(state.persisting_effects_for_unit(source_id)) == 1
+    enemy_id = "army-beta:intercessor-unit-2"
+    attack = WoundRollModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=enemy_id,
+        attacker_model_instance_id=_unit_by_id(state, enemy_id).own_models[0].model_instance_id,
+        target_unit_instance_id=source_id,
+        weapon_profile=_weapon_profile("core-bolt-rifle"),
+        strength=4,
+        toughness=4,
+    )
+    assert generic_rule_wound_roll_modifier(attack) == -1
+    restored = GameState.from_payload(state.to_payload())
+    assert len(restored.persisting_effects) == 2
+    assert restored.persisting_effects_for_unit(source_id) == state.persisting_effects_for_unit(
+        source_id
+    )
+
+
+@pytest.mark.parametrize(
+    "target",
+    [
+        "another friendly unit",
+        "another friendly INFANTRY unit",
+        "a friendly unit (excluding this unit)",
+    ],
+)
+def test_aura_explicit_source_exclusion_survives_compilation_and_round_trip(target: str) -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    rule_ir = _compiled(
+        f'Aura: while {target} is within 6" of this unit, subtract 1 from wound rolls.'
+    ).rule_ir
+    assert rule_ir.is_supported
+    rule_ir = RuleIR.from_payload(rule_ir.to_payload())
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            state=state, source_unit_instance_id="army-alpha:intercessor-unit-1"
+        ),
+    )
+    assert result.status is RuleExecutionStatus.APPLIED
+    affected = result.aura_evaluations[0]["affected_unit_instance_ids"]
+    assert isinstance(affected, list)
+    assert "army-alpha:intercessor-unit-1" not in affected
+
+
+def test_aura_overlap_across_attached_aliases_keeps_distinct_sources_and_effect_slots() -> None:
+    state = _battle_state_with_attached_leader_support()
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="attached-aura",
+        armies=tuple(state.army_definitions),
+    ).battlefield_state
+    ir = _compiled(
+        'Aura: while a friendly unit is within 6" of this unit, add 1 to hit rolls.'
+    ).rule_ir
+    result = execute_rule_ir(
+        rule_ir=ir,
+        context=_execution_context(state=state, source_unit_instance_id="army-alpha:leader-unit"),
+    )
+    payload = result.effect_payloads[0]
+    for index, target in enumerate(("army-alpha:leader-unit", "army-alpha:support-unit")):
+        state.record_persisting_effect(
+            generic_rule_persisting_effect(
+                effect_id=f"aura:attached:{index}",
+                source_rule_id=ir.source_id,
+                owner_player_id="player-a",
+                target_unit_instance_ids=(target,),
+                started_battle_round=1,
+                started_phase=BattlePhase.COMMAND,
+                expiration=EffectExpiration.end_of_battle(),
+                effect_payload=payload,
+            )
+        )
+    canonical = "attached-unit:army-alpha:bodyguard-unit"
+    assert len(rules_unit_persisting_effects(state, canonical)) == 1
+    first = state.persisting_effects[0]
+    for index, changed in enumerate(
+        (
+            {**payload, "source_id": "different-aura-source"},
+            {**payload, "effect_index": 1},
+        )
+    ):
+        state.record_persisting_effect(
+            replace(first, effect_id=f"aura:distinct:{index}", effect_payload=changed)
+        )
+    assert len(rules_unit_persisting_effects(state, canonical)) == 3
+    assert len(state.persisting_effects) == 4
+    conflicting = {**payload, "rule_ir_hash": "0" * 64}
+    state.record_persisting_effect(
+        replace(first, effect_id="aura:conflict", effect_payload=conflicting)
+    )
+    with pytest.raises(GameLifecycleError, match="conflicting source semantics"):
+        rules_unit_persisting_effects(state, canonical)
+
+
+@pytest.mark.parametrize("exclude_source", [False, True])
+def test_catalog_stealth_aura_uses_shared_source_inclusion(exclude_source: bool) -> None:
+    text = (
+        'Aura: while a friendly unit is within 6" of this model, '
+        "that unit has the [STEALTH] ability."
+    )
+    if exclude_source:
+        text = text.replace("a friendly unit", "another friendly unit")
+    descriptor = _generic_catalog_descriptor(text)
+    ir = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload))
+    # Canonical catalog fixture supplies the structured grant, as source providers do.
+    ir = replace(
+        ir,
+        clauses=tuple(
+            replace(
+                clause,
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.GRANT_ABILITY,
+                        source_span=clause.source_span,
+                        parameters=(RuleParameter("ability", "stealth"),),
+                    ),
+                ),
+            )
+            for clause in ir.clauses
+        ),
+    )
+    catalog = _catalog_with_descriptor(
+        replace(descriptor, rule_ir_payload=cast(CatalogJsonObject, ir.to_payload()))
+    )
+    armies = tuple(
+        muster_army(catalog=catalog, request=request)
+        for request in _setup_reactive_config(catalog).army_muster_requests
+    )
+    state = _battle_state()
+    for army in armies:
+        state.record_army_definition(army)
+    state.battlefield_state = create_deterministic_battlefield_scenario(
+        battlefield_id="aura-catalog", armies=armies
+    ).battlefield_state
+    records = catalog_ability_records_from_catalog(catalog)
+    runtime = CatalogDatasheetRuleRuntime(
+        {
+            army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+            for army in armies
+        },
+        armies,
+    )
+    registry = RuntimeModifierRegistry.from_bindings(
+        hit_roll_modifier_bindings=runtime.hit_roll_modifier_bindings()
+    )
+    attacker = armies[1].units[0]
+    context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        target_unit_instance_id=armies[0].units[0].unit_instance_id,
+        weapon_profile=_weapon_profile("core-bolt-rifle"),
+        source_phase=BattlePhase.SHOOTING,
+    )
+    assert registry.hit_roll_modifier(context) == (0 if exclude_source else -1)
 
 
 def test_phase17d_once_per_battle_activation_consumes_and_modifies_source_model() -> None:
@@ -2867,8 +3475,14 @@ def test_phase17d_friendly_aura_evaluation_ignores_enemy_units_in_range() -> Non
     )
 
     assert result.status is RuleExecutionStatus.APPLIED
-    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [friendly_unit_id]
-    assert result.effect_payloads[0]["target_unit_instance_ids"] == [friendly_unit_id]
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        source_unit_id,
+        friendly_unit_id,
+    ]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [
+        source_unit_id,
+        friendly_unit_id,
+    ]
 
 
 def test_phase17d_enemy_aura_evaluation_ignores_friendly_units_in_range() -> None:
@@ -2928,6 +3542,7 @@ def test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range() -> None
 
     assert result.status is RuleExecutionStatus.APPLIED
     assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        source_unit_id,
         friendly_unit_id,
         enemy_unit_id,
     ]
@@ -2985,8 +3600,11 @@ def test_phase17d_aura_keyword_gates_match_target_faction_keywords() -> None:
     )
 
     assert result.status is RuleExecutionStatus.APPLIED
-    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
-    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        source_unit_id,
+        target_unit_id,
+    ]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id, target_unit_id]
 
 
 def test_phase17d_shadow_of_chaos_aura_status_targets_matching_daemons() -> None:
@@ -3041,8 +3659,11 @@ def test_phase17d_shadow_of_chaos_aura_status_targets_matching_daemons() -> None
     effect = _json_object(result.effect_payloads[0]["effect"])
 
     assert result.status is RuleExecutionStatus.APPLIED
-    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
-    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        source_unit_id,
+        target_unit_id,
+    ]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id, target_unit_id]
     assert effect["kind"] == "set_contextual_status"
     assert parameter_payload(compiled.rule_ir.clauses[0].effects[0].parameters) == {
         "owner": "your_army",
@@ -3149,8 +3770,11 @@ def test_phase17d_this_model_aura_anchors_only_to_the_selected_source_model() ->
         registry=default_rule_execution_registry(),
     )
 
-    assert distant_anchor.aura_evaluations[0]["affected_unit_instance_ids"] == []
-    assert nearby_anchor.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+    assert distant_anchor.aura_evaluations[0]["affected_unit_instance_ids"] == [source_unit_id]
+    assert nearby_anchor.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        source_unit_id,
+        target_unit_id,
+    ]
 
 
 def test_phase17d_this_unit_aura_ignores_incidental_source_model_context() -> None:
@@ -3188,7 +3812,10 @@ def test_phase17d_this_unit_aura_ignores_incidental_source_model_context() -> No
         registry=default_rule_execution_registry(),
     )
 
-    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [
+        source_unit_id,
+        target_unit_id,
+    ]
 
 
 def test_phase17d_this_model_aura_fails_closed_without_source_model() -> None:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.engine.aura_applications import non_stacking_aura_applications
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -17,8 +18,10 @@ def rules_unit_persisting_effects(
     identity_ids = tuple(
         dict.fromkeys((rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids))
     )
-    return tuple(
-        (identity_id, effect)
-        for identity_id in identity_ids
-        for effect in state.persisting_effects_for_unit(identity_id)
+    return non_stacking_aura_applications(
+        tuple(
+            (identity_id, effect)
+            for identity_id in identity_ids
+            for effect in state.persisting_effects_for_unit(identity_id)
+        )
     )
