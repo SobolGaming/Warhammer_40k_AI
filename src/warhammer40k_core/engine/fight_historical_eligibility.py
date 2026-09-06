@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     FightEligibilityKind,
@@ -20,11 +21,14 @@ from warhammer40k_core.engine.fight_model_authority_history import (
 from warhammer40k_core.engine.fight_order import (
     FightActivationSelection,
     FightEligibilityContext,
+    FightPhaseState,
+    FightPhaseStatePayload,
 )
 from warhammer40k_core.engine.fights_first import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
     FightsFirstRegistry,
 )
+from warhammer40k_core.engine.forced_fight_authority import forced_fight_selecting_player_id
 from warhammer40k_core.engine.forced_fight_context import ForcedFightActivationContext
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -61,6 +65,15 @@ def forced_fight_eligibility_contexts_before_event(
 ) -> tuple[FightEligibilityContext, ...]:
     """Rebuild one forced-Fight request from event-bound physical authority."""
 
+    selecting_player_id = forced_fight_selecting_player_id(
+        state=state,
+        source_unit_instance_id=context.source_unit_instance_id,
+        eligible_unit_instance_ids=context.eligible_unit_instance_ids,
+    )
+    if context.selecting_player_id != selecting_player_id:
+        raise GameLifecycleError(
+            "Forced Fight historical selecting player differs from canonical owner."
+        )
     physical_rows = physical_model_authority_before_event(
         state=state,
         event_records=event_records,
@@ -74,14 +87,22 @@ def forced_fight_eligibility_contexts_before_event(
     enemy_models = tuple(
         row.geometry_model
         for row in historical_geometry_by_model_id.values()
-        if row.owner_player_id != context.selecting_player_id
+        if row.owner_player_id != selecting_player_id
     )
     prior_unit_ids = tuple(selection.unit_instance_id for selection in prior_selections)
+    suspended = forced_fight_suspended_state_before_event(
+        event_records=event_records, event_index=event_index, context=context
+    )
+    engaged_at_start = (
+        context.eligible_unit_instance_ids
+        if suspended is None
+        else suspended.fight_order_state.engaged_at_fight_step_start_unit_ids
+    )
     fights_first_registry = FightsFirstRegistry.from_state(state)
     contexts: list[FightEligibilityContext] = []
     for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
         unit_id = rules_unit.unit_instance_id
-        if rules_unit.owner_player_id != context.selecting_player_id:
+        if rules_unit.owner_player_id != selecting_player_id:
             continue
         if not rules_unit_identity_history_contains(
             state=state,
@@ -123,16 +144,20 @@ def forced_fight_eligibility_contexts_before_event(
                         effect_kind=CHARGE_FIGHTS_FIRST_EFFECT_KIND,
                     ),
                 ),
-                (FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START, True),
+                (
+                    FightEligibilityKind.ENGAGED_AT_FIGHT_STEP_START,
+                    rules_unit_identity_history_contains(
+                        state=state, identity_ids=engaged_at_start, unit_instance_id=unit_id
+                    ),
+                ),
                 (FightEligibilityKind.CURRENTLY_ENGAGED, currently_engaged),
             )
             if applies and reason in policy.eligibility_kinds
         )
-        if not reasons:
-            continue
+        reasons = (*reasons, FightEligibilityKind.FORCED_ACTIVATION)
         contexts.append(
             FightEligibilityContext(
-                player_id=context.selecting_player_id,
+                player_id=selecting_player_id,
                 battle_round=battle_round,
                 unit_instance_id=unit_id,
                 ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
@@ -145,6 +170,29 @@ def forced_fight_eligibility_contexts_before_event(
             )
         )
     return tuple(sorted(contexts, key=lambda value: value.unit_instance_id))
+
+
+def forced_fight_suspended_state_before_event(
+    *,
+    event_records: tuple[EventRecord, ...],
+    event_index: int,
+    context: ForcedFightActivationContext,
+) -> FightPhaseState | None:
+    if context.source_phase.value != "fight":
+        return None
+    starts = tuple(
+        event
+        for event in event_records[:event_index]
+        if event.event_type == "forced_fight_activation_queue_started"
+        and isinstance(event.payload, dict)
+        and event.payload.get("forced_activation_context") == context.to_payload()
+    )
+    if len(starts) != 1 or not isinstance(starts[0].payload, dict):
+        raise GameLifecycleError("Consolidation eligibility requires its preceding queue boundary.")
+    payload = starts[0].payload.get("suspended_state")
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Consolidation eligibility requires the ordinary Fight snapshot.")
+    return FightPhaseState.from_payload(cast(FightPhaseStatePayload, payload))
 
 
 def _historical_geometry_by_model_id(

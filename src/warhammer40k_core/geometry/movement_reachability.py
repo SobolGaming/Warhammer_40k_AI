@@ -73,12 +73,25 @@ class MovementGoal:
             for polygon in self.polygons
         )
 
-    def distance_lower_bound(self, model: Model) -> float:
+    def distance_lower_bound(
+        self, model: Model, *, ignores_vertical_distance: bool = False
+    ) -> float:
+        # Every orientation fits inside this disk. Its distance to the target
+        # region cannot exceed the translation needed by any rotated footprint.
+        radius = model.base.max_radius()
         if self.models:
             return min(
                 math.hypot(
-                    max(0.0, model.base_distance_to(target) - self.horizontal_inches),
                     max(
+                        0.0,
+                        model.pose.distance_2d_to(target.pose)
+                        - radius
+                        - target.base.max_radius()
+                        - self.horizontal_inches,
+                    ),
+                    0.0
+                    if ignores_vertical_distance
+                    else max(
                         0.0,
                         model.volume.vertical_gap_to(model.pose, target.volume, target.pose)
                         - self.vertical_inches,
@@ -91,9 +104,12 @@ class MovementGoal:
             pose, base = self.disk
             return math.hypot(
                 max(
-                    0.0, base_distance(model.base, model.pose, base, pose) - self.horizontal_inches
+                    0.0,
+                    model.pose.distance_2d_to(pose) - radius - base.radius - self.horizontal_inches,
                 ),
-                max(
+                0.0
+                if ignores_vertical_distance
+                else max(
                     0.0,
                     bottom - pose.position.z - self.vertical_inches,
                     pose.position.z - top - self.vertical_inches,
@@ -103,16 +119,19 @@ class MovementGoal:
             max(
                 0.0,
                 min(
-                    shapely_backend.base_footprint_distance_to_polygon(
-                        model.base,
-                        model.pose,
+                    shapely_backend.point_distance_to_polygon(
+                        model.pose.position.x,
+                        model.pose.position.y,
                         polygon,
                     )
                     for polygon in self.polygons
                 )
+                - radius
                 - self.horizontal_inches,
             ),
-            max(
+            0.0
+            if ignores_vertical_distance
+            else max(
                 0.0,
                 bottom - self.z_inches - self.vertical_inches,
                 self.z_inches - top - self.vertical_inches,
@@ -198,9 +217,10 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
         if stationary is not None:
             return MovementReachabilityResult(stationary, 0, MovementReachabilityStatus.REACHABLE)
     if (
-        isinstance(source.base, CircularBase)
-        and not query.path_context.ignores_vertical_distance
-        and query.goal.distance_lower_bound(source) > budget + _EPSILON
+        query.goal.distance_lower_bound(
+            source, ignores_vertical_distance=query.path_context.ignores_vertical_distance
+        )
+        > budget + _EPSILON
     ):
         return MovementReachabilityResult(None, 0, MovementReachabilityStatus.UNREACHABLE)
     # Direct paths are overwhelmingly the common headless case. Route construction is lazy.
@@ -236,12 +256,10 @@ def _cached_reachability(query: MovementReachabilityQuery) -> MovementReachabili
             new_distance = distance + _distance(query, current, node)
             if new_distance > budget + _EPSILON or new_distance >= best.get(next_index, math.inf):
                 continue
-            lower = query.goal.distance_lower_bound(replace(source, pose=node))
-            if (
-                not isinstance(source.base, CircularBase)
-                or query.path_context.ignores_vertical_distance
-            ):
-                lower = 0.0
+            lower = query.goal.distance_lower_bound(
+                replace(source, pose=node),
+                ignores_vertical_distance=query.path_context.ignores_vertical_distance,
+            )
             if new_distance + lower > budget + _EPSILON:
                 continue
             full = (*path[:-1], *_segment(current, node))

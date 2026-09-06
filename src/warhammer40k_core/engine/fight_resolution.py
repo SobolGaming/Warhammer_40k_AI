@@ -80,6 +80,11 @@ from warhammer40k_core.engine.fight_geometry import (
 from warhammer40k_core.engine.fight_movement_target_authority import (
     selectable_enemy_unit_ids_in_canonical_inventory,
 )
+from warhammer40k_core.engine.fight_movement_witness import (
+    closed_loop_fight_model_id,
+    fight_movement_path_violation,
+    validate_fight_witness_shape,
+)
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
@@ -130,7 +135,6 @@ from warhammer40k_core.geometry.pathing import (
     PathWitness,
     PathWitnessPayload,
     TerrainPathLegalityResult,
-    is_degenerate_endpoint_only_real_movement_path,
 )
 from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
@@ -404,19 +408,7 @@ class FightMovementProposal:
                 message="Fight movement target submissions require a PathWitness.",
                 field="witness",
             )
-        endpoint_only_model_id = _endpoint_only_model_id(self.witness)
-        if endpoint_only_model_id is not None:
-            return ProposalValidationResult.invalid(
-                proposal_request_id=request.request_id,
-                proposal_kind=request.proposal_kind,
-                violation_code="endpoint_only_path",
-                message="Fight movement PathWitness must not repeat only endpoint poses.",
-                field="witness",
-            )
-        return ProposalValidationResult.valid(
-            proposal_request_id=request.request_id,
-            proposal_kind=request.proposal_kind,
-        )
+        return validate_fight_witness_shape(request, self.witness)
 
     def to_payload(self) -> FightMovementProposalPayload:
         payload: FightMovementProposalPayload = {
@@ -548,6 +540,7 @@ class FightMovementResolution:
             all(result.is_valid for result in self.path_validation_results)
             and all(result.is_valid for result in self.terrain_path_legality_results)
             and self.rollback_record is None
+            and closed_loop_fight_model_id(self.witness) is None
         )
 
     def transition_batch(self, *, before: UnitPlacement) -> BattlefieldTransitionBatch:
@@ -1174,34 +1167,15 @@ def fight_movement_resolution_violation(
     ruleset_descriptor: RulesetDescriptor,
     state: GameState | None = None,
 ) -> ProposalValidationResult | None:
-    for path_result in resolution.path_validation_results:
-        if not path_result.is_valid:
-            path_violation = path_result.violations[0]
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code=path_violation.violation_code,
-                message=path_violation.message,
-                field="witness",
-            )
-    for terrain_result in resolution.terrain_path_legality_results:
-        if not terrain_result.is_valid:
-            terrain_violation = terrain_result.violations[0]
-            return ProposalValidationResult.invalid(
-                proposal_request_id=proposal_request.request_id,
-                proposal_kind=proposal_request.proposal_kind,
-                violation_code=terrain_violation.violation_code,
-                message=terrain_violation.message,
-                field="witness",
-            )
-    if resolution.rollback_record is not None:
-        return ProposalValidationResult.invalid(
-            proposal_request_id=proposal_request.request_id,
-            proposal_kind=proposal_request.proposal_kind,
-            violation_code="unit_coherency_invalid",
-            message="Fight movement endpoint violates unit coherency.",
-            field="witness",
-        )
+    path_violation = fight_movement_path_violation(
+        request=proposal_request,
+        witness=resolution.witness,
+        path_results=resolution.path_validation_results,
+        terrain_results=resolution.terrain_path_legality_results,
+        coherency_invalid=resolution.rollback_record is not None,
+    )
+    if path_violation is not None:
+        return path_violation
     if proposal.is_no_move_choice:
         return None
     if proposal.proposal_kind is ProposalKind.PILE_IN:
@@ -2976,14 +2950,6 @@ def _validate_fight_witness_matches_unit(
     for placement in unit_placement.model_placements:
         if witness.poses_for_model(placement.model_instance_id)[0] != placement.pose:
             raise GameLifecycleError("Fight movement witness must start at current model poses.")
-
-
-def _endpoint_only_model_id(witness: PathWitness) -> str | None:
-    for model_id in witness.model_ids():
-        path = witness.poses_for_model(model_id)
-        if is_degenerate_endpoint_only_real_movement_path(path):
-            return model_id
-    return None
 
 
 def fight_terrain_volumes_for_features(

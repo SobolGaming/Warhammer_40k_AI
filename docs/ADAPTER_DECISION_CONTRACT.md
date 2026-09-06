@@ -4591,6 +4591,9 @@ also apply. Closest selected units are determined before movement, including tie
 Mandatory-endpoint queries use immutable, bounded-cache geometry/policy snapshots.
 Successful queries contain a witness checked by the ordinary path and terrain
 validators. Only a proven distance bound grants an unreachable exemption. A
+rotation-conservative circumscribed-radius bound covers circular, oval and
+rectangular bases; horizontal-only policies omit the vertical cost. The shared
+512-entry cache includes the complete geometry and movement policy. A
 bounded search that cannot establish either answer returns typed invalid
 `consolidation_reachability_unresolved`, never an impossibility verdict. A caller
 may retry with a compliant endpoint or decline. Other new per-model diagnostics are
@@ -4608,6 +4611,19 @@ options, attack decisions and continuations remain authoritative; passing a forc
 selection is unavailable. Resolved selections enter ordinary Fight history and
 cannot be selected twice.
 
+Forced eligibility is recorded as `eligibility_reasons: [ ..., "forced_activation" ]`.
+It does not imply `engaged_at_fight_step_start`: consolidation responses retain the
+original Fight snapshot. A newly engaged unit can choose Normal or Overrun, while a
+unit engaged at the original start and still engaged has Normal only. An eligible
+forced unit that subsequently loses engagement retains its Overrun activation.
+Restore derives the response actor from canonical unit ownership before rebuilding
+options, and rejects unknown, friendly or mixed-owner response inventories.
+
+All Fight movement rejects a path that leaves its initial pose and returns to it
+with `closed_loop_fight_movement`, including rotation away and back. Repeated
+identical poses remain valid stationary evidence for standalone and attached units.
+Adapters must preserve the full witness; endpoint equality cannot hide movement.
+
 `ForcedFightActivationContext.source_phase` is `fight` for these responses, and
 `transport_unit_instance_id` is null only in that context. Shock Disembark retains
 its required Transport identity. Source IDs are
@@ -4624,6 +4640,11 @@ Completion preserves the original step, next player, ordering band, movement
 completion and attack continuations, while retaining forced selections and
 allocation history. Restore authenticates the movement, queue inventory, decision
 ordering, suspension and completion snapshots.
+The ordinary continuation is reconstructed from the preceding phase-start and
+Fight-step history, accepted selections/passes/interrupts, completed activations,
+movement decisions and allocation events. Queue snapshots must equal that complete
+state. Resumption adds only authenticated forced selections, allocations and
+Overrun completions; matching altered suspended/resumed copies are insufficient.
 
 ## Summary Rule
 

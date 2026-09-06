@@ -10,6 +10,7 @@ from warhammer40k_core.engine.battlefield_presence import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
 from warhammer40k_core.engine.fight_resolution import FightMovementProposal
+from warhammer40k_core.engine.forced_fight_authority import forced_fight_selecting_player_id
 from warhammer40k_core.engine.forced_fight_context import ForcedFightActivationContext
 from warhammer40k_core.engine.forced_fight_queue import install_forced_fight_queue
 from warhammer40k_core.engine.game_state import GameState
@@ -98,12 +99,11 @@ def start_consolidation_fight_queue(
             ),
         )
         return
-    owners = {
-        rules_unit_view_by_id(state=state, unit_instance_id=unit_id).owner_player_id
-        for unit_id in pending
-    }
-    if len(owners) != 1 or source.owner_player_id in owners:
-        raise GameLifecycleError("Consolidation response units must belong to one opponent.")
+    selecting_player_id = forced_fight_selecting_player_id(
+        state=state,
+        source_unit_instance_id=source.unit_instance_id,
+        eligible_unit_instance_ids=pending,
+    )
     context = ForcedFightActivationContext(
         context_id=f"forced-fight:{movement_event.event_id}",
         source_rule_id=source_rule_id,
@@ -111,7 +111,7 @@ def start_consolidation_fight_queue(
         source_phase=BattlePhaseKind.FIGHT,
         source_unit_instance_id=source.unit_instance_id,
         transport_unit_instance_id=None,
-        selecting_player_id=next(iter(owners)),
+        selecting_player_id=selecting_player_id,
         eligible_unit_instance_ids=pending,
     )
     install_forced_fight_queue(

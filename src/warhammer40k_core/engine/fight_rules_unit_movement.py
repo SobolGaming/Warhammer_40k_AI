@@ -53,6 +53,7 @@ from warhammer40k_core.engine.fight_movement_source import (
     require_fight_movement_source_matches_current,
     retained_fight_movement_source_path_violations,
 )
+from warhammer40k_core.engine.fight_movement_witness import fight_movement_path_violation
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ENEMY_DISTANCE_INCHES,
     FightMovementEndpointPayload,
@@ -504,31 +505,15 @@ def fight_rules_unit_movement_resolution_violation(
         state=state,
         unit_instance_id=proposal.unit_instance_id,
     )
-    for path_result in resolution.path_validation_results:
-        if not path_result.is_valid:
-            violation = path_result.violations[0]
-            return _invalid(
-                request=proposal_request,
-                code=violation.violation_code,
-                message=violation.message,
-                field="witness",
-            )
-    for terrain_result in resolution.terrain_path_legality_results:
-        if not terrain_result.is_valid:
-            terrain_violation = terrain_result.violations[0]
-            return _invalid(
-                request=proposal_request,
-                code=terrain_violation.violation_code,
-                message=terrain_violation.message,
-                field="witness",
-            )
-    if resolution.rollback_record is not None:
-        return _invalid(
-            request=proposal_request,
-            code="unit_coherency_invalid",
-            message="Fight movement endpoint violates rules-unit coherency.",
-            field="witness",
-        )
+    path_violation = fight_movement_path_violation(
+        request=proposal_request,
+        witness=resolution.witness,
+        path_results=resolution.path_validation_results,
+        terrain_results=resolution.terrain_path_legality_results,
+        coherency_invalid=resolution.rollback_record is not None,
+    )
+    if path_violation is not None:
+        return path_violation
     if proposal.is_no_move_choice:
         return None
     grouped_before = resolution.before_rules_unit_placement

@@ -311,7 +311,11 @@ class FightPhaseState:
                 ordering_bands=(FightOrderingBandKind.REMAINING_COMBATS,),
                 current_band_index=0,
                 next_player_id=context.selecting_player_id,
-                engaged_at_fight_step_start_unit_ids=(context.eligible_unit_instance_ids),
+                engaged_at_fight_step_start_unit_ids=(
+                    context.eligible_unit_instance_ids
+                    if suspended_state is None
+                    else suspended_state.fight_order_state.engaged_at_fight_step_start_unit_ids
+                ),
                 fights_first_registry=fights_first_registry,
             ),
             forced_activation_context=context,
@@ -968,6 +972,13 @@ def _fight_eligibility_reasons_for_rules_unit(
         rules_unit=rules_unit,
     ):
         reasons.append(FightEligibilityKind.CURRENTLY_ENGAGED)
+    forced = fight_state.forced_activation_context
+    if forced is not None and rules_unit_identity_history_contains(
+        state=state,
+        identity_ids=forced.eligible_unit_instance_ids,
+        unit_instance_id=rules_unit.unit_instance_id,
+    ):
+        reasons.append(FightEligibilityKind.FORCED_ACTIVATION)
     return tuple(reasons)
 
 

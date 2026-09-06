@@ -3079,7 +3079,9 @@ Mandatory-endpoint search takes immutable geometry and movement/coherency policy
 uses direct paths before lazy deterministic navigation, and returns only witnesses
 accepted by ordinary validators. A bounded 512-entry cache cannot reuse results
 when poses, bases, terrain, permissions, budgets or proposed peer positions change.
-A distance lower bound certifies impossibility. Exhausting navigation is not a
+A rotation-conservative distance lower bound covers circular, oval and rectangular
+bases and both full-distance and horizontal-only policies. It certifies obvious
+impossibility in empty space without running navigation. Exhausting navigation is not a
 certificate: `consolidation_reachability_unresolved` rejects that proposal and
 permits retry or decline. This conservative diagnostic covers narrow or complex
 routes where the bounded search cannot establish a legal alternative; it never
@@ -3091,6 +3093,13 @@ The opponent chooses existing Normal/Overrun options. The shared queue suspends 
 resumes ordinary Fight step/order/continuations; forced selections and allocation
 history survive. Restore authenticates movement, trigger, inventory, decisions and
 completion. Shared public-event redaction removes internal continuation snapshots.
+Forced actors are derived again from canonical ownership during restore. The
+ordinary continuation is reconstructed from its preceding phase, decisions and
+events, including exact movement completion and player progress, before comparing
+either queue snapshot. Forced entitlement is distinct from the original engagement
+snapshot, preserving Normal/Overrun choices and mandatory unengaged responses.
+Closed-loop Fight paths, including rotation away and back, are centrally rejected;
+stationary repeated poses preserve their evidence in attached-unit resolutions.
 Historical physical queries distinguish retained destroyed models from living
 models, preserving Fight On Death geometry without granting living authority.
 
@@ -3110,16 +3119,18 @@ event at a time, while sequence owners supply their initial authority. Static
 coverage prevents restoring the unanchored suffix replay. Source-registry bytes
 and their loader pin use LF on every platform, as required by `.gitattributes`.
 
-Final validation after the last production change: the complete behavioral suite
-passes `6163` tests with `85.01%` coverage; the separate code-quality suite passes
-`366` tests. Ruff lint/format, mypy (`2686` files), Pyright (zero errors/warnings),
+Final validation after merging main and the review corrections: the complete
+behavioral suite passes `6311` tests with `85.03%` coverage; the separate
+code-quality suite passes `371` tests. Ruff lint/format, mypy (`2695` files),
+Pyright (zero errors/warnings),
 all `11` import contracts, the exact eight-shard inventory check, and all-files
 pre-commit pass. No behavioral test file was added, removed, moved or renamed.
 
-All ten Core Rules source builders, the historical 40k.app audit, maintained-mirror
-audit, engine-build identity check, and external-contract `--base-ref origin/main`
-check pass at base `5ef1ce1eaa6b89ca3a5f7fd9d38bcf98d34c0630`. Installed-wheel smoke
-validates `2521` resources and `27` schemas. TypeScript dependency installation,
+All ten Core Rules source builders, F00 governance generation, the historical
+40k.app audit, maintained-mirror audit, engine-build identity check, and
+external-contract `--base-ref origin/main` check pass at base
+`f47762b3790b2e709b0f11d9f8fd7aa8b0a1033f`. Installed-wheel smoke
+validates `2529` resources and `27` schemas. TypeScript dependency installation,
 generated-client/type checks, all five client unit tests, and the two-server HTTP
 conformance scenario pass (`342` assertions, contract `11.1.0`). Windows validation
 uses the bundled Node runtime on PATH and a local integrity-verified npm package.

@@ -19,6 +19,7 @@ from warhammer40k_core.engine.fight_activation_requests import (
 )
 from warhammer40k_core.engine.fight_historical_eligibility import (
     forced_fight_eligibility_contexts_before_event,
+    forced_fight_suspended_state_before_event,
 )
 from warhammer40k_core.engine.fight_model_authority_history import (
     build_model_authority_timeline,
@@ -193,9 +194,12 @@ def _validate_forced_fight_phase_state_consistency(
         raise GameLifecycleError("Forced fight_phase_state ordering band drift.")
     if fight_order_state.passed_player_ids or fight_order_state.eligible_passes:
         raise GameLifecycleError("Forced fight_phase_state cannot contain Fight passes.")
-    if set(fight_order_state.engaged_at_fight_step_start_unit_ids) != set(
+    expected_engaged = (
         forced_context.eligible_unit_instance_ids
-    ):
+        if fight_state.suspended_state is None
+        else fight_state.suspended_state.fight_order_state.engaged_at_fight_step_start_unit_ids
+    )
+    if fight_order_state.engaged_at_fight_step_start_unit_ids != expected_engaged:
         raise GameLifecycleError("Forced fight_phase_state eligibility snapshot drift.")
     if not set(fight_order_state.selected_to_fight_unit_ids).issubset(
         forced_context.eligible_unit_instance_ids
@@ -885,6 +889,11 @@ def authenticated_forced_fight_selections(
             policy=ruleset_descriptor.fight_policy,
             context=context,
             fights_first_registry=FightsFirstRegistry.from_state(state),
+            suspended_state=forced_fight_suspended_state_before_event(
+                event_records=event_records,
+                event_index=selection_request_event_index,
+                context=context,
+            ),
         )
         canonical_request = build_fight_activation_request(
             state=state,

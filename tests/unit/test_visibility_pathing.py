@@ -9,7 +9,7 @@ from warhammer40k_core.core.attached_unit import AttachedUnit
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
-from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.collision import CollisionSet
 from warhammer40k_core.geometry.movement_envelope import MovementEnvelope
 from warhammer40k_core.geometry.movement_reachability import MovementReachabilityQuery
@@ -705,6 +705,86 @@ def test_mandatory_endpoint_search_never_treats_unresolved_search_as_impossible(
     result = movement_reachability(replace(query, forbidden_goals=(query.goal,)))
     assert result.witness is None
     assert result.status is MovementReachabilityStatus.UNRESOLVED
+
+
+@pytest.mark.parametrize("base", [CircularBase(0.5), OvalBase(2.0, 1.0), RectangularBase(2.0, 1.0)])
+@pytest.mark.parametrize("ignores_vertical", [False, True])
+@pytest.mark.parametrize("goal_kind", ["model", "disk", "polygon"])
+@pytest.mark.parametrize("target_x", [6.0, 12.0])
+def test_mandatory_endpoint_distance_proofs_cover_all_bases_and_distance_policies(
+    base: BaseShape, ignores_vertical: bool, goal_kind: str, target_x: float
+) -> None:
+    from warhammer40k_core.geometry.movement_reachability import (
+        MovementGoal,
+        MovementReachabilityStatus,
+        movement_reachability,
+    )
+
+    query = _mandatory_endpoint_query(target_x=target_x)
+    moving = replace(query.path_context.moving_model, base=base)
+    goal = query.goal
+    if goal_kind == "disk":
+        goal = MovementGoal(
+            disk=(Pose.at(target_x, 2.0), CircularBase(0.5)),
+            horizontal_inches=1.0,
+            vertical_inches=5.0,
+        )
+    elif goal_kind == "polygon":
+        goal = MovementGoal(
+            polygons=(
+                (
+                    (target_x - 0.5, 1.5),
+                    (target_x + 0.5, 1.5),
+                    (target_x + 0.5, 2.5),
+                    (target_x - 0.5, 2.5),
+                ),
+            ),
+            horizontal_inches=1.0,
+            vertical_inches=5.0,
+        )
+    query = replace(
+        query,
+        goal=goal,
+        path_context=replace(
+            query.path_context, moving_model=moving, ignores_vertical_distance=ignores_vertical
+        ),
+        terrain_context=replace(query.terrain_context, moving_model=moving),
+    )
+    result = movement_reachability(query)
+    if target_x == 12.0:
+        assert result.status is MovementReachabilityStatus.UNREACHABLE
+        assert result.explored_nodes == 0
+        assert result.witness is None
+    else:
+        assert result.status is MovementReachabilityStatus.REACHABLE
+        assert result.witness is not None
+        assert replace(query.path_context, witness=result.witness).validate().is_valid
+        assert replace(query.terrain_context, witness=result.witness).validate().is_valid
+
+
+def test_mandatory_endpoint_horizontal_policy_does_not_charge_vertical_goal_distance() -> None:
+    from warhammer40k_core.geometry.movement_reachability import movement_reachability
+
+    query = _mandatory_endpoint_query(target_x=6.0)
+    elevated = replace(query.goal.models[0], pose=Pose.at(6.0, 2.0, 30.0))
+    goal = replace(query.goal, models=(elevated,))
+    assert goal.distance_lower_bound(query.path_context.moving_model) > 3.0
+    assert (
+        goal.distance_lower_bound(query.path_context.moving_model, ignores_vertical_distance=True)
+        <= 3.0
+    )
+    # Reaching the horizontal region is still possible; no false impossibility
+    # certificate may bypass navigation/terrain validation for the height change.
+    from warhammer40k_core.geometry.movement_reachability import MovementReachabilityStatus
+
+    result = movement_reachability(
+        replace(
+            query,
+            goal=goal,
+            path_context=replace(query.path_context, ignores_vertical_distance=True),
+        )
+    )
+    assert result.status is not MovementReachabilityStatus.UNREACHABLE
 
 
 def test_mandatory_endpoint_witness_also_satisfies_strict_closer_constraint() -> None:

@@ -2,22 +2,23 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, ConsolidationModeKind
+from warhammer40k_core.engine.consolidation_continuation_history import (
+    consolidation_continuation_before_event,
+)
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.fight_historical_eligibility import (
     forced_fight_eligibility_contexts_before_event,
 )
 from warhammer40k_core.engine.fight_order import (
-    FightActivationSelection,
-    FightActivationSelectionPayload,
     FightPhaseState,
     FightPhaseStatePayload,
 )
 from warhammer40k_core.engine.fight_resolution import fight_movement_proposal_from_payload
+from warhammer40k_core.engine.forced_fight_authority import forced_fight_selecting_player_id
 from warhammer40k_core.engine.forced_fight_context import (
     ForcedFightActivationContext,
     ForcedFightActivationContextPayload,
@@ -61,7 +62,15 @@ def validate_consolidation_fight_history(
         resolution = _object(payload.get("resolution"))
         endpoint = _object(resolution.get("endpoint_witness"))
         engaged = _identifiers(endpoint.get("engaged_after_unit_ids"))
-        selected = _prior_selected_ids(event_records[:trigger_index], payload)
+        continuation = consolidation_continuation_before_event(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            event_index=trigger_index + 1,
+            battle_round=cast(int, payload["battle_round"]),
+            active_player_id=cast(str, payload["active_player_id"]),
+        )
+        selected = tuple(sorted(continuation.fight_order_state.selected_to_fight_unit_ids))
         pending = tuple(
             unit_id
             for unit_id in engaged
@@ -127,19 +136,22 @@ def validate_consolidation_fight_history(
             or context.eligible_unit_instance_ids != tuple(sorted(pending))
         ):
             raise GameLifecycleError("Consolidation response source or eligible inventory drift.")
+        selecting_player_id = forced_fight_selecting_player_id(
+            state=state,
+            source_unit_instance_id=proposal.unit_instance_id,
+            eligible_unit_instance_ids=pending,
+        )
+        if context.selecting_player_id != selecting_player_id:
+            raise GameLifecycleError(
+                "Consolidation response selecting player differs from canonical owner."
+            )
         suspended = FightPhaseState.from_payload(
             cast(
                 FightPhaseStatePayload,
                 _object(start_payload.get("suspended_state")),
             )
         )
-        if (
-            suspended.forced_activation_context is not None
-            or suspended.suspended_state is not None
-            or set(suspended.fight_order_state.selected_to_fight_unit_ids) != set(selected)
-            or suspended.consolidate_state is None
-            or proposal.unit_instance_id not in suspended.consolidate_state.completed_unit_ids
-        ):
+        if suspended != continuation:
             raise GameLifecycleError("Consolidation suspended ordinary state drift.")
         _validate_queue_completion(
             state=state,
@@ -222,54 +234,16 @@ def _validate_queue_completion(
             _object(payload.get("resumed_state")),
         )
     )
-    expected_order = replace(
-        suspended.fight_order_state,
-        selected_to_fight_unit_ids=(
-            *suspended.fight_order_state.selected_to_fight_unit_ids,
-            *(selection.unit_instance_id for selection in selections),
-        ),
-        activation_selections=(*suspended.fight_order_state.activation_selections, *selections),
+    canonical_resumed = consolidation_continuation_before_event(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        event_index=index + 1,
+        battle_round=suspended.battle_round,
+        active_player_id=suspended.active_player_id,
     )
-    if (
-        resumed.fight_order_state != expected_order
-        or replace(
-            resumed,
-            fight_order_state=suspended.fight_order_state,
-            allocated_model_ids_this_phase=suspended.allocated_model_ids_this_phase,
-            overrun_pile_in_completed_activation_result_ids=suspended.overrun_pile_in_completed_activation_result_ids,
-        )
-        != suspended
-    ):
-        raise GameLifecycleError("Consolidation resumed ordinary Fight state drift.")
-    if not set(suspended.allocated_model_ids_this_phase).issubset(
-        resumed.allocated_model_ids_this_phase
-    ):
-        raise GameLifecycleError("Consolidation lost prior damage allocation history.")
-
-
-def _prior_selected_ids(
-    events: tuple[EventRecord, ...], trigger: dict[str, JsonValue]
-) -> tuple[str, ...]:
-    selected: set[str] = set()
-    for event in events:
-        if event.event_type != "fight_activation_selected" or not isinstance(event.payload, dict):
-            continue
-        payload = event.payload
-        if payload.get("battle_round") != trigger.get("battle_round") or payload.get(
-            "active_player_id"
-        ) != trigger.get("active_player_id"):
-            continue
-        forced = payload.get("forced_activation_context")
-        if isinstance(forced, dict) and forced.get("source_phase") != "fight":
-            continue
-        selection = FightActivationSelection.from_payload(
-            cast(
-                FightActivationSelectionPayload,
-                _object(payload.get("activation_selection")),
-            )
-        )
-        selected.add(selection.unit_instance_id)
-    return tuple(sorted(selected))
+    if resumed != canonical_resumed:
+        raise GameLifecycleError("Consolidation resumed ordinary continuation drift.")
 
 
 def _trigger_id(payload: dict[str, JsonValue]) -> JsonValue:

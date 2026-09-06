@@ -19,6 +19,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacementPayload,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_movement_witness import closed_loop_fight_model_id
 from warhammer40k_core.engine.fight_resolution import (
     FightMovementEndpointPayload,
     FightMovementResolution,
@@ -325,6 +326,7 @@ class RulesUnitFightMovementResolution:
             moved_model_ids=changed_model_ids,
             coherency_result=self.coherency_result,
             rollback_record=self.rollback_record,
+            has_witness=self.witness is not None,
         )
 
     @property
@@ -333,6 +335,7 @@ class RulesUnitFightMovementResolution:
             all(result.is_valid for result in self.path_validation_results)
             and all(result.is_valid for result in self.terrain_path_legality_results)
             and self.rollback_record is None
+            and closed_loop_fight_model_id(self.witness) is None
         )
 
     def transition_batch(self) -> BattlefieldTransitionBatch:
@@ -752,12 +755,10 @@ def _validate_grouped_fight_movement_witness(
     attempted: FightRulesUnitPlacement,
     moved_model_ids: tuple[str, ...],
 ) -> None:
-    if not moved_model_ids:
-        if witness is not None:
-            raise GameLifecycleError("Grouped Fight no-move resolution must not include a witness.")
-        return
     if witness is None:
-        raise GameLifecycleError("Grouped Fight movement requires a witness.")
+        if moved_model_ids:
+            raise GameLifecycleError("Grouped Fight movement requires a witness.")
+        return
     expected_model_ids = _model_ids(before)
     if witness.model_ids() != expected_model_ids:
         raise GameLifecycleError("Grouped Fight movement witness model inventory drifted.")
@@ -784,8 +785,9 @@ def _validate_grouped_fight_movement_coherency(
     moved_model_ids: tuple[str, ...],
     coherency_result: UnitCoherencyResult | None,
     rollback_record: RulesUnitMovementRollbackRecord | None,
+    has_witness: bool,
 ) -> None:
-    if not moved_model_ids:
+    if not moved_model_ids and not has_witness:
         if coherency_result is not None:
             raise GameLifecycleError(
                 "Grouped Fight no-move resolution must not include coherency evidence."
