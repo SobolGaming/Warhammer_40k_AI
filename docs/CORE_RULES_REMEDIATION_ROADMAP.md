@@ -3144,8 +3144,8 @@ uses the bundled Node runtime on PATH and a local integrity-verified npm package
 
 ## P22 + P22B implementation evidence — Orders 20 and 21
 
-Status: Implemented together at the owner's explicit request. All final local
-gates pass; remote publication is being completed. Merge remains an owner action.
+Status: Implemented together at the owner's explicit request and published in
+PR #427. All final local gates pass. Merge remains an owner action.
 
 Finding IDs: `C22-01`, `C22-02`.
 
@@ -3266,4 +3266,5 @@ conformance scenario pass (`342` assertions, contract `11.1.0`). Windows client
 validation uses the bundled Node runtime and the local integrity-verified npm
 package. The final scope/architecture audit and `git diff --check` pass.
 
-PR URL and merge commit: Publication pending; not merged.
+PR URL and merge commit:
+[PR #427](https://github.com/SobolGaming/Warhammer_40k_AI/pull/427); not merged.
