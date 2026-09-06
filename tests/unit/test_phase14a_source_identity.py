@@ -1243,7 +1243,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 14
+    assert len(scope.source_packages) == 15
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -2983,4 +2983,36 @@ def test_order22_source_identity_does_not_claim_completed_duplicate_execution() 
     assert mirror.app_version is None
     assert "Select Weapons step" in rule.source_text
     with pytest.raises(source.DuplicatedAbilitiesSourceError, match="reviewed pin"):
+        source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
+
+
+def test_p01_source_package_pins_only_the_off_battlefield_command_obligation() -> None:
+    from tools.build_core_off_battlefield_battle_shock_source import (
+        ARTIFACT_PATH,
+        AUDIT_PATH,
+        build_payloads,
+    )
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_off_battlefield_battle_shock_2026_09 as source,
+    )
+
+    payload, audit = build_payloads()
+    assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
+    assert json.loads(AUDIT_PATH.read_bytes()) == audit
+    package = source.source_package()
+    (rule,) = source.source_rules()
+    assert package.evidence_required_source_ids == (rule.source_id,)
+    assert package.source_catalog.source_text_by_id(rule.source_id).raw_text == rule.source_text
+    assert rule.section_id == "01.02.04"
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "executable_engine_runtime"
+    assert len(rule.runtime_consumer_ids) == 3
+    assert "at or below half-strength" in rule.source_text
+    evidence = source.source_evidence_records()
+    assert len(evidence) == 2
+    assert evidence[1].provider_name == "40k.app"
+    assert evidence[1].observed_at == "2026-09-06T16:04:16Z"
+    assert hashlib.sha256(rule.source_text.encode()).hexdigest() == rule.transcription_sha256
+    with pytest.raises(source.OffBattlefieldBattleShockSourceError, match="reviewed pin"):
         source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")

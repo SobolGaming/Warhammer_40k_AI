@@ -340,6 +340,16 @@
           "audit_id": "core-duplicated-abilities-maintained-app-mirrors-2026-09-06",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-06T14:49:36Z"
+        },
+        {
+          "audit_id": "core-off-battlefield-battle-shock-maintained-app-mirrors-2026-09-06",
+          "row_id": "off-battlefield-battle-shock:40k-app",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "c139623d48440f0dd104f51333e4200bd14d5c8839713c2a932ca3e6f94ae31e",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-06T16:04:16Z"
         }
       ],
       "legacy_observations": [
@@ -668,6 +678,15 @@
           "version": "maintained-app-mirrors-observed-2026-09-06",
           "allowed_rule_source_ids": [
             "gw-11e-core-duplicated-abilities:duplicated-abilities"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-off-battlefield-battle-shock",
+          "version": "maintained-app-mirrors-observed-2026-09-06",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-off-battlefield-battle-shock:off-battlefield-battle-shock"
           ],
           "catalog_sha256": null
         }

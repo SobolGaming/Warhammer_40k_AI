@@ -18,6 +18,10 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
     BattleShockModifierApplication,
 )
+from warhammer40k_core.engine.battle_shock_model_authority import (
+    battle_shock_model_ids,
+    command_test_allows_off_battlefield,
+)
 from warhammer40k_core.engine.battle_shock_resolution import (
     BattleShockPassedStatePolicy,
     BattleShockResolutionResult,
@@ -25,16 +29,12 @@ from warhammer40k_core.engine.battle_shock_resolution import (
     is_battle_shock_reroll_request,
     resolve_battle_shock_test_with_optional_reroll,
 )
-from warhammer40k_core.engine.battlefield_state import BattlefieldRemovalKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rules_unit_geometry import (
-    placed_alive_geometry_models_for_rules_unit,
-)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
@@ -134,38 +134,20 @@ def materialize_battle_shock_test_request(
         raise GameLifecycleError("Battle-shock test active player does not match live state.")
     target_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_id)
     canonical_target_id = target_rules_unit.unit_instance_id
-    all_alive_model_ids = tuple(
-        sorted(model.model_instance_id for model in target_rules_unit.alive_models())
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Battle-shock test requires battlefield state.")
+    current_model_ids = battle_shock_model_ids(
+        rules_unit=target_rules_unit,
+        battlefield=battlefield,
+        state=state,
+        allow_off_battlefield=command_test_allows_off_battlefield(
+            reason=reason,
+            phase=phase,
+            player_id=target_rules_unit.owner_player_id,
+            active_player_id=active_player,
+        ),
     )
-    placed_model_ids = tuple(
-        sorted(
-            model.model_id
-            for model in placed_alive_geometry_models_for_rules_unit(
-                state=state,
-                unit_instance_id=canonical_target_id,
-            )
-        )
-    )
-    alive_model_id_set = set(all_alive_model_ids)
-    placed_model_id_set = set(placed_model_ids)
-    absent_alive_model_ids = alive_model_id_set - placed_model_id_set
-    destroyed_departure_model_ids = {
-        model_id
-        for departure in state.primary_battlefield_departure_states
-        if departure.removal_kind is BattlefieldRemovalKind.DESTROYED
-        and departure.rules_unit_instance_id == canonical_target_id
-        for model_id in departure.removed_model_instance_ids
-    }
-    if (
-        not placed_model_ids
-        or not placed_model_id_set <= alive_model_id_set
-        or not absent_alive_model_ids <= destroyed_departure_model_ids
-    ):
-        raise GameLifecycleError(
-            "Battle-shock target does not have every alive model on the battlefield or lacks "
-            "destroyed-departure authority for an absent model."
-        )
-    current_model_ids = placed_model_ids
     player_id = target_rules_unit.owner_player_id
     ability_index = runtime.ability_indexes_by_player_id.get(player_id)
     if ability_index is None:
