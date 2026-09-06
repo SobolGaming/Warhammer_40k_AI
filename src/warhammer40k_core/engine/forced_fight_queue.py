@@ -31,12 +31,17 @@ def install_forced_fight_queue(
         raise GameLifecycleError("Forced Fight queue cannot overwrite a different Fight state.")
     if state.active_player_id is None:
         raise GameLifecycleError("Forced Fight queue requires an active player.")
+    registry = (
+        FightsFirstRegistry.from_state(state)
+        if suspended_state is None
+        else suspended_state.fight_order_state.fights_first_registry
+    )
     fight_state = FightPhaseState.for_forced_activations(
         battle_round=state.battle_round,
         active_player_id=state.active_player_id,
         policy=policy,
         context=context,
-        fights_first_registry=FightsFirstRegistry.from_state(state),
+        fights_first_registry=registry,
         suspended_state=suspended_state,
     )
     state.replace_fight_phase_state(fight_state)
@@ -51,7 +56,7 @@ def install_forced_fight_queue(
                 "phase_body_status": "forced_fight_activation_queue_started",
                 "forced_activation_context": context.to_payload(),
                 **(
-                    {}
+                    {"fights_first_registry": registry.to_payload()}
                     if suspended_state is None
                     else {"suspended_state": suspended_state.to_payload()}
                 ),

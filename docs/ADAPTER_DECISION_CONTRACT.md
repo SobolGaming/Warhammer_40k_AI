@@ -4636,6 +4636,14 @@ Fight-phase forced queue; nested forced suspension is invalid. Queue-start and
 completion engine events carry `suspended_state` and `resumed_state` for restore
 authentication. Shared redaction removes both from public event projections. Public
 source contexts/options/selection records keep their existing viewer policy.
+Request, option, request-event and waiting-status round fields come from the
+owning Fight state, including historical reconstruction after later turns or rounds.
+Consolidation responses retain the suspended Fight state's Fights First registry.
+A forced queue that starts a new Fight step (Shock Disembark) records its initial
+`fights_first_registry` in the internal queue-start event; shared redaction removes
+this snapshot too. Restore uses these frozen registries rather than current
+persisting effects, which may have expired. Exact historical round/context and
+request comparisons remain mandatory; completed earlier-round queues are validated.
 Completion preserves the original step, next player, ordering band, movement
 completion and attack continuations, while retaining forced selections and
 allocation history. Restore authenticates the movement, queue inventory, decision

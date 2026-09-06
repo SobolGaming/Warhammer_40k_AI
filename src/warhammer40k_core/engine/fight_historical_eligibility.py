@@ -27,6 +27,7 @@ from warhammer40k_core.engine.fight_order import (
 from warhammer40k_core.engine.fights_first import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
     FightsFirstRegistry,
+    FightsFirstRegistryPayload,
 )
 from warhammer40k_core.engine.forced_fight_authority import forced_fight_selecting_player_id
 from warhammer40k_core.engine.forced_fight_context import ForcedFightActivationContext
@@ -98,7 +99,12 @@ def forced_fight_eligibility_contexts_before_event(
         if suspended is None
         else suspended.fight_order_state.engaged_at_fight_step_start_unit_ids
     )
-    fights_first_registry = FightsFirstRegistry.from_state(state)
+    fights_first_registry = forced_fight_registry_before_event(
+        event_records=event_records,
+        event_index=event_index,
+        context=context,
+        battle_round=battle_round,
+    )
     contexts: list[FightEligibilityContext] = []
     for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
         unit_id = rules_unit.unit_instance_id
@@ -192,7 +198,50 @@ def forced_fight_suspended_state_before_event(
     payload = starts[0].payload.get("suspended_state")
     if not isinstance(payload, dict):
         raise GameLifecycleError("Consolidation eligibility requires the ordinary Fight snapshot.")
-    return FightPhaseState.from_payload(cast(FightPhaseStatePayload, payload))
+    suspended = FightPhaseState.from_payload(cast(FightPhaseStatePayload, payload))
+    if (
+        starts[0].payload.get("battle_round") != suspended.battle_round
+        or starts[0].payload.get("active_player_id") != suspended.active_player_id
+        or starts[0].payload.get("phase") != context.source_phase.value
+    ):
+        raise GameLifecycleError("Consolidation historical Fight time context drift.")
+    return suspended
+
+
+def forced_fight_registry_before_event(
+    *,
+    event_records: tuple[EventRecord, ...],
+    event_index: int,
+    context: ForcedFightActivationContext,
+    battle_round: int,
+) -> FightsFirstRegistry:
+    """Use the registry frozen by the original Fight owner, never today's effects."""
+    suspended = forced_fight_suspended_state_before_event(
+        event_records=event_records, event_index=event_index, context=context
+    )
+    if suspended is not None:
+        if suspended.battle_round != battle_round:
+            raise GameLifecycleError("Forced Fight historical registry round drift.")
+        return suspended.fight_order_state.fights_first_registry
+    starts = tuple(
+        event
+        for event in event_records[:event_index]
+        if event.event_type == "forced_fight_activation_queue_started"
+        and isinstance(event.payload, dict)
+        and event.payload.get("forced_activation_context") == context.to_payload()
+    )
+    if len(starts) != 1 or not isinstance(starts[0].payload, dict):
+        raise GameLifecycleError("Forced Fight registry requires one exact queue-start event.")
+    payload = starts[0].payload
+    if payload.get("battle_round") != battle_round:
+        raise GameLifecycleError("Forced Fight historical registry round drift.")
+    registry_payload = payload.get("fights_first_registry")
+    if not isinstance(registry_payload, dict):
+        raise GameLifecycleError("Forced Fight registry snapshot is missing or malformed.")
+    try:
+        return FightsFirstRegistry.from_payload(cast(FightsFirstRegistryPayload, registry_payload))
+    except (KeyError, TypeError) as exc:
+        raise GameLifecycleError("Forced Fight registry snapshot is malformed.") from exc
 
 
 def _historical_geometry_by_model_id(

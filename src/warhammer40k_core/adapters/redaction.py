@@ -551,7 +551,7 @@ def _public_event_payload(
             {
                 key: value
                 for key, value in payload.items()
-                if key not in {"suspended_state", "resumed_state"}
+                if key not in {"suspended_state", "resumed_state", "fights_first_registry"}
             }
         )
     if event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:

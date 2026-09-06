@@ -3098,6 +3098,13 @@ ordinary continuation is reconstructed from its preceding phase, decisions and
 events, including exact movement completion and player progress, before comparing
 either queue snapshot. Forced entitlement is distinct from the original engagement
 snapshot, preserving Normal/Overrun choices and mandatory unengaged responses.
+Historical request, option, event and status builders retain the owning Fight
+round after time advances. Frozen Fight registries survive turn-scoped effect
+expiration: consolidation uses the suspended ordinary registry, while a new
+forced Fight step records its initial registry in a redacted internal event.
+Facade regressions complete both consolidation modes in both source-player
+directions, advance normally into Round 2, restore and replay exactly, and reject
+altered historical round/context fields after the effects have expired.
 Closed-loop Fight paths, including rotation away and back, are centrally rejected;
 stationary repeated poses preserve their evidence in attached-unit resolutions.
 Historical physical queries distinguish retained destroyed models from living
@@ -3119,9 +3126,9 @@ event at a time, while sequence owners supply their initial authority. Static
 coverage prevents restoring the unanchored suffix replay. Source-registry bytes
 and their loader pin use LF on every platform, as required by `.gitattributes`.
 
-Final validation after merging main and the review corrections: the complete
-behavioral suite passes `6311` tests with `85.03%` coverage; the separate
-code-quality suite passes `371` tests. Ruff lint/format, mypy (`2695` files),
+Final validation after merging main and the cross-round review corrections: the
+complete behavioral suite passes `6311` tests with `85.02%` coverage; the separate
+code-quality suite passes `372` tests. Ruff lint/format, mypy (`2695` files),
 Pyright (zero errors/warnings),
 all `11` import contracts, the exact eight-shard inventory check, and all-files
 pre-commit pass. No behavioral test file was added, removed, moved or renamed.

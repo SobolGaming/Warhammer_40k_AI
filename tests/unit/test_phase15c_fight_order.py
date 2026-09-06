@@ -4862,6 +4862,10 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
     mode: ConsolidationModeKind,
     source_player: str,
 ) -> None:
+    from warhammer40k_core.engine.fight_historical_eligibility import (
+        forced_fight_registry_before_event,
+    )
+
     source_keys = ("a-source", "z-later")
     target_keys = ("enemy-1", "enemy-2")
     lifecycle, units = _fight_lifecycle(
@@ -5118,8 +5122,54 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
     assert skipped["engaged_enemy_unit_instance_ids"] == list(later_targets)
     assert skipped["already_selected_unit_instance_ids"] == sorted(selected)
     assert len(_event_payloads(lifecycle, "forced_fight_activation_queue_started")) == 1
+    _p12_advance_to_second_round(session, status)
+    assert _state(lifecycle).battle_round == 2
+    assert FightsFirstRegistry.from_state(_state(lifecycle)).sources == ()
+    assert forced.forced_activation_context is not None
+    historical_registry = forced_fight_registry_before_event(
+        event_records=lifecycle.decision_controller.event_log.records,
+        event_index=len(lifecycle.decision_controller.event_log.records),
+        context=forced.forced_activation_context,
+        battle_round=1,
+    )
+    assert historical_registry.sources
+    assert historical_registry == ordinary.fight_order_state.fights_first_registry
     final = lifecycle.to_payload()
     assert GameLifecycle.from_payload(final).to_payload() == final
+    for drift in ("request", "option", "requested_event", "queue_round", "queue_player"):
+        forged_round = cast(GameLifecyclePayload, json.loads(json.dumps(final)))
+        record = next(
+            record
+            for record in forged_round["decisions"]["records"]
+            if isinstance(record["request"]["payload"], dict)
+            and "forced_activation_context" in record["request"]["payload"]
+        )
+        if drift == "request":
+            cast(dict[str, JsonValue], record["request"]["payload"])["battle_round"] = 2
+        elif drift == "option":
+            cast(dict[str, JsonValue], record["request"]["options"][0]["payload"])[
+                "battle_round"
+            ] = 2
+        else:
+            event_type = (
+                "fight_activation_selection_requested"
+                if drift == "requested_event"
+                else "forced_fight_activation_queue_started"
+            )
+            round_event = next(
+                event
+                for event in forged_round["decisions"]["event_log"]
+                if event["event_type"] == event_type
+                and isinstance(event["payload"], dict)
+                and "forced_activation_context" in event["payload"]
+            )
+            event_payload = cast(dict[str, JsonValue], round_event["payload"])
+            if drift == "queue_player":
+                event_payload["active_player_id"] = "player-b"
+            else:
+                event_payload["battle_round"] = 2
+        with pytest.raises((GameLifecycleError, DecisionError)):
+            GameLifecycle.from_payload(forged_round)
     artifact = ReplayArtifact.capture(
         artifact_id=f"p12-replay:{mode.value}:{source_player}",
         initial_lifecycle_payload=replay_initial,
@@ -5143,6 +5193,49 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
                 )
                 assert "suspended_state" not in json.dumps(public)
                 assert "resumed_state" not in json.dumps(public)
+
+
+def _p12_advance_to_second_round(session: LocalGameSession, status: LifecycleStatus) -> None:
+    lifecycle = session.lifecycle
+    for index in range(200):
+        if _state(lifecycle).battle_round == 2:
+            return
+        request = _decision_request(status)
+        if request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"p12-next-round-decline:{index}",
+                payload=stratagem_decline_payload(),
+            )
+            continue
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            status = _submit_fight_movement_no_move(
+                lifecycle, request=request, result_id=f"p12-next-round-movement:{index}"
+            )
+        elif request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            status = _submit_minimal_melee_declaration(
+                lifecycle, request=request, result_id=f"p12-next-round-melee:{index}"
+            )
+        else:
+            preferred = tuple(
+                option
+                for option in request.options
+                if option.option_id
+                in {
+                    "remain_stationary",
+                    "complete_shooting_phase",
+                    "complete_charge_phase",
+                    "decline_stratagem_window",
+                }
+            )
+            option = preferred[0] if preferred else request.options[0]
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id=option.option_id,
+                result_id=f"p12-next-round-option:{index}",
+            )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
+    pytest.fail("The facade did not reach the next battle round.")
 
 
 def _p12_forge_continuation(

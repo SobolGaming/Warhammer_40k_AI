@@ -19,6 +19,7 @@ from warhammer40k_core.engine.fight_activation_requests import (
 )
 from warhammer40k_core.engine.fight_historical_eligibility import (
     forced_fight_eligibility_contexts_before_event,
+    forced_fight_registry_before_event,
     forced_fight_suspended_state_before_event,
 )
 from warhammer40k_core.engine.fight_model_authority_history import (
@@ -34,7 +35,6 @@ from warhammer40k_core.engine.fight_order import (
     FightPhaseState,
     current_fight_activation_selection_from_payload,
 )
-from warhammer40k_core.engine.fights_first import FightsFirstRegistry
 from warhammer40k_core.engine.forced_fight_context import (
     ForcedFightActivationContext,
     ForcedFightActivationContextPayload,
@@ -129,6 +129,14 @@ def validate_fight_phase_state_consistency(
             unit_owner_by_id=unit_owner_by_id,
             known_unit_ids=known_unit_ids,
         )
+        registry = forced_fight_registry_before_event(
+            event_records=event_records,
+            event_index=len(event_records),
+            context=forced_context,
+            battle_round=fight_state.battle_round,
+        )
+        if fight_order_state.fights_first_registry != registry:
+            raise GameLifecycleError("Forced fight_phase_state registry differs from its start.")
     for unit_id in (
         *fight_order_state.engaged_at_fight_step_start_unit_ids,
         *fight_order_state.selected_to_fight_unit_ids,
@@ -672,6 +680,12 @@ def _validate_shock_disembark_fight_history(
     )
     if context != expected_context:
         raise GameLifecycleError("Shock Disembark queue-start eligibility context drift.")
+    registry = forced_fight_registry_before_event(
+        event_records=event_records,
+        event_index=started_event_index + 1,
+        context=context,
+        battle_round=disembarked_state.battle_round,
+    )
     expected_started_payload = validate_json_value(
         {
             "game_id": state.game_id,
@@ -680,6 +694,7 @@ def _validate_shock_disembark_fight_history(
             "active_player_id": disembarked_state.turn_player_id,
             "phase_body_status": "forced_fight_activation_queue_started",
             "forced_activation_context": expected_context.to_payload(),
+            "fights_first_registry": registry.to_payload(),
         }
     )
     if started_payload != expected_started_payload:
@@ -724,6 +739,8 @@ def _validate_shock_disembark_fight_history(
         fight_state = state.fight_phase_state
         if fight_state is None:
             raise GameLifecycleError("Active Shock Disembark queue lost its Fight state.")
+        if fight_state.fight_order_state.fights_first_registry != registry:
+            raise GameLifecycleError("Active Shock Disembark registry differs from its start.")
         if fight_state.fight_order_state.activation_selections != tuple(
             selection for selection, _event_index in context_selections
         ):
@@ -888,7 +905,12 @@ def authenticated_forced_fight_selections(
             active_player_id=active_player_id,
             policy=ruleset_descriptor.fight_policy,
             context=context,
-            fights_first_registry=FightsFirstRegistry.from_state(state),
+            fights_first_registry=forced_fight_registry_before_event(
+                event_records=event_records,
+                event_index=selection_request_event_index,
+                context=context,
+                battle_round=battle_round,
+            ),
             suspended_state=forced_fight_suspended_state_before_event(
                 event_records=event_records,
                 event_index=selection_request_event_index,

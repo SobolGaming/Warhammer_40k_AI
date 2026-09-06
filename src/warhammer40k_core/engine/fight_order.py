@@ -779,7 +779,7 @@ def fight_activation_option_payload(
     payload: dict[str, JsonValue] = {
         "submission_kind": "select_fight_activation",
         "game_id": state.game_id,
-        "battle_round": state.battle_round,
+        "battle_round": fight_state.battle_round,
         "phase": BattlePhaseKind.FIGHT.value,
         "player_id": context.player_id,
         "active_player_id": fight_state.active_player_id,
@@ -807,7 +807,7 @@ def eligible_pass_option_payload(
         {
             "submission_kind": "eligible_to_fight_pass",
             "game_id": state.game_id,
-            "battle_round": state.battle_round,
+            "battle_round": fight_state.battle_round,
             "phase": BattlePhaseKind.FIGHT.value,
             "player_id": _validate_identifier("player_id", player_id),
             "active_player_id": fight_state.active_player_id,

@@ -59,7 +59,7 @@ def request_fight_activation(
         payload={
             "phase": BattlePhase.FIGHT.value,
             "phase_body_status": FIGHT_ACTIVATION_REQUIRED_STATUS,
-            "battle_round": state.battle_round,
+            "battle_round": fight_state.battle_round,
             "active_player_id": fight_state.active_player_id,
             "player_id": fight_state.fight_order_state.next_player_id,
             "ordering_band": fight_state.current_ordering_band.value,
@@ -91,7 +91,7 @@ def build_fight_activation_request(
         payload=validate_json_value(
             {
                 "game_id": state.game_id,
-                "battle_round": state.battle_round,
+                "battle_round": fight_state.battle_round,
                 "phase": BattlePhase.FIGHT.value,
                 "active_player_id": fight_state.active_player_id,
                 "player_id": fight_state.fight_order_state.next_player_id,
@@ -128,7 +128,7 @@ def fight_activation_selection_requested_payload(
     return validate_json_value(
         {
             "game_id": state.game_id,
-            "battle_round": state.battle_round,
+            "battle_round": fight_state.battle_round,
             "phase": BattlePhase.FIGHT.value,
             "active_player_id": fight_state.active_player_id,
             "player_id": fight_state.fight_order_state.next_player_id,
