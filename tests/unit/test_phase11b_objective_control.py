@@ -1702,3 +1702,45 @@ def _model_objective_control(characteristics: tuple[CharacteristicValue, ...]) -
         if characteristic.characteristic is Characteristic.OBJECTIVE_CONTROL:
             return characteristic.final
     raise AssertionError("model missing Objective Control")
+
+
+@pytest.mark.parametrize("terrain_objective", [False, True])
+def test_p12_consolidation_uses_the_mission_objective_geometry_owner(
+    terrain_objective: bool,
+) -> None:
+    from warhammer40k_core.engine.consolidation_objectives import (
+        consolidation_objective_distances,
+        consolidation_objectives,
+        legal_consolidation_objective_ids,
+    )
+    from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
+
+    state, marker = _battle_shocked_attached_objective_state(terrain_objective=terrain_objective)
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+    )
+    objectives = consolidation_objectives(markers=context.objective_markers, state=state)
+    assert objectives == mission_objective_geometries(state)
+    objective = next(
+        value for value in objectives if value.objective_id == marker.objective_marker_id
+    )
+    placements = tuple(
+        item
+        for army in context.scenario.battlefield_state.placed_armies
+        for unit in army.unit_placements
+        for item in unit.model_placements
+    )
+    distances = consolidation_objective_distances(
+        scenario=context.scenario, placements=placements, objective=objective
+    )
+    assert any(value.within_control_range for value in distances)
+    assert marker.objective_marker_id in legal_consolidation_objective_ids(
+        scenario=context.scenario,
+        placements=placements,
+        markers=context.objective_markers,
+        state=state,
+    )
+    assert bool(objective.footprint_polygons) is terrain_objective

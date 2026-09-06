@@ -195,7 +195,7 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
         ): 1,
         (
             "src/warhammer40k_core/engine/fight_resolution.py",
-            "_unit_is_engaged_with_any",
+            "fight_unit_is_engaged_with_any",
         ): 1,
         (
             "src/warhammer40k_core/engine/fight_resolution.py",
@@ -265,6 +265,15 @@ DIRECT_ENGAGEMENT_RANGE_CALL_ALLOWLIST: Counter[tuple[str, str]] = Counter(
             "src/warhammer40k_core/geometry/pathing.py",
             "_models_are_in_enemy_engagement_range",
         ): 1,
+        # Pure geometry for proposed endpoints and their complete coherency graph.
+        (
+            "src/warhammer40k_core/geometry/movement_reachability.py",
+            "contains",
+        ): 1,
+        (
+            "src/warhammer40k_core/geometry/movement_reachability.py",
+            "_endpoint_satisfies",
+        ): 2,
     }
 )
 

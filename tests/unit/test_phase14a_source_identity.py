@@ -1243,7 +1243,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 11
+    assert len(scope.source_packages) == 12
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -2876,3 +2876,39 @@ def _observation_sha256(payload: RuleEvidencePayload) -> str:
     return hashlib.sha256(
         json.dumps(observation_payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+
+
+def test_p12_source_package_records_current_consolidation_and_ongoing_erratum() -> None:
+    from tools.build_core_fight_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_fight_2026_09 as source,
+    )
+
+    payload, audit = build_payloads()
+    assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
+    assert json.loads(AUDIT_PATH.read_bytes()) == audit
+    package = source.source_package()
+    assert len(package.evidence_required_source_ids) == 3
+    assert len(source.source_evidence_records()) == 6
+    for rule in source.source_rules():
+        text = package.source_catalog.source_text_by_id(rule.source_id)
+        assert text.raw_text == rule.source_text
+        assert hashlib.sha256(text.raw_text.encode()).hexdigest() == rule.transcription_sha256
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "executable_engine_runtime"
+        assert rule.runtime_consumer_ids
+    erratum = package.source_catalog.source_text_by_id(source.ONGOING_SOURCE_ID)
+    assert "your opponent must select each of those units" in erratum.raw_text
+    assert "one at a time" in erratum.raw_text
+    mirror = next(
+        row
+        for row in source.source_evidence_records()
+        if row.rule_source_id == source.ONGOING_SOURCE_ID
+        and row.provider_name == "Game Datamissions"
+    )
+    assert mirror.app_version == "931"
+    assert mirror.observed_at is None
+    assert audit["observed_at"]
+    with pytest.raises(source.FightSourceError, match="reviewed pin"):
+        source.validate_fight_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")

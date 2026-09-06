@@ -54,6 +54,7 @@ def forced_fight_eligibility_contexts_before_event(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
     event_index: int,
+    battle_round: int,
     context: ForcedFightActivationContext,
     prior_selections: tuple[FightActivationSelection, ...],
     policy: FightPolicyDescriptor,
@@ -132,7 +133,7 @@ def forced_fight_eligibility_contexts_before_event(
         contexts.append(
             FightEligibilityContext(
                 player_id=context.selecting_player_id,
-                battle_round=state.battle_round,
+                battle_round=battle_round,
                 unit_instance_id=unit_id,
                 ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
                 eligibility_reasons=reasons,
@@ -159,7 +160,7 @@ def _historical_geometry_by_model_id(
     }
     geometry_by_id: dict[str, _HistoricalGeometry] = {}
     for row in physical_rows:
-        if row.presence != "battlefield":
+        if row.presence not in {"battlefield", "retained_destroyed"}:
             continue
         identity = model_authority.get(row.model_instance_id)
         if identity is None or row.pose is None:

@@ -68,7 +68,17 @@ def validate_fight_phase_state_consistency(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
 ) -> None:
+    from warhammer40k_core.engine.consolidation_fight_history import (
+        validate_consolidation_fight_history,
+    )
+
+    validate_consolidation_fight_history(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
     fight_state = state.fight_phase_state
     if fight_state is None:
         return
@@ -161,11 +171,21 @@ def _validate_forced_fight_phase_state_consistency(
     fight_order_state = fight_state.fight_order_state
     if forced_context.selecting_player_id not in state.player_ids:
         raise GameLifecycleError("Forced fight_phase_state selecting player is not in this game.")
-    if forced_context.selecting_player_id == state.active_player_id:
-        raise GameLifecycleError("Forced fight_phase_state must be selected by the opponent.")
     if forced_context.source_unit_instance_id not in known_unit_ids:
         raise GameLifecycleError("Forced fight_phase_state source unit is unknown.")
-    if forced_context.transport_unit_instance_id not in known_unit_ids:
+    source_owner = unit_owner_by_id.get(forced_context.source_unit_instance_id)
+    if source_owner is None:
+        source_owner = next(
+            record.player_id
+            for record in state.starting_attached_unit_records
+            if record.attached_unit_instance_id == forced_context.source_unit_instance_id
+        )
+    if forced_context.selecting_player_id == source_owner:
+        raise GameLifecycleError("Forced fight_phase_state must be selected by the opponent.")
+    if (
+        forced_context.transport_unit_instance_id is not None
+        and forced_context.transport_unit_instance_id not in known_unit_ids
+    ):
         raise GameLifecycleError("Forced fight_phase_state Transport is unknown.")
     if fight_order_state.next_player_id != forced_context.selecting_player_id:
         raise GameLifecycleError("Forced fight_phase_state selecting player drift.")
@@ -184,6 +204,12 @@ def _validate_forced_fight_phase_state_consistency(
     for unit_id in forced_context.eligible_unit_instance_ids:
         if unit_owner_by_id.get(unit_id) != forced_context.selecting_player_id:
             raise GameLifecycleError("Forced fight_phase_state eligible unit player drift.")
+    if forced_context.source_phase.value == BattlePhase.FIGHT.value:
+        if fight_state.suspended_state is None:
+            raise GameLifecycleError(
+                "Consolidation forced Fight requires suspended ordinary state."
+            )
+        return
     trigger_events = tuple(
         event for event in event_records if event.event_id == forced_context.trigger_event_id
     )
@@ -535,7 +561,7 @@ def _validate_shock_disembark_fight_history(
     decision_records: tuple[DecisionRecord, ...],
 ) -> None:
     disembark_event_index = event_records.index(disembark_event)
-    authenticated_selections = _authenticated_forced_fight_selections(
+    authenticated_selections = authenticated_forced_fight_selections(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
@@ -769,7 +795,7 @@ def _validate_shock_disembark_fight_history(
         )
 
 
-def _authenticated_forced_fight_selections(
+def authenticated_forced_fight_selections(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
@@ -850,6 +876,7 @@ def _authenticated_forced_fight_selections(
             context=context,
             prior_selections=prior_context_selections,
             selected_unit_instance_id=selection.unit_instance_id,
+            battle_round=battle_round,
             policy=ruleset_descriptor.fight_policy,
         )
         historical_fight_state = FightPhaseState.for_forced_activations(
@@ -933,7 +960,12 @@ def _authenticated_forced_fight_selections(
             index
             for index, candidate in enumerate(event_records)
             if candidate.event_id == context.trigger_event_id
-            and candidate.event_type == "unit_disembarked"
+            and candidate.event_type
+            == (
+                "fight_movement_completed"
+                if context.source_phase.value == "fight"
+                else "unit_disembarked"
+            )
         )
         if len(trigger_indexes) != 1 or not (
             trigger_indexes[0]
@@ -957,6 +989,7 @@ def _forced_fight_eligibility_contexts_from_request(
     context: ForcedFightActivationContext,
     prior_selections: tuple[FightActivationSelection, ...],
     selected_unit_instance_id: str,
+    battle_round: int,
     policy: FightPolicyDescriptor,
 ) -> tuple[FightEligibilityContext, ...]:
     raw_contexts = request_payload.get("eligible_contexts")
@@ -993,6 +1026,7 @@ def _forced_fight_eligibility_contexts_from_request(
         event_records=event_records,
         decision_records=decision_records,
         event_index=selection_request_event_index,
+        battle_round=battle_round,
         context=context,
         prior_selections=prior_selections,
         policy=policy,

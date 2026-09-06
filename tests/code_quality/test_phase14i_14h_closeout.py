@@ -467,11 +467,13 @@ def test_p18e_shock_disembark_is_source_bound_and_reuses_canonical_fight_activat
     assert "fight_activation_selection_requested_payload" in fight_request_source
     assert "advance_forced_fight_activations_if_needed" in fight_phase_source
     assert "FIGHT_ACTIVATION_DECISION_TYPE" in fight_phase_source
-    assert "pass_available=False" in fight_phase_source
+    assert "pass_available=False" in source_for(
+        FIGHT_PHASE_PATH.parent.parent / "forced_fight_queue.py"
+    )
     assert "forced_activation_context" in fight_hook_source
     assert "advance_forced_fight_activations_if_needed" in lifecycle_source
     assert "_validate_shock_disembark_fight_history" in restore_source
-    assert "_authenticated_forced_fight_selections" in restore_source
+    assert "authenticated_forced_fight_selections" in restore_source
     assert "build_fight_activation_request" in restore_source
     assert "fight_activation_selection_requested_payload" in restore_source
     assert "forced_fight_eligibility_contexts_before_event" in restore_source
@@ -566,3 +568,31 @@ def test_phase14h_docs_mark_complete_after_attached_formation_cutover() -> None:
     assert "actual destruction event before Transport removal and Deadly Demise" in adapter_contract
     assert "mixed-Toughness attached-unit attack handling" not in architecture
     assert "mixed-Toughness attached-unit attack handling" not in readme
+
+
+def test_p12_consolidation_shares_objective_model_and_forced_fight_owners() -> None:
+    engine = FIGHT_PHASE_PATH.parent.parent
+    endpoint = source_for(engine / "consolidation_validation.py")
+    grouped = source_for(engine / "fight_rules_unit_movement.py")
+    geometry = source_for(engine / "consolidation_objectives.py")
+    response = source_for(engine / "consolidation_fight_queue.py")
+    queue = source_for(engine / "forced_fight_queue.py")
+    for source in (endpoint, grouped):
+        assert "consolidation_model_violation" in source
+        assert "consolidation_objective_distances" in source
+    assert "mission_objective_geometries" in geometry
+    assert "measure_model_to_objective" in geometry
+    assert "install_forced_fight_queue" in response
+    assert "suspended_state=suspended" in response
+    assert "resume_suspended_fight_state" in queue
+    assert "state.replace_fight_phase_state(resumed)" in queue
+    physical_history = source_for(engine / "primary_mission_boundary_physical_authority.py")
+    assert "later_mutated_model_ids" in physical_history
+    assert "for event in event_records[replay_start_index:]" in physical_history
+    assert "initial=before" in physical_history
+    assert "later_without_initial" not in physical_history
+    assert "consolidation_reachability_unresolved" in source_for(
+        engine / "consolidation_model_constraints.py"
+    )
+    for forbidden in ("_unit_distance_to_objective_marker", "_objective_markers_within_distance"):
+        assert forbidden not in source_for(engine / "fight_resolution.py")

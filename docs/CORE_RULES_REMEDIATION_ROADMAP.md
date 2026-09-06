@@ -3052,3 +3052,74 @@ PR; P12 remains one atomic APP-DRIFT PR immediately after P14. The numbered
 one-PR-at-a-time order is fixed except for fail-closed insertion of newly found
 remediation PRs before PFINAL, or unless the user explicitly revises the
 roadmap.
+
+
+## P12 implementation evidence - Order 19
+
+P12 consumes P14 objective geometry and P18E forced-Fight execution. Reviewed
+12.07/12.08 and the v931 Ongoing Consolidation erratum are committed in
+`core_fight_2026_09/artifacts/package.json`, with a hash-pinned loader and
+`data/source_audits/maintained_app_mirrors/fight_2026_09_05.audit.json`.
+Observation: 2026-09-05T18:32:47-04:00; 40k.app exposes no App version; the Game
+Datamissions erratum is version 931. The official Core Rules PDF hash
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833` remains historical
+evidence. No co-versioned mirror conflict was observed. The July Objective
+Consolidation source continues to support its narrower unengaged-endpoint fix,
+while the new source owns complete P12 semantics. Check artifacts offline with
+`uv run --no-sync python tools/build_core_fight_source.py --check`.
+
+C12-01 uses closest model bases, marker disks, vertical gaps and complete terrain
+footprints through the P14 owner. C12-02 shares per-model closer/required-endpoint
+validation between standalone and attached units, with full path/terrain checks,
+coherency, Ongoing base-contact/prior-engagement constraints, Engaging all-target
+engagement and Objective final unengaged/in-range constraints. The closest selected
+unit is determined before movement, including ties.
+
+Mandatory-endpoint search takes immutable geometry and movement/coherency policy,
+uses direct paths before lazy deterministic navigation, and returns only witnesses
+accepted by ordinary validators. A bounded 512-entry cache cannot reuse results
+when poses, bases, terrain, permissions, budgets or proposed peer positions change.
+A distance lower bound certifies impossibility. Exhausting navigation is not a
+certificate: `consolidation_reachability_unresolved` rejects that proposal and
+permits retry or decline. This conservative diagnostic covers narrow or complex
+routes where the bounded search cannot establish a legal alternative; it never
+accepts a closer-only move on a speculative impossibility verdict.
+
+C12-03 queues every physically engaged enemy rules unit with a placed living model
+that has not been selected this Fight phase, for Ongoing and Engaging consolidation.
+The opponent chooses existing Normal/Overrun options. The shared queue suspends and
+resumes ordinary Fight step/order/continuations; forced selections and allocation
+history survive. Restore authenticates movement, trigger, inventory, decisions and
+completion. Shared public-event redaction removes internal continuation snapshots.
+Historical physical queries distinguish retained destroyed models from living
+models, preserving Fight On Death geometry without granting living authority.
+
+Focused regressions cover per-model endpoints, marker/terrain consumers, cache
+reuse/invalidation, blocker detours, both modes and both players, attached movement,
+retained destroyed models, checkpoints and replay. No new rule family, named
+handler, player-facing decision type or unsupported catalog content is introduced.
+The user authorized the expanded reachability and ordinary-Fight suspension scope.
+
+The violated history invariant is that physical validation must start from an
+authenticated state, including damage and later movement of the same model.
+The already-selected-enemy regression also covers damage followed by a later
+Consolidation move. Historical affected-model inventory now examines individual
+events; the full transition chain is then validated from its authenticated anchor.
+The bug-class search found that the other inventory owners already inspect one
+event at a time, while sequence owners supply their initial authority. Static
+coverage prevents restoring the unanchored suffix replay. Source-registry bytes
+and their loader pin use LF on every platform, as required by `.gitattributes`.
+
+Final validation after the last production change: the complete behavioral suite
+passes `6163` tests with `85.01%` coverage; the separate code-quality suite passes
+`366` tests. Ruff lint/format, mypy (`2686` files), Pyright (zero errors/warnings),
+all `11` import contracts, the exact eight-shard inventory check, and all-files
+pre-commit pass. No behavioral test file was added, removed, moved or renamed.
+
+All ten Core Rules source builders, the historical 40k.app audit, maintained-mirror
+audit, engine-build identity check, and external-contract `--base-ref origin/main`
+check pass at base `5ef1ce1eaa6b89ca3a5f7fd9d38bcf98d34c0630`. Installed-wheel smoke
+validates `2521` resources and `27` schemas. TypeScript dependency installation,
+generated-client/type checks, all five client unit tests, and the two-server HTTP
+conformance scenario pass (`342` assertions, contract `11.1.0`). Windows validation
+uses the bundled Node runtime on PATH and a local integrity-verified npm package.

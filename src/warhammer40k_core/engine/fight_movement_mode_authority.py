@@ -9,6 +9,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.consolidation_objectives import legal_consolidation_objective_ids
 from warhammer40k_core.engine.fight_movement_source import (
     fight_movement_source_model_placements,
 )
@@ -26,7 +27,6 @@ from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
     rules_unit_view_by_id,
 )
-from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -116,15 +116,11 @@ def legal_consolidation_modes(
         scenario=scenario,
         rules_unit=rules_unit,
     )
-    if any(
-        min(
-            placement.pose.position.distance_2d_to(
-                Pose.at(marker.x_inches, marker.y_inches).position
-            )
-            for placement in source_placements
-        )
-        <= 3.0
-        for marker in objective_markers
+    if legal_consolidation_objective_ids(
+        scenario=scenario,
+        placements=source_placements,
+        markers=objective_markers,
+        state=state,
     ):
         return (ConsolidationModeKind.OBJECTIVE,)
     return ()

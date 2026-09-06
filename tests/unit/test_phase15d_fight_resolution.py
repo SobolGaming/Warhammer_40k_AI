@@ -6924,6 +6924,193 @@ def test_phase15d_resolve_fight_movement_fails_fast_on_wrong_context() -> None:
         )
 
 
+def test_p12_objective_consolidation_uses_closest_parts_for_eligibility() -> None:
+    _catalog, ruleset, scenario, attacker, _a, _b = _melee_fixture(
+        target_a_pose=Pose.at(30.0, 30.0), target_b_pose=Pose.at(40.0, 30.0)
+    )
+    marker = ObjectiveMarker(
+        objective_marker_id="p12:marker", name="P12 marker", x_inches=14.0, y_inches=10.0
+    )
+    assert legal_consolidation_modes(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        objective_markers=(marker,),
+    ) == (ConsolidationModeKind.OBJECTIVE,)
+
+
+def test_p12_objective_consolidation_allows_moving_within_range_without_getting_closer() -> None:
+    _catalog, ruleset, scenario, attacker, _a, _b = _melee_fixture(
+        target_a_pose=Pose.at(30.0, 30.0), target_b_pose=Pose.at(40.0, 30.0)
+    )
+    marker = ObjectiveMarker(
+        objective_marker_id="p12:marker", name="P12 marker", x_inches=12.0, y_inches=10.0
+    )
+    request = _fight_movement_request(
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        attacker=attacker,
+        context={"objective_markers": [marker.to_payload()]},
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.OBJECTIVE,
+        objective_id=marker.objective_marker_id,
+        witness=_movement_witness_for_unit(
+            scenario=scenario,
+            unit_instance_id=attacker.unit_instance_id,
+            dx=-0.5,
+            endpoint_only=False,
+        ),
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+    )
+    # A model already in range can move within range without needing to move closer.
+    assert (
+        fight_movement_resolution_violation(
+            proposal_request=request,
+            proposal=proposal,
+            resolution=resolution,
+            scenario=scenario,
+            ruleset_descriptor=ruleset,
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize("mode", [ConsolidationModeKind.ENGAGING, ConsolidationModeKind.OBJECTIVE])
+def test_p12_each_moved_model_must_reach_its_required_endpoint_when_possible(
+    mode: ConsolidationModeKind,
+) -> None:
+    _catalog, ruleset, scenario, attacker, target, _other = _melee_fixture(
+        attacker_datasheet_id="core-intercessor-like-infantry",
+        attacker_model_profile_id="core-intercessor-like",
+        attacker_wargear_ids=("core-leader-blade",),
+        attacker_model_count=5,
+        target_a_pose=Pose.at(13.0, 10.0)
+        if mode is ConsolidationModeKind.ENGAGING
+        else Pose.at(30.0, 30.0),
+        target_b_pose=Pose.at(40.0, 30.0),
+    )
+    placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    # One model satisfies the unit-level endpoint. The other can reach it too,
+    # but proposes only a token movement towards the required destination.
+    starts = (
+        Pose.at(10.3, 8.9),
+        Pose.at(10.0, 12.0),
+        Pose.at(8.0, 8.9),
+        Pose.at(8.0, 11.0),
+        Pose.at(10.0, 6.9),
+    )
+    placement = placement.with_model_placements(
+        tuple(
+            item.with_pose(pose)
+            for item, pose in zip(placement.model_placements, starts, strict=True)
+        )
+    )
+    scenario = replace(
+        scenario, battlefield_state=scenario.battlefield_state.with_unit_placement(placement)
+    )
+    marker = ObjectiveMarker(
+        objective_marker_id="p12:model-goal", name="Model goal", x_inches=14.5, y_inches=10.0
+    )
+    request = _fight_movement_request(
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        attacker=attacker,
+        context={"objective_markers": [marker.to_payload()]},
+    )
+    destinations = (Pose.at(11.2, 8.9), Pose.at(10.1, 12.0), *starts[2:])
+    witness = PathWitness.for_paths(
+        tuple(
+            (
+                item.model_instance_id,
+                (start, Pose.at((start.position.x + end.position.x) / 2, start.position.y), end),
+            )
+            for item, start, end in zip(
+                placement.model_placements, starts, destinations, strict=True
+            )
+        )
+    )
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=mode,
+        consolidate_target_unit_instance_ids=(target.unit_instance_id,)
+        if mode is ConsolidationModeKind.ENGAGING
+        else (),
+        objective_id=marker.objective_marker_id
+        if mode is ConsolidationModeKind.OBJECTIVE
+        else None,
+        witness=witness,
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    assert resolution.is_valid
+    violation = fight_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+    )
+    assert violation is not None
+    assert (
+        violation.violations[0].violation_code == "consolidation_model_must_reach_required_endpoint"
+    )
+
+
+def test_p12_consolidation_cannot_switch_which_selected_unit_was_closest() -> None:
+    _catalog, ruleset, scenario, attacker, first, second = _melee_fixture(
+        target_a_pose=Pose.at(12.9, 10.0), target_b_pose=Pose.at(10.0, 13.0)
+    )
+    request = _fight_movement_request(proposal_kind=ProposalKind.CONSOLIDATE, attacker=attacker)
+    placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    item = placement.model_placements[0]
+    end = Pose.at(item.pose.position.x, item.pose.position.y + 0.2)
+    proposal = FightMovementProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+        unit_instance_id=attacker.unit_instance_id,
+        movement_phase_action=CONSOLIDATE_ACTION,
+        movement_mode=MovementMode.CONSOLIDATE,
+        consolidation_mode=ConsolidationModeKind.ONGOING,
+        consolidate_target_unit_instance_ids=(first.unit_instance_id, second.unit_instance_id),
+        witness=PathWitness.for_paths(
+            (
+                (
+                    item.model_instance_id,
+                    (item.pose, Pose.at(item.pose.position.x, item.pose.position.y + 0.1), end),
+                ),
+            )
+        ),
+    )
+    resolution = resolve_fight_movement(
+        scenario=scenario, ruleset_descriptor=ruleset, proposal=proposal
+    )
+    assert resolution.is_valid
+    violation = fight_movement_resolution_violation(
+        proposal_request=request,
+        proposal=proposal,
+        resolution=resolution,
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+    )
+    assert violation is not None
+    assert (
+        violation.violations[0].violation_code == "moved_model_not_closer_to_closest_selected_unit"
+    )
+
+
 def _melee_fixture(
     *,
     include_extra_attacks: bool = False,

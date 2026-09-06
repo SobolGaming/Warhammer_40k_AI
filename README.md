@@ -153,7 +153,17 @@ and provider audit can be checked offline with
 `uv run --no-sync python tools/build_core_objectives_source.py --check`.
 See the P14 finding in
 [the remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md) for evidence,
-scope, and validation; Objective Consolidation remains owned by P12.
+scope, and validation.
+
+Order 19 (P12) consumes that geometry for Objective Consolidation and enforces
+per-model destinations for all consolidation modes. Mandatory endpoint queries
+validate complete paths and cache immutable geometry/policy snapshots in a bounded
+512-entry cache. Ongoing and Engaging consolidation suspend ordinary Fight state
+while each affected unselected enemy fights through the opponent's decision path,
+then resume the interrupted consolidation order. Internal continuation snapshots
+remain outside public event projections. Check the reviewed 12.07/12.08 and v931
+source artifact with `uv run --no-sync python tools/build_core_fight_source.py --check`.
+The P12 roadmap entry records the conservative reachability diagnostic and scope.
 
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,

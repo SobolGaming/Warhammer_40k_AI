@@ -112,6 +112,7 @@ class PhysicalModelAuthority:
             raise GameLifecycleError("Physical model authority identity is invalid.")
         if self.presence not in {
             "battlefield",
+            "retained_destroyed",
             "destroyed",
             "embarked",
             "reserves",
@@ -125,6 +126,9 @@ class PhysicalModelAuthority:
                 raise GameLifecycleError(
                     "Battlefield physical model authority requires a living pose."
                 )
+        elif self.presence == "retained_destroyed":
+            if type(self.pose) is not Pose or self.wounds_remaining != 0:
+                raise GameLifecycleError("Retained destroyed authority requires a zero-wound pose.")
         elif self.pose is not None:
             raise GameLifecycleError(
                 "Off-battlefield physical model authority must not retain a pose."
@@ -232,14 +236,21 @@ def physical_model_authority_before_event(
                 )
         before.update(anchor_authority)
         replay_start_index = anchor_index + 1
-    later_without_initial = _physical_authority_by_model(
-        event_records[replay_start_index:],
-        model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
-        starting_wounds_by_model_id=starting_wounds_by_model_id,
-        destruction_by_id=destruction_by_id,
-        departure_by_id=departure_by_id,
-        no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
-    )
+    # Inventory individual events without inventing an unanchored state chain:
+    # damage alone records wounds, so a later displacement cannot be validated
+    # against that partial row. The complete chain is checked below from `before`.
+    later_mutated_model_ids = {
+        model_id
+        for event in event_records[replay_start_index:]
+        for model_id in _physical_authority_by_model(
+            (event,),
+            model_ids_by_rules_unit_id=model_ids_by_rules_unit_id,
+            starting_wounds_by_model_id=starting_wounds_by_model_id,
+            destruction_by_id=destruction_by_id,
+            departure_by_id=departure_by_id,
+            no_trigger_destroyed_departure_ids=no_trigger_destroyed_departure_ids,
+        )
+    }
     for model_instance_id, current_authority in current.items():
         prior = before.get(model_instance_id)
         if (
@@ -249,7 +260,7 @@ def physical_model_authority_before_event(
             and (prior.presence != "battlefield" or prior.pose is not None)
         ):
             continue
-        if model_instance_id in later_without_initial:
+        if model_instance_id in later_mutated_model_ids:
             raise GameLifecycleError(
                 "Physical event-bound history lacks an exact pre-mutation anchor."
             )
@@ -284,7 +295,11 @@ def physical_model_authority_before_event(
         rows.append(
             PhysicalModelAuthority(
                 model_instance_id=model_instance_id,
-                presence=authority.presence,
+                presence=(
+                    "retained_destroyed"
+                    if authority.presence == "battlefield" and authority.wounds_remaining == 0
+                    else authority.presence
+                ),
                 pose=authority.pose,
                 wounds_remaining=authority.wounds_remaining,
             )
