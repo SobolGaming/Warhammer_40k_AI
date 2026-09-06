@@ -3240,6 +3240,14 @@ source-specific once-per-battle limits remain additional restrictions. Static
 audits prohibit physical/display identity in the Psychic key and runtime parsing
 in the new authority modules.
 
+The test-only follow-up also drives one `LocalGameSession` naturally from
+round-one Command through Movement, the opponent's turn and round-two Command.
+The same unit uses the same Psychic ability in all three selected phase
+occurrences through three physical sources. A persistence checkpoint restores
+the earlier phase/round use records unchanged, preserves both viewers' event
+history and reproduces the complete decision/event history exactly through
+replay. This covers historical-time validation without changing engine behavior.
+
 Generated artifacts/documentation: Versioned
 `core_aura_psychic_2026_09/artifacts/package.json`, typed pinned loader, maintained
 mirror audit, source-authority registry/pin, package classification, engine-build
@@ -3265,6 +3273,12 @@ generated-client/type checks, all `5` client unit tests and the two-server HTTP
 conformance scenario pass (`342` assertions, contract `11.1.0`). Windows client
 validation uses the bundled Node runtime and the local integrity-verified npm
 package. The final scope/architecture audit and `git diff --check` pass.
+
+Follow-up validation: all `16` Psychic-selected behavioral tests pass (`88.94s`),
+as do `10` focused test-policy/RuleIR quality audits, Ruff check/format, full mypy
+and pyright, all-files pre-commit and the exact eight-shard check. These are
+additional focused results for the test-only historical-time scenario; the
+runtime build identity remains unchanged from the aggregate gates above.
 
 PR URL and merge commit:
 [PR #427](https://github.com/SobolGaming/Warhammer_40k_AI/pull/427); not merged.

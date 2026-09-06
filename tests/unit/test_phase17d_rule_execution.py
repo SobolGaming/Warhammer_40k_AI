@@ -53,6 +53,9 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
 )
+from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
+    SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_restore_lost_wounds_after_destroying_unit,
@@ -98,7 +101,12 @@ from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_jso
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
 )
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.generic_rule_attack_hooks import generic_rule_wound_roll_modifier
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
@@ -152,6 +160,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
+)
 from warhammer40k_core.engine.target_restriction_hooks import ChargeTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_windows import (
     ReactionWindow,
@@ -305,7 +317,103 @@ def test_psychic_catalog_activation_uses_one_model_per_unit_and_restores() -> No
     assert replay.status is ReplayRunStatus.REPRODUCED
 
 
-def _psychic_level_session(*, attached: bool = False, any_phase: bool = False) -> LocalGameSession:
+def test_psychic_facade_preserves_historical_uses_after_phase_and_round_transitions() -> None:
+    session = _psychic_level_session(any_phase=True, start_phase=BattlePhase.COMMAND)
+    expected_occurrences = (
+        (1, "player-a", BattlePhase.COMMAND),
+        (1, "player-a", BattlePhase.MOVEMENT),
+        (2, "player-a", BattlePhase.COMMAND),
+    )
+    status = session.advance_until_decision_or_terminal()
+    for index in range(200):
+        state = session.lifecycle.state
+        assert state is not None
+        uses = psychic_uses(session.lifecycle.decision_controller.event_log)
+        if len(uses) == len(expected_occurrences):
+            break
+        request = status.decision_request
+        assert request is not None, status.payload
+        if request.decision_type == SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE:
+            activate = (
+                request.actor_id == "player-a"
+                and (
+                    state.battle_round,
+                    state.active_player_id,
+                    state.current_battle_phase,
+                )
+                == expected_occurrences[len(uses)]
+            )
+            option = next(
+                option
+                for option in request.options
+                if _json_object(option.payload)["activate"] is activate
+            )
+        elif request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"psychic:history:decline-stratagem:{index}",
+                payload=stratagem_decline_payload(),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
+            continue
+        elif request.decision_type == "select_movement_unit":
+            option = request.options[0]
+        else:
+            options = tuple(
+                option
+                for option in request.options
+                if option.option_id
+                in {
+                    "remain_stationary",
+                    "complete_shooting_phase",
+                    "complete_charge_phase",
+                    "decline_stratagem_window",
+                }
+            )
+            assert len(options) == 1, request.to_payload()
+            option = options[0]
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option.option_id,
+            result_id=f"psychic:history:option:{index}",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status.payload
+    else:
+        pytest.fail("The Psychic facade scenario did not reach the next battle round.")
+
+    assert (state.battle_round, state.active_player_id, state.current_battle_phase) == (
+        expected_occurrences[-1]
+    )
+    assert tuple((use.battle_round, use.active_player_id, use.phase) for use in uses) == (
+        expected_occurrences
+    )
+    assert len({use.rules_unit_instance_id for use in uses}) == 1
+    assert len({use.ability_source_id for use in uses}) == 1
+    assert len({use.usage_key for use in uses}) == 3
+    # Once-per-battle physical-source limits still apply independently of the Psychic phase limit.
+    assert len({use.source_model_instance_id for use in uses}) == 3
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(copy.deepcopy(checkpoint))
+    assert restored.to_persistence_payload() == checkpoint
+    assert psychic_uses(restored.lifecycle.decision_controller.event_log) == uses
+    for viewer in ("player-a", "player-b"):
+        original_events = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        restored_events = restored.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        assert restored_events == original_events
+        assert tuple(
+            event["payload"]
+            for event in restored_events["events"]
+            if event["event_type"] == "psychic_ability_used"
+        ) == tuple(use.to_payload() for use in uses)
+    replay = ReplayRunner.from_payload(
+        restored.replay_artifact(artifact_id="replay:psychic:historical-phases")
+    ).run()
+    assert replay.reproduced_exactly, replay.to_payload()
+
+
+def _psychic_level_session(
+    *, attached: bool = False, any_phase: bool = False, start_phase: BattlePhase = BattlePhase.FIGHT
+) -> LocalGameSession:
     text = ONCE_PER_BATTLE_FIGHT_BOOST_TEXT
     if any_phase:
         text = text.replace("at the start of the Fight phase", "at the start of any phase")
@@ -376,7 +484,15 @@ def _psychic_level_session(*, attached: bool = False, any_phase: bool = False) -
         battlefield_id="psychic-level",
         armies=armies,
     ).battlefield_state
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.battle_phase_index = state.battle_phase_sequence.index(start_phase)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
     decisions = DecisionController()
     ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     return LocalGameSession(
