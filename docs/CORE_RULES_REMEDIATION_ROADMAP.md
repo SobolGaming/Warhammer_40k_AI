@@ -3696,4 +3696,5 @@ The complete no-coverage code-quality suite passes: `378 passed`, `318.78s`,
 with 64 xdist workers and work stealing. Its earlier failures were corrected
 without relaxing the mutation, module-size or decision-documentation gates.
 
-PR URL and merge commit: pending publication; not merged.
+PR URL and merge commit:
+[PR #430](https://github.com/SobolGaming/Warhammer_40k_AI/pull/430); not merged.
