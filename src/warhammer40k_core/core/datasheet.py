@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.ability_sources import (
+    AbilitySourceError,
+    validate_datasheet_ability_sources,
+)
 from warhammer40k_core.core.attachment_eligibility import (
     AttachmentEligibility,
     AttachmentEligibilityPayload,
@@ -1876,18 +1880,10 @@ def _validate_ability_descriptor_tuple(
     field_name: str,
     values: tuple[DatasheetAbilityDescriptor, ...],
 ) -> tuple[DatasheetAbilityDescriptor, ...]:
-    if type(values) is not tuple:
-        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
-    seen: set[str] = set()
-    validated: list[DatasheetAbilityDescriptor] = []
-    for value in values:
-        if type(value) is not DatasheetAbilityDescriptor:
-            raise DatasheetCatalogError(f"{field_name} must contain ability descriptors.")
-        if value.ability_id in seen:
-            raise DatasheetCatalogError(f"{field_name} must not contain duplicate ability IDs.")
-        seen.add(value.ability_id)
-        validated.append(value)
-    return tuple(validated)
+    try:
+        return validate_datasheet_ability_sources(values)
+    except AbilitySourceError as exc:
+        raise DatasheetCatalogError(f"{field_name}: {exc}") from exc
 
 
 def _validate_damaged_effect_tuple(

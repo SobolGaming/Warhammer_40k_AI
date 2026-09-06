@@ -215,9 +215,25 @@
         }
       ]
     },
+    "ability_source_instance": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "instance_id": {"$ref": "#/$defs/identifier"},
+        "owner_id": {"$ref": "#/$defs/identifier"},
+        "source_id": {"$ref": "#/$defs/identifier"},
+        "source_instance_id": {"$ref": "#/$defs/identifier"},
+        "slot_id": {"$ref": "#/$defs/identifier"},
+        "ability_id": {"$ref": "#/$defs/identifier"}
+      },
+      "required": ["instance_id", "owner_id", "source_id", "source_instance_id", "slot_id", "ability_id"]
+    },
     "weapon_profile": {
       "additionalProperties": false,
       "properties": {
+        "ability_sources": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/ability_source_instance"}
+        },
         "abilities": {
           "items": {"$ref": "#/$defs/ability_descriptor"},
           "type": "array"

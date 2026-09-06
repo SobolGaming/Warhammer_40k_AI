@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.weapon_ability_sources import reidentify_weapon_profile
 from warhammer40k_core.engine.attack_sequence_imports import *
 
 # fmt: off
@@ -350,7 +351,7 @@ def _synthetic_pool_for_gathered_group(
         wargear_id = f"gathered-wargear:{gathered_group.group_id}"
         weapon_profile_id = f"gathered-profile:{gathered_group.group_id}"
         weapon_instance_id = f"gathered-weapon-instance:{gathered_group.group_id}"
-        weapon_profile = replace(
+        weapon_profile = reidentify_weapon_profile(
             base_pool.weapon_profile,
             profile_id=weapon_profile_id,
             name=f"Gathered weapon pool {gathered_group.group_id}",

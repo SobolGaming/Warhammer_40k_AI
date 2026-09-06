@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
@@ -886,13 +887,13 @@ def _unit_and_army_by_id(
 def _profile_with_keyword(profile: WeaponProfile, *, keyword: WeaponKeyword) -> WeaponProfile:
     if type(profile) is not WeaponProfile:
         raise GameLifecycleError("Black Templars weapon modifier requires WeaponProfile.")
-    keywords = profile.keywords
-    if keyword not in keywords:
-        keywords = (*keywords, keyword)
-    source_ids = profile.source_ids
-    if SOURCE_RULE_ID not in source_ids:
-        source_ids = (*source_ids, SOURCE_RULE_ID)
-    return replace(profile, keywords=keywords, source_ids=source_ids)
+    return grant_weapon_ability(
+        profile,
+        keyword=keyword,
+        ability=None,
+        source_id=SOURCE_RULE_ID,
+        source_instance_id=SOURCE_RULE_ID,
+    )
 
 
 def _active_player_id(context: PhaseEndObjectiveControlContext) -> str:

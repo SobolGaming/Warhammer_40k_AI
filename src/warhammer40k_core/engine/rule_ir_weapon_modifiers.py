@@ -9,6 +9,7 @@ from warhammer40k_core.core.attributes import (
     CharacteristicBoundPolicy,
     CharacteristicValue,
 )
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -85,7 +86,11 @@ def rule_ir_modified_weapon_profile(
 
 
 def rule_ir_weapon_ability_granted_profile(
-    *, parameters: Mapping[str, object], profile: WeaponProfile, source_id: str
+    *,
+    parameters: Mapping[str, object],
+    profile: WeaponProfile,
+    source_id: str,
+    source_instance_id: str,
 ) -> WeaponProfile:
     if type(profile) is not WeaponProfile:
         raise GameLifecycleError("RuleIR weapon ability grant requires WeaponProfile.")
@@ -93,22 +98,13 @@ def rule_ir_weapon_ability_granted_profile(
         return profile
     keyword = _weapon_keyword_parameter(parameters)
     ability = _weapon_ability_descriptor(parameters, keyword=keyword)
-    keywords = profile.keywords
-    if keyword not in keywords:
-        keywords = tuple(sorted((*keywords, keyword), key=lambda value: value.value))
-    abilities = profile.abilities
-    if ability is not None and all(
-        existing.ability_id != ability.ability_id for existing in abilities
-    ):
-        abilities = tuple(sorted((*abilities, ability), key=lambda value: value.ability_id))
-    source_ids = _source_ids_with(profile.source_ids, source_id)
-    if (
-        keywords == profile.keywords
-        and abilities == profile.abilities
-        and source_ids == profile.source_ids
-    ):
-        return profile
-    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+    return grant_weapon_ability(
+        profile,
+        keyword=keyword,
+        ability=ability,
+        source_id=source_id,
+        source_instance_id=source_instance_id,
+    )
 
 
 def _weapon_names(parameters: Mapping[str, object]) -> frozenset[str]:

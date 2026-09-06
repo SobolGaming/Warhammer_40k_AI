@@ -7,6 +7,7 @@ from typing import cast
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -471,25 +472,27 @@ def _protector_weapon_profile(profile: WeaponProfile) -> WeaponProfile:
         raise GameLifecycleError("Doctrina Imperatives Protector requires WeaponProfile.")
     if profile.range_profile.kind is not RangeProfileKind.DISTANCE:
         return profile
-    heavy = AbilityDescriptor.heavy()
-    abilities = profile.abilities
-    if all(ability.ability_id != heavy.ability_id for ability in abilities):
-        abilities = (*abilities, heavy)
-    return replace(
+    granted = grant_weapon_ability(
         profile,
-        keywords=_weapon_keywords_with(profile.keywords, WeaponKeyword.HEAVY),
-        abilities=abilities,
-        skill=_improve_ballistic_skill(profile.skill),
-        source_ids=_source_ids_with_doctrina(profile.source_ids),
+        keyword=WeaponKeyword.HEAVY,
+        ability=AbilityDescriptor.heavy(),
+        source_id=SOURCE_RULE_ID,
+        source_instance_id=SOURCE_RULE_ID,
     )
+    return replace(granted, skill=_improve_ballistic_skill(profile.skill))
 
 
 def _conqueror_weapon_profile(context: WeaponProfileModifierContext) -> WeaponProfile:
     profile = context.weapon_profile
-    keywords = profile.keywords
     skill = profile.skill
     if profile.range_profile.kind is RangeProfileKind.DISTANCE:
-        keywords = _weapon_keywords_with(keywords, WeaponKeyword.ASSAULT)
+        profile = grant_weapon_ability(
+            profile,
+            keyword=WeaponKeyword.ASSAULT,
+            ability=None,
+            source_id=SOURCE_RULE_ID,
+            source_instance_id=SOURCE_RULE_ID,
+        )
     elif profile.range_profile.kind is RangeProfileKind.MELEE:
         skill = _improve_weapon_skill(skill)
     else:
@@ -502,7 +505,6 @@ def _conqueror_weapon_profile(context: WeaponProfileModifierContext) -> WeaponPr
         armor_penetration = _improve_armor_penetration(armor_penetration, bonus=1)
     return replace(
         profile,
-        keywords=keywords,
         skill=skill,
         armor_penetration=armor_penetration,
         source_ids=_source_ids_with_doctrina(profile.source_ids),
@@ -936,20 +938,6 @@ def _improve_armor_penetration(
     )
 
 
-def _weapon_keywords_with(
-    keywords: tuple[WeaponKeyword, ...],
-    keyword: WeaponKeyword,
-) -> tuple[WeaponKeyword, ...]:
-    if type(keywords) is not tuple:
-        raise GameLifecycleError("Doctrina Imperatives keywords must be a tuple.")
-    requested = _weapon_keyword_from_token(keyword)
-    for stored in keywords:
-        _weapon_keyword_from_token(stored)
-    if requested in keywords:
-        return keywords
-    return tuple(sorted((*keywords, requested)))
-
-
 def _source_ids_with_doctrina(source_ids: tuple[str, ...]) -> tuple[str, ...]:
     if type(source_ids) is not tuple:
         raise GameLifecycleError("Doctrina Imperatives source_ids must be a tuple.")
@@ -988,17 +976,6 @@ def _imperative_from_token(token: object) -> DoctrinaImperative:
         return DoctrinaImperative(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Doctrina Imperative: {token}.") from exc
-
-
-def _weapon_keyword_from_token(token: object) -> WeaponKeyword:
-    if type(token) is WeaponKeyword:
-        return token
-    if type(token) is not str:
-        raise GameLifecycleError("Doctrina Imperatives weapon keyword must be a string.")
-    try:
-        return WeaponKeyword(token)
-    except ValueError as exc:
-        raise GameLifecycleError(f"Unsupported Doctrina weapon keyword: {token}.") from exc
 
 
 def _json_object(field_name: str, value: object) -> dict[str, JsonValue]:

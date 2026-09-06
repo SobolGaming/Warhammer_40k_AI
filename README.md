@@ -174,6 +174,13 @@ before recording or mutation. Check the reviewed 22.01/22.03.01 source package w
 offline builder reproduces both the versioned JSON and maintained-mirror audit.
 The source loader and authority registry pin their bytes and observation identities.
 
+Order 22 (P24C1) preserves duplicate Core and weapon ability source occurrences,
+including equal-valued grants from different sources. Native profile definitions
+and explicit grants have deterministic identities that survive serialization and
+replay. Player instance selection remains P24C2; source evidence records partial
+runtime support. Verify the pinned 24.02 source and audit offline with
+`uv run --no-sync python tools/build_core_duplicated_abilities_source.py --check`.
+
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,
 interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).

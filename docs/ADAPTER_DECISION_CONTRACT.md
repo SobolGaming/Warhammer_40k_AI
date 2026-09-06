@@ -4711,3 +4711,43 @@ or catalogue support.
 The adapter boundary is a choice boundary, not a rules boundary.
 
 Adapters choose, render, transmit, or generate submissions. The engine validates, mutates, records, and replays them.
+
+
+## Order 22: duplicated ability source identity (P24C1)
+
+Contract 11.2 adds the optional, nonempty `ability_sources` inventory to a
+serialized weapon profile. Each closed entry contains `instance_id`, `owner_id`,
+`source_id`, `source_instance_id`, `slot_id`, and `ability_id`. The instance ID is
+the SHA-256 of the canonical owner/source/physical-source/slot tuple. The referenced
+ability descriptor may change values without changing that occurrence's identity.
+Distinct sources may reference the same descriptor; descriptor IDs alone are not
+source-instance IDs.
+
+A profile without the inventory is a native definition: its profile ID owns one
+occurrence of each declared descriptor and each remaining keyword. It is not an
+unknown or inferred external grant. The first explicit grant snapshots those native
+occurrences. Explicit inventories must cover the profile, reference its owner and
+provenance, and contain no repeated instance IDs. Empty, malformed, dangling,
+foreign-owner, drifted-ID and conflicting-source payloads fail closed. Native
+catalog provenance remains in `source_ids`. Synthetic gathered profiles retain
+original source occurrences and record their original carrier as provenance.
+
+Core datasheet descriptors retain distinct `(ability_id, source_id)` occurrences;
+`UnitInstance.ability_source_instances()` scopes them to their physical component.
+Canonical attached-unit identity does not erase component lineage. The same source
+record cannot be inserted twice, and applying an identical grant again is idempotent.
+Non-Core catalog descriptor uniqueness is unchanged.
+
+These are public catalog/profile fields wherever those payloads are already
+public, and otherwise follow the existing shared viewer-scoped projection/event
+policy. No new decision type, option family or proposal kind is introduced. The
+existing proposal schema accepts the new optional inventory; submissions still
+validate against engine-owned profiles and use the same lifecycle path.
+
+P24C1 supplies identity and storage, not the P24C2 instance-selection workflow.
+Unresolved duplicate non-Anti descriptors raise a domain error at the shared
+weapon-ability execution boundary rather than choosing a source, summing values,
+or selecting a maximum. The existing distinct-descriptor Anti decision remains
+unchanged. Keyword membership remains a non-stacking presence query. Source
+support is `loaded` / `partial_engine_runtime`; C24-03B and the parent C24-03
+family remain open, including Select Weapons timing and the Scouts selection rule.

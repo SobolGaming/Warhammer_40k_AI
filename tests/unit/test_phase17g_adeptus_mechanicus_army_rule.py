@@ -680,10 +680,6 @@ def test_doctrina_structured_validators_reject_malformed_values() -> None:
         army_rule._imperative_from_token(object())
     with pytest.raises(GameLifecycleError, match="Unsupported Doctrina Imperative"):
         army_rule._imperative_from_token("unsupported")
-    with pytest.raises(GameLifecycleError, match="weapon keyword must be a string"):
-        army_rule._weapon_keyword_from_token(object())
-    with pytest.raises(GameLifecycleError, match="Unsupported Doctrina weapon keyword"):
-        army_rule._weapon_keyword_from_token("unsupported")
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
         army_rule._payload_object("bad-payload")
     with pytest.raises(GameLifecycleError, match="must be an object"):

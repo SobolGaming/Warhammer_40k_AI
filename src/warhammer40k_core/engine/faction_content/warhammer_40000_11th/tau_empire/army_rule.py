@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
@@ -314,9 +315,12 @@ def for_the_greater_good_weapon_profile_modifier(
     effect_payload = _payload_object(spotted_effect.effect_payload)
     if not _payload_bool(effect_payload, key="observer_has_markerlight"):
         return modified
-    return replace(
+    return grant_weapon_ability(
         modified,
-        keywords=_weapon_keywords_with_ignores_cover(modified.keywords),
+        keyword=WeaponKeyword.IGNORES_COVER,
+        ability=None,
+        source_id=spotted_effect.source_rule_id,
+        source_instance_id=spotted_effect.effect_id,
     )
 
 
@@ -826,16 +830,6 @@ def _improve_skill(current: int) -> int:
     if current <= 2:
         return current
     return current - 1
-
-
-def _weapon_keywords_with_ignores_cover(
-    keywords: tuple[WeaponKeyword, ...],
-) -> tuple[WeaponKeyword, ...]:
-    if type(keywords) is not tuple:
-        raise GameLifecycleError("For the Greater Good keywords must be a tuple.")
-    if WeaponKeyword.IGNORES_COVER in keywords:
-        return keywords
-    return (*keywords, WeaponKeyword.IGNORES_COVER)
 
 
 def _source_ids_with_for_the_greater_good(source_ids: tuple[str, ...]) -> tuple[str, ...]:

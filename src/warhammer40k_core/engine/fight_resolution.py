@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -13,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     movement_mode_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.battlefield_state import (
@@ -1682,11 +1683,12 @@ def _epic_challenge_profile_if_applicable(
             continue
         if effect_payload.get("model_instance_id") != model_id:
             continue
-        if WeaponKeyword.PRECISION in profile.keywords:
-            return profile
-        return replace(
+        return grant_weapon_ability(
             profile,
-            keywords=tuple(sorted((*profile.keywords, WeaponKeyword.PRECISION))),
+            keyword=WeaponKeyword.PRECISION,
+            ability=None,
+            source_id=effect.source_rule_id,
+            source_instance_id=effect.effect_id,
         )
     return profile
 

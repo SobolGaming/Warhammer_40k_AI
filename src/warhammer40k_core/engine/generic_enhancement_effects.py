@@ -354,6 +354,7 @@ def _aura_weapon_profile(
         profile = rule_ir_weapon_ability_granted_profile(
             parameters=parameter_payload(effect.parameters),
             profile=profile,
+            source_instance_id=binding_source.assignment.bearer_unit_instance_id,
             source_id=_aura_weapon_effect_source_id(
                 rule_ir=binding_source.rule_ir,
                 effect_payload=effect_payload,
