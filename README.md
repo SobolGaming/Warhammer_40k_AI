@@ -181,6 +181,14 @@ replay. Player instance selection remains P24C2; source evidence records partial
 runtime support. Verify the pinned 24.02 source and audit offline with
 `uv run --no-sync python tools/build_core_duplicated_abilities_source.py --check`.
 
+Order 23 (P01) resolves Command-phase Battle-shock for embarked and Strategic
+Reserve rules units through the existing candidate, sequencing, reroll and event
+path. Living model authority is independent of battlefield geometry and is
+revalidated for pending submissions and historical replay. Verify the reviewed
+01.02.04 location definition and Battle-shock paragraph with
+`uv run --no-sync python tools/build_core_off_battlefield_battle_shock_source.py --check`.
+The remaining clauses of 01.02.04 are outside this certification.
+
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,
 interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).

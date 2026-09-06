@@ -1198,7 +1198,7 @@ def test_attached_rules_unit_uses_one_canonical_required_test_and_clear_identity
     assert resolved["cleared_battle_shocked_unit_ids"] == [attached_id]
 
 
-def test_off_battlefield_singleton_returns_restorable_typed_command_unsupported() -> None:
+def test_off_battlefield_singleton_resolves_required_command_test_and_restores() -> None:
     state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
     decisions.queue.remove_by_id(request.request_id)
     prewound = continue_mortal_wound_application(
@@ -1273,19 +1273,11 @@ def test_off_battlefield_singleton_returns_restorable_typed_command_unsupported(
     handler = CommandPhaseHandler(stratagem_index=StratagemCatalogIndex.from_records(()))
     status = handler.begin_phase(state=state, decisions=decisions)
 
-    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
-    assert status.payload == {
-        "source_rule_id": "gw-11e-core-rules:command-phase:battle-shock",
-        "section_id": "08.03",
-        "unit_instance_id": unit_id,
-        "component_unit_instance_ids": [unit_id],
-        "candidate_reasons": ["at_or_below_half_strength"],
-        "unsupported_scope": "off_battlefield_battle_shock_test",
-    }
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
     command_state = _command_step_state(state)
-    assert command_state.current_step is CommandPhaseStep.BATTLE_SHOCK
-    assert not command_state.battle_shock_step_resolved
-    assert command_state.battle_shock_required_unit_ids == ()
+    assert command_state.battle_shock_step_resolved
+    assert command_state.battle_shock_required_unit_ids == (unit_id,)
+    assert len(command_state.completed_battle_shock_test_request_ids) == 1
     assert command_state.battle_shock_in_flight_test_request is None
     lifecycle = GameLifecycle(
         state=state,
@@ -1303,7 +1295,7 @@ def test_off_battlefield_singleton_returns_restorable_typed_command_unsupported(
         decisions=restored.decision_controller,
     )
 
-    assert reentered.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert reentered.status_kind is LifecycleStatusKind.ADVANCED
     assert reentered.payload == status.payload
     assert restored.to_payload() == before_reentry
 
@@ -5055,7 +5047,7 @@ def test_battle_shock_event_authority_helpers_fail_closed() -> None:
         request=historical.request,
         active_player_id="player-a",
         phase_start_battle_shocked_unit_ids=(),
-        placed_model_ids=historical.placed_alive_model_ids(unit_id),
+        current_model_ids=historical.placed_alive_model_ids(unit_id),
     )
     invalid_candidate_calls: tuple[dict[str, Any], ...] = (
         {"request": cast(BattleShockTestRequest, object())},
@@ -5079,7 +5071,7 @@ def test_battle_shock_event_authority_helpers_fail_closed() -> None:
         "request": historical.request,
         "active_player_id": "player-a",
         "phase_start_battle_shocked_unit_ids": (),
-        "placed_model_ids": historical.placed_alive_model_ids(unit_id),
+        "current_model_ids": historical.placed_alive_model_ids(unit_id),
     }
     for candidate_overrides in invalid_candidate_calls:
         with pytest.raises(GameLifecycleError, match="Command Battle-shock candidate"):
@@ -6694,7 +6686,7 @@ def test_battle_shock_request_and_live_leadership_edges_fail_closed() -> None:
     )
     army = off_battlefield.army_definition_for_player("player-a")
     assert army is not None
-    with pytest.raises(GameLifecycleError, match="eligible off-battlefield"):
+    with pytest.raises(GameLifecycleError, match="authenticated embarkation"):
         collect_battle_shock_test_requests(
             game_id=off_battlefield.game_id,
             battle_round=off_battlefield.battle_round,
@@ -8242,7 +8234,7 @@ def test_command_battle_shock_pending_reroll_context_drift_is_rejected() -> None
     unplaced_state.battlefield_state = unplaced_state.battlefield_state.without_unit_placement(
         unit_id
     )
-    with pytest.raises(GameLifecycleError, match="no longer placed"):
+    with pytest.raises(GameLifecycleError, match="every alive model"):
         battle_shock_pending_authority._expected_live_test_request(
             state=unplaced_state,
             authority=authority,

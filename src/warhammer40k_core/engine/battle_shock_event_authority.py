@@ -239,8 +239,8 @@ def _validate_historical_request_semantics(
     rules_unit = historical.rules_unit(request.unit_instance_id)
     if rules_unit.owner_player_id != request.player_id:
         raise GameLifecycleError("Battle-shock historical request owner drifted.")
-    placed_model_ids = historical.placed_alive_model_ids(rules_unit.unit_instance_id)
-    if not placed_model_ids:
+    current_model_ids = historical.battle_shock_model_ids(rules_unit.unit_instance_id)
+    if not current_model_ids:
         raise GameLifecycleError("Battle-shock historical request unit is not on battlefield.")
     if request_base.get("source_kind") == "command_battle_shock":
         _validate_command_candidate_model_authority(
@@ -249,7 +249,7 @@ def _validate_historical_request_semantics(
             request=result.request,
             active_player_id=active_player_id,
             phase_start_battle_shocked_unit_ids=(phase_start_battle_shocked_unit_ids),
-            placed_model_ids=placed_model_ids,
+            current_model_ids=current_model_ids,
         )
     expected_strength_context = historical.below_half_strength_context(rules_unit.unit_instance_id)
     if request.below_half_strength_context != expected_strength_context:
@@ -259,7 +259,7 @@ def _validate_historical_request_semantics(
         raise GameLifecycleError("Battle-shock request lacks loaded Leadership authority.")
     expected_leadership = battle_shock_leadership_target_for_rules_unit(
         rules_unit,
-        current_model_ids=placed_model_ids,
+        current_model_ids=current_model_ids,
         ability_index=ability_index,
         state=None,
     )
@@ -396,7 +396,7 @@ def _validate_command_candidate_model_authority(
     request: BattleShockTestRequest,
     active_player_id: str,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
-    placed_model_ids: tuple[str, ...],
+    current_model_ids: tuple[str, ...],
 ) -> None:
     from warhammer40k_core.engine.command_battle_shock_candidates import (
         CommandBattleShockCandidate,
@@ -436,7 +436,7 @@ def _validate_command_candidate_model_authority(
     if (
         len(matching) != 1
         or matching[0].test_reason is not request.reason
-        or request.below_half_strength_context.current_model_count != len(placed_model_ids)
+        or request.below_half_strength_context.current_model_count != len(current_model_ids)
         or payload.get("battle_shock_phase_start_unit_ids")
         != list(phase_start_battle_shocked_unit_ids)
     ):

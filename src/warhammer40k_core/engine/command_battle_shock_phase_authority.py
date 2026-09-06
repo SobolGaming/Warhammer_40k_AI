@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.engine import command_battle_shock_candidates as _cbsc
+from warhammer40k_core.engine.battle_shock_model_authority import battle_shock_model_ids
 from warhammer40k_core.engine.command_battle_shock_history import (
     COMMAND_BATTLE_SHOCK_REROLL_SOURCE_KIND,
 )
@@ -16,7 +17,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.rules_units import reconcile_rules_unit_identity
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.sequencing import (
     SequencingConflictContext,
     SequencingNextParticipantDecision,
@@ -64,31 +67,27 @@ def unsupported_candidate_status(
             continue
         if candidate.unit_instance_id in completed_unit_ids:
             continue
-        reconciliation = reconcile_rules_unit_identity(
-            state=state,
-            unit_instance_id=candidate.unit_instance_id,
-        )
-        if (
-            reconciliation.surviving_unit_instance_ids
-            and reconciliation.placed_surviving_unit_instance_ids
-            == reconciliation.surviving_unit_instance_ids
-        ):
-            continue
-        return LifecycleStatus.unsupported(
-            stage=GameLifecycleStage.BATTLE,
-            message=(
-                "Command Battle-shock testing for an eligible off-battlefield rules unit "
-                "is not supported."
-            ),
-            payload={
-                "source_rule_id": COMMAND_BATTLE_SHOCK_SOURCE_RULE_ID,
-                "section_id": "08.03",
-                "unit_instance_id": candidate.unit_instance_id,
-                "component_unit_instance_ids": list(candidate.component_unit_instance_ids),
-                "candidate_reasons": [reason.value for reason in candidate.eligibility_reasons],
-                "unsupported_scope": "off_battlefield_battle_shock_test",
-            },
-        )
+        rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=candidate.unit_instance_id)
+        try:
+            battle_shock_model_ids(
+                rules_unit=rules_unit,
+                battlefield=battlefield,
+                state=state,
+                allow_off_battlefield=True,
+            )
+        except GameLifecycleError as exc:
+            return LifecycleStatus.unsupported(
+                stage=GameLifecycleStage.BATTLE,
+                message=f"Command Battle-shock model presence is not supported: {exc}",
+                payload={
+                    "source_rule_id": COMMAND_BATTLE_SHOCK_SOURCE_RULE_ID,
+                    "section_id": "08.03",
+                    "unit_instance_id": candidate.unit_instance_id,
+                    "component_unit_instance_ids": list(candidate.component_unit_instance_ids),
+                    "candidate_reasons": [reason.value for reason in candidate.eligibility_reasons],
+                    "unsupported_scope": "battle_shock_model_presence",
+                },
+            )
     return None
 
 

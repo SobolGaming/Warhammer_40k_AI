@@ -12,6 +12,10 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockDiceExpressionContext,
     BattleShockRerollPermissionContext,
 )
+from warhammer40k_core.engine.battle_shock_model_authority import (
+    battle_shock_model_ids,
+    command_test_allows_off_battlefield,
+)
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     PendingBattleShockRerollAuthority,
     parse_pending_battle_shock_reroll_authority,
@@ -25,9 +29,6 @@ from warhammer40k_core.engine.decision_request import DecisionError, DecisionReq
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.rules_unit_geometry import (
-    placed_alive_geometry_models_for_rules_unit,
-)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
@@ -170,17 +171,20 @@ def _expected_live_test_request(
     )
     if rules_unit.owner_player_id != retained.player_id:
         raise GameLifecycleError("Pending Battle-shock target owner drifted.")
-    current_model_ids = tuple(
-        sorted(
-            model.model_id
-            for model in placed_alive_geometry_models_for_rules_unit(
-                state=state,
-                unit_instance_id=rules_unit.unit_instance_id,
-            )
-        )
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Pending Battle-shock requires battlefield state.")
+    current_model_ids = battle_shock_model_ids(
+        rules_unit=rules_unit,
+        battlefield=battlefield,
+        state=state,
+        allow_off_battlefield=command_test_allows_off_battlefield(
+            reason=retained.reason,
+            phase=authority.phase,
+            player_id=retained.player_id,
+            active_player_id=authority.active_player_id,
+        ),
     )
-    if not current_model_ids:
-        raise GameLifecycleError("Pending Battle-shock target is no longer placed.")
     ability_index = runtime_content_bundle.ability_indexes_by_player_id.get(retained.player_id)
     if ability_index is None:
         raise GameLifecycleError("Pending Battle-shock target lacks ability authority.")

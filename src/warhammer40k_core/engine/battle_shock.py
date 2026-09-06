@@ -20,6 +20,7 @@ from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock_model_authority import battle_shock_model_ids
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_leadership_characteristic_for_unit,
@@ -565,10 +566,6 @@ def collect_battle_shock_test_requests(
         )
         if not alive_model_ids:
             continue
-        placed_model_ids = _current_battlefield_model_ids_for_rules_unit(
-            rules_unit=rules_unit,
-            battlefield_state=battlefield_state,
-        )
         record = records.get(rules_unit.unit_instance_id)
         if record is None:
             raise GameLifecycleError("Battle-shock request missing StartingStrengthRecord.")
@@ -581,9 +578,12 @@ def collect_battle_shock_test_requests(
         is_core_required = (
             rules_unit.unit_instance_id in shocked_ids or context.is_at_or_below_half_strength
         )
-        if (is_forced or is_core_required) and placed_model_ids != alive_model_ids:
-            raise GameLifecycleError(
-                "Battle-shock test for an eligible off-battlefield rules unit is unsupported."
+        if is_forced or is_core_required:
+            battle_shock_model_ids(
+                rules_unit=rules_unit,
+                battlefield=battlefield_state,
+                state=state,
+                allow_off_battlefield=True,
             )
         forced_test_added = False
         if is_forced:
@@ -921,26 +921,6 @@ def _model_leadership(model: ModelInstance) -> int:
         if characteristic.characteristic is Characteristic.LEADERSHIP:
             return characteristic.final
     raise GameLifecycleError("ModelInstance is missing Leadership.")
-
-
-def _current_battlefield_model_ids_for_rules_unit(
-    *,
-    rules_unit: RulesUnitView,
-    battlefield_state: BattlefieldRuntimeState,
-) -> tuple[str, ...]:
-    rules_unit_model_by_id = {model.model_instance_id: model for model in rules_unit.own_models}
-    current_ids: list[str] = []
-    for component in rules_unit.components:
-        placement = battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
-        if placement is None:
-            continue
-        for model_placement in placement.model_placements:
-            model = rules_unit_model_by_id.get(model_placement.model_instance_id)
-            if model is None:
-                raise GameLifecycleError("Battlefield unit placement contains unknown model.")
-            if model.is_alive:
-                current_ids.append(model.model_instance_id)
-    return tuple(sorted(current_ids))
 
 
 def _starting_strength_by_unit(

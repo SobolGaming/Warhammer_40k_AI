@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
+from warhammer40k_core.engine.battle_shock_model_authority import (
+    command_test_allows_off_battlefield,
+)
 from warhammer40k_core.engine.battle_shock_state_history import (
     battle_shock_state_authority_before_event,
 )
@@ -186,10 +189,35 @@ class HistoricalBattleShockAuthorityContext:
             )
         )
 
+    def battle_shock_model_ids(self, unit_instance_id: str) -> tuple[str, ...]:
+        """Use event-bound living strength without manufacturing battlefield geometry."""
+        rules_unit = self.rules_unit(unit_instance_id)
+        allowed = {model.model_instance_id for model in rules_unit.own_models}
+        rows = tuple(
+            row
+            for row in self.physical_models
+            if row.model_instance_id in allowed and row.wounds_remaining > 0
+        )
+        if (
+            command_test_allows_off_battlefield(
+                reason=self.request.reason,
+                phase=self.phase,
+                player_id=rules_unit.owner_player_id,
+                active_player_id=self.active_player_id,
+            )
+            and rows
+        ):
+            presences = {row.presence for row in rows}
+            if presences in ({"embarked"}, {"reserves"}):
+                return tuple(sorted(row.model_instance_id for row in rows))
+            if presences & {"embarked", "reserves"}:
+                raise GameLifecycleError("Historical Battle-shock rules-unit presence is split.")
+        return self.placed_alive_model_ids(unit_instance_id)
+
     def below_half_strength_context(self, unit_instance_id: str) -> BelowHalfStrengthContext:
         rules_unit = self.rules_unit(unit_instance_id)
         starting_strength = self.starting_strength(rules_unit.unit_instance_id)
-        current_model_ids = self.placed_alive_model_ids(rules_unit.unit_instance_id)
+        current_model_ids = self.battle_shock_model_ids(rules_unit.unit_instance_id)
         single_model_wounds_remaining = None
         if starting_strength.starting_model_count == 1:
             model_ids = {model.model_instance_id for model in rules_unit.own_models}

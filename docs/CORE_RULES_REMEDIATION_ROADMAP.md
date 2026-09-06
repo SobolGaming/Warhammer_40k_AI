@@ -3426,3 +3426,128 @@ The final architecture/scope audit and `git diff --check` pass.
 
 PR URL and merge commit:
 [PR #428](https://github.com/SobolGaming/Warhammer_40k_AI/pull/428); not merged.
+
+
+## P01 implementation evidence — Order 23
+
+Status: implemented and locally validated; PR publication pending.
+This closes only `C01-01` after review/merge; category 01 and P01B/P01C remain open.
+
+Finding IDs: `C01-01`.
+
+Dependencies and evidence gate: P08B and its later shared Battle-shock authority
+are merged; implementation starts from current `main` at `2d04a9f1` after Order
+22. `APP-AUTHORITY` uses the maintained-mirror policy approved by S-MIRRORS.
+
+Violated invariant: a living rules unit's mandatory Command Battle-shock test
+must not depend on battlefield placement. Embarked and Strategic Reserve units
+must test when currently Battle-shocked or at/below Half-strength, once per
+canonical rules unit even when both predicates apply.
+
+How it is currently done: P08B already snapshots all living candidates and uses
+the corrected predicate, but its phase gate returns unsupported for an eligible
+off-battlefield candidate. The collection helper also rejects it, while live
+request materialization, pending reroll validation and historical request
+validation require placed living models.
+
+How it should be done: one shared living-model authority recognizes complete
+battlefield, embarked and reserve membership. Command test materialization and
+pending reroll validation consume its exact model IDs for strength and
+Leadership. Historical validation selects the corresponding authenticated
+physical rows at the request event. Existing sequencing, dice, outcome hooks,
+Battle-shock state updates and continuation keep their ownership.
+
+Specific authoritative maintained direct App-data mirror rule/statement and
+source ID: 01.02.04 Not On The Battlefield, the unit-location definition and the
+complete final Battle-shock paragraph. Stable source ID:
+`gw-11e-core-off-battlefield-battle-shock:off-battlefield-battle-shock`.
+The versioned source artifact certifies only these retained clauses as
+`loaded` / `executable_engine_runtime`; it does not certify the remaining
+visibility, measurement or general ability clauses of 01.02.04.
+
+Provider, URL, App-data version or observation timestamp, transcription SHA-256,
+and source-observation fingerprint:
+
+- Provider: non-affiliated 40k.app;
+  <https://www.40k.app/rules/01-core-concepts>.
+- Observed: `2026-09-06T16:04:16Z` through the search-index page observation;
+  direct retrieval returned HTTP 403. No App-data version is inferred.
+- Retained clause transcription SHA-256:
+  `cadc6f7705726995ad1a0c8329e0fe5763798c9f004e6e1d9086a6e8fbfa3a9b`.
+- Audit-row source-observation fingerprint:
+  `c139623d48440f0dd104f51333e4200bd14d5c8839713c2a932ca3e6f94ae31e`.
+- RuleEvidence observation fingerprint:
+  `ccf5632c66e344f27b90e72f89762f2f5dbec1c2994a8feedc7e4b7e0e92dabd`.
+- The original official Core Rules PDF remains historical evidence with SHA-256
+  `f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+Scope and explicit exclusions: this change completes the Command Battle-shock
+obligation. It adds no named handler, faction rule, player-choice family,
+movement permission, visibility or measuring authority. General embarked-ability
+semantics remain P01C. Setup deployment has a separate component/canonical-ID
+mismatch in `deployment._unavailable_component_unit_ids` for directly reserved
+attached units; that setup repair is outside this finding. Attached embarked
+fixtures cover canonical identity including bodyguard loss, while reserve
+fixtures and the existing authenticated during-battle reserve-entry regression
+cover the Battle-shock consumer independently of that setup defect.
+
+Owning state/validation/mutation/event/replay path:
+`command_battle_shock_candidates` snapshots eligibility;
+`command_battle_shock_phase_authority` validates remaining candidates and orders
+them; `battle_shock_model_authority` resolves living model membership from the
+engine's explicit cargo/reserve presence APIs; `battle_shock_test_service` and
+`battle_shock_pending_authority` use that same model authority before rolling or
+queue pop. `HistoricalBattleShockAuthorityContext` reconstructs historical
+strength independently of geometry. The existing shared result service mutates
+Battle-shock and records deterministic events consumed by adapters and replay.
+
+Decision and viewer-visibility impact: existing finite sequencing and reroll
+requests are reused. Public Battle-shock events and options stay public for
+both viewers; no private mission or deployment content is added. The documented
+unsupported scope becomes `battle_shock_model_presence` for unexplained or
+conflicting model presence. Missing placements do not silently grant permission.
+
+Regression scenarios and same-bug-class search: an existing regression first
+failed with typed unsupported after real damage and an authenticated Gate of
+Infinity reserve entry. It now resolves once, restores and re-enters without a
+second test. Additional real-domain cases cover both off-battlefield locations,
+healthy/damaged/already-shocked/destroyed candidates, dual-predicate deduplication,
+attached Half-strength and bodyguard loss, singleton wounds, facade completion,
+public event equivalence, mixed finite sequencing, replay, reroll acceptance and
+decline, stale/malformed/incorrect-actor rejection and lost cargo/reserve
+authority before queue pop. The whole Battle-shock family was searched for
+placement-derived strength and request gating: the collector, phase preflight,
+materializer, pending validator and historical validator are fixed together.
+Geometry-dependent faction rules and non-Command forced tests retain their
+existing boundaries. An AST audit prevents these consumers reverting to
+placement-only Battle-shock authority.
+
+Generated artifacts/documentation: added an offline P01 source builder, typed
+hash-pinned loader, versioned JSON and immutable mirror audit; registered its
+exact source scope and fingerprint. Updated this finding, README, the adapter
+contract, engine build identity and external-contract examples. All eight
+committed shards and their duration inventory were regenerated from the complete
+successful behavioral JUnit profile, including the new integration test file.
+
+Validation results: the complete behavioral suite passes once with coverage:
+`6374 passed`, `85.04%`, `755.79s`, with 64 xdist workers and work stealing.
+The bundled Node runtime is on PATH. That run emitted 10 ResourceWarnings for
+unclosed SQLite connections. The final focused subset passes (`247 passed` in
+`48.08s`). The full no-coverage code-quality suite passes (`377 passed` in
+`366.31s`) with 64 xdist workers and work stealing, after correcting its
+source-package inventory expectation from 14 to 15. Production code did not
+change after the coverage run.
+
+Ruff check and format check, mypy (`2712` source files), pyright (zero errors or
+warnings), all `11` import-linter contracts, all-files pre-commit and the exact
+eight-shard inventory check pass. The new source/audit builder, engine-build
+identity check and external-contract `--base-ref origin/main` check pass at base
+`2d04a9f167c2839ed2233fd0fa75aa55254a1155`. Installed-wheel smoke verifies
+`2547` engine resources and `27` schemas. TypeScript dependency installation,
+generated-client/type checks, all `5` client unit tests and the two-server HTTP
+conformance scenario pass (`342` assertions, contract `11.2.0`). Windows client
+validation uses bundled Node `24.19.0` and npm from the local Node environment;
+regenerating the client corrected checkout line endings without a semantic diff.
+The architecture/scope audit and `git diff --check` pass.
+
+PR URL and merge commit: publication pending; not merged.
