@@ -3648,6 +3648,26 @@ Leader effects confined to the correct successor. The shared ownership AST
 audit prevents local model-prefix validation from bypassing the new authority.
 The search also replaced duplicated live-group reconstruction in physical,
 history and scoring consumers rather than patching only split construction.
+PR review exposed two remaining consumers of the same ownership invariant:
+enhancement activation/live queries still required the original physical bearer,
+and generic modifier gates discarded effects found through predecessor aliases.
+The shared enhancement resolver now preserves assignment provenance while
+returning the live component that contains the original bearer model. Activation,
+generic Aura/application, fight hooks and existing source-specific consumers use
+that resolver. Historical effect target validation recognizes authenticated
+source components. Typed effect applications retain the original effect and
+matched predecessor targets separately from current membership, with once-per-
+instance deduplication. Generic hit and characteristic consumers use those
+applications. Regressions exercise Targetin Squigs and Slaughterthirst through
+facade splitting, deployment, checkpoint restore and exact persistence replay;
+the Aura also stops when the live bearer dies. Numerical regressions verify
+whole-unit, Leader-model and multiple-alias behavior after restoration.
+Gateway unto Damnation's existing Deadly Demise consumer also validates its
+unchanged source record separately from current bearer ownership; its split,
+checkpoint and exact replay regression preserves the original modifier.
+Static audits reject local enhancement ownership reconstruction and historical-only
+generic target gates. This completes source-bound behavior preservation within
+the approved scope; it adds no new split timing or reserve valuation behavior.
 Two older Stratagem fixtures inferred attachments from Starting Strength
 source strings; they now muster real Leader attachments. That regression
 exposed component IDs reaching canonical mortal-wound target freezing.
@@ -3673,26 +3693,26 @@ contract schemas/examples/manifest and generated TypeScript client. The complete
 behavioral JUnit profile supplies the eight-shard inventory before publication.
 
 Validation results: the final complete behavioral suite passes with coverage:
-`6405 passed`, `85.05%`, `820.06s`, with 64 xdist workers and work stealing.
+`6412 passed`, `85.06%`, `807.23s`, with 64 xdist workers and work stealing.
 The bundled Node runtime is on PATH. The run emitted 10 ResourceWarnings for
 unclosed SQLite connections. No production code changed after this run.
 All eight shards and the duration inventory were regenerated from its complete
 successful JUnit profile, and the exact eight-shard inventory check passes.
 
-Ruff check and format check (`2814` files), mypy (`2726` source files), pyright
+Ruff check and format check (`2816` files), mypy (`2728` source files), pyright
 (zero errors or warnings), all `11` import-linter contracts and all-files
 pre-commit pass. The source/audit builder and engine-build identity check pass;
 the validated runtime-tree SHA-256 is
-`35c2605a21dfeddb60e19290c62dc3b63296cd9a07db66c0e89666ffa8079c70`.
+`88f06d14cc00bcb3dfda0eaf2184a44d604174f1e2898242a1ec942638079952`.
 External-contract `--check --base-ref origin/main` passes at base
 `b8805911de434f9b53b4c209e896012998e0e95f`. TypeScript generated-client/type
 checks, all `5` client unit tests and two-server HTTP conformance pass
 (`342` assertions, contract `11.3.0`). Installed-wheel smoke verifies
-`2560` engine resources and `27` schemas against the same build identity.
+`2562` engine resources and `27` schemas against the same build identity.
 Windows validation uses bundled Node `24.19.0` and a local npm executable.
 The architecture/scope audit and `git diff --check` pass.
 
-The complete no-coverage code-quality suite passes: `378 passed`, `318.78s`,
+The complete no-coverage code-quality suite passes: `380 passed`, `312.86s`,
 with 64 xdist workers and work stealing. Its earlier failures were corrected
 without relaxing the mutation, module-size or decision-documentation gates.
 

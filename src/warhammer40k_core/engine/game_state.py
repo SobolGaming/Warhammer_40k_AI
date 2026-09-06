@@ -249,6 +249,7 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.engine.return_on_death import (
     PendingReturnOnDeath,
 )
+from warhammer40k_core.engine.rules_unit_effects import known_effect_target_unit_ids
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -298,7 +299,6 @@ from warhammer40k_core.engine.tracked_target_state import (
     active_tracked_target_for as _active_tracked_target_for,
 )
 from warhammer40k_core.engine.tracked_target_state import (
-    attached_rules_unit_ids,
     attached_rules_unit_owner_ids,
     destroyed_attached_rules_unit_ids,
     validate_canonical_tracked_target_record,
@@ -3244,7 +3244,7 @@ class GameState:
             raise GameLifecycleError("persisting_effect must be a PersistingEffect.")
         if effect.owner_player_id not in self.player_ids:
             raise GameLifecycleError("PersistingEffect owner_player_id is not in this game.")
-        unit_ids = _known_rules_unit_ids(
+        unit_ids = known_effect_target_unit_ids(
             army_definitions=self.army_definitions,
             starting_strength_records=self.starting_strength_records,
         )
@@ -6809,7 +6809,7 @@ def _validate_persisting_effects(
 ) -> list[PersistingEffect]:
     if not isinstance(effects, list):
         raise GameLifecycleError("GameState persisting_effects must be a list.")
-    unit_ids = _known_rules_unit_ids(
+    unit_ids = known_effect_target_unit_ids(
         army_definitions=army_definitions,
         starting_strength_records=starting_strength_records,
     )
@@ -6922,18 +6922,6 @@ def _validate_pending_return_on_death(
             seen_open_consumed_keys.add(consumed_key)
         validated.append(pending)
     return sorted(validated, key=lambda pending: pending.pending_id)
-
-
-def _known_rules_unit_ids(
-    *,
-    army_definitions: list[ArmyDefinition],
-    starting_strength_records: list[StartingStrengthRecord],
-) -> set[str]:
-    return (
-        {unit.unit_instance_id for army in army_definitions for unit in army.units}
-        | attached_rules_unit_ids(tuple(army_definitions))
-        | {record.unit_instance_id for record in starting_strength_records}
-    )
 
 
 def _model_ids_for_unit(

@@ -20,6 +20,7 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationHookBinding,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.enhancement_bearers import runtime_assignment_for_current_bearer
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectContext,
@@ -1179,12 +1180,13 @@ def _fight_activation_option_for_context(
         raise GameLifecycleError("Generic fight activation option requires context.")
     if type(source) is not _GenericFightActivationAbilitySource:
         raise GameLifecycleError("Generic fight activation option requires source.")
-    assignment = source.assignments_by_bearer_unit_id.get(context.unit_instance_id)
-    if assignment is None:
-        return None
-    if assignment.player_id != context.player_id:
-        raise GameLifecycleError("Generic fight activation assignment player drift.")
-    if not context.target_unit_instance_ids:
+    assignment = runtime_assignment_for_current_bearer(
+        state=context.state,
+        player_id=context.player_id,
+        assignments=tuple(source.assignments_by_bearer_unit_id.values()),
+        unit_instance_id=context.unit_instance_id,
+    )
+    if assignment is None or not context.target_unit_instance_ids:
         return None
     result = execute_rule_ir(
         rule_ir=source.rule_ir,

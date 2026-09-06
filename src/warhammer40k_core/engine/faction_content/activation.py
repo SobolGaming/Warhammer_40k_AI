@@ -14,6 +14,7 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
     muster_army,
 )
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
@@ -466,7 +467,7 @@ def _runtime_enhancement_assignment_from_army(
         army_id=army.army_id,
         enhancement_id=assignment.enhancement_id,
         target_unit_selection_id=assignment.target_unit_selection_id,
-        bearer_unit_instance_id=bearer_unit.unit_instance_id,
+        bearer_unit_instance_id=bearer_unit.source_unit_instance_id,
         source_id=assignment.source_id,
     )
 
@@ -476,11 +477,7 @@ def _bearer_unit_for_assignment(
     army: ArmyDefinition,
     assignment: EnhancementAssignment,
 ) -> UnitInstance:
-    expected_unit_instance_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
-    for unit in army.units:
-        if unit.unit_instance_id == expected_unit_instance_id:
-            return unit
-    raise GameLifecycleError("Runtime enhancement assignment references unknown bearer unit.")
+    return enhancement_bearer_unit(army, assignment=assignment)
 
 
 def _validate_runtime_enhancement_assignment_tuple(

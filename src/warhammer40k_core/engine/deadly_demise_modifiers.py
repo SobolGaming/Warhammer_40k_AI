@@ -243,15 +243,19 @@ def _modifier_from_persisting_effect(
         context_payload,
         key="source_unit_instance_id",
     )
-    source_model_ids = _physical_unit_model_ids(
+    source_model_ids = _source_unit_model_ids(
         state=state,
         unit_instance_id=source_unit_id,
     )
     if source_model_ids != (source_model_id,):
         raise GameLifecycleError("Deadly Demise modifier requires an exact single-model bearer.")
-    if state.unit_instance_id_for_model(source_model_id) != source_unit_id:
+    current_unit_id = state.unit_instance_id_for_model(source_model_id)
+    bearer = rules_unit_view_by_id(
+        state=state, unit_instance_id=current_unit_id
+    ).component_unit_for_model(source_model_id)
+    if source_unit_id not in {bearer.unit_instance_id, bearer.source_unit_instance_id}:
         raise GameLifecycleError("Deadly Demise modifier source model identity drift.")
-    if rules_unit_owner_player_id(state=state, unit_instance_id=source_unit_id) != (
+    if rules_unit_owner_player_id(state=state, unit_instance_id=current_unit_id) != (
         persisting_effect.owner_player_id
     ):
         raise GameLifecycleError("Deadly Demise modifier owner identity drift.")
@@ -347,7 +351,7 @@ def _destruction_matches_modifier(
         return False
     expected_rules_unit_id = rules_unit_view_by_id(
         state=state,
-        unit_instance_id=modifier.source_unit_instance_id,
+        unit_instance_id=state.unit_instance_id_for_model(modifier.source_model_instance_id),
     ).unit_instance_id
     attributed_views = current_rules_unit_views_for_identity(
         state=state,
@@ -358,7 +362,7 @@ def _destruction_matches_modifier(
     return attribution.source_model_instance_id == modifier.source_model_instance_id
 
 
-def _physical_unit_model_ids(
+def _source_unit_model_ids(
     *,
     state: GameState,
     unit_instance_id: str,
@@ -367,7 +371,10 @@ def _physical_unit_model_ids(
     matches = tuple(
         unit
         for army in state.army_definitions
-        for unit in army.units
+        for unit in (
+            *army.units,
+            *(source for record in army.unit_splits for source in record.source_units),
+        )
         if unit.unit_instance_id == requested_unit_id
     )
     if len(matches) != 1:

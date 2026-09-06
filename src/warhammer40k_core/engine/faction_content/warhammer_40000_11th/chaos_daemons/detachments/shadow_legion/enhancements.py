@@ -27,6 +27,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementDatasheetAbilityGrant,
     EnhancementEffectContext,
@@ -1068,11 +1069,7 @@ def _unit_for_assignment(
     *,
     assignment: EnhancementAssignment,
 ) -> UnitInstance:
-    expected_unit_instance_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
-    for unit in army.units:
-        if unit.unit_instance_id == expected_unit_instance_id:
-            return unit
-    raise GameLifecycleError("Fade to Darkness assignment target unit was not mustered.")
+    return enhancement_bearer_unit(army, assignment=assignment)
 
 
 def _leaping_shadows_scouts_descriptor() -> DatasheetAbilityDescriptor:

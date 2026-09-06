@@ -22,6 +22,7 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
@@ -740,11 +741,7 @@ def _unit_for_assignment(
     *,
     assignment: EnhancementAssignment,
 ) -> UnitInstance:
-    expected_unit_instance_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
-    for unit in army.units:
-        if unit.unit_instance_id == expected_unit_instance_id:
-            return unit
-    raise GameLifecycleError("EnhancementAssignment target unit was not mustered.")
+    return enhancement_bearer_unit(army, assignment=assignment)
 
 
 def _effect_target_unit_instance_ids(context: EnhancementEffectContext) -> frozenset[str]:

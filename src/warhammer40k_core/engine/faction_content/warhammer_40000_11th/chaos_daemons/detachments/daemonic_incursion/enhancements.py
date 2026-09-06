@@ -17,6 +17,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
     EnhancementFeelNoPainGrant,
@@ -603,11 +604,7 @@ def _unit_for_assignment(
 ) -> UnitInstance:
     if type(assignment) is not EnhancementAssignment:
         raise GameLifecycleError("Daemonic Incursion assignment lookup requires assignment.")
-    expected_unit_instance_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
-    for unit in army.units:
-        if unit.unit_instance_id == expected_unit_instance_id:
-            return unit
-    raise GameLifecycleError("Daemonic Incursion assignment target unit was not mustered.")
+    return enhancement_bearer_unit(army, assignment=assignment)
 
 
 def _owner_player_id_for_unit(state: GameState, *, unit_instance_id: str) -> str:

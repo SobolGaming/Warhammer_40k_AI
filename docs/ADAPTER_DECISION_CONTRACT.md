@@ -54,6 +54,15 @@ before mortal-wound application and its continuation. The finite/proposal
 families and payload shapes are unchanged; damage records retain canonical
 rules-unit targets, including split successors.
 
+Enhancement assignments retain their original roster selection and bearer unit
+ID as provenance. Engine consumers resolve the live bearer component through
+the partition and its unchanged bearer model ID. Existing effects keep their
+original target payloads; authenticated current applications carry predecessor
+membership separately and apply each effect instance once per queried rules
+unit. Component/model-scoped effects remain confined to their applicable
+successor. These internal query corrections add no decision family, submission
+shape, visibility rule or contract version change.
+
 This family executes the source-backed pre-battle permission shape. Other
 timings, conditional permission shapes and re-splitting raise explicit
 domain errors. It does not grant arbitrary mid-battle splitting or change
