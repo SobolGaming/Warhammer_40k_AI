@@ -22,6 +22,61 @@ ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 CATALOG_DATASHEET_RUNTIME = ENGINE_ROOT / "catalog_datasheet_rule_runtime.py"
 
+
+def test_order22_weapon_grants_share_source_preserving_owner() -> None:
+    owners = {
+        "rule_ir_weapon_modifiers.py": "rule_ir_weapon_ability_granted_profile",
+        "catalog_tracked_target_weapon_grants.py": "profile_with_catalog_weapon_keyword_grant",
+        "ranged_weapon_keyword_effects.py": "weapon_profile_with_ranged_keyword_effects",
+        "fight_resolution.py": "_epic_challenge_profile_if_applicable",
+        "faction_content/warhammer_40000_11th/world_eaters/army_rule.py": (
+            "_profile_with_keyword_and_ability"
+        ),
+        "faction_content/warhammer_40000_11th/adeptus_custodes/army_rule.py": (
+            "_profile_with_keyword_and_ability"
+        ),
+        "faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py": (
+            "_profile_with_keyword_and_ability"
+        ),
+        "faction_content/warhammer_40000_11th/black_templars/army_rule.py": "_profile_with_keyword",
+        "faction_content/warhammer_40000_11th/tau_empire/army_rule.py": (
+            "for_the_greater_good_weapon_profile_modifier"
+        ),
+    }
+    for relative, function_name in owners.items():
+        tree = ast.parse((ENGINE_ROOT / relative).read_text(encoding="utf-8"))
+        function = next(
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef) and node.name == function_name
+        )
+        assert any(
+            isinstance(node, ast.Call) and _call_name(node) == "grant_weapon_ability"
+            for node in ast.walk(function)
+        ), relative
+        assert not any(
+            isinstance(node, ast.Compare)
+            and any(
+                isinstance(child, ast.Attribute) and child.attr == "ability_id"
+                for child in ast.walk(node)
+            )
+            for node in ast.walk(function)
+        ), relative
+
+
+def test_order22_source_identity_does_not_depend_on_display_or_parameter_values() -> None:
+    path = ROOT / "src/warhammer40k_core/core/ability_sources.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    identity = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "instance_id"
+    )
+    attributes = {node.attr for node in ast.walk(identity) if isinstance(node, ast.Attribute)}
+    assert {"owner_id", "source_id", "source_instance_id", "slot_id"} <= attributes
+    assert not {"name", "parameters", "ability_id"} & attributes
+
+
 RULE_NAME_NORMALIZER_NAMES = frozenset(
     {
         "_canonical_rule_token",

@@ -3282,3 +3282,147 @@ runtime build identity remains unchanged from the aggregate gates above.
 
 PR URL and merge commit:
 [PR #427](https://github.com/SobolGaming/Warhammer_40k_AI/pull/427); not merged.
+
+## P24C1 implementation evidence — Order 22
+
+Status: Source-instance identity/schema implementation complete and published in
+PR #428; all final local gates pass. This closes only `C24-03A` after review/merge.
+`C24-03B` / P24C2 (Order 52), the parent `C24-03` family and category 24 remain open.
+
+Finding IDs: `C24-03A`.
+
+Dependencies and evidence gate: No implementation dependency is listed for
+P24C1. P00 and S-MIRRORS supply the merged source-governance foundation.
+The branch starts at `e9fec4d4a30a0b1461c7828de2a7da6d2fe5c615`, equal to
+fetched `origin/main`; Orders 20/21 are merged in PR #427. No other roadmap PR
+was open. `APP-AUTHORITY` applies; no official-App divergence was observed.
+
+Violated invariant: Distinct physical/source occurrences of a core or weapon
+ability must remain identifiable even when their family, number, keyword or
+complete descriptor is equal. Storing those occurrences must neither stack their
+effects nor silently choose one for the controlling player.
+
+How it is currently done: Before this change profile validation rejected duplicate
+non-Anti families, imports rejected repeated descriptors, core descriptors were
+unique only by ability ID, and runtime grants merged keyword/descriptor sets.
+Those paths could erase the source of a second grant before an instance decision
+could be made.
+
+How it should be done: Typed occurrence records bind carrier owner, stable source
+ID, source-instance ID and source slot to a deterministic instance ID. The referenced
+ability definition is separate from that identity. Native profile descriptors and
+otherwise undescribed keywords each own an occurrence; an explicit grant snapshots
+the native inventory and appends its own occurrence. Equal definition records may
+be shared by several occurrences. Reapplying the same occurrence is idempotent;
+conflicting source identity fails closed. Core descriptors retain distinct source
+rows and component-scoped identity. Non-Core catalog definition uniqueness remains
+unchanged.
+
+Specific authoritative maintained direct App-data mirror rule/statement and
+source ID: Complete **24.02 Duplicated Abilities**, including numbered core and
+weapon examples, Scouts and keyword-bearing Anti duplicates, is retained as
+`gw-11e-core-duplicated-abilities:duplicated-abilities`. Duplicate abilities do
+not accumulate; the controlling player selects the instance, with weapon
+selection in Select Weapons each time the unit attacks. The source package is
+recorded as `loaded` / `partial_engine_runtime`, since selection belongs to P24C2.
+
+Provider, URL, App-data version or observation timestamp, transcription SHA-256,
+and source-observation fingerprint:
+
+| Statement | Provider and retained URL | Version / observation | Transcription SHA-256 | Source-observation fingerprint |
+|---|---|---|---|---|
+| 24.02 | [40k.app](https://www.40k.app/rules/24-core-abilities) | `2026-09-06T14:49:36Z`; no App-data version asserted | `34244f9733c5d16731e52e23636b68afd931761b0077431bba2010275f980ab4` | `4a37e2adbecc617bc913a16d9548f68f895393887bdc9f6e33fcea33fa11da49` |
+
+The provider is explicitly non-affiliated. The complete operative section was
+observed through the search index; direct retrieval returned HTTP 403. No
+co-version comparison is claimed. The retained official PDF remains historical
+evidence, SHA-256
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+Scope and explicit exclusions: The shared identity/schema foundation, existing
+source-erasing grant consumers, source evidence and adapter/persistence contract.
+Existing faction wrappers migrate only their generic grant operation; no faction
+rules, catalog content, named handlers or support claims are added. No new
+player decision, Scouts choice, stacking algorithm, combat selection timing,
+movement validation, AI or excluded content is included. P24C2 must implement
+the controlling-player decision and certify execution; this PR does not claim
+that duplicate abilities are fully playable. No architecture boundary changes
+or compatibility shims are introduced. Named-handler budgets and classifications
+remain unchanged.
+
+Owning state/validation/mutation/event/replay path: `core.ability_sources` owns
+occurrence identity and core source-row validation; `core.weapon_ability_sources`
+owns native inventory, grants and source-preserving descriptor/carrier changes.
+Catalog ingress retains repeated structured descriptors. `WeaponProfile` owns
+its explicit occurrence payload and validates identity, coverage, owner and
+provenance. `UnitInstance` exposes component-scoped core occurrences. Engine
+grant owners call these shared pure transformations; enhancement mutation
+continues through its existing engine owner and event. Gathered attacks keep
+their contributing attack pools and rebind the synthetic carrier while retaining
+original source evidence. Existing checkpoint/catalog/replay serialization carries
+the records and restores them through the same typed validators.
+
+Decision and viewer-visibility impact: Contract `11.2.0` adds optional, closed,
+nonempty `weapon_profile.ability_sources` records. Absent records denote the
+native definition inventory; explicitly empty, malformed, duplicated, stale or
+unprovenanced records fail closed. No decision family, submission, finite option
+or visibility rule changes. Existing shared viewer scoping applies to containing
+catalogs/proposals/checkpoints. Boolean keyword presence stays non-stacking.
+Unresolved repeated descriptor occurrences fail explicitly at attack consumers;
+distinct existing Anti descriptor selections retain their current path. No
+automatic maximum/first-instance choice is introduced.
+
+Regression scenarios and same-bug-class search: Failing tests first exposed the
+missing identity APIs. Regressions cover equal and different values, multiple
+sources of one definition, native and granted keywords, repeated-source
+idempotence, source conflicts, canonical JSON round-trips, payload drift and
+missing fields, owner/provenance/coverage rejection, value changes, synthetic
+carriers, core duplicates and catalog ingestion. A real `LocalGameSession`
+submits an ordinary finite decision with duplicate core/weapon sources in its
+catalog, then checks checkpoint restoration, component identity, both viewers'
+projections/event streams and exact replay reproduction.
+
+A further failing catalog regression identified repeated keyword-only source
+entries (`Assault, Assault`) being erased by the bridge. Ingress now retains
+those native slots while the profile's canonical keyword membership remains
+unique. Numbered/conditional descriptors retain their own source occurrences.
+The existing event-history RNG incorporates enriched profile payloads; one
+deterministic non-reroll fixture expectation was refreshed from 6 to 5 while
+retaining its original ineligible-reroll assertion.
+
+Repository searches covered descriptor/keyword set merging, core grant
+deduplication, `replace` calls changing profile abilities/keywords/identity,
+RuleIR and persistent-effect grants, enhancement auras, tracked-target grants,
+Epic Challenge and the existing faction wrappers. Shared source-preserving
+helpers replace the instances of that bug class. Static audits bind grant
+owners to the shared helper and prohibit display/value identity in instance IDs.
+
+Generated artifacts/documentation: Versioned
+`core_duplicated_abilities_2026_09/artifacts/package.json`, pinned typed loader,
+maintained-mirror audit, source-authority registry/pin, package classification,
+engine-build manifest, external-contract schema/examples/manifest and generated
+TypeScript client; README, adapter contract and this evidence record.
+`tools/build_core_duplicated_abilities_source.py --check` reproduces source and
+audit offline. Behavioral test additions extend existing files, so the eight
+shard inventories retain the same membership.
+
+Validation results: The complete behavioral suite passes once with coverage:
+`6348 passed`, `85.04%`, `752.82s`, with 64 xdist workers and work stealing.
+The no-coverage code-quality suite passes with `375 passed` in `299.26s`, using
+16 xdist workers and work stealing. The bundled Node runtime is on PATH. The final
+focused boundary subset passes (`67 passed`).
+Ruff check and format check, mypy (`2708` source files), pyright (zero errors or
+warnings), all `11` import-linter contracts, all-files pre-commit and the exact
+eight-shard inventory check pass.
+
+The new source/audit builder, engine-build identity check and external-contract
+`--base-ref origin/main` check pass at base
+`e9fec4d4a30a0b1461c7828de2a7da6d2fe5c615`. Installed-wheel smoke verifies
+`2544` engine resources and `27` schemas. TypeScript dependency installation,
+generated-client/type checks, all `5` client unit tests and the two-server HTTP
+conformance scenario pass (`342` assertions, contract `11.2.0`). Windows client
+validation uses the bundled Node runtime and npm from the local Node environment.
+The final architecture/scope audit and `git diff --check` pass.
+
+PR URL and merge commit:
+[PR #428](https://github.com/SobolGaming/Warhammer_40k_AI/pull/428); not merged.

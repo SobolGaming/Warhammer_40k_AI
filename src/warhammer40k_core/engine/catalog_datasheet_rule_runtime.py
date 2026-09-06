@@ -1009,6 +1009,7 @@ class CatalogDatasheetRuleRuntime:
                 parameters=parameters,
                 profile=context.weapon_profile,
                 source_id=source.rule_ir.source_id,
+                source_instance_id=f"{source.unit.unit_instance_id}:{source.clause.clause_id}",
             )
 
         return handler

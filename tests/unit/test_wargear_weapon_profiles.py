@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -34,6 +35,245 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.rules.keywords import canonical_rule_keyword_tokens
 from warhammer40k_core.rules.text_normalization import canonical_keyword_forms
+
+
+def test_order22_duplicate_weapon_sources_survive_without_selecting_an_instance() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import (
+        grant_weapon_ability,
+        weapon_ability_sources,
+    )
+
+    native = replace(
+        _bolt_rifle_profile(),
+        abilities=(AbilityDescriptor.rapid_fire(1),),
+        source_ids=("source:weapon-row",),
+    )
+    first = grant_weapon_ability(
+        native,
+        keyword=WeaponKeyword.RAPID_FIRE,
+        ability=AbilityDescriptor.rapid_fire(1),
+        source_id="source:grant-a",
+        source_instance_id="effect:a",
+    )
+    second = grant_weapon_ability(
+        first,
+        keyword=WeaponKeyword.RAPID_FIRE,
+        ability=AbilityDescriptor.rapid_fire(2),
+        source_id="source:grant-b",
+        source_instance_id="effect:b",
+    )
+    sources = tuple(
+        row for row in weapon_ability_sources(second) if row.ability_id.startswith("rapid-fire")
+    )
+    assert len(sources) == 3
+    assert len({row.instance_id for row in sources}) == 3
+    assert {row.source_id for row in sources} == {
+        native.stable_identity(),
+        "source:grant-a",
+        "source:grant-b",
+    }
+    assert len(second.abilities) == 2
+    restored = WeaponProfile.from_payload(
+        cast(WeaponProfilePayload, json.loads(json.dumps(second.to_payload())))
+    )
+    assert restored == second
+    assert weapon_ability_sources(restored) == weapon_ability_sources(second)
+    assert (
+        grant_weapon_ability(
+            second,
+            keyword=WeaponKeyword.RAPID_FIRE,
+            ability=AbilityDescriptor.rapid_fire(2),
+            source_id="source:grant-b",
+            source_instance_id="effect:b",
+        )
+        == second
+    )
+
+
+def test_order22_core_duplicate_definitions_preserve_source_identity() -> None:
+    from warhammer40k_core.core.ability_sources import (
+        AbilitySourceError,
+        datasheet_ability_sources,
+        merge_datasheet_ability_source,
+        validate_datasheet_ability_sources,
+    )
+    from warhammer40k_core.core.datasheet import (
+        CatalogAbilitySourceKind,
+        CatalogAbilitySupport,
+        DatasheetAbilityDescriptor,
+    )
+
+    first = DatasheetAbilityDescriptor(
+        ability_id="core-feel-no-pain",
+        name="Feel No Pain 5+",
+        source_id="source:row-a",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="Feel No Pain 5+",
+        parameter_tokens=("5+",),
+    )
+    second = replace(first, source_id="source:row-b", parameter_tokens=("6+",))
+    sources = datasheet_ability_sources((first, second), owner_id="unit:a")
+    assert len({row.instance_id for row in sources}) == 2
+    assert {row.ability_id for row in sources} == {"core-feel-no-pain"}
+    assert datasheet_ability_sources((second, first), owner_id="unit:a") == sources
+    assert merge_datasheet_ability_source((first,), first) == (first,)
+    assert merge_datasheet_ability_source((first,), second) == (first, second)
+    with pytest.raises(AbilitySourceError, match="conflicting semantics"):
+        merge_datasheet_ability_source((first,), replace(first, parameter_tokens=("6+",)))
+    with pytest.raises(AbilitySourceError, match="duplicate ability IDs"):
+        validate_datasheet_ability_sources((first, first))
+    with pytest.raises(AbilitySourceError, match="duplicate ability IDs"):
+        validate_datasheet_ability_sources(
+            tuple(
+                replace(row, source_kind=CatalogAbilitySourceKind.DATASHEET)
+                for row in (first, second)
+            )
+        )
+    with pytest.raises(AbilitySourceError, match="must be a tuple"):
+        validate_datasheet_ability_sources(cast(tuple[DatasheetAbilityDescriptor, ...], [first]))
+    with pytest.raises(AbilitySourceError, match="contain ability descriptors"):
+        validate_datasheet_ability_sources((cast(DatasheetAbilityDescriptor, object()),))
+
+
+@pytest.mark.parametrize(
+    "field", ["instance_id", "owner_id", "source_id", "source_instance_id", "slot_id", "ability_id"]
+)
+def test_order22_source_payload_rejects_missing_or_drifted_identity(field: str) -> None:
+    from warhammer40k_core.core.ability_sources import (
+        AbilitySourceError,
+        AbilitySourceInstance,
+        AbilitySourceInstancePayload,
+    )
+
+    source = AbilitySourceInstance(
+        owner_id="profile:a",
+        source_id="rule:a",
+        source_instance_id="model:a",
+        slot_id="effect:1",
+        ability_id="melta:2",
+    )
+    payload = source.to_payload()
+    assert AbilitySourceInstance.from_payload(payload) == source
+    malformed = dict(payload)
+    del malformed[field]
+    with pytest.raises(AbilitySourceError, match="invalid fields"):
+        AbilitySourceInstance.from_payload(cast(AbilitySourceInstancePayload, malformed))
+    malformed = dict(payload)
+    malformed[field] = ""
+    with pytest.raises(AbilitySourceError):
+        AbilitySourceInstance.from_payload(cast(AbilitySourceInstancePayload, malformed))
+    if field != "ability_id":
+        malformed[field] = "different"
+        with pytest.raises(AbilitySourceError, match="drifted"):
+            AbilitySourceInstance.from_payload(cast(AbilitySourceInstancePayload, malformed))
+
+
+def test_order22_profile_sources_reject_missing_foreign_duplicate_and_conflicting_sources() -> None:
+    from warhammer40k_core.core.ability_sources import AbilitySourceError, AbilitySourceInstance
+    from warhammer40k_core.core.weapon_ability_sources import (
+        grant_weapon_ability,
+        weapon_ability_sources,
+    )
+
+    profile = grant_weapon_ability(
+        _bolt_rifle_profile(),
+        keyword=WeaponKeyword.SUSTAINED_HITS,
+        ability=AbilityDescriptor.sustained_hits(1),
+        source_id="rule:a",
+        source_instance_id="effect:a",
+    )
+    sources = weapon_ability_sources(profile)
+    with pytest.raises(AbilitySourceError, match="duplicate"):
+        replace(profile, ability_sources=(*sources, sources[0]))
+    with pytest.raises(AbilitySourceError, match="different owner"):
+        replace(profile, ability_sources=(replace(sources[0], owner_id="wrong"), *sources[1:]))
+    with pytest.raises(AbilitySourceError, match="cover every"):
+        replace(profile, ability_sources=sources[1:])
+    with pytest.raises(AbilitySourceError, match="no profile provenance"):
+        replace(profile, ability_sources=(replace(sources[0], source_id="unknown"), *sources[1:]))
+    with pytest.raises(AbilitySourceError, match="typed instances"):
+        replace(profile, ability_sources=cast(tuple[AbilitySourceInstance, ...], (object(),)))
+    with pytest.raises(AbilitySourceError, match="must be a tuple"):
+        replace(profile, ability_sources=cast(tuple[AbilitySourceInstance, ...], list(sources)))
+    with pytest.raises(AbilitySourceError, match="changed its ability"):
+        grant_weapon_ability(
+            profile,
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+            ability=AbilityDescriptor.sustained_hits(2),
+            source_id="rule:a",
+            source_instance_id="effect:a",
+        )
+    conflicting = replace(AbilityDescriptor.sustained_hits(2), ability_id="sustained-hits:1")
+    with pytest.raises(AbilitySourceError, match="conflicting semantics"):
+        grant_weapon_ability(
+            profile,
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+            ability=conflicting,
+            source_id="rule:a",
+            source_instance_id="effect:a",
+        )
+    with pytest.raises(WeaponProfileError, match="must not be empty"):
+        WeaponProfile.from_payload({**profile.to_payload(), "ability_sources": []})
+
+
+def test_order22_keyword_only_sources_and_value_changes_keep_distinct_occurrences() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import (
+        grant_weapon_ability,
+        reidentify_weapon_profile,
+        replace_weapon_ability_descriptors,
+        weapon_ability_sources,
+    )
+
+    profile = _bolt_rifle_profile()
+    for instance in ("model:a", "model:b"):
+        profile = grant_weapon_ability(
+            profile,
+            keyword=WeaponKeyword.ASSAULT,
+            ability=None,
+            source_id="rule:assault",
+            source_instance_id=instance,
+        )
+    assert (
+        len(
+            [
+                row
+                for row in weapon_ability_sources(profile)
+                if row.ability_id == "weapon-keyword:Assault"
+            ]
+        )
+        == 3
+    )
+    profile = grant_weapon_ability(
+        profile,
+        keyword=WeaponKeyword.MELTA,
+        ability=AbilityDescriptor.melta(2),
+        source_id="rule:melta",
+        source_instance_id="effect:melta",
+    )
+    updated = replace_weapon_ability_descriptors(profile, {"melta:2": AbilityDescriptor.melta(3)})
+    assert tuple(row.instance_id for row in weapon_ability_sources(updated)) == tuple(
+        row.instance_id for row in weapon_ability_sources(profile)
+    )
+    assert "melta:3" in {row.ability_id for row in weapon_ability_sources(updated)}
+    carrier = reidentify_weapon_profile(updated, profile_id="gathered:1", name="Gathered")
+    assert {row.source_instance_id for row in weapon_ability_sources(carrier)} == {
+        row.source_instance_id for row in weapon_ability_sources(updated)
+    }
+    assert WeaponProfile.from_payload(carrier.to_payload()) == carrier
+    from warhammer40k_core.core.ability_sources import AbilitySourceError
+
+    with pytest.raises(AbilitySourceError, match="unknown ability"):
+        replace_weapon_ability_descriptors(profile, {"unknown": AbilityDescriptor.melta(3)})
+    with pytest.raises(AbilitySourceError, match="retain its ability family"):
+        replace_weapon_ability_descriptors(profile, {"melta:2": AbilityDescriptor.rapid_fire(3)})
+    two_values = replace(
+        _bolt_rifle_profile(), abilities=(AbilityDescriptor.melta(2), AbilityDescriptor.melta(3))
+    )
+    with pytest.raises(AbilitySourceError, match="conflicting semantics"):
+        replace_weapon_ability_descriptors(
+            two_values, {"melta:2": replace(AbilityDescriptor.melta(2), ability_id="melta:3")}
+        )
 
 
 def _bolt_rifle_profile() -> WeaponProfile:
@@ -435,18 +675,18 @@ def test_weapon_profile_abilities_are_deduplicated_and_sorted_deterministically(
             damage_profile=DamageProfile.fixed(1),
             abilities=(rapid_fire, rapid_fire),
         )
-    with pytest.raises(WeaponProfileError, match="duplicate non-Anti ability kinds"):
-        WeaponProfile(
-            profile_id="duplicate-non-anti-ability-kinds",
-            name="Duplicate non-Anti ability kinds",
-            range_profile=RangeProfile.distance(12),
-            attack_profile=AttackProfile.fixed(1),
-            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
-            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
-            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
-            damage_profile=DamageProfile.fixed(1),
-            abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
-        )
+    duplicated = WeaponProfile(
+        profile_id="duplicate-non-anti-ability-kinds",
+        name="Duplicate non-Anti ability kinds",
+        range_profile=RangeProfile.distance(12),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
+    )
+    assert len(duplicated.abilities) == 2
     anti_profile = WeaponProfile(
         profile_id="duplicate-anti-ability-kinds",
         name="Duplicate Anti ability kinds",

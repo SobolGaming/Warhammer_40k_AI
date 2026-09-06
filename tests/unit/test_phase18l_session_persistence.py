@@ -613,6 +613,98 @@ def test_phase18l_local_session_checkpoint_round_trips_exact_replay_projection_e
     assert replay_result.status is ReplayRunStatus.REPRODUCED
 
 
+def test_order22_duplicate_sources_survive_facade_submission_checkpoint_and_replay() -> None:
+    from dataclasses import replace
+
+    from warhammer40k_core.adapters.event_stream import EventStreamCursor
+    from warhammer40k_core.core.datasheet import (
+        CatalogAbilitySourceKind,
+        CatalogAbilitySupport,
+        DatasheetAbilityDescriptor,
+    )
+    from warhammer40k_core.core.weapon_ability_sources import (
+        grant_weapon_ability,
+        weapon_ability_sources,
+    )
+    from warhammer40k_core.core.weapon_profiles import AbilityDescriptor, WeaponKeyword
+
+    config = canonical_setup_prebattle_smoke_config(game_id="order22-source-checkpoint")
+    catalog = config.army_catalog
+    gear = next(item for item in catalog.wargear if item.wargear_id == "core-bolt-rifle")
+    profile = gear.weapon_profiles[0]
+    for owner in ("attached-component:a", "attached-component:b"):
+        profile = grant_weapon_ability(
+            profile,
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+            ability=AbilityDescriptor.sustained_hits(1),
+            source_id="fixture:source:grant",
+            source_instance_id=owner,
+        )
+    first = DatasheetAbilityDescriptor(
+        ability_id="core-stealth",
+        name="Stealth",
+        source_id="fixture:source:stealth-a",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="Stealth",
+    )
+    second = replace(first, source_id="fixture:source:stealth-b")
+    datasheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    catalog = replace(
+        catalog,
+        wargear=tuple(
+            replace(item, weapon_profiles=(profile,)) if item == gear else item
+            for item in catalog.wargear
+        ),
+        datasheets=tuple(
+            replace(item, abilities=(*item.abilities, first, second)) if item == datasheet else item
+            for item in catalog.datasheets
+        ),
+    )
+    session = LocalGameSession()
+    session.start(replace(config, army_catalog=catalog))
+    request = session.advance_until_decision_or_terminal().decision_request
+    assert request is not None
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=FIXED_SECONDARY_OPTION_ID,
+        result_id="order22-secondary",
+    )
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    restored_profile = next(
+        item
+        for item in restored.lifecycle.config.army_catalog.wargear
+        if item.wargear_id == gear.wargear_id
+    ).weapon_profiles[0]
+    assert weapon_ability_sources(restored_profile) == weapon_ability_sources(profile)
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    assert restored.rules_catalog_view() == session.rules_catalog_view()
+    for player in (PLAYER_A, PLAYER_B):
+        assert restored.view(viewer_player_id=player) == session.view(viewer_player_id=player)
+        assert restored.events_since(
+            EventStreamCursor(), viewer_player_id=player
+        ) == session.events_since(EventStreamCursor(), viewer_player_id=player)
+    state = restored.lifecycle.state
+    assert state is not None
+    units = tuple(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.datasheet_id == datasheet.datasheet_id
+    )
+    assert units
+    for unit in units:
+        sources = tuple(
+            source
+            for source in unit.ability_source_instances()
+            if source.ability_id == first.ability_id
+        )
+        assert len(sources) == 2
+        assert {source.source_id for source in sources} == {first.source_id, second.source_id}
+    replay = restored.replay_artifact(artifact_id="order22-source-replay")
+    assert ReplayRunner.from_payload(replay).run().status is ReplayRunStatus.REPRODUCED
+
+
 @pytest.mark.parametrize(
     "boundary",
     ["setup", "movement", "shooting", "charge", "fight", "terminal"],

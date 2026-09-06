@@ -63,6 +63,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.wargear_selection_limits import DatasheetWargearSelectionLimit
+from warhammer40k_core.core.weapon_ability_sources import preserve_native_keyword_occurrences
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityDescriptorPayload,
@@ -84,9 +85,6 @@ from warhammer40k_core.rules.catalog_generation_fields import (
 )
 from warhammer40k_core.rules.catalog_generation_fields import (
     required_split_field as _required_split_field,
-)
-from warhammer40k_core.rules.catalog_generation_fields import (
-    split_field_value as _split_field_value,
 )
 from warhammer40k_core.rules.catalog_generation_values import (
     attack_profile_from_raw_text as _attack_profile_from_raw_text,
@@ -663,7 +661,10 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
     skill_characteristic = _characteristic_token_from_field(
         _required_field(row=row, column_name="skill_characteristic")
     )
-    return WeaponProfile(
+    keyword_occurrences = _weapon_keywords_from_field(
+        _optional_field(row=row, column_name="weapon_keywords") or ""
+    )
+    profile = WeaponProfile(
         profile_id=_required_field(row=row, column_name="weapon_profile_id"),
         name=_required_field(row=row, column_name="name"),
         range_profile=_range_profile_from_token(_required_field(row=row, column_name="range")),
@@ -683,14 +684,13 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
             characteristic=Characteristic.ARMOR_PENETRATION,
         ),
         damage_profile=_damage_profile_from_raw_text(_required_field(row=row, column_name="d")),
-        keywords=_weapon_keywords_from_field(
-            _optional_field(row=row, column_name="weapon_keywords") or ""
-        ),
+        keywords=tuple(dict.fromkeys(keyword_occurrences)),
         abilities=_weapon_abilities_from_field(
             _optional_field(row=row, column_name="weapon_abilities") or ""
         ),
         source_ids=_source_ids_from_row(row),
     )
+    return preserve_native_keyword_occurrences(profile, keyword_occurrences)
 
 
 def _wargear_option_conditions_from_row(
@@ -1258,11 +1258,13 @@ def _weapon_keywords_from_field(value: str) -> tuple[WeaponKeyword, ...]:
     if not value.strip():
         return ()
     keywords: list[WeaponKeyword] = []
-    for item in _split_field_value(value):
+    for item in (part.strip() for part in value.split(",") if part.strip()):
         try:
             keywords.append(WeaponKeyword(item))
         except ValueError as exc:
             raise CatalogGenerationError("Unsupported weapon keyword in source row.") from exc
+    if not keywords:
+        raise CatalogGenerationError("Required list field must not be empty.")
     return tuple(sorted(keywords, key=lambda keyword: keyword.value))
 
 

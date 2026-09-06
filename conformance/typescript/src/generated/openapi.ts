@@ -417,6 +417,14 @@ export interface components {
             unit_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
             witness: components["schemas"]["proposal-payload--path_witness.schema"];
         };
+        "proposal-payload--ability_source_instance.schema": {
+            instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            owner_id: components["schemas"]["proposal-payload--identifier.schema"];
+            source_id: components["schemas"]["proposal-payload--identifier.schema"];
+            source_instance_id: components["schemas"]["proposal-payload--identifier.schema"];
+            slot_id: components["schemas"]["proposal-payload--identifier.schema"];
+            ability_id: components["schemas"]["proposal-payload--identifier.schema"];
+        };
         "proposal-payload--ability_parameter.schema": {
             name: components["schemas"]["proposal-payload--identifier.schema"]; value: boolean | number | string;
         };
@@ -456,6 +464,7 @@ export interface components {
             kind: "melee";
         };
         "proposal-payload--weapon_profile.schema": {
+            ability_sources?: components["schemas"]["proposal-payload--ability_source_instance.schema"][];
             abilities: components["schemas"]["proposal-payload--ability_descriptor.schema"][];
             armor_penetration: components["schemas"]["proposal-payload--characteristic_value.schema"];
             attack_profile: components["schemas"]["proposal-payload--attack_profile.schema"];

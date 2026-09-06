@@ -663,6 +663,29 @@ def _canonical_keyword(keyword: object) -> str:
 def _validate_weapon_profile(profile: object) -> WeaponProfile:
     if type(profile) is not WeaponProfile:
         raise GameLifecycleError("Weapon ability helpers require a WeaponProfile.")
+    descriptors = profile.abilities
+    if profile.ability_sources:
+        by_id = {ability.ability_id: ability for ability in profile.abilities}
+        descriptors = tuple(
+            by_id[source.ability_id]
+            for source in profile.ability_sources
+            if source.ability_id in by_id
+        )
+    kinds: set[AbilityKind] = set()
+    anti_ids: set[str] = set()
+    for descriptor in descriptors:
+        if descriptor.ability_kind is AbilityKind.ANTI_KEYWORD:
+            if descriptor.ability_id in anti_ids:
+                raise GameLifecycleError(
+                    "Duplicated Anti sources require instance selection (P24C2)."
+                )
+            anti_ids.add(descriptor.ability_id)
+            continue
+        if descriptor.ability_kind in kinds:
+            raise GameLifecycleError(
+                "Duplicated weapon ability sources require instance selection (P24C2)."
+            )
+        kinds.add(descriptor.ability_kind)
     return profile
 
 

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     WeaponKeyword,
@@ -256,26 +257,13 @@ def profile_with_catalog_weapon_keyword_grant(
         raise GameLifecycleError("Catalog weapon keyword grant requires a WeaponProfile.")
     if type(grant) is not CatalogWeaponKeywordGrant:
         raise GameLifecycleError("Catalog weapon keyword grant requires grant data.")
-    keywords = profile.keywords
-    if grant.keyword not in keywords:
-        keywords = tuple(sorted((*keywords, grant.keyword), key=lambda keyword: keyword.value))
-    abilities = profile.abilities
-    if grant.ability is not None and all(
-        ability.ability_id != grant.ability.ability_id for ability in abilities
-    ):
-        abilities = tuple(
-            sorted((*abilities, grant.ability), key=lambda ability: ability.ability_id)
-        )
-    source_ids = profile.source_ids
-    if grant.source_id not in source_ids:
-        source_ids = tuple(sorted((*source_ids, grant.source_id)))
-    if (
-        keywords == profile.keywords
-        and abilities == profile.abilities
-        and source_ids == profile.source_ids
-    ):
-        return profile
-    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+    return grant_weapon_ability(
+        profile,
+        keyword=grant.keyword,
+        ability=grant.ability,
+        source_id=grant.source_id,
+        source_instance_id=grant.source_unit_instance_id or grant.source_id,
+    )
 
 
 def catalog_weapon_grant_source_index_and_rules_unit(

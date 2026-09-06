@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `11.1.0`
+Contract version: `11.2.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -348,3 +348,10 @@ reviewed compatibility major. It may refresh that baseline until it appears on
 the base commit, then refuses to overwrite it or add another baseline within
 the same major. See
 [compatibility-policy.md](compatibility-policy.md).
+
+
+Contract 11.2 permits the optional nonempty weapon-profile `ability_sources`
+inventory in proposal/profile payloads. It preserves distinct source occurrences
+without changing existing descriptor IDs or introducing an instance-selection
+submission. See Order 22 in `docs/ADAPTER_DECISION_CONTRACT.md`. Missing inventory
+means a native profile definition; malformed explicit inventories are rejected.

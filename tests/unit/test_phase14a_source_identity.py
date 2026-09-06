@@ -1243,7 +1243,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 13
+    assert len(scope.source_packages) == 14
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -2952,4 +2952,35 @@ def test_p22_p22b_source_package_pins_aura_and_psychic_use_authority() -> None:
         in package.source_catalog.source_text_by_id(source.PSYCHIC_SOURCE_ID).raw_text
     )
     with pytest.raises(source.AuraPsychicSourceError, match="reviewed pin"):
+        source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
+
+
+def test_order22_source_identity_does_not_claim_completed_duplicate_execution() -> None:
+    from tools.build_core_duplicated_abilities_source import (
+        ARTIFACT_PATH,
+        AUDIT_PATH,
+        build_payloads,
+    )
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_duplicated_abilities_2026_09 as source,
+    )
+
+    payload, audit = build_payloads()
+    assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
+    assert json.loads(AUDIT_PATH.read_bytes()) == audit
+    package = source.source_package()
+    assert package.evidence_required_source_ids == (source.DUPLICATED_ABILITIES_SOURCE_ID,)
+    (rule,) = source.source_rules()
+    assert rule.section_id == "24.02"
+    assert rule.load_support_status == "loaded"
+    assert rule.semantic_execution_status == "partial_engine_runtime"
+    assert package.source_catalog.source_text_by_id(rule.source_id).raw_text == rule.source_text
+    assert hashlib.sha256(rule.source_text.encode()).hexdigest() == rule.transcription_sha256
+    (mirror,) = (row for row in source.source_evidence_records() if row.provider_name == "40k.app")
+    assert mirror.provider_non_affiliation_recorded
+    assert mirror.observed_at == "2026-09-06T14:49:36Z"
+    assert mirror.app_version is None
+    assert "Select Weapons step" in rule.source_text
+    with pytest.raises(source.DuplicatedAbilitiesSourceError, match="reviewed pin"):
         source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")

@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+from warhammer40k_core.core.ability_sources import merge_datasheet_ability_source
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
@@ -604,18 +605,13 @@ def _apply_datasheet_ability_grant(
             updated_units.append(unit)
             continue
         target_seen = True
-        if any(
-            ability.ability_id == effect.datasheet_ability.ability_id
-            for ability in unit.datasheet_abilities
-        ):
+        updated_abilities = merge_datasheet_ability_source(
+            unit.datasheet_abilities,
+            effect.datasheet_ability,
+        )
+        if updated_abilities == unit.datasheet_abilities:
             updated_units.append(unit)
             continue
-        updated_abilities = tuple(
-            sorted(
-                (*unit.datasheet_abilities, effect.datasheet_ability),
-                key=lambda ability: ability.ability_id,
-            )
-        )
         updated_units.append(replace(unit, datasheet_abilities=updated_abilities))
         payload = {
             **cast(dict[str, JsonValue], effect.to_payload()),

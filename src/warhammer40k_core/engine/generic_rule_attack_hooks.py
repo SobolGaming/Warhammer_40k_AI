@@ -1227,6 +1227,7 @@ def _profile_with_weapon_ability_grant(
     return rule_ir_weapon_ability_granted_profile(
         parameters=effect.parameters,
         profile=profile,
+        source_instance_id=f"{effect.persisting_effect.effect_id}:{effect.effect_index}",
         source_id=generic_rule_modifier_source_id(effect),
     )
 

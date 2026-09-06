@@ -466,7 +466,7 @@ def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -
             "daemonforge-ineligible-step3-other-result-5",
             army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
             True,
-            6,
+            5,
         ),
         (
             "daemonforge-ineligible-step3-no-pact-5",

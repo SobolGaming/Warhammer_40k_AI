@@ -4,6 +4,12 @@ import math
 from dataclasses import dataclass, replace
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.ability_sources import (
+    AbilitySourceError,
+    AbilitySourceInstance,
+    datasheet_ability_sources,
+    validate_datasheet_ability_sources,
+)
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.attributes import (
     Characteristic,
@@ -340,6 +346,9 @@ class UnitInstance:
 
     def stable_identity(self) -> str:
         return f"unit:{self.unit_instance_id}"
+
+    def ability_source_instances(self) -> tuple[AbilitySourceInstance, ...]:
+        return datasheet_ability_sources(self.datasheet_abilities, owner_id=self.unit_instance_id)
 
     def own_model_ids(self) -> tuple[str, ...]:
         return tuple(model.model_instance_id for model in self.own_models)
@@ -1185,17 +1194,13 @@ def _validate_datasheet_ability_tuple(
 ) -> tuple[DatasheetAbilityDescriptor, ...]:
     if type(values) is not tuple:
         raise UnitFactoryError(f"{field_name} must be a tuple.")
-    validated: list[DatasheetAbilityDescriptor] = []
-    seen: set[str] = set()
-    raw_values = cast(tuple[object, ...], values)
-    for value in raw_values:
-        if type(value) is not DatasheetAbilityDescriptor:
-            raise UnitFactoryError(f"{field_name} must contain DatasheetAbilityDescriptor values.")
-        if value.ability_id in seen:
-            raise UnitFactoryError(f"{field_name} must not contain duplicate ability IDs.")
-        seen.add(value.ability_id)
-        validated.append(value)
-    return tuple(sorted(validated, key=lambda ability: ability.ability_id))
+    try:
+        validated = validate_datasheet_ability_sources(
+            cast(tuple[DatasheetAbilityDescriptor, ...], values)
+        )
+    except AbilitySourceError as exc:
+        raise UnitFactoryError(f"{field_name}: {exc}") from exc
+    return tuple(sorted(validated, key=lambda ability: (ability.ability_id, ability.source_id)))
 
 
 def _validate_damaged_effect_tuple(

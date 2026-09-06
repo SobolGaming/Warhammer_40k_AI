@@ -89,15 +89,6 @@ def test_phase17k_bridge_rejects_unowned_wargear_profile_ability() -> None:
         ("[EXTRA ATTACKS: MONSTER]", "Unsupported conditioned Wahapedia weapon keyword"),
         ("[RAPID FIRE]", "Valued Wahapedia weapon keyword is missing its value"),
         ("[UNKNOWN]", "Unsupported Wahapedia weapon keyword"),
-        ("[LETHAL HITS, LETHAL HITS]", "must not duplicate"),
-        (
-            "[DEVASTATING WOUNDS: INFANTRY, DEVASTATING WOUNDS: MONSTER]",
-            "duplicate non-Anti ability kinds",
-        ),
-        (
-            "[MELTA 2: non-MONSTER/VEHICLE, MELTA 4: INFANTRY]",
-            "duplicate non-Anti ability kinds",
-        ),
         ("[LETHAL HITS: non-]", "Invalid Wahapedia weapon ability descriptor"),
     ],
 )
@@ -206,3 +197,55 @@ def test_phase17k_bridge_requires_accepted_height_overrides() -> None:
             datasheet_ids=("000001115",),
             height_overrides=(),
         )
+
+
+@pytest.mark.parametrize(
+    "description",
+    [
+        "[LETHAL HITS, LETHAL HITS]",
+        "[DEVASTATING WOUNDS: INFANTRY, DEVASTATING WOUNDS: MONSTER]",
+        "[MELTA 2: non-MONSTER/VEHICLE, MELTA 4: INFANTRY]",
+    ],
+)
+def test_order22_bridge_retains_duplicate_weapon_descriptors(description: str) -> None:
+    from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
+
+    artifacts = conditioned_weapon_keyword_bridge_artifacts(description)
+    package = build_canonical_catalog_package(
+        source_artifacts=artifacts,
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+    )
+    profiles = tuple(
+        profile for gear in package.army_catalog.wargear for profile in gear.weapon_profiles
+    )
+    duplicated = tuple(profile for profile in profiles if len(profile.abilities) == 2)
+    assert duplicated
+    for profile in duplicated:
+        assert len({source.instance_id for source in weapon_ability_sources(profile)}) >= 2
+        assert len({ability.ability_id for ability in profile.abilities}) == 2
+
+
+def test_order22_bridge_retains_duplicate_keyword_only_sources() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
+
+    package = build_canonical_catalog_package(
+        source_artifacts=conditioned_weapon_keyword_bridge_artifacts("[ASSAULT, ASSAULT, MELTA 2]"),
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+    )
+    profiles = tuple(
+        profile
+        for gear in package.army_catalog.wargear
+        for profile in gear.weapon_profiles
+        if any(ability.ability_id == "melta:2" for ability in profile.abilities)
+    )
+    assert profiles
+    for profile in profiles:
+        sources = weapon_ability_sources(profile)
+        assert (
+            len([source for source in sources if source.ability_id == "weapon-keyword:Assault"])
+            == 2
+        )
+        assert len({source.instance_id for source in sources}) == len(sources)
+        assert type(profile).from_payload(profile.to_payload()) == profile

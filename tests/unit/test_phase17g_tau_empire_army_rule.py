@@ -170,6 +170,11 @@ def test_lifecycle_requests_for_the_greater_good_and_guided_markerlight_modifier
     assert guided_profile.skill.final == 3
     assert WeaponKeyword.IGNORES_COVER in guided_profile.keywords
     assert army_rule.SOURCE_RULE_ID in guided_profile.source_ids
+    assert any(
+        source.source_id == army_rule.SOURCE_RULE_ID
+        and source.ability_id == "weapon-keyword:Ignores Cover"
+        for source in guided_profile.ability_sources
+    )
 
     observer_profile = army_rule.for_the_greater_good_weapon_profile_modifier(
         _weapon_context(
@@ -718,11 +723,6 @@ def test_for_the_greater_good_internal_guards_reject_invalid_state_and_payloads(
         army_rule._improve_ballistic_skill(
             CharacteristicValue.source_dash(Characteristic.BALLISTIC_SKILL)
         )
-    with pytest.raises(GameLifecycleError, match="keywords must be a tuple"):
-        army_rule._weapon_keywords_with_ignores_cover(cast(tuple[WeaponKeyword, ...], []))
-    assert army_rule._weapon_keywords_with_ignores_cover((WeaponKeyword.IGNORES_COVER,)) == (
-        WeaponKeyword.IGNORES_COVER,
-    )
     with pytest.raises(GameLifecycleError, match="source_ids must be a tuple"):
         army_rule._source_ids_with_for_the_greater_good(cast(tuple[str, ...], ["source"]))
     with pytest.raises(GameLifecycleError, match="label requires rules unit"):

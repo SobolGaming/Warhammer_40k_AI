@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -63,6 +64,18 @@ from warhammer40k_core.engine.weapon_abilities import (
     weapon_ability_int_value,
     weapon_ability_selection_request,
 )
+
+
+def test_order22_equal_anti_sources_are_stored_but_require_instance_selection() -> None:
+    from warhammer40k_core.core.weapon_ability_sources import weapon_ability_sources
+
+    native = _profile(keywords=(), abilities=(AbilityDescriptor.anti_keyword("Infantry", 2),))
+    source = weapon_ability_sources(native)[0]
+    duplicate = replace(source, source_instance_id="second-native-slot")
+    profile = replace(native, ability_sources=(source, duplicate))
+    assert WeaponProfile.from_payload(profile.to_payload()) == profile
+    with pytest.raises(GameLifecycleError, match="Duplicated Anti sources require instance"):
+        has_weapon_keyword(profile, WeaponKeyword.LETHAL_HITS)
 
 
 def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
@@ -149,10 +162,13 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
     )
     no_descriptor_profile = _profile(keywords=(), abilities=())
 
-    with pytest.raises(WeaponProfileError, match="duplicate non-Anti ability kinds"):
-        _profile(
-            keywords=(WeaponKeyword.RAPID_FIRE,),
-            abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
+    with pytest.raises(GameLifecycleError, match="require instance selection"):
+        weapon_ability_int_value(
+            _profile(
+                keywords=(WeaponKeyword.RAPID_FIRE,),
+                abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
+            ),
+            AbilityKind.RAPID_FIRE,
         )
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE)

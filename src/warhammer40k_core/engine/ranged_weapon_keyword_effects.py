@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
@@ -57,8 +57,7 @@ def weapon_profile_with_ranged_keyword_effects(
     if type(effects) is not tuple:
         raise GameLifecycleError("Ranged weapon keyword effects require an effect tuple.")
     requested_owner = _validate_identifier("owner_player_id", owner_player_id)
-    granted_keywords: set[WeaponKeyword] = set()
-    source_ids: set[str] = set()
+    updated = profile
     for effect in effects:
         if type(effect) is not PersistingEffect:
             raise GameLifecycleError(
@@ -74,20 +73,18 @@ def weapon_profile_with_ranged_keyword_effects(
         raw_keywords = payload.get(RANGED_WEAPON_KEYWORD_GRANT_KEY)
         if not isinstance(raw_keywords, list):
             raise GameLifecycleError("Ranged weapon keyword grant payload is missing keywords.")
-        granted_keywords.update(
-            _validate_weapon_keyword_tuple(
-                "ranged weapon keyword grant",
-                tuple(cast(tuple[object, ...], tuple(raw_keywords))),
+        for keyword in _validate_weapon_keyword_tuple(
+            "ranged weapon keyword grant",
+            tuple(cast(tuple[object, ...], tuple(raw_keywords))),
+        ):
+            updated = grant_weapon_ability(
+                updated,
+                keyword=keyword,
+                ability=None,
+                source_id=effect.source_rule_id,
+                source_instance_id=effect.effect_id,
             )
-        )
-        source_ids.add(effect.source_rule_id)
-    if not granted_keywords:
-        return profile
-    merged_keywords = tuple(
-        sorted({*profile.keywords, *granted_keywords}, key=lambda keyword: keyword.value)
-    )
-    merged_source_ids = tuple(sorted({*profile.source_ids, *source_ids}))
-    return replace(profile, keywords=merged_keywords, source_ids=merged_source_ids)
+    return updated
 
 
 def _validate_weapon_keyword_tuple(

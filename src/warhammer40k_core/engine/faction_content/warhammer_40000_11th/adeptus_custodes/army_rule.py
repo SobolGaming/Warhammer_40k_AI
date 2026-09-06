@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import replace
 from enum import StrEnum
 from typing import cast
 
@@ -10,6 +9,7 @@ from warhammer40k_core.core.faction_aliases import (
 )
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -351,16 +351,13 @@ def _profile_with_keyword_and_ability(
     if type(profile) is not WeaponProfile:
         raise GameLifecycleError("Martial Ka'tah weapon profile modifier requires WeaponProfile.")
     requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
-    keywords = profile.keywords
-    if keyword not in keywords:
-        keywords = (*keywords, keyword)
-    abilities = profile.abilities
-    if all(existing.ability_id != ability.ability_id for existing in abilities):
-        abilities = (*abilities, ability)
-    source_ids = profile.source_ids
-    if requested_source_rule_id not in source_ids:
-        source_ids = (*source_ids, requested_source_rule_id)
-    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+    return grant_weapon_ability(
+        profile,
+        keyword=keyword,
+        ability=ability,
+        source_id=requested_source_rule_id,
+        source_instance_id=requested_source_rule_id,
+    )
 
 
 def _stance_from_token(token: object) -> MartialKatahStance:

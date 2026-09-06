@@ -5,7 +5,7 @@ import io
 import json
 import re
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
@@ -26,7 +26,6 @@ from warhammer40k_core.core.weapon_profiles import (
     AntiKeywordMatchMode,
     WeaponKeyword,
     WeaponProfileError,
-    validate_weapon_ability_descriptor_multiplicity,
 )
 from warhammer40k_core.rules import wahapedia_base_size_bridge as _base_size_bridge
 from warhammer40k_core.rules import wahapedia_bridge_columns as _bridge_columns
@@ -1950,16 +1949,12 @@ def _weapon_keywords(
 ) -> tuple[str, ...]:
     return tuple(
         sorted(
-            _deduplicated(
-                [
-                    entry.keyword.value
-                    for entry in _weapon_keyword_entries(
-                        description,
-                        ignored_name_keys=ignored_name_keys,
-                    )
-                    if entry.keyword is not None
-                ]
+            entry.keyword.value
+            for entry in _weapon_keyword_entries(
+                description,
+                ignored_name_keys=ignored_name_keys,
             )
+            if entry.keyword is not None
         )
     )
 
@@ -1979,19 +1974,21 @@ def _weapon_abilities_payload(
     )
     if not abilities:
         return ""
-    seen: set[str] = set()
+    occurrences: dict[str, int] = {}
+    distinct: list[AbilityDescriptor] = []
     for ability in abilities:
-        if ability.ability_id in seen:
-            raise WahapediaBridgeError("Wahapedia weapon abilities must not duplicate.")
-        seen.add(ability.ability_id)
-    try:
-        validate_weapon_ability_descriptor_multiplicity(abilities)
-    except WeaponProfileError as exc:
-        raise WahapediaBridgeError(
-            "Wahapedia weapon abilities must not duplicate non-Anti ability kinds."
-        ) from exc
+        occurrence = occurrences.get(ability.ability_id, 0) + 1
+        occurrences[ability.ability_id] = occurrence
+        distinct.append(
+            ability
+            if occurrence == 1
+            else replace(
+                ability,
+                ability_id=f"{ability.ability_id}:source-occurrence:{occurrence}",
+            )
+        )
     return json.dumps(
-        [ability.to_payload() for ability in sorted(abilities, key=lambda item: item.ability_id)],
+        [ability.to_payload() for ability in sorted(distinct, key=lambda item: item.ability_id)],
         sort_keys=True,
         separators=(",", ":"),
     )

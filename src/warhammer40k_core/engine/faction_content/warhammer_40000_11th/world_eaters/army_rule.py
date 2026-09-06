@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import StrEnum
 from itertools import combinations
 from typing import TYPE_CHECKING
@@ -9,6 +9,7 @@ from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -698,16 +699,13 @@ def _profile_with_keyword_and_ability(
 ) -> WeaponProfile:
     if type(profile) is not WeaponProfile:
         raise GameLifecycleError("Blessings weapon profile modifier requires WeaponProfile.")
-    keywords = profile.keywords
-    if keyword not in keywords:
-        keywords = (*keywords, keyword)
-    abilities = profile.abilities
-    if all(existing.ability_id != ability.ability_id for existing in abilities):
-        abilities = (*abilities, ability)
-    source_ids = profile.source_ids
-    if SOURCE_RULE_ID not in source_ids:
-        source_ids = (*source_ids, SOURCE_RULE_ID)
-    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+    return grant_weapon_ability(
+        profile,
+        keyword=keyword,
+        ability=ability,
+        source_id=SOURCE_RULE_ID,
+        source_instance_id=SOURCE_RULE_ID,
+    )
 
 
 def _blessing_option(

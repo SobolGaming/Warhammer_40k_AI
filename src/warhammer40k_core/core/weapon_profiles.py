@@ -3,8 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 from math import isfinite
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict
 
+from warhammer40k_core.core.ability_sources import (
+    AbilitySourceInstance,
+    AbilitySourceInstancePayload,
+)
 from warhammer40k_core.core.attributes import (
     Characteristic,
     CharacteristicError,
@@ -13,6 +17,7 @@ from warhammer40k_core.core.attributes import (
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceExpressionPayload, DiceRollSpecError
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import validate_weapon_ability_sources
 
 
 class WeaponProfileError(ValueError):
@@ -133,6 +138,7 @@ class WeaponProfilePayload(TypedDict):
     keywords: list[str]
     abilities: list[AbilityDescriptorPayload]
     source_ids: list[str]
+    ability_sources: NotRequired[list[AbilitySourceInstancePayload]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -646,6 +652,7 @@ class WeaponProfile:
     keywords: tuple[WeaponKeyword, ...] = ()
     abilities: tuple[AbilityDescriptor, ...] = ()
     source_ids: tuple[str, ...] = ()
+    ability_sources: tuple[AbilitySourceInstance, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -686,6 +693,7 @@ class WeaponProfile:
         abilities = _canonical_ability_tuple(self.abilities)
         if abilities != self.abilities:
             object.__setattr__(self, "abilities", abilities)
+        object.__setattr__(self, "ability_sources", validate_weapon_ability_sources(self))
         object.__setattr__(
             self,
             "source_ids",
@@ -701,7 +709,7 @@ class WeaponProfile:
         return f"weapon-profile:{self.profile_id}"
 
     def to_payload(self) -> WeaponProfilePayload:
-        return {
+        payload: WeaponProfilePayload = {
             "profile_id": self.profile_id,
             "name": self.name,
             "range_profile": self.range_profile.to_payload(),
@@ -714,9 +722,14 @@ class WeaponProfile:
             "abilities": [ability.to_payload() for ability in self.abilities],
             "source_ids": list(self.source_ids),
         }
+        if self.ability_sources:
+            payload["ability_sources"] = [source.to_payload() for source in self.ability_sources]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: WeaponProfilePayload) -> Self:
+        if "ability_sources" in payload and not payload["ability_sources"]:
+            raise WeaponProfileError("Explicit weapon ability sources must not be empty.")
         return cls(
             profile_id=payload["profile_id"],
             name=payload["name"],
@@ -737,6 +750,11 @@ class WeaponProfile:
                 AbilityDescriptor.from_payload(ability) for ability in payload["abilities"]
             ),
             source_ids=tuple(payload["source_ids"]),
+            ability_sources=tuple(
+                AbilitySourceInstance.from_payload(source) for source in payload["ability_sources"]
+            )
+            if "ability_sources" in payload
+            else (),
         )
 
 
@@ -1039,16 +1057,8 @@ def validate_weapon_ability_descriptor_multiplicity(
 ) -> None:
     if type(abilities) is not tuple:
         raise WeaponProfileError("Weapon ability descriptor multiplicity requires a tuple.")
-    seen_non_selectable_kinds: set[AbilityKind] = set()
     for ability in abilities:
         _validate_ability_descriptor(ability)
-        if ability.ability_kind is AbilityKind.ANTI_KEYWORD:
-            continue
-        if ability.ability_kind in seen_non_selectable_kinds:
-            raise WeaponProfileError(
-                "WeaponProfile abilities must not contain duplicate non-Anti ability kinds."
-            )
-        seen_non_selectable_kinds.add(ability.ability_kind)
 
 
 def _validate_ability_descriptor(ability: object) -> AbilityDescriptor:

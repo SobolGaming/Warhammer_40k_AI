@@ -11,6 +11,10 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_ability_sources import (
+    grant_weapon_ability,
+    replace_weapon_ability_descriptors,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
@@ -623,22 +627,29 @@ def outcast_ambush_weapon_profile_modifier(
         effect_kind=OUTCAST_AMBUSH_EFFECT_KIND,
     ):
         return context.weapon_profile
-    profile = context.weapon_profile
-    return replace(
-        profile,
-        armor_penetration=_improved_ap(profile.armor_penetration),
-        keywords=tuple(
-            sorted(
-                {
-                    *profile.keywords,
-                    WeaponKeyword.IGNORES_COVER,
-                    WeaponKeyword.RAPID_FIRE,
-                }
-            )
-        ),
-        abilities=_abilities_with_rapid_fire_one(profile.abilities),
-        source_ids=tuple(sorted({*profile.source_ids, OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID})),
+    profile = grant_weapon_ability(
+        context.weapon_profile,
+        keyword=WeaponKeyword.IGNORES_COVER,
+        ability=None,
+        source_id=OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
+        source_instance_id=OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
     )
+    replacements = {
+        ability.ability_id: _abilities_with_rapid_fire_one((ability,))[0]
+        for ability in profile.abilities
+        if ability.ability_kind is AbilityKind.RAPID_FIRE
+    }
+    if replacements:
+        profile = replace_weapon_ability_descriptors(profile, replacements)
+    else:
+        profile = grant_weapon_ability(
+            profile,
+            keyword=WeaponKeyword.RAPID_FIRE,
+            ability=AbilityDescriptor.rapid_fire(1),
+            source_id=OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
+            source_instance_id=OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
+        )
+    return replace(profile, armor_penetration=_improved_ap(profile.armor_penetration))
 
 
 def _pirates_due_record() -> StratagemCatalogRecord:
