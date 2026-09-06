@@ -3430,7 +3430,7 @@ PR URL and merge commit:
 
 ## P01 implementation evidence — Order 23
 
-Status: implemented and locally validated; PR publication pending.
+Status: implemented and locally validated; PR ready for review.
 This closes only `C01-01` after review/merge; category 01 and P01B/P01C remain open.
 
 Finding IDs: `C01-01`.
@@ -3550,4 +3550,5 @@ validation uses bundled Node `24.19.0` and npm from the local Node environment;
 regenerating the client corrected checkout line endings without a semantic diff.
 The architecture/scope audit and `git diff --check` pass.
 
-PR URL and merge commit: publication pending; not merged.
+PR URL and merge commit:
+[PR #429](https://github.com/SobolGaming/Warhammer_40k_AI/pull/429); not merged.
