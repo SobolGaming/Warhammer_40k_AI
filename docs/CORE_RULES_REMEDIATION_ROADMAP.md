@@ -3873,8 +3873,8 @@ PR URL and merge commit: [PR #431](https://github.com/SobolGaming/Warhammer_40k_
 
 ### P02A / P02B / P02C — Orders 26, 27 and 29
 
-Status: Implemented; all local gates passed and publication pending. The owner explicitly
-requested these three orders as one PR. This combines their shared arithmetic
+Status: Implemented and published for review; all local gates passed. The owner
+explicitly requested these three orders as one PR. This combines their shared arithmetic
 and terminal-boundary owner without changing the remaining roadmap sequence.
 
 Finding IDs: `C02-01`, `C02-02`, `C02-03`.
@@ -4018,4 +4018,5 @@ scenario and rejection assertions are retained; deterministic fixture IDs are
 refreshed for the new schema without changing the RNG owner or its history
 semantics.
 
-PR URL and merge commit: PENDING_PUBLICATION_26_27_29. Merge remains an owner action.
+PR URL and merge commit: [PR #432](https://github.com/SobolGaming/Warhammer_40k_AI/pull/432);
+not merged. Merge remains an owner action.
