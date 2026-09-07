@@ -3822,6 +3822,18 @@ now use the shared authority; explicit move, engagement, reserve-arrival and
 physical-target checks remain physical. AST guards prevent source enumeration
 and live/historical geometry policy from diverging again.
 
+Review correction: Stratagem-cost eligibility now evaluates the existing typed
+`source_model_on_battlefield` condition after resolving active source presence.
+The shared eligibility owner covers automatic modifiers, optional-opportunity
+enumeration and result-side revalidation. The initial 12-case regression matrix
+reproduced four failures for restricted embarked/reserve sources, with the eight
+unrestricted or battlefield-present cases already passing. Both runtime modes
+are covered without adding a parser shape. A per-function AST audit requires the
+condition helper in CP gain/cost eligibility and shared eligibility in all three
+cost entry points. The existing adapter decision contract and payloads apply.
+The same-class search found this condition at the command-point parser boundary;
+phase-gain execution already enforces it, while the cost path was missing it.
+
 The reserve regression uses a standalone rules unit: the existing attached-reserve
 deployment accounting issue is outside P01C and is not presented as fixed here.
 
@@ -3831,28 +3843,29 @@ identity, external-contract examples/manifest, eight-shard behavioral inventory,
 README and adapter contract. The builder's `--check` reproduces both evidence
 artifacts offline.
 
-Validation results: the complete behavioral suite passes once with coverage:
-`6444 passed`, `85.07%`, `787.75s`, 64 xdist workers with work stealing and the
-bundled Node runtime on PATH. It emitted 10 ResourceWarnings for unclosed SQLite
-connections. The subsequent complete no-coverage code-quality suite passes:
-`382 passed`, `299.18s`, 64 workers with work stealing. No production code
-changed after the behavioral run began. The successful complete JUnit report
-regenerated all eight shards and their duration inventory with an explicit
-local-Windows profile; the exact eight-shard check passes.
+Validation results after the review correction: the complete behavioral suite
+passes once with coverage: `6456 passed`, `85.07%`, `799.81s`, 64 xdist workers
+with work stealing and the bundled Node runtime on PATH. It emitted 10
+ResourceWarnings for unclosed SQLite connections. The subsequent complete
+no-coverage code-quality suite passes: `383 passed`, `305.09s`, 64 workers with
+work stealing. No production code changed after the behavioral run began.
+The correction adds cases to an existing behavioral test file; the committed
+eight-shard file inventory remains valid and the exact eight-shard check passes.
 
 Ruff check, Ruff format check (`2822` files), mypy (`2733` source files), pyright
 (zero errors or warnings), all 11 import-linter contracts and all-files
 pre-commit pass. The source/audit builder and engine-build identity checks pass;
 the validated runtime-tree SHA-256 is
-`8fcd78d364ebdb956adead784d6304648344854a3b38fde98ebc71a0507ee634`.
+`502c1db13e5010b375b5e7e7b7bb8396897e8cb6378cbf3b2197481f9363d852`.
 External-contract `--check --base-ref origin/main` passes at the reviewed base.
 TypeScript generated-client/type checks, all five client unit tests and the
 two-server HTTP conformance scenario pass (`342` assertions, contract `11.3.0`).
 Installed-wheel smoke verifies `2565` runtime resources and `27` schemas against
-the same engine identity. The semantic-support generator reproduces its
-committed reports without a content change. Contract JSON differences are
-limited to engine identity and dependent persistence/manifest hashes; no wire
-schema change is claimed. The scope/architecture audit and `git diff --check`
-pass. Initial focused regressions and the final 133-test focused run also pass.
+the same engine identity. The full quality suite includes the generated semantic
+support artifact checks. Contract JSON differences are limited to engine identity
+and dependent persistence/manifest hashes; no wire schema change is claimed.
+The scope/architecture audit and `git diff --check` pass. The focused CP/embarked
+regression run passes all 57 tests, including the new 12-case cost matrix and
+the per-function condition audit.
 
 PR URL and merge commit: [PR #431](https://github.com/SobolGaming/Warhammer_40k_AI/pull/431); not merged.

@@ -570,6 +570,13 @@ class CatalogCommandPointRuntime:
             raise GameLifecycleError("Catalog Stratagem cost affected_player is malformed.")
         if not _source_model_is_available(context.state, source=source):
             return False
+        if not ability_battlefield_conditions_apply(
+            state=context.state,
+            clause=source.clause,
+            source_unit_instance_id=source.source_unit_instance_id,
+            source_model_instance_id=source.source_model_instance_id,
+        ):
+            return False
         trigger_parameters = parameter_payload(_required_trigger(source.clause).parameters)
         relationship = trigger_parameters.get("source_relationship")
         if relationship == "stratagem_targets_source_unit":

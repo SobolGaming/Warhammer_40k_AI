@@ -4827,6 +4827,8 @@ source enumeration uses `engine.ability_presence` to resolve living models in
 the current rules unit from explicit battlefield, cargo and reserve authority.
 Missing placement alone grants no availability. Source-specific battlefield,
 phase, keyword, leading, target and frequency restrictions still apply.
+Stratagem-cost eligibility checks explicit battlefield conditions when applying
+automatic modifiers, enumerating optional opportunities and revalidating choices.
 
 Existing finite ability families may therefore enumerate an eligible
 non-spatial choice for an off-battlefield source. Their existing option IDs,

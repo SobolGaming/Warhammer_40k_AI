@@ -22,9 +22,13 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
 )
 from warhammer40k_core.engine.catalog_command_point_runtime import CatalogCommandPointRuntime
+from warhammer40k_core.engine.catalog_command_point_support import (
+    clause_is_supported_stratagem_cost_modifier,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     eligible_selection_target_unit_ids,
 )
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
@@ -39,6 +43,18 @@ from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.engine.rule_execution import RuleExecutionContext, execute_rule_ir
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_catalog_records
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import StratagemCostChoiceRequestContext
+from warhammer40k_core.engine.stratagem_cost_modifiers import (
+    StratagemCostModifierContext,
+    StratagemCostModifierRegistry,
+)
+from warhammer40k_core.engine.stratagems import (
+    STRATAGEM_DECISION_TYPE,
+    StratagemEligibilityContext,
+    StratagemTargetBinding,
+    StratagemTargetKind,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
@@ -111,6 +127,129 @@ def test_embarked_command_point_ability_uses_its_own_battlefield_restriction(
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert state.command_point_total("player-a") == before + int(not restricted or not embarked)
+
+
+@pytest.mark.parametrize("presence", ["embarked", "reserves", "battlefield"])
+@pytest.mark.parametrize("restricted", [True, False])
+@pytest.mark.parametrize("optional", [True, False])
+def test_stratagem_cost_sources_enforce_their_own_battlefield_restriction(
+    presence: str, restricted: bool, optional: bool
+) -> None:
+    _, state, decisions = ability_presence_fixture(
+        embarked=presence == "embarked", reserves=presence == "reserves", attached=False
+    )
+    restriction = "if this model is on the battlefield, " if restricted else ""
+    text = (
+        f"Once per battle round, {restriction}"
+        "you can target a friendly unit with a Stratagem for 0CP."
+    )
+    rule_ir = compiled_ability_rule(text)
+    clause = rule_ir.clauses[0]
+    effect = clause.effects[0]
+    # Exercise both supported runtime modes without adding an automatic parser shape.
+    effect = replace(
+        effect,
+        parameters=tuple(
+            replace(parameter, value=optional) if parameter.key == "optional" else parameter
+            for parameter in effect.parameters
+        ),
+    )
+    clause = replace(clause, effects=(effect,))
+    assert clause_is_supported_stratagem_cost_modifier(clause)
+    assert (
+        any(
+            parameter.key == "relationship" and parameter.value == "source_model_on_battlefield"
+            for condition in clause.conditions
+            for parameter in condition.parameters
+        )
+        is restricted
+    )
+    rule_ir = replace(rule_ir, clauses=(clause,))
+    record = AbilityCatalogRecord(
+        record_id="test:p01c:stratagem-cost",
+        definition=AbilityDefinition(
+            ability_id="test:p01c:stratagem-cost",
+            name="Stratagem cost ability",
+            source_id=rule_ir.source_id,
+            when_descriptor="When a friendly unit is targeted with a Stratagem.",
+            effect_descriptor=text,
+            restrictions_descriptor=restriction or "Once per battle round.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="core-character-leader",
+    )
+    runtime = CatalogCommandPointRuntime(
+        ability_indexes_by_player_id={
+            player: AbilityCatalogIndex.from_records((record,) if player == "player-a" else ())
+            for player in state.player_ids
+        },
+        armies=tuple(state.army_definitions),
+    )
+    definition = next(
+        record.definition
+        for record in eleventh_edition_stratagem_catalog_records()
+        if record.definition.stratagem_id == "insane-bravery"
+    )
+    eligibility = StratagemEligibilityContext.from_state(
+        state=state, player_id="player-a", trigger_kind=TimingTriggerKind.START_PHASE
+    )
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_instance_id="army-alpha:passengers",
+    )
+    eligible = not restricted or presence == "battlefield"
+    if optional:
+        # Only enumerate the opportunity here; no player choice or mutation is bypassed.
+        source_request = DecisionRequest(
+            request_id="p01c:stratagem-request",
+            decision_type=STRATAGEM_DECISION_TYPE,
+            actor_id="player-a",
+            payload={"finite": True},
+            options=(
+                DecisionOption(
+                    option_id="p01c:stratagem-use",
+                    label="Use Stratagem",
+                    payload={"submission_kind": STRATAGEM_DECISION_TYPE},
+                ),
+            ),
+        )
+        request = runtime.stratagem_cost_choice_request(
+            StratagemCostChoiceRequestContext(
+                state=state,
+                decisions=decisions,
+                source_request=source_request,
+                source_result=DecisionResult.for_request(
+                    result_id="p01c:stratagem-result",
+                    request=source_request,
+                    selected_option_id=source_request.options[0].option_id,
+                ),
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+            )
+        )
+        assert (request is not None) is eligible
+    else:
+        registry = StratagemCostModifierRegistry.from_bindings(
+            runtime.stratagem_cost_modifier_bindings()
+        )
+        cost = registry.modified_command_point_cost(
+            StratagemCostModifierContext(
+                state=state,
+                definition=definition,
+                eligibility_context=eligibility,
+                target_binding=target_binding,
+                effect_selection=None,
+                base_command_point_cost=definition.command_point_cost,
+                current_command_point_cost=definition.command_point_cost,
+            )
+        )
+        assert cost == definition.command_point_cost - int(eligible)
 
 
 @pytest.mark.parametrize("anchor", ["this model", "this unit"])

@@ -6,8 +6,14 @@ from pathlib import Path
 ENGINE = Path(__file__).resolve().parents[2] / "src" / "warhammer40k_core" / "engine"
 
 
-def _calls(path: str) -> set[str]:
-    tree = ast.parse((ENGINE / path).read_text(encoding="utf-8"))
+def _calls(path: str, *, function: str | None = None) -> set[str]:
+    tree: ast.AST = ast.parse((ENGINE / path).read_text(encoding="utf-8"))
+    if function is not None:
+        tree = next(
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef) and node.name == function
+        )
     return {
         node.func.id if isinstance(node.func, ast.Name) else node.func.attr
         for node in ast.walk(tree)
@@ -55,4 +61,15 @@ def test_live_and_historical_spatial_consumers_share_self_and_off_battlefield_po
         "ability_presence_from_model_ids",
         "ability_spatial_relationship_from_presence",
     } <= calls
-    assert "ability_battlefield_conditions_apply" in _calls("catalog_command_point_runtime.py")
+
+
+def test_command_point_consumers_enforce_battlefield_conditions_after_source_availability() -> None:
+    module = "catalog_command_point_runtime.py"
+    for function in ("_phase_gain_handler", "_cost_source_is_eligible"):
+        assert "ability_battlefield_conditions_apply" in _calls(module, function=function)
+    for function in (
+        "_stratagem_cost_modifier_handler",
+        "stratagem_cost_choice_request",
+        "apply_stratagem_cost_choice_result",
+    ):
+        assert "_cost_source_is_eligible" in _calls(module, function=function)
