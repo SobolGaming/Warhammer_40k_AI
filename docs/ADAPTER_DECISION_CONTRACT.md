@@ -2,7 +2,13 @@
 
 ## Orders 26, 27 and 29: ordered modifiers and terminal limits
 
-External contract 11.4.0 adds `replacement_zero` and `replacement_star` to the
+External contract 11.5.0 adds optional source-linked `skill_modifiers` to runtime
+weapon profiles and individual Psychic modifier selection records. Existing finite
+clients continue to choose an engine-enumerated option ID; per-source continuation
+choices allow arbitrary subsets. Runtime saves/replays require the matching build
+identity and reject older aggregate-only modified pools.
+
+External contract 11.4.0 added `replacement_zero` and `replacement_star` to the
 characteristic value kinds. A replacement of a characteristic by 0, dash or
 star is terminal; its value kind survives JSON restoration and subsequent
 resolution, including bounded-characteristic and Damage record conversions.
@@ -2115,7 +2121,7 @@ Deadly Demise target snapshots enumerate canonical rules units, so an Attached U
 Phase 13D adds these attacker-visible attack-resolution decisions:
 
 - `select_precision_allocation`: finite attacking-player choice at the start of the Allocation Order step while resolving attacks made with one or more `[PRECISION]` weapons against a unit containing visible eligible Character allocation groups. Option IDs are visible eligible Character `group_id` values plus `decline_precision`; Character options include `payload.selected_group_id` and `payload.selected_model_ids`, and the decline option uses `selected_group_id: null` with an empty model list. Grouped-host requests include the wounded pool's `attack_contexts` in the request payload. Accepted Character-group selection is pool-scoped until those attacks resolve or that Character group is destroyed, whichever happens first. In the grouped host, the selected Character group is carried as allocation-order `priority_group_ids` and promoted ahead of ordinary defender group order; remaining failed saves return to normal ordered groups after that Character group is destroyed. Declining, having no visible Character group, having no Precision source, or destruction of the selected Character group follows the normal defender allocation path.
-- `select_psychic_attack_modifier_ignores`: finite attacking-player choice emitted before the Hit roll for a `[PSYCHIC]` weapon attack when the current attack context has a non-zero BS/WS modifier or hit-roll modifier. The request payload includes `submission_kind: "select_psychic_attack_modifier_ignores"`, `attack_context_id`, attacking unit/model IDs, target unit ID, `weapon_profile_id`, `source_phase`, `skill_modifier`, and `hit_roll_modifier`. Legal option IDs are engine-enumerated from `keep-all-modifiers`, `ignore-detrimental-modifiers`, `ignore-beneficial-modifiers`, and `ignore-all-modifiers`, excluding duplicate effective outcomes. Each option payload repeats the attack context and weapon profile, carries the original modifiers, and records `effective_skill_modifier`, `effective_hit_roll_modifier`, `ignored_skill_modifier`, and `ignored_hit_roll_modifier`. Adapters must submit one pending option ID through `GameLifecycle.submit_decision(...)`; stale context, wrong weapon, wrong actor, malformed payloads, or option drift reject before queue pop and before the Hit roll is made.
+- `select_psychic_attack_modifier_ignores`: finite attacking-player choices before a Psychic attack's Hit roll. The engine retains each source-linked BS/WS and hit modifier, including cancelling and equal-valued effects. A canonical sequence of individual keep/ignore choices supports any subset; whole-remaining-set and beneficial/detrimental shortcuts may finish the sequence. Choices never merge by numerical outcome. See Order 28 below.
 
 Phase 13C/14H attack-resolution events are typed, ordered, and JSON-safe at hit, Critical Hit, wound, Critical Wound, allocate, save, and damage. Supported grouped-host weapon abilities preserve those event boundaries, including Lethal Hits skipped wound payloads, Sustained Hits generated-hit wound contexts, Precision priority-group allocation, Psychic attack classification via `is_psychic_attack`, and Devastating Wounds deferred mortal-wound packets. Phase 14H has one pooled save/damage resolver: adapters must not expect or submit single-attack allocation decisions during shooting attack resolution. Normal damage is resolved before deferred Devastating Wounds mortal-wound packets for the same attack pool. Internal grouped-damage continuation payloads are replay-safe engine state, not adapter-submitted payloads, and must not leak hidden information through viewer-scoped projections or event deltas.
 
@@ -4914,3 +4920,83 @@ cargo ability grants remain scoped to their own rules unit. The existing
 `catalog_battle_shock_failed_heal_no_effect` event's `no_effect_reason` is
 `source_unit_unavailable` when no living, explicitly present source remains;
 off-battlefield presence alone no longer yields a no-effect result.
+
+
+## Order 28 (P24I): individual Psychic modifiers
+
+The existing finite family applies to Shooting, Fight and their supported
+out-of-phase attack hosts. Each request freezes attack/unit/model/weapon/target
+identity, source phase, pool SHA-256, authoritative Core source IDs, base skill
+and characteristic, and a canonical list of typed modifiers. Each modifier has
+its skill/hit kind and a source-linked operation record; skill operations retain
+scope, timing, operation, operand, priority and exclusive group. Hit operations
+retain source ID, modifier ID, additive operand and priority. Kind plus modifier
+ID distinguishes equal-valued independent sources.
+
+Requests include the canonical prefix of decided modifier IDs and the ignored
+subset. An individual keep/ignore option advances the prefix by one; a shortcut
+finishes all remaining sources. Selection completes before the Hit roll.
+Per-modifier option IDs bind the exact modifier snapshot hash. Whole-set option
+IDs act on remaining modifiers and preserve previous individual decisions.
+Exact duplicate subsets may share one option; equal effective totals do not.
+No modifier-count cap or exponential enumeration is introduced.
+
+Adapters use `FiniteOptionSubmission` through `GameLifecycle.submit_decision`.
+Before queue pop the common engine validator rebuilds the complete current
+request and compares source identity, values, attack context, option payloads
+and prior progress. Wrong actor, foreign/duplicate IDs, malformed payloads,
+stale context and same-total source drift reject without records, dice or state
+mutation. Existing typed invalid statuses leave the pending request intact.
+
+Modified weapon profiles carry a nonempty optional `skill_modifiers` list.
+`skill.raw` retains the source value; final skill and applied IDs authenticate
+against the shared arithmetic owner. Unmodified source profiles omit the list.
+Attack pools likewise retain optional nonempty `hit_roll_modifiers` alongside
+the checked scalar total. Nonzero totals without source operations are invalid;
+there is no missing-source inference. Existing runtime build identity rejects
+incompatible persisted games. Modifier provenance participates in attack-group
+identity and survives decisions, hit events, session checkpoints and exact replay.
+
+No visibility class is added. Existing shared adapter redaction governs both
+viewer projections, event deltas and transport metadata. P22B's separate Psychic
+ability-use ledger is unchanged. No new faction content, generic hook family,
+or named handler is introduced.
+
+The effect snapshot hashes the current, canonically ordered persisting-effect
+inventory. It makes a change to a skill source stale even though the attack pool
+retains its declaration-time skill trace. This conservatively invalidates a pending
+choice if any persisting effect changes before submission. Such a rejected stale
+submission leaves the pending request, records, RNG and authoritative state intact.
+Selection history binds this boundary across every continuation; hit events carry
+and validate the final selected identities and effective skill/hit arithmetic.
+
+`effect_snapshot_sha256` is engine-private authority evidence. The shared adapters
+redaction owner removes it recursively from pending choices, decision records,
+events and status metadata for every viewer. Finite clients submit an option ID;
+the engine supplies the corresponding complete internal payload. Persistence and
+privileged exact replay retain the hash for source-drift checks.
+
+Completed Psychic history also requires `psychic_modifier_history_origin` on the
+operator-only lifecycle checkpoint. The engine freezes one complete lifecycle
+immediately before its first Shooting or Fight declaration submission, installing
+that immutable origin only after the decision controller accepts the result. It
+retains original catalog/config, state, effects, RNG and ledger inputs, rather
+than copying any Psychic choice snapshot. The origin cannot contain another origin
+or an earlier declaration/Psychic decision; its ledger must match the checkpoint's
+exact prefix and its config must match the loaded game.
+
+Standalone lifecycle restoration replays recorded decisions from this origin
+through the existing lifecycle/decision path whenever Psychic choices are present.
+Replay rebuilds declaration pools, skill operations, runtime-effect inventories,
+actor, source commitments and finite requests at their original boundaries. Exact
+request/options and event-stream checks authenticate the first choice independently
+before the continuation and hit evidence can be accepted. Current effects are not
+substituted for expired historical sources. The same check applies to completed
+history inside a replay's captured initial lifecycle, including an empty tail.
+
+The new field is covered by the existing operator lifecycle/persistence/replay JSON
+surface; it adds no finite option, submission envelope or player-facing payload.
+Both this origin and the effect hash remain private under the shared recursive
+redaction owner. Runtime identity changes, so older completed Psychic checkpoints
+without the required origin fail closed. One origin is retained per lifecycle;
+restoring Psychic history incurs the additional engine replay of its decision tail.

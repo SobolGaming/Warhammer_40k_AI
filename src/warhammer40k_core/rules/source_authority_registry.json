@@ -420,6 +420,26 @@
           "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-07T02:46:54Z"
+        },
+        {
+          "row_id": "psychic-individual-modifiers:40k-app",
+          "source_observation_sha256": "7a0858e8559dec4c4c8cd135e6865be496f91e94e26fab51582504ce8f8fb5cc",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/24-core-abilities",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T16:05:47Z"
+        },
+        {
+          "row_id": "ignore-individual-modifiers:40k-app",
+          "source_observation_sha256": "5416540cae6e3d3c1d4c006550573651951dd4fe4ee21cebb70abc8aaabbe4ff",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/02-datasheets",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T16:05:47Z"
         }
       ],
       "legacy_observations": [
@@ -786,8 +806,10 @@
           "version": "maintained-app-mirrors-observed-2026-09-07",
           "allowed_rule_source_ids": [
             "gw-11e-core-modifiers:detection-lone-operative-limits",
+            "gw-11e-core-modifiers:ignore-individual-modifiers",
             "gw-11e-core-modifiers:modified-dice-limits",
-            "gw-11e-core-modifiers:ordered-modifiers"
+            "gw-11e-core-modifiers:ordered-modifiers",
+            "gw-11e-core-modifiers:psychic-individual-modifiers"
           ],
           "catalog_sha256": null
         }

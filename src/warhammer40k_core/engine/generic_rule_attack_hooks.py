@@ -84,31 +84,7 @@ class GenericRuleRerollPermissionContext:
 
 
 def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
-    if type(context) is not HitRollModifierContext:
-        raise GameLifecycleError("Generic hit roll hooks require HitRollModifierContext.")
-    return _dice_roll_modifier_for_attack(
-        state=context.state,
-        attacking_unit_instance_id=context.attacking_unit_instance_id,
-        attacker_model_instance_id=context.attacker_model_instance_id,
-        target_unit_instance_id=context.target_unit_instance_id,
-        source_phase=context.source_phase,
-        weapon_profile=context.weapon_profile,
-        expected_roll_type="hit",
-        legacy_attacker_role_allowed=lambda effect: (
-            _required_int_parameter(
-                effect.parameters,
-                key="delta",
-            )
-            >= 0
-        ),
-        legacy_target_role_allowed=lambda effect: (
-            _required_int_parameter(
-                effect.parameters,
-                key="delta",
-            )
-            <= 0
-        ),
-    )
+    return sum(modifier.operand for modifier in generic_hit_roll_modifiers(context))
 
 
 def generic_rule_wound_roll_modifier(context: WoundRollModifierContext) -> int:
@@ -1206,6 +1182,7 @@ def _profile_with_characteristic_modifier(
         parameters=effect.parameters,
         profile=profile,
         source_id=generic_rule_modifier_source_id(effect),
+        modifier_id=f"{effect.persisting_effect.effect_id}:skill:{effect.effect_index}",
     )
 
 
@@ -1445,3 +1422,34 @@ def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def generic_hit_roll_modifiers(context: HitRollModifierContext) -> tuple[RollModifier, ...]:
+    from warhammer40k_core.engine.runtime_modifiers import HitRollModifierContext
+    from warhammer40k_core.rules.rule_ir import RuleEffectKind
+
+    if type(context) is not HitRollModifierContext:
+        raise GameLifecycleError("Generic hit roll hooks require HitRollModifierContext.")
+    return tuple(
+        RollModifier(
+            modifier_id=f"{effect.persisting_effect.effect_id}:hit:{effect.effect_index}",
+            source_id=effect.source_id,
+            operand=_required_int_parameter(effect.parameters, key="delta"),
+        )
+        for effect in _matching_generic_attack_effects(
+            state=context.state,
+            attacking_unit_instance_id=context.attacking_unit_instance_id,
+            attacker_model_instance_id=context.attacker_model_instance_id,
+            target_unit_instance_id=context.target_unit_instance_id,
+            source_phase=context.source_phase,
+            weapon_profile=context.weapon_profile,
+            effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+            legacy_attacker_role_allowed=lambda effect: (
+                _required_int_parameter(effect.parameters, key="delta") >= 0
+            ),
+            legacy_target_role_allowed=lambda effect: (
+                _required_int_parameter(effect.parameters, key="delta") <= 0
+            ),
+        )
+        if _roll_type_matches(effect.parameters, expected="hit")
+    )

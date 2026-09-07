@@ -713,18 +713,6 @@ def test_for_the_greater_good_internal_guards_reject_invalid_state_and_payloads(
         army_rule._rules_unit_has_keyword(cast(RulesUnitView, object()), "Markerlight")
     with pytest.raises(GameLifecycleError, match="keyword list must be a tuple"):
         army_rule._unit_has_keyword(cast(tuple[str, ...], ["Markerlight"]), "Markerlight")
-    with pytest.raises(GameLifecycleError, match="ballistic skill requires value"):
-        army_rule._improve_ballistic_skill(cast(CharacteristicValue, object()))
-    with pytest.raises(GameLifecycleError, match="characteristic drift"):
-        army_rule._improve_ballistic_skill(
-            CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 4)
-        )
-    with pytest.raises(GameLifecycleError, match="cannot improve non-numeric"):
-        army_rule._improve_ballistic_skill(
-            CharacteristicValue.source_dash(Characteristic.BALLISTIC_SKILL)
-        )
-    with pytest.raises(GameLifecycleError, match="source_ids must be a tuple"):
-        army_rule._source_ids_with_for_the_greater_good(cast(tuple[str, ...], ["source"]))
     with pytest.raises(GameLifecycleError, match="label requires rules unit"):
         army_rule._rules_unit_label(cast(RulesUnitView, object()))
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
@@ -737,8 +725,6 @@ def test_for_the_greater_good_internal_guards_reject_invalid_state_and_payloads(
         army_rule._validate_identifier("field", 1)
     with pytest.raises(GameLifecycleError, match="field must not be empty"):
         army_rule._validate_identifier("field", " ")
-    with pytest.raises(GameLifecycleError, match="skill must be non-negative int"):
-        army_rule._validate_non_negative_int("skill", -1)
 
     active_player_id = state.active_player_id
     state.active_player_id = None

@@ -1049,21 +1049,15 @@ class RuntimeModifierRegistry:
             context=context, bindings=self.unit_characteristic_modifier_bindings
         ).final
 
-    def hit_roll_modifier(self, context: HitRollModifierContext) -> int:
+    def hit_roll_modifiers(self, context: HitRollModifierContext) -> tuple[RollModifier, ...]:
         if type(context) is not HitRollModifierContext:
             raise GameLifecycleError("Hit roll modifiers require a context.")
-        from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_hit_roll_modifier,
-        )
+        from warhammer40k_core.engine.attack_hit_modifiers import registered_hit_roll_modifiers
 
-        total = 0
-        for binding in self.hit_roll_modifier_bindings:
-            total += _validate_int(
-                f"{binding.modifier_id} returned modifier",
-                binding.handler(context),
-            )
-        total += generic_rule_hit_roll_modifier(context)
-        return total
+        return registered_hit_roll_modifiers(context, self.hit_roll_modifier_bindings)
+
+    def hit_roll_modifier(self, context: HitRollModifierContext) -> int:
+        return sum(modifier.operand for modifier in self.hit_roll_modifiers(context))
 
     def minimum_unmodified_hit_success(
         self,
@@ -1252,10 +1246,17 @@ class RuntimeModifierRegistry:
 
         current = context.weapon_profile
         for binding in self.weapon_profile_modifier_bindings:
-            current = _validate_weapon_profile(
+            updated = _validate_weapon_profile(
                 f"{binding.modifier_id} returned weapon profile",
                 binding.handler(replace(context, weapon_profile=current)),
             )
+            if (
+                (updated.skill != current.skill and not updated.skill_modifiers)
+                or updated.skill.raw != current.skill.raw
+                or not set(current.skill_modifiers).issubset(updated.skill_modifiers)
+            ):
+                raise GameLifecycleError("Weapon skill provider discarded source operations.")
+            current = updated
         return generic_rule_modified_weapon_profile(replace(context, weapon_profile=current))
 
 

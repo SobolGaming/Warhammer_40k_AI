@@ -14,6 +14,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
@@ -479,12 +480,13 @@ def _protector_weapon_profile(profile: WeaponProfile) -> WeaponProfile:
         source_id=SOURCE_RULE_ID,
         source_instance_id=SOURCE_RULE_ID,
     )
-    return replace(granted, skill=_improve_ballistic_skill(profile.skill))
+    return with_weapon_skill_modifier(
+        granted, modifier_id=f"{SOURCE_RULE_ID}:protector:skill", source_id=SOURCE_RULE_ID, delta=-1
+    )
 
 
 def _conqueror_weapon_profile(context: WeaponProfileModifierContext) -> WeaponProfile:
     profile = context.weapon_profile
-    skill = profile.skill
     if profile.range_profile.kind is RangeProfileKind.DISTANCE:
         profile = grant_weapon_ability(
             profile,
@@ -494,7 +496,12 @@ def _conqueror_weapon_profile(context: WeaponProfileModifierContext) -> WeaponPr
             source_instance_id=SOURCE_RULE_ID,
         )
     elif profile.range_profile.kind is RangeProfileKind.MELEE:
-        skill = _improve_weapon_skill(skill)
+        profile = with_weapon_skill_modifier(
+            profile,
+            modifier_id=f"{SOURCE_RULE_ID}:conqueror:skill",
+            source_id=SOURCE_RULE_ID,
+            delta=-1,
+        )
     else:
         raise GameLifecycleError("Doctrina Imperatives profile range kind is unsupported.")
     armor_penetration = profile.armor_penetration
@@ -505,7 +512,6 @@ def _conqueror_weapon_profile(context: WeaponProfileModifierContext) -> WeaponPr
         armor_penetration = _improve_armor_penetration(armor_penetration, bonus=1)
     return replace(
         profile,
-        skill=skill,
         armor_penetration=armor_penetration,
         source_ids=_source_ids_with_doctrina(profile.source_ids),
     )
@@ -887,39 +893,6 @@ def _doctrina_effect_payload(payload: JsonValue) -> dict[str, JsonValue]:
     _imperative_from_token(_payload_string(raw, key="selected_doctrina_imperative_id"))
     _payload_string_tuple(raw, key="target_unit_instance_ids")
     return raw
-
-
-def _improve_ballistic_skill(skill: CharacteristicValue) -> CharacteristicValue:
-    if type(skill) is not CharacteristicValue:
-        raise GameLifecycleError("Doctrina Imperatives Ballistic Skill requires value.")
-    if skill.characteristic is not Characteristic.BALLISTIC_SKILL:
-        raise GameLifecycleError("Doctrina Imperatives Ballistic Skill characteristic drift.")
-    if not skill.is_numeric:
-        raise GameLifecycleError("Doctrina Imperatives cannot improve non-numeric Ballistic Skill.")
-    return CharacteristicValue.from_raw(
-        Characteristic.BALLISTIC_SKILL,
-        _improve_skill(skill.final),
-    )
-
-
-def _improve_weapon_skill(skill: CharacteristicValue) -> CharacteristicValue:
-    if type(skill) is not CharacteristicValue:
-        raise GameLifecycleError("Doctrina Imperatives Weapon Skill requires value.")
-    if skill.characteristic is not Characteristic.WEAPON_SKILL:
-        raise GameLifecycleError("Doctrina Imperatives Weapon Skill characteristic drift.")
-    if not skill.is_numeric:
-        raise GameLifecycleError("Doctrina Imperatives cannot improve non-numeric Weapon Skill.")
-    return CharacteristicValue.from_raw(
-        Characteristic.WEAPON_SKILL,
-        _improve_skill(skill.final),
-    )
-
-
-def _improve_skill(value: int) -> int:
-    current = _validate_positive_int("skill", value)
-    if current <= 2:
-        return current
-    return current - 1
 
 
 def _improve_armor_penetration(

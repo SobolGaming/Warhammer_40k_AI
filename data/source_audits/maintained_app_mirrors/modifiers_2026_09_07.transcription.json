@@ -16,5 +16,21 @@
     "section": "02.02.01",
     "source_text": "OTHER MODIFIED RULES\n\nThe following rules apply to various rules and effects found throughout the game.\n\n  * Detection range and Lone Operative cannot be better than 9\" or worse than 30\".",
     "consumer": "warhammer40k_core.core.modifiers:resolve_targeting_range"
+  },
+  {
+    "slug": "psychic-individual-modifiers",
+    "section": "24.29",
+    "source_text": "Each time an attack is made with a [PSYCHIC] weapon, you can ignore any or all modifiers to that attack’s BS or WS characteristic and any or all modifiers to the hit roll. Attacks made with [PSYCHIC] weapons are known as psychic attacks (this can be important for the triggering of other rules).",
+    "consumer": "warhammer40k_core.engine.attack_sequence_psychic_modifiers",
+    "source_url": "https://www.40k.app/rules/24-core-abilities",
+    "observed_at": "2026-09-07T16:05:47Z"
+  },
+  {
+    "slug": "ignore-individual-modifiers",
+    "section": "02.02.02",
+    "source_text": "Some rules enable a player, weapon, model or unit to ignore modifiers. When using such rules, the following points apply:\n\nUnless otherwise stated, that rule allows you to ignore modifiers to the unit's rolls and the unit's profile and weapon characteristics.\n\nWhen a rule states you can ignore modifiers to a stated roll or characteristic, you can choose to ignore all of those modifiers, or only some of them. For example, you can still choose to apply positive/beneficial modifiers while ignoring negative/detrimental modifiers.\n\nExample: Your unit can ignore characteristic modifiers and is under the effect of +2\" M and -2\" M. You can choose to ignore the -2\" M, meaning that unit's M characteristic will only be modified by the +2\" M.\n\nExample: Your unit's ranged attacks can ignore roll modifiers and are under the effect of +1 to hit rolls and -1 to hit rolls. You can choose to ignore the -1 to hit rolls, meaning those attacks will only be affected by the +1 to hit rolls.",
+    "consumer": "warhammer40k_core.engine.attack_sequence_psychic_modifiers",
+    "source_url": "https://www.40k.app/rules/02-datasheets",
+    "observed_at": "2026-09-07T16:05:47Z"
   }
 ]

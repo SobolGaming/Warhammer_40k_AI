@@ -37,11 +37,35 @@
       "transcription_sha256": "0bb1eb9564822364cae638f8db886fe5186524fd999f16c382f1d4b73a9afccc",
       "provider_non_affiliation_recorded": true,
       "source_observation_sha256": "293e62779134a817b3f697aa75e459c2f53616b9e577bfaef36404d3264c64f8"
+    },
+    {
+      "row_id": "psychic-individual-modifiers:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/24-core-abilities",
+      "observed_at": "2026-09-07T16:05:47Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-modifiers:psychic-individual-modifiers",
+      "transcription_sha256": "4a6d83c584957daf12e931a840822fee1a46c25814eb14fc6f563bf39f82c4d0",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "7a0858e8559dec4c4c8cd135e6865be496f91e94e26fab51582504ce8f8fb5cc"
+    },
+    {
+      "row_id": "ignore-individual-modifiers:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/02-datasheets",
+      "observed_at": "2026-09-07T16:05:47Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-modifiers:ignore-individual-modifiers",
+      "transcription_sha256": "7c1439a4548907e7648e50c665cab0bfb7e0cf9eb3e92d82ccb453fda838a2a0",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "5416540cae6e3d3c1d4c006550573651951dd4fe4ee21cebb70abc8aaabbe4ff"
     }
   ],
   "official_historical_source": {
     "source_id": "gw-11e-core-rules",
     "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
   },
-  "co_version_comparison": "02.02.01 operative clauses observed through the 40k.app search-index page; direct retrieval returned HTTP 403. No App version or co-version comparison is inferred. The retained transcription separates the three reviewed obligations."
+  "co_version_comparison": "02.02.01, 02.02.02 and 24.29 operative clauses observed through the 40k.app search index; direct retrieval returned HTTP 403. No App version or co-version comparison is inferred. The retained transcription separates the three reviewed obligations."
 }

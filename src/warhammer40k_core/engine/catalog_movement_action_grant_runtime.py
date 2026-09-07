@@ -321,6 +321,7 @@ def _random_movement_attack_boost_weapon_handler(
             parameters=parameter_payload(source.clause.effects[1].parameters),
             profile=context.weapon_profile,
             source_id=source.rule_ir.source_id,
+            modifier_id=f"{source.binding_id}:skill",
         )
 
     return handler

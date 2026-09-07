@@ -643,7 +643,7 @@ def test_modifier_source_artifact_matches_reviewed_evidence_and_rejects_drift() 
     assert json.loads(ARTIFACT_PATH.read_bytes()) == payload
     assert json.loads(AUDIT_PATH.read_bytes()) == audit
     package = source.source_package()
-    assert len(source.source_rules()) == 3
+    assert len(source.source_rules()) == 5
     for rule in source.source_rules():
         assert rule.source_id in package.evidence_required_source_ids
         assert package.source_catalog.source_text_by_id(rule.source_id).raw_text == rule.source_text

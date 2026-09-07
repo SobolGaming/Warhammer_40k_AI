@@ -16,8 +16,10 @@ from warhammer40k_core.core.attributes import (
     CharacteristicValuePayload,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceExpressionPayload, DiceRollSpecError
+from warhammer40k_core.core.modifiers import Modifier, ModifierPayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import validate_weapon_ability_sources
+from warhammer40k_core.core.weapon_skill_modifiers import validate_weapon_skill_modifiers
 
 
 class WeaponProfileError(ValueError):
@@ -139,6 +141,7 @@ class WeaponProfilePayload(TypedDict):
     abilities: list[AbilityDescriptorPayload]
     source_ids: list[str]
     ability_sources: NotRequired[list[AbilitySourceInstancePayload]]
+    skill_modifiers: NotRequired[list[ModifierPayload]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -653,6 +656,7 @@ class WeaponProfile:
     abilities: tuple[AbilityDescriptor, ...] = ()
     source_ids: tuple[str, ...] = ()
     ability_sources: tuple[AbilitySourceInstance, ...] = ()
+    skill_modifiers: tuple[Modifier, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -664,11 +668,18 @@ class WeaponProfile:
         _validate_range_profile(self.range_profile)
         _validate_attack_profile(self.attack_profile)
         _validate_damage_profile(self.damage_profile)
-        _validate_unmodified_characteristic_profile(
+        _validate_characteristic_profile(
             "WeaponProfile skill",
             self.skill,
             frozenset({Characteristic.WEAPON_SKILL, Characteristic.BALLISTIC_SKILL}),
         )
+        validate_weapon_skill_modifiers(self)
+        if not self.skill_modifiers:
+            _validate_unmodified_characteristic_profile(
+                "WeaponProfile skill",
+                self.skill,
+                frozenset({Characteristic.WEAPON_SKILL, Characteristic.BALLISTIC_SKILL}),
+            )
         _validate_unmodified_characteristic_profile(
             "WeaponProfile strength",
             self.strength,
@@ -724,12 +735,18 @@ class WeaponProfile:
         }
         if self.ability_sources:
             payload["ability_sources"] = [source.to_payload() for source in self.ability_sources]
+        if self.skill_modifiers:
+            payload["skill_modifiers"] = [
+                modifier.to_payload() for modifier in self.skill_modifiers
+            ]
         return payload
 
     @classmethod
     def from_payload(cls, payload: WeaponProfilePayload) -> Self:
         if "ability_sources" in payload and not payload["ability_sources"]:
             raise WeaponProfileError("Explicit weapon ability sources must not be empty.")
+        if "skill_modifiers" in payload and not payload["skill_modifiers"]:
+            raise WeaponProfileError("Explicit weapon skill modifiers must not be empty.")
         return cls(
             profile_id=payload["profile_id"],
             name=payload["name"],
@@ -750,6 +767,11 @@ class WeaponProfile:
                 AbilityDescriptor.from_payload(ability) for ability in payload["abilities"]
             ),
             source_ids=tuple(payload["source_ids"]),
+            skill_modifiers=tuple(
+                Modifier.from_payload(modifier) for modifier in payload["skill_modifiers"]
+            )
+            if "skill_modifiers" in payload
+            else (),
             ability_sources=tuple(
                 AbilitySourceInstance.from_payload(source) for source in payload["ability_sources"]
             )

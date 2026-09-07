@@ -4100,3 +4100,196 @@ checks, all five client unit tests and two-server HTTP conformance pass
 resources, 27 schemas and six request families against that engine identity.
 Scope, architecture, module-size and diff audits pass. No production code changed
 after the aggregate coverage run began.
+
+
+### P24I — Order 28
+
+Status: Implemented; all required local gates passed. Published in [PR #433](https://github.com/SobolGaming/Warhammer_40k_AI/pull/433); not merged.
+Finding ID: `C24-09`. Dependencies P00, P02A and P02B are merged; reviewed base
+`67c60842ef87d3df646ec762f4e328eeff46ee0b` includes Orders 26, 27 and 29 via PR #432.
+The owner approved the upstream BS/WS provenance repair recorded in
+[Order 28 scope review](ORDER_28_SCOPE_PLAN.md) on 2026-09-07.
+
+Violated invariant: each individual modifier to a Psychic attack's BS/WS or hit
+roll must retain its source until the controlling player has chosen the ignored
+subset. Combination and final bounds follow that selection. Equal numerical
+outcomes cannot identify distinct source selections.
+
+How it was done: Cover and Plunging Fire were combined into one skill total,
+and declared, persisting, registered and generic hit effects into one hit total.
+Cancelling totals suppressed the choice. Options represented only whole numeric
+buckets. Upstream BS/WS providers also clamped each delta and overwrote the raw
+skill, losing both source operations and correct arithmetic order.
+
+How it is done: `WeaponProfile.skill_modifiers` retains typed source-linked
+operations against the original skill. Existing RuleIR and Adeptus Mechanicus,
+Astra Militarum and T'au BS/WS producers use the same core operation owner.
+`RangedAttackPool.hit_roll_modifiers` preserves declaration contributions;
+registered bindings and generic/persisting effects contribute their own IDs.
+`attack_modifier_snapshots` supplies the same ordered source inventory to the
+Psychic request and hit resolver, including Cover and Plunging as separate terms.
+Gathered attack signatures retain these records instead of merging their totals.
+
+Finite per-source keep/ignore choices permit every subset, with whole-set
+shortcuts and at most six options per request. Deduplication uses decided/ignored
+source identity rather than arithmetic. Each continuation records a canonical
+prefix; the hit resolver applies only retained operations through `ModifierStack`
+and then the existing hit cap. Hit events preserve the completed selection.
+
+Specific authoritative maintained direct App-data mirror statements:
+[24.29 Psychic](https://www.40k.app/rules/24-core-abilities) permits ignoring any
+or all BS/WS and hit modifiers for each Psychic attack;
+[02.02.02 Ignore Modifiers](https://www.40k.app/rules/02-datasheets) permits
+retaining only some modifiers, including opposing modifiers in the same bucket.
+Complete operative transcriptions are retained in the Core modifiers JSON package.
+
+Provider: non-affiliated 40k.app. Observation timestamp:
+`2026-09-07T16:05:47Z`, through the indexed pages. Direct retrieval returned HTTP
+403. No App-data version, direct official capture or co-versioned comparison is
+asserted. The owner-approved maintained-mirror policy supplies project authority;
+no source exception-pause condition was observed. The existing historical official
+Core Rules PDF and SHA-256 remain provenance context, not the controlling wording.
+
+| Stable source ID | Transcription SHA-256 | RuleEvidence observation | Retained audit observation |
+| --- | --- | --- | --- |
+| `gw-11e-core-modifiers:psychic-individual-modifiers` | `4a6d83c584957daf12e931a840822fee1a46c25814eb14fc6f563bf39f82c4d0` | `0c2099e07a6c3b6db8c974975be03eef02da5cc0a33fbf9919065a6d307f8cc4` | `7a0858e8559dec4c4c8cd135e6865be496f91e94e26fab51582504ce8f8fb5cc` |
+| `gw-11e-core-modifiers:ignore-individual-modifiers` | `7c1439a4548907e7648e50c665cab0bfb7e0cf9eb3e92d82ccb453fda838a2a0` | `b84f3f6f4c819e14dfcc300768303dde1a40eef2de44dbf5626d0efcdc62cccc` | `5416540cae6e3d3c1d4c006550573651951dd4fe4ee21cebb70abc8aaabbe4ff` |
+
+Package hash: `69eab05ecbc5a23aaa08fe499005b01a0f58a360a823e22dc102a1e6aef51e89`.
+Artifact bytes: `07db393dbbcbe13435a3c24c1f999bb96271c6d696e80892803cc633d6ae0995`.
+The eager source loader and source-authority registry pin the new evidence rows.
+Load support is recorded as `loaded`; semantic execution is separately recorded
+as `executable_engine_runtime` with the shared Psychic attack consumer.
+
+Owning state/validation/mutation/event/replay path: retained source JSON and eager
+loader → original catalog skill plus source-linked runtime operations → attack
+pool and common modifier snapshots → `DecisionRequest` / finite submission /
+`DecisionResult` → lifecycle prevalidation → engine-owned attack resolution →
+hit/decision events, viewer projections, persistence and exact replay.
+
+Decision and viewer impact: contract 11.5 adds optional nonempty skill-operation
+inventories to runtime weapon profiles and documents the individual finite choices,
+source hashes and hit-event trace. The finite submission envelope remains the same.
+Pending choices bind the weapon/pool, actor, attack context, phase and canonically
+ordered current persisting-effect inventory. This conservatively rejects a change
+to any persisting effect before submission, including same-total BS/WS source swaps.
+The global effect hash is engine-private; the shared adapter redaction owner
+removes it recursively from all viewer projections, decision/event payloads and
+status metadata. Invalid submissions do not pop the queue, record a choice, consume
+RNG or mutate state. Restore verifies continuation history, pending source context and hit-event
+selection/arithmetic. Session restoration and replay additionally reproduce the
+recorded tail from its captured initial state. Build identity rejects older runtime
+saves lacking the new provenance. Both phase families use the same facade and shared
+adapter redaction module; no new visibility class is introduced.
+
+Regression scenarios and same-bug-class search: pre-fix Cover/Plunging cancellation
+and BS 2 modifier ordering failures were reproduced with real domain objects.
+Regressions cover opposing hit and skill terms, bounded BS/WS results, all sixteen
+subsets of a four-source inventory, distinct equal-valued sources, source swaps with
+unchanged totals, duplicated/foreign/bool/arithmetic/context payload corruption,
+partial-history/actor/option restore drift, profile provenance loss, Shooting/Fight
+facade submissions, both viewer streams, partial/completed persistence and replay.
+The producer search covered generic/catalog skill effects and all existing faction
+skill producers, declaration hit rules, Smokescreen, runtime bindings, gathering
+and attack hosts. Static audits require shared source collection, core arithmetic,
+lifecycle prevalidation and restored-history validation. Existing attack routing
+audits follow the extracted prevalidation owner.
+
+Scope and architecture: only C24-09 is implemented here. The existing faction
+producer migration repairs the shared numeric/provenance invariant; it does not
+add or certify faction rules. P22B's Psychic ability-use ledger and P24C2's duplicate
+ability-instance choice remain separate. No new named handler, generic hook family,
+content-name branch, movement semantics or architecture boundary is introduced.
+Attack prevalidation and its private checks are extracted from the frozen lifecycle
+module. New modules remain below 1,500 lines. Category and whole-engine certification
+remain open.
+
+Initial implementation validation (reviewed head `15d4efc5`): the complete behavioral suite passed once with coverage:
+6,609 tests, 85.07% combined statement/branch coverage, 64 xdist workers with work
+stealing and the required Node PATH prefix. The final code-quality suite passed
+390 tests without coverage. Ruff check/format, mypy (2,754 source files), pyright,
+all 11 import contracts, pre-commit and the exact eight-shard check passed.
+Focused iteration included the 45 Order 28 regressions and broader attack/skill
+coverage. The eight-shard inventory is regenerated from the successful complete
+JUnit profile (Python 3.14.5, Windows, 219 behavioral files, 6,609 cases), with
+its SHA-256 and accurate host/runtime metadata committed in `durations.json`.
+
+The retained modifier-source generator check and isolated external-contract
+regeneration/base-ref compatibility against `origin/main` passed. The generated
+TypeScript check and typecheck, five client unit tests and live HTTP conformance
+passed (342 assertions, contract 11.5.0). Installed-wheel smoke validates 2,580
+runtime resources, 27 schemas and six request families against engine build
+`warhammer40k-core-v2:runtime-tree-sha256-v1:b4d2c59bad74ec2d47ec309cb0af0a9041b4a01b628e5b3ff5b2125164c96de8`.
+
+The contract addition crossed the generated TypeScript module budget. Its
+operation interface is now generated separately, retaining the public type
+exports and shared contract source; drift checking covers both file contents
+and the complete generated-file inventory. The modules are 1,368 and 151 lines.
+Only conformance generation/artifacts, code-quality assertions, documentation and
+the shard inventory changed after the successful engine coverage run; client and
+quality gates were then revalidated. Scope, architecture and final diff audits
+pass. No engine production code changed after that coverage run began.
+
+PR URL: [#433](https://github.com/SobolGaming/Warhammer_40k_AI/pull/433). Merge commit: not merged.
+
+#### PR #433 completed-history review correction
+
+Reviewed head `15d4efc5db38f1d38fb45c30a804b6a312f5507b` passed all remote CI lanes
+(run #1560). The following correction addresses the subsequent C24-09 review;
+those earlier results do not validate this revised runtime.
+
+Violated invariant: completed Psychic choices must authenticate the modifiers
+available at the original attack boundary. Matching copies in decision requests,
+options/results and hit events establish internal agreement, not source authority.
+A same-total substitution of a non-first hit/skill source, both source commitments,
+or the controlling actor was reproduced as accepted by standalone lifecycle restore
+in both Shooting and Fight: all ten strict pre-fix regressions failed to reject.
+
+The corrected owner is `psychic_modifier_history_origin`. It retains one immutable
+pre-declaration lifecycle origin, prepared before queue pop and installed only after
+the controller accepts the result. Origins are nonrecursive and cannot include an
+earlier attack declaration or Psychic decision. Catalog/config identity and exact
+ledger-prefix checks bind the origin to the restored game. The existing engine
+replay owner then reconstructs declarations, profile operations, effects and finite
+requests from these original inputs and demands exact request/options and event-tail
+equality. Coordinated copies of a false source, hash or actor fail against the live
+request reconstructed at the historical boundary. Existing continuation, source
+selection and hit-arithmetic validation remains in place.
+
+This uses the same lifecycle validators and mutation owners as live play; it adds
+no source-specific historical handlers and never consults current effects as a
+replacement for expired attack sources. The preserved origin also authenticates
+completed history in a replay's captured initial lifecycle, where replaying only
+that artifact's tail would otherwise miss the prefix. Original catalog and
+pre-attack state remain the authority root, as for ordinary exact replay; this is
+not cryptographic authentication of an arbitrary externally replaced game.
+
+The bug-class search covered pending and completed Psychic validation, session
+persistence replay, captured initial lifecycles, and existing historical Leadership
+and mission source-authority implementations. Scope stays on C24-09: a single
+engine origin and replay owner replace a second implementation of historical
+modifier semantics. One origin is retained per lifecycle; restoring recorded Psychic
+choices adds a replay of the decision tail. The operator-only checkpoint field is
+covered by the existing persistence/replay JSON contract and shared redaction owner;
+no public decision, event family, faction rule or named handler changes.
+
+Regressions cover coordinated completed source/commitment/actor corruption in both
+phase families, absent/recursive/late/foreign origins, ledger-prefix substitution,
+real phase expiry followed by exact standalone and session restoration, captured
+completed initial histories, and exact replay. Static guards require origin capture,
+standalone restoration validation and the shared replay consumer. Final revised validation passed: 6,631 behavioral tests with 85.07% combined
+statement/branch coverage, followed by all 390 code-quality tests without coverage,
+both using 64 xdist workers and work stealing. The focused Order 28 suite passed
+67 tests. Ruff check/format, mypy (2,755 files), pyright, all 11 import contracts,
+pre-commit and the exact eight-shard inventory check passed. The refreshed shard
+manifests use the successful complete Windows JUnit profile (Python 3.14.5,
+219 behavioral files, 6,631 cases), with its report SHA-256 and runtime metadata.
+
+Source regeneration, engine identity and isolated external-contract regeneration
+with `--base-ref origin/main` passed. TypeScript generation/typecheck, five client
+unit tests and live conformance (342 assertions, contract 11.5.0) passed.
+Installed-wheel smoke verifies 2,581 resources, 27 schemas and six request families.
+The revised runtime identity is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:c90ed5c08e063f34eb3930e82c5c6ac116c39ca2fca7eee57227c1011fc3fc98`.
+No production code changed after the successful aggregate coverage run began.
+The correction is published through PR #433; merging remains separate.

@@ -20,6 +20,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfileError,
     weapon_keyword_from_token,
 )
+from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 
@@ -43,7 +44,7 @@ def rule_ir_weapon_selector_applies(
 
 
 def rule_ir_modified_weapon_profile(
-    *, parameters: Mapping[str, object], profile: WeaponProfile, source_id: str
+    *, parameters: Mapping[str, object], profile: WeaponProfile, source_id: str, modifier_id: str
 ) -> WeaponProfile:
     if not rule_ir_weapon_selector_applies(parameters=parameters, profile=profile):
         return profile
@@ -65,10 +66,8 @@ def rule_ir_modified_weapon_profile(
     if characteristic in {Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL}:
         if profile.skill.characteristic is not characteristic:
             return profile
-        return replace(
-            profile,
-            skill=_modified_characteristic_value(profile.skill, delta),
-            source_ids=source_ids,
+        return with_weapon_skill_modifier(
+            profile, modifier_id=modifier_id, source_id=source_id, delta=delta
         )
     if characteristic is Characteristic.ATTACKS:
         return replace(

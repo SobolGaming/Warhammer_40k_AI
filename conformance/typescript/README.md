@@ -77,11 +77,13 @@ the reference development credentials by setting all four variables:
 - `CORE_V2_CONFORMANCE_REPLAY_TOKEN`
 
 `npm run check:generated` regenerates the OpenAPI types in a temporary
-directory and fails on drift. The generation adapter removes canonical `$id`
+directory and fails on content or file-inventory drift. The generation adapter removes canonical `$id`
 values, maps their absolute local references to sibling schema files, and
 extracts `$defs` into temporary referenced schemas so definition containers are
 not misgenerated as required wire properties. These transformations exist only
 in that temporary copy. The adapter selects the normative 2.0 session
 operations and omits deprecated legacy routes plus unused component aliases so
-the generated module stays within the repository size budget; it does not alter
-or maintain another contract source.
+the generated models stay within the repository size budget. It extracts the
+generated `operations` interface into `openapi.operations.ts`, while `openapi.ts`
+retains schemas, paths and the public type exports. The modules use type-only
+imports and share the same contract source.

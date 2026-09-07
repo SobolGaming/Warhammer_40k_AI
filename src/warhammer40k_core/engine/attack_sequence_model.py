@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.psychic_modifier_selection import PsychicAttackModifierIgnoreSelection
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -253,48 +255,6 @@ class WoundRollPayload(TypedDict):
     successful: bool
     critical: bool
     skipped: bool
-
-
-@dataclass(frozen=True, slots=True)
-class PsychicAttackModifierIgnoreSelection:
-    option_id: str
-    skill_modifier: int
-    hit_roll_modifier: int
-    effective_skill_modifier: int
-    effective_hit_roll_modifier: int
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "option_id",
-            _validate_identifier("Psychic modifier option_id", self.option_id),
-        )
-        object.__setattr__(
-            self,
-            "skill_modifier",
-            _validate_int("Psychic modifier skill_modifier", self.skill_modifier),
-        )
-        object.__setattr__(
-            self,
-            "hit_roll_modifier",
-            _validate_int("Psychic modifier hit_roll_modifier", self.hit_roll_modifier),
-        )
-        object.__setattr__(
-            self,
-            "effective_skill_modifier",
-            _validate_int(
-                "Psychic modifier effective_skill_modifier",
-                self.effective_skill_modifier,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "effective_hit_roll_modifier",
-            _validate_int(
-                "Psychic modifier effective_hit_roll_modifier",
-                self.effective_hit_roll_modifier,
-            ),
-        )
 
 
 class AttackSequencePayload(TypedDict):

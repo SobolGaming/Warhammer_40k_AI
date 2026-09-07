@@ -232,6 +232,6 @@ def test_internal_model_destruction_authority_redaction_covers_public_surfaces()
         assert any(
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)
-            and node.func.id == "_without_internal_model_destruction_authority"
+            and node.func.id == "_without_internal_authority_commitments"
             for node in ast.walk(function)
         )
