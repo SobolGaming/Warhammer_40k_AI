@@ -988,17 +988,6 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
             ),
             distance_inches=6.0,
         )
-    with pytest.raises(GameLifecycleError, match="requires battlefield state"):
-        battle_shock_runtime._placed_alive_model_ids_for_rules_unit(  # pyright: ignore[reportPrivateUsage]
-            context=replace(
-                context,
-                state=_state_without_battlefield(
-                    active_player_id=army.player_id,
-                    phase=BattlePhase.COMMAND,
-                ),
-            ),
-            rules_unit=target_rules_unit,
-        )
     with pytest.raises(GameLifecycleError, match="placement evidence drifted"):
         battle_shock_runtime._geometry_models_for_unit_ids(  # pyright: ignore[reportPrivateUsage]
             state=state,

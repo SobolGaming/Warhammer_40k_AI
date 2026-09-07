@@ -3718,3 +3718,154 @@ without relaxing the mutation, module-size or decision-documentation gates.
 
 PR URL and merge commit:
 [PR #430](https://github.com/SobolGaming/Warhammer_40k_AI/pull/430); not merged.
+
+
+## Order 25 — P01C: embarked abilities and spatial conditions
+
+Status: implemented and locally validated; awaiting PR review/merge. This finding
+closes only after review/merge; category 01 is not certified by this PR.
+
+Finding IDs: `C01-03`.
+
+Dependencies and evidence gate: P19 and S-MIRRORS are merged. The reviewed base
+is `064982c1ece761111cc3687fafe10adb7c63dacc` (`origin/main`, Order 24 merged).
+APP-AUTHORITY applies under the maintained-direct-App-data-mirrors policy.
+
+Violated invariant: an embarked unit retains its abilities within their own
+restrictions; lack of battlefield geometry must not globally deactivate the
+source. Range and visibility to another unit must fail independently, while
+the unit remains visible to and within range of its own abilities.
+
+How it is currently done: generic source enumeration used placed/alive models
+as a proxy for ability availability. This suppressed optional activations,
+CP effects, weapon grants and other non-spatial rules. Aura evaluation either
+returned no targets or demanded a source model's missing geometry. Historical
+Battle-shock providers repeated placement-only source and proximity checks.
+
+How it should be done: `ability_presence` resolves current component ownership
+and living membership from explicit placement, cargo or unarrived reserve
+records. `active_ability_model_ids_for_unit` supplies source enumeration.
+One shared spatial relationship distinguishes self, battlefield, off-battlefield
+and unavailable sources/targets. Typed battlefield, keyword, phase, leading,
+target and frequency conditions still govern individual abilities. Missing
+placement alone never authorizes an ability; contradictory or incomplete
+cargo/battlefield membership fails closed.
+
+Specific authoritative maintained direct App-data mirror rule/statement and
+source ID: the complete v931 embarked-abilities FAQ, including the Azrael/Firing
+Deck example, is `gw-11e-core-embarked-abilities:embarked-abilities`. The
+01.02.04 ability, visibility and measurement clauses are
+`gw-11e-core-embarked-abilities:off-battlefield-ability-conditions`. The latter
+also covers Strategic Reserves and army-wide/non-spatial rules. Its final
+Battle-shock obligation remains separately pinned by P01.
+
+Provider, URL, App-data version or observation timestamp, transcription SHA-256,
+and source-observation fingerprint:
+
+- [Game Datamissions](https://game-datamissions.com/11th/rules/changelog), version `931`
+  observed `2026-09-07T00:02:56Z`; source `gw-11e-core-embarked-abilities:embarked-abilities`.
+  Transcription SHA-256 `4c186dc9730e3431986655c2d8a81be7dc788c44382e0f508ccd30ee0c9376e6`.
+  Audit observation `570d6afeb3ba563bdb5cdda85018ad948694af7c7d869ec99bc5fe13aa6aadb0`.
+  RuleEvidence observation `51b787a9204ce20ed0c7f0028be5f4171113f7f739eeafa8a02db44180ab5d5d`.
+
+- [40k.app](https://www.40k.app/rules/01-core-concepts), no recorded App version,
+  observed `2026-09-07T00:02:56Z`; source `gw-11e-core-embarked-abilities:off-battlefield-ability-conditions`.
+  Transcription SHA-256 `d54813925aec1839fd755c822f9b9662b5e2f25c9e5d33e1dcc7eb51e10205bd`.
+  Audit observation `fddababef28f6b2c98b06804e86f4827236c5c8e2502ea5d09f443d1a2d5fb7d`.
+  RuleEvidence observation `8533bb05f31daf52df28e1a5e1435a99ff62b91352f92cccd0dd6a5529d8b131`.
+
+The Game Datamissions observation used the rendered v931 changelog selection;
+the default v946 entry is not substituted. The 40k.app observation is from its
+search-index page; direct retrieval returned HTTP 403 and no App version is
+inferred. These are recorded as non-affiliated providers under the approved
+policy. No same-version comparison is claimed. Package hash
+`81e006418aa305b53635b0f7a51a1b99922d380795506ad023e08efd894d8dbf`; byte SHA-256
+`3102868123dc8f612999dffcc069fad97a1d0ed1bbf6f3e663e39cc97c4d05ff`.
+The official historical PDF hash remains
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+
+Scope and explicit exclusions: this is shared Core ability availability and
+spatial eligibility for existing consumers, including the reserve/self clauses
+explicitly referenced by the FAQ. Movement, placement, attacks, coherency,
+collision and reserve arrival retain their physical requirements. It adds no
+faction content, named handler, speculative hook, decision family, or unsupported
+rule-text shape. Firing Deck keeps the transport as the weapon's attacking owner;
+active passenger/attached-Leader grants do not become transport grants.
+
+Owning state/validation/mutation/event/replay path: `GameState` owns cargo,
+reserves, placements, membership and wounds. The new read-only authority feeds
+existing catalog runtime providers, generic Aura/selection services, CP and
+restoration consumers. Existing engine services still apply effects and record
+events. Historical Battle-shock reads authenticated event-bound physical rows
+through the same pure presence/spatial policy. No live geometry is fabricated
+for historical or off-battlefield units. Existing finite decisions re-enumerate
+their options before accepting the result; queue, effects and replay stay on the
+normal lifecycle path.
+
+Decision and viewer-visibility impact: existing finite activation and target
+families can expose eligible off-battlefield sources. Option payload shapes and
+IDs retain the existing contract; public/owner-scoped projections and event
+streams use shared redaction. The adapter contract documents this behavior and
+the more accurate failed-heal diagnostic `source_unit_unavailable`. It introduces
+no hidden-info field, wire schema or transport-only source enumeration.
+
+Regression scenarios and same-bug-class search: initial CP and model/unit Aura
+regressions failed against placed-only source enumeration. Tests cover explicit
+battlefield restrictions, self/other range and visibility, non-spatial army
+selection, attached/unattached activate/decline choices through LocalGameSession,
+actor/payload/cargo/phase drift before queue pop, checkpoint restoration,
+viewer-scoped event equality and deterministic replay, Firing Deck ownership,
+reserve/cargo live-versus-historical proximity, missing/conflicting/incomplete
+presence and dead sources. The audit searched placed-model source loops and
+geometry lookups across generic catalog/runtime consumers. Source-only gates
+now use the shared authority; explicit move, engagement, reserve-arrival and
+physical-target checks remain physical. AST guards prevent source enumeration
+and live/historical geometry policy from diverging again.
+
+Review correction: Stratagem-cost eligibility now evaluates the existing typed
+`source_model_on_battlefield` condition after resolving active source presence.
+The shared eligibility owner covers automatic modifiers, optional-opportunity
+enumeration and result-side revalidation. The initial 12-case regression matrix
+reproduced four failures for restricted embarked/reserve sources, with the eight
+unrestricted or battlefield-present cases already passing. Both runtime modes
+are covered without adding a parser shape. A per-function AST audit requires the
+condition helper in CP gain/cost eligibility and shared eligibility in all three
+cost entry points. The existing adapter decision contract and payloads apply.
+The same-class search found this condition at the command-point parser boundary;
+phase-gain execution already enforces it, while the cost path was missing it.
+
+The reserve regression uses a standalone rules unit: the existing attached-reserve
+deployment accounting issue is outside P01C and is not presented as fixed here.
+
+Generated artifacts/documentation: committed JSON source/audit, typed eager
+hash-pinned loader, source authority registry/classification, engine build
+identity, external-contract examples/manifest, eight-shard behavioral inventory,
+README and adapter contract. The builder's `--check` reproduces both evidence
+artifacts offline.
+
+Validation results after the review correction: the complete behavioral suite
+passes once with coverage: `6456 passed`, `85.07%`, `799.81s`, 64 xdist workers
+with work stealing and the bundled Node runtime on PATH. It emitted 10
+ResourceWarnings for unclosed SQLite connections. The subsequent complete
+no-coverage code-quality suite passes: `383 passed`, `305.09s`, 64 workers with
+work stealing. No production code changed after the behavioral run began.
+The correction adds cases to an existing behavioral test file; the committed
+eight-shard file inventory remains valid and the exact eight-shard check passes.
+
+Ruff check, Ruff format check (`2822` files), mypy (`2733` source files), pyright
+(zero errors or warnings), all 11 import-linter contracts and all-files
+pre-commit pass. The source/audit builder and engine-build identity checks pass;
+the validated runtime-tree SHA-256 is
+`502c1db13e5010b375b5e7e7b7bb8396897e8cb6378cbf3b2197481f9363d852`.
+External-contract `--check --base-ref origin/main` passes at the reviewed base.
+TypeScript generated-client/type checks, all five client unit tests and the
+two-server HTTP conformance scenario pass (`342` assertions, contract `11.3.0`).
+Installed-wheel smoke verifies `2565` runtime resources and `27` schemas against
+the same engine identity. The full quality suite includes the generated semantic
+support artifact checks. Contract JSON differences are limited to engine identity
+and dependent persistence/manifest hashes; no wire schema change is claimed.
+The scope/architecture audit and `git diff --check` pass. The focused CP/embarked
+regression run passes all 57 tests, including the new 12-case cost matrix and
+the per-function condition audit.
+
+PR URL and merge commit: [PR #431](https://github.com/SobolGaming/Warhammer_40k_AI/pull/431); not merged.

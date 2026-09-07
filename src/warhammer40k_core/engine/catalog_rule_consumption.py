@@ -55,6 +55,7 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     ability_record_is_active_generic_rule_ir,
 )
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
     AdvanceEligibilityGrant,
@@ -931,7 +932,7 @@ class CatalogWeaponKeywordGrantRuntime:
         )
         grants: list[CatalogWeaponKeywordGrant] = []
         for component in rules_unit.components:
-            current_model_ids = _current_placed_alive_model_instance_ids_for_unit(
+            current_model_ids = active_ability_model_ids_for_unit(
                 state=context.state, unit=component.unit
             )
             if not current_model_ids:
@@ -1598,7 +1599,7 @@ def _available_catalog_named_weapon_ability_choice_groups(
         raise GameLifecycleError("Catalog named weapon ability choice index is missing player.")
     groups: list[CatalogNamedWeaponAbilityChoiceGroup] = []
     for unit in army.units:
-        current_model_ids = _current_placed_alive_model_instance_ids_for_unit(
+        current_model_ids = active_ability_model_ids_for_unit(
             state=context.state,
             unit=unit,
         )
@@ -1727,7 +1728,7 @@ def _available_catalog_post_shoot_hit_target_status_groups(
     index = ability_indexes_by_player_id.get(player_id)
     if index is None:
         raise GameLifecycleError("Catalog post-shoot status index is missing player.")
-    current_model_ids = _current_placed_alive_model_instance_ids_for_unit(
+    current_model_ids = active_ability_model_ids_for_unit(
         state=context.state,
         unit=unit,
     )

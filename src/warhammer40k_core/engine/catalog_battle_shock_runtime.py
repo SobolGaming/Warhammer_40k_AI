@@ -19,6 +19,12 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
 )
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_presence,
+    ability_spatial_relationship,
+    active_ability_model_ids_for_unit,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import BATTLE_SHOCK_ROLL_TYPE
 from warhammer40k_core.engine.battle_shock_historical_authority import (
@@ -37,7 +43,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
     CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_ir_consumers_for_clause,
     catalog_rule_record_source_matches_unit,
 )
@@ -55,8 +60,8 @@ from warhammer40k_core.engine.rules_unit_geometry import (
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    placed_alive_rules_unit_views,
     rules_unit_view_by_id,
+    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -171,10 +176,9 @@ class CatalogBattleShockRerollRuntime:
         )
         if target_rules_unit.owner_player_id != army.player_id:
             raise GameLifecycleError("Catalog Battle-shock reroll target owner drift.")
-        target_model_ids = _placed_alive_model_ids_for_rules_unit(
-            context=context,
-            rules_unit=target_rules_unit,
-        )
+        target_model_ids = ability_presence(
+            state=context.state, rules_unit=target_rules_unit
+        ).active_model_ids
         if not target_model_ids:
             return None
         index = self.ability_indexes_by_player_id.get(player_id)
@@ -182,7 +186,7 @@ class CatalogBattleShockRerollRuntime:
             raise GameLifecycleError("Catalog Battle-shock reroll is missing ability index.")
         permissions: list[RerollPermission] = []
         for source_unit in army.units:
-            source_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            source_model_ids = active_ability_model_ids_for_unit(
                 state=context.state,
                 unit=source_unit,
             )
@@ -234,7 +238,7 @@ class CatalogBattleShockRerollRuntime:
         target_models = context.geometry_models(target.unit_instance_id)
         permissions: list[RerollPermission] = []
         for source_unit in army.units:
-            source_model_ids = context.component_placed_alive_model_ids(
+            source_model_ids = context.component_active_ability_model_ids(
                 source_unit.unit_instance_id
             )
             if not source_model_ids:
@@ -263,7 +267,15 @@ class CatalogBattleShockRerollRuntime:
                     ):
                         continue
                     distance = _battle_shock_reroll_distance_inches(clause)
-                    if not any(
+                    relationship = context.ability_spatial_relationship(
+                        source_unit.unit_instance_id, target.unit_instance_id
+                    )
+                    if relationship not in {
+                        AbilitySpatialRelationship.OWN_ABILITY,
+                        AbilitySpatialRelationship.BATTLEFIELD,
+                    }:
+                        continue
+                    if relationship is AbilitySpatialRelationship.BATTLEFIELD and not any(
                         source_model.base_distance_to(target_model) <= distance
                         for source_model in source_models
                         for target_model in target_models
@@ -306,8 +318,11 @@ def catalog_forced_battle_shock_unit_ids(
     if active_army is None:
         raise GameLifecycleError("Catalog Battle-shock forced tests require active army.")
     forced_ids: set[str] = set()
-    for rules_unit in placed_alive_rules_unit_views(state=context.state):
-        if rules_unit.owner_player_id != active_army.player_id:
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(context.state.army_definitions)):
+        if (
+            rules_unit.owner_player_id != active_army.player_id
+            or not ability_presence(state=context.state, rules_unit=rules_unit).active_model_ids
+        ):
             continue
         for effect in context.state.persisting_effects_for_unit(rules_unit.unit_instance_id):
             if effect.owner_player_id == context.active_player_id:
@@ -344,10 +359,9 @@ def _resolve_failed_battle_shock_heal_effect(
         state=context.state,
         unit_instance_id=source_unit_id,
     )
-    current_model_ids = _placed_alive_model_ids_for_rules_unit(
-        context=context,
-        rules_unit=source_rules_unit,
-    )
+    current_model_ids = ability_presence(
+        state=context.state, rules_unit=source_rules_unit
+    ).active_model_ids
     if not current_model_ids:
         context.decisions.event_log.append(
             CATALOG_BATTLE_SHOCK_FAILED_HEAL_NO_EFFECT_EVENT,
@@ -359,7 +373,7 @@ def _resolve_failed_battle_shock_heal_effect(
                 "battle_shock_result_id": context.result.result_id,
                 "persisting_effect_id": effect.effect_id,
                 "source_unit_instance_id": source_rules_unit.unit_instance_id,
-                "no_effect_reason": "source_unit_not_placed",
+                "no_effect_reason": "source_unit_unavailable",
             },
         )
         return
@@ -679,6 +693,16 @@ def _unit_within_distance_of_rules_unit(
 ) -> bool:
     if context.state.battlefield_state is None:
         raise GameLifecycleError("Catalog Battle-shock reroll requires battlefield state.")
+    source = rules_unit_view_by_id(
+        state=context.state, unit_instance_id=source_unit.unit_instance_id
+    )
+    relationship = ability_spatial_relationship(
+        state=context.state, source=source, target=target_rules_unit
+    )
+    if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+        return True
+    if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
+        return False
     source_models = _geometry_models_for_unit_ids(
         state=context.state,
         unit=source_unit,
@@ -782,24 +806,6 @@ def _roll_d3(
         )
     )
     return D3RollResult.from_source_d6_result(roll_state.original_result)
-
-
-def _placed_alive_model_ids_for_rules_unit(
-    *,
-    context: BattleShockOutcomeContext | BattleShockRerollPermissionContext,
-    rules_unit: RulesUnitView,
-) -> tuple[str, ...]:
-    battlefield = context.state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Catalog Battle-shock runtime requires battlefield state.")
-    placed_ids = frozenset(battlefield.placed_model_ids())
-    return tuple(
-        sorted(
-            model.model_instance_id
-            for model in rules_unit.own_models
-            if model.is_alive and model.model_instance_id in placed_ids
-        )
-    )
 
 
 def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:

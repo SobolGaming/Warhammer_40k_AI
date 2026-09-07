@@ -13,6 +13,7 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     ability_record_is_active_generic_rule_ir,
 )
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_once_per_battle_support import (
     clause_is_fight_start_once_per_battle_activation,
@@ -20,7 +21,6 @@ from warhammer40k_core.engine.catalog_once_per_battle_support import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -237,7 +237,7 @@ def _available_activations(
         if index is None:
             raise GameLifecycleError("Catalog once-per-battle ability index is missing.")
         for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
-            current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            current_model_ids = active_ability_model_ids_for_unit(
                 state=context.state,
                 unit=unit,
             )

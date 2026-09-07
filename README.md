@@ -659,3 +659,12 @@ and these invariants are enforced by tests:
 - dice rolls require labels;
 - dice replay round-trips;
 - event/decision serialization contains no memory-address reprs.
+
+Order 25 (P01C) centralizes ability availability for living embarked and reserve
+units independently of spatial eligibility. Typed restrictions still apply;
+self range/visibility survives, while geometry involving another off-battlefield
+unit fails. Firing Deck retains transport weapon ownership. The source package
+and mirror audit are reproducible with
+`uv run python tools/build_core_embarked_abilities_source.py --check`.
+See the Order 25 evidence in
+[`docs/CORE_RULES_REMEDIATION_ROADMAP.md`](docs/CORE_RULES_REMEDIATION_ROADMAP.md).

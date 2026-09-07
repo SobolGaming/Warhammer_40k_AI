@@ -6,10 +6,10 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex, AbilityCatalogRecord
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
 )
 from warhammer40k_core.engine.catalog_selected_target_decisions import (
     SelectedTargetGroup,
@@ -218,7 +218,7 @@ def _selected_target_groups(
         raise GameLifecycleError("Catalog Movement-end target effect missing ability index.")
     groups: list[SelectedTargetGroup] = []
     for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
-        current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+        current_model_ids = active_ability_model_ids_for_unit(
             state=state,
             unit=unit,
         )

@@ -15,6 +15,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
 )
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveContext,
     AdvanceMoveGrant,
@@ -35,7 +36,6 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_source_matches_unit,
 )
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -201,7 +201,7 @@ class CatalogConditionalLeadingRuntime:
             if component.role not in {"leader", "support"}:
                 continue
             unit = component.unit
-            current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            current_model_ids = active_ability_model_ids_for_unit(
                 state=state,
                 unit=unit,
             )

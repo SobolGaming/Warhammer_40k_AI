@@ -3,6 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_spatial_relationship,
+    active_ability_model_ids_for_unit,
+)
 from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
@@ -54,14 +59,24 @@ def rules_unit_within_friendly_keyworded_models(
         state=state,
         models=source_view.alive_models(),
     )
-    if not source_models:
-        return False
     for army in state.army_definitions:
         if army.player_id != source_view.owner_player_id:
             continue
         for unit in army.units:
             component_keywords = {*unit.keywords, *unit.faction_keywords}
             if not required_keywords.issubset(component_keywords):
+                continue
+            if not active_ability_model_ids_for_unit(state=state, unit=unit):
+                continue
+            candidate_view = rules_unit_view_by_id(
+                state=state, unit_instance_id=unit.unit_instance_id
+            )
+            relationship = ability_spatial_relationship(
+                state=state, source=source_view, target=candidate_view
+            )
+            if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+                return True
+            if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
                 continue
             candidate_models = _geometry_models_for_alive_models(
                 state=state,
@@ -97,13 +112,18 @@ def rules_unit_within_friendly_keyworded_units(
         state=state,
         models=source_view.alive_models(),
     )
-    if not source_models:
-        return False
     for candidate_view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
         if candidate_view.owner_player_id != source_view.owner_player_id:
             continue
         candidate_keywords = {*candidate_view.keywords, *candidate_view.faction_keywords}
         if not required_keywords.issubset(candidate_keywords):
+            continue
+        relationship = ability_spatial_relationship(
+            state=state, source=source_view, target=candidate_view
+        )
+        if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+            return True
+        if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
             continue
         candidate_models = _geometry_models_for_alive_models(
             state=state,

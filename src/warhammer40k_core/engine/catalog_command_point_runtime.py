@@ -20,6 +20,12 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
     AbilitySourceKind,
 )
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_battlefield_conditions_apply,
+    ability_spatial_relationship,
+    active_ability_model_ids_for_unit,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import (
     battle_shock_leadership_target_for_rules_unit,
@@ -40,7 +46,6 @@ from warhammer40k_core.engine.catalog_command_point_support import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
 )
@@ -462,7 +467,7 @@ class CatalogCommandPointRuntime:
             resolutions: list[JsonValue] = []
             army = _army_for_player(self.armies, player_id=source.owner_player_id)
             for unit in army.units:
-                current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                current_model_ids = active_ability_model_ids_for_unit(
                     state=context.state,
                     unit=unit,
                 )
@@ -480,6 +485,13 @@ class CatalogCommandPointRuntime:
                     current_model_instance_ids=current_model_ids,
                 )
                 for model_id in source_model_ids:
+                    if not ability_battlefield_conditions_apply(
+                        state=context.state,
+                        clause=source.clause,
+                        source_unit_instance_id=unit.unit_instance_id,
+                        source_model_instance_id=model_id,
+                    ):
+                        continue
                     if clause_requires_source_unit_enemy_destruction(
                         source.clause
                     ) and not _source_unit_destroyed_enemy_unit_this_phase(
@@ -558,6 +570,13 @@ class CatalogCommandPointRuntime:
             raise GameLifecycleError("Catalog Stratagem cost affected_player is malformed.")
         if not _source_model_is_available(context.state, source=source):
             return False
+        if not ability_battlefield_conditions_apply(
+            state=context.state,
+            clause=source.clause,
+            source_unit_instance_id=source.source_unit_instance_id,
+            source_model_instance_id=source.source_model_instance_id,
+        ):
+            return False
         trigger_parameters = parameter_payload(_required_trigger(source.clause).parameters)
         relationship = trigger_parameters.get("source_relationship")
         if relationship == "stratagem_targets_source_unit":
@@ -572,6 +591,7 @@ class CatalogCommandPointRuntime:
                 _source_model_is_within_target_range(
                     state=context.state,
                     source_model_instance_id=source.source_model_instance_id,
+                    source_unit_instance_id=source.source_unit_instance_id,
                     target_unit_instance_id=target_id,
                     range_inches=_cost_source_range_inches(source.clause),
                 )
@@ -911,14 +931,11 @@ def _source_model_is_available(state: object, *, source: _CostSource) -> bool:
 
     if type(state) is not GameState:
         raise GameLifecycleError("Catalog Stratagem cost source requires GameState.")
-    if state.battlefield_state is None:
-        return False
     unit = _unit_by_id(tuple(state.army_definitions), source.source_unit_instance_id)
     model = _model_in_unit(unit, model_instance_id=source.source_model_instance_id)
-    return (
-        model.is_alive
-        and state.battlefield_state.model_placement_or_none(source.source_model_instance_id)
-        is not None
+    return model.model_instance_id in active_ability_model_ids_for_unit(
+        state=state,
+        unit=unit,
     )
 
 
@@ -926,6 +943,7 @@ def _source_model_is_within_target_range(
     *,
     state: object,
     source_model_instance_id: str,
+    source_unit_instance_id: str,
     target_unit_instance_id: str,
     range_inches: float,
 ) -> bool:
@@ -933,8 +951,20 @@ def _source_model_is_within_target_range(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Catalog Stratagem cost range requires GameState.")
-    if state.battlefield_state is None:
+    source_view = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
+    target_view = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+    relationship = ability_spatial_relationship(
+        state=state,
+        source=source_view,
+        target=target_view,
+        source_model_instance_id=source_model_instance_id,
+    )
+    if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+        return True
+    if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
         return False
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Active battlefield ability requires battlefield state.")
     source_placement = state.battlefield_state.model_placement_or_none(source_model_instance_id)
     if source_placement is None:
         return False
@@ -946,7 +976,6 @@ def _source_model_is_within_target_range(
         model=scenario.model_instance_for_placement(source_placement),
         placement=source_placement,
     )
-    target_view = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
     for model in target_view.alive_models():
         target_placement = state.battlefield_state.model_placement_or_none(model.model_instance_id)
         if target_placement is None:

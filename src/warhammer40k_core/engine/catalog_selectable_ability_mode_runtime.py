@@ -17,6 +17,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
 )
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import battle_shock_leadership_target_for_unit
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import rules_units_within
@@ -302,7 +303,7 @@ class CatalogSelectableAbilityModeRuntime:
                 continue
             for component in rules_unit.components:
                 unit = component.unit
-                current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                current_model_ids = active_ability_model_ids_for_unit(
                     state=state,
                     unit=unit,
                 )

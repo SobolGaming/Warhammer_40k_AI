@@ -370,6 +370,26 @@
           "audit_id": "core-unit-splitting-maintained-app-mirrors-2026-09-06",
           "identity_kind": "app_version",
           "identity_value": "931"
+        },
+        {
+          "row_id": "embarked-abilities:gdm-v931",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "570d6afeb3ba563bdb5cdda85018ad948694af7c7d869ec99bc5fe13aa6aadb0",
+          "audit_id": "core-embarked-abilities-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "row_id": "off-battlefield-ability-conditions:40k-app",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/01-core-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "source_observation_sha256": "fddababef28f6b2c98b06804e86f4827236c5c8e2502ea5d09f443d1a2d5fb7d",
+          "audit_id": "core-embarked-abilities-maintained-app-mirrors-2026-09-07",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T00:02:56Z"
         }
       ],
       "legacy_observations": [
@@ -717,6 +737,16 @@
           "allowed_rule_source_ids": [
             "gw-11e-core-unit-splitting:balanced-unit-splitting",
             "gw-11e-core-unit-splitting:unit-splitting"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-embarked-abilities",
+          "version": "maintained-app-mirrors-observed-2026-09-07",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-embarked-abilities:embarked-abilities",
+            "gw-11e-core-embarked-abilities:off-battlefield-ability-conditions"
           ],
           "catalog_sha256": null
         }

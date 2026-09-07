@@ -21,6 +21,7 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     ability_record_is_active_generic_rule_ir,
 )
+from warhammer40k_core.engine.ability_presence import AbilitySpatialRelationship
 from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveHookBinding,
 )
@@ -746,7 +747,7 @@ class CatalogDatasheetRuleRuntime:
             target = context.rules_unit(context.request.unit_instance_id)
             if (
                 source.unit.unit_instance_id not in target.component_unit_instance_ids
-                or not context.component_placed_alive_model_ids(source.unit.unit_instance_id)
+                or not context.component_active_ability_model_ids(source.unit.unit_instance_id)
             ):
                 return current
             source_models = context.component_geometry_models(source.unit.unit_instance_id)
@@ -755,6 +756,13 @@ class CatalogDatasheetRuleRuntime:
                     continue
                 keywords = frozenset((*candidate.keywords, *candidate.faction_keywords))
                 if not frozenset(descriptor.required_keyword_sequence).issubset(keywords):
+                    continue
+                relationship = context.ability_spatial_relationship(
+                    source.unit.unit_instance_id, candidate.unit_instance_id
+                )
+                if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+                    return descriptor.characteristic_value
+                if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
                     continue
                 if any(
                     first.base_distance_to(second) <= descriptor.distance_inches
