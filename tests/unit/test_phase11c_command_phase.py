@@ -32,12 +32,11 @@ from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
     DiceRollState,
-    ModifiedRollResult,
     RerollComponentSelectionPolicy,
     RerollPermission,
-    UnmodifiedRollResult,
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
+from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine import battle_shock as battle_shock_module
@@ -4841,7 +4840,7 @@ def test_battle_shock_event_authority_helpers_fail_closed() -> None:
             UnitCharacteristicModifierBinding(
                 modifier_id="phase11c:modifier:live-leadership-only",
                 source_id="phase11c:source:live-leadership-only",
-                handler=lambda context: context.current_value,
+                handler=lambda context: (),
             ),
         )
     )

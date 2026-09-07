@@ -7,6 +7,12 @@ from typing import Any, cast
 
 import pytest
 from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
+from tests.characteristic_modifier_helpers import (
+    resolve_characteristic_handler,
+    resolve_historical_handler,
+    resolve_movement_handler,
+    resolve_objective_control_handler,
+)
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -335,8 +341,9 @@ def test_voice_of_command_replaces_prior_order_and_battle_shock_clears_order() -
     assert len(effects) == 1
     assert _effect_payload(effects[0])["order_id"] == army_rule.VoiceOfCommandOrder.TAKE_COVER.value
     assert (
-        army_rule.voice_of_command_movement_modifier(
-            _movement_context(state=state, unit_instance_id=INFANTRY_UNIT_ID)
+        resolve_movement_handler(
+            army_rule.voice_of_command_movement_modifier,
+            _movement_context(state=state, unit_instance_id=INFANTRY_UNIT_ID),
         )
         == 6.0
     )
@@ -365,8 +372,9 @@ def test_voice_of_command_modifiers_cover_all_orders() -> None:
         result_id="phase17g-astra-move-order",
     )
     assert (
-        army_rule.voice_of_command_movement_modifier(
-            _movement_context(state=state, unit_instance_id=INFANTRY_UNIT_ID)
+        resolve_movement_handler(
+            army_rule.voice_of_command_movement_modifier,
+            _movement_context(state=state, unit_instance_id=INFANTRY_UNIT_ID),
         )
         == 9.0
     )
@@ -479,26 +487,28 @@ def test_voice_of_command_modifiers_cover_all_orders() -> None:
         == already_capped_armour
     )
     assert (
-        army_rule.voice_of_command_unit_characteristic_modifier(
+        resolve_characteristic_handler(
+            army_rule.voice_of_command_unit_characteristic_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 characteristic=Characteristic.SAVE,
                 base_value=4,
                 current_value=4,
-            )
+            ),
         )
         == 3
     )
     assert (
-        army_rule.voice_of_command_unit_characteristic_modifier(
+        resolve_characteristic_handler(
+            army_rule.voice_of_command_unit_characteristic_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 characteristic=Characteristic.SAVE,
                 base_value=3,
                 current_value=3,
-            )
+            ),
         )
         == 3
     )
@@ -510,50 +520,54 @@ def test_voice_of_command_modifiers_cover_all_orders() -> None:
         result_id="phase17g-astra-duty-and-honour",
     )
     assert (
-        army_rule.voice_of_command_unit_characteristic_modifier(
+        resolve_characteristic_handler(
+            army_rule.voice_of_command_unit_characteristic_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 characteristic=Characteristic.LEADERSHIP,
                 base_value=7,
                 current_value=7,
-            )
+            ),
         )
         == 6
     )
     assert (
-        army_rule.voice_of_command_unit_characteristic_modifier(
+        resolve_characteristic_handler(
+            army_rule.voice_of_command_unit_characteristic_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 characteristic=Characteristic.LEADERSHIP,
                 base_value=4,
                 current_value=4,
-            )
+            ),
         )
         == 4
     )
     assert (
-        army_rule.voice_of_command_unit_characteristic_modifier(
+        resolve_characteristic_handler(
+            army_rule.voice_of_command_unit_characteristic_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 characteristic=Characteristic.OBJECTIVE_CONTROL,
                 base_value=2,
                 current_value=2,
-            )
+            ),
         )
         == 3
     )
     assert (
-        army_rule.voice_of_command_objective_control_modifier(
+        resolve_objective_control_handler(
+            army_rule.voice_of_command_objective_control_modifier,
             ObjectiveControlModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 model_instance_id=f"{INFANTRY_UNIT_ID}:model-001",
                 base_objective_control=2,
                 current_objective_control=2,
-            )
+            ),
         )
         == 3
     )
@@ -575,9 +589,13 @@ def test_voice_of_command_historical_leadership_replays_live_order_boundary() ->
         active_player_id="player-a",
     )
 
-    assert army_rule.historical_voice_of_command_leadership(context, 7) == 6
     assert (
-        army_rule.historical_voice_of_command_leadership(
+        resolve_historical_handler(army_rule.historical_voice_of_command_leadership, context, 7)
+        == 6
+    )
+    assert (
+        resolve_historical_handler(
+            army_rule.historical_voice_of_command_leadership,
             replace(context, battle_shocked_unit_ids=(INFANTRY_UNIT_ID,)),
             7,
         )
@@ -589,7 +607,12 @@ def test_voice_of_command_historical_leadership_replays_live_order_boundary() ->
         unit_instance_id=ENEMY_UNIT_ID,
         active_player_id="player-a",
     )
-    assert army_rule.historical_voice_of_command_leadership(enemy_context, 7) == 7
+    assert (
+        resolve_historical_handler(
+            army_rule.historical_voice_of_command_leadership, enemy_context, 7
+        )
+        == 7
+    )
     with pytest.raises(GameLifecycleError, match="historical authority requires context"):
         army_rule.historical_voice_of_command_leadership(cast(Any, object()), 7)
 
@@ -861,32 +884,35 @@ def test_voice_of_command_non_applicable_modifiers_and_battle_shock_noops() -> N
     state = _require_state(lifecycle)
 
     assert (
-        army_rule.voice_of_command_movement_modifier(
-            _movement_context(state=state, unit_instance_id=ENEMY_UNIT_ID)
+        resolve_movement_handler(
+            army_rule.voice_of_command_movement_modifier,
+            _movement_context(state=state, unit_instance_id=ENEMY_UNIT_ID),
         )
         == 6.0
     )
     assert (
-        army_rule.voice_of_command_objective_control_modifier(
+        resolve_objective_control_handler(
+            army_rule.voice_of_command_objective_control_modifier,
             ObjectiveControlModifierContext(
                 state=state,
                 unit_instance_id=ENEMY_UNIT_ID,
                 model_instance_id=f"{ENEMY_UNIT_ID}:model-001",
                 base_objective_control=2,
                 current_objective_control=2,
-            )
+            ),
         )
         == 2
     )
     assert (
-        army_rule.voice_of_command_unit_characteristic_modifier(
+        resolve_characteristic_handler(
+            army_rule.voice_of_command_unit_characteristic_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=INFANTRY_UNIT_ID,
                 characteristic=Characteristic.STRENGTH,
                 base_value=3,
                 current_value=3,
-            )
+            ),
         )
         == 3
     )
@@ -1030,13 +1056,15 @@ def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
         army_rule.voice_of_command_battle_shock_outcome(cast(BattleShockOutcomeContext, object()))
     with pytest.raises(GameLifecycleError, match="characteristic modifier requires context"):
         army_rule.voice_of_command_unit_characteristic_modifier(
-            cast(UnitCharacteristicModifierContext, object())
+            cast(UnitCharacteristicModifierContext, object()),
         )
     with pytest.raises(GameLifecycleError, match="movement modifier requires context"):
-        army_rule.voice_of_command_movement_modifier(cast(MovementBudgetModifierContext, object()))
+        army_rule.voice_of_command_movement_modifier(
+            cast(MovementBudgetModifierContext, object()),
+        )
     with pytest.raises(GameLifecycleError, match="Objective Control modifier requires context"):
         army_rule.voice_of_command_objective_control_modifier(
-            cast(ObjectiveControlModifierContext, object())
+            cast(ObjectiveControlModifierContext, object()),
         )
     with pytest.raises(GameLifecycleError, match="save option modifier requires context"):
         army_rule.voice_of_command_save_option_modifier(cast(SaveOptionModifierContext, object()))
@@ -1635,8 +1663,7 @@ def _movement_context(*, state: GameState, unit_instance_id: str) -> MovementBud
         state=state,
         unit_instance_id=unit_instance_id,
         model_instance_id=f"{unit_instance_id}:model-001",
-        base_movement_inches=6.0,
-        current_movement_inches=6.0,
+        movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
     )
 
 

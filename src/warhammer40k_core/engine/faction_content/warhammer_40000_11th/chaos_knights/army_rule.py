@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSpec
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
@@ -493,11 +494,13 @@ def unit_has_active_dread(
     return requested_dread in active_dread_abilities_for_player(state, player_id=army.player_id)
 
 
-def harbingers_leadership_modifier(context: UnitCharacteristicModifierContext) -> int:
+def harbingers_leadership_modifier(
+    context: UnitCharacteristicModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not UnitCharacteristicModifierContext:
         raise GameLifecycleError("Harbingers of Dread Leadership modifier requires context.")
     if context.characteristic is not Characteristic.LEADERSHIP:
-        return context.current_value
+        return ()
     _target_unit, target_army = _unit_and_army_by_id(
         context.state,
         unit_instance_id=context.unit_instance_id,
@@ -520,13 +523,13 @@ def harbingers_leadership_modifier(context: UnitCharacteristicModifierContext) -
             modifier += 1
         if DreadAbility.DESPAIR in active:
             modifier += 1
-    return context.current_value + modifier
+    return (ModifierTerm(ModifierOperation.ADD, modifier),)
 
 
 def historical_harbingers_leadership(
     context: HistoricalBattleShockAuthorityContext,
     current: int,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not HistoricalBattleShockAuthorityContext:
         raise GameLifecycleError("Harbingers historical authority requires context.")
     target = context.rules_unit(context.request.unit_instance_id)
@@ -567,7 +570,7 @@ def historical_harbingers_leadership(
             if ability is DreadAbility.DEATHLY_TERROR or ability in active:
                 raise GameLifecycleError("Harbingers historical ability is duplicated.")
             active.add(ability)
-    modified = current
+    modified = 0
     for army in context.armies:
         active = active_by_player.get(army.player_id)
         if active is None or army.player_id == target.owner_player_id:
@@ -589,7 +592,7 @@ def historical_harbingers_leadership(
             modified += 1
             if DreadAbility.DESPAIR in active:
                 modified += 1
-    return modified
+    return (ModifierTerm(ModifierOperation.ADD, modified),)
 
 
 def harbingers_darkness_hit_roll_modifier(context: HitRollModifierContext) -> int:

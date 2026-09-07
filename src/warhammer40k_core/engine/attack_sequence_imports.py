@@ -210,6 +210,7 @@ from warhammer40k_core.engine.saves import (
     save_options_for_model,
     saving_throw_roll_spec,
 )
+from warhammer40k_core.engine.shooting_model_blockers import shooting_dynamic_model_blockers
 from warhammer40k_core.engine.shooting_selection_range import (
     geometry_models_for_unit_placements,
     unit_placements_for_rules_unit_or_none,
@@ -217,7 +218,6 @@ from warhammer40k_core.engine.shooting_selection_range import (
 from warhammer40k_core.engine.shooting_targets import (
     BENEFIT_OF_COVER_RULE_ID,
     PLUNGING_FIRE_RULE_ID,
-    shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.shooting_terrain_visibility import (

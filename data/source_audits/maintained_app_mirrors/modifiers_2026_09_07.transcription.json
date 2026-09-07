@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "ordered-modifiers",
+    "section": "02.02.01",
+    "source_text": "APPLYING MODIFIERS\n\nThis section presents the various ways rules may be modified. All modifiers are cumulative.\n\nWhen a value is modified (e.g. characteristic, dice roll, distance), do so in the following order.\n\n1. If a rule instructs you to change or replace one value with a specified value, you must first change the relevant value to the new value.\n\nNote that rules that modify a characteristic in this step to a new value of ‘0’, ‘-’ or ‘*’ cannot be modified by other rules (in such cases, skip steps 2-5).\n\n2. Apply multiplication modifiers.\n\n3. Apply addition modifiers.\n\n4. Apply division modifiers.\n\n5. Apply subtraction modifiers.\n\n6. Round any fractions up after applying all modifiers.",
+    "consumer": "warhammer40k_core.core.modifiers:ModifierStack"
+  },
+  {
+    "slug": "modified-dice-limits",
+    "section": "02.02.01",
+    "source_text": "WHEN MODIFYING DICE ROLLS\n\nWhen modifying dice rolls, the following points also apply:\n\n  * Modifiers are applied after any re-rolls of that dice roll.\n    * Rules that refer to the value of an ‘unmodified’ dice roll are referring to the dice result after any re-rolls, but before modifiers.\n  * A dice result can be modified above its maximum possible value (for example, a D6 roll can be modified above 6).\n  * A result that would be less than 1 is changed to a result of 1.\n  * Hit rolls and wound rolls can never be modified by more than -1 or +1. After all the cumulative modifiers to such a roll have been calculated, if the total modifier would be:\n    * -2 or worse, it is changed to -1.\n    * +2 or better, it is changed to +1.\n  * Charge rolls cannot be greater than 12. After all the cumulative modifiers to a charge roll have been calculated, if the result would be 13 or more, it is changed to 12.",
+    "consumer": "warhammer40k_core.core.modifiers:resolve_roll_modifiers"
+  },
+  {
+    "slug": "detection-lone-operative-limits",
+    "section": "02.02.01",
+    "source_text": "OTHER MODIFIED RULES\n\nThe following rules apply to various rules and effects found throughout the game.\n\n  * Detection range and Lone Operative cannot be better than 9\" or worse than 30\".",
+    "consumer": "warhammer40k_core.core.modifiers:resolve_targeting_range"
+  }
+]

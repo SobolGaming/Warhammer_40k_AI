@@ -1,6 +1,13 @@
 # CORE V2 external contract
 
-Contract version: `11.3.0`
+Contract version: `11.4.0`
+
+Contract 11.4 adds terminal zero/star characteristic kinds and documents the
+engine-produced raw, rerolled, modified and rule-limited roll stages for Orders
+26/27/29. Existing client submissions remain compatible; replay and persistence
+continue to require the exact engine build identity. See
+`docs/ADAPTER_DECISION_CONTRACT.md` for Charge's 1–12 result and shared 9–30 inch
+targeting limits.
 
 Order 24 adds the finite `select_unit_split_membership` family and optional
 `split_origin` ownership proof on projected models and placement payloads.

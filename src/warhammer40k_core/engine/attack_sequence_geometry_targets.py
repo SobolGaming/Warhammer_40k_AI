@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
+from warhammer40k_core.core.modifiers import RollModifier
+
 from warhammer40k_core.engine.attack_sequence_imports import *
 
 # fmt: off
@@ -242,14 +245,24 @@ def _damage_value(
         timing=timing,
         scope_id=scope_id,
         roll_state=roll_state,
-        value=max(1, roll_state.current_total + damage_modifier),
+        value=roll_state.current_total,
+    )
+    modified_roll = ModifiedRollResult.from_unmodified(
+        UnmodifiedRollResult.from_state(roll_state),
+        intrinsic_offset=profile.dice_expression.modifier,
+        modifiers=(RollModifier(f"{scope_id}:runtime-damage-modifier", damage_modifier),),
     )
     _append_replay_resume_unique_event_once(
         decisions=decisions,
         event_type="random_characteristic_rolled",
-        payload=validate_json_value(random_roll.to_payload()),
+        payload=validate_json_value(
+            {
+                **random_roll.to_payload(),
+                "modified_roll": modified_roll.to_payload(),
+            }
+        ),
     )
-    return random_roll.value, None
+    return modified_roll.final_value, None
 
 
 def _model_is_alive(*, state: GameState, model_instance_id: str) -> bool:

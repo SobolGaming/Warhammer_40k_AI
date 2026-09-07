@@ -7,7 +7,7 @@ import pytest
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetKeywordSet
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
@@ -445,8 +445,7 @@ def test_ws14_more_dakka_stratagem_ir_effects_drive_runtime_hooks() -> None:
                 state=huge_state,
                 unit_instance_id="army-alpha:walker-1",
                 model_instance_id=walker_model_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
             )
         )
         == 7.0
@@ -660,8 +659,7 @@ def test_ws14_spectacle_of_slaughter_rule_and_enhancements_bind_to_runtime_hooks
                 state=state,
                 unit_instance_id="army-alpha:blades-2",
                 model_instance_id=eager_model_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
             )
         )
         == 8.0
@@ -884,8 +882,7 @@ def test_ws14_court_of_the_phoenician_rule_and_enhancements_bind_to_runtime_hook
                 state=state,
                 unit_instance_id="army-alpha:lord-exultant-1",
                 model_instance_id=lord_model_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
             )
         )
         == 7.0
@@ -992,8 +989,7 @@ def test_ws14_july_exalted_patron_mustering_and_lifecycle_remove_attachment_gran
                 state=state,
                 unit_instance_id="army-alpha:lord-exultant-1",
                 model_instance_id=lord_model_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
             )
         )
         == 7.0

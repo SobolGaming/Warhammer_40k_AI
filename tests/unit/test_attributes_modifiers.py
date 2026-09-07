@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
+from itertools import permutations
 from typing import cast
 
 import pytest
 
 from warhammer40k_core.core.attributes import (
+    BoundedCharacteristicValue,
     Characteristic,
     CharacteristicError,
     CharacteristicValue,
@@ -22,13 +25,64 @@ from warhammer40k_core.core.modifiers import (
     ModifierStack,
     ModifierStackingError,
     ModifierStackPayload,
+    ModifierTerm,
     ModifierTiming,
     modifier_operation_from_token,
     modifier_timing_from_token,
     resolve_characteristic_value,
     resolve_damage_characteristic,
+    resolve_distance_deltas,
+    resolve_targeting_range,
 )
 from warhammer40k_core.rules.timing import ordered_modifier_timings
+
+
+def test_runtime_terms_preserve_exact_intermediates_and_operation_identity() -> None:
+    from fractions import Fraction
+
+    terms = (
+        ("a-negative", ModifierTerm(ModifierOperation.ADD, -8)),
+        ("z-positive", ModifierTerm(ModifierOperation.ADD, 4)),
+        ("divide", ModifierTerm(ModifierOperation.DIVIDE, 2)),
+    )
+    for ordered in permutations(terms):
+        stack = ModifierStack(
+            Characteristic.TOUGHNESS,
+            6,
+            tuple(
+                term.bind(
+                    modifier_id=identifier,
+                    source_id=f"source:{identifier}",
+                    characteristic=Characteristic.TOUGHNESS,
+                )
+                for identifier, term in ordered
+            ),
+        )
+        steps = stack.arithmetic_steps()
+        assert tuple(step.after for step in steps) == (Fraction(10), Fraction(5), Fraction(-3))
+        assert stack.resolve().final == 1
+        assert stack.resolve().applied_modifier_ids == ("z-positive", "divide", "a-negative")
+    with pytest.raises(ModifierError, match="positive divisor"):
+        ModifierTerm(ModifierOperation.DIVIDE, 0)
+    with pytest.raises(ModifierError, match="ModifierOperation"):
+        ModifierTerm(cast(ModifierOperation, "add"), 1)
+
+
+def test_distance_deltas_keep_fractional_values_and_bound_only_the_final_distance() -> None:
+    for ordered in permutations((("a-negative", -8.25), ("z-positive", 4.5))):
+        value, steps = resolve_distance_deltas(6.0, ordered)
+        assert value == 2.25
+        assert steps == (("z-positive", 6.0, 10.5), ("a-negative", 10.5, 2.25))
+    assert resolve_distance_deltas(1, (("negative", -2),))[0] == 0
+    assert resolve_distance_deltas(1, (("identity", 0),)) == (1, ())
+    for value in (-1.0, float("inf"), float("nan"), True):
+        with pytest.raises(ModifierError, match="Distance must be finite"):
+            resolve_distance_deltas(value, ())
+    for delta in (float("inf"), float("nan"), True):
+        with pytest.raises(ModifierError, match="Distance modifier must be finite"):
+            resolve_distance_deltas(1, (("invalid", delta),))
+    with pytest.raises(ModifierStackingError, match="unique"):
+        resolve_distance_deltas(1, (("duplicate", 1), ("duplicate", -1)))
 
 
 def test_initial_phase_two_characteristics_are_supported() -> None:
@@ -178,7 +232,7 @@ def test_phase14c_detection_range_defaults_to_fifteen_and_can_be_lowered() -> No
     assert resolved.applied_modifier_ids == ("stealth-field",)
 
 
-def test_phase14c_damage_is_halved_after_other_modifiers() -> None:
+def test_damage_division_uses_the_shared_ordered_modifier_algebra() -> None:
     damage_bonus = Modifier(
         modifier_id="focused-strike",
         scope=ModifierScope.for_characteristics((Characteristic.DAMAGE,)),
@@ -189,12 +243,20 @@ def test_phase14c_damage_is_halved_after_other_modifiers() -> None:
 
     resolved = resolve_damage_characteristic(
         CharacteristicValue.from_raw(Characteristic.DAMAGE, 5),
-        (damage_bonus,),
-        halve_damage_after_modifiers=True,
+        (
+            damage_bonus,
+            Modifier(
+                "halve",
+                ModifierScope.any(),
+                ModifierTiming.DIVISIVE,
+                ModifierOperation.DIVIDE,
+                2,
+            ),
+        ),
     )
     payload = resolved.to_payload()
 
-    assert resolved.modifier_final == 7
+    assert resolved.modifier_final == 4
     assert resolved.final == 4
     assert resolved.to_characteristic_value().final == 4
     assert DamageCharacteristicResolution.from_payload(payload).to_payload() == payload
@@ -490,5 +552,209 @@ def test_rules_timing_exports_deterministic_modifier_timing_order() -> None:
         ModifierTiming.BASE,
         ModifierTiming.MULTIPLICATIVE,
         ModifierTiming.ADDITIVE,
+        ModifierTiming.DIVISIVE,
+        ModifierTiming.SUBTRACTIVE,
         ModifierTiming.FINAL,
     )
+
+
+def test_order26_division_precedes_subtraction_and_rounding_is_terminal() -> None:
+    modifiers = (
+        Modifier(
+            "subtract", ModifierScope.any(), ModifierTiming.ADDITIVE, ModifierOperation.ADD, -1
+        ),
+        Modifier(
+            "divide", ModifierScope.any(), ModifierTiming.DIVISIVE, ModifierOperation.DIVIDE, 2
+        ),
+        Modifier("add", ModifierScope.any(), ModifierTiming.ADDITIVE, ModifierOperation.ADD, 2),
+    )
+    resolved = ModifierStack(Characteristic.STRENGTH, 5, modifiers).resolve()
+    assert resolved.final == 3  # ceil((5 + 2) / 2 - 1)
+    assert resolved.applied_modifier_ids == ("add", "divide", "subtract")
+
+
+def test_order26_zero_replacement_is_terminal_even_for_damage() -> None:
+    resolved = ModifierStack(
+        Characteristic.DAMAGE,
+        5,
+        (
+            Modifier("replace", ModifierScope.any(), ModifierTiming.BASE, ModifierOperation.SET, 0),
+            Modifier(
+                "bonus", ModifierScope.any(), ModifierTiming.ADDITIVE, ModifierOperation.ADD, 3
+            ),
+        ),
+    ).resolve()
+    assert resolved.final == 0
+    assert resolved.applied_modifier_ids == ("replace",)
+
+
+@pytest.mark.parametrize(("operand", "expected"), [(-20, 9), (100, 30)])
+def test_order29_detection_range_is_terminally_bounded(operand: int, expected: int) -> None:
+    resolved = resolve_characteristic_value(
+        CharacteristicValue.detection_range_default(),
+        (
+            Modifier(
+                "range-effect",
+                ModifierScope.any(),
+                ModifierTiming.ADDITIVE,
+                ModifierOperation.ADD,
+                operand,
+            ),
+        ),
+    )
+    assert resolved.final == expected
+
+
+def test_order26_complete_algebra_is_exact_and_independent_of_input_order() -> None:
+    modifiers = (
+        Modifier("replace", ModifierScope.any(), ModifierTiming.BASE, ModifierOperation.SET, 5),
+        Modifier(
+            "multiply",
+            ModifierScope.any(),
+            ModifierTiming.MULTIPLICATIVE,
+            ModifierOperation.MULTIPLY,
+            3,
+        ),
+        Modifier("add", ModifierScope.any(), ModifierTiming.ADDITIVE, ModifierOperation.ADD, 2),
+        Modifier(
+            "divide", ModifierScope.any(), ModifierTiming.DIVISIVE, ModifierOperation.DIVIDE, 2
+        ),
+        Modifier(
+            "subtract",
+            ModifierScope.any(),
+            ModifierTiming.SUBTRACTIVE,
+            ModifierOperation.SUBTRACT,
+            4,
+        ),
+    )
+    for ordered in permutations(modifiers):
+        stack = ModifierStack(Characteristic.STRENGTH, 8, ordered)
+        assert stack.resolve().final == 5  # ceil((5*3+2)/2-4)
+        restored = ModifierStack.from_payload(stack.to_payload())
+        assert restored.resolve() == stack.resolve()
+    huge = 2**80 + 1
+    assert (
+        ModifierStack(
+            Characteristic.STRENGTH,
+            huge,
+            (
+                Modifier(
+                    "divide",
+                    ModifierScope.any(),
+                    ModifierTiming.DIVISIVE,
+                    ModifierOperation.DIVIDE,
+                    2,
+                ),
+                Modifier(
+                    "multiply",
+                    ModifierScope.any(),
+                    ModifierTiming.MULTIPLICATIVE,
+                    ModifierOperation.MULTIPLY,
+                    2,
+                ),
+            ),
+        )
+        .resolve()
+        .final
+        == huge
+    )
+    assert (
+        ModifierStack(
+            Characteristic.ARMOR_PENETRATION,
+            -3,
+            (
+                Modifier(
+                    "divide",
+                    ModifierScope.any(),
+                    ModifierTiming.DIVISIVE,
+                    ModifierOperation.DIVIDE,
+                    2,
+                ),
+            ),
+        )
+        .resolve()
+        .final
+        == -1
+    )
+
+
+@pytest.mark.parametrize(
+    ("operation", "kind"),
+    [
+        (ModifierOperation.SET_DASH, CharacteristicValueKind.REPLACEMENT_DASH),
+        (ModifierOperation.SET_STAR, CharacteristicValueKind.REPLACEMENT_STAR),
+    ],
+)
+def test_order26_symbolic_replacements_are_terminal_and_serializable(
+    operation: ModifierOperation,
+    kind: CharacteristicValueKind,
+) -> None:
+    stack = ModifierStack(
+        Characteristic.DAMAGE,
+        5,
+        (
+            Modifier("replace", ModifierScope.any(), ModifierTiming.BASE, operation, 0),
+            Modifier("add", ModifierScope.any(), ModifierTiming.ADDITIVE, ModifierOperation.ADD, 5),
+        ),
+    )
+    result = stack.resolve()
+    assert not result.is_numeric
+    assert result.value_kind is kind
+    assert result.applied_modifier_ids == ("replace",)
+    assert CharacteristicValue.from_payload(result.to_payload()) == result
+    assert resolve_characteristic_value(result, stack.modifiers) == result
+    with pytest.raises(ModifierError, match="Symbolic"):
+        stack.resolve_bounded()
+    with pytest.raises(ModifierError, match="Damage"):
+        resolve_damage_characteristic(result, ())
+
+
+def test_order26_damage_zero_stays_terminal_on_subsequent_resolution() -> None:
+    modifiers = (
+        Modifier("replace", ModifierScope.any(), ModifierTiming.BASE, ModifierOperation.SET, 0),
+    )
+    zero = ModifierStack(Characteristic.DAMAGE, 5, modifiers).resolve()
+    bounded = ModifierStack(Characteristic.DAMAGE, 5, modifiers).resolve_bounded()
+    restored_bounded = BoundedCharacteristicValue.from_payload(bounded.to_payload())
+    assert restored_bounded.to_characteristic_value() == zero
+    with pytest.raises(CharacteristicError, match="nonzero arithmetic"):
+        replace(bounded, unbounded_final=1)
+    with pytest.raises(CharacteristicError, match="must be numeric"):
+        replace(bounded, value_kind=CharacteristicValueKind.REPLACEMENT_STAR)
+    with pytest.raises(CharacteristicError, match="zero base and final"):
+        replace(bounded, base=1)
+    damage = resolve_damage_characteristic(zero, ())
+    restored = DamageCharacteristicResolution.from_payload(
+        damage.to_payload()
+    ).to_characteristic_value()
+    assert restored.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO
+    assert resolve_characteristic_value(restored, modifiers) == restored
+    assert (
+        resolve_damage_characteristic(
+            zero,
+            (
+                Modifier(
+                    "add", ModifierScope.any(), ModifierTiming.ADDITIVE, ModifierOperation.ADD, 5
+                ),
+            ),
+        ).final
+        == 0
+    )
+
+
+@pytest.mark.parametrize("divisor", [0, -1])
+def test_order26_invalid_division_fails_before_resolution(divisor: int) -> None:
+    with pytest.raises(ModifierError, match="positive divisor"):
+        Modifier(
+            "division",
+            ModifierScope.any(),
+            ModifierTiming.DIVISIVE,
+            ModifierOperation.DIVIDE,
+            divisor,
+        )
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), True])
+def test_order29_targeting_range_rejects_invalid_numbers(value: float) -> None:
+    with pytest.raises(ModifierError, match="finite"):
+        resolve_targeting_range(value)

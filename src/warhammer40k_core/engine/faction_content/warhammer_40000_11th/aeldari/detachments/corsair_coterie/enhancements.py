@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battle_formation_hooks import (
@@ -505,15 +506,17 @@ def apply_archraider_command_point_cost_choice_result(
     return True
 
 
-def infamy_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+def infamy_objective_control_modifier(
+    context: ObjectiveControlModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Infamy Objective Control modifier requires context.")
     if not _unit_is_afflicted_by_infamy(
         state=context.state,
         target_unit_instance_id=context.unit_instance_id,
     ):
-        return context.current_objective_control
-    return max(1, context.current_objective_control - 1)
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, -1), ModifierTerm(ModifierOperation.FLOOR, 1))
 
 
 def voidstone_save_option_modifier(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:

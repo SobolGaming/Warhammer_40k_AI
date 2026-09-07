@@ -2,6 +2,10 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.attributes import CharacteristicValue
+from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
+
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
@@ -94,7 +98,6 @@ __all__ = (
     "_unit_can_take_to_the_skies",
     "_unit_has_keyword",
     "_unit_instance_by_id",
-    "_validate_advance_roll_spec",
     "_validate_bool",
     "_validate_desperate_escape_reason_tuple",
     "_validate_desperate_escape_requirement_tuple",
@@ -725,12 +728,7 @@ def _fall_back_mode_violation_code(
 
 
 def _model_movement_inches(model: ModelInstance) -> int:
-    if type(model) is not ModelInstance:
-        raise GameLifecycleError("Movement model must be a ModelInstance.")
-    for characteristic in model.characteristics:
-        if characteristic.characteristic is Characteristic.MOVEMENT:
-            return characteristic.final
-    raise GameLifecycleError("Normal Move requires a Movement characteristic.")
+    return model_movement_characteristic(model).final
 
 
 def _model_base_movement_inches(
@@ -747,15 +745,14 @@ def _model_base_movement_inches(
     if type(aircraft_policy) is not AircraftMovementPolicy:
         raise GameLifecycleError("Movement budget requires an AircraftMovementPolicy.")
     if aircraft_policy.hover_mode_active:
-        base_movement = 20.0
+        movement = CharacteristicValue(Characteristic.MOVEMENT, 20, 20, 20)
     else:
-        base_movement = float(_model_movement_inches(model))
+        movement = model_movement_characteristic(model)
     return _modified_movement_inches(
         state=state,
         unit_instance_id=unit_instance_id,
         model_instance_id=model_instance_id,
-        base_movement_inches=base_movement,
-        current_movement_inches=base_movement,
+        movement=movement,
         runtime_modifier_registry=runtime_modifier_registry,
     )
 
@@ -917,12 +914,11 @@ def _modified_movement_inches(
     state: GameState | None,
     unit_instance_id: str | None,
     model_instance_id: str | None,
-    base_movement_inches: float,
-    current_movement_inches: float,
+    movement: CharacteristicValue,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> float:
     if state is None:
-        return current_movement_inches
+        return float(movement.final)
     if unit_instance_id is None:
         raise GameLifecycleError("Movement modifier requires unit_instance_id.")
     if model_instance_id is None:
@@ -932,8 +928,7 @@ def _modified_movement_inches(
             state=state,
             unit_instance_id=unit_instance_id,
             model_instance_id=model_instance_id,
-            base_movement_inches=base_movement_inches,
-            current_movement_inches=current_movement_inches,
+            movement=movement,
         )
     )
 
@@ -1381,24 +1376,6 @@ def _validate_objective_marker_tuple(
         seen.add(value.objective_marker_id)
         markers.append(value)
     return tuple(sorted(markers, key=lambda marker: marker.objective_marker_id))
-
-
-def _validate_advance_roll_spec(
-    spec: DiceRollSpec,
-    *,
-    unit_instance_id: str,
-    expression_modifier: int,
-) -> None:
-    if type(spec) is not DiceRollSpec:
-        raise GameLifecycleError("Advance roll spec must be a DiceRollSpec.")
-    if type(expression_modifier) is not int:
-        raise GameLifecycleError("Advance roll expression_modifier must be an integer.")
-    if spec.expression != DiceExpression(quantity=1, sides=6, modifier=expression_modifier):
-        raise GameLifecycleError("Advance roll spec must match the D6 modifier payload.")
-    if spec.roll_type != "advance_roll":
-        raise GameLifecycleError("Advance roll spec roll_type must be advance_roll.")
-    if spec.actor_id != unit_instance_id:
-        raise GameLifecycleError("Advance roll spec actor_id must match unit_instance_id.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

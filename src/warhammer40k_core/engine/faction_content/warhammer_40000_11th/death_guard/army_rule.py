@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
@@ -274,15 +275,19 @@ def nurgles_gift_modified_toughness(
     return base_toughness
 
 
-def nurgles_gift_toughness_modifier(context: UnitCharacteristicModifierContext) -> int:
+def nurgles_gift_toughness_modifier(
+    context: UnitCharacteristicModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not UnitCharacteristicModifierContext:
         raise GameLifecycleError("Nurgle's Gift toughness modifier requires context.")
     if context.characteristic is not Characteristic.TOUGHNESS:
-        return context.current_value
-    return nurgles_gift_modified_toughness(
-        state=context.state,
-        target_unit_instance_id=context.unit_instance_id,
-        base_toughness=context.current_value,
+        return ()
+    return (
+        (ModifierTerm(ModifierOperation.ADD, -1),)
+        if afflicting_death_guard_player_ids(
+            context.state, target_unit_instance_id=context.unit_instance_id
+        )
+        else ()
     )
 
 
@@ -381,22 +386,28 @@ def nurgles_gift_modified_leadership_target(
     return base_leadership
 
 
-def nurgles_gift_leadership_modifier(context: UnitCharacteristicModifierContext) -> int:
+def nurgles_gift_leadership_modifier(
+    context: UnitCharacteristicModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not UnitCharacteristicModifierContext:
         raise GameLifecycleError("Nurgle's Gift Leadership modifier requires context.")
     if context.characteristic is not Characteristic.LEADERSHIP:
-        return context.current_value
-    return nurgles_gift_modified_leadership_target(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        base_leadership=context.current_value,
+        return ()
+    return (
+        (ModifierTerm(ModifierOperation.ADD, 1),)
+        if _unit_afflicted_by_plague(
+            state=context.state,
+            target_unit_instance_id=context.unit_instance_id,
+            plague=NurglesGiftPlague.SCABROUS_SOULROT,
+        )
+        else ()
     )
 
 
 def historical_nurgles_gift_leadership(
     context: HistoricalBattleShockAuthorityContext,
     current: int,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not HistoricalBattleShockAuthorityContext:
         raise GameLifecycleError("Nurgle's Gift historical authority requires context.")
     selected: dict[str, NurglesGiftPlague] = {}
@@ -442,15 +453,15 @@ def historical_nurgles_gift_leadership(
             for source in context.component_geometry_models(unit.unit_instance_id)
             for target_model in target_models
         ):
-            return current + 1
-    return current
+            return (ModifierTerm(ModifierOperation.ADD, 1),)
+    return ()
 
 
 def _historical_identity_leadership(
     _context: HistoricalBattleShockAuthorityContext,
     current: int,
-) -> int:
-    return current
+) -> tuple[ModifierTerm, ...]:
+    return ()
 
 
 def nurgles_gift_modified_objective_control(
@@ -472,13 +483,22 @@ def nurgles_gift_modified_objective_control(
     return base_objective_control
 
 
-def nurgles_gift_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+def nurgles_gift_objective_control_modifier(
+    context: ObjectiveControlModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Nurgle's Gift Objective Control modifier requires context.")
-    return nurgles_gift_modified_objective_control(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        base_objective_control=context.current_objective_control,
+    return (
+        (
+            ModifierTerm(ModifierOperation.ADD, -1),
+            ModifierTerm(ModifierOperation.FLOOR, 1),
+        )
+        if _unit_afflicted_by_plague(
+            state=context.state,
+            target_unit_instance_id=context.unit_instance_id,
+            plague=NurglesGiftPlague.SCABROUS_SOULROT,
+        )
+        else ()
     )
 
 
@@ -502,13 +522,19 @@ def nurgles_gift_modified_movement_inches(
     return movement
 
 
-def nurgles_gift_movement_budget_modifier(context: MovementBudgetModifierContext) -> float:
+def nurgles_gift_movement_budget_modifier(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("Nurgle's Gift Movement modifier requires context.")
-    return nurgles_gift_modified_movement_inches(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        base_movement_inches=context.current_movement_inches,
+    return (
+        (ModifierTerm(ModifierOperation.ADD, -1),)
+        if _unit_afflicted_by_plague(
+            state=context.state,
+            target_unit_instance_id=context.unit_instance_id,
+            plague=NurglesGiftPlague.SCABROUS_SOULROT,
+        )
+        else ()
     )
 
 

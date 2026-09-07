@@ -9,6 +9,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battlefield_presence import (
@@ -244,14 +245,17 @@ def mantle_of_gloom_modified_objective_control(
     return current_objective_control
 
 
-def mantle_of_gloom_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+def mantle_of_gloom_objective_control_modifier(
+    context: ObjectiveControlModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Mantle of Gloom Objective Control modifier requires context.")
-    return mantle_of_gloom_modified_objective_control(
+    if _unit_is_enemy_within_mantle_of_gloom(
         state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        current_objective_control=context.current_objective_control,
-    )
+        target_unit_instance_id=context.unit_instance_id,
+    ):
+        return (ModifierTerm(ModifierOperation.ADD, -1),)
+    return ()
 
 
 def malice_made_manifest_fight_phase_start_request(

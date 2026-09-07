@@ -8,6 +8,7 @@ from warhammer40k_core.core.datasheet import (
     DamagedEffectKind,
     DamagedWeaponScope,
 )
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
@@ -229,7 +230,9 @@ class CatalogDamagedEffectRuntime:
             and effect.modifier is not None
         )
 
-    def objective_control_modifier(self, context: ObjectiveControlModifierContext) -> int:
+    def objective_control_modifier(
+        self, context: ObjectiveControlModifierContext
+    ) -> tuple[ModifierTerm, ...]:
         if type(context) is not ObjectiveControlModifierContext:
             raise GameLifecycleError("DAMAGED Objective Control modifier requires context.")
         unit = _unit_by_id(context.state, context.unit_instance_id)
@@ -240,7 +243,7 @@ class CatalogDamagedEffectRuntime:
             if effect.effect_kind is DamagedEffectKind.OBJECTIVE_CONTROL_MODIFIER
             and effect.modifier is not None
         )
-        return max(0, context.current_objective_control + modifier)
+        return (ModifierTerm(ModifierOperation.ADD, modifier),) if modifier else ()
 
     def weapon_profile_modifier(self, context: WeaponProfileModifierContext) -> WeaponProfile:
         if type(context) is not WeaponProfileModifierContext:

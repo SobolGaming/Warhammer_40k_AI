@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol, cast
 
+from warhammer40k_core.core.modifiers import ModifierTerm
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
@@ -119,7 +120,7 @@ class _CorsairCoterieEnhancementsModule(Protocol):
     def infamy_objective_control_modifier(
         self,
         context: ObjectiveControlModifierContext,
-    ) -> int: ...
+    ) -> tuple[ModifierTerm, ...]: ...
 
     def voidstone_save_option_modifier(
         self,
@@ -567,7 +568,7 @@ def _corsair_infamy_objective_control_modifier_id(source: GenericRuleAbilitySour
 def _corsair_infamy_objective_control_modifier(
     context: ObjectiveControlModifierContext,
     source: GenericRuleAbilitySource,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Infamy Objective Control modifier requires source.")
     return _corsair_coterie_enhancements().infamy_objective_control_modifier(context)

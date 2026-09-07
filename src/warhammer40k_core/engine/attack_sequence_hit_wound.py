@@ -2,6 +2,8 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.modifiers import bound_modified_roll
+
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -113,7 +115,7 @@ def _roll_hit(
     )
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(modifier)
-    final_roll = unmodified + capped_modifier
+    final_roll = bound_modified_roll(unmodified + capped_modifier)
     if is_snap_shooting:
         base_minimum_success = 6
     elif INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids:
@@ -221,7 +223,7 @@ def _roll_wound(
     )
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(wound_modifier)
-    final_roll = unmodified + capped_modifier
+    final_roll = bound_modified_roll(unmodified + capped_modifier)
     critical_threshold = _validate_d6_target("critical_threshold", critical_threshold)
     critical = unmodified >= critical_threshold
     return WoundRoll(
@@ -350,7 +352,7 @@ def _reroll_wound_for_twin_linked_if_needed(
     )
     unmodified = updated_state.current_total
     capped_modifier = _cap_roll_modifier(initial_wound_roll.modifier)
-    final_roll = unmodified + capped_modifier
+    final_roll = bound_modified_roll(unmodified + capped_modifier)
     critical_threshold = initial_wound_roll.critical_threshold
     critical = unmodified >= critical_threshold
     wound_roll = WoundRoll(

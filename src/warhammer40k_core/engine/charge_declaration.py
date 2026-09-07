@@ -11,9 +11,13 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
+from warhammer40k_core.core.modified_dice import (
+    ModifiedRollResult,
+    ModifiedRollResultPayload,
+    UnmodifiedRollResult,
+)
 from warhammer40k_core.core.modifiers import (
     RollModifier,
-    RollModifierOperation,
     RollModifierPayload,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -57,6 +61,7 @@ class ChargeRollResultPayload(TypedDict):
     request: ChargeRollRequestPayload
     roll_state: DiceRollStatePayload
     value: int
+    modified_roll: ModifiedRollResultPayload
     reachable_target_distances_inches: dict[str, float]
     move_available: bool
     status: str
@@ -244,12 +249,19 @@ class ChargeRollRequest:
             expression=DiceExpression(
                 quantity=2,
                 sides=6,
-                modifier=sum(modifier.operand for modifier in self.roll_modifiers),
             ),
             reason=f"Charge distance for {self.unit_instance_id}",
             roll_type=CHARGE_ROLL_TYPE,
             actor_id=self.player_id,
             reroll_forbidden_rule_ids=(CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,),
+        )
+
+    def resolve_roll(self, roll_state: DiceRollState) -> ModifiedRollResult:
+        if roll_state.original_result.spec != self.spec:
+            raise GameLifecycleError("Charge roll source spec drifted.")
+        return ModifiedRollResult.from_unmodified(
+            UnmodifiedRollResult.from_state(roll_state),
+            modifiers=self.roll_modifiers,
         )
 
     def to_payload(self) -> ChargeRollRequestPayload:
@@ -300,15 +312,11 @@ class ChargeRollResult:
             raise GameLifecycleError("ChargeRollResult roll_state must be DiceRollState.")
         if self.roll_state.original_result.spec != self.request.spec:
             raise GameLifecycleError("ChargeRollResult roll_state spec must match request.")
-        if self.value != self.roll_state.current_total:
-            raise GameLifecycleError("ChargeRollResult value must match roll_state total.")
-        min_value = self.request.spec.expression.quantity + self.request.spec.expression.modifier
-        max_value = (
-            self.request.spec.expression.quantity * self.request.spec.expression.sides
-            + self.request.spec.expression.modifier
-        )
-        if self.value < min_value or self.value > max_value:
-            raise GameLifecycleError("ChargeRollResult value must match request expression bounds.")
+        if (
+            type(self.value) is not int
+            or self.value != self.request.resolve_roll(self.roll_state).final_value
+        ):
+            raise GameLifecycleError("ChargeRollResult value must match bounded modified result.")
         object.__setattr__(
             self,
             "reachable_target_distances_inches",
@@ -345,7 +353,7 @@ class ChargeRollResult:
         return cls(
             request=request,
             roll_state=roll_state,
-            value=roll_state.current_total,
+            value=request.resolve_roll(roll_state).final_value,
             reachable_target_distances_inches=reachable_target_distances_inches,
             move_available=move_available,
             status=CHARGE_MOVE_PENDING_STATUS if move_available else CHARGE_NO_MOVE_POSSIBLE_STATUS,
@@ -356,6 +364,7 @@ class ChargeRollResult:
             "request": self.request.to_payload(),
             "roll_state": self.roll_state.to_payload(),
             "value": self.value,
+            "modified_roll": self.request.resolve_roll(self.roll_state).to_payload(),
             "reachable_target_distances_inches": dict(
                 sorted(self.reachable_target_distances_inches.items())
             ),
@@ -365,7 +374,7 @@ class ChargeRollResult:
 
     @classmethod
     def from_payload(cls, payload: ChargeRollResultPayload) -> Self:
-        return cls(
+        result = cls(
             request=ChargeRollRequest.from_payload(payload["request"]),
             roll_state=DiceRollState.from_payload(payload["roll_state"]),
             value=payload["value"],
@@ -373,6 +382,11 @@ class ChargeRollResult:
             move_available=payload["move_available"],
             status=payload["status"],
         )
+        if ModifiedRollResult.from_payload(payload["modified_roll"]) != result.request.resolve_roll(
+            result.roll_state
+        ):
+            raise GameLifecycleError("ChargeRollResult modifier trace drifted.")
+        return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -476,8 +490,6 @@ def _validate_charge_roll_modifiers(
     for modifier in modifiers:
         if type(modifier) is not RollModifier:
             raise GameLifecycleError("ChargeRollRequest roll_modifiers must contain RollModifier.")
-        if modifier.operation is not RollModifierOperation.ADD:
-            raise GameLifecycleError("Charge roll modifiers must be additive.")
         if modifier.modifier_id in seen_ids:
             raise GameLifecycleError("ChargeRollRequest roll_modifiers must not duplicate IDs.")
         seen_ids.add(modifier.modifier_id)

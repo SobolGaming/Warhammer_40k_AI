@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.modifiers import resolve_targeting_range
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -49,7 +50,7 @@ def lone_operative_target_allowed(
         attacking_unit_instance_id=attacker_unit.unit_instance_id,
         attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=target_rules_unit.unit_instance_id,
-        max_range_inches=profile.range_inches,
+        max_range_inches=resolve_targeting_range(profile.range_inches),
         placed_alive_attacker_models_only=True,
         placed_alive_target_models_only=True,
     )

@@ -1968,7 +1968,7 @@ def _resolve_charge_roll_state(
     reachable_distances = _reachable_charge_target_distances(
         state=state,
         unit_instance_id=selection.unit_instance_id,
-        maximum_distance_inches=roll_state.current_total,
+        maximum_distance_inches=roll_request.resolve_roll(roll_state).final_value,
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
@@ -2341,8 +2341,8 @@ def resolve_charge_move(
         raise GameLifecycleError("Charge Move requires a PathWitness.")
     if type(maximum_distance_inches) is not int:
         raise GameLifecycleError("Charge Move maximum distance must be an int.")
-    if maximum_distance_inches < 2 or maximum_distance_inches > 12:
-        raise GameLifecycleError("Charge Move maximum distance must be a 2D6 value.")
+    if maximum_distance_inches < 1 or maximum_distance_inches > 12:
+        raise GameLifecycleError("Charge Move maximum distance must be within 1-12.")
     target_ids = _validate_identifier_tuple(
         "selected_target_unit_instance_ids",
         selected_target_unit_instance_ids,

@@ -2274,13 +2274,13 @@ def test_phase15b_resolve_charge_move_rejects_malformed_inputs() -> None:
             maximum_distance_inches=cast(int, 6.0),
             path_witness=witness,
         )
-    with pytest.raises(GameLifecycleError, match="maximum distance must be a 2D6 value"):
+    with pytest.raises(GameLifecycleError, match="maximum distance must be within 1-12"):
         resolve_charge_move(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
             selected_target_unit_instance_ids=selected_target_unit_instance_ids,
-            maximum_distance_inches=1,
+            maximum_distance_inches=0,
             path_witness=witness,
         )
     with pytest.raises(

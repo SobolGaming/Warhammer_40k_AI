@@ -11,6 +11,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
@@ -647,34 +648,34 @@ class CatalogDatasheetRuleRuntime:
 
     def _unit_characteristic_handler(
         self, source: _CatalogClauseSource
-    ) -> Callable[[UnitCharacteristicModifierContext], int]:
-        def handler(context: UnitCharacteristicModifierContext) -> int:
+    ) -> Callable[[UnitCharacteristicModifierContext], tuple[ModifierTerm, ...]]:
+        def handler(context: UnitCharacteristicModifierContext) -> tuple[ModifierTerm, ...]:
             if not _source_applies_to_rules_unit(
                 source=source, context_unit_id=context.unit_instance_id, state=context.state
             ):
-                return context.current_value
+                return ()
             characteristic, delta = _source_characteristic_delta(source)
             if characteristic is not context.characteristic or not _source_keyword_gate_applies(
                 source
             ):
-                return context.current_value
-            return context.current_value + delta
+                return ()
+            return (ModifierTerm(ModifierOperation.ADD, delta),)
 
         return handler
 
     def _movement_handler(
         self, source: _CatalogClauseSource
-    ) -> Callable[[MovementBudgetModifierContext], float]:
-        def handler(context: MovementBudgetModifierContext) -> float:
+    ) -> Callable[[MovementBudgetModifierContext], tuple[ModifierTerm, ...]]:
+        def handler(context: MovementBudgetModifierContext) -> tuple[ModifierTerm, ...]:
             if not _source_applies_to_rules_unit(
                 source=source, context_unit_id=context.unit_instance_id, state=context.state
             ):
-                return context.current_movement_inches
+                return ()
             if context.model_instance_id not in _current_effect_target_model_ids(
                 state=context.state, source=source
             ) or not _source_keyword_gate_applies(source):
-                return context.current_movement_inches
-            return context.current_movement_inches + float(_source_characteristic_delta(source)[1])
+                return ()
+            return (ModifierTerm(ModifierOperation.ADD, _source_characteristic_delta(source)[1]),)
 
         return handler
 
@@ -718,8 +719,8 @@ class CatalogDatasheetRuleRuntime:
         self,
         source: _CatalogClauseSource,
         descriptor: CatalogConditionalProximityEffectsDescriptor,
-    ) -> Callable[[UnitCharacteristicModifierContext], int]:
-        def handler(context: UnitCharacteristicModifierContext) -> int:
+    ) -> Callable[[UnitCharacteristicModifierContext], tuple[ModifierTerm, ...]]:
+        def handler(context: UnitCharacteristicModifierContext) -> tuple[ModifierTerm, ...]:
             if (
                 context.characteristic is not descriptor.characteristic
                 or not _source_applies_to_rules_unit(
@@ -729,8 +730,8 @@ class CatalogDatasheetRuleRuntime:
                 )
                 or not _friendly_keyworded_unit_within(source=source, state=context.state)
             ):
-                return context.current_value
-            return descriptor.characteristic_value
+                return ()
+            return (ModifierTerm(ModifierOperation.SET, descriptor.characteristic_value),)
 
         return handler
 
@@ -738,18 +739,20 @@ class CatalogDatasheetRuleRuntime:
         self,
         source: _CatalogClauseSource,
         descriptor: CatalogConditionalProximityEffectsDescriptor,
-    ) -> Callable[[HistoricalBattleShockAuthorityContext, int], int]:
-        def handler(context: HistoricalBattleShockAuthorityContext, current: int) -> int:
+    ) -> Callable[[HistoricalBattleShockAuthorityContext, int], tuple[ModifierTerm, ...]]:
+        def handler(
+            context: HistoricalBattleShockAuthorityContext, current: int
+        ) -> tuple[ModifierTerm, ...]:
             if type(context) is not HistoricalBattleShockAuthorityContext:
                 raise GameLifecycleError("Catalog historical Leadership modifier requires context.")
             if descriptor.characteristic is not Characteristic.LEADERSHIP:
-                return current
+                return ()
             target = context.rules_unit(context.request.unit_instance_id)
             if (
                 source.unit.unit_instance_id not in target.component_unit_instance_ids
                 or not context.component_active_ability_model_ids(source.unit.unit_instance_id)
             ):
-                return current
+                return ()
             source_models = context.component_geometry_models(source.unit.unit_instance_id)
             for candidate in context.all_rules_units():
                 if candidate.owner_player_id != source.player_id:
@@ -761,7 +764,7 @@ class CatalogDatasheetRuleRuntime:
                     source.unit.unit_instance_id, candidate.unit_instance_id
                 )
                 if relationship is AbilitySpatialRelationship.OWN_ABILITY:
-                    return descriptor.characteristic_value
+                    return (ModifierTerm(ModifierOperation.SET, descriptor.characteristic_value),)
                 if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
                     continue
                 if any(
@@ -769,8 +772,8 @@ class CatalogDatasheetRuleRuntime:
                     for first in source_models
                     for second in context.geometry_models(candidate.unit_instance_id)
                 ):
-                    return descriptor.characteristic_value
-            return current
+                    return (ModifierTerm(ModifierOperation.SET, descriptor.characteristic_value),)
+            return ()
 
         return handler
 
@@ -1453,8 +1456,8 @@ def _positive_float_parameter(parameters: Mapping[str, object], key: str) -> flo
 
 def _historical_identity_leadership(
     _context: HistoricalBattleShockAuthorityContext, current: int
-) -> int:
-    return current
+) -> tuple[ModifierTerm, ...]:
+    return ()
 
 
 def _validate_indexes(value: object) -> Mapping[str, AbilityCatalogIndex]:

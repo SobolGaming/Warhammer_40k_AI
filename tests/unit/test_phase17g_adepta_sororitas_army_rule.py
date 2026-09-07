@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.characteristic_modifier_helpers import resolve_movement_handler
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     ruleset,
@@ -298,14 +299,14 @@ def test_triumph_relics_apply_fiery_heart_and_bloody_rose_modifiers() -> None:
     )
 
     model = triumph.own_models[0]
-    moved = army_rule.triumph_fiery_heart_movement_modifier(
+    moved = resolve_movement_handler(
+        army_rule.triumph_fiery_heart_movement_modifier,
         MovementBudgetModifierContext(
             state=state,
             unit_instance_id=triumph.unit_instance_id,
             model_instance_id=model.model_instance_id,
-            base_movement_inches=6.0,
-            current_movement_inches=6.0,
-        )
+            movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
+        ),
     )
     charge_modifiers = army_rule.triumph_fiery_heart_charge_modifier(
         ChargeRollModifierContext(
@@ -544,14 +545,14 @@ def test_triumph_relic_public_apis_noop_without_active_selection() -> None:
         == 1
     )
     assert (
-        army_rule.triumph_fiery_heart_movement_modifier(
+        resolve_movement_handler(
+            army_rule.triumph_fiery_heart_movement_modifier,
             MovementBudgetModifierContext(
                 state=state,
                 unit_instance_id=triumph.unit_instance_id,
                 model_instance_id=model.model_instance_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
-            )
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
+            ),
         )
         == 6.0
     )
@@ -680,7 +681,7 @@ def test_triumph_relic_public_apis_fail_fast_on_drift() -> None:
 def test_triumph_modifier_handlers_fail_fast_on_invalid_contexts() -> None:
     with pytest.raises(GameLifecycleError, match="movement modifier requires context"):
         army_rule.triumph_fiery_heart_movement_modifier(
-            cast(MovementBudgetModifierContext, object())
+            cast(MovementBudgetModifierContext, object()),
         )
     with pytest.raises(GameLifecycleError, match="advance modifier requires context"):
         army_rule.triumph_fiery_heart_advance_modifier(cast(AdvanceRollModifierContext, object()))
@@ -708,14 +709,16 @@ def test_triumph_modifiers_ignore_non_adepta_armies_and_units() -> None:
         )
 
         assert (
-            army_rule.triumph_fiery_heart_movement_modifier(
+            resolve_movement_handler(
+                army_rule.triumph_fiery_heart_movement_modifier,
                 MovementBudgetModifierContext(
                     state=state,
                     unit_instance_id=unit.unit_instance_id,
                     model_instance_id=model.model_instance_id,
-                    base_movement_inches=6.0,
-                    current_movement_inches=6.0,
-                )
+                    movement=CharacteristicValue(
+                        Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)
+                    ),
+                ),
             )
             == 6.0
         )

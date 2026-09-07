@@ -12,6 +12,8 @@ from warhammer40k_core.core.dice import (
     DiceRollSpecPayload,
     DiceRollState,
     DiceRollStatePayload,
+)
+from warhammer40k_core.core.modified_dice import (
     ModifiedRollResult,
     ModifiedRollResultPayload,
     UnmodifiedRollResult,

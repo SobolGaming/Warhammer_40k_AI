@@ -16,7 +16,6 @@ from warhammer40k_core.core.dice import (
     DiceRollSpec,
     DiceRollSpecError,
     DiceRollState,
-    ModifiedRollResult,
     RandomCharacteristicRoll,
     RandomCharacteristicRollPayload,
     RandomCharacteristicTiming,
@@ -28,11 +27,11 @@ from warhammer40k_core.core.dice import (
     RollOffRequest,
     RollOffResult,
     RollOffResultPayload,
-    UnmodifiedRollResult,
     random_characteristic_timing_from_token,
     reroll_component_selection_policy_from_token,
 )
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
+from warhammer40k_core.core.modifiers import RollModifier, RollModifierOperation
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -462,6 +461,31 @@ def test_modifiers_apply_after_rerolls_and_preserve_unmodified_value() -> None:
     assert modified.applied_modifier_ids == ("shadow-of-chaos-penalty",)
 
 
+@pytest.mark.parametrize(
+    ("roll_type", "raw", "modifier", "expected"),
+    [
+        ("battle_shock_roll", 2, -10, 1),
+        ("charge_roll", 12, 5, 12),
+        ("advance_roll", 6, 5, 11),
+        ("hit_roll", 4, 10, 5),
+        ("wound_roll", 1, -10, 1),
+    ],
+)
+def test_order27_modified_dice_limits(
+    roll_type: str,
+    raw: int,
+    modifier: int,
+    expected: int,
+) -> None:
+    result = ModifiedRollResult.from_unmodified(
+        UnmodifiedRollResult("roll-limits", roll_type, raw, (raw,)),
+        modifiers=(RollModifier("effect", modifier),),
+    )
+    assert result.unmodified.value == raw
+    assert result.final_value == expected
+    assert ModifiedRollResult.from_payload(result.to_payload()) == result
+
+
 def test_random_move_characteristic_is_rolled_once_for_the_whole_unit() -> None:
     manager = DiceRollManager("seed")
 
@@ -774,8 +798,11 @@ def test_phase10j_records_fail_fast_on_invalid_shapes() -> None:
             component_values=(3,),
         ),
         lambda: ModifiedRollResult(
+            intrinsic_offset=0,
             unmodified=UnmodifiedRollResult.from_state(state),
             modifiers=(RollModifier(modifier_id="bonus", operand=1),),
+            unbounded_value=4,
+            modified_value=4,
             final_value=3,
             applied_modifier_ids=("bonus",),
         ),
@@ -796,3 +823,36 @@ def manager_roll_random_move_for_non_move() -> None:
         reason="Invalid random move timing",
         values=[1],
     )
+
+
+def test_roll_algebra_uses_exact_shared_order_and_zero_roll_replacement_is_not_terminal() -> None:
+    modifiers = (
+        RollModifier("subtract", 4, operation=RollModifierOperation.SUBTRACT),
+        RollModifier("divide", 2, operation=RollModifierOperation.DIVIDE),
+        RollModifier("add", 2),
+        RollModifier("multiply", 3, operation=RollModifierOperation.MULTIPLY),
+        RollModifier("replace", 5, operation=RollModifierOperation.SET),
+    )
+    result = ModifiedRollResult.from_unmodified(
+        UnmodifiedRollResult("ordered-roll", "advance_roll", 6, (6,)),
+        modifiers=modifiers,
+    )
+    assert result.final_value == 5
+    assert result.applied_modifier_ids == ("replace", "multiply", "add", "divide", "subtract")
+    assert ModifiedRollResult.from_payload(result.to_payload()) == result
+    zero = ModifiedRollResult.from_unmodified(
+        result.unmodified,
+        modifiers=(
+            RollModifier("zero", 0, operation=RollModifierOperation.SET),
+            RollModifier("bonus", 4),
+        ),
+    )
+    assert zero.final_value == 4
+
+
+def test_roll_off_rejects_an_intrinsic_offset() -> None:
+    with pytest.raises(DiceRollSpecError, match="Roll-off"):
+        ModifiedRollResult.from_unmodified(
+            UnmodifiedRollResult("roll-off", "roll_off", 3, (3,)),
+            intrinsic_offset=1,
+        )

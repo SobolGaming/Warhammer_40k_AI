@@ -4248,7 +4248,7 @@ def test_phase14i_impossible_armour_save_remains_real_save_roll() -> None:
     assert save_roll_types == ["attack_sequence.save.armour"]
     assert save_payload["save_kind"] == SaveKind.ARMOUR.value
     assert save_payload["target_number"] == 3
-    assert save_payload["final_roll"] == 0
+    assert save_payload["final_roll"] == 1
     assert save_payload["successful"] is False
     assert save_payload["resolution_rule"] == SaveResolutionRule.FAILED.value
     assert option["save_kind"] == SaveKind.ARMOUR.value

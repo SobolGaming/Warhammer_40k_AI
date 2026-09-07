@@ -156,10 +156,10 @@ def ability_presence_fixture(
     return config, state, decisions
 
 
-def compiled_ability_rule(text: str) -> RuleIR:
+def compiled_ability_rule(text: str, *, source_id: str = "test:p01c:catalog-rule") -> RuleIR:
     ir = compile_rule_source_text(
         RuleSourceText.from_raw(
-            source_id="test:p01c:catalog-rule",
+            source_id=source_id,
             raw_text=text,
             objective_scope=ObjectiveRuleScope.CORE_RULES,
         ),

@@ -17,7 +17,7 @@ from tools.generate_aeldari_aspect_warriors_rule_ir import (
     generated_artifact_payload,
 )
 
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -1433,8 +1433,9 @@ def test_flickerjump_grant_sets_move_forbids_charge_and_resolves_phase_end_self_
                 state=fixture.state,
                 unit_instance_id=fixture.warp_spiders.unit_instance_id,
                 model_instance_id=model.model_instance_id,
-                base_movement_inches=12.0,
-                current_movement_inches=12.0,
+                movement=CharacteristicValue(
+                    Characteristic.MOVEMENT, int(12.0), int(12.0), int(12.0)
+                ),
             )
         )
         == 24.0

@@ -3,10 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine.aura_applications import non_stacking_aura_applications
+from warhammer40k_core.engine.aura_applications import (
+    non_stacking_aura_applications,
+    persisting_effects_for_lineage,
+)
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.tracked_target_state import attached_rules_unit_ids
 from warhammer40k_core.engine.unit_split_views import split_effect_predecessor_ids
 
@@ -46,12 +49,41 @@ def rules_unit_effect_applications(
     state: GameState, unit_instance_id: str
 ) -> tuple[RulesUnitEffectApplication, ...]:
     """Bind current applicability to unchanged effect provenance, once per instance."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Rules-unit effect lookup requires GameState.")
+    return rules_unit_effect_applications_from_inventory(
+        armies=tuple(state.army_definitions),
+        effects=tuple(state.persisting_effects),
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id),
+    )
+
+
+def rules_unit_effect_applications_from_inventory(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    effects: tuple[PersistingEffect, ...],
+    rules_unit: RulesUnitView,
+) -> tuple[RulesUnitEffectApplication, ...]:
+    """Use the same immutable target lineage and Aura policy for any authenticated boundary."""
+    identity_ids = tuple(
+        dict.fromkeys((rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids))
+    )
+    candidates = non_stacking_aura_applications(
+        tuple(
+            (identity_id, effect)
+            for identity_id in identity_ids
+            for effect in persisting_effects_for_lineage(
+                list(effects),
+                split_effect_predecessor_ids(armies=armies, unit_instance_id=identity_id),
+            )
+        )
+    )
     applications: list[RulesUnitEffectApplication] = []
     seen: set[str] = set()
-    for current_id, effect in rules_unit_persisting_effects(state, unit_instance_id):
-        predecessors = split_effect_predecessor_ids(
-            armies=tuple(state.army_definitions), unit_instance_id=current_id
-        )
+    for current_id, effect in candidates:
+        predecessors = split_effect_predecessor_ids(armies=armies, unit_instance_id=current_id)
         matched = tuple(target for target in predecessors if effect.applies_to_unit(target))
         if not matched:
             raise GameLifecycleError("Effect application lacks authenticated target membership.")

@@ -2290,10 +2290,11 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
 
 def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> None:
     state = battle_state(
+        game_id="phase17g-shadow-phase-snapshot-ordered-1",
         player_a_units=(
             default_unit_selection("intercessor-unit-1"),
             default_unit_selection("intercessor-unit-2"),
-        )
+        ),
     )
     _mark_player_as_chaos_daemons(state, player_id="player-a")
     unit_ids = ("army-alpha:intercessor-unit-1", "army-alpha:intercessor-unit-2")
@@ -2420,7 +2421,9 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
 
 
 def test_daemonic_terror_pending_model_choice_restores_with_provider_authority() -> None:
-    config = _chaos_daemons_lifecycle_config()
+    config = replace(
+        _chaos_daemons_lifecycle_config(), game_id="phase17g-terror-provider-ordered-1"
+    )
     source_datasheet = config.army_catalog.datasheet_by_id(CHAOS_DAEMONS_TEST_DATASHEET_ID)
     terror_datasheet = replace(
         source_datasheet,

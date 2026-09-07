@@ -44,6 +44,7 @@ from warhammer40k_core.core.deployment_zones import (
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
@@ -2824,7 +2825,7 @@ def test_purge_and_secure_real_attack_from_objective_scores_through_lifecycle() 
 def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> None:
     config = replace(
         _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup()),
-        game_id="phase11e-meatgrinder-overwatch-return-auth-1",
+        game_id="phase11e-meatgrinder-overwatch-return-p02-3",
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
@@ -7902,11 +7903,13 @@ def test_mission_action_eligibility_uses_runtime_modified_objective_control(
     )
     modified_contexts: list[ObjectiveControlModifierContext] = []
 
-    def modify_objective_control(context: ObjectiveControlModifierContext) -> int:
+    def modify_objective_control(
+        context: ObjectiveControlModifierContext,
+    ) -> tuple[ModifierTerm, ...]:
         if context.unit_instance_id != unit_id:
-            return context.current_objective_control
+            return ()
         modified_contexts.append(context)
-        return modified_objective_control
+        return (ModifierTerm(ModifierOperation.SET, modified_objective_control),)
 
     registry = RuntimeModifierRegistry.from_bindings(
         objective_control_modifier_bindings=(

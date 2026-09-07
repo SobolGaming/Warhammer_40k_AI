@@ -14,7 +14,7 @@ from tools.generate_aeldari_night_spinner_rule_ir import (
     generated_artifact_payload,
 )
 
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import (
@@ -655,6 +655,5 @@ def _movement_context(state: GameState, unit: UnitInstance) -> MovementBudgetMod
         state=state,
         unit_instance_id=unit.unit_instance_id,
         model_instance_id=unit.own_models[0].model_instance_id,
-        base_movement_inches=14.0,
-        current_movement_inches=14.0,
+        movement=CharacteristicValue(Characteristic.MOVEMENT, int(14.0), int(14.0), int(14.0)),
     )

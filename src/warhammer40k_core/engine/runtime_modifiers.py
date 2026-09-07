@@ -4,8 +4,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, cast
 
-from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.modifiers import ModifierTerm, RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
@@ -38,10 +38,10 @@ if TYPE_CHECKING:
 
 type UnitCharacteristicModifierHandler = Callable[
     ["UnitCharacteristicModifierContext"],
-    int,
+    tuple[ModifierTerm, ...],
 ]
 type HistoricalLeadershipModifierHandler = Callable[
-    ["HistoricalBattleShockAuthorityContext", int], int
+    ["HistoricalBattleShockAuthorityContext", int], tuple[ModifierTerm, ...]
 ]
 type HitRollModifierHandler = Callable[["HitRollModifierContext"], int]
 type WoundRollModifierHandler = Callable[["WoundRollModifierContext"], int]
@@ -50,8 +50,12 @@ type SaveOptionModifierHandler = Callable[
     ["SaveOptionModifierContext"],
     tuple[SaveOption, ...],
 ]
-type MovementBudgetModifierHandler = Callable[["MovementBudgetModifierContext"], float]
-type ObjectiveControlModifierHandler = Callable[["ObjectiveControlModifierContext"], int]
+type MovementBudgetModifierHandler = Callable[
+    ["MovementBudgetModifierContext"], tuple[ModifierTerm, ...]
+]
+type ObjectiveControlModifierHandler = Callable[
+    ["ObjectiveControlModifierContext"], tuple[ModifierTerm, ...]
+]
 type AdvanceRollModifierHandler = Callable[
     ["AdvanceRollModifierContext"],
     tuple[RollModifier, ...],
@@ -1037,19 +1041,13 @@ class RuntimeModifierRegistry:
         return candidates[0] if candidates else None
 
     def modified_unit_characteristic(self, context: UnitCharacteristicModifierContext) -> int:
-        if type(context) is not UnitCharacteristicModifierContext:
-            raise GameLifecycleError("Unit characteristic modifiers require a context.")
-        from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_modified_unit_characteristic,
+        from warhammer40k_core.engine.runtime_characteristic_modifiers import (
+            resolve_runtime_characteristic,
         )
 
-        current = context.current_value
-        for binding in self.unit_characteristic_modifier_bindings:
-            current = _validate_non_negative_int(
-                f"{binding.modifier_id} returned value",
-                binding.handler(replace(context, current_value=current)),
-            )
-        return generic_rule_modified_unit_characteristic(replace(context, current_value=current))
+        return resolve_runtime_characteristic(
+            context=context, bindings=self.unit_characteristic_modifier_bindings
+        ).final
 
     def hit_roll_modifier(self, context: HitRollModifierContext) -> int:
         if type(context) is not HitRollModifierContext:
@@ -1164,28 +1162,28 @@ class RuntimeModifierRegistry:
         )
 
     def modified_objective_control(self, context: ObjectiveControlModifierContext) -> int:
-        from warhammer40k_core.engine.generic_rule_objective_control import apply_generic_oc
-
-        current, _ = self.objective_control_binding_trace(context)
-        return apply_generic_oc(replace(context, current_objective_control=current))
-
-    def objective_control_binding_trace(
-        self,
-        context: ObjectiveControlModifierContext,
-    ) -> tuple[int, tuple[str, ...]]:
         if type(context) is not ObjectiveControlModifierContext:
             raise GameLifecycleError("Objective Control modifiers require a context.")
-        current = context.current_objective_control
-        applied_modifier_ids: list[str] = []
-        for binding in self.objective_control_modifier_bindings:
-            modified = _validate_non_negative_int(
-                f"{binding.modifier_id} returned Objective Control",
-                binding.handler(replace(context, current_objective_control=current)),
-            )
-            if modified != current:
-                applied_modifier_ids.append(binding.modifier_id)
-            current = modified
-        return current, tuple(applied_modifier_ids)
+        value = CharacteristicValue.from_raw(
+            Characteristic.OBJECTIVE_CONTROL, context.current_objective_control
+        )
+        return self.resolve_objective_control(context, value=value).final
+
+    def resolve_objective_control(
+        self,
+        context: ObjectiveControlModifierContext,
+        *,
+        value: CharacteristicValue,
+    ) -> CharacteristicValue:
+        from warhammer40k_core.engine.runtime_characteristic_modifiers import (
+            resolve_runtime_objective_control,
+        )
+
+        return resolve_runtime_objective_control(
+            context=context,
+            value=value,
+            bindings=self.objective_control_modifier_bindings,
+        )
 
     def advance_roll_modifiers(
         self,

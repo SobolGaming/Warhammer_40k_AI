@@ -3,14 +3,20 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
+from fractions import Fraction
+from math import ceil, isfinite
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import (
+    TARGETING_RANGE_MAXIMUM,
+    TARGETING_RANGE_MINIMUM,
     BoundedCharacteristicValue,
     Characteristic,
     CharacteristicBoundPolicy,
     CharacteristicValue,
+    CharacteristicValueKind,
     characteristic_from_token,
+    characteristic_value_kind_from_token,
     validate_characteristic_value,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -28,6 +34,8 @@ class ModifierTiming(StrEnum):
     BASE = "base"
     MULTIPLICATIVE = "multiplicative"
     ADDITIVE = "additive"
+    DIVISIVE = "divisive"
+    SUBTRACTIVE = "subtractive"
     FINAL = "final"
 
     @property
@@ -41,8 +49,12 @@ class ModifierTiming(StrEnum):
 
 class ModifierOperation(StrEnum):
     SET = "set"
+    SET_DASH = "set_dash"
+    SET_STAR = "set_star"
     ADD = "add"
     MULTIPLY = "multiply"
+    DIVIDE = "divide"
+    SUBTRACT = "subtract"
     FLOOR = "floor"
     CEILING = "ceiling"
 
@@ -72,12 +84,12 @@ class ModifierStackPayload(TypedDict):
 
 class DamageCharacteristicResolutionPayload(TypedDict):
     characteristic: str
+    value_kind: str
     raw: int
     base: int
     modifier_final: int
     final: int
     applied_modifier_ids: list[str]
-    halve_damage_after_modifiers: bool
 
 
 class RollModifierPayload(TypedDict):
@@ -92,13 +104,19 @@ _MODIFIER_TIMING_ORDER = {
     ModifierTiming.BASE: 0,
     ModifierTiming.MULTIPLICATIVE: 1,
     ModifierTiming.ADDITIVE: 2,
-    ModifierTiming.FINAL: 3,
+    ModifierTiming.DIVISIVE: 3,
+    ModifierTiming.SUBTRACTIVE: 4,
+    ModifierTiming.FINAL: 5,
 }
 
 _OPERATION_TIMINGS = {
     ModifierOperation.SET: frozenset({ModifierTiming.BASE}),
+    ModifierOperation.SET_DASH: frozenset({ModifierTiming.BASE}),
+    ModifierOperation.SET_STAR: frozenset({ModifierTiming.BASE}),
     ModifierOperation.MULTIPLY: frozenset({ModifierTiming.MULTIPLICATIVE}),
     ModifierOperation.ADD: frozenset({ModifierTiming.ADDITIVE, ModifierTiming.FINAL}),
+    ModifierOperation.DIVIDE: frozenset({ModifierTiming.DIVISIVE}),
+    ModifierOperation.SUBTRACT: frozenset({ModifierTiming.SUBTRACTIVE}),
     ModifierOperation.FLOOR: frozenset({ModifierTiming.FINAL}),
     ModifierOperation.CEILING: frozenset({ModifierTiming.FINAL}),
 }
@@ -107,8 +125,39 @@ _OPERATION_TIMINGS = {
 class RollModifierOperation(StrEnum):
     ADD = "add"
     SET = "set"
+    MULTIPLY = "multiply"
+    DIVIDE = "divide"
+    SUBTRACT = "subtract"
     FLOOR = "floor"
     CEILING = "ceiling"
+
+
+@dataclass(frozen=True, slots=True)
+class ModifierTerm:
+    """An unevaluated operation; its runtime binding supplies source identity."""
+
+    operation: ModifierOperation
+    operand: int
+
+    def bind(self, *, modifier_id: str, source_id: str, characteristic: Characteristic) -> Modifier:
+        timings = _OPERATION_TIMINGS[self.operation]
+        return Modifier(
+            modifier_id=modifier_id,
+            source_id=source_id,
+            scope=ModifierScope.for_characteristics((characteristic,)),
+            timing=min(timings, key=lambda timing: timing.order),
+            operation=self.operation,
+            operand=self.operand,
+        )
+
+    def __post_init__(self) -> None:
+        _validate_modifier_operation(self.operation)
+        # Reuse the complete operation/operand validation without evaluating it.
+        self.bind(
+            modifier_id="modifier-term-validation",
+            source_id="modifier-term-validation",
+            characteristic=Characteristic.TOUGHNESS,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -226,19 +275,13 @@ class RollModifier:
             raise ModifierError("RollModifier operand must be an integer.")
         if type(self.priority) is not int:
             raise ModifierError("RollModifier priority must be an integer.")
+        if self.operation is RollModifierOperation.DIVIDE and self.operand <= 0:
+            raise ModifierError("Roll division requires a positive divisor.")
 
-    def apply(self, value: int) -> int:
-        if type(value) is not int:
-            raise ModifierError("RollModifier value must be an integer.")
-        if self.operation is RollModifierOperation.ADD:
-            return value + self.operand
-        if self.operation is RollModifierOperation.SET:
-            return self.operand
-        if self.operation is RollModifierOperation.FLOOR:
-            return max(value, self.operand)
-        if self.operation is RollModifierOperation.CEILING:
-            return min(value, self.operand)
-        raise ModifierError("Unsupported roll modifier operation.")
+    def apply(self, value: int | Fraction) -> Fraction:
+        if type(value) not in {int, Fraction}:
+            raise ModifierError("RollModifier value must be exact numeric data.")
+        return _apply_numeric_operation(self.operation.value, self.operand, Fraction(value))
 
     def to_payload(self) -> RollModifierPayload:
         return {
@@ -305,6 +348,10 @@ class Modifier:
             raise ModifierError("Modifier priority must be an integer.")
         if self.operand == 0 and operation is ModifierOperation.MULTIPLY:
             raise ModifierError("Modifier multiply operand must not be zero.")
+        if operation is ModifierOperation.DIVIDE and self.operand <= 0:
+            raise ModifierError("Modifier division requires a positive divisor.")
+        if operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR} and self.operand:
+            raise ModifierError("Symbolic replacement modifiers require a zero numeric operand.")
         if timing not in _OPERATION_TIMINGS[operation]:
             raise ModifierError("Modifier operation is not supported at the supplied timing.")
 
@@ -335,6 +382,13 @@ class Modifier:
             priority=payload["priority"],
             exclusive_group=payload["exclusive_group"],
         )
+
+
+@dataclass(frozen=True, slots=True)
+class ModifierArithmeticStep:
+    modifier: Modifier
+    before: Fraction
+    after: Fraction
 
 
 @dataclass(frozen=True, slots=True)
@@ -385,6 +439,38 @@ class ModifierStack:
         *,
         bound_policy: CharacteristicBoundPolicy | None = None,
     ) -> CharacteristicValue:
+        applicable = self.applicable_modifiers()
+        if applicable and applicable[0].operation in {
+            ModifierOperation.SET_DASH,
+            ModifierOperation.SET_STAR,
+        }:
+            if self.characteristic is Characteristic.DETECTION_RANGE:
+                raise ModifierError("Detection Range cannot have a symbolic replacement.")
+            replacement = applicable[0]
+            return CharacteristicValue(
+                self.characteristic,
+                0,
+                0,
+                0,
+                (replacement.modifier_id,),
+                CharacteristicValueKind.REPLACEMENT_DASH
+                if replacement.operation is ModifierOperation.SET_DASH
+                else CharacteristicValueKind.REPLACEMENT_STAR,
+            )
+        if (
+            applicable
+            and self.characteristic is not Characteristic.DETECTION_RANGE
+            and applicable[0].operation is ModifierOperation.SET
+            and not applicable[0].operand
+        ):
+            return CharacteristicValue(
+                self.characteristic,
+                self.raw_value,
+                0,
+                0,
+                (applicable[0].modifier_id,),
+                CharacteristicValueKind.REPLACEMENT_ZERO,
+            )
         return self.resolve_bounded(bound_policy=bound_policy).to_characteristic_value()
 
     def resolve_bounded(
@@ -393,23 +479,28 @@ class ModifierStack:
         bound_policy: CharacteristicBoundPolicy | None = None,
     ) -> BoundedCharacteristicValue:
         base = self.raw_value
-        final = self.raw_value
+        final = Fraction(self.raw_value)
         applied_modifier_ids: list[str] = []
 
-        for modifier in self.applicable_modifiers():
+        for step in self.arithmetic_steps():
+            modifier = step.modifier
             if modifier.operation is ModifierOperation.SET:
                 base = modifier.operand
-                final = modifier.operand
-            elif modifier.operation is ModifierOperation.MULTIPLY:
-                final *= modifier.operand
-            elif modifier.operation is ModifierOperation.ADD:
-                final += modifier.operand
-            elif modifier.operation is ModifierOperation.FLOOR:
-                final = max(final, modifier.operand)
-            elif modifier.operation is ModifierOperation.CEILING:
-                final = min(final, modifier.operand)
-            else:
-                raise ModifierError("Unsupported modifier operation.")
+                final = Fraction(modifier.operand)
+                if (
+                    not modifier.operand
+                    and self.characteristic is not Characteristic.DETECTION_RANGE
+                ):
+                    return BoundedCharacteristicValue.from_values(
+                        characteristic=self.characteristic,
+                        raw=self.raw_value,
+                        base=0,
+                        unbounded_final=0,
+                        applied_modifier_ids=(modifier.modifier_id,),
+                        bound_policy=CharacteristicBoundPolicy(self.characteristic, 0, 0),
+                        value_kind=CharacteristicValueKind.REPLACEMENT_ZERO,
+                    )
+            final = step.after
 
             applied_modifier_ids.append(modifier.modifier_id)
 
@@ -422,10 +513,28 @@ class ModifierStack:
             characteristic=self.characteristic,
             raw=self.raw_value,
             base=base,
-            unbounded_final=final,
+            unbounded_final=ceil(final),
             applied_modifier_ids=tuple(applied_modifier_ids),
             bound_policy=policy,
         )
+
+    def arithmetic_steps(self) -> tuple[ModifierArithmeticStep, ...]:
+        """Exact ordered intermediate values; these are not bounded characteristics."""
+        value = Fraction(self.raw_value)
+        steps: list[ModifierArithmeticStep] = []
+        for modifier in self.applicable_modifiers():
+            if modifier.operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR}:
+                raise ModifierError("Symbolic replacement requires characteristic resolution.")
+            modified = _apply_numeric_operation(modifier.operation.value, modifier.operand, value)
+            steps.append(ModifierArithmeticStep(modifier, value, modified))
+            value = modified
+            if (
+                modifier.operation is ModifierOperation.SET
+                and not modifier.operand
+                and self.characteristic is not Characteristic.DETECTION_RANGE
+            ):
+                break
+        return tuple(steps)
 
     def to_payload(self) -> ModifierStackPayload:
         return {
@@ -452,8 +561,8 @@ class DamageCharacteristicResolution:
     modifier_final: int
     final: int
     applied_modifier_ids: tuple[str, ...]
-    halve_damage_after_modifiers: bool
     characteristic: Characteristic = Characteristic.DAMAGE
+    value_kind: CharacteristicValueKind = CharacteristicValueKind.NUMERIC
 
     def __post_init__(self) -> None:
         if self.characteristic is not Characteristic.DAMAGE:
@@ -469,19 +578,16 @@ class DamageCharacteristicResolution:
                 f"DamageCharacteristicResolution {field_name}",
                 value,
             )
-        if type(self.halve_damage_after_modifiers) is not bool:
-            raise ModifierError("halve_damage_after_modifiers must be a bool.")
         ids = _validate_identifier_tuple(
             "DamageCharacteristicResolution applied_modifier_ids",
             self.applied_modifier_ids,
         )
         if ids != self.applied_modifier_ids:
             object.__setattr__(self, "applied_modifier_ids", ids)
-        expected_final = self.modifier_final
-        if self.halve_damage_after_modifiers:
-            expected_final = _halve_damage_rounding_up(expected_final)
-        if self.final != expected_final:
+        if self.final != self.modifier_final:
             raise ModifierError("DamageCharacteristicResolution final drift.")
+        if not self.to_characteristic_value().is_numeric:
+            raise ModifierError("Damage resolution requires a numeric characteristic.")
 
     def to_characteristic_value(self) -> CharacteristicValue:
         return CharacteristicValue(
@@ -490,29 +596,30 @@ class DamageCharacteristicResolution:
             base=self.base,
             final=self.final,
             applied_modifier_ids=self.applied_modifier_ids,
+            value_kind=self.value_kind,
         )
 
     def to_payload(self) -> DamageCharacteristicResolutionPayload:
         return {
             "characteristic": self.characteristic.value,
+            "value_kind": self.value_kind.value,
             "raw": self.raw,
             "base": self.base,
             "modifier_final": self.modifier_final,
             "final": self.final,
             "applied_modifier_ids": list(self.applied_modifier_ids),
-            "halve_damage_after_modifiers": self.halve_damage_after_modifiers,
         }
 
     @classmethod
     def from_payload(cls, payload: DamageCharacteristicResolutionPayload) -> Self:
         return cls(
             characteristic=characteristic_from_token(payload["characteristic"]),
+            value_kind=characteristic_value_kind_from_token(payload["value_kind"]),
             raw=payload["raw"],
             base=payload["base"],
             modifier_final=payload["modifier_final"],
             final=payload["final"],
             applied_modifier_ids=tuple(payload["applied_modifier_ids"]),
-            halve_damage_after_modifiers=payload["halve_damage_after_modifiers"],
         )
 
 
@@ -528,8 +635,8 @@ def resolve_characteristic_value(
     modifier_tuple = tuple(modifiers)
     for modifier in modifier_tuple:
         _validate_modifier(modifier)
-    if value.is_dash:
-        if any(
+    if not value.is_numeric or value.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO:
+        if value.value_kind is CharacteristicValueKind.SOURCE_DASH and any(
             modifier.applies_to(value.characteristic, target_id=target_id)
             for modifier in modifier_tuple
         ):
@@ -548,38 +655,33 @@ def resolve_damage_characteristic(
     modifiers: Iterable[Modifier],
     *,
     target_id: str | None = None,
-    halve_damage_after_modifiers: bool = False,
     damage_zero_permitted: bool = False,
 ) -> DamageCharacteristicResolution:
     if type(value) is not CharacteristicValue:
         raise ModifierError("resolve_damage_characteristic requires a CharacteristicValue.")
     if value.characteristic is not Characteristic.DAMAGE:
         raise ModifierError("resolve_damage_characteristic requires a Damage value.")
-    if value.is_dash:
+    if not value.is_numeric:
         raise ModifierError("Damage cannot be resolved from a dash characteristic value.")
-    if type(halve_damage_after_modifiers) is not bool:
-        raise ModifierError("halve_damage_after_modifiers must be a bool.")
-    bounded = ModifierStack(
-        characteristic=Characteristic.DAMAGE,
-        raw_value=value.raw,
-        modifiers=tuple(modifiers),
+    bounded = resolve_characteristic_value(
+        value,
+        modifiers,
         target_id=target_id,
-    ).resolve_bounded(
         bound_policy=CharacteristicBoundPolicy.for_characteristic(
             Characteristic.DAMAGE,
             damage_zero_permitted=damage_zero_permitted,
-        )
+        ),
     )
+    if not bounded.is_numeric:
+        raise ModifierError("Damage resolution requires a numeric characteristic.")
     final = bounded.final
-    if halve_damage_after_modifiers:
-        final = _halve_damage_rounding_up(final)
     return DamageCharacteristicResolution(
         raw=bounded.raw,
         base=bounded.base,
         modifier_final=bounded.final,
         final=final,
         applied_modifier_ids=bounded.applied_modifier_ids,
-        halve_damage_after_modifiers=halve_damage_after_modifiers,
+        value_kind=bounded.value_kind,
     )
 
 
@@ -616,6 +718,25 @@ def apply_roll_modifiers(
     value: int,
     modifiers: Iterable[RollModifier],
 ) -> tuple[int, tuple[str, ...]]:
+    resolution = resolve_roll_modifiers(value, modifiers)
+    return resolution.final, resolution.applied_modifier_ids
+
+
+@dataclass(frozen=True, slots=True)
+class RollModifierResolution:
+    unbounded: int
+    modified: int
+    final: int
+    applied_modifier_ids: tuple[str, ...]
+
+
+def resolve_roll_modifiers(
+    value: int,
+    modifiers: Iterable[RollModifier],
+    *,
+    maximum: int | None = None,
+    maximum_modifier: int | None = None,
+) -> RollModifierResolution:
     if type(value) is not int:
         raise ModifierError("Roll modifier input value must be an integer.")
     modifier_tuple = tuple(modifiers)
@@ -623,13 +744,60 @@ def apply_roll_modifiers(
         if type(modifier) is not RollModifier:
             raise ModifierError("Roll modifiers must contain RollModifier instances.")
     _validate_unique_roll_modifier_ids(modifier_tuple)
+    if sum(m.operation is RollModifierOperation.SET for m in modifier_tuple) > 1:
+        raise ModifierStackingError("Multiple roll replacements require explicit selection.")
 
-    final = value
+    if maximum is not None and (type(maximum) is not int or maximum < 1):
+        raise ModifierError("Roll maximum must be a positive integer.")
+    if maximum_modifier is not None and (type(maximum_modifier) is not int or maximum_modifier < 0):
+        raise ModifierError("Roll modifier limit must be a non-negative integer.")
+    final = Fraction(value)
     applied_modifier_ids: list[str] = []
     for modifier in sorted(modifier_tuple, key=_roll_modifier_order_key):
         final = modifier.apply(final)
         applied_modifier_ids.append(modifier.modifier_id)
-    return final, tuple(applied_modifier_ids)
+    unbounded = ceil(final)
+    modified = bound_modified_roll(unbounded)
+    limited = unbounded
+    if maximum_modifier is not None:
+        limited = value + max(-maximum_modifier, min(maximum_modifier, unbounded - value))
+    return RollModifierResolution(
+        unbounded,
+        modified,
+        bound_modified_roll(limited, maximum=maximum),
+        tuple(applied_modifier_ids),
+    )
+
+
+def resolve_targeting_range(value: float) -> float:
+    """Apply the common Detection/Lone Operative limit after all range effects."""
+    if type(value) not in {int, float} or not isfinite(value):
+        raise ModifierError("Targeting range must be a finite number.")
+    return max(float(TARGETING_RANGE_MINIMUM), min(float(TARGETING_RANGE_MAXIMUM), float(value)))
+
+
+def resolve_distance_deltas(
+    value: float, deltas: tuple[tuple[str, float], ...]
+) -> tuple[float, tuple[tuple[str, float, float], ...]]:
+    """Resolve subsequent distance additions exactly, with one final nonnegative bound."""
+    if type(value) not in {int, float} or not isfinite(value) or value < 0:
+        raise ModifierError("Distance must be finite and nonnegative.")
+    ids: set[str] = set()
+    for modifier_id, delta in deltas:
+        _validate_identifier("Distance modifier ID", modifier_id)
+        if modifier_id in ids:
+            raise ModifierStackingError("Distance modifier IDs must be unique.")
+        ids.add(modifier_id)
+        if type(delta) not in {int, float} or not isfinite(delta):
+            raise ModifierError("Distance modifier must be finite numeric data.")
+    current = Fraction(str(value))
+    steps: list[tuple[str, float, float]] = []
+    for modifier_id, delta in sorted(deltas, key=lambda item: (item[1] < 0, item[0])):
+        modified = _apply_numeric_operation("add", Fraction(str(delta)), current)
+        if modified != current:
+            steps.append((modifier_id, float(current), float(modified)))
+        current = modified
+    return float(max(Fraction(0), current)), tuple(steps)
 
 
 def _validate_characteristic(characteristic: object) -> Characteristic:
@@ -702,11 +870,7 @@ def _validate_unique_roll_modifier_ids(modifiers: tuple[RollModifier, ...]) -> N
 
 
 def _validate_supported_stacking(modifiers: tuple[Modifier, ...]) -> None:
-    base_setters = [
-        modifier
-        for modifier in modifiers
-        if modifier.timing is ModifierTiming.BASE and modifier.operation is ModifierOperation.SET
-    ]
+    base_setters = [modifier for modifier in modifiers if modifier.timing is ModifierTiming.BASE]
     if len(base_setters) > 1:
         raise ModifierStackingError("Multiple base-setting modifiers are unsupported.")
 
@@ -722,17 +886,60 @@ def _validate_supported_stacking(modifiers: tuple[Modifier, ...]) -> None:
 
 
 def _modifier_order_key(modifier: Modifier) -> tuple[int, int, str]:
-    return (modifier.timing.order, modifier.priority, modifier.modifier_id)
-
-
-def _roll_modifier_order_key(modifier: RollModifier) -> tuple[int, str]:
-    return (modifier.priority, modifier.modifier_id)
-
-
-def _halve_damage_rounding_up(value: int) -> int:
-    validate_characteristic_value(
-        Characteristic.DAMAGE,
-        "halve_damage_after_modifiers value",
-        value,
+    return (
+        _operation_order(modifier.operation.value, modifier.operand),
+        modifier.priority,
+        modifier.modifier_id,
     )
-    return (value + 1) // 2
+
+
+def _roll_modifier_order_key(modifier: RollModifier) -> tuple[int, int, str]:
+    return (
+        _operation_order(modifier.operation.value, modifier.operand),
+        modifier.priority,
+        modifier.modifier_id,
+    )
+
+
+def _operation_order(operation: str, operand: int) -> int:
+    if operation in {"set", "set_dash", "set_star"}:
+        return 0
+    if operation == "multiply":
+        return 1
+    if operation == "add":
+        return 2 if operand >= 0 else 4
+    if operation == "divide":
+        return 3
+    if operation == "subtract":
+        return 4 if operand >= 0 else 2
+    if operation in {"floor", "ceiling"}:
+        return 5
+    raise ModifierError("Unsupported ordered operation.")
+
+
+def bound_modified_roll(value: int, *, maximum: int | None = None) -> int:
+    """The terminal dice minimum, followed by a source-defined result cap."""
+    if type(value) is not int:
+        raise ModifierError("Modified dice value must be an integer.")
+    if maximum is not None and (type(maximum) is not int or maximum < 1):
+        raise ModifierError("Modified dice maximum must be a positive integer.")
+    modified = max(1, value)
+    return modified if maximum is None else min(modified, maximum)
+
+
+def _apply_numeric_operation(operation: str, operand: int | Fraction, value: Fraction) -> Fraction:
+    if operation == "set":
+        return Fraction(operand)
+    if operation == "multiply":
+        return value * operand
+    if operation == "add":
+        return value + operand
+    if operation == "divide":
+        return value / operand
+    if operation == "subtract":
+        return value - operand
+    if operation == "floor":
+        return max(value, Fraction(operand))
+    if operation == "ceiling":
+        return min(value, Fraction(operand))
+    raise ModifierError("Unsupported numeric modifier operation.")

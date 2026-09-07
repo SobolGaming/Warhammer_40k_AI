@@ -12,9 +12,10 @@ from tests.support.wahapedia_bridge_fixtures import screamers_bridge_artifacts
 from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_version
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.detachment import DetachmentDefinition
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -202,8 +203,7 @@ def test_movement_action_modifier_ignore_subsets_use_finite_lifecycle_and_round_
                 state=state,
                 unit_instance_id="army-alpha:intercessor-unit-1",
                 model_instance_id=model_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
             )
         )
         == expected_movement_inches
@@ -942,7 +942,9 @@ def _movement_modifier_ignore_registry() -> RuntimeModifierRegistry:
     )
 
 
-def _modifier_ignore_movement_penalty(context: MovementBudgetModifierContext) -> float:
+def _modifier_ignore_movement_penalty(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     source_unit = next(
         unit
         for army in context.state.army_definitions
@@ -950,8 +952,8 @@ def _modifier_ignore_movement_penalty(context: MovementBudgetModifierContext) ->
         if unit.unit_instance_id == context.unit_instance_id
     )
     if context.model_instance_id != source_unit.own_model_ids()[0]:
-        return context.current_movement_inches
-    return context.current_movement_inches - 2.0
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, -2),)
 
 
 def _modifier_ignore_advance_penalty(

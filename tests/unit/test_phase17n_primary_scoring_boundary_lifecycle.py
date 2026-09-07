@@ -32,6 +32,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
@@ -1092,7 +1093,10 @@ def test_forged_commit_checkpoint_pose_without_physical_event_fails_restore() ->
         GameLifecycle.from_payload(payload)
 
 
-def test_forged_commit_checkpoint_modifier_source_fails_registry_restore() -> None:
+@pytest.mark.parametrize(
+    "value_kind", ["numeric", "replacement_zero", "replacement_dash", "replacement_star"]
+)
+def test_forged_commit_checkpoint_modifier_source_fails_registry_restore(value_kind: str) -> None:
     lifecycle = _scored_command_boundary_after_mutation(kind="move")
     payload = deepcopy(lifecycle.to_payload())
     events = payload["decisions"]["event_log"]
@@ -1113,6 +1117,12 @@ def test_forged_commit_checkpoint_modifier_source_fails_registry_restore() -> No
             applied.append(modifier_id)
     applied.append("p2-forged-oc-modifier")
     resolved_payload["applied_modifier_ids"] = validate_json_value(applied)
+    if value_kind != "numeric":
+        resolved_payload["value_kind"] = value_kind
+        resolved_payload["base"] = 0
+        resolved_payload["final"] = 0
+        if value_kind != "replacement_zero":
+            resolved_payload["raw"] = 0
     rewritten_states = (
         replace(first, resolved_objective_control_json=canonical_json(resolved_payload)),
         *checkpoint.model_states[1:],
@@ -1216,9 +1226,9 @@ def test_sticky_control_expires_during_successful_atomic_secondary() -> None:
 
 
 def test_runtime_oc_modifier_changes_secondary_scoring_result() -> None:
-    def _zero_oc(context: ObjectiveControlModifierContext) -> int:
+    def _zero_oc(context: ObjectiveControlModifierContext) -> tuple[ModifierTerm, ...]:
         assert context.current_objective_control >= 0
-        return 0
+        return (ModifierTerm(ModifierOperation.SET, 0),)
 
     registry = RuntimeModifierRegistry.from_bindings(
         objective_control_modifier_bindings=(

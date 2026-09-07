@@ -13,11 +13,6 @@ from warhammer40k_core.core.dice_result_override import (
     DiceRollOverrideRecord,
     DiceRollOverrideRecordPayload,
 )
-from warhammer40k_core.core.modifiers import (
-    RollModifier,
-    RollModifierPayload,
-    apply_roll_modifiers,
-)
 
 type DiceRollSource = Literal["rng", "fixed", "injected"]
 
@@ -135,20 +130,6 @@ class RerollRecordPayload(TypedDict):
     replacement_result: DiceRollResultPayload
     final_values: list[int]
     final_unmodified_value: int
-
-
-class UnmodifiedRollResultPayload(TypedDict):
-    roll_id: str
-    roll_type: str
-    value: int
-    component_values: list[int]
-
-
-class ModifiedRollResultPayload(TypedDict):
-    unmodified: UnmodifiedRollResultPayload
-    modifiers: list[RollModifierPayload]
-    final_value: int
-    applied_modifier_ids: list[str]
 
 
 class RandomCharacteristicRollPayload(TypedDict):
@@ -1209,132 +1190,6 @@ class RerollRecord:
             replacement_result=DiceRollResult.from_payload(payload["replacement_result"]),
             final_values=tuple(payload["final_values"]),
             final_unmodified_value=payload["final_unmodified_value"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class UnmodifiedRollResult:
-    roll_id: str
-    roll_type: str
-    value: int
-    component_values: tuple[int, ...]
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "roll_id",
-            _dice_validation.validate_identifier("UnmodifiedRollResult roll_id", self.roll_id),
-        )
-        object.__setattr__(
-            self,
-            "roll_type",
-            _dice_validation.validate_identifier("UnmodifiedRollResult roll_type", self.roll_type),
-        )
-        if type(self.value) is not int:
-            raise DiceRollSpecError("UnmodifiedRollResult value must be an integer.")
-        component_values = _dice_validation.validate_int_tuple(
-            "UnmodifiedRollResult component_values",
-            self.component_values,
-        )
-        if component_values != self.component_values:
-            object.__setattr__(self, "component_values", component_values)
-
-    @classmethod
-    def from_state(cls, state: DiceRollState) -> Self:
-        if type(state) is not DiceRollState:
-            raise DiceRollSpecError("UnmodifiedRollResult state must be a DiceRollState.")
-        return cls(
-            roll_id=state.original_result.roll_id,
-            roll_type=state.original_result.spec.roll_type,
-            value=state.current_total,
-            component_values=state.current_values,
-        )
-
-    def to_payload(self) -> UnmodifiedRollResultPayload:
-        return {
-            "roll_id": self.roll_id,
-            "roll_type": self.roll_type,
-            "value": self.value,
-            "component_values": list(self.component_values),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: UnmodifiedRollResultPayload) -> Self:
-        return cls(
-            roll_id=payload["roll_id"],
-            roll_type=payload["roll_type"],
-            value=payload["value"],
-            component_values=tuple(payload["component_values"]),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class ModifiedRollResult:
-    unmodified: UnmodifiedRollResult
-    modifiers: tuple[RollModifier, ...]
-    final_value: int
-    applied_modifier_ids: tuple[str, ...]
-
-    def __post_init__(self) -> None:
-        if type(self.unmodified) is not UnmodifiedRollResult:
-            raise DiceRollSpecError(
-                "ModifiedRollResult unmodified must be an UnmodifiedRollResult."
-            )
-        modifiers = tuple(self.modifiers)
-        for modifier in modifiers:
-            if type(modifier) is not RollModifier:
-                raise DiceRollSpecError("ModifiedRollResult modifiers must contain RollModifier.")
-        if modifiers != self.modifiers:
-            object.__setattr__(self, "modifiers", modifiers)
-        final_value, applied_modifier_ids = apply_roll_modifiers(
-            self.unmodified.value,
-            modifiers,
-        )
-        if self.final_value != final_value:
-            raise DiceRollSpecError("ModifiedRollResult final_value does not match modifiers.")
-        if self.applied_modifier_ids != applied_modifier_ids:
-            raise DiceRollSpecError(
-                "ModifiedRollResult applied_modifier_ids do not match modifiers."
-            )
-
-    @classmethod
-    def from_unmodified(
-        cls,
-        unmodified: UnmodifiedRollResult,
-        *,
-        modifiers: Iterable[RollModifier] = (),
-    ) -> Self:
-        modifier_tuple = tuple(modifiers)
-        if unmodified.roll_type == "roll_off" and modifier_tuple:
-            raise DiceRollSpecError("Roll-off results cannot be modified.")
-        final_value, applied_modifier_ids = apply_roll_modifiers(
-            unmodified.value,
-            modifier_tuple,
-        )
-        return cls(
-            unmodified=unmodified,
-            modifiers=modifier_tuple,
-            final_value=final_value,
-            applied_modifier_ids=applied_modifier_ids,
-        )
-
-    def to_payload(self) -> ModifiedRollResultPayload:
-        return {
-            "unmodified": self.unmodified.to_payload(),
-            "modifiers": [modifier.to_payload() for modifier in self.modifiers],
-            "final_value": self.final_value,
-            "applied_modifier_ids": list(self.applied_modifier_ids),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ModifiedRollResultPayload) -> Self:
-        return cls(
-            unmodified=UnmodifiedRollResult.from_payload(payload["unmodified"]),
-            modifiers=tuple(
-                RollModifier.from_payload(modifier) for modifier in payload["modifiers"]
-            ),
-            final_value=payload["final_value"],
-            applied_modifier_ids=tuple(payload["applied_modifier_ids"]),
         )
 
 

@@ -31,6 +31,12 @@ class CharacteristicValueKind(StrEnum):
     NUMERIC = "numeric"
     SOURCE_DASH = "source_dash"
     REPLACEMENT_DASH = "replacement_dash"
+    REPLACEMENT_ZERO = "replacement_zero"
+    REPLACEMENT_STAR = "replacement_star"
+
+
+TARGETING_RANGE_MINIMUM = 9
+TARGETING_RANGE_MAXIMUM = 30
 
 
 class CharacteristicValuePayload(TypedDict):
@@ -51,6 +57,7 @@ class CharacteristicBoundPolicyPayload(TypedDict):
 
 class BoundedCharacteristicValuePayload(TypedDict):
     characteristic: str
+    value_kind: str
     raw: int
     base: int
     unbounded_final: int
@@ -83,10 +90,13 @@ class CharacteristicValue:
         _validate_characteristic_number(characteristic, "raw", self.raw)
         _validate_characteristic_number(characteristic, "base", self.base)
         _validate_characteristic_number(characteristic, "final", self.final)
-        if value_kind is not CharacteristicValueKind.NUMERIC and (
-            self.raw != 0 or self.base != 0 or self.final != 0
-        ):
+        if value_kind not in {
+            CharacteristicValueKind.NUMERIC,
+            CharacteristicValueKind.REPLACEMENT_ZERO,
+        } and (self.raw != 0 or self.base != 0 or self.final != 0):
             raise CharacteristicError("Dash characteristic values must use zero numeric fields.")
+        if value_kind is CharacteristicValueKind.REPLACEMENT_ZERO and (self.base or self.final):
+            raise CharacteristicError("Terminal zero replacement must retain zero base and final.")
 
         ids = _validate_identifier_tuple(
             "CharacteristicValue applied_modifier_ids",
@@ -136,11 +146,17 @@ class CharacteristicValue:
 
     @property
     def is_dash(self) -> bool:
-        return self.value_kind is not CharacteristicValueKind.NUMERIC
+        return self.value_kind in {
+            CharacteristicValueKind.SOURCE_DASH,
+            CharacteristicValueKind.REPLACEMENT_DASH,
+        }
 
     @property
     def is_numeric(self) -> bool:
-        return self.value_kind is CharacteristicValueKind.NUMERIC
+        return self.value_kind in {
+            CharacteristicValueKind.NUMERIC,
+            CharacteristicValueKind.REPLACEMENT_ZERO,
+        }
 
     def to_payload(self) -> CharacteristicValuePayload:
         return {
@@ -251,6 +267,7 @@ class BoundedCharacteristicValue:
     final: int
     applied_modifier_ids: tuple[str, ...]
     bound_policy: CharacteristicBoundPolicy
+    value_kind: CharacteristicValueKind = CharacteristicValueKind.NUMERIC
 
     def __post_init__(self) -> None:
         characteristic = _ensure_characteristic(self.characteristic)
@@ -278,6 +295,13 @@ class BoundedCharacteristicValue:
             raise CharacteristicError(
                 "BoundedCharacteristicValue final must match bound policy application."
             )
+        kind = characteristic_value_kind_from_token(self.value_kind)
+        object.__setattr__(self, "value_kind", kind)
+        if kind not in {CharacteristicValueKind.NUMERIC, CharacteristicValueKind.REPLACEMENT_ZERO}:
+            raise CharacteristicError("Bounded characteristic values must be numeric.")
+        if kind is CharacteristicValueKind.REPLACEMENT_ZERO and self.unbounded_final:
+            raise CharacteristicError("Terminal zero replacement cannot have nonzero arithmetic.")
+        self.to_characteristic_value()
 
     @classmethod
     def from_values(
@@ -289,6 +313,7 @@ class BoundedCharacteristicValue:
         unbounded_final: int,
         applied_modifier_ids: tuple[str, ...] = (),
         bound_policy: CharacteristicBoundPolicy | None = None,
+        value_kind: CharacteristicValueKind = CharacteristicValueKind.NUMERIC,
     ) -> Self:
         valid_characteristic = _ensure_characteristic(characteristic)
         policy = (
@@ -304,6 +329,7 @@ class BoundedCharacteristicValue:
             final=policy.apply(unbounded_final),
             applied_modifier_ids=applied_modifier_ids,
             bound_policy=policy,
+            value_kind=value_kind,
         )
 
     def to_characteristic_value(self) -> CharacteristicValue:
@@ -313,12 +339,13 @@ class BoundedCharacteristicValue:
             base=self.base,
             final=self.final,
             applied_modifier_ids=self.applied_modifier_ids,
-            value_kind=CharacteristicValueKind.NUMERIC,
+            value_kind=self.value_kind,
         )
 
     def to_payload(self) -> BoundedCharacteristicValuePayload:
         return {
             "characteristic": self.characteristic.value,
+            "value_kind": self.value_kind.value,
             "raw": self.raw,
             "base": self.base,
             "unbounded_final": self.unbounded_final,
@@ -331,6 +358,7 @@ class BoundedCharacteristicValue:
     def from_payload(cls, payload: BoundedCharacteristicValuePayload) -> Self:
         return cls(
             characteristic=characteristic_from_token(payload["characteristic"]),
+            value_kind=characteristic_value_kind_from_token(payload["value_kind"]),
             raw=payload["raw"],
             base=payload["base"],
             unbounded_final=payload["unbounded_final"],
@@ -442,10 +470,11 @@ _DEFAULT_MINIMUMS = {
     Characteristic.ATTACKS: 1,
     Characteristic.DAMAGE: 1,
     Characteristic.RANGE: 1,
-    Characteristic.DETECTION_RANGE: 0,
+    Characteristic.DETECTION_RANGE: TARGETING_RANGE_MINIMUM,
 }
 
 _DEFAULT_MAXIMUMS = {
+    Characteristic.DETECTION_RANGE: TARGETING_RANGE_MAXIMUM,
     Characteristic.LEADERSHIP: 9,
     Characteristic.ARMOR_PENETRATION: 0,
 }

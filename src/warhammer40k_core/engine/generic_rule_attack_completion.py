@@ -38,10 +38,8 @@ def expire_attack_sequence_scoped_generic_effects(
         raise GameLifecycleError("Generic attack completion requires BattlePhase.")
     if type(attack_sequence) is not AttackSequence:
         raise GameLifecycleError("Generic attack completion requires AttackSequence.")
-    effect_ids = tuple(
-        effect.effect_id
-        for effect in state.persisting_effects
-        if _generic_effect_attack_sequence_id(effect) == attack_sequence.sequence_id
+    effect_ids = generic_attack_sequence_expiration_ids(
+        effects=tuple(state.persisting_effects), sequence_id=attack_sequence.sequence_id
     )
     removed = state.remove_persisting_effects_by_id(effect_ids)
     if not removed:
@@ -61,6 +59,16 @@ def expire_attack_sequence_scoped_generic_effects(
         ),
     )
     return removed
+
+
+def generic_attack_sequence_expiration_ids(
+    *, effects: tuple[PersistingEffect, ...], sequence_id: str
+) -> tuple[str, ...]:
+    return tuple(
+        effect.effect_id
+        for effect in effects
+        if _generic_effect_attack_sequence_id(effect) == sequence_id
+    )
 
 
 def _generic_effect_attack_sequence_id(effect: PersistingEffect) -> str | None:

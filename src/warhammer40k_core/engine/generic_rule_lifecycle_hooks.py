@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
 
+from warhammer40k_core.core.modifiers import ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -995,15 +996,15 @@ def _objective_control_modifier_handler_for_descriptor(
     source: GenericRuleAbilitySource,
     descriptor: GenericRuleObjectiveControlModifierAbility,
 ) -> ObjectiveControlModifierHandler:
-    def handler(context: ObjectiveControlModifierContext) -> int:
+    def handler(context: ObjectiveControlModifierContext) -> tuple[ModifierTerm, ...]:
         if type(context) is not ObjectiveControlModifierContext:
             raise GameLifecycleError("Generic RuleIR objective-control modifier requires context.")
         if not descriptor.context_predicate(context, source):
-            return context.current_objective_control
+            return ()
         modified = descriptor.modifier_builder(context, source)
-        if type(modified) is not int:
+        if type(modified) is not tuple or any(type(term) is not ModifierTerm for term in modified):
             raise GameLifecycleError(
-                "Generic RuleIR objective-control modifier must return an int."
+                "Generic RuleIR objective-control modifier must return typed modifier terms."
             )
         return modified
 

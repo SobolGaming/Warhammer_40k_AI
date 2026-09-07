@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.movement_options_dice import _mission_action_state_is_active_for_unit, _movement_action_options, _advance_roll_request_for_action, _roll_advance_dice, _record_advance_roll_resolved_event, _advance_roll_reroll_request, _dice_roll_manager_for_state, _advance_reroll_permission_for_unit, _roll_desperate_escape_dice, _desperate_escape_model_selection_request, _desperate_escape_model_selection_options
     from warhammer40k_core.engine.phases.movement_resolvers import resolve_normal_move, resolve_advance_move, resolve_fall_back_move, _resolve_unit_move, _default_move_witness, _default_fall_back_witness, _movement_transition_batch, _fall_back_transition_batch, _normal_move_transition_batch, _movement_action_availability_result
     from warhammer40k_core.engine.phases.movement_geometry import _movement_action_availability_context, _enemy_engagement_model_ids_for_unit, _enemy_engaged_unit_ids_for_unit_placement, _hover_mode_state_for_unit, _desperate_escape_requirements_for_fall_back, _enemy_model_ids_crossed_by_witness, _sampled_witness_transit_poses, _interpolate_pose, _model_at_pose, _geometry_models_for_unit_placement, _friendly_geometry_models_for_path, _enemy_geometry_models_for_player, _friendly_vehicle_monster_model_ids, _enemy_vehicle_monster_model_ids_for_player, _unit_has_vehicle_or_monster_keyword, _unit_has_deep_strike_keyword, _canonical_keyword, _validate_ability_index_mapping, _ability_index_for_player, _validate_move_witness_matches_unit, _path_result_with_aircraft_violations, _normal_move_violation_code
-    from warhammer40k_core.engine.phases.movement_validation import _movement_action_invalid_payload, assert_move_units_step_complete_for_reinforcements, _remaining_move_units_unit_ids, _normal_move_invalid_message, _ensure_movement_phase_state, _validate_movement_phase_state, _battlefield_scenario, _movement_unit_options, _active_player_id, movement_phase_action_kind_from_token, fall_back_mode_kind_from_token, movement_phase_step_kind_from_token, desperate_escape_requirement_reason_from_token, movement_mode_for_phase_action, _movement_mode_from_payload, _movement_mode_from_proposal_submission, _fall_back_mode_from_payload, _fall_back_mode_from_proposal_submission, _movement_action_option_id, _movement_action_label, _movement_modes_for_action_options, _unit_can_take_to_the_skies, _fall_back_modes_for_parameterized_option, _fall_back_result_with_mode, _fall_back_mode_violation_code, _model_movement_inches, _model_base_movement_inches, _model_movement_budget_inches, _movement_distance_modifier_inches, _movement_mode_for_action, _temporary_movement_keywords_for_unit, _movement_bonus_inches_for_unit, _effective_movement_keywords, _model_default_movement_distance_inches, _modified_movement_inches, _runtime_modifier_registry, _default_move_end_pose, _ruleset_descriptor_for_handler, _mission_setup_for_live_reinforcements, _objective_markers_for_state, _active_movement_selection, _ensure_transport_cargo_phase_states, _unit_instance_by_id, _unit_has_keyword, _transport_status_for_movement_action, _movement_completion_context_payload, _transport_operation_invalid_payload, _request_payload_for_result, _decision_payload_object, _payload_string, _payload_object, _payload_json_object, _identifier_list_from_json_object, _payload_positive_int, _optional_payload_path_witness, _payload_model_displacement_kind, _payload_transition_batch, _payload_json_array, _validate_json_object, _validate_movement_action_tuple, _validate_transport_restriction_override_tuple, _validate_path_validation_result_tuple, _validate_terrain_path_legality_result_tuple, _validate_desperate_escape_reason_tuple, _validate_desperate_escape_requirement_tuple, _validate_desperate_escape_roll_tuple, _validate_identifier_tuple, _validate_movement_distance_records, _validate_objective_marker_tuple, _validate_advance_roll_spec, _validate_identifier, _validate_positive_int, _validate_non_negative_finite_number, _validate_bool
+    from warhammer40k_core.engine.phases.movement_validation import _movement_action_invalid_payload, assert_move_units_step_complete_for_reinforcements, _remaining_move_units_unit_ids, _normal_move_invalid_message, _ensure_movement_phase_state, _validate_movement_phase_state, _battlefield_scenario, _movement_unit_options, _active_player_id, movement_phase_action_kind_from_token, fall_back_mode_kind_from_token, movement_phase_step_kind_from_token, desperate_escape_requirement_reason_from_token, movement_mode_for_phase_action, _movement_mode_from_payload, _movement_mode_from_proposal_submission, _fall_back_mode_from_payload, _fall_back_mode_from_proposal_submission, _movement_action_option_id, _movement_action_label, _movement_modes_for_action_options, _unit_can_take_to_the_skies, _fall_back_modes_for_parameterized_option, _fall_back_result_with_mode, _fall_back_mode_violation_code, _model_movement_inches, _model_base_movement_inches, _model_movement_budget_inches, _movement_distance_modifier_inches, _movement_mode_for_action, _temporary_movement_keywords_for_unit, _movement_bonus_inches_for_unit, _effective_movement_keywords, _model_default_movement_distance_inches, _modified_movement_inches, _runtime_modifier_registry, _default_move_end_pose, _ruleset_descriptor_for_handler, _mission_setup_for_live_reinforcements, _objective_markers_for_state, _active_movement_selection, _ensure_transport_cargo_phase_states, _unit_instance_by_id, _unit_has_keyword, _transport_status_for_movement_action, _movement_completion_context_payload, _transport_operation_invalid_payload, _request_payload_for_result, _decision_payload_object, _payload_string, _payload_object, _payload_json_object, _identifier_list_from_json_object, _payload_positive_int, _optional_payload_path_witness, _payload_model_displacement_kind, _payload_transition_batch, _payload_json_array, _validate_json_object, _validate_movement_action_tuple, _validate_transport_restriction_override_tuple, _validate_path_validation_result_tuple, _validate_terrain_path_legality_result_tuple, _validate_desperate_escape_reason_tuple, _validate_desperate_escape_requirement_tuple, _validate_desperate_escape_roll_tuple, _validate_identifier_tuple, _validate_movement_distance_records, _validate_objective_marker_tuple, _validate_identifier, _validate_positive_int, _validate_non_negative_finite_number, _validate_bool
 
 # fmt: on
 
@@ -139,24 +139,6 @@ def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
     return MappingProxyType({})
 
 
-def _validate_movement_roll_modifiers(
-    field_name: str,
-    value: object,
-) -> tuple[RollModifier, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    modifiers: list[RollModifier] = []
-    seen: set[str] = set()
-    for modifier in cast(tuple[object, ...], value):
-        if type(modifier) is not RollModifier:
-            raise GameLifecycleError(f"{field_name} must contain RollModifier values.")
-        if modifier.modifier_id in seen:
-            raise GameLifecycleError(f"{field_name} must not duplicate modifier IDs.")
-        seen.add(modifier.modifier_id)
-        modifiers.append(modifier)
-    return tuple(modifiers)
-
-
 type _MovementProposalParseResult = (
     tuple[MovementProposalRequest, MovementProposalPayload] | LifecycleStatus
 )
@@ -220,23 +202,6 @@ class MovementDistanceRecordPayload(TypedDict):
     unit_instance_id: str
     maximum_model_distance_inches: float
     maximum_model_horizontal_distance_inches: float
-
-
-class AdvanceRollRequestPayload(TypedDict):
-    request_id: str
-    game_id: str
-    battle_round: int
-    player_id: str
-    unit_instance_id: str
-    spec: DiceRollSpecPayload
-    roll_modifiers: list[RollModifierPayload]
-    reroll_permission: RerollPermissionPayload | None
-
-
-class AdvanceRollResultPayload(TypedDict):
-    request: AdvanceRollRequestPayload
-    roll_state: DiceRollStatePayload
-    value: int
 
 
 class MovementDiceRecordPayload(TypedDict):
@@ -496,180 +461,6 @@ class MovementActionAvailabilityResult:
                 movement_phase_action_kind_from_token(action)
                 for action in payload["unavailable_actions"]
             ),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class AdvanceRollRequest:
-    request_id: str
-    game_id: str
-    battle_round: int
-    player_id: str
-    unit_instance_id: str
-    spec: DiceRollSpec
-    roll_modifiers: tuple[RollModifier, ...] = ()
-    reroll_permission: RerollPermission | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "request_id",
-            _validate_identifier("AdvanceRollRequest request_id", self.request_id),
-        )
-        object.__setattr__(
-            self,
-            "game_id",
-            _validate_identifier("AdvanceRollRequest game_id", self.game_id),
-        )
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("AdvanceRollRequest battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("AdvanceRollRequest player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "unit_instance_id",
-            _validate_identifier("AdvanceRollRequest unit_instance_id", self.unit_instance_id),
-        )
-        if type(self.spec) is not DiceRollSpec:
-            raise GameLifecycleError("AdvanceRollRequest spec must be a DiceRollSpec.")
-        modifiers = _validate_movement_roll_modifiers(
-            "AdvanceRollRequest roll_modifiers",
-            self.roll_modifiers,
-        )
-        object.__setattr__(self, "roll_modifiers", modifiers)
-        _validate_advance_roll_spec(
-            self.spec,
-            unit_instance_id=self.unit_instance_id,
-            expression_modifier=sum(modifier.operand for modifier in modifiers),
-        )
-        if self.reroll_permission is not None:
-            if type(self.reroll_permission) is not RerollPermission:
-                raise GameLifecycleError(
-                    "AdvanceRollRequest reroll_permission must be a RerollPermission."
-                )
-            if self.reroll_permission.owning_player_id != self.player_id:
-                raise GameLifecycleError(
-                    "AdvanceRollRequest reroll_permission owner must match player_id."
-                )
-            if self.reroll_permission.eligible_roll_type != self.spec.roll_type:
-                raise GameLifecycleError(
-                    "AdvanceRollRequest reroll_permission must target advance_roll."
-                )
-
-    @classmethod
-    def for_unit(
-        cls,
-        *,
-        request_id: str,
-        game_id: str,
-        battle_round: int,
-        player_id: str,
-        unit_instance_id: str,
-        roll_modifiers: tuple[RollModifier, ...] = (),
-        reroll_permission: RerollPermission | None = None,
-    ) -> Self:
-        modifiers = _validate_movement_roll_modifiers(
-            "AdvanceRollRequest roll_modifiers",
-            roll_modifiers,
-        )
-        return cls(
-            request_id=request_id,
-            game_id=game_id,
-            battle_round=battle_round,
-            player_id=player_id,
-            unit_instance_id=unit_instance_id,
-            spec=DiceRollSpec(
-                expression=DiceExpression(
-                    quantity=1,
-                    sides=6,
-                    modifier=sum(modifier.operand for modifier in modifiers),
-                ),
-                reason=f"Advance roll for {unit_instance_id}",
-                roll_type="advance_roll",
-                actor_id=unit_instance_id,
-            ),
-            roll_modifiers=modifiers,
-            reroll_permission=reroll_permission,
-        )
-
-    def to_payload(self) -> AdvanceRollRequestPayload:
-        return {
-            "request_id": self.request_id,
-            "game_id": self.game_id,
-            "battle_round": self.battle_round,
-            "player_id": self.player_id,
-            "unit_instance_id": self.unit_instance_id,
-            "spec": self.spec.to_payload(),
-            "roll_modifiers": [modifier.to_payload() for modifier in self.roll_modifiers],
-            "reroll_permission": (
-                None if self.reroll_permission is None else self.reroll_permission.to_payload()
-            ),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: AdvanceRollRequestPayload) -> Self:
-        reroll_permission_payload = payload["reroll_permission"]
-        return cls(
-            request_id=payload["request_id"],
-            game_id=payload["game_id"],
-            battle_round=payload["battle_round"],
-            player_id=payload["player_id"],
-            unit_instance_id=payload["unit_instance_id"],
-            spec=DiceRollSpec.from_payload(payload["spec"]),
-            roll_modifiers=tuple(
-                RollModifier.from_payload(modifier) for modifier in payload["roll_modifiers"]
-            ),
-            reroll_permission=(
-                None
-                if reroll_permission_payload is None
-                else RerollPermission.from_payload(reroll_permission_payload)
-            ),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class AdvanceRollResult:
-    request: AdvanceRollRequest
-    roll_state: DiceRollState
-    value: int
-
-    def __post_init__(self) -> None:
-        if type(self.request) is not AdvanceRollRequest:
-            raise GameLifecycleError("AdvanceRollResult request must be an AdvanceRollRequest.")
-        if type(self.roll_state) is not DiceRollState:
-            raise GameLifecycleError("AdvanceRollResult roll_state must be a DiceRollState.")
-        if self.roll_state.original_result.spec != self.request.spec:
-            raise GameLifecycleError("AdvanceRollResult roll_state spec must match request.")
-        if self.value != self.roll_state.current_total:
-            raise GameLifecycleError("AdvanceRollResult value must match roll_state total.")
-        min_value = 1 + self.request.spec.expression.modifier
-        max_value = self.request.spec.expression.sides + self.request.spec.expression.modifier
-        if self.value < min_value or self.value > max_value:
-            raise GameLifecycleError("AdvanceRollResult value must match request bounds.")
-
-    @classmethod
-    def from_roll_state(cls, *, request: AdvanceRollRequest, roll_state: DiceRollState) -> Self:
-        return cls(request=request, roll_state=roll_state, value=roll_state.current_total)
-
-    def to_payload(self) -> AdvanceRollResultPayload:
-        return {
-            "request": self.request.to_payload(),
-            "roll_state": self.roll_state.to_payload(),
-            "value": self.value,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: AdvanceRollResultPayload) -> Self:
-        return cls(
-            request=AdvanceRollRequest.from_payload(payload["request"]),
-            roll_state=DiceRollState.from_payload(payload["roll_state"]),
-            value=payload["value"],
         )
 
 

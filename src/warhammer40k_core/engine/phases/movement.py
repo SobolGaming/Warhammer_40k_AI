@@ -266,7 +266,6 @@ __all__ = (
     "_unit_has_vehicle_or_monster_keyword",
     "_unit_instance_by_id",
     "_validate_ability_index_mapping",
-    "_validate_advance_roll_spec",
     "_validate_bool",
     "_validate_desperate_escape_reason_tuple",
     "_validate_desperate_escape_requirement_tuple",

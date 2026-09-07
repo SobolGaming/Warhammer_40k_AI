@@ -89,6 +89,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.shooting_model_blockers import shooting_dynamic_model_blockers
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
     SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
     ShootingPhaseStartHookBinding,
@@ -96,7 +97,6 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.shooting_targets import (
-    shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.shooting_terrain_visibility import (

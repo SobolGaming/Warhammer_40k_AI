@@ -10,6 +10,7 @@ from warhammer40k_core.core.dice import (
     RandomCharacteristicRollPayload,
     RandomCharacteristicTiming,
 )
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.advance_hooks import (
@@ -106,14 +107,14 @@ def random_movement_attack_boost_weapon_binding(
 def _movement_action_grant_movement_handler(
     source: CatalogDatasheetClauseSource,
     descriptor: CatalogMovementActionGrantDescriptor,
-) -> Callable[[MovementBudgetModifierContext], float]:
-    def handler(context: MovementBudgetModifierContext) -> float:
+) -> Callable[[MovementBudgetModifierContext], tuple[ModifierTerm, ...]]:
+    def handler(context: MovementBudgetModifierContext) -> tuple[ModifierTerm, ...]:
         if not source_applies_to_rules_unit(
             source=source,
             context_unit_id=context.unit_instance_id,
             state=context.state,
         ):
-            return context.current_movement_inches
+            return ()
         rules_unit = rules_unit_view_by_id(
             state=context.state,
             unit_instance_id=context.unit_instance_id,
@@ -121,7 +122,7 @@ def _movement_action_grant_movement_handler(
         if context.model_instance_id not in {
             model.model_instance_id for model in rules_unit.alive_models()
         }:
-            return context.current_movement_inches
+            return ()
         for effect in context.state.persisting_effects_for_unit(rules_unit.unit_instance_id):
             payload = effect.effect_payload
             if (
@@ -134,8 +135,8 @@ def _movement_action_grant_movement_handler(
                     raise GameLifecycleError(
                         "Catalog movement action grant characteristic drifted."
                     )
-                return float(value)
-        return context.current_movement_inches
+                return (ModifierTerm(ModifierOperation.SET, value),)
+        return ()
 
     return handler
 
@@ -263,8 +264,8 @@ def _random_movement_attack_boost_handler(
 def _random_movement_attack_boost_movement_handler(
     source: CatalogDatasheetClauseSource,
     descriptor: CatalogRandomMovementAttackBoostDescriptor,
-) -> Callable[[MovementBudgetModifierContext], float]:
-    def handler(context: MovementBudgetModifierContext) -> float:
+) -> Callable[[MovementBudgetModifierContext], tuple[ModifierTerm, ...]]:
+    def handler(context: MovementBudgetModifierContext) -> tuple[ModifierTerm, ...]:
         if not source_applies_to_rules_unit(
             source=source,
             context_unit_id=context.unit_instance_id,
@@ -272,7 +273,7 @@ def _random_movement_attack_boost_movement_handler(
         ) or context.model_instance_id not in set(
             current_source_model_ids(state=context.state, source=source)
         ):
-            return context.current_movement_inches
+            return ()
         payload = _active_validated_random_boost_payload(
             state=context.state,
             rules_unit_instance_id=rules_unit_view_by_id(
@@ -283,11 +284,11 @@ def _random_movement_attack_boost_movement_handler(
             descriptor=descriptor,
         )
         if payload is None:
-            return context.current_movement_inches
+            return ()
         bonus = payload.get("movement_bonus_inches")
         if type(bonus) is not int:
             raise GameLifecycleError("Random movement attack boost roll value drifted.")
-        return context.current_movement_inches + float(bonus)
+        return (ModifierTerm(ModifierOperation.ADD, bonus),)
 
     return handler
 

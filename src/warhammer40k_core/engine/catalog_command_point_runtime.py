@@ -7,12 +7,8 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.dice import (
-    DiceExpression,
-    DiceRollSpec,
-    ModifiedRollResult,
-    UnmodifiedRollResult,
-)
+from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,

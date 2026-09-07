@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Protocol, cast
 
+from warhammer40k_core.core.modifiers import ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.advance_eligibility_hooks import (
@@ -166,7 +167,7 @@ class _ShadowLegionEnhancementsModule(Protocol):
     def mantle_of_gloom_objective_control_modifier(
         self,
         context: ObjectiveControlModifierContext,
-    ) -> int: ...
+    ) -> tuple[ModifierTerm, ...]: ...
 
     def record_fade_to_darkness_destroyed_enemy_unit(
         self,
@@ -738,7 +739,7 @@ def _shadow_legion_mantle_of_gloom_modifier_id(source: GenericRuleAbilitySource)
 def _shadow_legion_mantle_of_gloom_modifier(
     context: ObjectiveControlModifierContext,
     source: GenericRuleAbilitySource,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Mantle of Gloom modifier requires source.")
     return _shadow_legion_enhancements().mantle_of_gloom_objective_control_modifier(context)

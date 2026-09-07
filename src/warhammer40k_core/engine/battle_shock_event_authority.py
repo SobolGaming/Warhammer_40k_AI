@@ -3,16 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     DiceExpression,
     RerollPermission,
 )
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modifiers import Modifier, ModifierStack, RollModifier
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
     BattleShockResultPayload,
     BattleShockTestRequest,
     battle_shock_leadership_target_for_rules_unit,
+)
+from warhammer40k_core.engine.battle_shock_generic_leadership_authority import (
+    historical_generic_leadership_operations,
 )
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
@@ -45,6 +49,7 @@ from warhammer40k_core.engine.mutation_decision_authority import (
     validate_mutation_decision_closure,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.runtime_characteristic_modifiers import bind_characteristic_terms
 from warhammer40k_core.engine.stratagems_model import (
     GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     StratagemUseRecord,
@@ -266,15 +271,34 @@ def _validate_historical_request_semantics(
     characteristic_bindings = (
         runtime_content_bundle.runtime_modifier_registry.all_unit_characteristic_bindings()
     )
+    leadership_modifiers: list[Modifier] = list(
+        historical_generic_leadership_operations(
+            historical=historical, runtime_content_bundle=runtime_content_bundle
+        )
+    )
     for binding in characteristic_bindings:
         if binding.historical_leadership_handler is None:
             raise GameLifecycleError(
                 "Loaded unit characteristic modifier lacks historical Leadership authority."
             )
-        expected_leadership = binding.historical_leadership_handler(
-            historical,
-            expected_leadership,
+        leadership_modifiers.extend(
+            bind_characteristic_terms(
+                modifier_id=binding.modifier_id,
+                source_id=binding.source_id,
+                characteristic=Characteristic.LEADERSHIP,
+                terms=binding.historical_leadership_handler(historical, expected_leadership),
+            )
         )
+    expected_leadership = (
+        ModifierStack(
+            characteristic=Characteristic.LEADERSHIP,
+            raw_value=expected_leadership,
+            modifiers=tuple(leadership_modifiers),
+            target_id=request.unit_instance_id,
+        )
+        .resolve()
+        .final
+    )
     if request.leadership_target != expected_leadership:
         raise GameLifecycleError("Battle-shock request Leadership lacks exact authority.")
     expected_expression = _historical_dice_expression(

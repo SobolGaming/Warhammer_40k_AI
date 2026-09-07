@@ -1,5 +1,72 @@
 # Adapter Decision Contract
 
+## Orders 26, 27 and 29: ordered modifiers and terminal limits
+
+External contract 11.4.0 adds `replacement_zero` and `replacement_star` to the
+characteristic value kinds. A replacement of a characteristic by 0, dash or
+star is terminal; its value kind survives JSON restoration and subsequent
+resolution, including bounded-characteristic and Damage record conversions.
+Symbolic values cannot enter numeric Damage resolution. Other modifiers use
+replacement, multiplication, addition, division, subtraction,
+then one upward rounding step with exact intermediate arithmetic. Signed
+negative additions occupy the subtraction step, independently of priority.
+
+Registered characteristic handlers emit typed operations. The engine combines
+those operations with source-slot-deduplicated generic effects before applying
+the final characteristic bounds. Historical Leadership uses the same operation
+inventory, ordering and bounds. Generic Leadership effects are reconstructed at
+the original Battle-shock request boundary from loaded RuleIR, source ownership,
+causal creation/activation records, and source-derived expiration boundaries.
+Installation records and attack-sequence expiration records retain their existing
+authority checks. Restoration uses the shared rules-unit applicability and
+source-slot deduplication policy; later expiration cannot erase an earlier test's
+effect context. The exact request comparison remains mandatory, independently of
+the restored state's current effects. Source-specific minimums remain explicit operations.
+Objective Control checkpoint provenance retains the original binding/effect IDs,
+including when one source contributes several operations.
+Checkpoint structural validation permits source-backed replacement base/value
+kinds; authenticated runtime reconstruction still compares the complete resolved
+characteristic payload. A terminal source value cannot acquire later modifiers.
+
+Movement contexts retain the typed characteristic, including terminal value
+kinds. Internal movement application traces describe unbounded arithmetic and
+may contain negative intermediate values; the engine bounds the resulting
+characteristic once. Subsequent move-distance effects then resolve together,
+preserving fractional inches and applying a single nonnegative distance bound.
+The trace is not a new adapter payload. Existing modifier-ignore submissions
+still select engine-enumerated original source IDs. This correction changes no
+decision family, submission shape, visibility class, or contract schema version.
+
+The existing Advance and Charge result payloads include `modified_roll`, with
+post-reroll `unmodified` components, `intrinsic_offset`, source-linked
+`modifiers`, ordered `applied_modifier_ids`, `unbounded_value`, minimum-1
+`modified_value`, and `final_value` after rule limits. Raw `DiceRollState`
+retains original faces and reroll records. Advance and Charge expressions
+contain only raw dice. Charge's final result is within 1–12; Advance has no
+maximum of 6. Hit/wound cumulative modifiers remain limited to ±1, and their
+final rolls and save rolls are at least 1. A source expression such as D6+1
+retains its intrinsic +1 separately from runtime Damage modifiers; the existing
+`random_characteristic_rolled` Damage event includes its modifier trace.
+
+These are engine-produced result/event additions, not client-authored decision
+inputs. Existing finite/proposal families, option IDs, stale-context validation,
+viewer scoping, decision records and engine mutation remain the contract owners.
+A drifted result or modifier trace fails restoration. Persistence and exact
+replay remain bound to the regenerated engine build identity; artifacts from
+another build are rejected rather than upgraded by inferred fields.
+
+Charge movement consumes the final bounded result. Further source-defined move
+distance effects and Into the Fray's separate cap belong to their respective
+movement/Stratagem owners; they must not alter raw faces or reapply roll modifiers.
+Order 43 still owns target replacement/declaration sequencing, and Order 28
+still owns individual Psychic modifier choices. No new choice is introduced.
+
+Hidden detection and Lone Operative targeting use the same 9–30 inch terminal
+range limits. Detection combines source bonuses and Gone to Ground penalties
+before clamping, preserving model-group visibility, eligibility and range
+witnesses. Public roll results remain public; existing hidden decision/event
+redaction continues through the shared adapter visibility module.
+
 ## Order 24: source-authorized unit splitting
 
 External contract 11.3.0 adds the finite `select_unit_split_membership`
