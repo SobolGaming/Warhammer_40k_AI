@@ -136,3 +136,29 @@ def test_checkpoint_authority_reconstructs_the_complete_resolved_characteristic(
         "_validate_current_checkpoint_oc_resolutions",
     )
     assert {"resolve_checkpoint_objective_control", "canonical_json", "to_payload"} <= calls
+
+
+def test_historical_leadership_uses_authenticated_generic_inventory_and_shared_resolution() -> None:
+    assert {"historical_generic_leadership_operations", "ModifierStack"} <= _calls(
+        "engine/battle_shock_event_authority.py", "_validate_historical_request_semantics"
+    )
+    calls = _calls(
+        "engine/battle_shock_generic_leadership_authority.py",
+        "historical_generic_leadership_operations",
+    )
+    assert {
+        "rules_unit_effect_applications_from_inventory",
+        "generic_matching_unit_effect_applications",
+        "generic_characteristic_operations_from_effects",
+    } <= calls
+    source = (PACKAGE / "engine/battle_shock_generic_leadership_authority.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+    assert not any(
+        isinstance(node, ast.Attribute) and node.attr == "persisting_effects"
+        for node in ast.walk(tree)
+    )
+    assert {"expiration_for_duration", "validated_generic_execution_effect_payload"} <= _calls(
+        "engine/battle_shock_generic_leadership_authority.py", "_effect_from_execution"
+    )

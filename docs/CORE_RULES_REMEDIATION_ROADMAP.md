@@ -4041,7 +4041,7 @@ The correction introduces no new faction rule, hook family, named handler,
 decision, adapter payload shape, or visibility class. See the approved scope
 record for the consumer audit and deterministic fixture updates.
 
-Final review-correction validation:
+Validation at 441631a6:
 
 Validation results: the final complete behavioral suite passes with coverage:
 `6535 passed`, `85.08%`, `744.10s`, 64 xdist workers with work stealing and the
@@ -4066,3 +4066,37 @@ contract 11.4.0). Installed-wheel smoke verifies 2572 runtime resources, 27 sche
 and six request families against the same engine identity. Scope, architecture,
 module-size and diff audits pass. No production code changed after the aggregate
 coverage runs began.
+
+Historical generic Leadership follow-up: completed Battle-shock requests now
+reconstruct generic characteristic effects at their original event boundary,
+combine them with registered historical operations, and retain the exact
+Leadership comparison. The reconstruction authenticates loaded source semantics,
+ownership, creation/activation and expiration evidence, while sharing live
+applicability, source-slot deduplication and operation IDs. Later expiry does not
+substitute the restored current-effect inventory for historical authority.
+Generic-only and combined/duplicate-source tests require exact lifecycle/session
+restoration and replay after normal Command-phase completion; altered source,
+target, delta, duration, creation clock and activation evidence are rejected.
+See `ORDERS_26_27_29_SCOPE_PLAN.md` for the invariant, extraction audit and scope.
+
+Final historical Leadership validation:
+
+The complete behavioral suite passes once with coverage: `6564 passed`,
+`85.06%`, `795.05s`, 64 xdist workers with work stealing and the bundled
+Node runtime on PATH. The 10 warnings are existing SQLite connection
+ResourceWarnings. The subsequent complete code-quality suite passes once without
+coverage: `389 passed`, `347.53s`, also using 64 workers with work stealing.
+
+Ruff check, Ruff format check (2836 files), mypy (2746 source files), pyright
+(zero errors/warnings), all 11 import-linter contracts and all-files pre-commit
+pass. The exact eight-shard inventory check passes. The source/audit artifact
+check and runtime build-identity check pass. Engine identity:
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a88ba836f139acb5f7c74451b1939927f3084d60b6ae85dd53bd23002a01128b`.
+
+External-contract `--check --base-ref origin/main` passes against
+`55c06d4dad60c34a77b381d864db7e7d1c3f98a8`. TypeScript generated-client/type
+checks, all five client unit tests and two-server HTTP conformance pass
+(342 assertions, contract 11.4.0). Installed-wheel smoke verifies 2574 runtime
+resources, 27 schemas and six request families against that engine identity.
+Scope, architecture, module-size and diff audits pass. No production code changed
+after the aggregate coverage run began.

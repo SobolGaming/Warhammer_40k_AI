@@ -168,7 +168,7 @@ handler, content rule, package boundary, decision or visibility class is added.
 The movement context change is internal; the adapter contract documents the
 trace meaning and retained source identities without adding a public schema.
 
-## Final review-correction validation
+## Validation at 441631a6
 
 Validation results: the final complete behavioral suite passes with coverage:
 `6535 passed`, `85.08%`, `744.10s`, 64 xdist workers with work stealing and the
@@ -193,3 +193,68 @@ contract 11.4.0). Installed-wheel smoke verifies 2572 runtime resources, 27 sche
 and six request families against the same engine identity. Scope, architecture,
 module-size and diff audits pass. No production code changed after the aggregate
 coverage runs began.
+
+## Historical generic Leadership follow-up
+
+Review of 441631a6 identified a remaining operation-inventory mismatch: live
+Battle-shock included generic Leadership effects, while historical request
+authentication included only registered providers. The focused regression
+reproduced base Leadership 6 plus generic +1 recording 7, then failing unchanged
+restoration with `Battle-shock request Leadership lacks exact authority`.
+
+The correction reconstructs generic effects from causal events before the
+original test boundary. Loaded source RuleIR authenticates the clause, effect
+slot, semantics, target, duration and source identity. Immutable army and
+rules-unit membership authenticate ownership; optional activations retain their
+exact decision/event closure. Creation clocks come from phase history, expiration
+comes from the loaded duration and original turn order, and attack completion
+uses its existing expiration selector and completion-event anchor. Installation
+records use the same detachment/Enhancement validators as OC authority. Recorded
+effect copies must agree with the reconstructed source execution.
+
+Live and historical paths share rules-unit lineage/Aura applicability, generic
+source-slot deduplication and characteristic-operation construction. Both generic
+and registered historical operations enter the same ModifierStack before the
+unchanged exact request comparison. No restored current-effect inventory is used
+as historical evidence. The duration evaluator now declares the read-only
+calendar interface it consumes; no partial GameState or fallback is introduced.
+
+The bug-class search found existing OC source validation and generic effect
+matching with the necessary semantics. Those owners were extracted and reused
+instead of duplicating source validation or modifier selection. Existing OC
+authority regressions remain in place. New regressions complete Battle-shock
+through LocalGameSession, check generic-only and registered-plus-generic values,
+activate duplicate source occurrences through normal decisions, and require exact
+lifecycle/session restoration and replay, including after phase expiry. Tampered
+delta, target, source, duration, creation clock and activation evidence fail
+closed. An expiration-boundary matrix and a static shared-path/current-effect
+audit cover the changed invariant directly.
+
+Pre-aggregate scope/architecture audit: this follow-up changes historical effect
+inventory reconstruction and extracts existing source/applicability code. It adds
+no rule content, hook family, named handler, decision, public payload shape,
+visibility class or package boundary. The adapter contract remains 11.4.0. New
+production modules remain below 1,500 lines. Existing behavioral test files are
+extended, so the eight-shard inventory is unchanged.
+
+Final historical Leadership validation:
+
+The complete behavioral suite passes once with coverage: `6564 passed`,
+`85.06%`, `795.05s`, 64 xdist workers with work stealing and the bundled
+Node runtime on PATH. The 10 warnings are existing SQLite connection
+ResourceWarnings. The subsequent complete code-quality suite passes once without
+coverage: `389 passed`, `347.53s`, also using 64 workers with work stealing.
+
+Ruff check, Ruff format check (2836 files), mypy (2746 source files), pyright
+(zero errors/warnings), all 11 import-linter contracts and all-files pre-commit
+pass. The exact eight-shard inventory check passes. The source/audit artifact
+check and runtime build-identity check pass. Engine identity:
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a88ba836f139acb5f7c74451b1939927f3084d60b6ae85dd53bd23002a01128b`.
+
+External-contract `--check --base-ref origin/main` passes against
+`55c06d4dad60c34a77b381d864db7e7d1c3f98a8`. TypeScript generated-client/type
+checks, all five client unit tests and two-server HTTP conformance pass
+(342 assertions, contract 11.4.0). Installed-wheel smoke verifies 2574 runtime
+resources, 27 schemas and six request families against that engine identity.
+Scope, architecture, module-size and diff audits pass. No production code changed
+after the aggregate coverage run began.

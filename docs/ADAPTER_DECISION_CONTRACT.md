@@ -14,7 +14,14 @@ negative additions occupy the subtraction step, independently of priority.
 Registered characteristic handlers emit typed operations. The engine combines
 those operations with source-slot-deduplicated generic effects before applying
 the final characteristic bounds. Historical Leadership uses the same operation
-ordering and bounds. Source-specific minimums remain explicit operations.
+inventory, ordering and bounds. Generic Leadership effects are reconstructed at
+the original Battle-shock request boundary from loaded RuleIR, source ownership,
+causal creation/activation records, and source-derived expiration boundaries.
+Installation records and attack-sequence expiration records retain their existing
+authority checks. Restoration uses the shared rules-unit applicability and
+source-slot deduplication policy; later expiration cannot erase an earlier test's
+effect context. The exact request comparison remains mandatory, independently of
+the restored state's current effects. Source-specific minimums remain explicit operations.
 Objective Control checkpoint provenance retains the original binding/effect IDs,
 including when one source contributes several operations.
 Checkpoint structural validation permits source-backed replacement base/value

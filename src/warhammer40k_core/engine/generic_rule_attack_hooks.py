@@ -50,7 +50,10 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_weapon_selector_applies,
 )
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
-from warhammer40k_core.engine.rules_unit_effects import rules_unit_effect_applications
+from warhammer40k_core.engine.rules_unit_effects import (
+    RulesUnitEffectApplication,
+    rules_unit_effect_applications,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     DamageRollModifierContext,
@@ -469,6 +472,19 @@ def generic_rule_characteristic_operations(
 ) -> tuple[Modifier, ...]:
     if type(characteristic) is not Characteristic:
         raise GameLifecycleError("Generic characteristic operations require Characteristic.")
+    return generic_characteristic_operations_from_effects(
+        effects=generic_rule_matching_unit_effects(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+        ),
+        characteristic=characteristic,
+    )
+
+
+def generic_characteristic_operations_from_effects(
+    *, effects: tuple[GenericAttackEffect, ...], characteristic: Characteristic
+) -> tuple[Modifier, ...]:
     return tuple(
         ModifierTerm(
             ModifierOperation.ADD, _required_int_parameter(effect.parameters, key="delta")
@@ -477,11 +493,7 @@ def generic_rule_characteristic_operations(
             source_id=generic_rule_modifier_source_id(effect),
             characteristic=characteristic,
         )
-        for effect in generic_rule_matching_unit_effects(
-            state=state,
-            unit_instance_id=unit_instance_id,
-            effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
-        )
+        for effect in effects
         if _characteristic_parameter(effect.parameters) is characteristic
     )
 
@@ -599,11 +611,20 @@ def generic_rule_matching_unit_effects(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR unit hooks require GameState.")
+    return generic_matching_unit_effect_applications(
+        applications=rules_unit_effect_applications(
+            state, _validate_identifier("unit_instance_id", unit_instance_id)
+        ),
+        effect_kind=effect_kind,
+    )
+
+
+def generic_matching_unit_effect_applications(
+    *, applications: tuple[RulesUnitEffectApplication, ...], effect_kind: RuleEffectKind
+) -> tuple[GenericAttackEffect, ...]:
+    """Share applicability, source-slot conflict checks and deduplication across time."""
     matches_by_effect_slot: dict[str, GenericAttackEffect] = {}
-    for application in rules_unit_effect_applications(
-        state,
-        _validate_identifier("unit_instance_id", unit_instance_id),
-    ):
+    for application in applications:
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=application.effect,
             effective_target_unit_instance_ids=(application.unit_instance_id,),

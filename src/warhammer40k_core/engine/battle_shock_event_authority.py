@@ -15,6 +15,9 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestRequest,
     battle_shock_leadership_target_for_rules_unit,
 )
+from warhammer40k_core.engine.battle_shock_generic_leadership_authority import (
+    historical_generic_leadership_operations,
+)
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
     historical_battle_shock_authority_context,
@@ -268,7 +271,11 @@ def _validate_historical_request_semantics(
     characteristic_bindings = (
         runtime_content_bundle.runtime_modifier_registry.all_unit_characteristic_bindings()
     )
-    leadership_modifiers: list[Modifier] = []
+    leadership_modifiers: list[Modifier] = list(
+        historical_generic_leadership_operations(
+            historical=historical, runtime_content_bundle=runtime_content_bundle
+        )
+    )
     for binding in characteristic_bindings:
         if binding.historical_leadership_handler is None:
             raise GameLifecycleError(

@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tests.generic_modifier_helpers import generic_effect
+from tests.historical_leadership_helpers import (
+    completed_historical_leadership_session,
+    completed_leadership_history,
+)
 from tests.phase13b_shooting_declaration_helpers import (
     _attached_enemy_declarations,
     _attached_enemy_unit_specs,
@@ -37,6 +41,12 @@ from warhammer40k_core.engine.attack_sequence_model import (
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
 )
+from warhammer40k_core.engine.battle_shock_generic_leadership_authority import (
+    _expired_at_test as historical_effect_expired,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.battle_shock_historical_authority import (
+    HistoricalBattleShockAuthorityContext,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -45,6 +55,7 @@ from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.generic_rule_attack_hooks import (
     generic_rule_unit_characteristic_modifiers,
 )
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.lone_operative import lone_operative_target_allowed
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
@@ -67,6 +78,171 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
 )
 from warhammer40k_core.engine.unit_abilities import LoneOperativeAbilityProfile
 from warhammer40k_core.geometry.pose import Pose
+
+
+@pytest.fixture(scope="module")
+def leadership_history() -> HistoricalBattleShockAuthorityContext:
+    return completed_leadership_history(completed_historical_leadership_session())
+
+
+@pytest.mark.parametrize(
+    ("expiration", "expected"),
+    [
+        (EffectExpiration.end_of_battle(), False),
+        (EffectExpiration.end_battle_round(battle_round=1), True),
+        (EffectExpiration.end_battle_round(battle_round=3), False),
+        (EffectExpiration.start_battle_round(battle_round=2), True),
+        (EffectExpiration.end_battle_round(battle_round=2), False),
+        (EffectExpiration.start_turn(battle_round=2, player_id="player-a"), True),
+        (EffectExpiration.end_turn(battle_round=2, player_id="player-a"), True),
+        (EffectExpiration.start_turn(battle_round=2, player_id="player-b"), True),
+        (EffectExpiration.end_turn(battle_round=2, player_id="player-b"), False),
+        (
+            EffectExpiration.start_phase(
+                battle_round=2, player_id="player-b", phase=BattlePhase.MOVEMENT
+            ),
+            True,
+        ),
+        (
+            EffectExpiration.end_phase(
+                battle_round=2, player_id="player-b", phase=BattlePhase.MOVEMENT
+            ),
+            False,
+        ),
+        (
+            EffectExpiration.end_phase(
+                battle_round=2, player_id="player-b", phase=BattlePhase.COMMAND
+            ),
+            True,
+        ),
+        (
+            EffectExpiration.start_phase(
+                battle_round=2, player_id="player-b", phase=BattlePhase.FIGHT
+            ),
+            False,
+        ),
+    ],
+)
+def test_historical_effect_expiration_uses_original_turn_and_phase(
+    leadership_history: HistoricalBattleShockAuthorityContext,
+    expiration: EffectExpiration,
+    expected: bool,
+) -> None:
+    history = replace(
+        leadership_history,
+        request=replace(leadership_history.request, battle_round=2),
+        active_player_id="player-b",
+        phase=BattlePhase.MOVEMENT,
+    )
+    assert historical_effect_expired(expiration, history) is expected
+
+
+@pytest.mark.parametrize("registered", [False, True])
+@pytest.mark.parametrize("duplicate", [False, True])
+@pytest.mark.parametrize("expires", [False, True])
+def test_completed_battle_shock_restores_generic_leadership_history(
+    registered: bool, duplicate: bool, expires: bool
+) -> None:
+    session = completed_historical_leadership_session(
+        registered=registered, duplicate=duplicate, expires=expires
+    )
+    lifecycle = session.lifecycle
+    resolved = [
+        event.payload
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "battle_shock_test_resolved"
+    ]
+    assert len(resolved) == 1
+    assert isinstance(resolved[0], dict)
+    result = resolved[0]["battle_shock_result"]
+    assert isinstance(result, dict)
+    request_payload = result["request"]
+    assert isinstance(request_payload, dict)
+    assert request_payload["leadership_target"] == (6 if registered else 7)
+    assert lifecycle.state is not None
+    effects = [
+        effect
+        for effect in lifecycle.state.persisting_effects
+        if effect.source_rule_id == "fixture:historical-leadership"
+    ]
+    assert len(effects) == (0 if expires else (2 if duplicate else 1))
+    persisted = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(persisted).to_persistence_payload() == persisted
+    )
+    snapshot = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+    assert (
+        ReplayRunner.from_payload(
+            session.replay_artifact(artifact_id="historical-leadership-replay")
+        )
+        .run()
+        .status
+        is ReplayRunStatus.REPRODUCED
+    )
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "delta",
+        "target",
+        "source",
+        "expiration",
+        "missing_creation",
+        "creation_clock",
+        "activation",
+        "recorded_expiration",
+    ],
+)
+def test_expired_generic_leadership_requires_original_source_evidence(fault: str) -> None:
+    session = completed_historical_leadership_session(registered=True, duplicate=True, expires=True)
+    original = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(original).to_payload() == original
+    payload = cast(dict[str, Any], json.loads(json.dumps(original)))
+    events = payload["decisions"]["event_log"]
+    creations = [
+        event
+        for event in events
+        if event["event_type"] == "rule_execution_effect_applied"
+        and event["payload"].get("source_id") == "fixture:historical-leadership"
+    ]
+    assert len(creations) == 2
+    for event in creations:
+        effect = event["payload"]
+        if fault == "delta":
+            next(row for row in effect["effect"]["parameters"] if row["key"] == "delta")[
+                "value"
+            ] = 2
+        elif fault == "target":
+            effect["target_unit_instance_ids"] = ["army-beta:intercessor-unit-3"]
+        elif fault == "source":
+            effect["source_id"] = "fixture:unloaded-leadership"
+        elif fault == "expiration":
+            next(row for row in effect["duration"]["parameters"] if row["key"] == "endpoint")[
+                "value"
+            ] = "turn"
+        elif fault == "creation_clock":
+            effect["context"]["phase"] = "movement"
+        elif fault == "activation":
+            effect["context"]["trigger_payload"]["result_id"] = "invented-activation"
+        elif fault == "missing_creation":
+            events.remove(event)
+    if fault == "recorded_expiration":
+        changed = 0
+        for event in events:
+            result = event["payload"].get("rule_execution")
+            if not isinstance(result, dict):
+                continue
+            for effect in cast(list[dict[str, Any]], result["created_persisting_effects"]):
+                if effect["source_rule_id"] == "fixture:historical-leadership":
+                    effect["expiration"]["phase"] = "movement"
+                    changed += 1
+        assert changed == 2
+    for index, event in enumerate(events, start=1):
+        event["event_id"] = f"event-{index:06d}"
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, payload))
 
 
 @pytest.mark.parametrize("negative_first", [True, False])

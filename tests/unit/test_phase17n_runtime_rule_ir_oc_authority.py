@@ -37,6 +37,36 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _creation_family as creation_family,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _payload_bool as payload_bool,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _payload_optional_string as payload_optional_string,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _payload_positive_int as payload_positive_int,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _payload_string as payload_string,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _payload_string_tuple as payload_string_tuple,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    _rule_clause_for_payload as rule_clause_for_payload,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    validate_generic_detachment_effect_authority as validate_detachment_effect_authority,
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    validate_generic_enhancement_effect_authority as validate_enhancement_effect_authority,
+)
+from warhammer40k_core.engine.generic_rule_source_authority import (
+    validated_generic_execution_effect_payload as validated_execution_effect_payload,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.mission_decisions import (
     apply_mission_decision,
@@ -45,40 +75,10 @@ from warhammer40k_core.engine.mission_decisions import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
 from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _creation_family as creation_family,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
     _json_object as json_object,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _payload_bool as payload_bool,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
     _payload_non_negative_int as payload_non_negative_int,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _payload_optional_string as payload_optional_string,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _payload_positive_int as payload_positive_int,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _payload_string as payload_string,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _payload_string_tuple as payload_string_tuple,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _rule_clause_for_payload as rule_clause_for_payload,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _validate_detachment_effect_authority as validate_detachment_effect_authority,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _validate_enhancement_effect_authority as validate_enhancement_effect_authority,  # pyright: ignore[reportPrivateUsage]
-)
-from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
-    _validated_execution_effect_payload as validated_execution_effect_payload,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
@@ -743,7 +743,7 @@ def test_oc_provider_validators_fail_closed_before_registry_lookup(
     base_payload = deepcopy(raw_payload)
 
     validate_detachment_effect_authority(
-        state=state,
+        armies=tuple(state.army_definitions),
         effect=effect,
         event_records=(),
         checkpoint_index=0,
@@ -753,7 +753,7 @@ def test_oc_provider_validators_fail_closed_before_registry_lookup(
     partial_payload = {**base_payload, "coverage_descriptor_id": "coverage"}
     with pytest.raises(GameLifecycleError, match="detachment effect authority is incomplete"):
         validate_detachment_effect_authority(
-            state=state,
+            armies=tuple(state.army_definitions),
             effect=replace(effect, effect_payload=partial_payload),
             event_records=(),
             checkpoint_index=0,
@@ -770,7 +770,7 @@ def test_oc_provider_validators_fail_closed_before_registry_lookup(
     invalid_context_payload = {**detachment_payload, "context": None}
     with pytest.raises(GameLifecycleError, match="detachment effect context is invalid"):
         validate_detachment_effect_authority(
-            state=state,
+            armies=tuple(state.army_definitions),
             effect=replace(effect, effect_payload=invalid_context_payload),
             event_records=(),
             checkpoint_index=0,
@@ -779,7 +779,7 @@ def test_oc_provider_validators_fail_closed_before_registry_lookup(
         )
     with pytest.raises(GameLifecycleError, match="lacks provider authority"):
         validate_detachment_effect_authority(
-            state=state,
+            armies=tuple(state.army_definitions),
             effect=replace(effect, effect_payload=detachment_payload),
             event_records=(),
             checkpoint_index=0,

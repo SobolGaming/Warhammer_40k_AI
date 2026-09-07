@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Protocol
 
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -8,7 +8,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     battle_phase_kind_from_token,
 )
 from warhammer40k_core.engine.effects import EffectExpiration
-from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_target_resolution import clause_requires_unit_target
 from warhammer40k_core.rules.rule_ir import (
@@ -20,9 +19,20 @@ from warhammer40k_core.rules.rule_ir import (
 )
 
 
+class RuleDurationCalendar(Protocol):
+    @property
+    def player_ids(self) -> Sequence[str]: ...
+
+    @property
+    def turn_order(self) -> Sequence[str]: ...
+
+    @property
+    def battle_phase_sequence(self) -> Sequence[BattlePhaseKind]: ...
+
+
 class RuleDurationExecutionContext(Protocol):
     @property
-    def state(self) -> GameState | None: ...
+    def state(self) -> RuleDurationCalendar | None: ...
 
     @property
     def player_id(self) -> str: ...
@@ -260,7 +270,7 @@ def _relative_phase_battle_round(
     return context.battle_round + 1
 
 
-def _require_state(context: RuleDurationExecutionContext) -> GameState:
+def _require_state(context: RuleDurationExecutionContext) -> RuleDurationCalendar:
     state = context.state
     if state is None:
         raise GameLifecycleError("Rule duration execution requires game_state.")

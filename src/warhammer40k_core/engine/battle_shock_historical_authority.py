@@ -101,7 +101,8 @@ class HistoricalBattleShockAuthorityContext:
         matches = tuple(
             rules_unit
             for rules_unit in self.all_rules_units()
-            if any(
+            if rules_unit.unit_instance_id == unit_instance_id
+            or any(
                 component.unit.unit_instance_id == unit_instance_id
                 for component in rules_unit.components
             )
