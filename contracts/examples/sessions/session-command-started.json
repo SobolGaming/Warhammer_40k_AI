@@ -19,7 +19,7 @@
   "session": {
     "catalog_id": "phase9a-canonical",
     "created_at": "2026-07-18T20:00:00Z",
-    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a88ba836f139acb5f7c74451b1939927f3084d60b6ae85dd53bd23002a01128b",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4d2c59bad74ec2d47ec309cb0af0a9041b4a01b628e5b3ff5b2125164c96de8",
     "engine_version": "0.1.0",
     "event_cursor": "aLF7bwktW4CqCb69GO0psyuDPo9wIyHfXAQuba03Ijl7N60ZaDhjxVsiB4ZN4pzn",
     "game_id": "phase18e-contract-session",
@@ -42,7 +42,7 @@
       "version": "core-v2-setup-prebattle-ui-smoke"
     },
     "schema_version": "session-metadata-v11-contract",
-    "server_contract_version": "11.4.0",
+    "server_contract_version": "11.5.0",
     "session_id": "session-phase18e-contract-session",
     "session_revision": 1,
     "session_state": "active",

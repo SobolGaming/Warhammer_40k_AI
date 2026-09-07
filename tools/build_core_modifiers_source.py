@@ -50,6 +50,8 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
     for row in json.loads(TRANSCRIPTION_PATH.read_text(encoding="utf-8")):
         slug, section, source_text = row["slug"], row["section"], row["source_text"]
         consumers = [row["consumer"]]
+        observed_at = row.get("observed_at", OBSERVED_AT)
+        source_url = row.get("source_url", SOURCE_URL)
         source_id = f"{PACKAGE_ID}:{slug}"
         text_hash = hashlib.sha256(source_text.encode()).hexdigest()
         rules.append(
@@ -85,7 +87,9 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "review_audit_row_id": None,
             "review_audit_source_observation_sha256": None,
             "provider_name": "CORE V2 Source Review",
-            "source_title": f"P02A/P02B/P02C {section} {slug}",
+            "source_title": f"P02A/P02B/P02C {section} {slug}"
+            if section == "02.02.01"
+            else f"P24I {section} {slug}",
             "source_platform": "Repository",
             "source_url": None,
             "observed_at": None,
@@ -95,14 +99,14 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
         }
         review["observation_sha256"] = _observation(review)
         evidence.append(review)
-        providers: list[tuple[str, str, str | None]] = [("40k.app", SOURCE_URL, None)]
+        providers: list[tuple[str, str, str | None]] = [("40k.app", source_url, None)]
         for provider, url, version in providers:
             row_id = f"{slug}:{'gdm-v931' if version else '40k-app'}"
             audit: dict[str, object] = {
                 "row_id": row_id,
                 "provider_name": provider,
                 "source_url": url,
-                "observed_at": OBSERVED_AT,
+                "observed_at": observed_at,
                 "app_version": version,
                 "policy_id": POLICY,
                 "rule_source_id": source_id,
@@ -124,7 +128,7 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
                 "source_title": f"{provider} {section} {slug}",
                 "source_platform": "Web",
                 "source_url": url,
-                "observed_at": None if version else OBSERVED_AT,
+                "observed_at": None if version else observed_at,
                 "app_version": version,
                 "verification_status": "authoritative_app_mirror",
                 "provider_non_affiliation_recorded": True,
@@ -149,7 +153,8 @@ def build_payloads() -> tuple[dict[str, object], dict[str, object]]:
             "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
         },
         "co_version_comparison": (
-            "02.02.01 operative clauses observed through the 40k.app search-index page; "
+            "02.02.01, 02.02.02 and 24.29 operative clauses observed through "
+            "the 40k.app search index; "
             "direct retrieval returned HTTP 403. No App version or co-version comparison "
             "is inferred. The retained transcription separates the three reviewed obligations."
         ),

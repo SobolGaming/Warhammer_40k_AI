@@ -227,6 +227,87 @@
       },
       "required": ["instance_id", "owner_id", "source_id", "source_instance_id", "slot_id", "ability_id"]
     },
+    "weapon_skill_modifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modifier_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "source_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "characteristics": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "enum": [
+                  "ballistic_skill",
+                  "weapon_skill"
+                ]
+              }
+            },
+            "target_ids": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "characteristics",
+            "target_ids"
+          ]
+        },
+        "timing": {
+          "enum": [
+            "base",
+            "multiplicative",
+            "additive",
+            "divisive",
+            "subtractive",
+            "final"
+          ]
+        },
+        "operation": {
+          "enum": [
+            "set",
+            "set_dash",
+            "set_star",
+            "add",
+            "multiply",
+            "divide",
+            "subtract",
+            "floor",
+            "ceiling"
+          ]
+        },
+        "operand": {
+          "type": "integer"
+        },
+        "priority": {
+          "type": "integer"
+        },
+        "exclusive_group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "modifier_id",
+        "source_id",
+        "scope",
+        "timing",
+        "operation",
+        "operand",
+        "priority",
+        "exclusive_group"
+      ]
+    },
     "weapon_profile": {
       "additionalProperties": false,
       "properties": {
@@ -246,6 +327,10 @@
         "profile_id": {"$ref": "#/$defs/identifier"},
         "range_profile": {"$ref": "#/$defs/range_profile"},
         "skill": {"$ref": "#/$defs/characteristic_value"},
+        "skill_modifiers": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/weapon_skill_modifier"}
+        },
         "source_ids": {"$ref": "#/$defs/identifier_array"},
         "strength": {"$ref": "#/$defs/characteristic_value"}
       },

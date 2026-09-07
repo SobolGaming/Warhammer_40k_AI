@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
@@ -17,6 +17,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
@@ -556,20 +557,22 @@ def voice_of_command_weapon_profile_modifier(
             return context.weapon_profile
         if context.weapon_profile.range_profile.kind is not RangeProfileKind.MELEE:
             return context.weapon_profile
-        return replace(
+        return with_weapon_skill_modifier(
             context.weapon_profile,
-            skill=_improve_weapon_skill(context.weapon_profile.skill),
-            source_ids=_source_ids_with_voice_of_command(context.weapon_profile.source_ids),
+            modifier_id=f"{SOURCE_RULE_ID}:fix-bayonets:skill",
+            source_id=SOURCE_RULE_ID,
+            delta=-1,
         )
     if order is VoiceOfCommandOrder.TAKE_AIM:
         if context.source_phase is not BattlePhase.SHOOTING:
             return context.weapon_profile
         if context.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE:
             return context.weapon_profile
-        return replace(
+        return with_weapon_skill_modifier(
             context.weapon_profile,
-            skill=_improve_ballistic_skill(context.weapon_profile.skill),
-            source_ids=_source_ids_with_voice_of_command(context.weapon_profile.source_ids),
+            modifier_id=f"{SOURCE_RULE_ID}:take-aim:skill",
+            source_id=SOURCE_RULE_ID,
+            delta=-1,
         )
     if order is VoiceOfCommandOrder.FIRST_RANK_FIRE_SECOND_RANK_FIRE:
         if context.source_phase is not BattlePhase.SHOOTING:
@@ -1157,36 +1160,6 @@ def _improve_armour_save_option(option: SaveOption) -> SaveOption:
 def _improve_save(current: int) -> int:
     _validate_non_negative_int("save", current)
     if current <= 3:
-        return current
-    return current - 1
-
-
-def _improve_weapon_skill(skill: CharacteristicValue) -> CharacteristicValue:
-    if type(skill) is not CharacteristicValue:
-        raise GameLifecycleError("Voice of Command weapon skill requires CharacteristicValue.")
-    if skill.characteristic is not Characteristic.WEAPON_SKILL:
-        raise GameLifecycleError("Voice of Command weapon skill characteristic drift.")
-    if not skill.is_numeric:
-        raise GameLifecycleError("Voice of Command cannot improve non-numeric Weapon Skill.")
-    return CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, _improve_skill(skill.final))
-
-
-def _improve_ballistic_skill(skill: CharacteristicValue) -> CharacteristicValue:
-    if type(skill) is not CharacteristicValue:
-        raise GameLifecycleError("Voice of Command ballistic skill requires CharacteristicValue.")
-    if skill.characteristic is not Characteristic.BALLISTIC_SKILL:
-        raise GameLifecycleError("Voice of Command ballistic skill characteristic drift.")
-    if not skill.is_numeric:
-        raise GameLifecycleError("Voice of Command cannot improve non-numeric Ballistic Skill.")
-    return CharacteristicValue.from_raw(
-        Characteristic.BALLISTIC_SKILL,
-        _improve_skill(skill.final),
-    )
-
-
-def _improve_skill(current: int) -> int:
-    _validate_non_negative_int("skill", current)
-    if current <= 2:
         return current
     return current - 1
 

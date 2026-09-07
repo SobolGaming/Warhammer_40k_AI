@@ -73,6 +73,14 @@ def identical_attack_signature(pool: RangedAttackPool) -> IdenticalAttackSignatu
         weapon_rule_tokens=(
             *_weapon_rule_tokens_for_signature(profile),
             *(
+                f"skill-modifier:{canonical_json(item.to_payload())}"
+                for item in profile.skill_modifiers
+            ),
+            *(
+                f"hit-modifier:{canonical_json(item.to_payload())}"
+                for item in pool.hit_roll_modifiers
+            ),
+            *(
                 f"selected-weapon-ability:{ability_id}"
                 for ability_id in pool.selected_weapon_ability_ids
             ),
@@ -368,6 +376,7 @@ def _synthetic_pool_for_gathered_group(
         target_visible_model_ids=base_pool.target_visible_model_ids,
         target_in_range_model_ids=base_pool.target_in_range_model_ids,
         hit_roll_modifier=base_pool.hit_roll_modifier,
+        hit_roll_modifiers=base_pool.hit_roll_modifiers,
         targeting_rule_ids=base_pool.targeting_rule_ids,
         selected_weapon_ability_ids=base_pool.selected_weapon_ability_ids,
         firing_deck_source_unit_instance_id=base_pool.firing_deck_source_unit_instance_id,

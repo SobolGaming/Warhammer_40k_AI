@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `11.4.0`
+Contract version: `11.5.0`
 
 Contract 11.4 adds terminal zero/star characteristic kinds and documents the
 engine-produced raw, rerolled, modified and rule-limited roll stages for Orders
@@ -369,3 +369,10 @@ inventory in proposal/profile payloads. It preserves distinct source occurrences
 without changing existing descriptor IDs or introducing an instance-selection
 submission. See Order 22 in `docs/ADAPTER_DECISION_CONTRACT.md`. Missing inventory
 means a native profile definition; malformed explicit inventories are rejected.
+
+Contract 11.5 adds optional nonempty `skill_modifiers` to runtime weapon profiles.
+Each operation binds its modifier ID, source ID, BS/WS scope and arithmetic.
+Psychic finite choices retain all individual skill and hit sources, including
+cancelling contributions, and support per-source keep/ignore continuation choices.
+The existing finite submission envelope is unchanged. Hit events preserve the
+completed selection; engine build identity prevents aggregate-only runtime restores.

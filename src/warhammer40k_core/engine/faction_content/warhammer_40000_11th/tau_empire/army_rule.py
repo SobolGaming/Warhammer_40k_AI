@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
+from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -307,10 +308,11 @@ def for_the_greater_good_weapon_profile_modifier(
     if profile.skill.characteristic is not Characteristic.BALLISTIC_SKILL:
         raise GameLifecycleError("For the Greater Good requires a Ballistic Skill attack.")
 
-    modified = replace(
+    modified = with_weapon_skill_modifier(
         profile,
-        skill=_improve_ballistic_skill(profile.skill),
-        source_ids=_source_ids_with_for_the_greater_good(profile.source_ids),
+        modifier_id=f"{spotted_effect.effect_id}:skill",
+        source_id=SOURCE_RULE_ID,
+        delta=-1,
     )
     effect_payload = _payload_object(spotted_effect.effect_payload)
     if not _payload_bool(effect_payload, key="observer_has_markerlight"):
@@ -812,32 +814,6 @@ def _tau_empire_army_for_player(
     return matching[0]
 
 
-def _improve_ballistic_skill(skill: CharacteristicValue) -> CharacteristicValue:
-    if type(skill) is not CharacteristicValue:
-        raise GameLifecycleError("For the Greater Good ballistic skill requires value.")
-    if skill.characteristic is not Characteristic.BALLISTIC_SKILL:
-        raise GameLifecycleError("For the Greater Good ballistic skill characteristic drift.")
-    if not skill.is_numeric:
-        raise GameLifecycleError("For the Greater Good cannot improve non-numeric Ballistic Skill.")
-    return CharacteristicValue.from_raw(
-        Characteristic.BALLISTIC_SKILL,
-        _improve_skill(skill.final),
-    )
-
-
-def _improve_skill(current: int) -> int:
-    _validate_non_negative_int("skill", current)
-    if current <= 2:
-        return current
-    return current - 1
-
-
-def _source_ids_with_for_the_greater_good(source_ids: tuple[str, ...]) -> tuple[str, ...]:
-    if type(source_ids) is not tuple:
-        raise GameLifecycleError("For the Greater Good source_ids must be a tuple.")
-    return tuple(sorted({*source_ids, SOURCE_RULE_ID}))
-
-
 def _rules_unit_label(rules_unit: RulesUnitView) -> str:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("For the Greater Good label requires rules unit.")
@@ -853,9 +829,3 @@ def _active_player_id(state: GameState) -> str:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int or value < 0:
-        raise GameLifecycleError(f"For the Greater Good {field_name} must be non-negative int.")
-    return value

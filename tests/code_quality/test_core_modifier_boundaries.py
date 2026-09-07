@@ -162,3 +162,29 @@ def test_historical_leadership_uses_authenticated_generic_inventory_and_shared_r
     assert {"expiration_for_duration", "validated_generic_execution_effect_payload"} <= _calls(
         "engine/battle_shock_generic_leadership_authority.py", "_effect_from_execution"
     )
+
+
+def test_psychic_selection_and_hit_resolution_share_individual_source_owner() -> None:
+    for path, function in (
+        ("engine/attack_sequence_psychic_modifiers.py", "_psychic_attack_modifier_ignore_request"),
+        ("engine/attack_sequence_hit_wound.py", "_roll_hit"),
+    ):
+        calls = _calls(path, function)
+        assert "attack_modifier_snapshots" in calls
+        assert not calls.intersection({"_hit_skill_modifier", "_hit_roll_modifier"})
+    assert "ModifierStack" in _calls("core/weapon_skill_modifiers.py", "with_weapon_skill_modifier")
+    assert "with_weapon_skill_modifier" in _calls(
+        "engine/rule_ir_weapon_modifiers.py", "rule_ir_modified_weapon_profile"
+    )
+    for faction in ("adeptus_mechanicus", "astra_militarum", "tau_empire"):
+        source = (
+            PACKAGE / f"engine/faction_content/warhammer_40000_11th/{faction}/army_rule.py"
+        ).read_text(encoding="utf-8")
+        assert "with_weapon_skill_modifier" in source
+        assert "def _improve_skill" not in source
+    assert "invalid_psychic_modifier_status" in _calls(
+        "engine/lifecycle_attack_prevalidation.py", "pre_validate_attack_sequence_decision"
+    )
+    assert "validate_psychic_modifier_history" in _calls(
+        "engine/lifecycle.py", "from_payload", class_name="GameLifecycle"
+    )

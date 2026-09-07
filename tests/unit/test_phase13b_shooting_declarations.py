@@ -7098,6 +7098,7 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
             ),
             shooting_type=ShootingType.SNAP,
             hit_roll_modifier=1,
+            hit_roll_modifiers=(RollModifier("fixture:hit", 1, source_id="fixture:hit-source"),),
             targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
         )
 
@@ -7378,6 +7379,7 @@ def test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes() -> None:
             ),
             shooting_type=ShootingType.SNAP,
             hit_roll_modifier=1,
+            hit_roll_modifiers=(RollModifier("fixture:hit", 1, source_id="fixture:hit-source"),),
             targeting_rule_ids=(SNAP_SHOOTING_RULE_ID,),
         )
 
@@ -8681,6 +8683,9 @@ def test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier() -> None:
                         attacks=1,
                     ),
                     hit_roll_modifier=2,
+                    hit_roll_modifiers=(
+                        RollModifier("fixture:hit", 2, source_id="fixture:hit-source"),
+                    ),
                 ),
             ),
         ),
@@ -8753,6 +8758,9 @@ def test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers() ->
                     attacks=1,
                 ),
                 hit_roll_modifier=-1,
+                hit_roll_modifiers=(
+                    RollModifier("fixture:hit", -1, source_id="fixture:hit-source"),
+                ),
             ),
         ),
     )
@@ -8848,6 +8856,9 @@ def test_psychic_attack_can_ignore_detrimental_modifiers_and_keep_hit_bonus() ->
                     attacks=1,
                 ),
                 hit_roll_modifier=2,
+                hit_roll_modifiers=(
+                    RollModifier("fixture:hit", 2, source_id="fixture:hit-source"),
+                ),
             ),
         ),
     )
@@ -9683,7 +9694,11 @@ def test_phase14l_identical_attack_signature_and_gathered_group_payloads() -> No
             weapon_profile_id=strength_profile.profile_id,
             weapon_profile=strength_profile,
         ),
-        replace(first_pool, hit_roll_modifier=1),
+        replace(
+            first_pool,
+            hit_roll_modifier=1,
+            hit_roll_modifiers=(RollModifier("fixture:hit", 1, source_id="fixture:hit-source"),),
+        ),
         replace(
             first_pool,
             weapon_profile_id=torrent_profile.profile_id,

@@ -153,8 +153,14 @@ def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registe
         (ATTACK_SEQUENCE_PATH, "current_legal_damage_allocation_model_ids"),
         (SHOOTING_PHASE_PATH, "apply_damage_allocation_model_decision"),
         (LIFECYCLE_PATH, "SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE"),
-        (LIFECYCLE_PATH, "_invalid_damage_allocation_model_status"),
-        (LIFECYCLE_PATH, "current_legal_damage_allocation_model_ids"),
+        (
+            LIFECYCLE_PATH.with_name("lifecycle_attack_prevalidation.py"),
+            "_invalid_damage_allocation_model_status",
+        ),
+        (
+            LIFECYCLE_PATH.with_name("lifecycle_attack_prevalidation.py"),
+            "current_legal_damage_allocation_model_ids",
+        ),
     )
     missing: list[str] = []
 
@@ -191,7 +197,10 @@ def test_p06b_mortal_wound_model_ties_cannot_use_sorted_first_fallback() -> None
         "model_id = next(iter(legal_model_ids))"
     )
     assert "invalid_mortal_wound_model_status" in mortal_wound_model_source
-    assert "_mw_model.invalid_mortal_wound_model_status" in lifecycle_source
+    assert "pre_validate_attack_sequence_decision" in lifecycle_source
+    assert "_mw_model.invalid_mortal_wound_model_status" in source_for(
+        LIFECYCLE_PATH.with_name("lifecycle_attack_prevalidation.py")
+    )
     assert "select_mortal_wound_model" in contract_source
     assert "tuple(sorted(alive_model_ids))[0]" not in mortal_wound_model_source
     assert "tuple(sorted(alive_model_ids))[0]" not in direct_source

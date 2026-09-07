@@ -5,6 +5,7 @@ from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import RandomCharacteristicTiming
+from warhammer40k_core.core.modifiers import RollModifier, RollModifierPayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
@@ -57,6 +58,7 @@ class RangedAttackPoolPayload(TypedDict):
     target_visible_model_ids: list[str]
     target_in_range_model_ids: list[str]
     hit_roll_modifier: int
+    hit_roll_modifiers: NotRequired[list[RollModifierPayload]]
     targeting_rule_ids: list[str]
     selected_weapon_ability_ids: list[str]
     firing_deck_source_unit_instance_id: str | None
@@ -413,6 +415,7 @@ class RangedAttackPool:
     target_visible_model_ids: tuple[str, ...]
     target_in_range_model_ids: tuple[str, ...]
     hit_roll_modifier: int = 0
+    hit_roll_modifiers: tuple[RollModifier, ...] = ()
     targeting_rule_ids: tuple[str, ...] = ()
     selected_weapon_ability_ids: tuple[str, ...] = ()
     firing_deck_source_unit_instance_id: str | None = None
@@ -482,6 +485,21 @@ class RangedAttackPool:
                 self.target_in_range_model_ids,
             ),
         )
+        if type(self.hit_roll_modifiers) is not tuple or any(
+            type(item) is not RollModifier
+            or item.source_id is None
+            or item.operation.value != "add"
+            for item in self.hit_roll_modifiers
+        ):
+            raise GameLifecycleError(
+                "Attack pool hit modifiers require source-linked additive operations."
+            )
+        if len({item.modifier_id for item in self.hit_roll_modifiers}) != len(
+            self.hit_roll_modifiers
+        ):
+            raise GameLifecycleError("Attack pool hit modifier identities must be unique.")
+        if sum(item.operand for item in self.hit_roll_modifiers) != self.hit_roll_modifier:
+            raise GameLifecycleError("Attack pool hit modifier total or provenance drift.")
         if type(self.hit_roll_modifier) is not int:
             raise GameLifecycleError("RangedAttackPool hit_roll_modifier must be an int.")
         object.__setattr__(
@@ -537,6 +555,8 @@ class RangedAttackPool:
     ) -> Self:
         if type(declaration) is not WeaponDeclaration:
             raise GameLifecycleError("RangedAttackPool requires a WeaponDeclaration.")
+        from warhammer40k_core.engine.attack_hit_modifiers import declaration_hit_modifiers
+
         return cls(
             weapon_instance_id=declaration.weapon_instance_id,
             attacker_model_instance_id=declaration.attacker_model_instance_id,
@@ -549,6 +569,7 @@ class RangedAttackPool:
             target_visible_model_ids=target_visible_model_ids,
             target_in_range_model_ids=target_in_range_model_ids,
             hit_roll_modifier=hit_roll_modifier,
+            hit_roll_modifiers=declaration_hit_modifiers(targeting_rule_ids),
             targeting_rule_ids=targeting_rule_ids,
             selected_weapon_ability_ids=declaration.selected_weapon_ability_ids,
             firing_deck_source_unit_instance_id=declaration.firing_deck_source_unit_instance_id,
@@ -556,7 +577,7 @@ class RangedAttackPool:
         )
 
     def to_payload(self) -> RangedAttackPoolPayload:
-        return {
+        payload: RangedAttackPoolPayload = {
             "weapon_instance_id": self.weapon_instance_id,
             "attacker_model_instance_id": self.attacker_model_instance_id,
             "wargear_id": self.wargear_id,
@@ -573,9 +594,14 @@ class RangedAttackPool:
             "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
             "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
         }
+        if self.hit_roll_modifiers:
+            payload["hit_roll_modifiers"] = [item.to_payload() for item in self.hit_roll_modifiers]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: RangedAttackPoolPayload) -> Self:
+        if "hit_roll_modifiers" in payload and not payload["hit_roll_modifiers"]:
+            raise GameLifecycleError("Explicit hit modifier inventory must not be empty.")
         return cls(
             weapon_instance_id=payload["weapon_instance_id"],
             attacker_model_instance_id=payload["attacker_model_instance_id"],
@@ -588,6 +614,11 @@ class RangedAttackPool:
             target_visible_model_ids=tuple(payload["target_visible_model_ids"]),
             target_in_range_model_ids=tuple(payload["target_in_range_model_ids"]),
             hit_roll_modifier=payload["hit_roll_modifier"],
+            hit_roll_modifiers=tuple(
+                RollModifier.from_payload(item) for item in payload["hit_roll_modifiers"]
+            )
+            if "hit_roll_modifiers" in payload
+            else (),
             targeting_rule_ids=tuple(payload["targeting_rule_ids"]),
             selected_weapon_ability_ids=tuple(payload["selected_weapon_ability_ids"]),
             firing_deck_source_unit_instance_id=payload["firing_deck_source_unit_instance_id"],

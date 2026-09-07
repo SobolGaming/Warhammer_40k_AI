@@ -86,6 +86,9 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
 )
 
 
+_INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset({"effect_snapshot_sha256"})
+
+
 class RedactedLifecycleStatusPayload(TypedDict):
     stage: str
     status_kind: str
@@ -372,7 +375,7 @@ def public_decision_request_payload(
         validate_json_value(request.to_payload()),
         viewer=viewer,
     )
-    payload = _without_internal_model_destruction_authority(payload)
+    payload = _without_internal_authority_commitments(payload)
     if not isinstance(payload, dict):
         raise GameLifecycleError("Public DecisionRequest payload must be an object.")
     return payload
@@ -415,7 +418,7 @@ def redacted_lifecycle_status(
         "stage": status.stage.value,
         "status_kind": status.status_kind.value,
         "message": status.message,
-        "payload": _without_internal_model_destruction_authority(metadata_payload),
+        "payload": _without_internal_authority_commitments(metadata_payload),
         "pending_request_id": None if decision_request is None else decision_request.request_id,
         "decision_type": None if decision_request is None else decision_request.decision_type,
         "actor_id": None if decision_request is None else decision_request.actor_id,
@@ -440,7 +443,7 @@ def public_event_record_payload(
         payload=payload,
         viewer=viewer,
     )
-    public_payload = _without_internal_model_destruction_authority(public_payload)
+    public_payload = _without_internal_authority_commitments(public_payload)
     if _is_generic_hidden_event_payload(public_payload):
         return None
     return cast(
@@ -746,15 +749,16 @@ def _without_internal_secondary_authority_commitments(value: JsonValue) -> JsonV
     return value
 
 
-def _without_internal_model_destruction_authority(value: JsonValue) -> JsonValue:
+def _without_internal_authority_commitments(value: JsonValue) -> JsonValue:
     if isinstance(value, dict):
         return {
-            key: _without_internal_model_destruction_authority(nested)
+            key: _without_internal_authority_commitments(nested)
             for key, nested in value.items()
-            if key not in _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS
+            if key
+            not in _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS | _INTERNAL_PSYCHIC_AUTHORITY_KEYS
         }
     if isinstance(value, list):
-        return [_without_internal_model_destruction_authority(nested) for nested in value]
+        return [_without_internal_authority_commitments(nested) for nested in value]
     return value
 
 

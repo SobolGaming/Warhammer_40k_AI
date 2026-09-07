@@ -78,23 +78,36 @@ def _roll_hit(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     psychic_modifier_selection: PsychicAttackModifierIgnoreSelection | None = None,
 ) -> HitRoll:
-    skill_modifier = _hit_skill_modifier(state=state, pool=pool)
-    modifier = _hit_roll_modifier(
+    from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
+
+    _hit_skill(pool.weapon_profile)
+    snapshots = attack_modifier_snapshots(
         state=state,
         pool=pool,
         source_phase=source_phase,
-        runtime_modifier_registry=runtime_modifier_registry,
+        runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
     )
     if psychic_modifier_selection is not None:
         if (
-            psychic_modifier_selection.skill_modifier != skill_modifier
-            or psychic_modifier_selection.hit_roll_modifier != modifier
+            not psychic_modifier_selection.complete
+            or psychic_modifier_selection.modifiers != snapshots
+            or psychic_modifier_selection.skill_base != pool.weapon_profile.skill.raw
+            or psychic_modifier_selection.skill_characteristic
+            != pool.weapon_profile.skill.characteristic
         ):
             raise GameLifecycleError("Psychic modifier ignore selection context drift.")
-        skill_modifier = psychic_modifier_selection.effective_skill_modifier
-        modifier = psychic_modifier_selection.effective_hit_roll_modifier
-    skill = _hit_skill(pool.weapon_profile) + skill_modifier
-    skill = max(2, min(skill, 6))
+        selection = psychic_modifier_selection
+    else:
+        selection = PsychicAttackModifierIgnoreSelection(
+            "keep-all-modifiers",
+            pool.weapon_profile.skill.raw,
+            pool.weapon_profile.skill.characteristic,
+            snapshots,
+            tuple(item.modifier_id for item in snapshots),
+            (),
+        )
+    skill = selection.skill_value(ignored_ids=selection.ignored_modifier_ids)
+    modifier = selection.effective_hit_roll_modifier
     is_snap_shooting = (
         FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
         or SNAP_SHOOTING_RULE_ID in pool.targeting_rule_ids
@@ -678,26 +691,17 @@ def _hit_roll_modifier(
     source_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> int:
-    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
-    return (
-        pool.hit_roll_modifier
-        + _persisting_hit_roll_modifier(
+    from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
+
+    return sum(
+        item.modifier.operand
+        for item in attack_modifier_snapshots(
             state=state,
-            target_unit_instance_id=pool.target_unit_instance_id,
+            pool=pool,
+            source_phase=source_phase,
+            runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
         )
-        + runtime_modifiers.hit_roll_modifier(
-            HitRollModifierContext(
-                state=state,
-                attacking_unit_instance_id=_unit_instance_id_for_model(
-                    state=state,
-                    model_instance_id=pool.attacker_model_instance_id,
-                ),
-                attacker_model_instance_id=pool.attacker_model_instance_id,
-                target_unit_instance_id=pool.target_unit_instance_id,
-                weapon_profile=pool.weapon_profile,
-                source_phase=source_phase,
-            )
-        )
+        if item.kind == "hit_roll"
     )
 
 

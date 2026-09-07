@@ -823,6 +823,7 @@ class CatalogDatasheetRuleRuntime:
                     },
                     profile=profile,
                     source_id=source.rule_ir.source_id,
+                    modifier_id=f"{source.binding_id}:skill:{characteristic.value}",
                 )
             return profile
 
@@ -982,6 +983,7 @@ class CatalogDatasheetRuleRuntime:
                 parameters=parameter_payload(source.clause.effects[0].parameters),
                 profile=context.weapon_profile,
                 source_id=source.rule_ir.source_id,
+                modifier_id=f"{source.binding_id}:skill",
             )
 
         return handler

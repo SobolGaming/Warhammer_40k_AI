@@ -79,7 +79,7 @@ def _roll_hit_and_wound(
             decisions=decisions,
             attack_context_id=attack_context_id,
         )
-        if psychic_modifier_selection is None:
+        if psychic_modifier_selection is None or not psychic_modifier_selection.complete:
             request = _psychic_attack_modifier_ignore_request(
                 state=state,
                 pool=pool,
@@ -88,6 +88,7 @@ def _roll_hit_and_wound(
                 attack_context_id=attack_context_id,
                 source_phase=attack_sequence.source_phase,
                 runtime_modifier_registry=runtime_modifier_registry,
+                previous_selection=psychic_modifier_selection,
             )
             if request is not None:
                 decisions.request_decision(request)
@@ -191,6 +192,11 @@ def _roll_hit_and_wound(
                 payload=validate_json_value(
                     {
                         **hit_roll.to_payload(),
+                        **(
+                            {"psychic_modifier_selection": psychic_modifier_selection.to_payload()}
+                            if psychic_modifier_selection is not None
+                            else {}
+                        ),
                         "weapon_profile_id": pool.weapon_profile_id,
                         "is_psychic_attack": is_psychic_attack,
                         "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),

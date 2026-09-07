@@ -10,6 +10,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -2431,6 +2432,9 @@ def test_hit_roll_bonus_cap_applies_after_weapon_skill_modifier() -> None:
                 attacks=1,
                 weapon_profile=worsened_profile,
                 hit_roll_modifier=2,
+                hit_roll_modifiers=(
+                    RollModifier("fixture:hit", 2, source_id="fixture:hit-source"),
+                ),
             ),
         ),
     )

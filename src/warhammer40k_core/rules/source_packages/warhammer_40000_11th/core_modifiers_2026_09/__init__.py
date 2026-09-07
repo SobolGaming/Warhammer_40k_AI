@@ -1,4 +1,4 @@
-"""Hash-pinned 02.02.01 modifiers for P02A/P02B/P02C."""
+"""Hash-pinned modifiers and Psychic individual selection for P02A/P02B/P02C/P24I."""
 
 from __future__ import annotations
 
@@ -23,12 +23,15 @@ from warhammer40k_core.rules.source_evidence import (
 )
 from warhammer40k_core.rules.source_packages.artifact_loader import package_artifact_bytes
 
-EXPECTED_ARTIFACT_SHA256: Final = "6467f2a059d7ce28d870160782124ecee957f43b8486c9bb5652eb670b8db958"
+EXPECTED_ARTIFACT_SHA256: Final = "07db393dbbcbe13435a3c24c1f999bb96271c6d696e80892803cc633d6ae0995"
 SOURCE_PACKAGE_ID: Final = "gw-11e-core-modifiers"
 SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-07"
 ORDERED_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ordered-modifiers"
 MODIFIED_DICE_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:modified-dice-limits"
 TARGETING_RANGE_LIMITS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:detection-lone-operative-limits"
+
+PSYCHIC_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:psychic-individual-modifiers"
+IGNORE_MODIFIERS_SOURCE_ID: Final = f"{SOURCE_PACKAGE_ID}:ignore-individual-modifiers"
 
 
 class CoreModifiersSourceError(ValueError):
@@ -72,6 +75,8 @@ def validate_source_artifact_bytes(raw: bytes) -> CoreModifiersSourceArtifact:
             ORDERED_MODIFIERS_SOURCE_ID,
             MODIFIED_DICE_LIMITS_SOURCE_ID,
             TARGETING_RANGE_LIMITS_SOURCE_ID,
+            PSYCHIC_MODIFIERS_SOURCE_ID,
+            IGNORE_MODIFIERS_SOURCE_ID,
         )
     ):
         raise CoreModifiersSourceError("Core modifiers source identity drifted.")

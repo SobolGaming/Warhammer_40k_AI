@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,7 +7,7 @@ import { spawnSync } from "node:child_process";
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryDirectory = mkdtempSync(resolve(tmpdir(), "core-v2-openapi-"));
 const temporaryOutput = resolve(temporaryDirectory, "openapi.ts");
-const committedOutput = resolve(packageRoot, "src/generated/openapi.ts");
+const committedDirectory = resolve(packageRoot, "src/generated");
 const generator = resolve(packageRoot, "scripts/generate-models.mjs");
 
 try {
@@ -20,7 +20,15 @@ try {
     process.stderr.write(generated.stderr);
     process.exit(generated.status ?? 1);
   }
-  if (readFileSync(temporaryOutput, "utf8") !== readFileSync(committedOutput, "utf8")) {
+  const generatedFiles = readdirSync(temporaryDirectory).sort();
+  const committedFiles = readdirSync(committedDirectory).sort();
+  if (
+    JSON.stringify(generatedFiles) !== JSON.stringify(committedFiles)
+    || generatedFiles.some((name) =>
+      readFileSync(resolve(temporaryDirectory, name), "utf8")
+        !== readFileSync(resolve(committedDirectory, name), "utf8"),
+    )
+  ) {
     process.stderr.write(
       "Generated OpenAPI models drifted; run `npm run generate` in conformance/typescript.\n",
     );

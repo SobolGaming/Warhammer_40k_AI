@@ -82,6 +82,7 @@ def _charged_melee_weapon_characteristic_aura_handler(
             parameters=effect_parameters,
             profile=context.weapon_profile,
             source_id=aura_rule_source_id,
+            modifier_id=f"{source.binding_id}:skill",
         )
 
     return handler
