@@ -4104,7 +4104,7 @@ after the aggregate coverage run began.
 
 ### P24I — Order 28
 
-Status: Implemented; all required local gates passed. PR publication pending.
+Status: Implemented; all required local gates passed. Published in [PR #433](https://github.com/SobolGaming/Warhammer_40k_AI/pull/433); not merged.
 Finding ID: `C24-09`. Dependencies P00, P02A and P02B are merged; reviewed base
 `67c60842ef87d3df646ec762f4e328eeff46ee0b` includes Orders 26, 27 and 29 via PR #432.
 The owner approved the upstream BS/WS provenance repair recorded in
@@ -4230,4 +4230,4 @@ the shard inventory changed after the successful engine coverage run; client and
 quality gates were then revalidated. Scope, architecture and final diff audits
 pass. No engine production code changed after that coverage run began.
 
-PR URL and merge commit: publication pending; not merged.
+PR URL: [#433](https://github.com/SobolGaming/Warhammer_40k_AI/pull/433). Merge commit: not merged.

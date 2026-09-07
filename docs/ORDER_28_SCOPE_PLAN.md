@@ -1,6 +1,6 @@
 # Order 28 / P24I scope review
 
-Status: the owner approved the scope below on 2026-09-07. Implementation and all required local validation are complete; PR publication is pending.
+Status: the owner approved the scope below on 2026-09-07. Implementation and all required local validation are complete. Published in [PR #433](https://github.com/SobolGaming/Warhammer_40k_AI/pull/433); not merged.
 
 Finding: `C24-09`. Reviewed base: `67c60842ef87d3df646ec762f4e328eeff46ee0b`,
 matching `origin/main` after fetch on 2026-09-07. Orders 26 and 27 are merged
