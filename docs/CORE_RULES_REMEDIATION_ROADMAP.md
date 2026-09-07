@@ -3855,4 +3855,4 @@ limited to engine identity and dependent persistence/manifest hashes; no wire
 schema change is claimed. The scope/architecture audit and `git diff --check`
 pass. Initial focused regressions and the final 133-test focused run also pass.
 
-PR URL and merge commit: pending publication; not merged.
+PR URL and merge commit: [PR #431](https://github.com/SobolGaming/Warhammer_40k_AI/pull/431); not merged.
