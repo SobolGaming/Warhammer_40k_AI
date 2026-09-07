@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import (
     CharacteristicValue,
+    CharacteristicValueKind,
     CharacteristicValuePayload,
 )
 from warhammer40k_core.engine.battlefield_state import (
@@ -213,25 +214,29 @@ def validate_primary_mission_action_terrain_model_inventory(
             )
             or row.logical_terrain_area_ids != expected_area_ids
             or source_oc != expected_source_oc
-            or (
-                resolved_oc.characteristic,
-                resolved_oc.raw,
-                resolved_oc.base,
-                resolved_oc.value_kind,
-            )
-            != (
-                source_oc.characteristic,
-                source_oc.raw,
-                source_oc.base,
-                source_oc.value_kind,
-            )
-            or not set(source_oc.applied_modifier_ids) <= set(resolved_oc.applied_modifier_ids)
-            or (
-                resolved_oc.final != source_oc.final
-                and resolved_oc.applied_modifier_ids == source_oc.applied_modifier_ids
-            )
+            or not _runtime_oc_retains_source_lineage(source_oc, resolved_oc)
         ):
             raise GameLifecycleError("Primary Mission Action terrain-model inventory drifted.")
+
+
+def _runtime_oc_retains_source_lineage(
+    source: CharacteristicValue,
+    resolved: CharacteristicValue,
+) -> bool:
+    """Structural lineage only; checkpoint runtime authority recomputes every field."""
+    if source.characteristic is not resolved.characteristic:
+        return False
+    if not source.is_numeric or source.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO:
+        return resolved == source
+    if resolved.is_numeric and resolved.raw != source.raw:
+        return False
+    if resolved.value_kind is CharacteristicValueKind.SOURCE_DASH:
+        return False
+    source_ids = set(source.applied_modifier_ids)
+    resolved_ids = set(resolved.applied_modifier_ids)
+    if not source_ids <= resolved_ids:
+        return False
+    return resolved == source or bool(resolved_ids - source_ids)
 
 
 def _json_object(value: str) -> dict[str, object]:

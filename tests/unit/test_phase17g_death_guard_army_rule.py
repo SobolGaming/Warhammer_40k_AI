@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import pytest
 from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
+from tests.characteristic_modifier_helpers import resolve_historical_handler
 from tests.phase11c_command_phase_helpers import (
     battle_state_with_center_objective_positions,
     center_marker_definition,
@@ -28,6 +29,7 @@ from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywo
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -276,7 +278,7 @@ def test_nurgles_gift_historical_leadership_recomputes_from_event_bound_contagio
         active_player_id=state.active_player_id,
     )
 
-    assert army_rule.historical_nurgles_gift_leadership(context, 7) == 8
+    assert resolve_historical_handler(army_rule.historical_nurgles_gift_leadership, context, 7) == 8
     with pytest.raises(GameLifecycleError, match="historical authority requires"):
         army_rule.historical_nurgles_gift_leadership(cast(Any, object()), 7)
 
@@ -468,17 +470,21 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
     )
     call_order: list[str] = []
 
-    def unit_characteristic_first(context: UnitCharacteristicModifierContext) -> int:
+    def unit_characteristic_first(
+        context: UnitCharacteristicModifierContext,
+    ) -> tuple[ModifierTerm, ...]:
         call_order.append("unit-characteristic:first")
         assert context.base_value == 4
         assert context.current_value == 4
-        return context.current_value - 1
+        return (ModifierTerm(ModifierOperation.ADD, -1),)
 
-    def unit_characteristic_second(context: UnitCharacteristicModifierContext) -> int:
+    def unit_characteristic_second(
+        context: UnitCharacteristicModifierContext,
+    ) -> tuple[ModifierTerm, ...]:
         call_order.append("unit-characteristic:second")
         assert context.base_value == 4
-        assert context.current_value == 3
-        return context.current_value * 2
+        assert context.current_value == 4
+        return (ModifierTerm(ModifierOperation.MULTIPLY, 2),)
 
     def hit_roll_first(context: HitRollModifierContext) -> int:
         call_order.append("hit-roll:first")
@@ -524,25 +530,29 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
             ),
         )
 
-    def movement_first(context: MovementBudgetModifierContext) -> float:
+    def movement_first(context: MovementBudgetModifierContext) -> tuple[ModifierTerm, ...]:
         call_order.append("movement:first")
-        assert context.current_movement_inches == 6.0
-        return 5.0
+        assert context.movement.final == 6.0
+        return (ModifierTerm(ModifierOperation.ADD, -1),)
 
-    def movement_second(context: MovementBudgetModifierContext) -> float:
+    def movement_second(context: MovementBudgetModifierContext) -> tuple[ModifierTerm, ...]:
         call_order.append("movement:second")
-        assert context.current_movement_inches == 5.0
-        return 4.5
+        assert context.movement.final == 6.0
+        return (ModifierTerm(ModifierOperation.DIVIDE, 2),)
 
-    def objective_control_first(context: ObjectiveControlModifierContext) -> int:
+    def objective_control_first(
+        context: ObjectiveControlModifierContext,
+    ) -> tuple[ModifierTerm, ...]:
         call_order.append("objective-control:first")
         assert context.current_objective_control == 3
-        return 2
+        return (ModifierTerm(ModifierOperation.ADD, -1),)
 
-    def objective_control_second(context: ObjectiveControlModifierContext) -> int:
+    def objective_control_second(
+        context: ObjectiveControlModifierContext,
+    ) -> tuple[ModifierTerm, ...]:
         call_order.append("objective-control:second")
-        assert context.current_objective_control == 2
-        return 1
+        assert context.current_objective_control == 3
+        return (ModifierTerm(ModifierOperation.ADD, -1),)
 
     registry = RuntimeModifierRegistry.from_bindings(
         unit_characteristic_modifier_bindings=(
@@ -637,7 +647,7 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
                 current_value=4,
             )
         )
-        == 6
+        == 7
     )
     assert (
         registry.hit_roll_modifier(
@@ -686,11 +696,10 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
                 state=state,
                 unit_instance_id=unit.unit_instance_id,
                 model_instance_id=model_id,
-                base_movement_inches=6,
-                current_movement_inches=6,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, 6, 6, 6),
             )
         )
-        == 4.5
+        == 2.0
     )
     assert (
         registry.modified_objective_control(
@@ -738,19 +747,18 @@ def test_runtime_modifier_registry_rejects_duplicate_ids_and_bad_handler_results
     bad_binding = MovementBudgetModifierBinding(
         modifier_id="runtime:bad-movement",
         source_id="runtime:bad-movement-source",
-        handler=lambda _context: -1.0,
+        handler=lambda _context: cast(tuple[ModifierTerm, ...], -1.0),
     )
     bad_registry = RuntimeModifierRegistry.from_bindings(
         movement_budget_modifier_bindings=(bad_binding,)
     )
-    with pytest.raises(GameLifecycleError, match="runtime:bad-movement returned movement"):
+    with pytest.raises(GameLifecycleError, match="typed modifier terms"):
         bad_registry.modified_movement_inches(
             MovementBudgetModifierContext(
                 state=state,
                 unit_instance_id=unit.unit_instance_id,
                 model_instance_id=model_id,
-                base_movement_inches=6,
-                current_movement_inches=6,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, 6, 6, 6),
             )
         )
 
@@ -801,8 +809,7 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
             state=invalid_state,
             unit_instance_id=unit.unit_instance_id,
             model_instance_id=model_id,
-            base_movement_inches=6,
-            current_movement_inches=6,
+            movement=CharacteristicValue(Characteristic.MOVEMENT, 6, 6, 6),
         )
     with pytest.raises(GameLifecycleError, match="Objective Control modifier state"):
         ObjectiveControlModifierContext(
@@ -893,13 +900,12 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
             weapon_profile=_first_weapon_profile_for_unit(unit),
             source_phase=cast(BattlePhase, "invalid-phase"),
         )
-    with pytest.raises(GameLifecycleError, match="base_movement_inches must be numeric"):
+    with pytest.raises(GameLifecycleError, match="typed Movement characteristic"):
         MovementBudgetModifierContext(
             state=state,
             unit_instance_id=unit.unit_instance_id,
             model_instance_id=model_id,
-            base_movement_inches=cast(float, object()),
-            current_movement_inches=6,
+            movement=cast(CharacteristicValue, object()),
         )
     with pytest.raises(GameLifecycleError, match="base_value must not be negative"):
         UnitCharacteristicModifierContext(
@@ -1118,6 +1124,97 @@ def test_nurgles_gift_afflicted_units_have_minus_one_toughness() -> None:
         )
         == 3
     )
+
+
+@pytest.mark.parametrize("negative_first", [True, False])
+@pytest.mark.parametrize("restored", [False, True])
+def test_registered_contagion_and_generic_operations_share_one_terminal_bound(
+    negative_first: bool,
+    restored: bool,
+) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.primary_mission_objective_control_authority import (
+        resolve_checkpoint_objective_control,
+    )
+
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SCABROUS_SOULROT)
+    for characteristic in (
+        Characteristic.TOUGHNESS,
+        Characteristic.MOVEMENT,
+        Characteristic.OBJECTIVE_CONTROL,
+    ):
+        for name, delta in (("negative", -8), ("positive", 4)):
+            prefix = "a" if (name == "negative") == negative_first else "z"
+            state.record_persisting_effect(
+                generic_effect(
+                    effect_id=f"{prefix}-{characteristic.value}-{name}",
+                    owner_player_id="player-b",
+                    target_unit_instance_ids=(ENEMY_UNIT_ID,),
+                    target_kind="this_unit",
+                    effect_kind="modify_characteristic",
+                    parameters={"characteristic": characteristic.value, "delta": delta},
+                )
+            )
+    if restored:
+        state = GameState.from_payload(
+            cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+        )
+    registry = _death_guard_runtime_modifier_registry()
+    assert (
+        _target_unit_toughness(
+            state=state, target_unit_instance_id=ENEMY_UNIT_ID, runtime_modifier_registry=registry
+        )
+        == 1
+    )
+    unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == ENEMY_UNIT_ID
+    )
+    model = unit.own_models[0]
+    checkpoint_oc = resolve_checkpoint_objective_control(
+        state=state,
+        unit_instance_id=ENEMY_UNIT_ID,
+        model=model,
+        runtime_modifier_registry=registry,
+    )
+    assert checkpoint_oc.final == 1
+    assert set(checkpoint_oc.applied_modifier_ids) <= {
+        *(binding.modifier_id for binding in registry.all_objective_control_bindings()),
+        *(effect.effect_id for effect in state.persisting_effects),
+    }
+    movement = next(
+        value for value in model.characteristics if value.characteristic is Characteristic.MOVEMENT
+    )
+    assert (
+        registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=ENEMY_UNIT_ID,
+                model_instance_id=model.model_instance_id,
+                movement=movement,
+            )
+        )
+        == 1
+    )
+    record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=BattlePhase.COMMAND,
+            runtime_modifier_registry=registry,
+        )
+    )
+    contributors = tuple(
+        contribution
+        for result in record.results
+        for contribution in result.contributors
+        if contribution.unit_instance_id == ENEMY_UNIT_ID
+    )
+    assert contributors
+    assert {contribution.objective_control for contribution in contributors} == {1}
 
 
 def test_skullsquirm_blight_only_modifies_afflicted_melee_hit_rolls() -> None:

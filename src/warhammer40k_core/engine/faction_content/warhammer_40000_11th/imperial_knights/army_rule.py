@@ -11,7 +11,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -555,7 +555,9 @@ def resolve_code_chivalric_end_battle_round(
     )
 
 
-def code_chivalric_eager_movement_modifier(context: MovementBudgetModifierContext) -> float:
+def code_chivalric_eager_movement_modifier(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("Code Chivalric movement modifier requires context.")
     if not unit_has_code_chivalric_quality(
@@ -563,8 +565,8 @@ def code_chivalric_eager_movement_modifier(context: MovementBudgetModifierContex
         unit_instance_id=context.unit_instance_id,
         quality=CodeChivalricQuality.EAGER_FOR_THE_CHALLENGE,
     ):
-        return context.current_movement_inches
-    return context.current_movement_inches + 2.0
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, 2),)
 
 
 def code_chivalric_eager_charge_modifier(
@@ -590,7 +592,7 @@ def code_chivalric_eager_charge_modifier(
 
 def code_chivalric_legacy_objective_control_modifier(
     context: ObjectiveControlModifierContext,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Code Chivalric OC modifier requires context.")
     if not unit_has_code_chivalric_quality(
@@ -598,35 +600,35 @@ def code_chivalric_legacy_objective_control_modifier(
         unit_instance_id=context.unit_instance_id,
         quality=CodeChivalricQuality.LEGACY_UNSULLIED,
     ):
-        return context.current_objective_control
-    return context.current_objective_control + 2
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, 2),)
 
 
 def code_chivalric_legacy_leadership_modifier(
     context: UnitCharacteristicModifierContext,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not UnitCharacteristicModifierContext:
         raise GameLifecycleError("Code Chivalric Leadership modifier requires context.")
     if context.characteristic is not Characteristic.LEADERSHIP:
-        return context.current_value
+        return ()
     if not unit_has_code_chivalric_quality(
         context.state,
         unit_instance_id=context.unit_instance_id,
         quality=CodeChivalricQuality.LEGACY_UNSULLIED,
     ):
-        return context.current_value
-    return max(1, context.current_value - 1)
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, -1),)
 
 
 def historical_code_chivalric_leadership(
     context: HistoricalBattleShockAuthorityContext,
     current: int,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not HistoricalBattleShockAuthorityContext:
         raise GameLifecycleError("Code Chivalric historical authority requires context.")
     target = context.rules_unit(context.request.unit_instance_id)
     if not any(_unit_has_code_chivalric(component.unit) for component in target.components):
-        return current
+        return ()
     selected: dict[str, CodeChivalricQuality] = {}
     for event_index, event in enumerate(context.event_records[: context.boundary_event_index]):
         if event.event_type != CODE_CHIVALRIC_SELECTED_EVENT:
@@ -654,9 +656,9 @@ def historical_code_chivalric_leadership(
             _payload_string(_payload_object(row.payload), key="selected_quality_id")
         )
     return (
-        max(1, current - 1)
+        (ModifierTerm(ModifierOperation.ADD, -1),)
         if selected.get(target.owner_player_id) is CodeChivalricQuality.LEGACY_UNSULLIED
-        else current
+        else ()
     )
 
 

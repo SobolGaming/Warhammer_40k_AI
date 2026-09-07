@@ -2,6 +2,9 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.attributes import CharacteristicValue
+from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
@@ -300,14 +303,12 @@ def _movement_options_with_modifier_ignore_choices(
         model = models_by_id.get(model_id)
         if model is None:
             raise GameLifecycleError("Movement modifier snapshot model is not owned by unit.")
-        base_movement = float(_model_movement_inches(model))
         _modified, applications = runtime_modifier_registry.movement_budget_modifier_trace(
             MovementBudgetModifierContext(
                 state=state,
                 unit_instance_id=movement_unit_id,
                 model_instance_id=model_id,
-                base_movement_inches=base_movement,
-                current_movement_inches=base_movement,
+                movement=model_movement_characteristic(model),
             )
         )
         movement_snapshots.extend(

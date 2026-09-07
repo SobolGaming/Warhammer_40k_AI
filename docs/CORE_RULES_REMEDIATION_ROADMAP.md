@@ -3986,7 +3986,8 @@ contract 11.4 schema/examples/manifest and generated TypeScript client, eight-sh
 JUnit duration inventory, adapter contract, README and scope audit. Load and
 execution status are separately recorded for exactly the three supported clauses.
 
-Validation results: the final complete behavioral suite passes once with coverage:
+Initial published-commit validation (`e5aba9edf8ab603523ff3d5a52c09e95cad4608b`):
+the complete behavioral suite passed once with coverage:
 `6495 passed`, `85.09%`, `765.57s`, 64 xdist workers with work stealing and the
 bundled Node runtime on PATH. It emitted 10 unclosed SQLite connection
 ResourceWarnings. No production code changed after this final run began.
@@ -4020,3 +4021,48 @@ semantics.
 
 PR URL and merge commit: [PR #432](https://github.com/SobolGaming/Warhammer_40k_AI/pull/432);
 not merged. Merge remains an owner action.
+
+The approved review correction closes the remaining cumulative runtime gap:
+registered characteristic providers now emit typed operations and combine with
+deduplicated generic effects before the shared final bound. The concrete
+Toughness 6 / -8 / +4 regression produces 2 in either source order for ordinary
+and attached attack targets, including JSON-restored effects and duplicate
+source-slot occurrences. The same owner covers OC and movement characteristics;
+later distance deltas remain separate and preserve fractional inches. Registered
+historical Leadership uses the same ordering and bounds. Source-specific limits
+are explicit operations, and replacements retain their operation/value kinds.
+
+Checkpoint provenance retains original binding/effect IDs even when a source
+contributes several operations. Structural OC lineage permits replacement base
+and value-kind changes with source identity; exact runtime checkpoint
+reconstruction continues to authenticate every resolved field. Source-terminal
+values remain unchanged. Rehashed forged replacement provenance fails restore.
+The correction introduces no new faction rule, hook family, named handler,
+decision, adapter payload shape, or visibility class. See the approved scope
+record for the consumer audit and deterministic fixture updates.
+
+Final review-correction validation:
+
+Validation results: the final complete behavioral suite passes with coverage:
+`6535 passed`, `85.08%`, `744.10s`, 64 xdist workers with work stealing and the
+bundled Node runtime on PATH. The run reports 10 existing SQLite connection
+ResourceWarnings. The first aggregate iteration's seven fixture cases pass
+their focused regressions before this successful full run.
+
+The subsequent complete code-quality suite passes once without coverage:
+`388 passed`, `305.07s`, 64 xdist workers with work stealing.
+
+Ruff check, Ruff format check (2833 files), mypy (2743 source files), pyright
+(zero errors/warnings), all 11 import-linter contracts, and all-files pre-commit
+pass. The exact eight-shard inventory check passes; this correction adds no
+behavioral test file. The source/audit builder and runtime build-identity checks
+pass. Engine identity:
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a10ca235c1b439bdec1ab473ba347953e49fbb7052dcdee037f45eb4af872224`.
+
+External-contract `--check --base-ref origin/main` passes against
+`55c06d4dad60c34a77b381d864db7e7d1c3f98a8`. TypeScript generated-client/type checks,
+all five client unit tests, and two-server HTTP conformance pass (342 assertions,
+contract 11.4.0). Installed-wheel smoke verifies 2572 runtime resources, 27 schemas
+and six request families against the same engine identity. Scope, architecture,
+module-size and diff audits pass. No production code changed after the aggregate
+coverage runs began.

@@ -6,6 +6,10 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.characteristic_modifier_helpers import (
+    resolve_characteristic_handler,
+    resolve_historical_handler,
+)
 from tests.support.ability_presence_fixtures import ability_presence_fixture, compiled_ability_rule
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -498,14 +502,15 @@ def test_live_and_historical_proximity_use_the_same_off_battlefield_self_excepti
     )
     (binding,) = runtime.unit_characteristic_modifier_bindings()
     source = rules_unit_view_by_id(state=state, unit_instance_id="army-alpha:leader")
-    current = binding.handler(
+    current = resolve_characteristic_handler(
+        binding.handler,
         UnitCharacteristicModifierContext(
             state=state,
             unit_instance_id=source.unit_instance_id,
             characteristic=Characteristic.LEADERSHIP,
             base_value=7,
             current_value=7,
-        )
+        ),
     )
     history = historical_battle_shock_context_for_unit(
         state=state,
@@ -514,7 +519,7 @@ def test_live_and_historical_proximity_use_the_same_off_battlefield_self_excepti
         active_player_id="player-a",
     )
     assert binding.historical_leadership_handler is not None
-    historical = binding.historical_leadership_handler(history, 7)
+    historical = resolve_historical_handler(binding.historical_leadership_handler, history, 7)
     assert current == historical == (6 if keyword == "Infantry Character" else 7)
 
 

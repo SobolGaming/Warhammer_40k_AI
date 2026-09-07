@@ -25,14 +25,64 @@ from warhammer40k_core.core.modifiers import (
     ModifierStack,
     ModifierStackingError,
     ModifierStackPayload,
+    ModifierTerm,
     ModifierTiming,
     modifier_operation_from_token,
     modifier_timing_from_token,
     resolve_characteristic_value,
     resolve_damage_characteristic,
+    resolve_distance_deltas,
     resolve_targeting_range,
 )
 from warhammer40k_core.rules.timing import ordered_modifier_timings
+
+
+def test_runtime_terms_preserve_exact_intermediates_and_operation_identity() -> None:
+    from fractions import Fraction
+
+    terms = (
+        ("a-negative", ModifierTerm(ModifierOperation.ADD, -8)),
+        ("z-positive", ModifierTerm(ModifierOperation.ADD, 4)),
+        ("divide", ModifierTerm(ModifierOperation.DIVIDE, 2)),
+    )
+    for ordered in permutations(terms):
+        stack = ModifierStack(
+            Characteristic.TOUGHNESS,
+            6,
+            tuple(
+                term.bind(
+                    modifier_id=identifier,
+                    source_id=f"source:{identifier}",
+                    characteristic=Characteristic.TOUGHNESS,
+                )
+                for identifier, term in ordered
+            ),
+        )
+        steps = stack.arithmetic_steps()
+        assert tuple(step.after for step in steps) == (Fraction(10), Fraction(5), Fraction(-3))
+        assert stack.resolve().final == 1
+        assert stack.resolve().applied_modifier_ids == ("z-positive", "divide", "a-negative")
+    with pytest.raises(ModifierError, match="positive divisor"):
+        ModifierTerm(ModifierOperation.DIVIDE, 0)
+    with pytest.raises(ModifierError, match="ModifierOperation"):
+        ModifierTerm(cast(ModifierOperation, "add"), 1)
+
+
+def test_distance_deltas_keep_fractional_values_and_bound_only_the_final_distance() -> None:
+    for ordered in permutations((("a-negative", -8.25), ("z-positive", 4.5))):
+        value, steps = resolve_distance_deltas(6.0, ordered)
+        assert value == 2.25
+        assert steps == (("z-positive", 6.0, 10.5), ("a-negative", 10.5, 2.25))
+    assert resolve_distance_deltas(1, (("negative", -2),))[0] == 0
+    assert resolve_distance_deltas(1, (("identity", 0),)) == (1, ())
+    for value in (-1.0, float("inf"), float("nan"), True):
+        with pytest.raises(ModifierError, match="Distance must be finite"):
+            resolve_distance_deltas(value, ())
+    for delta in (float("inf"), float("nan"), True):
+        with pytest.raises(ModifierError, match="Distance modifier must be finite"):
+            resolve_distance_deltas(1, (("invalid", delta),))
+    with pytest.raises(ModifierStackingError, match="unique"):
+        resolve_distance_deltas(1, (("duplicate", 1), ("duplicate", -1)))
 
 
 def test_initial_phase_two_characteristics_are_supported() -> None:

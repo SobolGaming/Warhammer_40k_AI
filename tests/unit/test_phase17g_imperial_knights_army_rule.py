@@ -7,6 +7,12 @@ from typing import Any, cast
 
 import pytest
 from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
+from tests.characteristic_modifier_helpers import (
+    resolve_characteristic_handler,
+    resolve_historical_handler,
+    resolve_movement_handler,
+    resolve_objective_control_handler,
+)
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     battle_state_with_center_objective_positions,
@@ -18,7 +24,7 @@ from tests.phase11c_command_phase_helpers import (
     unit_by_id,
 )
 
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -220,7 +226,9 @@ def test_code_chivalric_historical_leadership_replays_event_bound_quality() -> N
         active_player_id=state.active_player_id,
     )
 
-    assert army_rule.historical_code_chivalric_leadership(context, 7) == 6
+    assert (
+        resolve_historical_handler(army_rule.historical_code_chivalric_leadership, context, 7) == 6
+    )
     with pytest.raises(GameLifecycleError, match="historical authority requires"):
         army_rule.historical_code_chivalric_leadership(cast(Any, object()), 7)
 
@@ -715,16 +723,16 @@ def test_code_chivalric_eager_and_legacy_quality_modifiers() -> None:
         quality=army_rule.CodeChivalricQuality.EAGER_FOR_THE_CHALLENGE,
     )
 
-    movement = army_rule.code_chivalric_eager_movement_modifier(
+    movement = resolve_movement_handler(
+        army_rule.code_chivalric_eager_movement_modifier,
         MovementBudgetModifierContext(
             state=eager_state,
             unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
             model_instance_id=unit_by_id(eager_state, IMPERIAL_KNIGHTS_UNIT_ID)
             .own_models[0]
             .model_instance_id,
-            base_movement_inches=10.0,
-            current_movement_inches=10.0,
-        )
+            movement=CharacteristicValue(Characteristic.MOVEMENT, int(10.0), int(10.0), int(10.0)),
+        ),
     )
     charge_modifiers = army_rule.code_chivalric_eager_charge_modifier(
         ChargeRollModifierContext(
@@ -748,23 +756,25 @@ def test_code_chivalric_eager_and_legacy_quality_modifiers() -> None:
     legacy_unit = unit_by_id(legacy_state, IMPERIAL_KNIGHTS_UNIT_ID)
     legacy_model_id = legacy_unit.own_models[0].model_instance_id
 
-    objective_control = army_rule.code_chivalric_legacy_objective_control_modifier(
+    objective_control = resolve_objective_control_handler(
+        army_rule.code_chivalric_legacy_objective_control_modifier,
         ObjectiveControlModifierContext(
             state=legacy_state,
             unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
             model_instance_id=legacy_model_id,
             base_objective_control=2,
             current_objective_control=2,
-        )
+        ),
     )
-    leadership = army_rule.code_chivalric_legacy_leadership_modifier(
+    leadership = resolve_characteristic_handler(
+        army_rule.code_chivalric_legacy_leadership_modifier,
         UnitCharacteristicModifierContext(
             state=legacy_state,
             unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
             characteristic=Characteristic.LEADERSHIP,
             base_value=7,
             current_value=7,
-        )
+        ),
     )
 
     assert objective_control == 4
@@ -792,14 +802,16 @@ def test_code_chivalric_modifiers_noop_without_matching_quality_or_characteristi
         is False
     )
     assert (
-        army_rule.code_chivalric_eager_movement_modifier(
+        resolve_movement_handler(
+            army_rule.code_chivalric_eager_movement_modifier,
             MovementBudgetModifierContext(
                 state=state,
                 unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
                 model_instance_id=model_id,
-                base_movement_inches=10.0,
-                current_movement_inches=10.0,
-            )
+                movement=CharacteristicValue(
+                    Characteristic.MOVEMENT, int(10.0), int(10.0), int(10.0)
+                ),
+            ),
         )
         == 10.0
     )
@@ -814,26 +826,28 @@ def test_code_chivalric_modifiers_noop_without_matching_quality_or_characteristi
         == ()
     )
     assert (
-        army_rule.code_chivalric_legacy_objective_control_modifier(
+        resolve_objective_control_handler(
+            army_rule.code_chivalric_legacy_objective_control_modifier,
             ObjectiveControlModifierContext(
                 state=state,
                 unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
                 model_instance_id=model_id,
                 base_objective_control=2,
                 current_objective_control=2,
-            )
+            ),
         )
         == 2
     )
     assert (
-        army_rule.code_chivalric_legacy_leadership_modifier(
+        resolve_characteristic_handler(
+            army_rule.code_chivalric_legacy_leadership_modifier,
             UnitCharacteristicModifierContext(
                 state=state,
                 unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
                 characteristic=Characteristic.MOVEMENT,
                 base_value=7,
                 current_value=7,
-            )
+            ),
         )
         == 7
     )
@@ -1454,7 +1468,7 @@ def test_code_chivalric_public_handlers_fail_fast_for_wrong_context_types() -> N
         )
     with pytest.raises(GameLifecycleError, match="movement modifier"):
         army_rule.code_chivalric_eager_movement_modifier(
-            cast(MovementBudgetModifierContext, invalid_object)
+            cast(MovementBudgetModifierContext, invalid_object),
         )
     with pytest.raises(GameLifecycleError, match="charge modifier"):
         army_rule.code_chivalric_eager_charge_modifier(
@@ -1462,11 +1476,11 @@ def test_code_chivalric_public_handlers_fail_fast_for_wrong_context_types() -> N
         )
     with pytest.raises(GameLifecycleError, match="OC modifier"):
         army_rule.code_chivalric_legacy_objective_control_modifier(
-            cast(ObjectiveControlModifierContext, invalid_object)
+            cast(ObjectiveControlModifierContext, invalid_object),
         )
     with pytest.raises(GameLifecycleError, match="Leadership modifier"):
         army_rule.code_chivalric_legacy_leadership_modifier(
-            cast(UnitCharacteristicModifierContext, invalid_object)
+            cast(UnitCharacteristicModifierContext, invalid_object),
         )
     with pytest.raises(GameLifecycleError, match="shooting grant"):
         army_rule.code_chivalric_martial_valour_shooting_grants(

@@ -133,6 +133,34 @@ class RollModifierOperation(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
+class ModifierTerm:
+    """An unevaluated operation; its runtime binding supplies source identity."""
+
+    operation: ModifierOperation
+    operand: int
+
+    def bind(self, *, modifier_id: str, source_id: str, characteristic: Characteristic) -> Modifier:
+        timings = _OPERATION_TIMINGS[self.operation]
+        return Modifier(
+            modifier_id=modifier_id,
+            source_id=source_id,
+            scope=ModifierScope.for_characteristics((characteristic,)),
+            timing=min(timings, key=lambda timing: timing.order),
+            operation=self.operation,
+            operand=self.operand,
+        )
+
+    def __post_init__(self) -> None:
+        _validate_modifier_operation(self.operation)
+        # Reuse the complete operation/operand validation without evaluating it.
+        self.bind(
+            modifier_id="modifier-term-validation",
+            source_id="modifier-term-validation",
+            characteristic=Characteristic.TOUGHNESS,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ModifierScope:
     characteristics: frozenset[Characteristic] | None = None
     target_ids: frozenset[str] | None = None
@@ -357,6 +385,13 @@ class Modifier:
 
 
 @dataclass(frozen=True, slots=True)
+class ModifierArithmeticStep:
+    modifier: Modifier
+    before: Fraction
+    after: Fraction
+
+
+@dataclass(frozen=True, slots=True)
 class ModifierStack:
     characteristic: Characteristic
     raw_value: int
@@ -447,9 +482,8 @@ class ModifierStack:
         final = Fraction(self.raw_value)
         applied_modifier_ids: list[str] = []
 
-        for modifier in self.applicable_modifiers():
-            if modifier.operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR}:
-                raise ModifierError("Symbolic replacement requires characteristic resolution.")
+        for step in self.arithmetic_steps():
+            modifier = step.modifier
             if modifier.operation is ModifierOperation.SET:
                 base = modifier.operand
                 final = Fraction(modifier.operand)
@@ -466,7 +500,7 @@ class ModifierStack:
                         bound_policy=CharacteristicBoundPolicy(self.characteristic, 0, 0),
                         value_kind=CharacteristicValueKind.REPLACEMENT_ZERO,
                     )
-            final = _apply_numeric_operation(modifier.operation.value, modifier.operand, final)
+            final = step.after
 
             applied_modifier_ids.append(modifier.modifier_id)
 
@@ -483,6 +517,24 @@ class ModifierStack:
             applied_modifier_ids=tuple(applied_modifier_ids),
             bound_policy=policy,
         )
+
+    def arithmetic_steps(self) -> tuple[ModifierArithmeticStep, ...]:
+        """Exact ordered intermediate values; these are not bounded characteristics."""
+        value = Fraction(self.raw_value)
+        steps: list[ModifierArithmeticStep] = []
+        for modifier in self.applicable_modifiers():
+            if modifier.operation in {ModifierOperation.SET_DASH, ModifierOperation.SET_STAR}:
+                raise ModifierError("Symbolic replacement requires characteristic resolution.")
+            modified = _apply_numeric_operation(modifier.operation.value, modifier.operand, value)
+            steps.append(ModifierArithmeticStep(modifier, value, modified))
+            value = modified
+            if (
+                modifier.operation is ModifierOperation.SET
+                and not modifier.operand
+                and self.characteristic is not Characteristic.DETECTION_RANGE
+            ):
+                break
+        return tuple(steps)
 
     def to_payload(self) -> ModifierStackPayload:
         return {
@@ -724,6 +776,30 @@ def resolve_targeting_range(value: float) -> float:
     return max(float(TARGETING_RANGE_MINIMUM), min(float(TARGETING_RANGE_MAXIMUM), float(value)))
 
 
+def resolve_distance_deltas(
+    value: float, deltas: tuple[tuple[str, float], ...]
+) -> tuple[float, tuple[tuple[str, float, float], ...]]:
+    """Resolve subsequent distance additions exactly, with one final nonnegative bound."""
+    if type(value) not in {int, float} or not isfinite(value) or value < 0:
+        raise ModifierError("Distance must be finite and nonnegative.")
+    ids: set[str] = set()
+    for modifier_id, delta in deltas:
+        _validate_identifier("Distance modifier ID", modifier_id)
+        if modifier_id in ids:
+            raise ModifierStackingError("Distance modifier IDs must be unique.")
+        ids.add(modifier_id)
+        if type(delta) not in {int, float} or not isfinite(delta):
+            raise ModifierError("Distance modifier must be finite numeric data.")
+    current = Fraction(str(value))
+    steps: list[tuple[str, float, float]] = []
+    for modifier_id, delta in sorted(deltas, key=lambda item: (item[1] < 0, item[0])):
+        modified = _apply_numeric_operation("add", Fraction(str(delta)), current)
+        if modified != current:
+            steps.append((modifier_id, float(current), float(modified)))
+        current = modified
+    return float(max(Fraction(0), current)), tuple(steps)
+
+
 def _validate_characteristic(characteristic: object) -> Characteristic:
     if type(characteristic) is not Characteristic:
         raise ModifierError("Expected a Characteristic.")
@@ -851,7 +927,7 @@ def bound_modified_roll(value: int, *, maximum: int | None = None) -> int:
     return modified if maximum is None else min(modified, maximum)
 
 
-def _apply_numeric_operation(operation: str, operand: int, value: Fraction) -> Fraction:
+def _apply_numeric_operation(operation: str, operand: int | Fraction, value: Fraction) -> Fraction:
     if operation == "set":
         return Fraction(operand)
     if operation == "multiply":

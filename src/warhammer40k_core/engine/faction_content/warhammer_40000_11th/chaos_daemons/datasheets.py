@@ -7,7 +7,7 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -349,7 +349,9 @@ def daemon_lord_of_slaanesh_weapon_profile_modifier(
     )
 
 
-def deluge_movement_budget_modifier(context: MovementBudgetModifierContext) -> float:
+def deluge_movement_budget_modifier(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("Deluge of Nurgle requires a MovementBudgetModifierContext.")
     if not _enemy_rules_unit_within_source_aura(
@@ -357,11 +359,13 @@ def deluge_movement_budget_modifier(context: MovementBudgetModifierContext) -> f
         target_unit_instance_id=context.unit_instance_id,
         ability_id=ROTIGUS_DELUGE_ABILITY_ID,
     ):
-        return context.current_movement_inches
-    return max(0.0, context.current_movement_inches - 2.0)
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, -2),)
 
 
-def deluge_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+def deluge_objective_control_modifier(
+    context: ObjectiveControlModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Deluge of Nurgle requires an ObjectiveControlModifierContext.")
     if not _enemy_rules_unit_within_source_aura(
@@ -369,8 +373,8 @@ def deluge_objective_control_modifier(context: ObjectiveControlModifierContext) 
         target_unit_instance_id=context.unit_instance_id,
         ability_id=ROTIGUS_DELUGE_ABILITY_ID,
     ):
-        return context.current_objective_control
-    return max(0, context.current_objective_control - 1)
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, -1),)
 
 
 def mischief_makers_hit_roll_modifier(context: HitRollModifierContext) -> int:

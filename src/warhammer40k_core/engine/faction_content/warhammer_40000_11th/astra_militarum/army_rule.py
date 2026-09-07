@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
@@ -378,7 +379,7 @@ def voice_of_command_battle_shock_outcome(context: BattleShockOutcomeContext) ->
 
 def voice_of_command_unit_characteristic_modifier(
     context: UnitCharacteristicModifierContext,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not UnitCharacteristicModifierContext:
         raise GameLifecycleError("Voice of Command characteristic modifier requires context.")
     order = _active_voice_of_command_order_for_unit(
@@ -386,34 +387,37 @@ def voice_of_command_unit_characteristic_modifier(
         unit_instance_id=context.unit_instance_id,
     )
     if order is VoiceOfCommandOrder.TAKE_COVER and context.characteristic is Characteristic.SAVE:
-        return _improve_save(context.current_value)
+        return (
+            ModifierTerm(ModifierOperation.ADD, -1),
+            ModifierTerm(ModifierOperation.FLOOR, min(context.current_value, 3)),
+        )
     if (
         order is VoiceOfCommandOrder.DUTY_AND_HONOUR
         and context.characteristic is Characteristic.LEADERSHIP
     ):
-        return _improve_leadership(context.current_value)
+        return (ModifierTerm(ModifierOperation.ADD, -1),)
     if (
         order is VoiceOfCommandOrder.DUTY_AND_HONOUR
         and context.characteristic is Characteristic.OBJECTIVE_CONTROL
     ):
-        return context.current_value + 1
-    return context.current_value
+        return (ModifierTerm(ModifierOperation.ADD, 1),)
+    return ()
 
 
 def historical_voice_of_command_leadership(
     context: HistoricalBattleShockAuthorityContext,
     current: int,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not HistoricalBattleShockAuthorityContext:
         raise GameLifecycleError("Voice of Command historical authority requires context.")
     target = context.rules_unit(context.request.unit_instance_id)
     if ASTRA_MILITARUM_FACTION_KEYWORD not in target.faction_keywords:
-        return current
+        return ()
     shocked = {target.unit_instance_id, *target.component_unit_instance_ids}.intersection(
         context.battle_shocked_unit_ids
     )
     if shocked:
-        return current
+        return ()
     effects: dict[str, PersistingEffect] = {}
     for event_index, event in enumerate(context.event_records[: context.boundary_event_index]):
         if not isinstance(event.payload, dict):
@@ -468,13 +472,13 @@ def historical_voice_of_command_leadership(
     if len(matching) > 1:
         raise GameLifecycleError("Voice of Command historical effect is ambiguous.")
     if not matching:
-        return current
+        return ()
     payload = _payload_object(matching[0].effect_payload)
     return (
-        _improve_leadership(current)
+        (ModifierTerm(ModifierOperation.ADD, -1),)
         if _order_from_token(_payload_string(payload, key="order_id"))
         is VoiceOfCommandOrder.DUTY_AND_HONOUR
-        else current
+        else ()
     )
 
 
@@ -496,7 +500,9 @@ def _historical_voice_effect_is_active(
     )
 
 
-def voice_of_command_movement_modifier(context: MovementBudgetModifierContext) -> float:
+def voice_of_command_movement_modifier(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("Voice of Command movement modifier requires context.")
     order = _active_voice_of_command_order_for_unit(
@@ -504,13 +510,13 @@ def voice_of_command_movement_modifier(context: MovementBudgetModifierContext) -
         unit_instance_id=context.unit_instance_id,
     )
     if order is not VoiceOfCommandOrder.MOVE_MOVE_MOVE:
-        return context.current_movement_inches
-    return context.current_movement_inches + 3.0
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, 3),)
 
 
 def voice_of_command_objective_control_modifier(
     context: ObjectiveControlModifierContext,
-) -> int:
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not ObjectiveControlModifierContext:
         raise GameLifecycleError("Voice of Command Objective Control modifier requires context.")
     order = _active_voice_of_command_order_for_unit(
@@ -518,8 +524,8 @@ def voice_of_command_objective_control_modifier(
         unit_instance_id=context.unit_instance_id,
     )
     if order is not VoiceOfCommandOrder.DUTY_AND_HONOUR:
-        return context.current_objective_control
-    return context.current_objective_control + 1
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, 1),)
 
 
 def voice_of_command_save_option_modifier(
@@ -1151,13 +1157,6 @@ def _improve_armour_save_option(option: SaveOption) -> SaveOption:
 def _improve_save(current: int) -> int:
     _validate_non_negative_int("save", current)
     if current <= 3:
-        return current
-    return current - 1
-
-
-def _improve_leadership(current: int) -> int:
-    _validate_non_negative_int("leadership", current)
-    if current <= 4:
         return current
     return current - 1
 

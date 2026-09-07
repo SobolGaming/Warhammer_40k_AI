@@ -2,6 +2,9 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.core.attributes import CharacteristicValue
+from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
+
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
@@ -665,13 +668,11 @@ def _default_fall_back_witness(
     model_paths: list[tuple[str, Pose, Pose]] = []
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
-        base_movement_inches = float(_model_movement_inches(model))
         movement_inches = _modified_movement_inches(
             state=state,
             unit_instance_id=unit_placement.unit_instance_id,
             model_instance_id=placement.model_instance_id,
-            base_movement_inches=base_movement_inches,
-            current_movement_inches=base_movement_inches,
+            movement=model_movement_characteristic(model),
             runtime_modifier_registry=runtime_modifier_registry,
         )
         model_paths.append(

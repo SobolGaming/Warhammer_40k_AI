@@ -11,6 +11,25 @@ replacement, multiplication, addition, division, subtraction,
 then one upward rounding step with exact intermediate arithmetic. Signed
 negative additions occupy the subtraction step, independently of priority.
 
+Registered characteristic handlers emit typed operations. The engine combines
+those operations with source-slot-deduplicated generic effects before applying
+the final characteristic bounds. Historical Leadership uses the same operation
+ordering and bounds. Source-specific minimums remain explicit operations.
+Objective Control checkpoint provenance retains the original binding/effect IDs,
+including when one source contributes several operations.
+Checkpoint structural validation permits source-backed replacement base/value
+kinds; authenticated runtime reconstruction still compares the complete resolved
+characteristic payload. A terminal source value cannot acquire later modifiers.
+
+Movement contexts retain the typed characteristic, including terminal value
+kinds. Internal movement application traces describe unbounded arithmetic and
+may contain negative intermediate values; the engine bounds the resulting
+characteristic once. Subsequent move-distance effects then resolve together,
+preserving fractional inches and applying a single nonnegative distance bound.
+The trace is not a new adapter payload. Existing modifier-ignore submissions
+still select engine-enumerated original source IDs. This correction changes no
+decision family, submission shape, visibility class, or contract schema version.
+
 The existing Advance and Charge result payloads include `modified_roll`, with
 post-reroll `unmodified` components, `intrinsic_offset`, source-linked
 `modifiers`, ordered `applied_modifier_ids`, `unbounded_value`, minimum-1

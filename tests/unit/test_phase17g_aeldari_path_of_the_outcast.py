@@ -850,7 +850,7 @@ def test_eldritch_suppression_targets_one_canonical_attached_rules_unit() -> Non
     strength = _json_object(request["below_half_strength_context"])
     assert request["unit_instance_id"] == attached_id
     assert request["player_id"] == "player-b"
-    assert request["leadership_target"] == 3
+    assert request["leadership_target"] == 4
     assert strength["unit_instance_id"] == attached_id
     assert strength["starting_model_count"] == 2
     assert strength["current_model_count"] == 2

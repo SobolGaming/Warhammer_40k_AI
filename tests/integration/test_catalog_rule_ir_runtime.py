@@ -31,7 +31,7 @@ from tests.support.wahapedia_bridge_fixtures import (
 from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_version
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     DatasheetMusteringOptionEffectKind,
@@ -444,8 +444,9 @@ def test_phase17k_daemon_prince_allegiance_modifiers_use_generic_runtime_queries
         state=slaanesh_state,
         unit_instance_id=slaanesh_unit.unit_instance_id,
         model_instance_id=slaanesh_unit.own_models[0].model_instance_id,
-        base_movement_inches=base_movement,
-        current_movement_inches=base_movement,
+        movement=CharacteristicValue(
+            Characteristic.MOVEMENT, int(base_movement), int(base_movement), int(base_movement)
+        ),
     )
     assert slaanesh_registry.modified_movement_inches(slaanesh_context) == (base_movement + 2.0)
     assert slaanesh_state.battlefield_state is not None

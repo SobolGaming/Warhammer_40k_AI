@@ -61,3 +61,78 @@ def test_advance_and_charge_never_embed_modifiers_in_raw_dice() -> None:
                 if keyword.arg == "modifier":
                     assert isinstance(keyword.value, ast.Constant)
                     assert keyword.value.value == 0
+
+
+def test_runtime_characteristic_owners_collect_operations_without_local_clamps() -> None:
+    owners = (
+        (
+            "engine/generic_rule_attack_hooks.py",
+            "generic_rule_modified_unit_characteristic",
+            "resolve_runtime_characteristic",
+        ),
+        (
+            "engine/runtime_characteristic_modifiers.py",
+            "resolve_runtime_characteristic",
+            "ModifierStack",
+        ),
+        (
+            "engine/runtime_modifiers.py",
+            "modified_unit_characteristic",
+            "resolve_runtime_characteristic",
+        ),
+        ("engine/runtime_modifiers.py", "modified_objective_control", "resolve_objective_control"),
+        (
+            "engine/generic_rule_objective_control.py",
+            "generic_rule_objective_control_trace",
+            "resolve_runtime_objective_control",
+        ),
+        (
+            "engine/movement_budget_modifiers.py",
+            "_resolve_movement",
+            "resolve_characteristic_value",
+        ),
+        (
+            "engine/primary_mission_objective_control_authority.py",
+            "resolve_checkpoint_objective_control",
+            "resolve_objective_control",
+        ),
+    )
+    for path, function, owner in owners:
+        calls = _calls(path, function)
+        assert owner in calls
+        assert not calls.intersection({"max", "min", "ceil", "round"}), (path, function)
+
+
+def test_typed_runtime_characteristic_producers_do_not_resolve_numeric_results() -> None:
+    producers = 0
+    for path in (PACKAGE / "engine").rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for function in ast.walk(tree):
+            if not isinstance(function, ast.FunctionDef) or function.returns is None:
+                continue
+            if ast.unparse(function.returns) != "tuple[ModifierTerm, ...]":
+                continue
+            producers += 1
+            for statement in ast.walk(function):
+                if not isinstance(statement, ast.Return) or statement.value is None:
+                    continue
+                assert not isinstance(statement.value, ast.BinOp | ast.Constant), (
+                    path,
+                    function.name,
+                )
+                if isinstance(statement.value, ast.Call) and isinstance(
+                    statement.value.func, ast.Name
+                ):
+                    assert statement.value.func.id not in {"max", "min", "ceil", "round"}, (
+                        path,
+                        function.name,
+                    )
+    assert producers >= 20
+
+
+def test_checkpoint_authority_reconstructs_the_complete_resolved_characteristic() -> None:
+    calls = _calls(
+        "engine/primary_mission_boundary_checkpoint.py",
+        "_validate_current_checkpoint_oc_resolutions",
+    )
+    assert {"resolve_checkpoint_objective_control", "canonical_json", "to_payload"} <= calls

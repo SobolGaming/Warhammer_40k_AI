@@ -14,7 +14,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
@@ -509,22 +509,24 @@ def acts_of_faith_phase_limit_for_unit(
     return 1
 
 
-def triumph_fiery_heart_movement_modifier(context: MovementBudgetModifierContext) -> float:
+def triumph_fiery_heart_movement_modifier(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("The Fiery Heart movement modifier requires context.")
     unit, army = _unit_and_army_by_id(context.state, unit_instance_id=context.unit_instance_id)
     if army.detachment_selection.faction_id != ADEPTA_SORORITAS_FACTION_ID:
-        return context.current_movement_inches
+        return ()
     if not _is_adepta_sororitas_unit(unit):
-        return context.current_movement_inches
+        return ()
     if _unit_has_active_triumph_relic_aura(
         context.state,
         player_id=army.player_id,
         target_unit_instance_id=unit.unit_instance_id,
         relic=TriumphRelic.FIERY_HEART,
     ):
-        return context.current_movement_inches + 2.0
-    return context.current_movement_inches
+        return (ModifierTerm(ModifierOperation.ADD, 2),)
+    return ()
 
 
 def triumph_fiery_heart_advance_modifier(

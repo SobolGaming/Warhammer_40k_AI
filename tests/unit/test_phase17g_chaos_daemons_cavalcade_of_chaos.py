@@ -26,6 +26,7 @@ from tests.support.catalog_package_fixtures import bloodcrushers_package
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetKeywordSet,
@@ -962,8 +963,7 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
                 state=state,
                 unit_instance_id=_CAVALCADE_UNIT_ID,
                 model_instance_id=first_model_id,
-                base_movement_inches=6.0,
-                current_movement_inches=6.0,
+                movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
             )
         )
         == 7.0

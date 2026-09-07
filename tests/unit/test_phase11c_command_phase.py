@@ -4840,7 +4840,7 @@ def test_battle_shock_event_authority_helpers_fail_closed() -> None:
             UnitCharacteristicModifierBinding(
                 modifier_id="phase11c:modifier:live-leadership-only",
                 source_id="phase11c:source:live-leadership-only",
-                handler=lambda context: context.current_value,
+                handler=lambda context: (),
             ),
         )
     )

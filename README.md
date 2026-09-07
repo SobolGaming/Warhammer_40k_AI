@@ -7,6 +7,8 @@ roll records with source-defined limits, and shared 9–30 inch Detection/Lone
 Operative range limits. Scope and evidence are recorded in the
 [combined scope audit](docs/ORDERS_26_27_29_SCOPE_PLAN.md) and
 [Core remediation roadmap](docs/CORE_RULES_REMEDIATION_ROADMAP.md).
+Registered and generic characteristic operations share that arithmetic before
+terminal bounds, including Objective Control, Movement and historical Leadership.
 Regenerate their reviewed source artifacts offline with
 `uv run python tools/build_core_modifiers_source.py`; use `--check` to verify
 committed data, then regenerate engine identity and the external contract as

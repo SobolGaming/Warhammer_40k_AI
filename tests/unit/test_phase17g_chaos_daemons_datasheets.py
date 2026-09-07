@@ -320,8 +320,7 @@ def test_rotigus_deluge_modifies_enemy_move_and_objective_control_within_aura() 
         state=state,
         unit_instance_id=target_unit_id,
         model_instance_id=target_model_id,
-        base_movement_inches=6.0,
-        current_movement_inches=6.0,
+        movement=CharacteristicValue(Characteristic.MOVEMENT, int(6.0), int(6.0), int(6.0)),
     )
     objective_control_context = ObjectiveControlModifierContext(
         state=state,

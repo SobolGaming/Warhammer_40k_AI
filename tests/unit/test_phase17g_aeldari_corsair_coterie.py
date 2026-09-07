@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.characteristic_modifier_helpers import resolve_objective_control_handler
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
@@ -2228,14 +2229,15 @@ def test_corsair_enhancements_apply_infamy_voidstone_and_webway_pathstone_effect
     )
     assert _unit_by_id(state, _WEBWAY_UNIT_ID).keywords.count(enhancements.DEEP_STRIKE) == 1
     assert (
-        enhancements.infamy_objective_control_modifier(
+        resolve_objective_control_handler(
+            enhancements.infamy_objective_control_modifier,
             ObjectiveControlModifierContext(
                 state=state,
                 unit_instance_id=_ENEMY_UNIT_ID,
                 model_instance_id=f"{_ENEMY_UNIT_ID}:model-001",
                 base_objective_control=2,
                 current_objective_control=2,
-            )
+            ),
         )
         == 1
     )
@@ -2300,14 +2302,15 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
         enhancements.infamy_effect(enemy_context)
 
     assert (
-        enhancements.infamy_objective_control_modifier(
+        resolve_objective_control_handler(
+            enhancements.infamy_objective_control_modifier,
             ObjectiveControlModifierContext(
                 state=state,
                 unit_instance_id=_ENEMY_UNIT_ID,
                 model_instance_id=f"{_ENEMY_UNIT_ID}:model-001",
                 base_objective_control=2,
                 current_objective_control=2,
-            )
+            ),
         )
         == 2
     )

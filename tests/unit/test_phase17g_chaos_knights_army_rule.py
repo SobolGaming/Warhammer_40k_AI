@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import pytest
 from tests.battle_shock_historical_helpers import historical_battle_shock_context_for_unit
+from tests.characteristic_modifier_helpers import resolve_historical_handler
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     center_marker_definition,
@@ -288,7 +289,7 @@ def test_harbingers_historical_leadership_recomputes_from_event_bound_aura() -> 
         active_player_id=state.active_player_id,
     )
 
-    assert army_rule.historical_harbingers_leadership(context, 7) == 9
+    assert resolve_historical_handler(army_rule.historical_harbingers_leadership, context, 7) == 9
     with pytest.raises(GameLifecycleError, match="historical authority requires"):
         army_rule.historical_harbingers_leadership(cast(Any, object()), 7)
 
@@ -1030,7 +1031,7 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
 
 def test_harbingers_uses_attached_rules_unit_identity_for_forced_test_and_outcome() -> None:
     state = battle_state(
-        game_id="phase17g-chaos-knights-attached-battle-shock",
+        game_id="phase17g-chaos-knights-attached-battle-shock-ordered-2",
         player_b_units=(
             default_unit_selection("bodyguard-unit"),
             unit_selection(
@@ -2178,7 +2179,7 @@ def test_delirium_dual_identity_drift_keeps_provider_ownership() -> None:
 
 def test_delirium_loaded_continuation_requires_pending_provider_claim() -> None:
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
-        game_id="phase17g-chaos-knights-delirium-missing-provider-claim",
+        game_id="phase17g-chaos-knights-delirium-missing-provider-claim-ordered-1",
         with_feel_no_pain=True,
     )
     contribution = army_rule.runtime_contribution()
@@ -2269,7 +2270,7 @@ def test_delirium_lifecycle_restore_rejects_outcome_history_tamper(
     history_kind: str,
 ) -> None:
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
-        game_id=f"phase17g-chaos-knights-delirium-lifecycle-tamper:{history_kind}",
+        game_id=f"phase17g-chaos-knights-delirium-lifecycle-tamper:{history_kind}-ordered-2",
         with_feel_no_pain=history_kind == "pending",
     )
     payload = cast(dict[str, Any], deepcopy(lifecycle.to_payload()))
@@ -2532,7 +2533,7 @@ def _record_real_harbingers_selection(
 
 def _assert_selected_target_delirium_continuation(*, reroll: bool) -> None:
     game_id = (
-        "phase17g-selected-target-delirium-reroll"
+        "phase17g-selected-target-delirium-reroll-ordered-2"
         if reroll
         else "phase17g-selected-target-delirium-direct"
     )
@@ -2750,7 +2751,7 @@ def _selected_target_delirium_provider_checkpoint(
 
 
 def _assert_phase_start_selected_target_delirium_continuation(*, phase: BattlePhase) -> None:
-    game_id = f"phase17g-selected-target-{phase.value}-start-delirium"
+    game_id = f"phase17g-selected-target-{phase.value}-start-delirium-ordered-1"
     selected_target_record = _phase_start_selected_target_battle_shock_record(phase=phase)
     lifecycle, bundle = _command_delirium_lifecycle_fixture(
         game_id=game_id,

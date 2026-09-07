@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Protocol, cast
 
+from warhammer40k_core.core.modifiers import ModifierTerm
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -190,7 +191,7 @@ type ObjectiveControlModifierContextPredicate = Callable[
 ]
 type ObjectiveControlModifierBuilder = Callable[
     [ObjectiveControlModifierContext, GenericRuleAbilitySource],
-    int,
+    tuple[ModifierTerm, ...],
 ]
 type StratagemCostChoiceRequestBuilder = Callable[
     [StratagemCostChoiceRequestContext, GenericRuleAbilitySource],

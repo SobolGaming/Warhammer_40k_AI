@@ -39,10 +39,11 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentRole,
     AttachmentTargetEligibility,
 )
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DamagedEffectKind
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -2956,8 +2957,12 @@ def test_csm_maulerfiend_siege_crawler_modifier_ignore_uses_actual_catalog_lifec
                 state=state,
                 unit_instance_id=current_maulerfiend.unit_instance_id,
                 model_instance_id=model.model_instance_id,
-                base_movement_inches=float(base_movement),
-                current_movement_inches=float(base_movement),
+                movement=CharacteristicValue(
+                    Characteristic.MOVEMENT,
+                    int(float(base_movement)),
+                    int(float(base_movement)),
+                    int(float(base_movement)),
+                ),
             )
         )
         == 10.0
@@ -8305,10 +8310,12 @@ def _install_csm_maulerfiend_movement_penalty(
     return registry
 
 
-def _csm_maulerfiend_movement_penalty(context: MovementBudgetModifierContext) -> float:
+def _csm_maulerfiend_movement_penalty(
+    context: MovementBudgetModifierContext,
+) -> tuple[ModifierTerm, ...]:
     if context.unit_instance_id != "army-a:source-battleline":
-        return context.current_movement_inches
-    return context.current_movement_inches - 2.0
+        return ()
+    return (ModifierTerm(ModifierOperation.ADD, -2),)
 
 
 def _move_unit_with_authenticated_normal_move(

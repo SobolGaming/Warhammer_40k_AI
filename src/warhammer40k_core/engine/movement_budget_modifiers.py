@@ -1,12 +1,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from math import isfinite
 from typing import TYPE_CHECKING, cast
 
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import (
+    Characteristic,
+    CharacteristicValue,
+    CharacteristicValueKind,
+)
+from warhammer40k_core.core.modifiers import (
+    Modifier,
+    ModifierStack,
+    resolve_characteristic_value,
+    resolve_distance_deltas,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.rules.rule_ir import RuleEffectKind
 
 if TYPE_CHECKING:
@@ -19,8 +31,7 @@ class MovementBudgetModifierContext:
     state: GameState
     unit_instance_id: str
     model_instance_id: str
-    base_movement_inches: float
-    current_movement_inches: float
+    movement: CharacteristicValue
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -37,16 +48,20 @@ class MovementBudgetModifierContext:
             "model_instance_id",
             _validate_identifier("model_instance_id", self.model_instance_id),
         )
-        object.__setattr__(
-            self,
-            "base_movement_inches",
-            _validate_non_negative_float("base_movement_inches", self.base_movement_inches),
-        )
-        object.__setattr__(
-            self,
-            "current_movement_inches",
-            _validate_non_negative_float("current_movement_inches", self.current_movement_inches),
-        )
+        if (
+            type(self.movement) is not CharacteristicValue
+            or self.movement.characteristic is not Characteristic.MOVEMENT
+        ):
+            raise GameLifecycleError("Movement modifiers require a typed Movement characteristic.")
+
+
+def model_movement_characteristic(model: ModelInstance) -> CharacteristicValue:
+    if type(model) is not ModelInstance:
+        raise GameLifecycleError("Movement model must be a ModelInstance.")
+    for value in model.characteristics:
+        if value.characteristic is Characteristic.MOVEMENT:
+            return value
+    raise GameLifecycleError("Normal Move requires a Movement characteristic.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,12 +88,12 @@ class MovementBudgetModifierApplication:
         object.__setattr__(
             self,
             "before_inches",
-            _validate_non_negative_float("before_inches", self.before_inches),
+            _validate_finite_float("before_inches", self.before_inches),
         )
         object.__setattr__(
             self,
             "after_inches",
-            _validate_non_negative_float("after_inches", self.after_inches),
+            _validate_finite_float("after_inches", self.after_inches),
         )
 
 
@@ -100,30 +115,7 @@ def movement_budget_modifier_trace(
             kind=ModifierIgnoreKind.MOVEMENT_CHARACTERISTIC,
         )
     )
-    current = context.current_movement_inches
-    applications: list[MovementBudgetModifierApplication] = []
-    for binding in bindings:
-        if binding.modifier_id in ignored_ids:
-            continue
-        modified = _validate_non_negative_float(
-            f"{binding.modifier_id} returned movement",
-            binding.handler(replace(context, current_movement_inches=current)),
-        )
-        if modified != current:
-            applications.append(
-                MovementBudgetModifierApplication(
-                    modifier_id=binding.modifier_id,
-                    source_id=binding.source_id,
-                    before_inches=current,
-                    after_inches=modified,
-                )
-            )
-        current = modified
-    current, generic_applications = generic_rule_movement_modifier_trace(
-        replace(context, current_movement_inches=current),
-        ignored_modifier_ids=ignored_ids,
-    )
-    return current, (*applications, *generic_applications)
+    return _resolve_movement(context, bindings=bindings, ignored_ids=ignored_ids)
 
 
 def generic_rule_movement_modifier_trace(
@@ -137,63 +129,126 @@ def generic_rule_movement_modifier_trace(
         type(modifier_id) is not str or not modifier_id for modifier_id in ignored_modifier_ids
     ):
         raise GameLifecycleError("Generic movement ignored modifier IDs must be a frozenset.")
+    return _resolve_movement(context, bindings=(), ignored_ids=ignored_modifier_ids)
+
+
+def _resolve_movement(
+    context: MovementBudgetModifierContext,
+    *,
+    bindings: tuple[MovementBudgetModifierBinding, ...],
+    ignored_ids: frozenset[str],
+) -> tuple[float, tuple[MovementBudgetModifierApplication, ...]]:
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
+        generic_rule_characteristic_operations,
         generic_rule_matching_unit_effects,
         generic_rule_modifier_source_id,
-        generic_rule_unit_characteristic_modifiers,
     )
+    from warhammer40k_core.engine.runtime_characteristic_modifiers import bind_characteristic_terms
 
-    current = context.current_movement_inches
-    applications: list[MovementBudgetModifierApplication] = []
-    for effect_id, delta in generic_rule_unit_characteristic_modifiers(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        characteristic=Characteristic.MOVEMENT,
-    ):
-        if effect_id in ignored_modifier_ids:
+    modifiers: list[Modifier] = []
+    binding_ids: dict[str, str] = {}
+    for binding in bindings:
+        if binding.modifier_id in ignored_ids:
             continue
-        modified = max(0.0, current + delta)
-        if modified != current:
-            applications.append(
-                MovementBudgetModifierApplication(
-                    modifier_id=effect_id,
-                    source_id=effect_id,
-                    before_inches=current,
-                    after_inches=modified,
-                )
-            )
-        current = modified
-    for effect in generic_rule_matching_unit_effects(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
-    ):
-        modifier_id = effect.persisting_effect.effect_id
-        if modifier_id in ignored_modifier_ids:
-            continue
-        modified = max(
-            0.0,
-            current + _required_numeric_parameter(effect.parameters, key="delta"),
+        terms = bind_characteristic_terms(
+            modifier_id=binding.modifier_id,
+            source_id=binding.source_id,
+            characteristic=Characteristic.MOVEMENT,
+            terms=binding.handler(context),
         )
-        if modified != current:
+        modifiers.extend(terms)
+        binding_ids.update((term.modifier_id, binding.modifier_id) for term in terms)
+    modifiers.extend(
+        modifier
+        for modifier in generic_rule_characteristic_operations(
+            state=context.state,
+            unit_instance_id=context.unit_instance_id,
+            characteristic=Characteristic.MOVEMENT,
+        )
+        if modifier.modifier_id not in ignored_ids
+    )
+    resolved = resolve_characteristic_value(
+        replace(context.movement, raw=context.movement.final),
+        modifiers,
+        target_id=context.model_instance_id,
+    )
+    applications: list[MovementBudgetModifierApplication] = []
+    if (
+        context.movement.is_numeric
+        and context.movement.value_kind is not CharacteristicValueKind.REPLACEMENT_ZERO
+    ):
+        stack = ModifierStack(
+            characteristic=Characteristic.MOVEMENT,
+            raw_value=context.movement.final,
+            modifiers=tuple(modifiers),
+            target_id=context.model_instance_id,
+        )
+        if resolved.is_numeric:
+            for step in stack.arithmetic_steps():
+                if step.before != step.after:
+                    applications.append(
+                        MovementBudgetModifierApplication(
+                            modifier_id=binding_ids.get(
+                                step.modifier.modifier_id, step.modifier.modifier_id
+                            ),
+                            source_id=step.modifier.source_id,
+                            before_inches=float(step.before),
+                            after_inches=float(step.after),
+                        )
+                    )
+        else:
+            replacement = stack.applicable_modifiers()[0]
             applications.append(
                 MovementBudgetModifierApplication(
-                    modifier_id=modifier_id,
-                    source_id=generic_rule_modifier_source_id(effect),
-                    before_inches=current,
-                    after_inches=modified,
+                    modifier_id=binding_ids.get(replacement.modifier_id, replacement.modifier_id),
+                    source_id=replacement.source_id,
+                    before_inches=float(context.movement.final),
+                    after_inches=0.0,
                 )
             )
-        current = modified
-    return current, tuple(applications)
+    if not resolved.is_numeric or resolved.value_kind is CharacteristicValueKind.REPLACEMENT_ZERO:
+        return float(resolved.final), tuple(applications)
+    distance_effects = tuple(
+        effect
+        for effect in generic_rule_matching_unit_effects(
+            state=context.state,
+            unit_instance_id=context.unit_instance_id,
+            effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
+        )
+        if effect.persisting_effect.effect_id not in ignored_ids
+    )
+    sources = {
+        effect.persisting_effect.effect_id: generic_rule_modifier_source_id(effect)
+        for effect in distance_effects
+    }
+    final, distance_steps = resolve_distance_deltas(
+        float(resolved.final),
+        tuple(
+            (
+                effect.persisting_effect.effect_id,
+                _required_numeric_parameter(effect.parameters, key="delta"),
+            )
+            for effect in distance_effects
+        ),
+    )
+    applications.extend(
+        MovementBudgetModifierApplication(
+            modifier_id=modifier_id,
+            source_id=sources[modifier_id],
+            before_inches=before,
+            after_inches=after,
+        )
+        for modifier_id, before, after in distance_steps
+    )
+    return final, tuple(applications)
 
 
-def _validate_non_negative_float(field_name: str, value: object) -> float:
+def _validate_finite_float(field_name: str, value: object) -> float:
     if type(value) not in {int, float}:
         raise GameLifecycleError(f"{field_name} must be numeric.")
     numeric = float(cast(int | float, value))
-    if numeric < 0.0:
-        raise GameLifecycleError(f"{field_name} must not be negative.")
+    if not isfinite(numeric):
+        raise GameLifecycleError(f"{field_name} must be finite.")
     return numeric
 
 

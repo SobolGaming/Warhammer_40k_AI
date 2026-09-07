@@ -32,7 +32,7 @@ from tools.generate_aeldari_solitaire_rule_ir import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_RULE_KEY,
@@ -373,8 +373,9 @@ def test_blitz_registry_grant_and_resolved_effect_use_source_backed_consumers() 
                 state=state,
                 unit_instance_id=solitaire.unit_instance_id,
                 model_instance_id=model.model_instance_id,
-                base_movement_inches=12.0,
-                current_movement_inches=12.0,
+                movement=CharacteristicValue(
+                    Characteristic.MOVEMENT, int(12.0), int(12.0), int(12.0)
+                ),
             )
         )
         == 12.0 + movement_bonus
@@ -538,8 +539,7 @@ def test_blitz_restored_effect_drift_is_rejected_by_movement_and_weapon_consumer
         state=state,
         unit_instance_id=solitaire.unit_instance_id,
         model_instance_id=model.model_instance_id,
-        base_movement_inches=12.0,
-        current_movement_inches=12.0,
+        movement=CharacteristicValue(Characteristic.MOVEMENT, int(12.0), int(12.0), int(12.0)),
     )
     weapon_context = WeaponProfileModifierContext(
         state=state,

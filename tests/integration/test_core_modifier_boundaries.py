@@ -7,8 +7,12 @@ from typing import cast
 import pytest
 from tests.generic_modifier_helpers import generic_effect
 from tests.phase13b_shooting_declaration_helpers import (
+    _attached_enemy_declarations,
+    _attached_enemy_unit_specs,
+    _attached_formation_for_player,
     _attack_pool_for_test,
     _first_weapon_profile,
+    _replace_unit_toughness,
     _ruleset,
     _shooting_lifecycle,
     _state,
@@ -17,12 +21,16 @@ from tests.phase15a_charge_declaration_helpers import charge_lifecycle, compact_
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollState
 from warhammer40k_core.core.modified_dice import ModifiedRollResult, ModifiedRollResultPayload
-from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm, RollModifier
 from warhammer40k_core.core.weapon_profiles import DamageProfile, RangeProfile
 from warhammer40k_core.engine.advance_roll import AdvanceRollRequest, AdvanceRollResult
-from warhammer40k_core.engine.attack_sequence_geometry_targets import _damage_value
+from warhammer40k_core.engine.attack_sequence_geometry_targets import (
+    _damage_value,
+    _target_unit_toughness,
+)
 from warhammer40k_core.engine.attack_sequence_hit_wound import _roll_hit, _roll_wound
 from warhammer40k_core.engine.attack_sequence_model import (
     HitRoll,
@@ -33,10 +41,22 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.game_state import GameState, GameStatePayload
+from warhammer40k_core.engine.generic_rule_attack_hooks import (
+    generic_rule_unit_characteristic_modifiers,
+)
 from warhammer40k_core.engine.lone_operative import lone_operative_target_allowed
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.runtime_modifiers import (
+    MovementBudgetModifierContext,
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+    RuntimeModifierRegistry,
+    UnitCharacteristicModifierBinding,
+    UnitCharacteristicModifierContext,
+)
 from warhammer40k_core.engine.saves import SaveKind, SaveOption, resolve_saving_throw
 from warhammer40k_core.engine.shooting_targets import (
     ShootingTargetViolationCode,
@@ -47,6 +67,309 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
 )
 from warhammer40k_core.engine.unit_abilities import LoneOperativeAbilityProfile
 from warhammer40k_core.geometry.pose import Pose
+
+
+@pytest.mark.parametrize("negative_first", [True, False])
+@pytest.mark.parametrize("restored", [False, True])
+@pytest.mark.parametrize("through_attack", [False, True])
+@pytest.mark.parametrize("attached", [False, True])
+def test_generic_characteristic_deltas_are_cumulative_after_effect_deduplication(
+    negative_first: bool,
+    restored: bool,
+    through_attack: bool,
+    attached: bool,
+) -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs() if attached else None,
+        enemy_attachment_declarations=_attached_enemy_declarations() if attached else (),
+    )
+    state = _state(lifecycle)
+    target = _replace_unit_toughness(
+        state=state, unit=units["bodyguard-unit" if attached else "enemy"], toughness=6
+    )
+    target_id = (
+        _attached_formation_for_player(state=state, player_id="player-b").attached_unit_instance_id
+        if attached
+        else target.unit_instance_id
+    )
+    negative = generic_effect(
+        effect_id="a-negative" if negative_first else "z-negative",
+        owner_player_id="player-b",
+        target_unit_instance_ids=(target_id,),
+        target_kind="this_unit",
+        effect_kind="modify_characteristic",
+        parameters={"characteristic": "toughness", "delta": -8},
+    )
+    positive = generic_effect(
+        effect_id="z-positive" if negative_first else "a-positive",
+        owner_player_id="player-b",
+        target_unit_instance_ids=(target_id,),
+        target_kind="this_unit",
+        effect_kind="modify_characteristic",
+        parameters={"characteristic": "toughness", "delta": 4},
+    )
+    duplicate = replace(negative, effect_id=f"{negative.effect_id}:duplicate")
+    for effect in (negative, positive, duplicate):
+        state.record_persisting_effect(effect)
+    if restored:
+        state = GameState.from_payload(
+            cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+        )
+    applicable = generic_rule_unit_characteristic_modifiers(
+        state=state,
+        unit_instance_id=target_id,
+        characteristic=Characteristic.TOUGHNESS,
+    )
+    assert dict(applicable) == {duplicate.effect_id: -8, positive.effect_id: 4}
+    assert applicable[0][1] == (-8 if negative_first else 4)
+    registry = RuntimeModifierRegistry()
+    if through_attack:
+        value = _target_unit_toughness(
+            state=state,
+            target_unit_instance_id=target_id,
+            runtime_modifier_registry=registry,
+        )
+    else:
+        value = registry.modified_unit_characteristic(
+            UnitCharacteristicModifierContext(
+                state=state,
+                unit_instance_id=target_id,
+                characteristic=Characteristic.TOUGHNESS,
+                base_value=6,
+                current_value=6,
+            )
+        )
+    assert value == 2
+
+
+@pytest.mark.parametrize("negative_first", [True, False])
+@pytest.mark.parametrize("restored", [False, True])
+@pytest.mark.parametrize("movement", [False, True])
+def test_generic_oc_and_movement_collect_before_bounds_and_keep_distance_separate(
+    negative_first: bool,
+    restored: bool,
+    movement: bool,
+) -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit = units["enemy"]
+    characteristic = Characteristic.MOVEMENT if movement else Characteristic.OBJECTIVE_CONTROL
+    model = unit.own_models[0]
+    base = next(value for value in model.characteristics if value.characteristic is characteristic)
+    for name, delta in (("negative", -(base.raw + 2)), ("positive", 4)):
+        prefix = "a" if (name == "negative") == negative_first else "z"
+        state.record_persisting_effect(
+            generic_effect(
+                effect_id=f"{prefix}-{name}",
+                owner_player_id="player-b",
+                target_unit_instance_ids=(unit.unit_instance_id,),
+                target_kind="this_unit",
+                effect_kind="modify_characteristic",
+                parameters={"characteristic": characteristic.value, "delta": delta},
+            )
+        )
+    if movement:
+        for effect_id, distance_delta in (("a-distance", -4), ("z-distance", 2.5)):
+            state.record_persisting_effect(
+                generic_effect(
+                    effect_id=effect_id,
+                    owner_player_id="player-b",
+                    target_unit_instance_ids=(unit.unit_instance_id,),
+                    target_kind="this_unit",
+                    effect_kind="modify_move_distance",
+                    parameters={"delta": distance_delta},
+                )
+            )
+    if restored:
+        state = GameState.from_payload(
+            cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+        )
+    registry = RuntimeModifierRegistry()
+    if movement:
+        value, applications = registry.movement_budget_modifier_trace(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                movement=base,
+            )
+        )
+        assert value == 0.5
+        assert len(applications) == 4
+        assert {application.modifier_id for application in applications} == {
+            "a-negative" if negative_first else "z-negative",
+            "z-positive" if negative_first else "a-positive",
+            "a-distance",
+            "z-distance",
+        }
+        assert all(application.source_id is not None for application in applications)
+        assert applications[-1].after_inches == 0.5
+    else:
+        assert (
+            registry.modified_objective_control(
+                ObjectiveControlModifierContext(
+                    state=state,
+                    unit_instance_id=unit.unit_instance_id,
+                    model_instance_id=model.model_instance_id,
+                    base_objective_control=base.raw,
+                    current_objective_control=base.raw,
+                )
+            )
+            == 2
+        )
+
+
+def test_movement_preserves_terminal_replacement_through_runtime_distance_effects() -> None:
+    from warhammer40k_core.core.attributes import CharacteristicValueKind
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit = units["enemy"]
+    state.record_persisting_effect(
+        generic_effect(
+            effect_id="distance-bonus",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_move_distance",
+            parameters={"delta": 4},
+        )
+    )
+    for kind in (
+        CharacteristicValueKind.REPLACEMENT_ZERO,
+        CharacteristicValueKind.REPLACEMENT_DASH,
+        CharacteristicValueKind.REPLACEMENT_STAR,
+    ):
+        assert (
+            RuntimeModifierRegistry().modified_movement_inches(
+                MovementBudgetModifierContext(
+                    state=state,
+                    unit_instance_id=unit.unit_instance_id,
+                    model_instance_id=unit.own_models[0].model_instance_id,
+                    movement=CharacteristicValue(Characteristic.MOVEMENT, 0, 0, 0, (), kind),
+                )
+            )
+            == 0
+        )
+
+
+@pytest.mark.parametrize(
+    "operation", [ModifierOperation.SET, ModifierOperation.SET_DASH, ModifierOperation.SET_STAR]
+)
+def test_registered_replacement_retains_terminal_semantics_at_numeric_consumer(
+    operation: ModifierOperation,
+) -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit = units["enemy"]
+
+    def replacement(context: UnitCharacteristicModifierContext) -> tuple[ModifierTerm, ...]:
+        assert context.unit_instance_id == unit.unit_instance_id
+        return (ModifierTerm(operation, 0),)
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        unit_characteristic_modifier_bindings=(
+            UnitCharacteristicModifierBinding(
+                "test:replacement", "test:replacement-source", replacement
+            ),
+        )
+    )
+    state.record_persisting_effect(
+        generic_effect(
+            effect_id="generic-bonus",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_characteristic",
+            parameters={"characteristic": "toughness", "delta": 4},
+        )
+    )
+    context = UnitCharacteristicModifierContext(
+        state,
+        unit.unit_instance_id,
+        Characteristic.TOUGHNESS,
+        6,
+        6,
+    )
+    if operation is ModifierOperation.SET:
+        assert registry.modified_unit_characteristic(context) == 0
+    else:
+        with pytest.raises(GameLifecycleError, match="symbolic replacement"):
+            registry.modified_unit_characteristic(context)
+
+
+@pytest.mark.parametrize("replacement_value", [0, 1])
+def test_registered_oc_replacement_preserves_typed_result_and_original_source_id(
+    replacement_value: int,
+) -> None:
+    from warhammer40k_core.core.attributes import CharacteristicValueKind
+
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit = units["enemy"]
+
+    def replacement(context: ObjectiveControlModifierContext) -> tuple[ModifierTerm, ...]:
+        assert context.current_objective_control == 2
+        return (
+            ModifierTerm(ModifierOperation.SET, replacement_value),
+            ModifierTerm(ModifierOperation.ADD, 4),
+        )
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding("test:oc", "test:oc-source", replacement),
+        )
+    )
+    context = ObjectiveControlModifierContext(
+        state, unit.unit_instance_id, unit.own_models[0].model_instance_id, 2, 2
+    )
+    source = CharacteristicValue.from_raw(Characteristic.OBJECTIVE_CONTROL, 2)
+    result = registry.resolve_objective_control(context, value=source)
+    assert result.raw == 2
+    assert result.base == replacement_value
+    assert result.final == (0 if replacement_value == 0 else 5)
+    assert result.value_kind is (
+        CharacteristicValueKind.REPLACEMENT_ZERO
+        if replacement_value == 0
+        else CharacteristicValueKind.NUMERIC
+    )
+    assert result.applied_modifier_ids == ("test:oc",)
+    assert CharacteristicValue.from_payload(json.loads(json.dumps(result.to_payload()))) == result
+    with pytest.raises(GameLifecycleError, match="typed characteristic"):
+        registry.resolve_objective_control(
+            context, value=CharacteristicValue.from_raw(Characteristic.TOUGHNESS, 2)
+        )
+    with pytest.raises(GameLifecycleError, match="context drifted"):
+        registry.resolve_objective_control(context, value=replace(source, final=1))
+
+
+def test_movement_trace_allows_negative_arithmetic_without_negative_budget() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit = units["enemy"]
+    state.record_persisting_effect(
+        generic_effect(
+            effect_id="movement-penalty",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_characteristic",
+            parameters={"characteristic": "movement", "delta": -10},
+        )
+    )
+    value, applications = RuntimeModifierRegistry().movement_budget_modifier_trace(
+        MovementBudgetModifierContext(
+            state,
+            unit.unit_instance_id,
+            unit.own_models[0].model_instance_id,
+            CharacteristicValue(Characteristic.MOVEMENT, 4, 4, 6),
+        )
+    )
+    assert value == 1
+    assert len(applications) == 1
+    assert applications[0].before_inches == 6
+    assert applications[0].after_inches == -4
 
 
 def test_hit_wound_and_save_consumers_keep_natural_one_separate_from_negative_modifiers() -> None:

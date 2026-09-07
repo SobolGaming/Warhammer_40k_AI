@@ -6047,7 +6047,7 @@ def test_catalog_command_point_leadership_gain_dispatches_at_owner_command_phase
     assert len(resolution_events) == 1
     resolution = cast(dict[str, JsonValue], resolution_events[0].payload)
     assert resolution["passed"] is True
-    assert resolution["leadership_target"] == 2
+    assert resolution["leadership_target"] == 4
     assert resolution["source_record_id"] == record.record_id
 
 
