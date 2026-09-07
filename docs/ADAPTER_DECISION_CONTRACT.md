@@ -4975,3 +4975,28 @@ redaction owner removes it recursively from pending choices, decision records,
 events and status metadata for every viewer. Finite clients submit an option ID;
 the engine supplies the corresponding complete internal payload. Persistence and
 privileged exact replay retain the hash for source-drift checks.
+
+Completed Psychic history also requires `psychic_modifier_history_origin` on the
+operator-only lifecycle checkpoint. The engine freezes one complete lifecycle
+immediately before its first Shooting or Fight declaration submission, installing
+that immutable origin only after the decision controller accepts the result. It
+retains original catalog/config, state, effects, RNG and ledger inputs, rather
+than copying any Psychic choice snapshot. The origin cannot contain another origin
+or an earlier declaration/Psychic decision; its ledger must match the checkpoint's
+exact prefix and its config must match the loaded game.
+
+Standalone lifecycle restoration replays recorded decisions from this origin
+through the existing lifecycle/decision path whenever Psychic choices are present.
+Replay rebuilds declaration pools, skill operations, runtime-effect inventories,
+actor, source commitments and finite requests at their original boundaries. Exact
+request/options and event-stream checks authenticate the first choice independently
+before the continuation and hit evidence can be accepted. Current effects are not
+substituted for expired historical sources. The same check applies to completed
+history inside a replay's captured initial lifecycle, including an empty tail.
+
+The new field is covered by the existing operator lifecycle/persistence/replay JSON
+surface; it adds no finite option, submission envelope or player-facing payload.
+Both this origin and the effect hash remain private under the shared recursive
+redaction owner. Runtime identity changes, so older completed Psychic checkpoints
+without the required origin fail closed. One origin is retained per lifecycle;
+restoring Psychic history incurs the additional engine replay of its decision tail.

@@ -4204,7 +4204,7 @@ Attack prevalidation and its private checks are extracted from the frozen lifecy
 module. New modules remain below 1,500 lines. Category and whole-engine certification
 remain open.
 
-Validation: the final complete behavioral suite passed once with coverage:
+Initial implementation validation (reviewed head `15d4efc5`): the complete behavioral suite passed once with coverage:
 6,609 tests, 85.07% combined statement/branch coverage, 64 xdist workers with work
 stealing and the required Node PATH prefix. The final code-quality suite passed
 390 tests without coverage. Ruff check/format, mypy (2,754 source files), pyright,
@@ -4231,3 +4231,65 @@ quality gates were then revalidated. Scope, architecture and final diff audits
 pass. No engine production code changed after that coverage run began.
 
 PR URL: [#433](https://github.com/SobolGaming/Warhammer_40k_AI/pull/433). Merge commit: not merged.
+
+#### PR #433 completed-history review correction
+
+Reviewed head `15d4efc5db38f1d38fb45c30a804b6a312f5507b` passed all remote CI lanes
+(run #1560). The following correction addresses the subsequent C24-09 review;
+those earlier results do not validate this revised runtime.
+
+Violated invariant: completed Psychic choices must authenticate the modifiers
+available at the original attack boundary. Matching copies in decision requests,
+options/results and hit events establish internal agreement, not source authority.
+A same-total substitution of a non-first hit/skill source, both source commitments,
+or the controlling actor was reproduced as accepted by standalone lifecycle restore
+in both Shooting and Fight: all ten strict pre-fix regressions failed to reject.
+
+The corrected owner is `psychic_modifier_history_origin`. It retains one immutable
+pre-declaration lifecycle origin, prepared before queue pop and installed only after
+the controller accepts the result. Origins are nonrecursive and cannot include an
+earlier attack declaration or Psychic decision. Catalog/config identity and exact
+ledger-prefix checks bind the origin to the restored game. The existing engine
+replay owner then reconstructs declarations, profile operations, effects and finite
+requests from these original inputs and demands exact request/options and event-tail
+equality. Coordinated copies of a false source, hash or actor fail against the live
+request reconstructed at the historical boundary. Existing continuation, source
+selection and hit-arithmetic validation remains in place.
+
+This uses the same lifecycle validators and mutation owners as live play; it adds
+no source-specific historical handlers and never consults current effects as a
+replacement for expired attack sources. The preserved origin also authenticates
+completed history in a replay's captured initial lifecycle, where replaying only
+that artifact's tail would otherwise miss the prefix. Original catalog and
+pre-attack state remain the authority root, as for ordinary exact replay; this is
+not cryptographic authentication of an arbitrary externally replaced game.
+
+The bug-class search covered pending and completed Psychic validation, session
+persistence replay, captured initial lifecycles, and existing historical Leadership
+and mission source-authority implementations. Scope stays on C24-09: a single
+engine origin and replay owner replace a second implementation of historical
+modifier semantics. One origin is retained per lifecycle; restoring recorded Psychic
+choices adds a replay of the decision tail. The operator-only checkpoint field is
+covered by the existing persistence/replay JSON contract and shared redaction owner;
+no public decision, event family, faction rule or named handler changes.
+
+Regressions cover coordinated completed source/commitment/actor corruption in both
+phase families, absent/recursive/late/foreign origins, ledger-prefix substitution,
+real phase expiry followed by exact standalone and session restoration, captured
+completed initial histories, and exact replay. Static guards require origin capture,
+standalone restoration validation and the shared replay consumer. Final revised validation passed: 6,631 behavioral tests with 85.07% combined
+statement/branch coverage, followed by all 390 code-quality tests without coverage,
+both using 64 xdist workers and work stealing. The focused Order 28 suite passed
+67 tests. Ruff check/format, mypy (2,755 files), pyright, all 11 import contracts,
+pre-commit and the exact eight-shard inventory check passed. The refreshed shard
+manifests use the successful complete Windows JUnit profile (Python 3.14.5,
+219 behavioral files, 6,631 cases), with its report SHA-256 and runtime metadata.
+
+Source regeneration, engine identity and isolated external-contract regeneration
+with `--base-ref origin/main` passed. TypeScript generation/typecheck, five client
+unit tests and live conformance (342 assertions, contract 11.5.0) passed.
+Installed-wheel smoke verifies 2,581 resources, 27 schemas and six request families.
+The revised runtime identity is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:c90ed5c08e063f34eb3930e82c5c6ac116c39ca2fca7eee57227c1011fc3fc98`.
+No production code changed after the successful aggregate coverage run began.
+The correction is published through PR #433; merging remains separate.

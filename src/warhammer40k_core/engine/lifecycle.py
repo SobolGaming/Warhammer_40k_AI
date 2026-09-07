@@ -36,6 +36,7 @@ from warhammer40k_core.engine import primary_mission_pending_request_integrity a
 from warhammer40k_core.engine import primary_mission_restore_integrity as _pmri
 from warhammer40k_core.engine import primary_mission_state_validation as _pmsv
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
+from warhammer40k_core.engine import psychic_modifier_history_origin as _pmh
 from warhammer40k_core.engine import reserve_state_integrity as _rsi
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine import transport_state_integrity as _tsi
@@ -404,6 +405,7 @@ class GameLifecyclePayload(TypedDict):
     decisions: DecisionControllerPayload
     reaction_queue: ReactionQueuePayload
     runtime_content_audit: NotRequired[dict[str, JsonValue]]
+    psychic_modifier_history_origin: NotRequired[dict[str, JsonValue]]
 
 
 _MOVEMENT_PROPOSAL_DECISION_TYPES = frozenset(
@@ -618,6 +620,7 @@ class GameLifecycle:
     reaction_queue: ReactionQueue = field(default_factory=ReactionQueue)
     state: GameState | None = None
     parameterized_movement_proposals: bool = True
+    _psychic_modifier_history_origin: _pmh.PsychicModifierHistoryOrigin | None = None
     _config: GameConfig | None = None
     _setup_flow: SetupFlow = field(default_factory=SetupFlow)
     _command_phase_handler: CommandPhaseHandler = field(default_factory=CommandPhaseHandler)
@@ -862,7 +865,13 @@ class GameLifecycle:
                 request=pending_request,
                 runtime_content_bundle=self._runtime_content_bundle,
             )
+        history_origin = _pmh.capture_psychic_history_origin(
+            lifecycle=self,
+            request=pending_request,
+            existing=self._psychic_modifier_history_origin,
+        )
         record = self.decision_controller.submit_result(result)
+        self._psychic_modifier_history_origin = history_origin
         status = self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
             record,
             result,
@@ -889,6 +898,10 @@ class GameLifecycle:
         }
         if self._runtime_content_audit is not None:
             payload["runtime_content_audit"] = dict(self._runtime_content_audit)
+        if self._psychic_modifier_history_origin is not None:
+            payload["psychic_modifier_history_origin"] = (
+                self._psychic_modifier_history_origin.to_payload()
+            )
         return payload
 
     @classmethod
@@ -911,6 +924,13 @@ class GameLifecycle:
             reaction_queue=ReactionQueue.from_payload(payload["reaction_queue"]),
             state=GameState.from_payload(payload["state"]),
             parameterized_movement_proposals=parameterized_movement_proposals,
+            _psychic_modifier_history_origin=(
+                _pmh.PsychicModifierHistoryOrigin.from_payload(
+                    payload["psychic_modifier_history_origin"]
+                )
+                if "psychic_modifier_history_origin" in payload
+                else None
+            ),
             _config=config,
             _runtime_content_bundle=runtime_content_bundle,
             _runtime_content_audit=_runtime_content_audit_from_payload(
@@ -1051,6 +1071,9 @@ class GameLifecycle:
             state=lifecycle._require_state(),
             decisions=lifecycle.decision_controller,
             runtime_modifier_registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
+        )
+        _pmh.validate_psychic_history_origin(
+            lifecycle=lifecycle, origin=lifecycle._psychic_modifier_history_origin
         )
         return lifecycle
 

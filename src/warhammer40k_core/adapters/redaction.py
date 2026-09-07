@@ -86,7 +86,9 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
 )
 
 
-_INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset({"effect_snapshot_sha256"})
+_INTERNAL_PSYCHIC_AUTHORITY_KEYS = frozenset(
+    {"effect_snapshot_sha256", "psychic_modifier_history_origin"}
+)
 
 
 class RedactedLifecycleStatusPayload(TypedDict):

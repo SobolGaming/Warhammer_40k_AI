@@ -137,3 +137,20 @@ eight-shard, source/artifact, base-ref compatibility, generated-client and
 installed-wheel checks passed. Live client conformance passed 342 assertions.
 The complete validation record and publication status are in the Order 28
 section of `CORE_RULES_REMEDIATION_ROADMAP.md`.
+
+PR #433 review follow-up: the owner requested independent source authentication
+for completed modifier history. The original head passed CI, but the coordinated
+source/hash/actor forgeries were reproduced in standalone restoration. The correction
+retains one pre-declaration lifecycle origin and reconstructs its decision tail with
+the existing engine replay owner. This includes original declaration and effect inputs
+without adding content-specific historical handlers. The contract and the roadmap's
+completed-history correction section record the authority boundary, scope, restore
+cost and revised validation. Publishing this correction updates PR #433.
+
+
+Revised validation passed: 6,631 behavioral tests with 85.07% coverage, 390
+code-quality tests, 67 focused Order 28 regressions, all lint/type/import/pre-commit
+checks, the exact refreshed eight-shard inventory check, source and contract
+regeneration/base-ref compatibility, installed-wheel smoke, five TypeScript client
+unit tests and 342 live conformance assertions. The roadmap records runtime identity
+and the distinction from the previously reviewed CI-successful head.

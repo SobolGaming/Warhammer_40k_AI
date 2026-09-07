@@ -10,6 +10,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _state,
 )
 
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.attack_sequence import _psychic_attack_modifier_ignore_request
@@ -117,6 +118,9 @@ def test_facade_individual_subset_preserves_sources_restore_and_replay(phase: Ba
         assert restored.to_persistence_payload() == persisted
         for viewer in ("player-a", "player-b"):
             assert "effect_snapshot_sha256" not in canonical_json(
+                session.view(viewer_player_id=viewer)
+            )
+            assert "psychic_modifier_history_origin" not in canonical_json(
                 session.view(viewer_player_id=viewer)
             )
         if count == 4:
@@ -432,3 +436,152 @@ def test_psychic_source_record_decoder_rejects_malformed_evidence(
         payload["skill_modifier"] = False
     with pytest.raises((GameLifecycleError, ModifierError)):
         selection_from_payload(payload)
+
+
+@pytest.fixture(scope="module", params=[BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def completed_psychic_session(request: pytest.FixtureRequest) -> LocalGameSession:
+    from tests.psychic_modifier_helpers import complete_psychic_attack, psychic_session
+
+    session = psychic_session(request.param)
+    complete_psychic_attack(session)
+    return session
+
+
+@pytest.mark.parametrize("fault", ["hit_source", "skill_source", "pool", "effects", "actor"])
+def test_completed_history_rejects_coordinated_same_total_forgery(
+    completed_psychic_session: LocalGameSession, fault: str
+) -> None:
+    from copy import deepcopy
+    from typing import Any, cast
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    payload = cast(dict[str, Any], deepcopy(completed_psychic_session.lifecycle.to_payload()))
+    records = payload["decisions"]["records"]
+    psychic = next(
+        record
+        for record in records
+        if record["request"]["decision_type"] == "select_psychic_attack_modifier_ignores"
+    )
+    modifier_index = 1 if fault == "hit_source" else 3
+    modifier_id = psychic["request"]["payload"]["modifiers"][modifier_index]["modifier"][
+        "modifier_id"
+    ]
+
+    def corrupt(value: JsonValue) -> None:
+        if isinstance(value, list):
+            for item in value:
+                corrupt(item)
+        elif isinstance(value, dict):
+            data = value
+            if "modifiers" in data and "decided_modifier_ids" in data:
+                if fault in {"hit_source", "skill_source"}:
+                    for item in cast(list[dict[str, JsonValue]], data["modifiers"]):
+                        modifier = cast(dict[str, JsonValue], item["modifier"])
+                        if modifier["modifier_id"] == modifier_id:
+                            modifier["source_id"] = "forged:historical-source"
+                elif fault in {"pool", "effects"}:
+                    key = "pool_sha256" if fault == "pool" else "effect_snapshot_sha256"
+                    if key in data:
+                        data[key] = "0" * 64
+            if fault == "actor" and "actor_id" in data:
+                data["actor_id"] = "player-b"
+            for item in data.values():
+                corrupt(item)
+
+    corrupt(psychic)
+    for event in payload["decisions"]["event_log"]:
+        event_payload = event["payload"]
+        if (
+            (
+                event["event_type"] == "decision_requested"
+                and event_payload.get("request_id") == psychic["request"]["request_id"]
+            )
+            or (
+                event["event_type"] == "decision_recorded"
+                and event_payload.get("record_id") == psychic["record_id"]
+            )
+            or (
+                event["event_type"] == "attack_sequence_step" and event_payload.get("step") == "hit"
+            )
+        ):
+            corrupt(event_payload)
+    with pytest.raises(GameLifecycleError, match=r"Psychic.*historical|historical.*Psychic"):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, payload))
+    from warhammer40k_core.engine.replay import ReplayArtifact
+
+    with pytest.raises(GameLifecycleError, match=r"Psychic.*historical|historical.*Psychic"):
+        ReplayArtifact.capture(
+            artifact_id="forged-completed-initial-prefix",
+            initial_lifecycle_payload=cast(GameLifecyclePayload, payload),
+            final_lifecycle=completed_psychic_session.lifecycle,
+        )
+
+
+def test_completed_history_restores_and_replays_after_source_expiration(
+    completed_psychic_session: LocalGameSession,
+) -> None:
+    from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+
+    session = LocalGameSession.from_persistence_payload(
+        completed_psychic_session.to_persistence_payload()
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    original_source_ids = {"a-hit", "b-hit", "c-skill", "d-skill"}
+    for _ in range(50):
+        if original_source_ids.isdisjoint(effect.effect_id for effect in state.persisting_effects):
+            break
+        submit_fixture_request(session, pending_request(session))
+    assert original_source_ids.isdisjoint(effect.effect_id for effect in state.persisting_effects)
+    payload = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
+    persisted = session.to_persistence_payload()
+    assert (
+        LocalGameSession.from_persistence_payload(persisted).to_persistence_payload() == persisted
+    )
+    replay = session.replay_artifact(artifact_id="expired-psychic-history")
+    assert ReplayRunner.from_payload(replay).run().status is ReplayRunStatus.REPRODUCED
+    # An artifact whose initial lifecycle already includes completed choices must
+    # authenticate that prefix too, even when its own replay tail is empty.
+    from warhammer40k_core.engine.replay import ReplayArtifact
+
+    captured = ReplayArtifact.capture(
+        artifact_id="captured-completed-psychic-prefix",
+        initial_lifecycle_payload=payload,
+        final_lifecycle=session.lifecycle,
+    )
+    assert not captured.decision_records
+    assert ReplayRunner(captured).run().status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.parametrize("fault", ["missing", "recursive", "late", "config", "prefix"])
+def test_completed_history_requires_an_independent_pre_declaration_origin(
+    completed_psychic_session: LocalGameSession, fault: str
+) -> None:
+    from copy import deepcopy
+    from typing import Any, cast
+
+    from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    payload = cast(dict[str, Any], deepcopy(completed_psychic_session.lifecycle.to_payload()))
+    key = "psychic_modifier_history_origin"
+    if fault == "missing":
+        del payload[key]
+    elif fault == "recursive":
+        payload[key][key] = {}
+    elif fault == "late":
+        late = deepcopy(payload)
+        del late[key]
+        payload[key] = late
+    elif fault == "config":
+        payload[key]["config"]["game_id"] = "forged:historical-game"
+    else:
+        payload[key]["decisions"]["event_log"][0]["payload"]["forged"] = True
+    with pytest.raises(GameLifecycleError, match=r"Psychic.*historical|historical.*Psychic"):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, payload))

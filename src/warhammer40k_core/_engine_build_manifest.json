@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b4d2c59bad74ec2d47ec309cb0af0a9041b4a01b628e5b3ff5b2125164c96de8",
-  "fingerprint": "b4d2c59bad74ec2d47ec309cb0af0a9041b4a01b628e5b3ff5b2125164c96de8",
-  "resource_count": 2580,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c90ed5c08e063f34eb3930e82c5c6ac116c39ca2fca7eee57227c1011fc3fc98",
+  "fingerprint": "c90ed5c08e063f34eb3930e82c5c6ac116c39ca2fca7eee57227c1011fc3fc98",
+  "resource_count": 2581,
   "resources": [
     {
       "byte_length": 113,
@@ -85,9 +85,9 @@
       "sha256": "70c322da3e1e7366bb8797a08665b8f9f9f73d1adf08c111b258b4e1bd1936bd"
     },
     {
-      "byte_length": 37409,
+      "byte_length": 37450,
       "path": "warhammer40k_core/adapters/redaction.py",
-      "sha256": "5c68e65653cb7818fb9f6b769186daddb17af166d78b434ead9c2972100e122b"
+      "sha256": "ab2e4a26df6258e864f2a278bf8332cbc500d16223acb88b59f26c56138ca65f"
     },
     {
       "byte_length": 1598,
@@ -9580,9 +9580,9 @@
       "sha256": "60d3f4301684c2b7e40e551b9ec1fe9116e38dbace4b1504d9bb68679e53b8d4"
     },
     {
-      "byte_length": 160121,
+      "byte_length": 161253,
       "path": "warhammer40k_core/engine/lifecycle.py",
-      "sha256": "8c0397d7df9e42897acf1228caeff1f651125aad00cc40f627907618da16cfc3"
+      "sha256": "a7c934754809eb14b2a4a1bdd37790096597669a0481341430ba1db3e4c4ebbb"
     },
     {
       "byte_length": 13770,
@@ -10558,6 +10558,11 @@
       "byte_length": 9129,
       "path": "warhammer40k_core/engine/psychic_ability_usage.py",
       "sha256": "72dc4238fd4da6eb38794d60dcbf6fff08a9cb6964f5a19d6e7ee6ebadcd4151"
+    },
+    {
+      "byte_length": 5911,
+      "path": "warhammer40k_core/engine/psychic_modifier_history_origin.py",
+      "sha256": "76634bd8a0f6d7a0d1db1c67b3e46b923a7f3530c072154687129b53494a1c04"
     },
     {
       "byte_length": 7302,

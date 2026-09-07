@@ -110,64 +110,102 @@ def pending_request(session: LocalGameSession) -> DecisionRequest:
     return status.decision_request
 
 
+def complete_psychic_attack(session: LocalGameSession) -> None:
+    request = reach_psychic_request(session)
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id=f"{request.request_id}:keep-all",
+        option_id="keep-all-modifiers",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    for _ in range(15):
+        if any(
+            event.event_type == "attack_sequence_step"
+            and isinstance(event.payload, dict)
+            and event.payload.get("step") == "hit"
+            for event in session.lifecycle.decision_controller.event_log.records
+        ):
+            return
+        request = pending_request(session)
+        option = next(
+            (
+                option
+                for option in request.options
+                if "decline" in option.option_id or "keep" in option.option_id
+            ),
+            request.options[0],
+        )
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=f"{request.request_id}:resolve",
+            option_id=option.option_id,
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+    raise AssertionError("Psychic attack did not record its hit.")
+
+
 def reach_psychic_request(session: LocalGameSession) -> DecisionRequest:
     for _ in range(25):
         request = pending_request(session)
         if request.decision_type == "select_psychic_attack_modifier_ignores":
             return request
-        result_id = f"{request.request_id}:fixture-choice"
-        if request.decision_type == "submit_shooting_declaration":
-            proposal = _proposal_from_request(request=request, target_unit_id="army-beta:enemy")
-            status = session.submit_parameterized_payload(
-                request_id=request.request_id,
-                result_id=result_id,
-                payload=validate_json_value(proposal.to_payload()),
-            )
-        elif request.decision_type == "submit_melee_declaration":
-            melee = MeleeDeclarationProposalRequest.from_decision_request(request)
-            weapon = cast(dict[str, JsonValue], melee.available_weapons[0])
-            targets = cast(list[str], weapon["engaged_target_unit_instance_ids"])
-            status = session.submit_parameterized_payload(
-                request_id=request.request_id,
-                result_id=result_id,
-                payload={
-                    "proposal_request_id": melee.request_id,
-                    "proposal_kind": melee.proposal_kind,
-                    "player_id": melee.actor_id,
-                    "battle_round": melee.battle_round,
-                    "unit_instance_id": melee.unit_instance_id,
-                    "source_decision_request_id": melee.source_decision_request_id,
-                    "source_decision_result_id": melee.source_decision_result_id,
-                    "declarations": [
-                        {
-                            "attacker_model_instance_id": weapon["model_instance_id"],
-                            "wargear_id": weapon["wargear_id"],
-                            "weapon_profile_id": weapon["weapon_profile_id"],
-                            "target_allocations": [{"target_unit_instance_id": targets[0]}],
-                        }
-                    ],
-                },
-            )
-        elif request.decision_type == "submit_movement_proposal":
-            move = MovementProposalRequest.from_decision_request_payload(request.payload)
-            context = cast(dict[str, JsonValue], move.context)
-            status = session.submit_parameterized_payload(
-                request_id=request.request_id,
-                result_id=result_id,
-                payload={
-                    "proposal_request_id": move.request_id,
-                    "proposal_kind": move.proposal_kind.value,
-                    "unit_instance_id": move.unit_instance_id,
-                    "movement_phase_action": move.movement_phase_action,
-                    "movement_mode": context["movement_mode"],
-                },
-            )
-        else:
-            assert request.options, request.decision_type
-            status = session.submit_option(
-                request_id=request.request_id,
-                result_id=result_id,
-                option_id=request.options[0].option_id,
-            )
-        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        submit_fixture_request(session, request)
     raise AssertionError("Did not reach the Psychic modifier choice.")
+
+
+def submit_fixture_request(session: LocalGameSession, request: DecisionRequest) -> None:
+    result_id = f"{request.request_id}:fixture-choice"
+    if request.decision_type == "submit_shooting_declaration":
+        proposal = _proposal_from_request(request=request, target_unit_id="army-beta:enemy")
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    elif request.decision_type == "submit_melee_declaration":
+        melee = MeleeDeclarationProposalRequest.from_decision_request(request)
+        weapon = cast(dict[str, JsonValue], melee.available_weapons[0])
+        targets = cast(list[str], weapon["engaged_target_unit_instance_ids"])
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload={
+                "proposal_request_id": melee.request_id,
+                "proposal_kind": melee.proposal_kind,
+                "player_id": melee.actor_id,
+                "battle_round": melee.battle_round,
+                "unit_instance_id": melee.unit_instance_id,
+                "source_decision_request_id": melee.source_decision_request_id,
+                "source_decision_result_id": melee.source_decision_result_id,
+                "declarations": [
+                    {
+                        "attacker_model_instance_id": weapon["model_instance_id"],
+                        "wargear_id": weapon["wargear_id"],
+                        "weapon_profile_id": weapon["weapon_profile_id"],
+                        "target_allocations": [{"target_unit_instance_id": targets[0]}],
+                    }
+                ],
+            },
+        )
+    elif request.decision_type == "submit_movement_proposal":
+        move = MovementProposalRequest.from_decision_request_payload(request.payload)
+        context = cast(dict[str, JsonValue], move.context)
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=result_id,
+            payload={
+                "proposal_request_id": move.request_id,
+                "proposal_kind": move.proposal_kind.value,
+                "unit_instance_id": move.unit_instance_id,
+                "movement_phase_action": move.movement_phase_action,
+                "movement_mode": context["movement_mode"],
+            },
+        )
+    else:
+        assert request.options, request.decision_type
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id=result_id,
+            option_id=request.options[0].option_id,
+        )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status

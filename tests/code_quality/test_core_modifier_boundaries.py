@@ -188,3 +188,12 @@ def test_psychic_selection_and_hit_resolution_share_individual_source_owner() ->
     assert "validate_psychic_modifier_history" in _calls(
         "engine/lifecycle.py", "from_payload", class_name="GameLifecycle"
     )
+    assert "capture_psychic_history_origin" in _calls(
+        "engine/lifecycle.py", "submit_decision", class_name="GameLifecycle"
+    )
+    assert "validate_psychic_history_origin" in _calls(
+        "engine/lifecycle.py", "from_payload", class_name="GameLifecycle"
+    )
+    assert {"capture", "ReplayRunner", "run"} <= _calls(
+        "engine/psychic_modifier_history_origin.py", "validate_psychic_history_origin"
+    )
