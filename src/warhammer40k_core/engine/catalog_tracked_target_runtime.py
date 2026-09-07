@@ -8,6 +8,7 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
 )
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartHookBinding,
@@ -19,7 +20,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clause_is_supported_tracked_target_destroyed_reselect,
     catalog_rule_clause_is_supported_tracked_target_selection,
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
     catalog_rule_tracked_target_supported_attack_roll_pairs_for_clause,
@@ -203,7 +203,7 @@ def _tracked_target_initial_selection_requests(
         if index is None:
             raise GameLifecycleError("Tracked-target runtime missing player ability index.")
         for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
-            current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            current_model_ids = active_ability_model_ids_for_unit(
                 state=context.state,
                 unit=unit,
             )
@@ -332,7 +332,7 @@ def _tracked_target_reselection_request(
         raise GameLifecycleError("Tracked-target reselection missing player ability index.")
     for component in rules_unit.components:
         unit = component.unit
-        current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+        current_model_ids = active_ability_model_ids_for_unit(
             state=context.state,
             unit=unit,
         )

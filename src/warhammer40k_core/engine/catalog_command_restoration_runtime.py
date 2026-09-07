@@ -11,8 +11,12 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
 )
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_spatial_relationship,
+    active_ability_model_ids_for_unit,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_presence import rules_unit_has_placed_alive_model
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     CatalogCommandRestorationDescriptor,
     command_restoration_descriptor_for_clause,
@@ -22,7 +26,6 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_source_matches_unit,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
@@ -351,7 +354,7 @@ class CatalogCommandRestorationRuntime:
                 continue
             for component in view.components:
                 unit = component.unit
-                current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                current_model_ids = active_ability_model_ids_for_unit(
                     state=state,
                     unit=unit,
                 )
@@ -430,14 +433,11 @@ class CatalogCommandRestorationRuntime:
             )
             if model.model_id == source.source_model_instance_id
         )
-        if len(source_models) != 1:
+        if len(source_models) > 1:
             raise GameLifecycleError("Catalog command restoration source model is not placed.")
-        source_model = source_models[0]
         targets: list[RulesUnitView] = []
         for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
             if view.owner_player_id != source.source_rules_unit.owner_player_id:
-                continue
-            if not rules_unit_has_placed_alive_model(state=state, rules_unit=view):
                 continue
             if not unit_has_required_keywords(
                 unit_keywords=view.keywords,
@@ -445,8 +445,20 @@ class CatalogCommandRestorationRuntime:
                 required_keywords=source.descriptor.required_keyword_sequence,
             ):
                 continue
+            relationship = ability_spatial_relationship(
+                state=state,
+                source=source.source_rules_unit,
+                target=view,
+                source_model_instance_id=source.source_model_instance_id,
+            )
+            if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+                targets.append(view)
+                continue
+            if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
+                continue
             if any(
                 source_model.range_to(target_model) <= source.descriptor.distance_inches
+                for source_model in source_models
                 for target_model in placed_alive_geometry_models_for_rules_unit(
                     state=state,
                     unit_instance_id=view.unit_instance_id,

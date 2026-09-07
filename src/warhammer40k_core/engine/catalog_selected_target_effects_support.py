@@ -13,10 +13,14 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
     AbilitySourceKind,
 )
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_presence,
+    ability_spatial_relationship,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -188,12 +192,11 @@ def eligible_selection_target_unit_ids(
     source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id)
     if source_rules_unit.owner_player_id != source_player:
         raise GameLifecycleError("Catalog selected-target source owner drift.")
-    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source_rules_unit):
+    source_presence = ability_presence(state=state, rules_unit=source_rules_unit)
+    if not source_presence.active_model_ids:
         return ()
-    if source_model_instance_id is not None and not rules_unit_has_placed_alive_model(
-        state=state,
-        rules_unit=source_rules_unit,
-        model_instance_id=source_model_instance_id,
+    if source_model_instance_id is not None and (
+        source_model_instance_id not in source_presence.active_model_ids
     ):
         return ()
     ruleset_descriptor = state.runtime_ruleset_descriptor()
@@ -222,22 +225,17 @@ def eligible_selection_target_unit_ids(
     required_keywords = required_keywords_for_clause(selection_clause)
     from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 
-    target_rules_units: dict[str, RulesUnitView] = {}
-    for placed_army in state.battlefield_state.placed_armies:
-        if (placed_army.player_id == source_player) != (target_allegiance == "friendly"):
-            continue
-        for target_placement in placed_army.unit_placements:
-            target_rules_unit = rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=target_placement.unit_instance_id,
-            )
-            target_rules_units[target_rules_unit.unit_instance_id] = target_rules_unit
+    target_rules_units = {
+        view.unit_instance_id: view
+        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        if (view.owner_player_id == source_player) == (target_allegiance == "friendly")
+    }
     target_ids: list[str] = []
     for target_rules_unit_id in sorted(target_rules_units):
         if explicit_ids is not None and target_rules_unit_id not in explicit_ids:
             continue
         target_rules_unit = target_rules_units[target_rules_unit_id]
-        if not rules_unit_has_placed_alive_model(state=state, rules_unit=target_rules_unit):
+        if not ability_presence(state=state, rules_unit=target_rules_unit).active_model_ids:
             continue
         if target_rules_unit.owner_player_id == source_player and target_allegiance != "friendly":
             raise GameLifecycleError("Catalog selected-target allegiance drift.")
@@ -334,6 +332,16 @@ def selection_distance_conditions_apply(
             condition_source_model_id = None
         else:
             raise GameLifecycleError("Catalog selected-target distance object kind is unsupported.")
+        relationship = ability_spatial_relationship(
+            state=state,
+            source=source_rules_unit,
+            target=target_rules_unit,
+            source_model_instance_id=condition_source_model_id,
+        )
+        if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+            continue
+        if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
+            return False
         uses_physical_engagement_geometry = parameters.get("range_kind") == "engagement_range"
         target_models = (
             physical_geometry_models_for_rules_unit(
@@ -407,6 +415,16 @@ def selection_visibility_conditions_apply(
             observer_model_id = None
         else:
             raise GameLifecycleError("Catalog selected-target visibility observer is unsupported.")
+        relationship = ability_spatial_relationship(
+            state=state,
+            source=source_rules_unit,
+            target=target_rules_unit,
+            source_model_instance_id=observer_model_id,
+        )
+        if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+            continue
+        if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
+            return False
         observing_components = (
             (source_rules_unit.component_unit_for_model(observer_model_id),)
             if observer_model_id is not None
@@ -481,7 +499,7 @@ def canonical_rules_unit_ids(
         canonical_ids.update(
             rules_unit.unit_instance_id
             for rules_unit in rules_units
-            if rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit)
+            if ability_presence(state=state, rules_unit=rules_unit).active_model_ids
         )
     return frozenset(canonical_ids)
 

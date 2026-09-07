@@ -3,6 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.ability_presence import (
+    AbilityPresence,
+    AbilitySpatialRelationship,
+    ability_presence_from_model_ids,
+    ability_spatial_relationship_from_presence,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
 from warhammer40k_core.engine.battle_shock_model_authority import (
@@ -170,6 +176,40 @@ class HistoricalBattleShockAuthorityContext:
             if presences & {"embarked", "reserves"}:
                 raise GameLifecycleError("Historical Battle-shock rules-unit presence is split.")
         return self.placed_alive_model_ids(unit_instance_id)
+
+    def ability_presence(self, unit_instance_id: str) -> AbilityPresence:
+        rules_unit = self.rules_unit_containing_unit(unit_instance_id)
+        allowed = {model.model_instance_id for model in rules_unit.own_models}
+        rows = tuple(row for row in self.physical_models if row.model_instance_id in allowed)
+        return ability_presence_from_model_ids(
+            rules_unit_instance_id=rules_unit.unit_instance_id,
+            alive_model_ids={row.model_instance_id for row in rows if row.wounds_remaining > 0},
+            battlefield_model_ids={
+                row.model_instance_id for row in rows if row.presence == "battlefield"
+            },
+            off_battlefield_model_ids={
+                row.model_instance_id for row in rows if row.presence in {"embarked", "reserves"}
+            },
+        )
+
+    def component_active_ability_model_ids(self, unit_instance_id: str) -> tuple[str, ...]:
+        unit, _army = self.unit_and_army(unit_instance_id)
+        allowed = set(unit.own_model_ids())
+        return tuple(
+            model_id
+            for model_id in self.ability_presence(unit_instance_id).active_model_ids
+            if model_id in allowed
+        )
+
+    def ability_spatial_relationship(
+        self, source_unit_id: str, target_unit_id: str
+    ) -> AbilitySpatialRelationship:
+        source = self.rules_unit_containing_unit(source_unit_id)
+        target = self.rules_unit(target_unit_id)
+        return ability_spatial_relationship_from_presence(
+            source_presence=self.ability_presence(source.components[0].unit.unit_instance_id),
+            target_presence=self.ability_presence(target.components[0].unit.unit_instance_id),
+        )
 
     def below_half_strength_context(self, unit_instance_id: str) -> BelowHalfStrengthContext:
         rules_unit = self.rules_unit(unit_instance_id)

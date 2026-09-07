@@ -4,14 +4,12 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex, AbilityCatalogRecord
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     successful_hit_target_unit_ids_for_sequence,
-)
-from warhammer40k_core.engine.catalog_rule_consumption import (
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
 )
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
@@ -228,7 +226,7 @@ def _post_fight_hit_target_effect_groups(
         key=lambda value: value.unit.unit_instance_id,
     ):
         unit = component.unit
-        current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+        current_model_ids = active_ability_model_ids_for_unit(
             state=context.state,
             unit=unit,
         )

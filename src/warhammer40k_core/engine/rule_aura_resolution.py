@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_spatial_relationship,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_target_resolution import (
@@ -54,8 +58,6 @@ def aura_affected_unit_ids(
         source_model_instance_id=source_model_instance_id,
         anchor_kind=_aura_anchor_kind(distance_parameters),
     )
-    if not source_geometries:
-        return ()
     distance_inches = _aura_distance_inches(distance_parameters)
     allegiance = _aura_allegiance(clause)
     required_keywords = _required_keywords(clause.conditions)
@@ -88,6 +90,21 @@ def aura_affected_unit_ids(
             rules_unit=target_rules_unit,
             excluded_keywords=excluded_keywords,
         ):
+            continue
+        relationship = ability_spatial_relationship(
+            state=state,
+            source=source_rules_unit,
+            target=target_rules_unit,
+            source_model_instance_id=(
+                source_model_instance_id
+                if _aura_anchor_kind(distance_parameters) == AURA_ANCHOR_MODEL
+                else None
+            ),
+        )
+        if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+            affected.append(target_rules_unit.unit_instance_id)
+            continue
+        if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
             continue
         target_geometries = _placed_alive_rules_unit_geometries(
             state=state,
@@ -123,6 +140,8 @@ def _aura_source_geometries(
         model.model_instance_id for model in source_rules_unit.alive_models()
     }:
         raise GameLifecycleError("Aura source model must be alive in the source rules unit.")
+    if not source_geometries:
+        return ()
     matching_geometries = tuple(
         geometry for geometry in source_geometries if geometry.model_id == source_model_instance_id
     )

@@ -1,0 +1,148 @@
+{
+  "artifact_schema": "core-v2-core-embarked-abilities-source-v1",
+  "source_package_id": "gw-11e-core-embarked-abilities",
+  "source_version": "maintained-app-mirrors-observed-2026-09-07",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-embarked-abilities:embarked-abilities",
+      "section_id": "FAQ",
+      "source_text": "Do a unit's abilities continue to function while they are embarked within a TRANSPORT?\nYes, within the restrictions specified by the ability itself. Embarked units are Not On The Battlefield (01.02.04), so any ability requiring visibility or measurement to another unit will fail.\nExample: Azrael is attached to an Intercessor Squad unit and embarked within a TRANSPORT, and that TRANSPORT is making a shooting attack using the Firing Deck ability. While Azrael's Supreme Grand Master ability is still technically active, it will have no effect, as the requirements of the ability are not met (the ability affects 'weapons equipped by models' in Azrael's unit, and for the purposes of Firing Deck, the TRANSPORT itself is equipped with those weapons instead).",
+      "transcription_sha256": "4c186dc9730e3431986655c2d8a81be7dc788c44382e0f508ccd30ee0c9376e6",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-embarked-abilities:off-battlefield-ability-conditions",
+      "section_id": "01.02.04",
+      "source_text": "A unit that is embarked within a TRANSPORT or that is in strategic reserves is not on the battlefield. The following applies to such units:\nThat unit is not visible to any other units (units are visible to themselves).\nAny other unit is not visible to that unit.\nPlayers cannot measure distances to or from that unit (units are within range of their own abilities).\nThis means units not on the battlefield cannot be selected or targeted by any attack or rule that requires a unit to be visible or within a certain distance (other than their own abilities).\nSuch units can still use their other rules, and are still units in the controlling player's army and so can be affected by rules that require a player to select a unit from an army, as well as rules that affect all units in an army.",
+      "transcription_sha256": "d54813925aec1839fd755c822f9b9662b5e2f25c9e5d33e1dcc7eb51e10205bd",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:ability_spatial_relationship"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-embarked-abilities:embarked-abilities",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "4c186dc9730e3431986655c2d8a81be7dc788c44382e0f508ccd30ee0c9376e6",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "60384163825f1dc2953a856a8100d441032627db3f14689b7c45f409a811a892",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+      ],
+      "evidence_id": "core-embarked-abilities-review:embarked-abilities",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01C FAQ embarked-abilities",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-embarked-abilities:embarked-abilities",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "4c186dc9730e3431986655c2d8a81be7dc788c44382e0f508ccd30ee0c9376e6",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "51b787a9204ce20ed0c7f0028be5f4171113f7f739eeafa8a02db44180ab5d5d",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+      ],
+      "evidence_id": "core-embarked-abilities-mirror:embarked-abilities:gdm-v931",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-embarked-abilities-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "embarked-abilities:gdm-v931",
+      "review_audit_source_observation_sha256": "570d6afeb3ba563bdb5cdda85018ad948694af7c7d869ec99bc5fe13aa6aadb0",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions FAQ embarked-abilities",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-embarked-abilities:off-battlefield-ability-conditions",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "d54813925aec1839fd755c822f9b9662b5e2f25c9e5d33e1dcc7eb51e10205bd",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "d3ba69280590e6d9fc460b585f768cae49bef55e2e6b75a96166bc9374e877ad",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:ability_spatial_relationship"
+      ],
+      "evidence_id": "core-embarked-abilities-review:off-battlefield-ability-conditions",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P01C 01.02.04 off-battlefield-ability-conditions",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-embarked-abilities:off-battlefield-ability-conditions",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "d54813925aec1839fd755c822f9b9662b5e2f25c9e5d33e1dcc7eb51e10205bd",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "8533bb05f31daf52df28e1a5e1435a99ff62b91352f92cccd0dd6a5529d8b131",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:ability_spatial_relationship"
+      ],
+      "evidence_id": "core-embarked-abilities-mirror:off-battlefield-ability-conditions:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-embarked-abilities-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "off-battlefield-ability-conditions:40k-app",
+      "review_audit_source_observation_sha256": "fddababef28f6b2c98b06804e86f4827236c5c8e2502ea5d09f443d1a2d5fb7d",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 01.02.04 off-battlefield-ability-conditions",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/01-core-concepts",
+      "observed_at": "2026-09-07T00:02:56Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "81e006418aa305b53635b0f7a51a1b99922d380795506ad023e08efd894d8dbf"
+}

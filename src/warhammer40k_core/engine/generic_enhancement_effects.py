@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.deadly_demise_modifiers import (
     DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION,
     DEADLY_DEMISE_MODIFIER_ABILITY,
@@ -755,10 +756,10 @@ def _source_model_is_active(
     )
     if source_model is None:
         raise GameLifecycleError("Generic aura weapon bearer model is missing.")
-    battlefield = state.battlefield_state
-    if battlefield is None or not source_model.is_alive:
-        return False
-    return battlefield.model_placement_or_none(source_model_instance_id) is not None
+    return source_model.model_instance_id in active_ability_model_ids_for_unit(
+        state=state,
+        unit=bearer,
+    )
 
 
 def _target_unit_ids_from_rule_payload(payload: dict[str, JsonValue]) -> tuple[str, ...]:

@@ -4819,3 +4819,29 @@ or selecting a maximum. The existing distinct-descriptor Anti decision remains
 unchanged. Keyword membership remains a non-stacking presence query. Source
 support is `loaded` / `partial_engine_runtime`; C24-03B and the parent C24-03
 family remain open, including Select Weapons timing and the Scouts selection rule.
+
+## Order 25: embarked ability availability (P01C)
+
+An embarked or unarrived-reserve unit retains its abilities. Generic catalog
+source enumeration uses `engine.ability_presence` to resolve living models in
+the current rules unit from explicit battlefield, cargo and reserve authority.
+Missing placement alone grants no availability. Source-specific battlefield,
+phase, keyword, leading, target and frequency restrictions still apply.
+
+Existing finite ability families may therefore enumerate an eligible
+non-spatial choice for an off-battlefield source. Their existing option IDs,
+payload schemas, queue validation and engine mutation remain authoritative.
+No new decision family or wire schema is introduced. Adapter submissions,
+checkpoint restore and replay use the same validation and current membership.
+The existing viewer-scoped decision/event policy applies without exposing
+hidden source information in transport metadata.
+
+The shared spatial query treats a unit as visible to and within range of its
+own abilities. Visibility or measurement involving another off-battlefield
+unit fails, including cargo versus its transport or another cargo unit.
+Rules that select an army unit without a spatial condition retain that scope.
+Firing Deck uses the transport's equipped weapon and attacking model identity;
+cargo ability grants remain scoped to their own rules unit. The existing
+`catalog_battle_shock_failed_heal_no_effect` event's `no_effect_reason` is
+`source_unit_unavailable` when no living, explicitly present source remains;
+off-battlefield presence alone no longer yields a no-effect result.

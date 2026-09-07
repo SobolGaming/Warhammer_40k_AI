@@ -5,9 +5,13 @@ from dataclasses import dataclass
 
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogRecord, AbilitySourceKind
+from warhammer40k_core.engine.ability_presence import (
+    AbilitySpatialRelationship,
+    ability_spatial_relationship,
+    active_ability_model_ids_for_unit,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.catalog_rule_consumption import (
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
 )
 from warhammer40k_core.engine.game_state import GameState
@@ -181,7 +185,7 @@ def current_source_model_ids(
 ) -> tuple[str, ...]:
     if type(state) is not GameState:
         raise GameLifecycleError("Catalog datasheet source query requires GameState.")
-    current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+    current_model_ids = active_ability_model_ids_for_unit(
         state=state,
         unit=source.unit,
     )
@@ -217,7 +221,7 @@ def current_effect_target_model_ids(
         sorted(
             model_instance_id
             for component in rules_unit.components
-            for model_instance_id in catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            for model_instance_id in active_ability_model_ids_for_unit(
                 state=state,
                 unit=component.unit,
             )
@@ -235,6 +239,16 @@ def rules_units_within(
 ) -> bool:
     if type(state) is not GameState or state.battlefield_state is None:
         raise GameLifecycleError("Catalog datasheet range query requires battlefield state.")
+    relationship = ability_spatial_relationship(
+        state=state,
+        source=rules_unit_view_by_id(state=state, unit_instance_id=first_unit_id),
+        target=rules_unit_view_by_id(state=state, unit_instance_id=second_unit_id),
+        source_model_instance_id=attacker_model_instance_id,
+    )
+    if relationship is AbilitySpatialRelationship.OWN_ABILITY:
+        return True
+    if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
+        return False
     attacking_unit_id = first_unit_id
     if attacker_model_instance_id is not None:
         attacking_unit_id = rules_unit_view_by_id(

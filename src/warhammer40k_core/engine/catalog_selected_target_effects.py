@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex, AbilityCatalogRecord
+from warhammer40k_core.engine.ability_presence import active_ability_model_ids_for_unit
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
@@ -26,7 +27,6 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
-    catalog_rule_current_placed_alive_model_instance_ids_for_unit,
 )
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
@@ -649,7 +649,7 @@ def _fight_start_selected_target_groups(
         if index is None:
             raise GameLifecycleError("Catalog selected-target missing ability index.")
         for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
-            current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            current_model_ids = active_ability_model_ids_for_unit(
                 state=context.state,
                 unit=unit,
             )
@@ -691,7 +691,7 @@ def _shooting_start_selected_target_groups(
         if index is None:
             raise GameLifecycleError("Catalog selected-target missing ability index.")
         for unit in sorted(army.units, key=lambda item: item.unit_instance_id):
-            current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+            current_model_ids = active_ability_model_ids_for_unit(
                 state=context.state,
                 unit=unit,
             )
@@ -742,7 +742,7 @@ def _post_shoot_hit_target_effect_groups(
         key=lambda value: value.unit.unit_instance_id,
     ):
         unit = component.unit
-        current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+        current_model_ids = active_ability_model_ids_for_unit(
             state=context.state,
             unit=unit,
         )
