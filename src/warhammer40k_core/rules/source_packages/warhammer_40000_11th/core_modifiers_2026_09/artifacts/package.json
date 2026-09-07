@@ -1,0 +1,217 @@
+{
+  "artifact_schema": "core-v2-core-modifiers-source-v1",
+  "source_package_id": "gw-11e-core-modifiers",
+  "source_version": "maintained-app-mirrors-observed-2026-09-07",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-modifiers:ordered-modifiers",
+      "section_id": "02.02.01",
+      "source_text": "APPLYING MODIFIERS\n\nThis section presents the various ways rules may be modified. All modifiers are cumulative.\n\nWhen a value is modified (e.g. characteristic, dice roll, distance), do so in the following order.\n\n1. If a rule instructs you to change or replace one value with a specified value, you must first change the relevant value to the new value.\n\nNote that rules that modify a characteristic in this step to a new value of ‘0’, ‘-’ or ‘*’ cannot be modified by other rules (in such cases, skip steps 2-5).\n\n2. Apply multiplication modifiers.\n\n3. Apply addition modifiers.\n\n4. Apply division modifiers.\n\n5. Apply subtraction modifiers.\n\n6. Round any fractions up after applying all modifiers.",
+      "transcription_sha256": "3fe2b25367c04c5648e0b572c9a802a3afd7fe69b03e4e4b11058920d0ce5044",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:ModifierStack"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-modifiers:modified-dice-limits",
+      "section_id": "02.02.01",
+      "source_text": "WHEN MODIFYING DICE ROLLS\n\nWhen modifying dice rolls, the following points also apply:\n\n  * Modifiers are applied after any re-rolls of that dice roll.\n    * Rules that refer to the value of an ‘unmodified’ dice roll are referring to the dice result after any re-rolls, but before modifiers.\n  * A dice result can be modified above its maximum possible value (for example, a D6 roll can be modified above 6).\n  * A result that would be less than 1 is changed to a result of 1.\n  * Hit rolls and wound rolls can never be modified by more than -1 or +1. After all the cumulative modifiers to such a roll have been calculated, if the total modifier would be:\n    * -2 or worse, it is changed to -1.\n    * +2 or better, it is changed to +1.\n  * Charge rolls cannot be greater than 12. After all the cumulative modifiers to a charge roll have been calculated, if the result would be 13 or more, it is changed to 12.",
+      "transcription_sha256": "21d051f1c9f037ac11d4957a94dd93cba1bab969ffd1f9bf9ffc7c847ddc5d29",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:resolve_roll_modifiers"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-modifiers:detection-lone-operative-limits",
+      "section_id": "02.02.01",
+      "source_text": "OTHER MODIFIED RULES\n\nThe following rules apply to various rules and effects found throughout the game.\n\n  * Detection range and Lone Operative cannot be better than 9\" or worse than 30\".",
+      "transcription_sha256": "0bb1eb9564822364cae638f8db886fe5186524fd999f16c382f1d4b73a9afccc",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:resolve_targeting_range"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-modifiers:ordered-modifiers",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "3fe2b25367c04c5648e0b572c9a802a3afd7fe69b03e4e4b11058920d0ce5044",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "c4d8f0ec40232c4590e349acd965a5437db87211c1a618eb379cbf6dc1b9ff3d",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:ModifierStack"
+      ],
+      "evidence_id": "core-modifiers-review:ordered-modifiers",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P02A/P02B/P02C 02.02.01 ordered-modifiers",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:ordered-modifiers",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "3fe2b25367c04c5648e0b572c9a802a3afd7fe69b03e4e4b11058920d0ce5044",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "0a8006428bebaa7de19f3aad606b23b7b12957e801355533ff95f2d47ea9b0b5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:ModifierStack"
+      ],
+      "evidence_id": "core-modifiers-mirror:ordered-modifiers:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "ordered-modifiers:40k-app",
+      "review_audit_source_observation_sha256": "ce29e604dda147708960150e85b167e1a195c308d3714b6125da6ec586e5536a",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 02.02.01 ordered-modifiers",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/02-datasheets",
+      "observed_at": "2026-09-07T02:46:54Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:modified-dice-limits",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "21d051f1c9f037ac11d4957a94dd93cba1bab969ffd1f9bf9ffc7c847ddc5d29",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "136b5b10d433db7b4f218be2206e1d6a1ac3a0ea66640dc046e933036aeb282e",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:resolve_roll_modifiers"
+      ],
+      "evidence_id": "core-modifiers-review:modified-dice-limits",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P02A/P02B/P02C 02.02.01 modified-dice-limits",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:modified-dice-limits",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "21d051f1c9f037ac11d4957a94dd93cba1bab969ffd1f9bf9ffc7c847ddc5d29",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "6029a91ce8f8988f0c6e17c56735d0f017fb5c2b6d141d2988eba3589ddad104",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:resolve_roll_modifiers"
+      ],
+      "evidence_id": "core-modifiers-mirror:modified-dice-limits:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "modified-dice-limits:40k-app",
+      "review_audit_source_observation_sha256": "4b24c317d0bf608322ce332c58246d2a202834f261228d28db10640fb820422b",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 02.02.01 modified-dice-limits",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/02-datasheets",
+      "observed_at": "2026-09-07T02:46:54Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:detection-lone-operative-limits",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "0bb1eb9564822364cae638f8db886fe5186524fd999f16c382f1d4b73a9afccc",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "4082f14e05b49c2b639e68254f53d52fc8d5900226171c58d6aa90f8bea68ff0",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:resolve_targeting_range"
+      ],
+      "evidence_id": "core-modifiers-review:detection-lone-operative-limits",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P02A/P02B/P02C 02.02.01 detection-lone-operative-limits",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-modifiers:detection-lone-operative-limits",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "0bb1eb9564822364cae638f8db886fe5186524fd999f16c382f1d4b73a9afccc",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "52cd07070b01404d9d16ea568f87c51de9977e2ede3ca0d8ee3d9315f51b29ad",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.core.modifiers:resolve_targeting_range"
+      ],
+      "evidence_id": "core-modifiers-mirror:detection-lone-operative-limits:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "detection-lone-operative-limits:40k-app",
+      "review_audit_source_observation_sha256": "293e62779134a817b3f697aa75e459c2f53616b9e577bfaef36404d3264c64f8",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 02.02.01 detection-lone-operative-limits",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/02-datasheets",
+      "observed_at": "2026-09-07T02:46:54Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "9ec39b854ae8180904d99c361b1f2df78024cdcf6b8362637c3ae5f7e3e632b6"
+}

@@ -148,7 +148,8 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
     assert len(modifiers) == 1
     assert destroyed_bearer_modifiers == ()
     assert modifiers[0].operand == 1
-    assert request.spec.expression.modifier == 1
+    assert request.spec.expression.modifier == 0
+    assert request.resolve_roll(roll_state).unmodified.value == 7
     assert destroyed_bearer_request.spec.expression.modifier == 0
     assert result.value == 8
     assert destroyed_bearer_result.value == 7

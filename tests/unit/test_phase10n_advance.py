@@ -667,7 +667,7 @@ def test_advance_domain_objects_fail_fast_on_drift() -> None:
             unit_instance_id="army-alpha:intercessor-unit-1",
             spec=cast(DiceRollSpec, "bad"),
         )
-    with pytest.raises(GameLifecycleError, match="D6 modifier payload"):
+    with pytest.raises(GameLifecycleError, match="unmodified D6"):
         AdvanceRollRequest(
             request_id="bad",
             game_id="phase10n-game",
@@ -681,7 +681,7 @@ def test_advance_domain_objects_fail_fast_on_drift() -> None:
                 actor_id="army-alpha:intercessor-unit-1",
             ),
         )
-    with pytest.raises(GameLifecycleError, match="D6 modifier payload"):
+    with pytest.raises(GameLifecycleError, match="unmodified D6"):
         AdvanceRollRequest(
             request_id="bad-modifier-drift",
             game_id="phase10n-game",
@@ -689,7 +689,7 @@ def test_advance_domain_objects_fail_fast_on_drift() -> None:
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             spec=DiceRollSpec(
-                expression=DiceExpression(quantity=1, sides=6),
+                expression=DiceExpression(quantity=1, sides=6, modifier=1),
                 reason="Advance validation",
                 roll_type="advance_roll",
                 actor_id="army-alpha:intercessor-unit-1",
@@ -732,7 +732,7 @@ def test_advance_domain_objects_fail_fast_on_drift() -> None:
                 component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
             ),
         )
-    with pytest.raises(GameLifecycleError, match="value"):
+    with pytest.raises(GameLifecycleError, match="bounded modifier trace"):
         AdvanceRollResult(request=request, roll_state=roll_state, value=4)
     with pytest.raises(GameLifecycleError, match="request"):
         AdvanceRollResult(

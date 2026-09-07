@@ -4877,7 +4877,12 @@ def test_p12_consolidation_forces_each_opponent_once_and_resumes_through_facade(
             "enemy-1": Pose.at(12.0 if mode is ConsolidationModeKind.ONGOING else 14.2, 9.3),
             "enemy-2": Pose.at(12.0 if mode is ConsolidationModeKind.ONGOING else 14.2, 10.7),
         },
-        game_id=f"p12-queue-{mode.value}-{source_player}",
+        game_id=f"p12-queue-{mode.value}-{source_player}"
+        + (
+            "-p02-2"
+            if source_player == "player-b" and mode is ConsolidationModeKind.ONGOING
+            else ""
+        ),
         charge_fights_first_unit_keys=source_keys,
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",

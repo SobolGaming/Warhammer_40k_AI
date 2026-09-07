@@ -1043,7 +1043,7 @@ def _advance_voluntary_desperate_escape_to_delirium_fnp(
 def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
     with_reroll: bool,
 ) -> None:
-    seed_suffix = 15 if with_reroll else 0
+    seed_suffix = 15 if with_reroll else 1
     game_id = f"phase10o-p09b-delirium-fnp-reroll-{int(with_reroll)}-{seed_suffix}"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
@@ -1206,7 +1206,7 @@ def test_voluntary_desperate_escape_waits_for_delirium_fnp_before_embark(
 
 
 def test_delirium_destruction_reconciles_identity_without_embark_request() -> None:
-    game_id = "phase10o-p09b-delirium-destroyed-0000"
+    game_id = "phase10o-p09b-delirium-destroyed-p02-2"
     lifecycle, status, target_unit_id = _advance_voluntary_desperate_escape_to_delirium_fnp(
         game_id=game_id,
         with_reroll=False,

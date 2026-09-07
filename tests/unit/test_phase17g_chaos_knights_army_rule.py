@@ -1839,7 +1839,7 @@ def test_selected_target_continuation_rejects_completed_provider_in_pending_phas
 def test_selected_target_remaining_effect_request_requires_retained_ancestry() -> None:
     selected_target_record = _selected_target_battle_shock_then_mortal_record()
     lifecycle, bundle, _provider_request = _selected_target_delirium_provider_checkpoint(
-        game_id="phase17g-selected-target-delirium-remaining-mortal-wounds",
+        game_id="phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1",
         selected_target_record=selected_target_record,
     )
     state = lifecycle.state
@@ -1859,7 +1859,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
             request_id=provider_request.request_id,
             option_id="decline",
             result_id=(
-                "phase17g-selected-target-delirium-remaining-mortal-wounds:"
+                "phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1:"
                 f"provider:{provider_decision_index}"
             ),
         )
@@ -1883,7 +1883,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
         forged_request
     )
     result = DecisionResult.for_request(
-        result_id=("phase17g-selected-target-delirium-remaining-mortal-wounds:forged-result"),
+        result_id=("phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1:forged-result"),
         request=forged_request,
         selected_option_id="decline",
     )
@@ -1915,7 +1915,7 @@ def test_selected_target_remaining_effect_request_requires_retained_ancestry() -
             request_id=current_request.request_id,
             option_id="decline",
             result_id=(
-                "phase17g-selected-target-delirium-remaining-mortal-wounds:"
+                "phase17g-selected-target-delirium-remaining-mortal-wounds-p02-1:"
                 f"nested:{nested_decision_index}"
             ),
         )

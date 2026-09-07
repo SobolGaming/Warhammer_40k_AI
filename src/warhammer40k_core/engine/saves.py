@@ -11,6 +11,7 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
+from warhammer40k_core.core.modifiers import bound_modified_roll
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -635,7 +636,7 @@ def _final_roll_for_save_option(*, option: SaveOption, unmodified_roll: int) -> 
     if option.save_kind is SaveKind.INVULNERABLE:
         return unmodified_roll
     cover_modifier = 1 if option.cover_applied else 0
-    return unmodified_roll + option.armor_penetration + cover_modifier
+    return bound_modified_roll(unmodified_roll + option.armor_penetration + cover_modifier)
 
 
 def cover_result_has_bonus(cover_result: BenefitOfCoverResult | None) -> bool:

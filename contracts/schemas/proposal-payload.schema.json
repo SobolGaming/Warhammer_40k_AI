@@ -100,7 +100,7 @@
         "final": {"type": "integer"},
         "raw": {"type": "integer"},
         "value_kind": {
-          "enum": ["numeric", "replacement_dash", "source_dash"],
+          "enum": ["numeric", "replacement_dash", "source_dash", "replacement_zero", "replacement_star"],
           "type": "string"
         }
       },

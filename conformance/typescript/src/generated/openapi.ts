@@ -446,7 +446,7 @@ export interface components {
             applied_modifier_ids: components["schemas"]["proposal-payload--identifier_array.schema"]; base: number;
             characteristic: components["schemas"]["proposal-payload--identifier.schema"]; final: number; raw: number;
             /** @enum {string} */
-            value_kind: "numeric" | "replacement_dash" | "source_dash";
+            value_kind: "numeric" | "replacement_dash" | "source_dash" | "replacement_zero" | "replacement_star";
         };
         "proposal-payload--dice_expression.schema": {
             modifier: number; quantity: number; sides: number;

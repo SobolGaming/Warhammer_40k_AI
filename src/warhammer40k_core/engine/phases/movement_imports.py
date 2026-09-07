@@ -58,6 +58,12 @@ from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveGrantPayload,
     AdvanceMoveHookRegistry,
 )
+from warhammer40k_core.engine.advance_roll import (
+    AdvanceRollRequest,
+    AdvanceRollRequestPayload,
+    AdvanceRollResult,
+    AdvanceRollResultPayload,
+)
 from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
     AircraftMovementPolicyPayload,
@@ -311,6 +317,10 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.mission_setup import MissionSetup
 
 __all__ = (
+    "AdvanceRollRequest",
+    "AdvanceRollRequestPayload",
+    "AdvanceRollResult",
+    "AdvanceRollResultPayload",
     "AbilityCatalogIndex",
     "AdvanceRollModifierContext",
     "AdvanceEligibilityContext",

@@ -3869,3 +3869,153 @@ regression run passes all 57 tests, including the new 12-case cost matrix and
 the per-function condition audit.
 
 PR URL and merge commit: [PR #431](https://github.com/SobolGaming/Warhammer_40k_AI/pull/431); not merged.
+
+
+### P02A / P02B / P02C — Orders 26, 27 and 29
+
+Status: Implemented; all local gates passed and publication pending. The owner explicitly
+requested these three orders as one PR. This combines their shared arithmetic
+and terminal-boundary owner without changing the remaining roadmap sequence.
+
+Finding IDs: `C02-01`, `C02-02`, `C02-03`.
+
+Dependencies and evidence gate: branch base is current merged Order 25,
+`55c06d4dad60c34a77b381d864db7e7d1c3f98a8` (PR #431). P00/S-MIRRORS source policy
+permits the reviewed maintained direct App-data mirror. No exception-pause
+condition was observed. Order 28 is independent of these numeric changes.
+
+Violated invariant: cumulative modifiers must follow exact replacement,
+multiplication, addition, division and subtraction order with one final upward
+rounding step. Characteristic replacements of 0, dash and star are terminal.
+Post-reroll dice, arithmetic, minimum-1 results and rule-specific limits must
+remain distinct; Charge results cannot exceed 12. Detection and Lone Operative
+ranges must end within 9–30 inches after all modifiers.
+
+How it was done: arithmetic omitted division/subtraction, used timing/priority
+to order signed additions and exposed a separate late Damage-halving shortcut.
+Zero replacements could receive later additions. Advance/Charge put modifiers
+inside the raw dice expression; Charge then rejected results outside natural
+2D6 bounds. Modified dice, hit/wound/save results could fall below 1. Random
+Damage incorrectly assigned a modified value to an immutable raw-roll record.
+Detection allowed zero/unbounded range and Lone Operative had a separate path.
+
+How it is done: `core.modifiers` shares exact Fraction arithmetic and canonical
+operation ordering between characteristics and dice. Stable priority/ID ordering
+breaks ties inside an operation step. Typed terminal value kinds survive
+restoration, including Damage conversion; symbolic numeric consumption fails.
+Division replaces the unused late-halving shortcut. `core.modified_dice`
+records post-reroll faces, intrinsic source-expression offset, ordered modifier
+IDs, unbounded arithmetic, minimum-1 value and rule-limited final value.
+Advance/Charge use raw D6/2D6 and consume the bounded result for movement.
+Random Damage preserves the original expression and emits a separate modified
+trace. Hit/wound/save consumers use the same terminal minimum. Detection and
+Lone Operative share one terminal range policy; base, source bonus and Gone to
+Ground penalty are combined before that policy.
+
+Specific authoritative maintained direct App-data mirror rule/statement and
+source ID: 02.02.01 Applying Modifiers, When Modifying Dice Rolls, and Other
+Modified Rules at [40k.app](https://www.40k.app/rules/02-datasheets). The committed
+transcription retains the complete operative clauses for these three findings,
+including the terminal characteristic exceptions, rerolls, above-natural-maximum
+dice, hit/wound ±1 limit, Charge cap and targeting-range bounds.
+
+Provider, URL, App-data version or observation timestamp, transcription SHA-256,
+and source-observation fingerprint: 40k.app, the URL above, observed
+`2026-09-07T02:46:54Z` through its indexed page. Direct retrieval returned HTTP
+403; no App build/version or co-version comparison is asserted. The source is
+project-authoritative under the maintained-mirror policy, not claimed to be a
+direct official capture. Each audit row also records provider non-affiliation.
+
+| Stable source ID | Transcription SHA-256 | RuleEvidence observation | Retained audit observation |
+| --- | --- | --- | --- |
+| `gw-11e-core-modifiers:ordered-modifiers` | `3fe2b25367c04c5648e0b572c9a802a3afd7fe69b03e4e4b11058920d0ce5044` | `0a8006428bebaa7de19f3aad606b23b7b12957e801355533ff95f2d47ea9b0b5` | `ce29e604dda147708960150e85b167e1a195c308d3714b6125da6ec586e5536a` |
+| `gw-11e-core-modifiers:modified-dice-limits` | `21d051f1c9f037ac11d4957a94dd93cba1bab969ffd1f9bf9ffc7c847ddc5d29` | `6029a91ce8f8988f0c6e17c56735d0f017fb5c2b6d141d2988eba3589ddad104` | `4b24c317d0bf608322ce332c58246d2a202834f261228d28db10640fb820422b` |
+| `gw-11e-core-modifiers:detection-lone-operative-limits` | `0bb1eb9564822364cae638f8db886fe5186524fd999f16c382f1d4b73a9afccc` | `52cd07070b01404d9d16ea568f87c51de9977e2ede3ca0d8ee3d9315f51b29ad` | `293e62779134a817b3f697aa75e459c2f53616b9e577bfaef36404d3264c64f8` |
+
+Package hash: `9ec39b854ae8180904d99c361b1f2df78024cdcf6b8362637c3ae5f7e3e632b6`.
+Artifact bytes: `6467f2a059d7ce28d870160782124ecee957f43b8486c9bb5652eb670b8db958`.
+The historical official source `gw-11e-core-rules`, SHA-256
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`, remains
+provenance context; the maintained observation controls the reviewed clauses.
+
+Scope and explicit exclusions: only C02-01/02/03 close here. No faction content,
+new hook family or named handler is added. Order 28 retains individual Psychic
+modifier selection. Order 43 retains target replacement/declaration sequencing;
+future Into the Fray/Command Re-roll orchestration stays with its named owner.
+The numerical Charge cap is implemented now, rather than deferred with those
+independent tasks. Category 02 and whole-engine certification remain open.
+
+Owning state/validation/mutation/event/replay path: pinned source JSON and eager
+loader → shared core arithmetic/typed value records → existing effect registries
+and Charge/Advance/attack owners → engine decision controller and validated
+movement budget → event records, session projection, persistence and exact
+replay. Raw dice and rerolls retain `DiceRollState` ownership. Physical movement
+still requires the existing PathWitness validation. Extraction of Advance
+records, modified dice, Hidden detection and dynamic model blockers keeps frozen
+large modules from growing; the shooting-target size allowlist shrinks.
+
+Decision and viewer-visibility impact: contract 11.4 adds zero/star value kinds
+and documents engine-produced roll traces. Existing client submissions, choice
+families and finite option IDs retain their validation paths. Source/context
+and trace drift fail closed. Engine build identity rejects incompatible old
+persistence/replay instead of inferring missing fields. Existing public Charge
+results are equal in both viewer streams; hidden information continues through
+the shared adapter redaction owner. No new player choice or visibility class.
+
+Regression scenarios and same-bug-class search: pre-fix failures covered missing
+division, operation ordering, terminal zero and missing range bounds. A separate
+pre-fix real Damage-consumer regression reproduced rejection of both positive
+and negative modifiers as raw-roll drift. Coverage includes all 120 operation
+permutations, exact large-integer and fractional arithmetic, signed AP rounding,
+terminal symbols/zero restoration, roll zero versus characteristic zero,
+rerolls, above-natural-maximum Advance, Charge 1/12 limits, drifted/bool payloads,
+real hit/wound/save consumers, intrinsic D6+1 Damage, Hidden cumulative bonuses,
+Lone Operative, facade submission, both viewer streams, checkpoint restoration
+and exact replay. Static audits require shared limit consumers and unmodified
+Advance/Charge expressions. Source loader tests verify retained bytes/evidence
+and reject drift. The repository-wide consumer search includes Battle-shock,
+Desperate Escape, ordinary Charge, Heroic Intervention and reactive movement.
+Existing Heroic Intervention uses natural 2D6, already within 1–12; its separate
+Into the Fray move cap remains separate. Positive reactive distance bonuses are
+movement budgets, not rewrites of raw dice. Conditional Lone Operative's fixed
+12-inch descriptor already lies inside the terminal interval.
+
+Generated artifacts/documentation: versioned modifier source package, retained
+transcription/audit, source authority registry/pins, engine build manifest,
+contract 11.4 schema/examples/manifest and generated TypeScript client, eight-shard
+JUnit duration inventory, adapter contract, README and scope audit. Load and
+execution status are separately recorded for exactly the three supported clauses.
+
+Validation results: the final complete behavioral suite passes once with coverage:
+`6495 passed`, `85.09%`, `765.57s`, 64 xdist workers with work stealing and the
+bundled Node runtime on PATH. It emitted 10 unclosed SQLite connection
+ResourceWarnings. No production code changed after this final run began.
+The subsequent complete no-coverage code-quality suite passes: `385 passed`,
+`305.51s`, 64 workers with work stealing. Its stale source-package inventory
+assertion was updated from 17 to 18 for the added pinned modifier package;
+the corrected audit passes all nine focused tests and the complete quality gate.
+The eight-shard inventory was regenerated from that successful local Windows
+Python 3.14.5 JUnit profile, with its report hash and host description retained;
+the exact fail-closed eight-shard check passes.
+
+Ruff check, Ruff format check (`2831` files), mypy (`2741` source files), pyright
+(zero errors or warnings), all 11 import-linter contracts and all-files
+pre-commit pass. The offline source/audit builder and engine-build identity
+checks pass. The final runtime-tree SHA-256 is
+`e1b27970a0bc4735b724489605068ce31ebbb17ecf37d77c501e1fa094c9f600`.
+External-contract `--check --base-ref origin/main` passes against the unchanged
+reviewed base. TypeScript generated-client/type checks, all five client unit
+tests and two-server HTTP conformance pass (`342` assertions, contract `11.4.0`).
+Installed-wheel smoke verifies `2571` runtime resources, `27` schemas and six
+request families against that same engine identity. The scope/architecture audit
+and `git diff --check` pass. The corrected fixed-seed and stale-expectation
+focused regression run passes all 20 tests before the final complete suite.
+
+The aggregate iteration also identified old expression/zero-result/version
+expectations, coordinated tamper fixtures missing the newly required roll
+stages, and fixed seeds tied to the former event-history hashes. Their intended
+scenario and rejection assertions are retained; deterministic fixture IDs are
+refreshed for the new schema without changing the RNG owner or its history
+semantics.
+
+PR URL and merge commit: PENDING_PUBLICATION_26_27_29. Merge remains an owner action.

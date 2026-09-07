@@ -7,15 +7,14 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
-    ModifiedRollResult,
     RerollComponentSelectionPolicy,
     RerollPermission,
-    UnmodifiedRollResult,
 )
 from warhammer40k_core.core.faction_aliases import (
     CHAOS_SPACE_MARINES_FACTION_ID,
     faction_reference_matches,
 )
+from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability

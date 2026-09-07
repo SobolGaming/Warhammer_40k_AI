@@ -522,6 +522,8 @@ def test_restore_rejects_coordinated_shadow_leadership_and_dice_semantic_tamper(
             component_values = cast(list[int], unmodified["component_values"])
             component_values.append(1)
             unmodified["value"] = cast(int, unmodified["value"]) + 1
+            modified_roll["unbounded_value"] = cast(int, modified_roll["unbounded_value"]) + 1
+            modified_roll["modified_value"] = cast(int, modified_roll["modified_value"]) + 1
             modified_roll["final_value"] = cast(int, modified_roll["final_value"]) + 1
 
     with pytest.raises(GameLifecycleError, match="provider output evidence drifted"):
@@ -547,6 +549,8 @@ def test_restore_rejects_omitted_mandatory_shadow_modifier_application() -> None
     assert unmodified_value >= cast(int, result["leadership_target"])
     modified_roll["modifiers"] = []
     modified_roll["applied_modifier_ids"] = []
+    modified_roll["unbounded_value"] = unmodified_value
+    modified_roll["modified_value"] = unmodified_value
     modified_roll["final_value"] = unmodified_value
     result["total"] = unmodified_value
 
@@ -622,6 +626,8 @@ def test_restore_rejects_out_of_context_inserted_shadow_modifier_application() -
     unmodified_value = cast(int, unmodified["value"])
     modified_roll["modifiers"] = [modifier_payload]
     modified_roll["applied_modifier_ids"] = [modifier_id]
+    modified_roll["unbounded_value"] = unmodified_value
+    modified_roll["modified_value"] = unmodified_value
     modified_roll["final_value"] = unmodified_value
     result["total"] = unmodified_value
 

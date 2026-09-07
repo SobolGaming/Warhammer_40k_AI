@@ -22,7 +22,6 @@ from warhammer40k_core.core.dice import (
     DiceRollSpecError,
     DiceRollState,
     DiceRollStatePayload,
-    ModifiedRollResult,
     RandomCharacteristicRoll,
     RandomCharacteristicTiming,
     RerollComponentSelectionPolicy,
@@ -34,8 +33,8 @@ from warhammer40k_core.core.dice import (
     RollOffRequest,
     RollOffResult,
     RollOffRound,
-    UnmodifiedRollResult,
 )
+from warhammer40k_core.core.modified_dice import ModifiedRollResult, UnmodifiedRollResult
 from warhammer40k_core.engine.decision import (
     DecisionError,
     DecisionOption,
