@@ -72,8 +72,8 @@
         "load_support_status": "loaded",
         "semantic_execution_status": "partial_engine_runtime",
         "runtime_consumer_ids": [
-          "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
-          "warhammer40k_core.engine.rule_model_destruction_fight_continuation:remove_remaining_fight_on_death_models_at_phase_end"
+          "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection",
+          "warhammer40k_core.engine.retained_destruction_cleanup:begin_retained_destruction_cleanup"
         ]
       },
       {
@@ -89,8 +89,8 @@
         "load_support_status": "loaded",
         "semantic_execution_status": "partial_engine_runtime",
         "runtime_consumer_ids": [
-          "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
-          "warhammer40k_core.engine.rule_model_destruction_fight_continuation:remove_remaining_fight_on_death_models_at_phase_end"
+          "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection",
+          "warhammer40k_core.engine.retained_destruction_cleanup:begin_retained_destruction_cleanup"
         ]
       },
       {
@@ -753,7 +753,7 @@
     "source_version": "1.1",
     "updated_source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07"
   },
-  "package_hash": "3608f6c6a26dabb2952482d8a47c1a153244af7bbf602a278b7b9d4eb5df3c3d",
+  "package_hash": "27ecf29d722d8d139420abf538fc00c5ad1cfb922b0b2816f15c46c978e9d84d",
   "source_date": "2026-07-22",
   "source_package_id": "gw-11e-rules-and-event-updates-2026-07-22",
   "source_title": "Warhammer 40,000 July 2026 Rules and Event Updates",

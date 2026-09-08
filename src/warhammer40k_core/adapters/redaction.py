@@ -82,6 +82,9 @@ _INTERNAL_MODEL_DESTRUCTION_AUTHORITY_KEYS = frozenset(
         "model_destruction_cause_authorities",
         "model_destruction_cause_id",
         "parent_model_destruction_cause_id",
+        "cause_id",
+        "logical_death_event_id",
+        "retention_sha256",
     }
 )
 
@@ -468,6 +471,12 @@ def _event_record_hidden_from_context(
         MODEL_LOGICAL_DEATH_RECORDED_EVENT,
         MORTAL_WOUND_APPLICATION_STARTED_EVENT,
         MORTAL_WOUND_MODEL_ALLOCATED_EVENT_TYPE,
+        "fight_on_death_retention_opened",
+        "fight_on_death_retention_trigger_resolved",
+        "fight_on_death_destruction_suspended",
+        "fight_on_death_destruction_progressed",
+        "retained_shooting_started",
+        "hazardous_destruction_routing_started",
     }:
         return True
     if _player_owned_secret_event_hidden_from_context(payload=payload, viewer=viewer):

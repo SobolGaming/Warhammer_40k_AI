@@ -51,9 +51,9 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 from warhammer40k_core.engine.rules_unit_geometry import (
-    placed_alive_geometry_models_for_rules_unit,
+    present_geometry_models_for_rules_unit,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_for_state
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
 
@@ -349,7 +349,7 @@ class CatalogCommandRestorationRuntime:
             raise GameLifecycleError("Catalog command restoration source lookup requires state.")
         index = self.ability_indexes_by_player_id[player_id]
         sources: list[_CommandRestorationSource] = []
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        for view in rules_unit_views_for_state(state=state):
             if view.owner_player_id != player_id:
                 continue
             for component in view.components:
@@ -427,7 +427,7 @@ class CatalogCommandRestorationRuntime:
             raise GameLifecycleError("Catalog command restoration target lookup requires state.")
         source_models = tuple(
             model
-            for model in placed_alive_geometry_models_for_rules_unit(
+            for model in present_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=source.source_rules_unit.unit_instance_id,
             )
@@ -436,7 +436,7 @@ class CatalogCommandRestorationRuntime:
         if len(source_models) > 1:
             raise GameLifecycleError("Catalog command restoration source model is not placed.")
         targets: list[RulesUnitView] = []
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        for view in rules_unit_views_for_state(state=state):
             if view.owner_player_id != source.source_rules_unit.owner_player_id:
                 continue
             if not unit_has_required_keywords(
@@ -459,7 +459,7 @@ class CatalogCommandRestorationRuntime:
             if any(
                 source_model.range_to(target_model) <= source.descriptor.distance_inches
                 for source_model in source_models
-                for target_model in placed_alive_geometry_models_for_rules_unit(
+                for target_model in present_geometry_models_for_rules_unit(
                     state=state,
                     unit_instance_id=view.unit_instance_id,
                 )

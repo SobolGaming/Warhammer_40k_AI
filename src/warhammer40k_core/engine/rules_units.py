@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Literal, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -54,6 +54,7 @@ class RulesUnitView:
     attached_unit: AttachedUnitFormation | None = None
     split_record: UnitSplitRecord | None = None
     split_index: int | None = None
+    retained_model_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -96,6 +97,10 @@ class RulesUnitView:
                 raise GameLifecycleError("Split rules-unit view has conflicting formation owners.")
         elif self.split_index is not None:
             raise GameLifecycleError("Split rules-unit index lacks a split record.")
+        retained = _validated_sorted_identity_ids("retained_model_ids", self.retained_model_ids)
+        models = {model.model_instance_id: model for model in self.own_models}
+        if any(model_id not in models or models[model_id].is_alive for model_id in retained):
+            raise GameLifecycleError("Rules-unit retained model authority drift.")
 
     @property
     def component_unit_instance_ids(self) -> tuple[str, ...]:
@@ -108,7 +113,9 @@ class RulesUnitView:
     @property
     def keywords(self) -> tuple[str, ...]:
         keywords = {
-            keyword for component in self.living_components for keyword in component.unit.keywords
+            keyword
+            for component in self.rules_present_components
+            for keyword in component.unit.keywords
         }
         return tuple(sorted(keywords))
 
@@ -116,7 +123,7 @@ class RulesUnitView:
     def faction_keywords(self) -> tuple[str, ...]:
         keywords = {
             keyword
-            for component in self.living_components
+            for component in self.rules_present_components
             for keyword in component.unit.faction_keywords
         }
         return tuple(sorted(keywords))
@@ -128,6 +135,18 @@ class RulesUnitView:
             component
             for component in self.components
             if any(model.is_alive for model in component.unit.own_models)
+        )
+
+    @property
+    def rules_present_components(self) -> tuple[RulesUnitComponent, ...]:
+        """Components retaining keyword and ability authority after logical death."""
+        return tuple(
+            component
+            for component in self.components
+            if any(
+                model.is_alive or model.model_instance_id in self.retained_model_ids
+                for model in component.unit.own_models
+            )
         )
 
     @property
@@ -277,10 +296,25 @@ def rules_unit_display_name(rules_unit: RulesUnitView) -> str:
 
 
 def rules_unit_view_by_id(*, state: GameState, unit_instance_id: str) -> RulesUnitView:
-    return rules_unit_view_from_armies(
+    from warhammer40k_core.engine.retained_model_presence import retained_model_ids
+
+    view = rules_unit_view_from_armies(
         armies=tuple(state.army_definitions),
         unit_instance_id=unit_instance_id,
     )
+    return rules_unit_view_with_retained_models(
+        view=view,
+        retained_model_ids=()
+        if state.battlefield_state is None
+        else retained_model_ids(state=state),
+    )
+
+
+def rules_unit_view_with_retained_models(
+    *, view: RulesUnitView, retained_model_ids: tuple[str, ...]
+) -> RulesUnitView:
+    own_ids = {model.model_instance_id for model in view.own_models}
+    return replace(view, retained_model_ids=tuple(sorted(own_ids.intersection(retained_model_ids))))
 
 
 def rules_unit_view_from_armies(
@@ -373,7 +407,7 @@ def placed_alive_rules_unit_views(*, state: GameState) -> tuple[RulesUnitView, .
         unavailable_unit_ids.update(reserve_state.embarked_unit_instance_ids)
 
     present: list[RulesUnitView] = []
-    for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+    for view in rules_unit_views_for_state(state=state):
         identity_ids = {view.unit_instance_id, *view.component_unit_instance_ids}
         if identity_ids.intersection(unavailable_unit_ids):
             continue
@@ -383,6 +417,16 @@ def placed_alive_rules_unit_views(*, state: GameState) -> tuple[RulesUnitView, .
         ):
             present.append(view)
     return tuple(present)
+
+
+def rules_unit_views_for_state(*, state: GameState) -> tuple[RulesUnitView, ...]:
+    from warhammer40k_core.engine.retained_model_presence import retained_model_ids
+
+    retained_ids = () if state.battlefield_state is None else retained_model_ids(state=state)
+    return tuple(
+        rules_unit_view_with_retained_models(view=view, retained_model_ids=retained_ids)
+        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+    )
 
 
 def current_rules_unit_views_for_identity(

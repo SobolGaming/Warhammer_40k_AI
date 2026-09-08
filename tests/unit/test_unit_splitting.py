@@ -662,6 +662,94 @@ def test_core_splitting_rule_grants_no_permission_and_catalog_consumer_is_regist
     assert UNIT_SPLIT_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(rule)
 
 
+@pytest.mark.parametrize("include_component_aliases", [False, True])
+def test_retained_attack_grant_follows_split_predecessor_once_per_model(
+    include_component_aliases: bool,
+) -> None:
+    from tests.generic_modifier_helpers import generic_effect
+
+    from warhammer40k_core.engine.destruction_reaction_kind import DestructionReactionKind
+    from warhammer40k_core.engine.event_log import JsonValue
+    from warhammer40k_core.engine.retained_attack_grants import persisted_retained_attack_sources
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        retained_attack_sources_2026_09 as retained_sources,
+    )
+
+    session = _session_at_split(
+        phase11c_config(
+            player_a_units=(
+                default_unit_selection("bodyguard"),
+                unit_selection(
+                    unit_selection_id="leader",
+                    datasheet_id="core-character-leader",
+                    model_profile_id="core-character-leader",
+                    model_count=1,
+                ),
+            ),
+            player_a_attachment_declarations=(
+                AttachmentDeclaration(
+                    source_unit_selection_id="leader",
+                    bodyguard_unit_selection_id="bodyguard",
+                ),
+            ),
+        )
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    (original,) = rules_unit_views_from_armies(armies=(state.army_definitions[0],))
+    rule = retained_sources.rule_ir_for_source(retained_sources.UNENDING_FIDELITY_SOURCE_ID)
+    clause = rule.clauses[0]
+    targets = (
+        (original.unit_instance_id, *original.component_unit_instance_ids)
+        if include_component_aliases
+        else (original.unit_instance_id,)
+    )
+    effect = generic_effect(
+        effect_id="test:retained-predecessor-grant",
+        owner_player_id="player-a",
+        target_unit_instance_ids=targets,
+        target_kind="selected_unit",
+        effect_kind="grant_ability",
+        parameters={},
+    )
+    payload = effect.effect_payload
+    assert isinstance(payload, dict)
+    payload = {
+        **payload,
+        "effect": cast(JsonValue, clause.effects[0].to_payload()),
+        "rule_ir_hash": rule.ir_hash(),
+        "clause_id": clause.clause_id,
+    }
+    effect = replace(
+        effect,
+        source_rule_id=rule.source_id,
+        expiration=EffectExpiration.end_of_battle(),
+        effect_payload=payload,
+    )
+    state.record_persisting_effect(effect)
+    _complete_split(session)
+    checkpoint = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(checkpoint)
+    assert restored.to_payload() == checkpoint
+    state = restored.state
+    assert state is not None
+    successors = rules_unit_views_from_armies(armies=(state.army_definitions[0],))
+    assert len(successors) == 2
+    for view in successors:
+        assert view.unit_instance_id != original.unit_instance_id
+        for model in view.own_models:
+            sources = persisted_retained_attack_sources(
+                state=state, model_instance_id=model.model_instance_id
+            )
+            assert len(sources) == 1, (view.unit_instance_id, model.model_instance_id)
+            assert sources[0].reaction_kind is DestructionReactionKind.SHOOT_OR_FIGHT_ON_DEATH
+            assert sources[0].source_rule_id == rule.source_id
+    opponent = state.army_definitions[1].units[0].own_models[0]
+    assert not persisted_retained_attack_sources(
+        state=state, model_instance_id=opponent.model_instance_id
+    )
+
+
 def test_leader_effect_follows_its_source_models_without_granting_to_sibling() -> None:
     session = _session_at_split(
         phase11c_config(

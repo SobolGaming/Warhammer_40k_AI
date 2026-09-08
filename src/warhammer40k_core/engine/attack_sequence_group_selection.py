@@ -552,17 +552,7 @@ def apply_destruction_reaction_decision(
         selected_source is not None
         and selected_source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
     ):
-        restore_selected_model_awaiting_fight_on_death(
-            state=state,
-            decisions=decisions,
-            model_destroyed_event_id=context["model_destroyed_event_id"],
-            model_instance_id=context["model_instance_id"],
-            source_id=selected_source.source_id,
-            source_rule_id=selected_source.source_rule_id,
-            source_phase=attack_sequence.source_phase,
-            activation_result_id=result.result_id,
-            completion_context=cast(JsonValue, context),
-        )
+        raise GameLifecycleError("Fight On Death must be selected before physical removal.")
     decisions.event_log.append(
         "destruction_reaction_resolved",
         {
@@ -892,7 +882,12 @@ def _continue_hazardous_after_mortal_wound_feel_no_pain(
         source_context=source_context,
         application=routed.application,
     )
-    return None, already_allocated_model_ids, None
+    from warhammer40k_core.engine.hazardous_retention import finish_retained_hazardous_damage
+
+    status = finish_retained_hazardous_damage(
+        state=state, decisions=decisions, sequence=attack_sequence, routed=routed
+    )
+    return (attack_sequence if status is not None else None), already_allocated_model_ids, status
 
 
 def _continue_deadly_demise_after_mortal_wound_feel_no_pain(

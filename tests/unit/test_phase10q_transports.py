@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -63,7 +64,9 @@ from warhammer40k_core.engine.event_log import (
     JsonValue,
     validate_json_value,
 )
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
+from warhammer40k_core.engine.fight_activation_completion import (
+    complete_active_fight_activation as _complete_active_fight_activation,
+)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FightPhaseState,
@@ -118,7 +121,6 @@ from warhammer40k_core.engine.phases import (
 )
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
-    _complete_active_fight_activation,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.movement import (
     DECLINE_EMBARK_OPTION_ID,
@@ -7575,6 +7577,7 @@ def test_combat_disembark_can_only_set_up_engaged_with_transport_engagement() ->
 
 
 def test_combat_disembark_uses_retained_attached_engagement_as_canonical_permission() -> None:
+    retention_decisions = DecisionController()
     scenario, passenger, transport, bodyguard, _catalog = _transport_scenario(enemy_attached=True)
     leader = scenario.armies[1].unit_by_id("army-beta:enemy-leader")
     disembark_scenario = _without_unit(scenario, passenger.unit_instance_id)
@@ -7615,7 +7618,8 @@ def test_combat_disembark_uses_retained_attached_engagement_as_canonical_permiss
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=leader_placement.model_placements[0],
         effect_id="phase10q-combat-disembark-retained-attached-leader",

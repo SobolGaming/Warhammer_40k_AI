@@ -741,8 +741,8 @@ def test_fight_movement_separates_selectable_targets_from_physical_geometry() ->
         for node in ast.walk(target_inventory)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
-    assert "placed_alive_rules_unit_views" in target_inventory_calls
-    assert "fight_present_rules_unit_views" not in target_inventory_calls
+    assert "fight_present_rules_unit_views" in target_inventory_calls
+    assert "placed_alive_rules_unit_views" not in target_inventory_calls
 
     physical_inventory = _function_node(
         path=FIGHT_RULES_UNIT_MOVEMENT,
@@ -785,7 +785,7 @@ def test_fight_movement_separates_selectable_targets_from_physical_geometry() ->
         for node in ast.walk(targetable_inventory)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
-    assert "placed_alive_rules_unit_views" in targetable_inventory_calls
+    assert "fight_present_rules_unit_views" in targetable_inventory_calls
 
     physical_blockers = _function_node(
         path=FIGHT_RULES_UNIT_MOVEMENT,
@@ -820,7 +820,7 @@ def test_fight_movement_separates_selectable_targets_from_physical_geometry() ->
     }
     assert {
         "rules_unit_view_from_armies",
-        "scenario_rules_unit_has_placed_alive_model",
+        "scenario_rules_unit_has_present_model",
     }.issubset(standalone_target_calls)
 
     standalone_physical_blockers = _function_node(
@@ -937,7 +937,7 @@ def test_phase_current_engagement_consumers_use_shared_physical_owner() -> None:
     assert "is_within_engagement_range" not in ast.unparse(turn_start)
 
 
-def test_catalog_engagement_consumers_require_living_authority_and_shared_geometry() -> None:
+def test_catalog_engagement_consumers_require_present_authority_and_shared_geometry() -> None:
     for path, function_name in (
         (CATALOG_CONDITIONAL_CHARGE_RUNTIME, "_models_are_engaged"),
         (CATALOG_DESPERATE_ESCAPE, "_target_within_source_engagement"),
@@ -947,7 +947,7 @@ def test_catalog_engagement_consumers_require_living_authority_and_shared_geomet
         consumer = _function_node(path=path, function_name=function_name)
         calls = _direct_call_names(consumer)
         assert {
-            "rules_unit_has_placed_alive_model",
+            "rules_unit_has_present_model",
             "scenario_rules_units_are_physically_engaged",
         }.issubset(calls)
         assert "is_within_engagement_range" not in ast.unparse(consumer)
@@ -996,7 +996,7 @@ def test_content_and_stratagem_engagement_consumers_keep_living_authority_separa
     ):
         consumer = _function_node(path=path, function_name=function_name)
         calls = _direct_call_names(consumer)
-        assert "rules_unit_has_placed_alive_model" in calls
+        assert "rules_unit_has_present_model" in calls
         assert physical_call in calls
 
     corsair_engagement = _function_node(
@@ -1194,9 +1194,8 @@ def test_fight_movement_restore_authenticates_target_authority_at_the_right_boun
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     assert "current_rules_unit_views_for_canonical_identity" in emitter_calls
-    assert any(
-        isinstance(node, ast.Attribute) and node.attr == "is_alive" for node in ast.walk(emitter)
-    )
+    assert "model_is_present_on_battlefield" in emitter_calls
+    assert "present_model_instance_ids" in ast.unparse(emitter)
 
 
 def test_battlefield_transition_history_has_one_shared_event_registry() -> None:
@@ -1225,14 +1224,15 @@ def test_battlefield_transition_history_has_one_shared_event_registry() -> None:
     )
 
 
-def test_attack_target_geometry_is_living_only_without_weakening_stratagem_presence() -> None:
+def test_attack_and_stratagem_target_geometry_share_retained_presence() -> None:
     shooting_candidate = _function_node(path=SHOOTING_TARGETS, function_name="_target_candidate")
     shooting_calls = {
         node.func.id
         for node in ast.walk(shooting_candidate)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
-    assert "_geometry_models_for_target_placements" in shooting_calls
+    assert "_geometry_models_for_unit_placements" in shooting_calls
+    assert "_geometry_models_for_target_placements" not in shooting_calls
 
     melee_targets = _function_node(path=FIGHT_RESOLUTION, function_name="melee_target_unit_ids")
     melee_calls = {
@@ -1246,10 +1246,8 @@ def test_attack_target_geometry_is_living_only_without_weakening_stratagem_prese
         path=FIGHT_GEOMETRY,
         function_name="geometry_models_for_fight_attack_target_unit",
     )
-    assert any(
-        isinstance(node, ast.Attribute) and node.attr == "is_alive"
-        for node in ast.walk(fight_target_geometry)
-    )
+    assert "geometry_models_for_fight_unit" in _direct_call_names(fight_target_geometry)
+    assert ".is_alive" not in ast.unparse(fight_target_geometry)
 
     stratagem_geometry = _function_node(
         path=STRATAGEMS_GEOMETRY,
@@ -1265,6 +1263,25 @@ def test_attack_target_geometry_is_living_only_without_weakening_stratagem_prese
 
 
 def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> None:
+    living_range_consumers = {
+        ENGINE / "primary_mission_action_lifecycle_policy.py",
+        ENGINE / "primary_mission_action_options.py",
+    }
+    present_range_consumers = {
+        ENGINE / "catalog_attack_context_rule_runtime.py",
+        ENGINE / "generic_target_restriction_effects.py",
+        ENGINE / "lone_operative.py",
+        SHOOTING_TARGETING,
+    }
+    present_los_consumers = {
+        ENGINE / "catalog_movement_target_pair_runtime.py",
+        CATALOG_RULE_CONSUMPTION,
+        CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT,
+        SHOOTING_TARGETING,
+        STRATAGEMS_GEOMETRY,
+        ENGINE / "faction_content" / "warhammer_40000_11th" / "tau_empire" / "army_rule.py",
+    }
+    observed_range_consumers: set[Path] = set()
     physical_los_calls: list[tuple[Path, int]] = []
     range_call_count = 0
     los_call_count = 0
@@ -1277,16 +1294,21 @@ def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> Non
             keywords = {keyword.arg: keyword.value for keyword in node.keywords}
             if node.func.id == "target_within_shooting_selection_range":
                 range_call_count += 1
+                observed_range_consumers.add(path)
+                assert path in living_range_consumers | present_range_consumers
+                living_only = path in living_range_consumers
                 for keyword_name in (
                     "placed_alive_attacker_models_only",
                     "placed_alive_target_models_only",
                 ):
                     value = keywords.get(keyword_name)
                     assert isinstance(value, ast.Constant), (
-                        f"{path.relative_to(ROOT)}:{node.lineno} must pass {keyword_name}=True"
+                        f"{path.relative_to(ROOT)}:{node.lineno} must explicitly pass "
+                        f"{keyword_name}"
                     )
-                    assert value.value is True, (
-                        f"{path.relative_to(ROOT)}:{node.lineno} must pass {keyword_name}=True"
+                    assert value.value is living_only, (
+                        f"{path.relative_to(ROOT)}:{node.lineno} must pass "
+                        f"{keyword_name}={living_only}"
                     )
             if node.func.id == "unit_has_line_of_sight_to_target":
                 los_call_count += 1
@@ -1304,8 +1326,9 @@ def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> Non
 
     assert range_call_count > 0
     assert los_call_count > 0
-    assert len(physical_los_calls) == 1
-    assert physical_los_calls[0][0] == STRATAGEMS_GEOMETRY
+    assert observed_range_consumers == living_range_consumers | present_range_consumers
+    assert len(physical_los_calls) == len(present_los_consumers)
+    assert {path for path, _ in physical_los_calls} == present_los_consumers
 
     stratagem_visibility = _function_node(
         path=STRATAGEMS_GEOMETRY,

@@ -226,6 +226,7 @@ def _handler_unavailable_reason(
         if context.active_player_id == context.player_id:
             return "defensive_stratagem_requires_opponent_turn"
         selected_context_error = _selected_target_context_error(
+            state=state,
             context=context,
             target_binding=target_binding,
         )

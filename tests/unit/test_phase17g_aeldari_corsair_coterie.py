@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import pytest
 from tests.characteristic_modifier_helpers import resolve_objective_control_handler
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
@@ -112,7 +113,6 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
     FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
 )
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FightPhaseState,
@@ -1052,6 +1052,7 @@ def test_corsair_stratagem_validators_reject_ineligible_targets_and_phase_state(
 
 
 def test_vengeful_sorrow_uses_retained_physical_engagement_and_keeps_fod_target_exception() -> None:
+    retention_decisions = DecisionController()
     engaged_state, _corsair_army, _enemy_army = _corsair_state(
         phase=BattlePhase.SHOOTING,
         active_player_id="player-b",
@@ -1070,7 +1071,8 @@ def test_vengeful_sorrow_uses_retained_physical_engagement_and_keeps_fod_target_
         damage=enemy_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=engaged_state,
         placement=enemy_placement,
         effect_id="phase17g:corsair:vengeful-sorrow:retained-enemy",
@@ -1110,7 +1112,8 @@ def test_vengeful_sorrow_uses_retained_physical_engagement_and_keeps_fod_target_
         damage=corsair_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=retained_target_state,
         placement=corsair_placement,
         effect_id="phase17g:corsair:vengeful-sorrow:retained-target",

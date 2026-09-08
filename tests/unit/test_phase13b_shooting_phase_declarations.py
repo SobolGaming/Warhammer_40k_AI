@@ -2230,7 +2230,7 @@ def test_locked_in_combat_big_guns_and_pistol_interactions_are_declaration_state
     assert blast_candidates[0].violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
 
 
-def test_retained_only_enemy_locks_living_shooter_but_is_not_selectable() -> None:
+def test_retained_only_enemy_locks_living_shooter_and_remains_a_visible_target() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_specs=(
@@ -2317,7 +2317,11 @@ def test_retained_only_enemy_locks_living_shooter_but_is_not_selectable() -> Non
     }
 
     assert candidates[retained_enemy.unit_instance_id].violation_code is (
-        ShootingTargetViolationCode.TARGET_HAS_NO_PLACED_LIVING_MODELS
+        ShootingTargetViolationCode.LOCKED_IN_COMBAT
+    )
+    assert (
+        retained_model_ids[0]
+        in candidates[retained_enemy.unit_instance_id].target_visible_model_ids
     )
     assert candidates[living_enemy.unit_instance_id].violation_code is (
         ShootingTargetViolationCode.LOCKED_IN_COMBAT
@@ -2397,8 +2401,8 @@ def test_retained_base_alone_establishes_mixed_target_engagement_context() -> No
     assert without_retained_base.is_legal
     assert with_retained_base.violation_code is ShootingTargetViolationCode.LOCKED_IN_COMBAT
     assert with_retained_base.target_visible_model_ids
-    assert retained_model_id not in with_retained_base.target_visible_model_ids
-    assert retained_model_id not in with_retained_base.target_in_range_model_ids
+    assert retained_model_id in with_retained_base.target_visible_model_ids
+    assert retained_model_id in with_retained_base.target_in_range_model_ids
 
 
 def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() -> None:

@@ -28,7 +28,6 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
     RuntimeContentEventIndex,
 )
-from warhammer40k_core.engine.fight_on_death import remove_models_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_decisions import request_tactical_secondary_score
 from warhammer40k_core.engine.objective_control import (
@@ -342,20 +341,17 @@ class BattleRoundFlow:
             army_catalog=self._army_catalog,
         )
         if state.battlefield_state is not None:
-            removed_fight_on_death_model_ids = remove_models_awaiting_fight_on_death(state=state)
-            if removed_fight_on_death_model_ids:
-                decisions.event_log.append(
-                    "fight_on_death_models_removed",
-                    validate_json_value(
-                        {
-                            "game_id": state.game_id,
-                            "battle_round": state.battle_round,
-                            "phase": current_phase.value,
-                            "model_instance_ids": list(removed_fight_on_death_model_ids),
-                            "reason": "phase_end",
-                        }
-                    ),
-                )
+            from warhammer40k_core.engine.retained_destruction_cleanup import (
+                begin_retained_destruction_cleanup,
+            )
+
+            retention_status = begin_retained_destruction_cleanup(
+                state=state,
+                decisions=decisions,
+                reason="phase_end",
+            )
+            if retention_status is not None:
+                return retention_status
         _apply_phase_end_objective_control_hooks(
             state=state,
             decisions=decisions,

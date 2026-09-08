@@ -47,7 +47,6 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.fight_order import CHARGE_FIGHTS_FIRST_EFFECT_KIND
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -69,6 +68,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -412,6 +412,120 @@ def test_excessive_vigour_includes_the_charged_source_unit() -> None:
     assert modified.armor_penetration.final == melee.armor_penetration.final - 1
 
 
+@pytest.mark.parametrize("retain_source", [True, False])
+def test_order_30_aura_preserves_retained_source_and_target(retain_source: bool) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+
+    from warhammer40k_core.engine.decision_controller import DecisionController
+
+    fixture = _runtime_fixture()
+    unit = fixture.prince if retain_source else fixture.escort
+    model = unit.own_models[0]
+    battlefield = fixture.state.battlefield_state
+    assert battlefield is not None
+    # Only this escort model is in range of the real catalog Aura.
+    escort_placement = battlefield.unit_placement_by_id(fixture.escort.unit_instance_id)
+    fixture.state.replace_battlefield_state(
+        battlefield.with_unit_placement(
+            replace(
+                escort_placement,
+                model_placements=tuple(
+                    placement
+                    if index == 0
+                    else replace(placement, pose=Pose.at(70, 20 + index * 2))
+                    for index, placement in enumerate(escort_placement.model_placements)
+                ),
+            )
+        )
+    )
+    assert fixture.state.battlefield_state is not None
+    placement = fixture.state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    apply_damage_to_model(
+        state=fixture.state,
+        target_unit_instance_id=unit.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+        remove_destroyed_model=False,
+    )
+    retain_destroyed_model_for_fixture(
+        state=fixture.state,
+        placement=placement,
+        effect_id="order-30-aura-retention",
+        source_rule_id="order-30-aura-retention-source",
+        source_phase=BattlePhase.FIGHT,
+        decisions=DecisionController(),
+    )
+    _record_charge_move(fixture.state, fixture.escort)
+    source_id = _generated_rule(generator.EXCESSIVE_VIGOUR_ROW_ID).source_id
+    binding = next(
+        binding
+        for binding in fixture.runtime.weapon_profile_modifier_bindings()
+        if binding.source_id == source_id
+    )
+    melee = _weapon_profile(fixture.package, TORMENTORS_ID, "Close combat weapon")
+    modified = binding.handler(
+        WeaponProfileModifierContext(
+            state=fixture.state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=fixture.escort.unit_instance_id,
+            attacker_model_instance_id=fixture.escort.own_models[0].model_instance_id,
+            target_unit_instance_id=fixture.enemy_prince.unit_instance_id,
+            weapon_profile=melee,
+        )
+    )
+    assert modified.armor_penetration.final == melee.armor_penetration.final - 1
+
+
+@pytest.mark.parametrize("retain_source", [True, False])
+@pytest.mark.parametrize("model_scoped", [True, False])
+def test_order_30_keyworded_proximity_preserves_retained_geometry(
+    retain_source: bool, model_scoped: bool
+) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.unit_proximity import (
+        rules_unit_within_friendly_keyworded_models,
+        rules_unit_within_friendly_keyworded_units,
+    )
+
+    fixture = _runtime_fixture()
+    model = fixture.prince.own_models[0]
+    battlefield = fixture.state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.model_placement_by_id(model.model_instance_id)
+    apply_damage_to_model(
+        state=fixture.state,
+        target_unit_instance_id=fixture.prince.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+        remove_destroyed_model=False,
+    )
+    retain_destroyed_model_for_fixture(
+        state=fixture.state,
+        placement=placement,
+        effect_id="order-30-proximity-retention",
+        source_rule_id="order-30-proximity-retention-source",
+        source_phase=BattlePhase.FIGHT,
+        decisions=DecisionController(),
+    )
+    query = (
+        rules_unit_within_friendly_keyworded_models
+        if model_scoped
+        else rules_unit_within_friendly_keyworded_units
+    )
+    assert query(
+        state=fixture.state,
+        source_unit_instance_id=(
+            fixture.prince if retain_source else fixture.escort
+        ).unit_instance_id,
+        required_keyword_sequence=("INFANTRY" if retain_source else "MONSTER",),
+        max_range_inches=3,
+    )
+
+
 def test_two_excessive_vigour_sources_do_not_stack_the_same_aura_rule() -> None:
     fixture = _runtime_fixture(include_second_aura_source=True)
     assert fixture.second_prince is not None
@@ -495,7 +609,7 @@ def test_ecstatic_death_registers_idempotent_serializable_two_plus_model_source(
 
 
 def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() -> None:
-    session, attacker, target = _ecstatic_death_fight_session(game_id="ecstatic-full-p05a-001")
+    session, attacker, target = _ecstatic_death_fight_session(game_id="ecstatic-full-p05b-002")
     state = session.lifecycle.state
     assert state is not None
     target_model_id = target.own_models[0].model_instance_id
@@ -532,18 +646,15 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
     assert reaction_request.actor_id == "player-b"
     reaction_payload = cast(dict[str, JsonValue], reaction_request.payload)
     destruction_context = cast(dict[str, JsonValue], reaction_payload["destruction_context"])
-    provenance = cast(dict[str, JsonValue], destruction_context["destruction_provenance"])
-    assert provenance["attack_kind"] == "melee"
+    assert destruction_context["context_kind"] == "fight_on_death_retention"
     assert destruction_context["model_instance_id"] == target_model_id
-    assert not model_is_present_on_battlefield(
-        state=state,
-        model_instance_id=target_model_id,
-    )
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.model_placement_or_none(target_model_id) is not None
 
     trigger_event = next(
         event
         for event in session.lifecycle.decision_controller.event_log.records
-        if event.event_type == "destruction_reaction_trigger_rolled"
+        if event.event_type == "fight_on_death_retention_trigger_resolved"
         and cast(dict[str, JsonValue], event.payload)["model_instance_id"] == target_model_id
     )
     trigger_payload = cast(dict[str, JsonValue], trigger_event.payload)
@@ -551,7 +662,9 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
     original_result = cast(dict[str, JsonValue], trigger_roll["original_result"])
     roll_spec = cast(dict[str, JsonValue], original_result["spec"])
     assert roll_spec["roll_type"] == "emperors_children_ecstatic_death"
-    assert trigger_payload["trigger_roll_threshold"] == 2
+    trigger_source = cast(dict[str, JsonValue], trigger_payload["source"])
+    source_payload = cast(dict[str, JsonValue], trigger_source["payload"])
+    assert source_payload["trigger_roll_threshold"] == 2
     assert trigger_payload["triggered"] is True
     assert cast(int, trigger_roll["current_total"]) >= 2
 
@@ -573,7 +686,7 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
         model_instance_id=target_model_id,
     )
     assert any(
-        event.event_type == "fight_on_death_model_awaiting_attack"
+        event.event_type == "fight_on_death_retention_selected"
         for event in session.lifecycle.decision_controller.event_log.records
     )
     fight_state = state.fight_phase_state
@@ -624,21 +737,18 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
         model_instance_id=target_model_id,
     )
     attacker_model_id = attacker.own_models[0].model_instance_id
-    assert not model_is_present_on_battlefield(
-        state=state,
-        model_instance_id=attacker_model_id,
-    )
-    assert all(
-        cast(dict[str, JsonValue], event.payload)["model_instance_id"] != attacker_model_id
+    assert not any(
+        cast(dict[str, JsonValue], event.payload)["model_instance_id"] == attacker_model_id
+        and cast(dict[str, JsonValue], event.payload)["triggered"] is True
         for event in session.lifecycle.decision_controller.event_log.records
-        if event.event_type == "destruction_reaction_trigger_rolled"
+        if event.event_type == "fight_on_death_retention_trigger_resolved"
     )
     cleanup_payload = next(
         cast(dict[str, JsonValue], event.payload)
         for event in reversed(session.lifecycle.decision_controller.event_log.records)
-        if event.event_type == "fight_on_death_models_removed"
+        if event.event_type == "fight_on_death_destruction_completed"
     )
-    assert cleanup_payload["model_instance_ids"] == [target_model_id]
+    assert cleanup_payload["model_instance_id"] == target_model_id
     assert cleanup_payload["reason"] == "unit_fight_completed"
     activation_payload = next(
         cast(dict[str, JsonValue], event.payload)
@@ -669,25 +779,24 @@ def test_ecstatic_death_destroyed_unit_uses_normal_fight_selection_and_replay() 
 
 
 @pytest.mark.parametrize(
-    ("corruption", "expected_message"),
+    "corruption",
     [
-        ("context_kind", "completion context kind is unsupported"),
-        ("model_destroyed_event", "one authoritative model_destroyed event"),
-        ("missing_reaction_record", "must match one destruction reaction record"),
-        ("orphan_result", "activation result decision binding drift"),
-        ("wrong_decision", "activation result decision binding drift"),
+        "context_kind",
+        "logical_death_event",
+        "missing_reaction_record",
+        "orphan_result",
+        "wrong_decision",
     ],
 )
 def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
     corruption: str,
-    expected_message: str,
 ) -> None:
-    session, attacker, _target = _ecstatic_death_fight_session(game_id="ecstatic-p05a-seed-009")
+    session, attacker, _target = _ecstatic_death_fight_session(game_id="ecstatic-full-p05b-002")
     status = _advance_ecstatic_death_session(
         session=session,
         status=session.advance_until_decision_or_terminal(),
         stop_at_decision_type="select_fight_activation",
-        result_id_prefix="ecstatic-death-integrity:before-attacker",
+        result_id_prefix="ecstatic-death:before-attacker",
     )
     activation_request = status.decision_request
     assert activation_request is not None
@@ -698,13 +807,13 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
             for option in activation_request.options
             if attacker.unit_instance_id in option.option_id
         ),
-        result_id="ecstatic-death-integrity:attacker-activation",
+        result_id="ecstatic-death:attacker-activation",
     )
     status = _advance_ecstatic_death_session(
         session=session,
         status=status,
         stop_at_decision_type=SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-        result_id_prefix="ecstatic-death-integrity:attacker",
+        result_id_prefix="ecstatic-death:attacker",
         melee_profile_suffix=":sweep",
     )
     reaction_request = status.decision_request
@@ -716,31 +825,28 @@ def test_ecstatic_death_restore_rejects_contextual_fight_on_death_drift(
             for option in reaction_request.options
             if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
         ),
-        result_id="ecstatic-death-integrity:accept",
+        result_id="ecstatic-death:accept",
     )
     payload = json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True))
     awaiting_effect = next(
         effect
         for effect in payload["state"]["persisting_effects"]
-        if effect["effect_payload"].get("effect_kind") == "fight_on_death_awaiting_attack"
+        if effect["effect_payload"].get("effect_kind") == "retained_model_destruction"
     )
-    effect_payload = awaiting_effect["effect_payload"]
-    context = effect_payload["completion_context"]
+    destruction = awaiting_effect["effect_payload"]["destruction"]
     if corruption == "context_kind":
-        context["context_kind"] = "unsupported_destroyed_context"
-    elif corruption == "model_destroyed_event":
-        context["model_destroyed_event_id"] = "event-999999"
+        destruction["owner_context"]["sequence_id"] = "forged-sequence"
+    elif corruption == "logical_death_event":
+        destruction["logical_death_event_id"] = "event-999999"
     elif corruption == "missing_reaction_record":
-        assert payload["decisions"]["records"][-1]["result"]["result_id"] == (
-            "ecstatic-death-integrity:accept"
-        )
+        assert payload["decisions"]["records"][-1]["result"]["result_id"] == "ecstatic-death:accept"
         payload["decisions"]["records"].pop()
     elif corruption == "orphan_result":
-        effect_payload["activation_result_id"] = "orphaned-fight-on-death-result"
+        destruction["result_id"] = "orphaned-retention-result"
     elif corruption == "wrong_decision":
-        effect_payload["activation_result_id"] = "ecstatic-death-integrity:attacker-activation"
+        destruction["result_id"] = "ecstatic-death:attacker-activation"
 
-    with pytest.raises(GameLifecycleError, match=expected_message):
+    with pytest.raises(GameLifecycleError):
         GameLifecycle.from_payload(payload)
 
 

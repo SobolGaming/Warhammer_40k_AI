@@ -14,6 +14,7 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
     rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -806,7 +807,7 @@ def _scenario_at_triggering_unit_start(*, context: MovementEndSurgeContext) -> B
         state=context.state,
         unit_instance_id=context.triggering_unit_instance_id,
     )
-    if not rules_unit_has_placed_alive_model(
+    if not rules_unit_has_present_model(
         state=context.state,
         rules_unit=triggering_rules_unit,
     ):

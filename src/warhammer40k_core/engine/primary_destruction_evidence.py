@@ -14,10 +14,10 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.event_log import EventLog
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.objective_geometry import measure_model_to_objective
 from warhammer40k_core.engine.objective_geometry_sources import mission_objective_geometries
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     current_rules_unit_views_for_canonical_identity,

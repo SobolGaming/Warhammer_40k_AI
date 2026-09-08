@@ -1,0 +1,485 @@
+{
+  "stratagem_profile": {
+    "source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+    "stratagem_id": "grey-knights-hallowed-conclave-unending-fidelity",
+    "detachment_id": "grey-knights-hallowed-conclave",
+    "name": "Unending Fidelity",
+    "command_point_cost": 1,
+    "category": "strategic_ploy",
+    "trigger_kind": "after_unit_selected_as_target",
+    "phases": [
+      "shooting",
+      "fight"
+    ],
+    "target_policy_id": "selected_target_unit",
+    "required_keywords": [
+      "INFANTRY"
+    ],
+    "required_faction_keywords": [
+      "GREY KNIGHTS"
+    ],
+    "opponent_turn_phases": [
+      "shooting"
+    ]
+  },
+  "historical_official_sources": [
+    {
+      "source_id": "gw-11e-space-marines-faction-pack-2026-07",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_space_marines-631fzvmfjm-2qfrbosgdj.pdf",
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_space_marines-631fzvmfjm-2qfrbosgdj.pdf",
+      "sha256": "a9f2ab0a28aa1e4ed649667adde34c4b2c185a4493c070cef9768c61fc9b93a6",
+      "relationship": "historical_primary_not_current_corroboration"
+    },
+    {
+      "source_id": "gw-11e-grey-knights-faction-pack-2026-07",
+      "source_url": "https://assets.warhammer-community.com/eng_22-07_warhammer_40,000_faction_pack_grey_knights-dlzvusufhy-uialb3pko4.pdf",
+      "artifact_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_grey_knights-dlzvusufhy-uialb3pko4.pdf",
+      "sha256": "8df7b54292988edb5ef5a83260dd4c054f658f06ba7cacc2467e3f558a1dd797",
+      "relationship": "historical_primary_not_current_corroboration"
+    }
+  ],
+  "artifact_schema": "core-v2-retained-attack-source-v1",
+  "source_package_id": "reviewed-retained-attack-faction-sources",
+  "source_version": "app-data-946-observed-2026-09-08",
+  "source_catalog": {
+    "package_id": {
+      "namespace": "core-v2-reviewed-app-mirror",
+      "package_name": "reviewed-retained-attack-faction-sources",
+      "version": "app-data-946-observed-2026-09-08"
+    },
+    "catalog_version": {
+      "version_id": "app-data-946-observed-2026-09-08",
+      "source_date": "2026-09-08"
+    },
+    "documents": [
+      {
+        "document_id": {
+          "package_id": {
+            "namespace": "core-v2-reviewed-app-mirror",
+            "package_name": "reviewed-retained-attack-faction-sources",
+            "version": "app-data-946-observed-2026-09-08"
+          },
+          "document_id": "retained-attack-consumers"
+        },
+        "title": "Reviewed retained attack faction rules",
+        "source_texts": [
+          {
+            "source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+            "raw_text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit’s attacks.\nWhen: Your opponent’s Shooting phase or the Fight phase.just after an enemy unit has selected its targets.\nEffect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play.\n1 CP",
+            "normalized_text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+            "parsed_tokens": {
+              "normalized_text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+              "dice_expressions": [
+                {
+                  "text": "D6",
+                  "start": 380,
+                  "end": 382,
+                  "expression": {
+                    "quantity": 1,
+                    "sides": 6,
+                    "modifier": 0
+                  }
+                }
+              ],
+              "range_expressions": [],
+              "distance_predicates": [],
+              "keywords": []
+            },
+            "objective_scope": "non_core_rules"
+          },
+          {
+            "source_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter",
+            "raw_text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model’s unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed.\nDesigner’s Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+            "normalized_text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+            "parsed_tokens": {
+              "normalized_text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+              "dice_expressions": [
+                {
+                  "text": "D6",
+                  "start": 54,
+                  "end": 56,
+                  "expression": {
+                    "quantity": 1,
+                    "sides": 6,
+                    "modifier": 0
+                  }
+                }
+              ],
+              "range_expressions": [],
+              "distance_predicates": [],
+              "keywords": [
+                {
+                  "text": "Hazardous",
+                  "start": 256,
+                  "end": 265,
+                  "keyword": "Hazardous"
+                },
+                {
+                  "text": "Hazardous",
+                  "start": 434,
+                  "end": 443,
+                  "keyword": "Hazardous"
+                }
+              ]
+            },
+            "objective_scope": "non_core_rules"
+          }
+        ]
+      }
+    ],
+    "ruleset_bundles": []
+  },
+  "rules": [
+    {
+      "source_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter",
+      "source_text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model’s unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed.\nDesigner’s Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+      "transcription_sha256": "d8df6ced8bebf0189aabf065ebaf2e5372c81f74dcb105fc8184f1ac5698f05d",
+      "rule_ir": {
+        "rule_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter:rule-ir",
+        "source_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter",
+        "normalized_text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+        "parser_version": "reviewed-retained-attack-v1",
+        "schema_version": "phase17c-rule-ir-v1",
+        "clauses": [
+          {
+            "clause_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter:grant",
+            "template_id": "retained-attack:model-destruction-grant",
+            "source_span": {
+              "text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+              "start": 0,
+              "end": 516
+            },
+            "trigger": {
+              "kind": "model_destroyed",
+              "source_span": {
+                "text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+                "start": 0,
+                "end": 516
+              },
+              "parameters": [
+                {
+                  "key": "destroyed_target",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "after_attacking_unit_finished_attacks"
+                }
+              ]
+            },
+            "conditions": [],
+            "target": {
+              "kind": "this_model",
+              "source_span": {
+                "text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+                "start": 0,
+                "end": 516
+              },
+              "parameters": []
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "source_span": {
+                  "text": "Each time a model in this unit is destroyed, roll one D6: on a 3+, do not remove it from play. The destroyed model can shoot after the attacking model's unit has finished making its attacks, and is then removed from play. When resolving these attacks, any Hazardous tests taken for that attack are automatically passed. Designer's Note: This ability is triggered even when a model in this unit is destroyed as the result of failing a Hazardous test, meaning such a model may be able to shoot twice in the same phase.",
+                  "start": 0,
+                  "end": 516
+                },
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "retained_destruction_attack"
+                  },
+                  {
+                    "key": "actions",
+                    "value": [
+                      "shoot"
+                    ]
+                  },
+                  {
+                    "key": "optional",
+                    "value": true
+                  },
+                  {
+                    "key": "requires_not_shot_or_fought_this_phase",
+                    "value": false
+                  },
+                  {
+                    "key": "shooting_hazardous_tests_automatically_pass",
+                    "value": true
+                  },
+                  {
+                    "key": "trigger_roll_threshold",
+                    "value": 3
+                  }
+                ]
+              }
+            ],
+            "duration": null,
+            "unsupported_reason": null,
+            "diagnostics": []
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "06a5e45f4315b82c92e9fab6d14aba2a489abdeede525ad6ebea4e1701ebaabe"
+      },
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_attack_grants:static_retained_attack_source"
+      ],
+      "fieldability_certified": false
+    },
+    {
+      "source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+      "source_text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit’s attacks.\nWhen: Your opponent’s Shooting phase or the Fight phase.just after an enemy unit has selected its targets.\nEffect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play.\n1 CP",
+      "transcription_sha256": "7d30f6317af41a52547817803a30f96234c6fea57bcd8b7df730f9c4f8175617",
+      "rule_ir": {
+        "rule_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity:rule-ir",
+        "source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+        "normalized_text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+        "parser_version": "reviewed-retained-attack-v1",
+        "schema_version": "phase17c-rule-ir-v1",
+        "clauses": [
+          {
+            "clause_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity:grant",
+            "template_id": "retained-attack:timed-unit-grant",
+            "source_span": {
+              "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+              "start": 0,
+              "end": 553
+            },
+            "trigger": null,
+            "conditions": [],
+            "target": {
+              "kind": "selected_unit",
+              "source_span": {
+                "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+                "start": 0,
+                "end": 553
+              },
+              "parameters": []
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "source_span": {
+                  "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+                  "start": 0,
+                  "end": 553
+                },
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "retained_destruction_attack"
+                  },
+                  {
+                    "key": "actions",
+                    "value": [
+                      "shoot",
+                      "fight"
+                    ]
+                  },
+                  {
+                    "key": "optional",
+                    "value": true
+                  },
+                  {
+                    "key": "requires_not_shot_or_fought_this_phase",
+                    "value": true
+                  },
+                  {
+                    "key": "shooting_hazardous_tests_automatically_pass",
+                    "value": false
+                  },
+                  {
+                    "key": "trigger_roll_threshold",
+                    "value": 4
+                  }
+                ]
+              }
+            ],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "source_span": {
+                "text": "Target: One GREY KNIGHTS INFANTRY unit from your army that was selected as the target of one or more of the attacking unit's attacks. When: Your opponent's Shooting phase or the Fight phase.just after an enemy unit has selected its targets. Effect: Until the end of the phase, each time a model in your unit is destroyed, if that model has not shot or fought this phase, roll one D6. On a 4+, do not remove the destroyed model from play; it can shoot or fight after the attacking unit has finished making its attacks, and is then removed from play. 1 CP",
+                "start": 0,
+                "end": 553
+              },
+              "parameters": [
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                }
+              ]
+            },
+            "unsupported_reason": null,
+            "diagnostics": []
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "345e316c906de9993e5fb435bc4c08010f134985b7e2669bfb68f4c0d811d443"
+      },
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_attack_grants:persisted_retained_attack_sources"
+      ],
+      "fieldability_certified": false
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "retained-attack-faction-app-mirror-2026-09-08:space-marines:hellblaster-squad:for-the-chapter:transcription",
+      "rule_source_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "space-marines:hellblaster-squad:for-the-chapter",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "d8df6ced8bebf0189aabf065ebaf2e5372c81f74dcb105fc8184f1ac5698f05d",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "23b1e7ed1939dc6634da0b36e9bc67641af1d37d7b55e92fd4f450e7b7a2ae36",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_attack_grants:static_retained_attack_source"
+      ]
+    },
+    {
+      "evidence_id": "retained-attack-faction-app-mirror-2026-09-08:space-marines:hellblaster-squad:for-the-chapter:mirror",
+      "rule_source_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "review_audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+      "review_audit_row_id": "space-marines:hellblaster-squad:for-the-chapter",
+      "review_audit_source_observation_sha256": "d4274993057452b0f88dc4a3f0cff441f82c9503b16fb2f8f7e62cbab424e28d",
+      "provider_name": "40k.app",
+      "source_title": "space-marines:hellblaster-squad:for-the-chapter",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/factions/space-marines/units/hellblaster-squad",
+      "observed_at": "2026-09-08T01:39:45+00:00",
+      "app_version": "946",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "d8df6ced8bebf0189aabf065ebaf2e5372c81f74dcb105fc8184f1ac5698f05d",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "a62cf5252e168f8f940863f7832c5f30a0e43bbc15654e6f9d599b2f876045ba",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_attack_grants:static_retained_attack_source"
+      ]
+    },
+    {
+      "evidence_id": "retained-attack-faction-app-mirror-2026-09-08:grey-knights:hallowed-conclave:unending-fidelity:transcription",
+      "rule_source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "grey-knights:hallowed-conclave:unending-fidelity",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "7d30f6317af41a52547817803a30f96234c6fea57bcd8b7df730f9c4f8175617",
+      "official_corroborating_source_ids": [],
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false,
+      "observation_sha256": "4eaa9a0959852869895dfaf8edd29d68af376c15ad40b6eff498ec93e5045bd1",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_attack_grants:persisted_retained_attack_sources"
+      ]
+    },
+    {
+      "evidence_id": "retained-attack-faction-app-mirror-2026-09-08:grey-knights:hallowed-conclave:unending-fidelity:mirror",
+      "rule_source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "review_audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+      "review_audit_row_id": "grey-knights:hallowed-conclave:unending-fidelity",
+      "review_audit_source_observation_sha256": "27e9d21da15cbbf3117914f9be65a66f703d031f7dd2ff11a69feaa2deb2e0ec",
+      "provider_name": "40k.app",
+      "source_title": "grey-knights:hallowed-conclave:unending-fidelity",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/factions/grey-knights/detachments/hallowed-conclave",
+      "observed_at": "2026-09-08T01:39:45+00:00",
+      "app_version": "946",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "7d30f6317af41a52547817803a30f96234c6fea57bcd8b7df730f9c4f8175617",
+      "official_corroborating_source_ids": [],
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true,
+      "observation_sha256": "7d27b337c0488f40830ddff8259e7268ab2e5ea58f20d89c1a9d7fb9fd0a5003",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_attack_grants:persisted_retained_attack_sources"
+      ]
+    }
+  ],
+  "audit_rows": [
+    {
+      "audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+      "row_id": "space-marines:hellblaster-squad:for-the-chapter",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/factions/space-marines/units/hellblaster-squad",
+      "observed_at": "2026-09-08T01:39:45+00:00",
+      "app_version": "946",
+      "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "rule_source_id": "faction-app:space-marines:hellblaster-squad:for-the-chapter",
+      "transcription_sha256": "d8df6ced8bebf0189aabf065ebaf2e5372c81f74dcb105fc8184f1ac5698f05d",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "d4274993057452b0f88dc4a3f0cff441f82c9503b16fb2f8f7e62cbab424e28d"
+    },
+    {
+      "audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+      "row_id": "grey-knights:hallowed-conclave:unending-fidelity",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/factions/grey-knights/detachments/hallowed-conclave",
+      "observed_at": "2026-09-08T01:39:45+00:00",
+      "app_version": "946",
+      "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+      "rule_source_id": "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+      "transcription_sha256": "7d30f6317af41a52547817803a30f96234c6fea57bcd8b7df730f9c4f8175617",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "27e9d21da15cbbf3117914f9be65a66f703d031f7dd2ff11a69feaa2deb2e0ec"
+    }
+  ],
+  "version_evidence": {
+    "source_url": "https://www.40k.app/factions/updates",
+    "observed_at": "2026-09-08T01:39:45+00:00",
+    "statement": "Version 946\nReleased 2026-09-02."
+  },
+  "capture_method": "browser rendered page and accessibility tree",
+  "scope": "Only the two named matched-play rule consumers; no complete faction, detachment or datasheet fieldability certification.",
+  "package_hash": "4a49f0ea045a7671593fb514bffb8ab1c5c5d77e0ba6f27c47e3b21099adeea4"
+}

@@ -9,7 +9,7 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
+from warhammer40k_core.engine.fight_on_death import model_has_fight_action_authority
 from warhammer40k_core.engine.fight_resolution import (
     MeleeDeclarationProposal,
     MeleeDeclarationProposalRequest,
@@ -409,7 +409,7 @@ def _present_component_units(
             key=lambda stored: stored.unit.unit_instance_id,
         )
         if any(
-            model_is_present_on_battlefield(
+            model_has_fight_action_authority(
                 state=state,
                 model_instance_id=model.model_instance_id,
             )

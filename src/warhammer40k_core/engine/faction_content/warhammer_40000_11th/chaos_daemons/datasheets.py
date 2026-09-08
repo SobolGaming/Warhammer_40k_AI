@@ -22,7 +22,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -900,7 +900,7 @@ def _enemy_rules_unit_within_source_engagement_range(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    if not rules_unit_has_placed_alive_model(
+    if not rules_unit_has_present_model(
         state=state,
         rules_unit=target_rules_unit,
     ):
@@ -1282,7 +1282,7 @@ def _enemy_rules_unit_ids_within_source_engagement_range(
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
             unit_instance_id=source_rules_unit.unit_instance_id,
         )
-        if rules_unit_has_placed_alive_model(
+        if rules_unit_has_present_model(
             state=state,
             rules_unit=rules_unit_view_by_id(
                 state=state,
@@ -1307,7 +1307,7 @@ def _component_unit_has_placed_alive_model(
     if type(component_unit) is not UnitInstance:
         raise GameLifecycleError("Component model presence lookup requires UnitInstance.")
     return any(
-        rules_unit_has_placed_alive_model(
+        rules_unit_has_present_model(
             state=state,
             rules_unit=rules_unit,
             model_instance_id=model.model_instance_id,

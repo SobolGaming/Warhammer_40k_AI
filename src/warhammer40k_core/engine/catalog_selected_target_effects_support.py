@@ -75,13 +75,13 @@ from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_unit_geometry import (
-    placed_alive_geometry_models_for_rules_unit,
+    present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     current_rules_unit_views_for_identity,
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.shooting_terrain_visibility import (
@@ -227,7 +227,7 @@ def eligible_selection_target_unit_ids(
 
     target_rules_units = {
         view.unit_instance_id: view
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        for view in rules_unit_views_for_state(state=state)
         if (view.owner_player_id == source_player) == (target_allegiance == "friendly")
     }
     target_ids: list[str] = []
@@ -349,7 +349,7 @@ def selection_distance_conditions_apply(
                 unit_instance_id=target_rules_unit.unit_instance_id,
             )
             if uses_physical_engagement_geometry
-            else placed_alive_geometry_models_for_rules_unit(
+            else present_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=target_rules_unit.unit_instance_id,
             )
@@ -360,7 +360,7 @@ def selection_distance_conditions_apply(
                 unit_instance_id=source_rules_unit.unit_instance_id,
             )
             if uses_physical_engagement_geometry and condition_source_model_id is None
-            else placed_alive_geometry_models_for_rules_unit(
+            else present_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=source_rules_unit.unit_instance_id,
             )
@@ -444,7 +444,7 @@ def selection_visibility_conditions_apply(
                 observer_model_instance_id=observer_model_id,
                 terrain_features=state.battlefield_state.terrain_features,
                 terrain_areas=shooting_terrain_areas_for_state(state),
-                placed_alive_models_only=True,
+                placed_alive_models_only=False,
             )
             for observing_unit in observing_components
         ):
@@ -538,7 +538,7 @@ def effect_target_unit_ids(
     required_keywords = required_keywords_for_clause(clause)
     return tuple(
         unit.unit_instance_id
-        for unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        for unit in rules_unit_views_for_state(state=state)
         if unit.owner_player_id == source_player_id
         and (
             not required_keywords

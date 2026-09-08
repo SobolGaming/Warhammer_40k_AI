@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import cast
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
@@ -70,8 +71,8 @@ def generic_persisted_shooting_target_range_restriction(
             attacker_model_instance_id=context.attacker_model_instance_id,
             target_unit_instance_id=context.target_unit_instance_id,
             max_range_inches=effect_context.max_range_inches,
-            placed_alive_attacker_models_only=True,
-            placed_alive_target_models_only=True,
+            placed_alive_attacker_models_only=False,
+            placed_alive_target_models_only=False,
         ):
             continue
         return TargetRestriction(
@@ -180,10 +181,7 @@ def _battlefield_scenario(state: object) -> BattlefieldScenario:
         raise GameLifecycleError(
             "Generic persisted shooting target range restriction requires battlefield state."
         )
-    return BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
+    return battlefield_scenario_for_state(state=state)
 
 
 def _restriction_replay_payload(

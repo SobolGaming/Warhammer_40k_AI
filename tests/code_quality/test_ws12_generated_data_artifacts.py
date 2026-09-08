@@ -106,6 +106,12 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "core_attack_sequence_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),
+    "core_fight_on_death_2026_09": (
+        "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
+    "retained_attack_sources_2026_09": (
+        "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
+    ),
     "core_transports_2026_09": (
         "project_reviewed_transcription_with_project_authoritative_app_mirror_source"
     ),

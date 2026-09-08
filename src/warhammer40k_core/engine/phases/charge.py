@@ -44,7 +44,6 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeRollRequest,
     ChargeRollRequestPayload,
     ChargeRollResult,
-    ChargeTargetCandidate,
     phase15a_charge_roll_payload,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import (
@@ -81,6 +80,9 @@ from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
     enemy_vehicle_monster_model_ids_for_player,
     unit_has_vehicle_or_monster_keyword,
+)
+from warhammer40k_core.engine.charge_targets import (
+    charge_target_candidates as _charge_target_candidates,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -125,14 +127,11 @@ from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
 )
 from warhammer40k_core.engine.rules_units import (
-    placed_alive_rules_unit_views,
     rules_unit_view_from_armies,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import (
-    ChargeTargetRestrictionContext,
     ChargeTargetRestrictionHookRegistry,
-    TargetRestriction,
 )
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
@@ -2658,72 +2657,6 @@ def _charge_after_fall_back_allowed_by_effects(
     return False
 
 
-def _charge_target_restriction(
-    *,
-    state: GameState,
-    charging_unit_instance_id: str,
-    target_unit_instance_id: str,
-    registry: ChargeTargetRestrictionHookRegistry | None,
-) -> TargetRestriction | None:
-    if registry is None:
-        return None
-    if type(registry) is not ChargeTargetRestrictionHookRegistry:
-        raise GameLifecycleError("Charge target restriction requires a registry.")
-    restrictions = registry.restrictions_for(
-        ChargeTargetRestrictionContext(
-            state=state,
-            player_id=_active_player_id(state),
-            battle_round=state.battle_round,
-            charging_unit_instance_id=charging_unit_instance_id,
-            target_unit_instance_id=target_unit_instance_id,
-        )
-    )
-    return restrictions[0] if restrictions else None
-
-
-def _charge_target_candidates(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-    ruleset_descriptor: RulesetDescriptor,
-    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
-) -> tuple[ChargeTargetCandidate, ...]:
-    scenario = _battlefield_scenario(state)
-    max_range = ruleset_descriptor.charge_policy.max_declaration_range_inches
-    candidates: list[ChargeTargetCandidate] = []
-    for target in placed_alive_rules_unit_views(state=state):
-        if target.owner_player_id == _active_player_id(state):
-            continue
-        target_id = target.unit_instance_id
-        distance = _closest_unit_distance_inches(
-            scenario=scenario,
-            source_unit_instance_id=unit_instance_id,
-            target_unit_instance_id=target_id,
-        )
-        is_legal = distance <= max_range
-        restriction = _charge_target_restriction(
-            state=state,
-            charging_unit_instance_id=unit_instance_id,
-            target_unit_instance_id=target_id,
-            registry=charge_target_restriction_hooks,
-        )
-        violation_code: str | None
-        if is_legal and restriction is not None:
-            is_legal = False
-            violation_code = restriction.violation_code
-        else:
-            violation_code = None if is_legal else "target_out_of_declaration_range"
-        candidates.append(
-            ChargeTargetCandidate(
-                target_unit_instance_id=target_id,
-                closest_distance_inches=distance,
-                is_legal=is_legal,
-                violation_code=violation_code,
-            )
-        )
-    return tuple(sorted(candidates, key=lambda candidate: candidate.target_unit_instance_id))
-
-
 def legal_charge_target_unit_instance_ids(
     *,
     state: GameState,
@@ -2761,29 +2694,6 @@ def _reachable_charge_target_distances(
         if candidate.is_legal and candidate.closest_distance_inches <= maximum_distance_inches:
             distances[candidate.target_unit_instance_id] = candidate.closest_distance_inches
     return dict(sorted(distances.items()))
-
-
-def _closest_unit_distance_inches(
-    *,
-    scenario: BattlefieldScenario,
-    source_unit_instance_id: str,
-    target_unit_instance_id: str,
-) -> float:
-    source_models = _geometry_models_for_unit(
-        scenario=scenario,
-        unit_instance_id=source_unit_instance_id,
-    )
-    target_models = _geometry_models_for_unit(
-        scenario=scenario,
-        unit_instance_id=target_unit_instance_id,
-    )
-    if not source_models or not target_models:
-        raise GameLifecycleError("Charge distance requires placed models.")
-    return min(
-        source_model.range_to(target_model)
-        for source_model in source_models
-        for target_model in target_models
-    )
 
 
 def _closest_distance_between_model_groups(

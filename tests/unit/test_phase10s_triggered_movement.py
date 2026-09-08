@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
@@ -25,7 +26,6 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -2280,6 +2280,7 @@ def _retain_models_for_fight_on_death(
     state: GameState,
     placements: tuple[ModelPlacement, ...],
 ) -> None:
+    retention_decisions = DecisionController()
     models_by_id = {
         model.model_instance_id: model
         for army in state.army_definitions
@@ -2296,7 +2297,8 @@ def _retain_models_for_fight_on_death(
             damage_kind=DamageKind.NORMAL,
         )
         assert damage.destroyed
-        restore_model_awaiting_fight_on_death(
+        retain_destroyed_model_for_fixture(
+            decisions=retention_decisions,
             state=state,
             placement=placement,
             effect_id=f"phase10s-fight-on-death:{placement.model_instance_id}",

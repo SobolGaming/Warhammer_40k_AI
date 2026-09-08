@@ -4203,7 +4203,7 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     ),
     [
         ("icon-lifecycle-p02-1", False, True, "applied"),
-        ("icon-of-excess-fail-6", False, False, None),
+        ("icon-of-excess-fail-10", False, False, None),
         ("icon-cap-outcome-3", True, True, "capped"),
     ],
 )

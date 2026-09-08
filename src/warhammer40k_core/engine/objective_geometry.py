@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from warhammer40k_core.core.objectives import (
     DEFAULT_OBJECTIVE_CONTROL_VERTICAL_INCHES,
@@ -166,7 +166,8 @@ def measure_rules_unit_to_objective(
 ) -> tuple[ObjectiveModelMeasurement, ...]:
     """Return deterministic per-model evidence, preserving attached component ownership.
 
-    Models absent from the battlefield and destroyed models have no OC contribution.
+    Models absent from the battlefield have no measurement. Accepted retained
+    models remain measurement geometry while their original placement is present.
     Distances remain paired per model, so horizontal and vertical minima from different
     members cannot accidentally establish range for the unit.
     """
@@ -174,12 +175,17 @@ def measure_rules_unit_to_objective(
         raise GameLifecycleError("Objective group query requires a scenario and RulesUnitView.")
     if type(objective) is not ObjectiveGeometry:
         raise GameLifecycleError("Objective group query requires ObjectiveGeometry.")
-    if rules_unit != rules_unit_view_from_armies(
+    if replace(rules_unit, retained_model_ids=()) != rules_unit_view_from_armies(
         armies=scenario.armies, unit_instance_id=rules_unit.unit_instance_id
     ):
         raise GameLifecycleError("Objective group query rules-unit identity drifted.")
     measurements: list[ObjectiveModelMeasurement] = []
-    for model in rules_unit.alive_models():
+    for model in rules_unit.own_models:
+        if (
+            not model.is_alive
+            and model.model_instance_id not in scenario.present_destroyed_model_ids
+        ):
+            continue
         placement = scenario.battlefield_state.model_placement_or_none(model.model_instance_id)
         if placement is None:
             continue

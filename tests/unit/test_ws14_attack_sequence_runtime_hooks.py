@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.generic_modifier_helpers import generic_effect as _generic_effect
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -19,12 +20,12 @@ from warhammer40k_core.engine.critical_wounds import (
     WoundRollCriticalThresholdContext,
     generic_rule_critical_wound_threshold,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpirationBoundary,
 )
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_proximity_keyword_gate_applies,
@@ -749,10 +750,11 @@ def test_ws14_attached_attacker_closest_target_constraint_uses_rules_unit_geomet
         ("eligible_unit_within_12", 12.0),
     ],
 )
-def test_ws14_attack_distance_constraint_uses_actual_attacker_not_retained_dead_member(
+def test_ws14_unit_distance_constraint_uses_retained_member_for_all_unit_attacks(
     target_constraint: str,
     maximum_distance_inches: float,
 ) -> None:
+    retention_decisions = DecisionController()
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     attacker = _unit(
         catalog=catalog,
@@ -801,7 +803,8 @@ def test_ws14_attack_distance_constraint_uses_actual_attacker_not_retained_dead_
     )
     _replace_unit(state, attacker_with_retained_dead_model)
     state.replace_battlefield_state(separated_battlefield.with_removed_models((retained_model_id,)))
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_placement,
         effect_id=f"ws14:retained-attacker:{target_constraint}",
@@ -838,7 +841,7 @@ def test_ws14_attack_distance_constraint_uses_actual_attacker_not_retained_dead_
             )
         )
 
-    assert modifier_for_model(1) == 0
+    assert modifier_for_model(1) == 1
     assert living_attacker_model.is_alive
     assert modifier_for_model(0) == 1
 

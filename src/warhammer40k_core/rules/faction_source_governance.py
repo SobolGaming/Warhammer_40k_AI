@@ -205,6 +205,18 @@ def authorize_faction_observation(
     app_version: str | None,
 ) -> None:
     """Prevent a registered page fingerprint from authorizing unrelated rule text."""
+    if audit_id == "retained-attack-faction-app-mirror-2026-09-08":
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            retained_attack_sources_2026_09 as retained_sources,
+        )
+
+        try:
+            identity = retained_sources.observation_identity(row_id=row_id)
+        except retained_sources.RetainedAttackSourceError as exc:
+            raise FactionSourceError(str(exc)) from exc
+        if identity != (source_id, transcription_sha256, source_title, observed_at, app_version):
+            raise FactionSourceError("Faction evidence does not match its retained observation.")
+        return
     audit = faction_source_audit()
     if audit.audit_id != audit_id:
         raise FactionSourceError("Faction source audit identity is unregistered.")

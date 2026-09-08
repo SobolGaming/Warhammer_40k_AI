@@ -261,6 +261,20 @@ class CatalogDatasheetRuleRuntime:
                 "Catalog destruction-reaction registration requires GameState."
             )
         recorded: list[tuple[str, DestructionReactionSource]] = []
+        from warhammer40k_core.engine.retained_attack_grants import (
+            retained_attack_descriptor_for_clause,
+            static_retained_attack_source,
+        )
+
+        for source, grant in self._described_sources(retained_attack_descriptor_for_clause):
+            for model_id in _static_source_model_ids(source):
+                reaction = static_retained_attack_source(
+                    source=source, descriptor=grant, model_instance_id=model_id
+                )
+                _record_destruction_reaction_source(
+                    state=state, model_instance_id=model_id, source=reaction
+                )
+                recorded.append((model_id, reaction))
         for source, descriptor in self._described_sources(fight_on_death_descriptor_for_clause):
             for model_id in _static_source_model_ids(source):
                 reaction = _catalog_fight_on_death_source(

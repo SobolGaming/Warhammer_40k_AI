@@ -81,7 +81,6 @@ from warhammer40k_core.engine.physical_engagement import (
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    placed_alive_rules_unit_views,
     rules_unit_identity_ids,
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
@@ -1327,7 +1326,7 @@ def _enemy_rules_units(
 ) -> tuple[RulesUnitView, ...]:
     return tuple(
         view
-        for view in placed_alive_rules_unit_views(state=state)
+        for view in fight_present_rules_unit_views(state=state)
         if view.owner_player_id != rules_unit.owner_player_id
     )
 

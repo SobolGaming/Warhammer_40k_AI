@@ -158,8 +158,8 @@ class PrimaryMissionBoundaryModelState:
             raise GameLifecycleError("Primary mission boundary model placement drifted.")
         if self.presence == "destroyed" and self.alive:
             raise GameLifecycleError("A living model cannot have destroyed boundary presence.")
-        if not self.alive and self.presence != "destroyed":
-            raise GameLifecycleError("A destroyed model must have destroyed boundary presence.")
+        if not self.alive and self.presence not in {"destroyed", "battlefield"}:
+            raise GameLifecycleError("A destroyed model must be retained or physically removed.")
         object.__setattr__(
             self,
             "model_placement_json",

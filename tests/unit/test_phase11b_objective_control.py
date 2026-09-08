@@ -202,6 +202,59 @@ def test_p14_terrain_query_preserves_concavity_and_separate_footprint_parts() ->
     assert second_part.within_control_range
 
 
+def test_order_30_objective_measurement_includes_retained_target_for_attack_rules() -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+
+    from warhammer40k_core.engine.attack_sequence_dice_rerolls import (
+        _target_unit_within_any_objective_marker_range,
+    )
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+    from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.objective_geometry import (
+        ObjectiveGeometry,
+        measure_rules_unit_to_objective,
+    )
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    state = _battle_state_with_center_objective_positions(player_a_offsets=((0.0, 0.0),))
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    unit_id = "army-alpha:intercessor-unit-1"
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
+    model = view.own_models[0]
+    assert state.battlefield_state is not None
+    placement = state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=unit_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    retain_destroyed_model_for_fixture(
+        state=state,
+        placement=placement,
+        effect_id="order-30-objective-retention",
+        source_rule_id="order-30-objective-retention-rule",
+        source_phase=BattlePhase.FIGHT,
+        decisions=DecisionController(),
+    )
+    rows = measure_rules_unit_to_objective(
+        scenario=battlefield_scenario_for_state(state=state),
+        rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
+        objective=ObjectiveGeometry.from_marker(
+            _center_marker_definition(state).to_objective_marker()
+        ),
+    )
+    assert any(
+        row.model_instance_id == model.model_instance_id and row.within_control_range
+        for row in rows
+    )
+    assert _target_unit_within_any_objective_marker_range(
+        state=state, target_unit_instance_id=unit_id
+    )
+
+
 def test_p14_group_query_includes_attached_components_and_rejects_stale_identity() -> None:
     from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
     from warhammer40k_core.engine.objective_geometry import (

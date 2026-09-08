@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.generic_rule_strength_constraints import (
     TARGET_CONSTRAINT_NOT_BELOW_HALF_STRENGTH,
     TARGET_CONSTRAINT_SOURCE_UNIT_BELOW_HALF_STRENGTH,
@@ -16,14 +15,14 @@ from warhammer40k_core.engine.generic_rule_strength_constraints import (
     TARGET_CONSTRAINT_TARGET_UNIT_BELOW_STARTING_STRENGTH,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
 from warhammer40k_core.engine.rules_unit_geometry import (
-    geometry_models_for_rules_unit,
-    placed_alive_geometry_models_for_rules_unit,
+    present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.volume import Model
@@ -540,14 +539,13 @@ def _placed_rules_unit_ids_by_allegiance(
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Generic RuleIR target proximity gate requires battlefield_state.")
-    placed_model_ids = frozenset(battlefield.placed_model_ids())
     return tuple(
         view.unit_instance_id
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        for view in rules_unit_views_for_state(state=state)
         if (view.owner_player_id == requested_player_id)
         == (allegiance == TARGET_ALLEGIANCE_FRIENDLY)
         and any(
-            model.is_alive and model.model_instance_id in placed_model_ids
+            model_is_present_on_battlefield(state=state, model_instance_id=model.model_instance_id)
             for model in view.own_models
         )
     )
@@ -575,11 +573,11 @@ def _closest_placed_alive_unit_distance_inches(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    first_models = placed_alive_geometry_models_for_rules_unit(
+    first_models = present_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=first_unit_instance_id,
     )
-    second_models = placed_alive_geometry_models_for_rules_unit(
+    second_models = present_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=second_unit_instance_id,
     )
@@ -608,7 +606,7 @@ def _closest_attack_target_distance_inches(
         attacking_unit_instance_id=attacking_unit_instance_id,
         attacker_model_instance_id=attacker_model_instance_id,
     )
-    target_models = placed_alive_geometry_models_for_rules_unit(
+    target_models = present_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
@@ -637,12 +635,12 @@ def _attack_source_geometry_models(
         "attacking_unit_instance_id",
         attacking_unit_instance_id,
     )
-    living_models = placed_alive_geometry_models_for_rules_unit(
+    present_models = present_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=attacking_unit_id,
     )
     if attacker_model_instance_id is None:
-        return living_models
+        return present_models
     attacker_model_id = _validate_identifier(
         "attacker_model_instance_id",
         attacker_model_instance_id,
@@ -663,26 +661,12 @@ def _attack_source_geometry_models(
         raise GameLifecycleError(
             "Generic RuleIR attacker model does not belong to the attacking rules unit."
         )
-    if attacker_model.is_alive:
-        return living_models
     if not model_is_present_on_battlefield(
         state=state,
         model_instance_id=attacker_model_id,
     ):
         return ()
-    retained_attacker_models = tuple(
-        model
-        for model in geometry_models_for_rules_unit(
-            state=state,
-            unit_instance_id=attacking_unit_id,
-        )
-        if model.model_id == attacker_model_id
-    )
-    if not retained_attacker_models:
-        raise GameLifecycleError(
-            "Generic RuleIR retained attacker model requires physical geometry."
-        )
-    return (*living_models, *retained_attacker_models)
+    return present_models
 
 
 def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:

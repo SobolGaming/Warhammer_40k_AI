@@ -10,7 +10,6 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
     ModelPlacement,
-    ModelPlacementPayload,
     ModelRemovalRecord,
     PlacementError,
 )
@@ -25,10 +24,6 @@ from warhammer40k_core.engine.destruction_source_attribution import (
     validate_destruction_source_identity,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import (
-    FIGHT_ON_DEATH_AWAITING_EFFECT_KIND,
-    fight_on_death_model_ids_awaiting_attack,
-)
 from warhammer40k_core.engine.model_destruction_cause_authority import (
     MODEL_DESTRUCTION_CAUSE_ID_FIELD,
     consumed_model_destruction_cause_authority_for_event,
@@ -669,82 +664,7 @@ def _validate_finalized_model_battlefield_state(
     current_placement = battlefield.model_placement_or_none(model_instance_id)
     if current_placement is None:
         return
-    if existing_model_destroyed_event is None:
-        raise GameLifecycleError("Finalized mortal wound destruction requires battlefield removal.")
-    authority = consumed_model_destruction_cause_authority_for_event(
-        state=state,
-        event=existing_model_destroyed_event,
-    )
-    destroyed_payload = existing_model_destroyed_event.payload
-    if not isinstance(destroyed_payload, dict):
-        raise GameLifecycleError("Fight On Death model-destroyed payload must be an object.")
-    raw_placement = destroyed_payload.get("destroyed_model_placement")
-    if not isinstance(raw_placement, dict):
-        raise GameLifecycleError("Fight On Death destroyed placement is missing.")
-    destroyed_placement = ModelPlacement.from_payload(cast(ModelPlacementPayload, raw_placement))
-    if (
-        authority.model_instance_id != model_instance_id
-        or authority.physical_unit_instance_id != destroyed_placement.unit_instance_id
-        or destroyed_placement.model_instance_id != model_instance_id
-        or current_placement != destroyed_placement
-    ):
-        raise GameLifecycleError("Fight On Death awaiting placement drift.")
-
-    expected_effect_id = f"fight-on-death-awaiting:{existing_model_destroyed_event.event_id}"
-    effects = tuple(
-        effect for effect in state.persisting_effects if effect.effect_id == expected_effect_id
-    )
-    if len(effects) != 1:
-        raise GameLifecycleError(
-            "Restored mortal wound casualty lacks one Fight On Death awaiting effect."
-        )
-    effect = effects[0]
-    effect_payload = effect.effect_payload
-    if (
-        not isinstance(effect_payload, dict)
-        or effect_payload.get("effect_kind") != FIGHT_ON_DEATH_AWAITING_EFFECT_KIND
-        or effect_payload.get("model_instance_id") != model_instance_id
-        or effect.target_unit_instance_ids != (authority.physical_unit_instance_id,)
-        or model_instance_id not in fight_on_death_model_ids_awaiting_attack(state=state)
-    ):
-        raise GameLifecycleError("Restored mortal wound casualty is not awaiting Fight On Death.")
-
-    indexed_records = tuple(enumerate(decisions.event_log.records))
-    destroyed_matches = tuple(
-        index for index, event in indexed_records if event == existing_model_destroyed_event
-    )
-    awaiting_matches = tuple(
-        (index, event)
-        for index, event in indexed_records
-        if event.event_type == "fight_on_death_model_awaiting_attack"
-        and isinstance(event.payload, dict)
-        and event.payload.get("effect_id") == expected_effect_id
-    )
-    if len(destroyed_matches) != 1 or len(awaiting_matches) != 1:
-        raise GameLifecycleError(
-            "Restored mortal wound casualty lacks one Fight On Death awaiting event."
-        )
-    awaiting_index, awaiting_event = awaiting_matches[0]
-    awaiting_payload = awaiting_event.payload
-    if not isinstance(awaiting_payload, dict):
-        raise GameLifecycleError("Fight On Death awaiting event payload must be an object.")
-    source_id = _validate_identifier(
-        "Fight On Death awaiting source_id",
-        awaiting_payload.get("source_id"),
-    )
-    expected_awaiting_payload = {
-        "game_id": state.game_id,
-        "battle_round": state.battle_round,
-        "phase": None if effect.started_phase is None else effect.started_phase.value,
-        "model_instance_id": model_instance_id,
-        "unit_instance_id": authority.physical_unit_instance_id,
-        "source_id": source_id,
-        "source_rule_id": effect.source_rule_id,
-        "effect_id": expected_effect_id,
-        "model_placement": destroyed_placement.to_payload(),
-    }
-    if awaiting_index <= destroyed_matches[0] or awaiting_payload != expected_awaiting_payload:
-        raise GameLifecycleError("Fight On Death awaiting event placement authority drift.")
+    raise GameLifecycleError("Finalized mortal wound destruction requires battlefield removal.")
 
 
 def _destroyed_damage_application_for_model(

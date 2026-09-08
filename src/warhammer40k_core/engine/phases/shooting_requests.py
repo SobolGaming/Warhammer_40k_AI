@@ -238,6 +238,19 @@ def _request_shooting_declaration(
             )
             for candidate in candidates
         )
+    out_of_phase = state.out_of_phase_shooting_state
+    if (
+        out_of_phase is not None
+        and active_selection.request_id == out_of_phase.source_decision_request_id
+        and active_selection.result_id == out_of_phase.source_decision_result_id
+        and not any(
+            isinstance(candidate, dict) and candidate["is_legal"] is True
+            for candidate in target_candidates
+        )
+    ):
+        return _complete_out_of_phase_shooting(
+            state=state, decisions=decisions, completed_state=out_of_phase
+        )
     visibility_cache_key = shooting_visibility_cache_key(
         scenario=scenario,
         terrain_features=terrain_features,

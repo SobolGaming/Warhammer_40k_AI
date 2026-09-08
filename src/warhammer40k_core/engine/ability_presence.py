@@ -7,11 +7,15 @@ from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_model_presence import retained_model_ids_for_rules_unit
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleConditionKind, parameter_payload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_embarked_abilities_2026_09 as source_authority,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_fight_on_death_2026_09,
 )
 
 if TYPE_CHECKING:
@@ -52,15 +56,25 @@ def ability_presence(*, state: GameState, rules_unit: RulesUnitView) -> AbilityP
         raise GameLifecycleError("Ability presence requires GameState and RulesUnitView.")
     current = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit.unit_instance_id)
     alive = {model.model_instance_id for model in current.alive_models()}
+    retained = (
+        set[str]()
+        if state.battlefield_state is None
+        else set(
+            retained_model_ids_for_rules_unit(
+                state=state, unit_instance_id=current.unit_instance_id
+            )
+        )
+    )
     placed = (
         set[str]()
         if state.battlefield_state is None
         else set(state.battlefield_state.placed_model_ids())
-    ) & alive
+    ) & (alive | retained)
     off_board = (set(state.embarked_model_ids()) | set(state.unarrived_reserve_model_ids())) & alive
     return ability_presence_from_model_ids(
         rules_unit_instance_id=current.unit_instance_id,
         alive_model_ids=alive,
+        retained_model_ids=retained,
         battlefield_model_ids=placed,
         off_battlefield_model_ids=off_board,
     )
@@ -70,11 +84,14 @@ def ability_presence_from_model_ids(
     *,
     rules_unit_instance_id: str,
     alive_model_ids: set[str],
+    retained_model_ids: set[str],
     battlefield_model_ids: set[str],
     off_battlefield_model_ids: set[str],
 ) -> AbilityPresence:
     """Shared live/historical policy over explicitly authenticated model facts."""
-    alive = alive_model_ids
+    if alive_model_ids & retained_model_ids or not retained_model_ids <= battlefield_model_ids:
+        raise GameLifecycleError("Retained ability presence authority is inconsistent.")
+    alive = alive_model_ids | retained_model_ids
     placed = battlefield_model_ids & alive
     off_board = off_battlefield_model_ids & alive
     if placed & off_board or (placed and off_board):
@@ -88,6 +105,11 @@ def ability_presence_from_model_ids(
         battlefield_model_ids=tuple(sorted(placed)),
         off_battlefield_model_ids=tuple(sorted(off_board)),
         unavailable_model_ids=tuple(sorted(unavailable)),
+        source_rule_id=(
+            core_fight_on_death_2026_09.RETAINED_PRESENCE_SOURCE_ID
+            if retained_model_ids
+            else EMBARKED_ABILITIES_SOURCE_ID
+        ),
     )
 
 

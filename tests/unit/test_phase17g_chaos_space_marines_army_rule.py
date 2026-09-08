@@ -829,6 +829,20 @@ def test_dark_pacts_out_of_phase_shooting_requests_grant_before_declaration() ->
     state = _csm_battle_state()
     unit = _unit_for_player(state, player_id="player-a")
     target = _unit_for_player(state, player_id="player-b")
+    assert state.battlefield_state is not None
+    for placed_unit, x in ((unit, 10.0), (target, 20.0)):
+        placement = state.battlefield_state.unit_placement_by_id(placed_unit.unit_instance_id)
+        state.replace_battlefield_state(
+            state.battlefield_state.with_unit_placement(
+                replace(
+                    placement,
+                    model_placements=tuple(
+                        replace(model, pose=Pose.at(x, 10.0 + index * 1.8))
+                        for index, model in enumerate(placement.model_placements)
+                    ),
+                )
+            )
+        )
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     decisions = DecisionController()
     contribution = army_rule.runtime_contribution()

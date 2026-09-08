@@ -2,7 +2,13 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.retained_attack_permissions import RETAINED_ATTACK_REACTION_KINDS
+
 from typing import TYPE_CHECKING
+
+from warhammer40k_core.engine.attack_destruction_reactions import (
+    resolve_mandatory_destruction_reactions_before_removal as _resolve_mandatory_destruction_reactions_before_removal,
+)
 
 from warhammer40k_core.engine import attack_sequence_destruction_authority as _asda
 from warhammer40k_core.engine.attack_sequence_deadly_demise_continuation import (
@@ -482,7 +488,11 @@ def _destruction_reaction_status_if_needed(
         destruction_provenance=destruction_provenance,
         damage=damage,
         destroyed_emission=destroyed_emission,
-        sources=tuple(source for source in active_sources if source.optional),
+        sources=tuple(
+            source
+            for source in active_sources
+            if source.optional and source.reaction_kind not in RETAINED_ATTACK_REACTION_KINDS
+        ),
         destroyed_model_controller_player_id=controller_player_id,
     )
     if not optional_sources:
@@ -625,80 +635,6 @@ def _optional_destruction_reaction_trigger_roll_type(
     if type(raw_roll_type) is not str or not raw_roll_type.strip():
         raise GameLifecycleError("Destruction reaction trigger_roll_type must be a string.")
     return raw_roll_type
-
-
-def _resolve_mandatory_destruction_reactions_before_removal(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    manager: DiceRollManager,
-    attack_sequence: AttackSequence,
-    attack_context: AttackResolutionContextPayload,
-    damage: DamageApplication | None,
-    saving_throw_payload: JsonValue,
-    feel_no_pain: FeelNoPainResolution,
-    destroyed_model_controller_player_id: str | None = None,
-    sources: tuple[DestructionReactionSource, ...] | None = None,
-    parent_cause_ids: tuple[str, ...] = (),
-    source_damage_completion: JsonValue = None,
-) -> LifecycleStatus | None:
-    if damage is None or not damage.destroyed:
-        return None
-    _asda.reserve_destroyed_attack_damage_authority(
-        state=state,
-        decisions=decisions,
-        attack_sequence=attack_sequence,
-        damage=damage,
-        parent_cause_ids=parent_cause_ids,
-    )
-    controller_player_id = (
-        attack_context["defender_player_id"]
-        if destroyed_model_controller_player_id is None
-        else _validate_identifier(
-            "destroyed_model_controller_player_id",
-            destroyed_model_controller_player_id,
-        )
-    )
-    active_sources = (
-        _state_destruction_reaction_sources(
-            state=state,
-            model_instance_id=damage.model_instance_id,
-        )
-        if sources is None
-        else sources
-    )
-    mandatory_sources = tuple(source for source in active_sources if not source.optional)
-    for source_index, source in enumerate(mandatory_sources):
-        if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE:
-            status = _resolve_deadly_demise_before_removal(
-                state=state,
-                decisions=decisions,
-                manager=manager,
-                attack_sequence=attack_sequence,
-                attack_context=attack_context,
-                damage=damage,
-                saving_throw_payload=saving_throw_payload,
-                feel_no_pain=feel_no_pain,
-                source=source,
-                destroyed_model_controller_player_id=controller_player_id,
-                pending_sources=mandatory_sources[source_index + 1 :],
-                source_damage_completion=source_damage_completion,
-            )
-            if status is not None:
-                return status
-            continue
-        _emit_mandatory_destruction_reaction_record(
-            decisions=decisions,
-            attack_sequence=attack_sequence,
-            attack_context=attack_context,
-            damage=damage,
-            saving_throw_payload=saving_throw_payload,
-            feel_no_pain=feel_no_pain,
-            source=source,
-            destroyed_model_controller_player_id=controller_player_id,
-            execution_status="recorded_for_action_host",
-        )
-    return None
 
 
 def _emit_mandatory_destruction_reaction_record(

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_presence import (
-    scenario_rules_unit_has_placed_alive_model,
+    scenario_rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -13,8 +13,8 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -46,17 +46,12 @@ def geometry_models_for_fight_attack_target_unit(
     unit_instance_id: str,
     state: GameState | None = None,
 ) -> tuple[GeometryModel, ...]:
-    """Return only living models from a placed melee attack target unit."""
-    models = geometry_models_for_fight_unit(
+    """Return present target geometry, including retained Fight On Death bases."""
+    return geometry_models_for_fight_unit(
         scenario=scenario,
         unit_instance_id=unit_instance_id,
         state=state,
     )
-    unit = scenario.unit_instance_for_placement(
-        scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    )
-    living_model_ids = {model.model_instance_id for model in unit.own_models if model.is_alive}
-    return tuple(model for model in models if model.model_id in living_model_ids)
 
 
 def attack_targetable_engaged_enemy_unit_ids(
@@ -304,7 +299,7 @@ def enemy_unit_ids_for_fight_placement(
         if army.player_id != unit_placement.player_id
         for unit in army.units
         if scenario.battlefield_state.is_unit_placed(unit.unit_instance_id)
-        and scenario_rules_unit_has_placed_alive_model(
+        and scenario_rules_unit_has_present_model(
             scenario=scenario,
             rules_unit=rules_unit_view_from_armies(
                 armies=scenario.armies,

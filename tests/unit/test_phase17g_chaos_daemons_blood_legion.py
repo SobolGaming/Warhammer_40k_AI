@@ -796,17 +796,14 @@ def test_furys_cage_fight_on_death_uses_same_activation_and_retains_identity() -
         for army in restored_state.army_definitions
         for attached in army.attached_units
     )
-    continued_payload = _event_payload(
-        decisions,
-        "fight_on_death_active_activation_continued",
-    )
+    continued_payload = _event_payload(decisions, "unit_has_fought")
     activation_payload = cast(
         dict[str, JsonValue],
         continued_payload["activation_selection"],
     )
     assert activation_payload["result_id"] == original_activation_result_id
-    removed_payload = _event_payload(decisions, "fight_on_death_models_removed")
-    assert removed_payload["model_instance_ids"] == [bearer_model_id]
+    removed_payload = _event_payload(decisions, "fight_on_death_destruction_completed")
+    assert removed_payload["model_instance_id"] == bearer_model_id
     assert removed_payload["reason"] == "unit_fight_completed"
     _event_payload(
         decisions,

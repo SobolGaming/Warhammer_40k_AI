@@ -93,6 +93,7 @@ def fight_lifecycle(
     battle_phase: BattlePhase = BattlePhase.FIGHT,
     poses_by_unit_key: dict[str, tuple[Pose, ...]] | None = None,
     alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_config = (
         fight_config(
@@ -110,6 +111,7 @@ def fight_lifecycle(
             enemy_faction_id=enemy_faction_id,
             enemy_detachment_ids=enemy_detachment_ids,
             alpha_attachment_declarations=alpha_attachment_declarations,
+            enemy_attachment_declarations=enemy_attachment_declarations,
         )
         if config is None
         else config
@@ -209,6 +211,7 @@ def fight_config(
     enemy_faction_id: str = "core-marine-force",
     enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
     alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
@@ -243,6 +246,7 @@ def fight_config(
                 unit_specs=enemy_unit_specs,
                 faction_id=enemy_faction_id,
                 detachment_ids=enemy_detachment_ids,
+                attachment_declarations=enemy_attachment_declarations,
             ),
         ),
         player_ids=("player-a", "player-b"),

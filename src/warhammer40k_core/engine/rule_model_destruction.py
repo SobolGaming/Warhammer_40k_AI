@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import rule_deadly_demise_mortal_wound_routing as _r
 from warhammer40k_core.engine.attached_unit_reconciliation import (
@@ -54,9 +52,6 @@ from warhammer40k_core.engine.destruction_source_attribution import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import (
-    restore_selected_model_awaiting_fight_on_death,
-)
 from warhammer40k_core.engine.model_destruction_cause_producers import (
     append_rule_effect_model_destroyed_event as _append_model_destroyed,
 )
@@ -77,6 +72,8 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
     destruction_source_objective_proximity_witness,
     rules_unit_objective_proximity_witness,
 )
+from warhammer40k_core.engine.retained_attack_permissions import RETAINED_ATTACK_REACTION_KINDS
+from warhammer40k_core.engine.retained_destruction_rule import offer_rule_fight_on_death
 from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
     RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
@@ -94,8 +91,8 @@ from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
 from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
     validate_applied_damage_rule_destruction_context,
 )
-from warhammer40k_core.engine.rule_model_destruction_fight_on_death import (
-    fight_on_death_activation_result_id_for_rule_destruction,
+from warhammer40k_core.engine.rule_model_destruction_result import (
+    RuleModelDestructionResult as RuleModelDestructionResult,
 )
 from warhammer40k_core.engine.rule_model_destruction_source_liabilities import (
     consume_rule_destruction_source_liabilities,
@@ -108,37 +105,6 @@ if TYPE_CHECKING:
 RULE_MODEL_DESTRUCTION_FINALIZED_EVENT = "rule_model_destruction_finalized"
 is_rule_model_destruction_mortal_wound_request = _r.is_rule_model_destruction_mortal_wound_request
 _mortal_wound_waiting_status = _r.rule_deadly_demise_mortal_wound_waiting_status
-
-
-@dataclass(frozen=True, slots=True)
-class RuleModelDestructionResult:
-    model_destroyed_event_id: str | None
-    removal_record: ModelRemovalRecord | None
-    transition_batch: BattlefieldTransitionBatch | None
-    status: LifecycleStatus | None = None
-
-    def __post_init__(self) -> None:
-        if self.model_destroyed_event_id is not None:
-            object.__setattr__(
-                self,
-                "model_destroyed_event_id",
-                _validate_identifier("model_destroyed_event_id", self.model_destroyed_event_id),
-            )
-        if self.removal_record is not None and type(self.removal_record) is not ModelRemovalRecord:
-            raise GameLifecycleError("Rule destruction removal record is invalid.")
-        if self.transition_batch is not None and type(self.transition_batch) is not (
-            BattlefieldTransitionBatch
-        ):
-            raise GameLifecycleError("Rule destruction transition batch is invalid.")
-        if self.status is not None and type(self.status) is not LifecycleStatus:
-            raise GameLifecycleError("Rule destruction status must be LifecycleStatus or None.")
-        completed = (
-            self.model_destroyed_event_id is not None
-            and self.removal_record is not None
-            and self.transition_batch is not None
-        )
-        if self.status is None and not completed:
-            raise GameLifecycleError("Completed rule destruction requires removal artifacts.")
 
 
 def destroy_model_with_rule_reactions(
@@ -490,6 +456,13 @@ def _continue_rule_deadly_demise_sources(
         decisions=decisions,
         root_context=root_context,
     )
+    retention_status = offer_rule_fight_on_death(
+        state=state,
+        decisions=decisions,
+        root_context=root_context,
+    )
+    if retention_status is not None:
+        return retention_status
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     model_id = _payload_string(root_context, "model_instance_id")
     controller_player_id = _payload_string(root_context, "destroyed_model_controller_player_id")
@@ -763,7 +736,7 @@ def _remove_rule_destroyed_model_and_continue(
         sources=tuple(
             source
             for source in state.destruction_reaction_sources_for_model(model_instance_id=model_id)
-            if source.optional
+            if source.optional and source.reaction_kind not in RETAINED_ATTACK_REACTION_KINDS
         ),
         rules_unit_instance_id=rules_unit_id,
         model_instance_id=model_id,
@@ -1096,23 +1069,7 @@ def apply_rule_model_destruction_reaction_decision(
         selected_source is not None
         and selected_source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
     ):
-        restore_selected_model_awaiting_fight_on_death(
-            state=state,
-            decisions=decisions,
-            model_destroyed_event_id=_payload_string(context, "model_destroyed_event_id"),
-            model_instance_id=_payload_string(context, "model_instance_id"),
-            source_id=selected_source.source_id,
-            source_rule_id=selected_source.source_rule_id,
-            source_phase=BattlePhaseKind.FIGHT,
-            activation_result_id=(
-                fight_on_death_activation_result_id_for_rule_destruction(
-                    state=state,
-                    context=context,
-                    reaction_result_id=result.result_id,
-                )
-            ),
-            completion_context=context,
-        )
+        raise GameLifecycleError("Fight On Death must be selected before physical removal.")
     decisions.event_log.append(
         "destruction_reaction_resolved",
         validate_json_value(
@@ -1133,11 +1090,6 @@ def apply_rule_model_destruction_reaction_decision(
             }
         ),
     )
-    if (
-        selected_source is not None
-        and selected_source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
-    ):
-        return context
     finalize_rule_model_destruction(state=state, decisions=decisions, context=context)
     return None
 

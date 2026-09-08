@@ -20,7 +20,7 @@ from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
 from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
+from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
 from warhammer40k_core.engine.physical_engagement import (
     current_physically_engaged_enemy_rules_unit_ids,
     current_rules_unit_is_physically_engaged,

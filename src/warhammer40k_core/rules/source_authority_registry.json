@@ -440,6 +440,26 @@
           "audit_id": "core-modifiers-maintained-app-mirrors-2026-09-07",
           "identity_kind": "observed_at",
           "identity_value": "2026-09-07T16:05:47Z"
+        },
+        {
+          "audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+          "row_id": "retained-presence:gdm-v931",
+          "source_observation_sha256": "175989634a824a069106f3097fcacec41b5935da1bf90f195e56b6b18990c2d6",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
+        },
+        {
+          "audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+          "row_id": "fight-on-death:40k-app",
+          "source_observation_sha256": "a1a92b105252f4bd310fd8e721fd1d22729efd66875ecceea694480eedc51291",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/05-attack-sequence",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-07T21:35:45Z"
         }
       ],
       "legacy_observations": [
@@ -812,6 +832,16 @@
             "gw-11e-core-modifiers:psychic-individual-modifiers"
           ],
           "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-fight-on-death",
+          "version": "maintained-app-mirrors-observed-2026-09-07",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-fight-on-death:fight-on-death",
+            "gw-11e-core-fight-on-death:retained-presence"
+          ],
+          "catalog_sha256": null
         }
       ]
     },
@@ -852,6 +882,26 @@
           "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
           "identity_kind": "versioned_observation",
           "identity_value": "946@2026-09-05T22:36:11+00:00"
+        },
+        {
+          "audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+          "row_id": "space-marines:hellblaster-squad:for-the-chapter",
+          "source_observation_sha256": "d4274993057452b0f88dc4a3f0cff441f82c9503b16fb2f8f7e62cbab424e28d",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/space-marines/units/hellblaster-squad",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-08T01:39:45+00:00"
+        },
+        {
+          "audit_id": "retained-attack-faction-app-mirror-2026-09-08",
+          "row_id": "grey-knights:hallowed-conclave:unending-fidelity",
+          "source_observation_sha256": "27e9d21da15cbbf3117914f9be65a66f703d031f7dd2ff11a69feaa2deb2e0ec",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/factions/grey-knights/detachments/hallowed-conclave",
+          "policy_id": "faction-source-policy:maintained-direct-app-data-mirror:2026-09-05",
+          "identity_kind": "versioned_observation",
+          "identity_value": "946@2026-09-08T01:39:45+00:00"
         }
       ],
       "legacy_observations": [],
@@ -866,6 +916,16 @@
             "faction-app:adepta-sororitas:detachment:sanctified-orators"
           ],
           "catalog_sha256": "81ab4a71ea5e22f4fae34a657c49e5abcbfce37977bb1a32ed72917d4532eb91"
+        },
+        {
+          "namespace": "core-v2-reviewed-app-mirror",
+          "package_name": "reviewed-retained-attack-faction-sources",
+          "version": "app-data-946-observed-2026-09-08",
+          "allowed_rule_source_ids": [
+            "faction-app:grey-knights:hallowed-conclave:unending-fidelity",
+            "faction-app:space-marines:hellblaster-squad:for-the-chapter"
+          ],
+          "catalog_sha256": "e1f80012ea30fdaf487ba1f4737e93da5b34dc40b70011f26592060c4d9a5ba0"
         }
       ]
     }

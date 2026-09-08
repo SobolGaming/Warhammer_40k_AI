@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.ability_presence import (
     AbilitySpatialRelationship,
+    ability_presence,
     ability_spatial_relationship,
 )
 from warhammer40k_core.engine.game_state import GameState
@@ -10,11 +11,11 @@ from warhammer40k_core.engine.rule_target_resolution import (
     canonical_keyword,
     unit_has_required_keywords,
 )
-from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
+from warhammer40k_core.engine.rules_unit_geometry import present_geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -64,7 +65,7 @@ def aura_affected_unit_ids(
     excluded_keywords = _excluded_keywords(clause.conditions)
     include_source_unit = _aura_includes_source_unit(clause)
     affected: list[str] = []
-    for target_rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+    for target_rules_unit in rules_unit_views_for_state(state=state):
         if (
             target_rules_unit.unit_instance_id == source_rules_unit.unit_instance_id
             and not include_source_unit
@@ -106,7 +107,7 @@ def aura_affected_unit_ids(
             continue
         if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
             continue
-        target_geometries = _placed_alive_rules_unit_geometries(
+        target_geometries = _present_rules_unit_geometries(
             state=state,
             rules_unit=target_rules_unit,
         )
@@ -126,7 +127,7 @@ def _aura_source_geometries(
     source_model_instance_id: str | None,
     anchor_kind: str,
 ) -> tuple[GeometryModel, ...]:
-    source_geometries = _placed_alive_rules_unit_geometries(
+    source_geometries = _present_rules_unit_geometries(
         state=state,
         rules_unit=source_rules_unit,
     )
@@ -136,10 +137,11 @@ def _aura_source_geometries(
         raise GameLifecycleError("Aura anchor kind is unsupported.")
     if source_model_instance_id is None:
         raise GameLifecycleError("Aura this_model anchor requires source_model_instance_id.")
-    if source_model_instance_id not in {
-        model.model_instance_id for model in source_rules_unit.alive_models()
-    }:
-        raise GameLifecycleError("Aura source model must be alive in the source rules unit.")
+    if (
+        source_model_instance_id
+        not in ability_presence(state=state, rules_unit=source_rules_unit).active_model_ids
+    ):
+        raise GameLifecycleError("Aura source model must have active ability presence.")
     if not source_geometries:
         return ()
     matching_geometries = tuple(
@@ -150,24 +152,13 @@ def _aura_source_geometries(
     return matching_geometries
 
 
-def _placed_alive_rules_unit_geometries(
+def _present_rules_unit_geometries(
     *,
     state: GameState,
     rules_unit: RulesUnitView,
 ) -> tuple[GeometryModel, ...]:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Aura evaluation requires battlefield_state.")
-    alive_model_ids = {model.model_instance_id for model in rules_unit.alive_models()}
-    if not alive_model_ids.intersection(battlefield.placed_model_ids()):
-        return ()
-    return tuple(
-        geometry
-        for geometry in geometry_models_for_rules_unit(
-            state=state,
-            unit_instance_id=rules_unit.unit_instance_id,
-        )
-        if geometry.model_id in alive_model_ids
+    return present_geometry_models_for_rules_unit(
+        state=state, unit_instance_id=rules_unit.unit_instance_id
     )
 
 

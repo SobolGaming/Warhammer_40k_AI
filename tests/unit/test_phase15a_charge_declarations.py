@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 from tests.support.selected_target_charge_fixtures import (
     selected_target_charge_persisting_effect,
@@ -89,7 +90,6 @@ from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollMan
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -2734,9 +2734,7 @@ def test_charge_targets_use_canonical_attached_rules_unit_identity_after_round_t
     assert endpoint_witness["non_target_engaged_unit_instance_ids"] == []
 
 
-def test_charge_targets_require_living_authority_but_measure_mixed_unit_from_retained_base() -> (
-    None
-):
+def test_charge_targets_include_retained_units_and_measure_mixed_retained_geometry() -> None:
     lifecycle, units = _charge_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_unit_ids=("retained-only", "mixed-target"),
@@ -2779,7 +2777,8 @@ def test_charge_targets_require_living_authority_but_measure_mixed_unit_from_ret
             damage=model.wounds_remaining,
             damage_kind=DamageKind.NORMAL,
         )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=lifecycle.decision_controller,
         state=state,
         placement=retained_model_placement,
         effect_id="phase15a:fight-on-death:retained-only-charge-target",
@@ -2794,7 +2793,8 @@ def test_charge_targets_require_living_authority_but_measure_mixed_unit_from_ret
         damage=mixed_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=lifecycle.decision_controller,
         state=state,
         placement=mixed_model_placement,
         effect_id="phase15a:fight-on-death:mixed-charge-target",
@@ -2815,7 +2815,7 @@ def test_charge_targets_require_living_authority_but_measure_mixed_unit_from_ret
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
     )
     assert mixed_target.unit_instance_id in target_ids
-    assert retained_only.unit_instance_id not in target_ids
+    assert retained_only.unit_instance_id in target_ids
 
 
 def test_repeated_selected_target_charge_effects_coalesce_one_reroll_and_require_all_targets() -> (

@@ -5,9 +5,6 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine import model_destruction_cause_payload_validation as _mdcpv
 from warhammer40k_core.engine import mortal_wound_application_authority as _mwaa
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import (
-    FIGHT_ON_DEATH_AWAITING_EFFECT_KIND,
-)
 from warhammer40k_core.engine.model_destruction_cause_attack_restore import (
     active_attack_destruction_context_ids,
     mortal_application_contains_damage,
@@ -31,7 +28,6 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
-    from warhammer40k_core.engine.effects import PersistingEffect
     from warhammer40k_core.engine.event_log import EventRecord
     from warhammer40k_core.engine.game_state import GameState
 
@@ -40,6 +36,7 @@ def validate_pending_model_destruction_cause_inventory(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
     from warhammer40k_core.engine.attack_sequence_model import DEADLY_DEMISE_SOURCE_KIND
@@ -58,6 +55,11 @@ def validate_pending_model_destruction_cause_inventory(
         is_mortal_wound_resolution_request,
         mortal_wound_resolution_source_context,
     )
+    from warhammer40k_core.engine.retained_destruction_history import (
+        retained_attack_sequence_for_cause,
+        validate_retained_destruction_history,
+    )
+    from warhammer40k_core.engine.retained_destruction_state import RetainedDestructionStage
     from warhammer40k_core.engine.rule_deadly_demise_mortal_wound_routing import (
         RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
     )
@@ -66,8 +68,18 @@ def validate_pending_model_destruction_cause_inventory(
         rules_unit_view_by_id,
     )
 
+    retained = validate_retained_destruction_history(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
+    )
     active_attack_sequence = active_attack_sequence_for_state(state)
-    expected_cause_ids: set[str] = set()
+    expected_cause_ids: set[str] = {
+        record.cause_id
+        for record in retained
+        if record.stage is not RetainedDestructionStage.REMOVED
+    }
     if active_attack_sequence is not None:
         from warhammer40k_core.engine.model_destruction_cause_producers import (
             attack_damage_model_destruction_cause_id_for_context,
@@ -202,32 +214,6 @@ def validate_pending_model_destruction_cause_inventory(
             ):
                 raise GameLifecycleError("Pending rule destruction continuation drift.")
             expected_cause_ids.add(cause_id)
-    for effect in state.persisting_effects:
-        effect_payload = effect.effect_payload
-        if not isinstance(effect_payload, dict) or effect_payload.get("effect_kind") != (
-            FIGHT_ON_DEATH_AWAITING_EFFECT_KIND
-        ):
-            continue
-        child_matches = tuple(
-            authority
-            for authority in state.model_destruction_cause_authorities
-            if authority.model_destroyed_event is not None
-            and effect.effect_id
-            == f"fight-on-death-awaiting:{authority.model_destroyed_event.event_id}"
-        )
-        if len(child_matches) != 1:
-            raise GameLifecycleError(
-                "Fight On Death continuation lacks one consumed cause authority."
-            )
-        for parent_id in child_matches[0].parent_cause_ids:
-            parent = model_destruction_cause_authority_by_id_or_none(
-                state=state,
-                cause_id=parent_id,
-            )
-            if parent is None:
-                raise GameLifecycleError("Fight On Death continuation parent cause is missing.")
-            if not parent.source_authority_finalized:
-                expected_cause_ids.add(parent_id)
     pending_by_id = {
         authority.cause_id: authority
         for authority in state.model_destruction_cause_authorities
@@ -275,18 +261,22 @@ def validate_pending_model_destruction_cause_inventory(
         if authority.cause_kind is not ModelDestructionCauseKind.ATTACK_DAMAGE:
             continue
         context = authority.producer_context
-        if active_attack_sequence is None or (
-            context.get("sequence_id") != active_attack_sequence.sequence_id
+        retained_sequence = retained_attack_sequence_for_cause(
+            state=state, records=retained, cause_id=authority.cause_id
+        )
+        source_sequence = active_attack_sequence if retained_sequence is None else retained_sequence
+        if source_sequence is None or (
+            context.get("sequence_id") != source_sequence.sequence_id
             or context.get("attack_context_id")
-            not in active_attack_destruction_context_ids(active_attack_sequence)
-            or context.get("attacker_player_id") != active_attack_sequence.attacker_player_id
+            not in active_attack_destruction_context_ids(source_sequence)
+            or context.get("attacker_player_id") != source_sequence.attacker_player_id
             or context.get("attacking_unit_instance_id")
-            != active_attack_sequence.attacking_unit_instance_id
+            != source_sequence.attacking_unit_instance_id
             or rules_unit_owner_player_id(
                 state=state,
-                unit_instance_id=active_attack_sequence.attacking_unit_instance_id,
+                unit_instance_id=source_sequence.attacking_unit_instance_id,
             )
-            != active_attack_sequence.attacker_player_id
+            != source_sequence.attacker_player_id
         ):
             raise GameLifecycleError("Pending attack destruction source binding drift.")
 
@@ -405,6 +395,17 @@ def validate_model_logical_death_inventory(
                 or not placement_matches
             ):
                 raise GameLifecycleError("Pending mortal-wound logical-death state binding drift.")
+    from warhammer40k_core.engine.hazardous_retention_history import (
+        pending_hazardous_logical_deaths,
+    )
+
+    for event in pending_hazardous_logical_deaths(state=state, event_records=event_records):
+        _claim_logical_death_event(
+            event=event,
+            claimant="pending-hazardous-router",
+            canonical_by_id=canonical_by_id,
+            claims_by_event_id=claims_by_event_id,
+        )
     logical_events = tuple(
         event for event in event_records if event.event_type == MODEL_LOGICAL_DEATH_RECORDED_EVENT
     )
@@ -1046,7 +1047,11 @@ def _attack_deadly_demise_parent_and_application(
         parent is None
         or parent.cause_kind is not ModelDestructionCauseKind.ATTACK_DAMAGE
         or parent.producer_id != authority.producer_id
-        or (require_parent_finalized and not parent.source_authority_finalized)
+        or (
+            require_parent_finalized
+            and not parent.source_authority_finalized
+            and not _retained_parent_owns_collateral_continuation(state=state, parent=parent)
+        )
     ):
         raise GameLifecycleError("Attack Deadly Demise collateral parent authority drift.")
     parent_damage = _mdcpv.parse_damage_application(
@@ -1097,6 +1102,37 @@ def _attack_deadly_demise_parent_and_application(
     return parent, parent_damage, applied_events[0]
 
 
+def _retained_parent_owns_collateral_continuation(
+    *, state: GameState, parent: ModelDestructionCauseAuthority
+) -> bool:
+    from warhammer40k_core.engine.retained_destruction_history import (
+        retained_attack_sequence_for_cause,
+    )
+    from warhammer40k_core.engine.retained_destruction_state import (
+        RetainedDestructionStage,
+        retained_destructions,
+    )
+
+    records = tuple(
+        record
+        for record in retained_destructions(state=state)
+        if record.is_retained or record.stage is RetainedDestructionStage.REMOVED
+    )
+    sequence = retained_attack_sequence_for_cause(
+        state=state,
+        records=records,
+        cause_id=parent.cause_id,
+    )
+    return (
+        sequence is not None
+        and sequence.sequence_id == parent.producer_context.get("sequence_id")
+        and any(
+            pending.damage_application.model_instance_id == parent.model_instance_id
+            for pending in sequence.pending_attack_destructions
+        )
+    )
+
+
 def validate_rule_effect_completion_or_pending_window(
     *,
     state: GameState,
@@ -1127,12 +1163,7 @@ def validate_rule_effect_completion_or_pending_window(
         ):
             pending_request_values.append(request)
     pending_requests = tuple(pending_request_values)
-    awaiting_effects = tuple(
-        effect
-        for effect in state.persisting_effects
-        if effect.effect_id == f"fight-on-death-awaiting:{destroyed_event.event_id}"
-    )
-    if len(finalization_events) == 1 and not pending_requests and not awaiting_effects:
+    if len(finalization_events) == 1 and not pending_requests:
         event = finalization_events[0]
         payload = _mdcpv.json_object_value(event.payload, "rule destruction finalization")
         destroyed_payload = _mdcpv.json_object_value(
@@ -1162,25 +1193,14 @@ def validate_rule_effect_completion_or_pending_window(
             event_records=event_records,
         )
         return
-    if finalization_events or (pending_requests and awaiting_effects):
+    if finalization_events:
         raise GameLifecycleError("Rule destruction completion authority is ambiguous.")
     _require_rule_mode_completion_absent(
         authority=authority,
         destroyed_event=destroyed_event,
         event_records=event_records,
     )
-    if not pending_requests:
-        if len(awaiting_effects) != 1:
-            raise GameLifecycleError("Rule destruction completion authority is ambiguous.")
-        _validate_pending_rule_fight_on_death_effect(
-            authority=authority,
-            attribution=attribution,
-            destroyed_event=destroyed_event,
-            effect=awaiting_effects[0],
-            event_records=event_records,
-        )
-        return
-    if len(pending_requests) != 1 or awaiting_effects:
+    if len(pending_requests) != 1:
         raise GameLifecycleError("Rule destruction completion authority is ambiguous.")
     request = pending_requests[0]
     request_payload = _mdcpv.json_object_value(
@@ -1235,86 +1255,6 @@ def validate_rule_effect_completion_or_pending_window(
         != attribution.destruction_provenance.to_payload()
     ):
         raise GameLifecycleError("Rule destruction reaction window binding drift.")
-
-
-def _validate_pending_rule_fight_on_death_effect(
-    *,
-    authority: ModelDestructionCauseAuthority,
-    attribution: ModelDestructionAttribution,
-    destroyed_event: EventRecord,
-    effect: PersistingEffect,
-    event_records: tuple[EventRecord, ...],
-) -> None:
-    context = authority.producer_context
-    payload = _mdcpv.json_object_value(
-        effect.effect_payload,
-        "pending rule Fight On Death effect",
-    )
-    completion_context = _mdcpv.json_object_value(
-        payload.get("completion_context"),
-        "pending rule Fight On Death completion context",
-    )
-    destroyed_payload = _mdcpv.json_object_value(
-        destroyed_event.payload,
-        "pending rule Fight On Death model_destroyed",
-    )
-    awaiting_events = tuple(
-        event
-        for event in event_records
-        if event.event_type == "fight_on_death_model_awaiting_attack"
-        and isinstance(event.payload, dict)
-        and event.payload.get("effect_id") == effect.effect_id
-    )
-    if len(awaiting_events) != 1:
-        raise GameLifecycleError("Pending rule Fight On Death lacks one canonical awaiting event.")
-    awaiting_event = awaiting_events[0]
-    awaiting_payload = _mdcpv.json_object_value(
-        awaiting_event.payload,
-        "pending rule Fight On Death awaiting event",
-    )
-    attribution_payload = attribution.to_payload()
-    if (
-        payload.get("effect_kind") != FIGHT_ON_DEATH_AWAITING_EFFECT_KIND
-        or payload.get("model_instance_id") != authority.model_instance_id
-        or type(payload.get("activation_result_id")) is not str
-        or not payload.get("activation_result_id")
-        or effect.target_unit_instance_ids != (authority.physical_unit_instance_id,)
-        or _mdcpv.event_index(event_records, awaiting_event)
-        <= _mdcpv.event_index(event_records, destroyed_event)
-        or awaiting_payload.get("game_id") != authority.game_id
-        or awaiting_payload.get("battle_round") != destroyed_payload.get("battle_round")
-        or awaiting_payload.get("phase") != context.get("source_phase")
-        or awaiting_payload.get("model_instance_id") != authority.model_instance_id
-        or awaiting_payload.get("unit_instance_id") != authority.physical_unit_instance_id
-        or type(awaiting_payload.get("source_id")) is not str
-        or not awaiting_payload.get("source_id")
-        or awaiting_payload.get("source_rule_id") != effect.source_rule_id
-        or awaiting_payload.get("effect_id") != effect.effect_id
-        or awaiting_payload.get("model_placement") != context.get("destroyed_model_placement")
-        or completion_context.get("context_kind") != "rule_model_destroyed"
-        or completion_context.get("game_id") != authority.game_id
-        or completion_context.get("completion_kind") != context.get("completion_kind")
-        or completion_context.get("completion_event_type") != context.get("completion_event_type")
-        or completion_context.get("completion_event_payload")
-        != context.get("completion_event_payload")
-        or completion_context.get("source_rule_id") != context.get("source_rule_id")
-        or completion_context.get("source_result_id") != authority.producer_id
-        or completion_context.get("source_effect_ids") != context.get("source_effect_ids")
-        or completion_context.get("phase") != context.get("source_phase")
-        or completion_context.get("source_step") != context.get("source_step")
-        or completion_context.get("model_instance_id") != authority.model_instance_id
-        or completion_context.get("target_unit_instance_id") != authority.physical_unit_instance_id
-        or completion_context.get("rules_unit_instance_id") != authority.rules_unit_instance_id
-        or completion_context.get("destroyed_model_placement")
-        != context.get("destroyed_model_placement")
-        or completion_context.get("damage_application") != context.get("damage_application")
-        or completion_context.get("model_destroyed_event_id") != destroyed_event.event_id
-        or completion_context.get("removal_record") != destroyed_payload.get("removal_record")
-        or completion_context.get("transition_batch") != destroyed_payload.get("transition_batch")
-        or any(completion_context.get(key) != value for key, value in attribution_payload.items())
-        or completion_context.get("destroyed_model_controller_player_id") != effect.owner_player_id
-    ):
-        raise GameLifecycleError("Pending rule Fight On Death authority binding drift.")
 
 
 def _validate_rule_mode_completion_event(

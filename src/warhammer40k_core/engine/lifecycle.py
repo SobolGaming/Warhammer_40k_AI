@@ -131,7 +131,6 @@ from warhammer40k_core.engine.deployment import (
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.dice_result_overrides import (
     DICE_RESULT_OVERRIDE_DECISION_TYPE,
-    apply_dice_result_override_decision,
 )
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import (
@@ -773,6 +772,16 @@ class GameLifecycle:
         )
         if continuation_status is not None:
             return continuation_status
+        from warhammer40k_core.engine.retained_shooting import advance_retained_shooting
+
+        retained_shooting_status = advance_retained_shooting(
+            state=state,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            army_catalog=self._require_config().army_catalog,
+        )
+        if retained_shooting_status is not None:
+            return retained_shooting_status
         out_of_phase_status = self._shooting_phase_handler.advance_out_of_phase_shooting_if_needed(
             state=state,
             decisions=self.decision_controller,
@@ -1654,6 +1663,12 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
+        from warhammer40k_core.engine.retained_destruction_cleanup import (
+            active_retained_attack_destruction,
+        )
+
+        if active_retained_attack_destruction(state=state) is not None:
+            return self._apply_attack_sequence_decision(record, result)
         resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
         if _destroyed_transport_request_is_fight_owned(
             state=state,
@@ -1816,50 +1831,31 @@ class GameLifecycle:
         record: DecisionRecord,
         result: DecisionResult,
     ) -> LifecycleStatus:
+        from warhammer40k_core.engine.lifecycle_attack_dispatch import (
+            AttackDecisionDispatchContext,
+            apply_attack_sequence_decision,
+        )
+
         state = self._require_state()
-        if record.request.decision_type == DICE_RESULT_OVERRIDE_DECISION_TYPE:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            fight_owned = _fight_decision_owns_request(state=state, request=record.request)
-            apply_dice_result_override_decision(
-                state=state,
-                decisions=self.decision_controller,
-                request=record.request,
-                result=result,
-            )
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                if fight_owned:
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=advanced_status,
-                    )
-                else:
-                    handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                        result=result,
-                        status=advanced_status,
-                    )
-                    if handled_status is not None:
-                        return handled_status
-            return advanced_status
-        if _mw_model.is_mortal_wound_resolution_request(record.request):
-            return self._apply_mortal_wound_resolution_decision(record=record, result=result)
-        if rule_model_destruction.is_rule_model_destruction_reaction_request(record.request):
-            destruction_phase = rule_model_destruction.rule_model_destruction_phase(record.request)
-            if destruction_phase is BattlePhase.FIGHT:
-                return self._apply_fight_phase_decision(record, result)
-            if destruction_phase is BattlePhase.SHOOTING:
-                return self._apply_shooting_phase_decision(record, result)
-            raise GameLifecycleError("Rule destruction reaction phase has no action host.")
-        if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
+        context = AttackDecisionDispatchContext(
             state=state,
-            request=record.request,
-        ):
-            return self._apply_fight_phase_decision(record, result)
-        if record.request.decision_type in _SHOOTING_DECISION_TYPES:
-            return self._apply_shooting_phase_decision(record, result)
-        if record.request.decision_type in _FIGHT_DECISION_TYPES:
-            return self._apply_fight_phase_decision(record, result)
-        raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
+            decisions=self.decision_controller,
+            ruleset_descriptor=lambda: self._require_config().ruleset_descriptor,
+            runtime_modifier_registry=lambda: (
+                self._require_runtime_content_bundle().runtime_modifier_registry
+            ),
+            fight_owned=_fight_decision_owns_request(state=state, request=record.request),
+            resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
+            fight_decision_types=_FIGHT_DECISION_TYPES,
+            shooting_decision_types=_SHOOTING_DECISION_TYPES,
+            advance=self.advance_until_decision_or_terminal,
+            apply_fight=self._apply_fight_phase_decision,
+            apply_shooting=self._apply_shooting_phase_decision,
+            apply_mortal_wounds=self._apply_mortal_wound_resolution_decision,
+            continue_fight_reaction=self._continue_or_resolve_fight_reaction,
+            continue_shooting_reaction=self._continue_or_resolve_out_of_phase_reaction,
+        )
+        return apply_attack_sequence_decision(context, record=record, result=result)
 
     def _apply_mortal_wound_resolution_decision(
         self,
@@ -1875,6 +1871,11 @@ class GameLifecycle:
             )
             if status is not None:
                 return status
+            from warhammer40k_core.engine.retained_destruction_cleanup import (
+                complete_removed_retained_destructions,
+            )
+
+            complete_removed_retained_destructions(state=state, decisions=self.decision_controller)
             return self.advance_until_decision_or_terminal()
         movement_fnp_status = _movement_mw.apply_movement_fnp_if_applicable(
             state=state,
@@ -3296,6 +3297,17 @@ def _destroyed_transport_attack_sequence_for_request(
     sequence_id = required_movement_proposal_context_string(
         proposal_request, key="attack_sequence_id"
     )
+    from warhammer40k_core.engine.retained_destruction_cleanup import (
+        active_retained_attack_destruction,
+        attack_sequence_for_retained_destruction,
+    )
+
+    retained = active_retained_attack_destruction(state=state)
+    if retained is not None:
+        sequence = attack_sequence_for_retained_destruction(retained)
+        if sequence.sequence_id != sequence_id:
+            raise GameLifecycleError("Retained Transport placement sequence drift.")
+        return sequence
     fight_state = state.fight_phase_state
     if (
         fight_state is not None

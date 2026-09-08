@@ -50,7 +50,7 @@ from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_paylo
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
@@ -294,7 +294,7 @@ class CatalogSelectableAbilityModeRuntime:
             raise GameLifecycleError("Catalog ability mode source lookup requires GameState.")
         index = self.ability_indexes_by_player_id[player_id]
         sources: list[_ModeSource] = []
-        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        for rules_unit in rules_unit_views_for_state(state=state):
             if rules_unit.owner_player_id != player_id:
                 continue
             for component in rules_unit.components:

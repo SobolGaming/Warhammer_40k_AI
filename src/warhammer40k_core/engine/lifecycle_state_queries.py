@@ -10,6 +10,14 @@ if TYPE_CHECKING:
 
 
 def active_attack_sequence_for_state(state: GameState) -> AttackSequence | None:
+    from warhammer40k_core.engine.retained_destruction_cleanup import (
+        active_retained_attack_destruction,
+        attack_sequence_for_retained_destruction,
+    )
+
+    retained = active_retained_attack_destruction(state=state)
+    if retained is not None:
+        return attack_sequence_for_retained_destruction(retained)
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
         return out_of_phase_state.attack_sequence

@@ -83,7 +83,6 @@ from warhammer40k_core.engine.effects import (
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_activation_units import (
     active_fight_activation_rules_unit,
-    finalize_rule_destruction_after_fight_activation,
 )
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_end_hooks import (
@@ -143,15 +142,14 @@ from warhammer40k_core.engine.reaction_queue import (
     ReactionQueueFrame,
     TriggeredDecisionRequest,
 )
+from warhammer40k_core.engine.retained_destruction_cleanup import begin_retained_destruction_cleanup
+from warhammer40k_core.engine.retained_destruction_rule import resume_retained_rule_destruction
+from warhammer40k_core.engine.retained_destruction_selection import apply_retention_selection
 from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
 )
 from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
     continue_applied_mortal_wound_destruction_with_rule_reactions,
-)
-from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
-    apply_rule_destruction_fight_on_death_reaction,
-    remove_rule_fight_on_death_contexts_for_completed_activation,
 )
 from warhammer40k_core.engine.rule_model_destruction_source_liabilities import (
     consume_rule_destruction_source_liabilities,
@@ -1066,14 +1064,7 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
         army_catalog=package.army_catalog,
     )
 
-    assert (
-        handler.apply_decision(
-            state=state,
-            decisions=decisions,
-            result=reaction_record.result,
-        )
-        is None
-    )
+    apply_retention_selection(state=state, decisions=decisions, result=reaction_record.result)
     assert any(
         formation.attached_unit_instance_id == attached_id
         for army in state.army_definitions
@@ -1107,7 +1098,7 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
         if placement["model_instance_id"] == model_id
     )
     retained_placement["pose"]["position"]["x"] += 1.0
-    with pytest.raises(GameLifecycleError, match="retained model placement drift"):
+    with pytest.raises(GameLifecycleError, match="Retained destruction fixed placement drift"):
         GameLifecycle.from_payload(placement_drift)
     liability_drift = cast(
         GameLifecyclePayload,
@@ -1117,11 +1108,14 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
         effect
         for effect in liability_drift["state"]["persisting_effects"]
         if cast(dict[str, JsonValue], effect["effect_payload"]).get("effect_kind")
-        == "fight_on_death_awaiting_attack"
+        == "retained_model_destruction"
     )
     completion_context = cast(
         dict[str, JsonValue],
-        cast(dict[str, JsonValue], awaiting_effect["effect_payload"])["completion_context"],
+        cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], awaiting_effect["effect_payload"])["destruction"],
+        )["owner_context"],
     )
     source_effect_ids = cast(list[str], completion_context["source_effect_ids"])
     assert source_effect_ids
@@ -1130,7 +1124,7 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
         for effect in liability_drift["state"]["persisting_effects"]
         if effect["effect_id"] != source_effect_ids[0]
     ]
-    with pytest.raises(GameLifecycleError, match="source liability drift"):
+    with pytest.raises(GameLifecycleError, match="source liability effect is missing"):
         GameLifecycle.from_payload(liability_drift)
     context_drift = cast(
         GameLifecyclePayload,
@@ -1140,19 +1134,28 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
         effect
         for effect in context_drift["state"]["persisting_effects"]
         if cast(dict[str, JsonValue], effect["effect_payload"]).get("effect_kind")
-        == "fight_on_death_awaiting_attack"
+        == "retained_model_destruction"
     )
     cast(
         dict[str, JsonValue],
-        cast(dict[str, JsonValue], drifted_awaiting_effect["effect_payload"])["completion_context"],
+        cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], drifted_awaiting_effect["effect_payload"])["destruction"],
+        )["owner_context"],
     )["battle_round"] = state.battle_round + 1
-    with pytest.raises(GameLifecycleError, match="model_destroyed event drift"):
+    with pytest.raises(
+        GameLifecycleError, match="Fight On Death retained state differs from its event history"
+    ):
         GameLifecycle.from_payload(context_drift)
     assert not any(
         event.event_type == "fight_on_death_activation_started"
         for event in decisions.event_log.records
     )
 
+    assert (
+        begin_retained_destruction_cleanup(state=state, decisions=decisions, reason="phase_end")
+        is None
+    )
     completed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
@@ -1168,8 +1171,8 @@ def test_selected_to_fight_risk_fight_on_death_cleanup_retains_attached_identity
     assert not state.persisting_effects
     assert state.battlefield_state is not None
     assert model_id not in state.battlefield_state.placed_model_ids()
-    removed = _last_event_payload(decisions, "fight_on_death_models_removed")
-    assert removed["model_instance_ids"] == [model_id]
+    removed = _last_event_payload(decisions, "fight_on_death_destruction_completed")
+    assert removed["model_instance_id"] == model_id
     assert removed["reason"] == "phase_end"
 
 
@@ -1252,15 +1255,12 @@ def test_fight_end_fight_on_death_does_not_grant_second_activation() -> None:
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         army_catalog=package.army_catalog,
     )
+    apply_retention_selection(state=state, decisions=decisions, result=reaction_record.result)
+
     assert (
-        handler.apply_decision(
-            state=state,
-            decisions=decisions,
-            result=reaction_record.result,
-        )
+        begin_retained_destruction_cleanup(state=state, decisions=decisions, reason="phase_end")
         is None
     )
-
     completed = handler.begin_phase(state=state, decisions=decisions)
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
@@ -1275,8 +1275,8 @@ def test_fight_end_fight_on_death_does_not_grant_second_activation() -> None:
         event.event_type == "fight_on_death_activation_started"
         for event in decisions.event_log.records
     )
-    removed = _last_event_payload(decisions, "fight_on_death_models_removed")
-    assert removed["model_instance_ids"] == [model_id]
+    removed = _last_event_payload(decisions, "fight_on_death_destruction_completed")
+    assert removed["model_instance_id"] == model_id
     assert removed["reason"] == "phase_end"
 
 
@@ -1565,6 +1565,16 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
     mandatory_kind: DestructionReactionKind,
     expected_action_host: str,
 ) -> None:
+    with pytest.raises(
+        GameLifecycleError, match="Fight On Death grants require a finite source decision"
+    ):
+        _run_collateral_mandatory_action_after_restore(mandatory_kind, expected_action_host)
+
+
+def _run_collateral_mandatory_action_after_restore(
+    mandatory_kind: DestructionReactionKind,
+    expected_action_host: str,
+) -> None:
     state, _runtime, decisions, bodyguard, leader, enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
             bodyguard_model_count=2,
@@ -1681,11 +1691,14 @@ def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restor
         )
     )
 
+    retained = apply_retention_selection(
+        state=restored_state, decisions=restored_decisions, result=pause_record.result
+    )
+    from warhammer40k_core.engine.retained_destruction_rule import resume_retained_rule_destruction
+
     assert (
-        rule_model_destruction.apply_rule_model_destruction_reaction_decision(
-            state=restored_state,
-            decisions=restored_decisions,
-            result=pause_record.result,
+        resume_retained_rule_destruction(
+            state=restored_state, decisions=restored_decisions, record=retained
         )
         is None
     )
@@ -1818,14 +1831,7 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         army_catalog=package.army_catalog,
     )
 
-    assert (
-        handler.apply_decision(
-            state=state,
-            decisions=decisions,
-            result=reaction_record.result,
-        )
-        is None
-    )
+    apply_retention_selection(state=state, decisions=decisions, result=reaction_record.result)
     checkpoint_authorities = {
         authority.model_instance_id: authority
         for authority in state.model_destruction_cause_authorities
@@ -1837,7 +1843,7 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     assert root_authority.logical_death_event is not None
     assert collateral_authority.logical_death_event is not None
     assert root_authority.model_destroyed_event is None
-    assert collateral_authority.model_destroyed_event is not None
+    assert collateral_authority.model_destroyed_event is None
     assert model_by_id(state=state, model_instance_id=root_model_id).wounds_remaining == 0
     assert model_by_id(state=state, model_instance_id=bodyguard_model_id).wounds_remaining == 0
     assert state.battlefield_state is not None
@@ -1855,14 +1861,13 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     fight_on_death_awaiting_index = next(
         index
         for index, event in enumerate(checkpoint_records)
-        if event.event_type == "fight_on_death_model_awaiting_attack"
+        if event.event_type == "fight_on_death_retention_selected"
         and cast(dict[str, JsonValue], event.payload)["model_instance_id"] == bodyguard_model_id
     )
     assert (
         checkpoint_indexes[root_authority.logical_death_event.event_id]
         < checkpoint_indexes[collateral_authority.logical_death_event.event_id]
         < deadly_demise_applied_index
-        < checkpoint_indexes[collateral_authority.model_destroyed_event.event_id]
         < fight_on_death_awaiting_index
     )
     assert tuple(
@@ -1939,7 +1944,7 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     canonical_awaiting_event = next(
         event
         for event in relocated_decisions_payload["event_log"]
-        if event["event_type"] == "fight_on_death_model_awaiting_attack"
+        if event["event_type"] == "fight_on_death_retention_selected"
         and cast(dict[str, object], event["payload"])["model_instance_id"] == bodyguard_model_id
     )
     canonical_logical_event["event_type"], canonical_awaiting_event["event_type"] = (
@@ -1961,6 +1966,12 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
 
     round_tripped_state = GameState.from_payload(state.to_payload())
     round_tripped_decisions = DecisionController.from_payload(decisions.to_payload())
+    assert (
+        begin_retained_destruction_cleanup(
+            state=round_tripped_state, decisions=round_tripped_decisions, reason="phase_end"
+        )
+        is None
+    )
     completed = handler.begin_phase(
         state=round_tripped_state,
         decisions=round_tripped_decisions,
@@ -1989,16 +2000,15 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     fight_on_death_cleanup_index = next(
         index
         for index, event in enumerate(completed_records)
-        if event.event_type == "fight_on_death_models_removed"
-        and bodyguard_model_id
-        in cast(list[str], cast(dict[str, JsonValue], event.payload)["model_instance_ids"])
+        if event.event_type == "fight_on_death_destruction_completed"
+        and bodyguard_model_id == cast(dict[str, JsonValue], event.payload)["model_instance_id"]
     )
     assert (
         completed_indexes[completed_root_authority.logical_death_event.event_id]
         < completed_indexes[completed_collateral_authority.logical_death_event.event_id]
         < completed_indexes[completed_collateral_authority.model_destroyed_event.event_id]
-        < fight_on_death_cleanup_index
         < completed_indexes[completed_root_authority.model_destroyed_event.event_id]
+        < fight_on_death_cleanup_index
     )
     destroyed_ids = tuple(
         cast(dict[str, JsonValue], event.payload)["model_instance_id"]
@@ -2187,12 +2197,6 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
             "requires_destroyed_by_melee_attack": True,
         },
     )
-    mandatory_shoot_source = DestructionReactionSource(
-        source_id="phase12a:applied:mandatory-shoot-on-death",
-        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
-        source_rule_id="phase12a:applied:mandatory-shoot-on-death",
-        optional=False,
-    )
     state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
     state.record_model_destruction_reaction_sources(
         model_instance_id=model.model_instance_id,
@@ -2200,7 +2204,6 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
             eligible_source,
             roll_source,
             melee_only_source,
-            mandatory_shoot_source,
         ),
     )
     evidence = MortalWoundDestructionEvidence.for_non_attack_state(
@@ -2254,21 +2257,17 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
     offered_source_ids = {cast(str, payload["source_id"]) for payload in source_payloads}
     assert eligible_source.source_id in offered_source_ids
     assert melee_only_source.source_id not in offered_source_ids
-    assert any(
-        event.event_type == "destruction_reaction_trigger_rolled"
-        for event in decisions.event_log.records
-    )
-    not_applicable = _last_event_payload(decisions, "destruction_reaction_trigger_not_applicable")
-    assert cast(dict[str, JsonValue], not_applicable["selected_source"])["source_id"] == (
-        melee_only_source.source_id
-    )
-    mandatory = next(
+    triggers = [
         cast(dict[str, JsonValue], event.payload)
         for event in decisions.event_log.records
-        if event.event_type == "destruction_reaction_resolved"
-        and cast(dict[str, JsonValue], event.payload).get("resolution_kind") == "mandatory"
+        if event.event_type == "fight_on_death_retention_trigger_resolved"
+    ]
+    assert any(trigger["trigger_roll"] is not None for trigger in triggers)
+    not_applicable = next(trigger for trigger in triggers if not trigger["applicable"])
+    assert (
+        cast(dict[str, JsonValue], not_applicable["source"])["source_id"]
+        == melee_only_source.source_id
     )
-    assert mandatory["action_host"] == "shooting"
 
     record = decisions.submit_result(
         DecisionResult.for_request(
@@ -2278,17 +2277,18 @@ def test_applied_destruction_filters_optional_sources_then_decline_resumes_compl
         )
     )
     assert (
-        rule_model_destruction.apply_rule_model_destruction_reaction_decision(
+        resume_retained_rule_destruction(
             state=state,
             decisions=decisions,
-            result=record.result,
+            record=apply_retention_selection(
+                state=state, decisions=decisions, result=record.result
+            ),
         )
         is None
     )
     assert not decisions.queue.pending_requests
     assert (
-        _last_event_payload(decisions, "destruction_reaction_resolved")["execution_status"]
-        == "declined"
+        _last_event_payload(decisions, "fight_on_death_retention_selected")["stage"] == "declined"
     )
     assert (
         _last_event_payload(decisions, "phase12a_applied_optional_filter_completed")["filter"]
@@ -2386,7 +2386,7 @@ def test_applied_fight_on_death_continues_and_retains_attached_activation_identi
         )
     )
 
-    apply_rule_destruction_fight_on_death_reaction(
+    apply_retention_selection(
         state=state,
         decisions=decisions,
         result=record.result,
@@ -2401,28 +2401,25 @@ def test_applied_fight_on_death_continues_and_retains_attached_activation_identi
         for army in state.army_definitions
         for formation in army.attached_units
     )
-    continued = _last_event_payload(decisions, "fight_on_death_active_activation_continued")
-    assert cast(dict[str, JsonValue], continued["activation_selection"])["result_id"] == (
-        activation.result_id
+    decisions.event_log.append(
+        "unit_has_fought",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": "fight",
+            "activation_selection": activation.to_payload(),
+        },
     )
-
-    state.replace_fight_phase_state(state.fight_phase_state.with_active_activation(None))
-    completion_contexts = remove_rule_fight_on_death_contexts_for_completed_activation(
-        state=state,
-        decisions=decisions,
-        activation=activation,
-    )
-    assert len(completion_contexts) == 1
-    completion_context = completion_contexts[0]
     assert (
-        finalize_rule_destruction_after_fight_activation(
+        begin_retained_destruction_cleanup(
             state=state,
             decisions=decisions,
-            context=completion_context,
-            rules_unit_instance_id=attached_id,
+            unit_instance_id=attached_id,
+            reason="unit_fight_completed",
         )
         is None
     )
+    state.replace_fight_phase_state(state.fight_phase_state.with_active_activation(None))
     assert state.battlefield_state is not None
     assert model.model_instance_id not in state.battlefield_state.placed_model_ids()
     assert any(
@@ -2434,8 +2431,8 @@ def test_applied_fight_on_death_continues_and_retains_attached_activation_identi
     assert leader.unit_instance_id not in {
         record.unit_instance_id for record in state.starting_strength_records
     }
-    removed = _last_event_payload(decisions, "fight_on_death_models_removed")
-    assert removed["model_instance_ids"] == [model.model_instance_id]
+    removed = _last_event_payload(decisions, "fight_on_death_destruction_completed")
+    assert removed["model_instance_id"] == model.model_instance_id
     assert removed["reason"] == "unit_fight_completed"
 
 

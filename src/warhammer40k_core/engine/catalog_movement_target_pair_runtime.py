@@ -15,6 +15,7 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
     rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     CatalogMovementTargetPairDescriptor,
@@ -59,12 +60,12 @@ from warhammer40k_core.engine.rule_target_resolution import (
     unit_has_required_keywords,
 )
 from warhammer40k_core.engine.rules_unit_geometry import (
-    placed_alive_geometry_models_for_rules_unit,
+    present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.shooting_terrain_visibility import (
@@ -448,7 +449,7 @@ class CatalogMovementTargetPairRuntime:
             raise GameLifecycleError("Catalog movement target-pair lookup requires GameState.")
         source_models = tuple(
             model
-            for model in placed_alive_geometry_models_for_rules_unit(
+            for model in present_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=source.source_rules_unit.unit_instance_id,
             )
@@ -458,7 +459,7 @@ class CatalogMovementTargetPairRuntime:
             raise GameLifecycleError("Catalog movement target-pair source model is not placed.")
         source_model = source_models[0]
         candidates: list[RulesUnitView] = []
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        for view in rules_unit_views_for_state(state=state):
             if view.owner_player_id != source.source_rules_unit.owner_player_id:
                 continue
             if not rules_unit_has_placed_alive_model(state=state, rules_unit=view):
@@ -477,7 +478,7 @@ class CatalogMovementTargetPairRuntime:
                 for keyword in source.descriptor.excluded_keywords
             ):
                 continue
-            target_models = placed_alive_geometry_models_for_rules_unit(
+            target_models = present_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=view.unit_instance_id,
             )
@@ -505,10 +506,10 @@ class CatalogMovementTargetPairRuntime:
             source.source_model_instance_id
         )
         candidates: list[RulesUnitView] = []
-        for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        for view in rules_unit_views_for_state(state=state):
             if view.owner_player_id == source.source_rules_unit.owner_player_id:
                 continue
-            if not rules_unit_has_placed_alive_model(state=state, rules_unit=view):
+            if not rules_unit_has_present_model(state=state, rules_unit=view):
                 continue
             if unit_has_line_of_sight_to_target(
                 state=state,
@@ -516,7 +517,7 @@ class CatalogMovementTargetPairRuntime:
                 ruleset_descriptor=state.runtime_ruleset_descriptor(),
                 observing_unit=observing_unit,
                 observer_model_instance_id=source.source_model_instance_id,
-                placed_alive_models_only=True,
+                placed_alive_models_only=False,
                 target_unit_id=view.unit_instance_id,
                 terrain_features=state.battlefield_state.terrain_features,
                 terrain_areas=shooting_terrain_areas_for_state(state),

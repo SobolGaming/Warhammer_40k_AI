@@ -949,8 +949,8 @@ def test_non_attack_handoff_waits_for_optional_destruction_reaction_finalization
     )
     scenario.state.record_persisting_effect(liability)
     reaction = DestructionReactionSource(
-        source_id="test:horrors:pending-reaction:shoot-on-death",
-        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_id="test:horrors:pending-reaction:fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
         source_rule_id="test:horrors:pending-reaction:source-rule",
     )
     scenario.state.record_model_destruction_reaction_sources(
@@ -1004,14 +1004,32 @@ def test_non_attack_handoff_waits_for_optional_destruction_reaction_finalization
         selected_option_id=selected_option_id,
     )
     restored_decisions.submit_result(result)
-    assert (
-        rule_model_destruction.apply_rule_model_destruction_reaction_decision(
+    from warhammer40k_core.engine.retained_destruction_cleanup import (
+        begin_retained_destruction_cleanup,
+    )
+    from warhammer40k_core.engine.retained_destruction_rule import resume_retained_rule_destruction
+    from warhammer40k_core.engine.retained_destruction_selection import apply_retention_selection
+
+    retained = apply_retention_selection(
+        state=restored_state, decisions=restored_decisions, result=result
+    )
+    if select_reaction:
+        assert (
+            scenario.runtime.reconcile_non_attack_model_destruction_events(
+                state=restored_state, decisions=restored_decisions
+            )
+            is False
+        )
+        cleanup_status = begin_retained_destruction_cleanup(
+            state=restored_state, decisions=restored_decisions, reason="phase_end"
+        )
+    else:
+        cleanup_status = resume_retained_rule_destruction(
             state=restored_state,
             decisions=restored_decisions,
-            result=result,
+            record=retained,
         )
-        is None
-    )
+    assert cleanup_status is None
 
     assert (
         scenario.runtime.reconcile_non_attack_model_destruction_events(

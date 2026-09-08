@@ -46,6 +46,17 @@ def _resolve_hazardous_tests(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
 ) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.hazardous_retention import (
+        finish_retained_hazardous_damage,
+        resume_retained_hazardous_destructions,
+        route_hazardous_damage,
+    )
+
+    resumed, status = resume_retained_hazardous_destructions(
+        state=state, decisions=decisions, sequence=attack_sequence
+    )
+    if resumed:
+        return status
     hazardous_pools = tuple(
         pool
         for pool in attack_sequence.attack_pools
@@ -56,6 +67,18 @@ def _resolve_hazardous_tests(
     hazardous_weapon_instance_ids, hazardous_weapon_profile_ids = _hazardous_weapon_identity_pairs(
         hazardous_pools
     )
+    from warhammer40k_core.engine.retained_shooting import (
+        automatically_pass_retained_shooting_hazardous,
+    )
+
+    if automatically_pass_retained_shooting_hazardous(
+        state=state,
+        decisions=decisions,
+        sequence=attack_sequence,
+        weapon_instance_ids=hazardous_weapon_instance_ids,
+        weapon_profile_ids=hazardous_weapon_profile_ids,
+    ):
+        return None
     roll_state = manager.roll(
         _hazardous_roll_spec(
             attack_sequence=attack_sequence,
@@ -116,12 +139,8 @@ def _resolve_hazardous_tests(
             source_step="hazardous_test",
         ),
     )
-    routed = continue_mortal_wound_application(
-        state=state,
-        decisions=decisions,
-        request_id=state.next_decision_request_id(),
-        progress=progress,
-        dice_manager=manager,
+    routed = route_hazardous_damage(
+        state=state, decisions=decisions, progress=progress, manager=manager
     )
     if routed.request is not None:
         decisions.request_decision(routed.request)
@@ -163,7 +182,9 @@ def _resolve_hazardous_tests(
         source_context=_hazardous_source_context_from_payload(progress.source_context),
         application=routed.application,
     )
-    return None
+    return finish_retained_hazardous_damage(
+        state=state, decisions=decisions, sequence=attack_sequence, routed=routed
+    )
 
 
 def _emit_hazardous_test_resolved(

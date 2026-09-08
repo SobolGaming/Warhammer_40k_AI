@@ -38,6 +38,10 @@ from warhammer40k_core.engine.finite_decision_validation import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.fight import invalid_fight_attack_sequence_selection_status
 from warhammer40k_core.engine.psychic_modifier_validation import invalid_psychic_modifier_status
+from warhammer40k_core.engine.retained_destruction_selection import (
+    invalid_retention_request_status,
+    is_retention_request,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -55,6 +59,8 @@ def pre_validate_attack_sequence_decision(
     request: DecisionRequest,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
+    if is_retention_request(request):
+        return invalid_retention_request_status(state=state, request=request, result=result)
     if request.decision_type == DECISION_TYPE:
         return invalid_psychic_modifier_status(
             state=state,

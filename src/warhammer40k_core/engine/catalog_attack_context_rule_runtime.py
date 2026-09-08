@@ -10,7 +10,7 @@ from warhammer40k_core.engine.ability_presence import (
     ability_spatial_relationship,
     active_ability_model_ids_for_unit,
 )
-from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_record_current_wargear_bearer_model_ids,
 )
@@ -256,14 +256,11 @@ def rules_units_within(
             unit_instance_id=first_unit_id,
         ).component_unit_id_for_model(attacker_model_instance_id)
     return target_within_shooting_selection_range(
-        scenario=BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=state.battlefield_state,
-        ),
+        scenario=battlefield_scenario_for_state(state=state),
         attacking_unit_instance_id=attacking_unit_id,
         attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=second_unit_id,
         max_range_inches=distance,
-        placed_alive_attacker_models_only=True,
-        placed_alive_target_models_only=True,
+        placed_alive_attacker_models_only=False,
+        placed_alive_target_models_only=False,
     )

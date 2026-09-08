@@ -142,6 +142,7 @@ def validate_registry(
             row.identity_value,
         )
         for row in scope.audit_rows
+        if row.audit_id == audit.audit_id
     }
     if retained != registered:
         raise FactionSourceError("Faction authority registry does not match retained observations.")
@@ -153,7 +154,13 @@ def validate_registry(
         allowed_rule_source_ids=tuple(sorted(audit.selected_source_ids)),
         catalog_sha256=catalog.catalog_sha256(),
     )
-    if scope.source_packages != (expected_package,):
+    registered_packages = tuple(
+        package
+        for package in scope.source_packages
+        if (package.namespace, package.package_name)
+        == (expected_package.namespace, expected_package.package_name)
+    )
+    if registered_packages != (expected_package,):
         raise FactionSourceError(
             "Faction source-package authorization does not match its audit catalog."
         )

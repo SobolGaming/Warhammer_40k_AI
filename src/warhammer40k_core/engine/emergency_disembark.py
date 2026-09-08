@@ -52,6 +52,17 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 
+def transport_hazard_mortal_wound_application_id(
+    *,
+    unit_instance_id: str,
+    disembark_mode: DisembarkModeKind,
+    battle_round: int,
+) -> str:
+    return (
+        f"{unit_instance_id}:{disembark_mode.value}:transport-hazard-mortal-wounds:r{battle_round}"
+    )
+
+
 def validate_destroyed_transport_hazard_rolls(
     hazard_rolls: DestroyedTransportHazardRolls,
 ) -> None:
@@ -527,9 +538,10 @@ def apply_transport_hazard_mortal_wounds_service(
 
     progress = start_hazardous_mortal_wound_application(
         state=state,
-        application_id=(
-            f"{disembark.unit_instance_id}:{disembark_mode_for_hazard(disembark).value}:"
-            f"transport-hazard-mortal-wounds:r{disembark.battle_round}"
+        application_id=transport_hazard_mortal_wound_application_id(
+            unit_instance_id=disembark.unit_instance_id,
+            disembark_mode=disembark_mode_for_hazard(disembark),
+            battle_round=disembark.battle_round,
         ),
         source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
         source_context=transport_hazard_source_context(

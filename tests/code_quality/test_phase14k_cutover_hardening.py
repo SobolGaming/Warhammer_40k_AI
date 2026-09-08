@@ -99,7 +99,9 @@ def test_p14_objective_consumers_share_group_geometry_and_boundary_terminology()
         assert "from_objective_marker_to_model(" not in source
         assert "base_footprint_distance_to_polygon(" not in source
     query = source_for(SRC_ROOT / "engine" / "objective_geometry.py")
-    assert "rules_unit.alive_models()" in query
+    assert "rules_unit.own_models" in query
+    assert "scenario.present_destroyed_model_ids" in query
+    assert "not model.is_alive" in query
     assert "rules_unit.component_unit_id_for_model(" in query
     assert "model_placement_or_none(" in query
     boundary = source_for(SRC_ROOT / "rules" / "source_data.py")
@@ -138,7 +140,7 @@ def test_p24d_hazardous_uses_physical_weapon_identity_at_shared_completion_bound
         in hazardous_source
     )
     assert "sorted({pool.weapon_profile_id" not in hazardous_source
-    completion_index = dispatch_source.index('"attack_sequence_completed"')
+    completion_index = dispatch_source.index("record_attack_sequence_completed(")
     hazardous_index = dispatch_source.index("hazardous_status = _resolve_hazardous_tests(")
     assert completion_index < hazardous_index
 

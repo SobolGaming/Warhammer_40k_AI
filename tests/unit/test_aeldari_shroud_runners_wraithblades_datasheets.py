@@ -88,9 +88,6 @@ from warhammer40k_core.engine.destruction_reaction_conditions import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_on_death import (
-    model_is_present_on_battlefield,
-)
 from warhammer40k_core.engine.fight_order import (
     FightActivationSelection,
     FightPhaseState,
@@ -104,17 +101,29 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
-    _complete_active_fight_activation,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.retained_destruction_selection import (
+    apply_retention_selection,
+    is_retention_request,
+)
+from warhammer40k_core.engine.retained_destruction_state import retained_destructions
+from warhammer40k_core.engine.retained_destruction_trigger_history import (
+    retained_destruction_provenance,
+)
+from warhammer40k_core.engine.retained_model_presence import (
+    model_is_present_on_battlefield,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -565,8 +574,17 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     assert target_model.model_instance_id in allocated_ids
     payload = cast(dict[str, JsonValue], request.payload)
     context = cast(dict[str, JsonValue], payload["destruction_context"])
-    provenance = DestructionProvenance.from_payload(context["destruction_provenance"])
-    attack_context = cast(dict[str, JsonValue], context["attack_context"])
+    retained = next(
+        record
+        for record in retained_destructions(state=fixture.state)
+        if record.request_id == request.request_id
+    )
+    provenance = retained_destruction_provenance(retained)
+    sequence_payload = cast(dict[str, Any], retained.owner_context)
+    attack_context = cast(
+        dict[str, JsonValue], sequence_payload["pending_attack_destructions"][0]["attack_context"]
+    )
+    assert context["context_kind"] == "fight_on_death_retention"
     assert attack_context["attack_index"] == expected_attack_index
 
     fight_state = fixture.state.fight_phase_state
@@ -600,7 +618,17 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         dict[str, JsonValue],
         cast(dict[str, JsonValue], replayed_request.payload)["destruction_context"],
     )
-    assert replayed_context["destruction_provenance"] == provenance.to_payload()
+    assert replayed_context["context_kind"] == "fight_on_death_retention"
+    assert (
+        retained_destruction_provenance(
+            next(
+                record
+                for record in retained_destructions(state=replayed_state)
+                if record.request_id == replayed_request.request_id
+            )
+        )
+        == provenance
+    )
     assert not model_is_present_on_battlefield(
         state=replayed_state,
         model_instance_id=target_model.model_instance_id,
@@ -621,47 +649,59 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         army_catalog=_package().army_catalog,
     )
     replayed.decision_controller.submit_result(result)
-    accepted = handler.apply_decision(
-        state=replayed_state,
-        decisions=replayed.decision_controller,
-        result=result,
+    apply_retention_selection(
+        state=replayed_state, decisions=replayed.decision_controller, result=result
     )
+    accepted = handler.begin_phase(state=replayed_state, decisions=replayed.decision_controller)
     assert accepted is None or accepted.status_kind is not LifecycleStatusKind.INVALID
-    pending_status = accepted
     for decision_index in range(16):
+        fight_state = replayed_state.fight_phase_state
+        assert fight_state is not None
+        if fight_state.active_activation is None:
+            break
         if not replayed.decision_controller.queue.pending_requests:
-            fight_state = replayed_state.fight_phase_state
-            if (
-                pending_status is not None
-                or fight_state is None
-                or fight_state.attack_sequence is None
-                or not fight_state.attack_sequence.pending_attack_destructions
-            ):
+            handler.begin_phase(state=replayed_state, decisions=replayed.decision_controller)
+            current = replayed_state.fight_phase_state
+            assert current is not None
+            if current.active_activation is None:
                 break
-            pending_status = handler.begin_phase(
-                state=replayed_state,
-                decisions=replayed.decision_controller,
-            )
         pending = replayed.decision_controller.queue.peek_next()
         assert pending.options
+        choice_payload: JsonValue = None
         selected_option_id = next(
             (option.option_id for option in pending.options if "decline" in option.option_id),
             pending.options[0].option_id,
         )
+        if pending.decision_type == "submit_movement_proposal":
+            movement = MovementProposalRequest.from_decision_request_payload(pending.payload)
+            context = cast(dict[str, JsonValue], movement.context)
+            choice_payload = {
+                "proposal_request_id": movement.request_id,
+                "proposal_kind": movement.proposal_kind.value,
+                "unit_instance_id": movement.unit_instance_id,
+                "movement_phase_action": movement.movement_phase_action,
+                "movement_mode": context["movement_mode"],
+            }
         pending_result = DecisionResult.for_request(
             result_id=f"result:malevolent-souls:finish-attacker:{decision_index:02d}",
             request=pending,
             selected_option_id=selected_option_id,
         )
+        if choice_payload is not None:
+            pending_result = replace(pending_result, payload=choice_payload)
         replayed.decision_controller.submit_result(pending_result)
-        pending_status = handler.apply_decision(
-            state=replayed_state,
-            decisions=replayed.decision_controller,
-            result=pending_result,
-        )
-        assert pending_status is None or (
-            pending_status.status_kind is not LifecycleStatusKind.INVALID
-        )
+        if is_retention_request(pending):
+            apply_retention_selection(
+                state=replayed_state, decisions=replayed.decision_controller, result=pending_result
+            )
+        else:
+            pending_status = handler.apply_decision(
+                state=replayed_state, decisions=replayed.decision_controller, result=pending_result
+            )
+            assert (
+                pending_status is None
+                or pending_status.status_kind is not LifecycleStatusKind.INVALID
+            )
     else:
         raise AssertionError("Malevolent Souls attacker decisions did not finish.")
 
@@ -670,10 +710,9 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         model_instance_id=target_model.model_instance_id,
     )
     assert any(
-        event.event_type == "fight_on_death_model_awaiting_attack"
+        event.event_type == "fight_on_death_retention_selected"
         for event in replayed.decision_controller.event_log.records
     )
-    policy = replayed_state.runtime_ruleset_descriptor().fight_policy
     current_fight_state = replayed_state.fight_phase_state
     assert current_fight_state is not None
     assert (
@@ -685,32 +724,9 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
         and event.payload.get("sequence_id") == "attack-sequence:malevolent-melee"
         for event in replayed.decision_controller.event_log.records
     )
-    replayed_state.replace_fight_phase_state(
-        replace(
-            current_fight_state.with_current_step(
-                current_step=FightPhaseStepKind.FIGHT,
-                policy=policy,
-            ),
-            attack_sequence=None,
-        )
-    )
-    assert (
-        _complete_active_fight_activation(
-            handler=handler,
-            state=replayed_state,
-            decisions=replayed.decision_controller,
-            reaction_queue=None,
-            policy=policy,
-            activation=attacker_activation,
-        )
-        is None
-    )
-    selection_status = handler.begin_phase(
-        state=replayed_state,
-        decisions=replayed.decision_controller,
-    )
-    selection_request = selection_status.decision_request
-    assert selection_request is not None
+    assert current_fight_state.active_activation is None
+
+    selection_request = replayed.decision_controller.queue.peek_next()
     assert selection_request.decision_type == "select_fight_activation"
     target_option_id = next(
         option.option_id
@@ -778,23 +794,11 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
     assert target_model.model_instance_id in available_model_ids
     assert living_model_ids
     assert present_model_ids == available_model_ids
-    assert all(
-        authority.source_authority_finalized
+    assert any(
+        not authority.source_authority_finalized
+        and authority.model_instance_id == target_model.model_instance_id
         for authority in replayed_state.model_destruction_cause_authorities
-    ), [
-        (
-            authority.cause_kind.value,
-            authority.model_instance_id,
-            authority.producer_id,
-            authority.producer_context,
-            authority.parent_cause_ids,
-            None
-            if authority.model_destroyed_event is None
-            else authority.model_destroyed_event.event_id,
-        )
-        for authority in replayed_state.model_destruction_cause_authorities
-        if not authority.source_authority_finalized
-    ]
+    )
     replayed_payload = replayed.to_payload()
     assert GameLifecycle.from_payload(replayed_payload).to_payload() == replayed_payload
 
@@ -813,7 +817,7 @@ def test_malevolent_souls_grouped_melee_replays_and_enters_fight_on_death(
 def test_destruction_reaction_rejects_authoritative_context_or_weapon_profile_drift(
     drift_kind: str,
 ) -> None:
-    fixture, decisions, remaining, _allocated, _status, target_model = _resolve_malevolent_attack(
+    fixture, decisions, remaining, _allocated, _status, _target_model = _resolve_malevolent_attack(
         attack_kind=DestructionAttackKind.MELEE,
         trigger_roll=3,
         attacks=1 if drift_kind == "generated_hit_context" else 3,
@@ -837,34 +841,8 @@ def test_destruction_reaction_rejects_authoritative_context_or_weapon_profile_dr
         drift_kind=drift_kind,
     )
 
-    replayed = GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
-    state = cast(GameState, replayed.state)
-    fight_state = state.fight_phase_state
-    assert fight_state is not None
-    assert fight_state.attack_sequence is not None
-    request = replayed.decision_controller.queue.peek_next()
-    selected_source = next(
-        option.option_id
-        for option in request.options
-        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
-    )
-    result = DecisionResult.for_request(
-        result_id=f"result:profile-drift:{drift_kind}",
-        request=request,
-        selected_option_id=selected_source,
-    )
-    unchanged_payload = replayed.to_payload()
-    invalid = replayed.submit_decision(result)
-
-    assert invalid.status_kind is LifecycleStatusKind.INVALID
-    assert cast(dict[str, JsonValue], invalid.payload)["invalid_reason"] == (
-        "invalid_destruction_reaction_result"
-    )
-    assert replayed.to_payload() == unchanged_payload
-    assert not model_is_present_on_battlefield(
-        state=state,
-        model_instance_id=target_model.model_instance_id,
-    )
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
 @pytest.mark.parametrize(
@@ -895,7 +873,9 @@ def test_malevolent_souls_does_not_open_for_failed_ranged_or_already_fought_dest
     trigger_events = tuple(
         event
         for event in decisions.event_log.records
-        if event.event_type == "destruction_reaction_trigger_rolled"
+        if event.event_type == "fight_on_death_retention_trigger_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload["trigger_roll"] is not None
     )
     assert len(trigger_events) == (1 if trigger_roll == 2 else 0)
 
@@ -1105,7 +1085,9 @@ def test_malevolent_souls_does_not_trigger_for_deadly_demise_collateral_in_fight
     not_applicable = tuple(
         event
         for event in decisions.event_log.records
-        if event.event_type == "destruction_reaction_trigger_not_applicable"
+        if event.event_type == "fight_on_death_retention_trigger_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload["applicable"] is False
     )
     assert len(not_applicable) == 1
     provenance = cast(dict[str, JsonValue], not_applicable[0].payload)["destruction_provenance"]
@@ -1591,7 +1573,13 @@ def _resolve_malevolent_attack(
                     selected_to_fight_unit_ids=(defender.unit_instance_id,),
                 ),
             )
-        fixture.state.fight_phase_state = replace(started_fight, attack_sequence=sequence)
+        fixture.state.fight_phase_state = replace(
+            started_fight.with_current_step(
+                current_step=FightPhaseStepKind.FIGHT,
+                policy=fixture.state.runtime_ruleset_descriptor().fight_policy,
+            ),
+            attack_sequence=sequence,
+        )
     injected_results = list(
         successful_attack_roll_results(
             attack_sequence=sequence,

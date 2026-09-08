@@ -7,6 +7,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase15a_charge_declaration_helpers import mission_setup as charge_mission_setup
 from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruins
 
@@ -272,9 +273,6 @@ from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityContext
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
-)
-from warhammer40k_core.engine.fight_on_death import (
-    restore_model_awaiting_fight_on_death,
 )
 from warhammer40k_core.engine.fight_order import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
@@ -638,6 +636,7 @@ def test_catalog_desperate_escape_consumer_filters_keywords_distance_and_shape_d
 
 
 def test_catalog_desperate_escape_uses_physical_engagement_and_living_authority() -> None:
+    retention_decisions = DecisionController()
     target_army, source_army = _mustered_core_armies()
     target_unit = target_army.units[0]
     source_unit = source_army.units[0]
@@ -679,7 +678,8 @@ def test_catalog_desperate_escape_uses_physical_engagement_and_living_authority(
     dead_source_state.replace_battlefield_state(
         dead_source_battlefield.with_removed_models((dead_source_placement.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=dead_source_state,
         placement=dead_source_placement,
         effect_id="catalog-desperate-escape-retained-source",
@@ -740,7 +740,8 @@ def test_catalog_desperate_escape_uses_physical_engagement_and_living_authority(
     dead_target_state.replace_battlefield_state(
         dead_target_battlefield.with_removed_models((dead_target_placement.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=dead_target_state,
         placement=dead_target_placement,
         effect_id="catalog-desperate-escape-retained-target",
@@ -5343,9 +5344,8 @@ def test_catalog_selected_target_visibility_gate_uses_real_line_of_sight() -> No
     )
 
 
-def test_catalog_selected_target_visibility_ignores_retained_dead_los_but_stratagems_do_not() -> (
-    None
-):
+def test_catalog_selection_and_stratagem_visibility_use_retained_geometry() -> None:
+    retention_decisions = DecisionController()
     source_army, target_army = _mustered_core_armies()
     source_unit = _unit_with_dead_model(source_army.units[0], index=0)
     target_unit = _unit_with_dead_model(target_army.units[0], index=0)
@@ -5403,14 +5403,16 @@ def test_catalog_selected_target_visibility_ignores_retained_dead_los_but_strata
         active_player_id=source_army.player_id,
         phase=BattlePhase.FIGHT,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=dead_source_placement,
         effect_id="catalog-selected-target-retained-dead-los-source",
         source_rule_id="catalog-selected-target-retained-dead-los-source-rule",
         source_phase=BattlePhaseKind.FIGHT,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=dead_target_placement,
         effect_id="catalog-selected-target-retained-dead-los-target",
@@ -5429,17 +5431,14 @@ def test_catalog_selected_target_visibility_ignores_retained_dead_los_but_strata
         ),
     )
 
-    assert (
-        eligible_selection_target_unit_ids(
-            state=state,
-            source_player_id=source_army.player_id,
-            source_unit_instance_id=source_unit.unit_instance_id,
-            source_model_instance_id=None,
-            selection_clause=visibility_selection,
-            explicit_target_unit_ids=None,
-        )
-        == ()
-    )
+    assert eligible_selection_target_unit_ids(
+        state=state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=None,
+        selection_clause=visibility_selection,
+        explicit_target_unit_ids=None,
+    ) == (target_unit.unit_instance_id,)
     assert visible_enemy_unit_ids_for_source(
         state=state,
         player_id=source_army.player_id,
@@ -5495,6 +5494,7 @@ def test_catalog_selected_target_conditions_resolve_their_declared_geometry_scop
 
 
 def test_catalog_selected_target_engagement_uses_physical_units_and_living_authority() -> None:
+    retention_decisions = DecisionController()
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     target_unit = target_army.units[0]
@@ -5554,7 +5554,8 @@ def test_catalog_selected_target_engagement_uses_physical_units_and_living_autho
     dead_source_state.replace_battlefield_state(
         dead_source_battlefield.with_removed_models((dead_source_model.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=dead_source_state,
         placement=dead_source_placement,
         effect_id="catalog-selected-target-retained-dead-source-base",
@@ -5616,7 +5617,8 @@ def test_catalog_selected_target_engagement_uses_physical_units_and_living_autho
     dead_target_state.replace_battlefield_state(
         dead_target_battlefield.with_removed_models((dead_target_model.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=dead_target_state,
         placement=dead_target_placement,
         effect_id="catalog-selected-target-retained-dead-base",
@@ -5673,7 +5675,8 @@ def test_catalog_selected_target_engagement_uses_physical_units_and_living_autho
     fod_only_state.replace_battlefield_state(
         fod_only_battlefield.with_removed_models((fod_only_placement.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=fod_only_state,
         placement=fod_only_placement,
         effect_id="catalog-selected-target-fod-only-target",
@@ -5681,24 +5684,22 @@ def test_catalog_selected_target_engagement_uses_physical_units_and_living_autho
         source_phase=BattlePhaseKind.FIGHT,
     )
 
-    assert (
-        eligible_selection_target_unit_ids(
-            state=fod_only_state,
-            source_player_id=source_army.player_id,
-            source_unit_instance_id=source_unit.unit_instance_id,
-            source_model_instance_id=None,
-            selection_clause=unit_distance_selection,
-            explicit_target_unit_ids=None,
-        )
-        == ()
-    )
+    assert eligible_selection_target_unit_ids(
+        state=fod_only_state,
+        source_player_id=source_army.player_id,
+        source_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=None,
+        selection_clause=unit_distance_selection,
+        explicit_target_unit_ids=None,
+    ) == (fod_only_target.unit_instance_id,)
     assert _move_completed_engagement_candidate_sets(
         state=fod_only_state,
         source_unit_instance_id=source_unit.unit_instance_id,
-    ) == ((), ())
+    ) == (expected_target, expected_target)
 
 
 def test_catalog_conditional_charge_uses_physical_engagement_and_living_authority() -> None:
+    retention_decisions = DecisionController()
     source_army, target_army = _mustered_core_armies()
     source_unit = source_army.units[0]
     target_unit = _unit_with_dead_model(target_army.units[0], index=0)
@@ -5745,7 +5746,8 @@ def test_catalog_conditional_charge_uses_physical_engagement_and_living_authorit
     state.replace_battlefield_state(
         battlefield.with_removed_models((target_placement.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=target_placement,
         effect_id="catalog-conditional-charge-retained-target",
@@ -5785,7 +5787,8 @@ def test_catalog_conditional_charge_uses_physical_engagement_and_living_authorit
     fod_only_state.replace_battlefield_state(
         fod_only_battlefield.with_removed_models((fod_only_placement.model_instance_id,))
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=fod_only_state,
         placement=fod_only_placement,
         effect_id="catalog-conditional-charge-fod-only-target",
@@ -5794,7 +5797,7 @@ def test_catalog_conditional_charge_uses_physical_engagement_and_living_authorit
     )
     fod_only_context = replace(context, state=fod_only_state)
 
-    assert not conditional_charge_runtime._models_are_engaged(  # pyright: ignore[reportPrivateUsage]
+    assert conditional_charge_runtime._models_are_engaged(  # pyright: ignore[reportPrivateUsage]
         fod_only_context,
         rules_unit_view_by_id(
             state=fod_only_state,

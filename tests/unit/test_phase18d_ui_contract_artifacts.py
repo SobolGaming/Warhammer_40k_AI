@@ -404,14 +404,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_eleven_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_twelve_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "11.0.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "10.2.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "12.0.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "11.5.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -459,7 +459,7 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     assert "session-persistence.schema.json" not in json.dumps(openapi, sort_keys=True)
 
 
-def test_contract_eleven_advances_only_affected_session_wrapper_families() -> None:
+def test_contract_twelve_advances_only_affected_session_wrapper_families() -> None:
     metadata = _json_object(
         _read_json(REPO_ROOT / Path("contracts/schemas/session-metadata.schema.json"))
     )
@@ -474,28 +474,28 @@ def test_contract_eleven_advances_only_affected_session_wrapper_families() -> No
     )
 
     assert metadata["$id"] == (
-        "https://warhammer40k-core.local/contracts/v11/session-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v12/session-metadata.schema.json"
     )
     assert result["$id"] == (
-        "https://warhammer40k-core.local/contracts/v11/session-command-result.schema.json"
+        "https://warhammer40k-core.local/contracts/v12/session-command-result.schema.json"
     )
     assert outcome["$id"] == (
-        "https://warhammer40k-core.local/contracts/v11/session-command-outcome.schema.json"
+        "https://warhammer40k-core.local/contracts/v12/session-command-outcome.schema.json"
     )
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v11-contract"
+        == "session-metadata-v12-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v11-contract"
+        == "session-command-result-v12-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v11-contract"
+        == "session-command-outcome-v12-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]

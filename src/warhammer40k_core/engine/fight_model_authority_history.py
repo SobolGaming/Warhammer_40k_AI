@@ -74,8 +74,6 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-_FIGHT_ON_DEATH_AWAITING_EVENT = "fight_on_death_model_awaiting_attack"
-_FIGHT_ON_DEATH_REMOVED_EVENT = "fight_on_death_models_removed"
 _MODEL_DESTROYED_EVENT = "model_destroyed"
 _HEALING_STEP_EVENT = "healing_step_resolved"
 _CATALOG_PLACEMENT_MIRROR_EVENT = "battlefield_models_placed"
@@ -371,22 +369,6 @@ def _authority_mutations_by_event_index(
                     model_unit_by_id=model_unit_by_id,
                 )
             )
-        elif event.event_type == _FIGHT_ON_DEATH_AWAITING_EVENT:
-            event_mutations.append(
-                _fight_on_death_awaiting_mutation(
-                    state=state,
-                    event=event,
-                    model_unit_by_id=model_unit_by_id,
-                )
-            )
-        elif event.event_type == _FIGHT_ON_DEATH_REMOVED_EVENT:
-            event_mutations.extend(
-                _fight_on_death_cleanup_mutations(
-                    state=state,
-                    event=event,
-                    model_unit_by_id=model_unit_by_id,
-                )
-            )
         elif event.event_type == TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE:
             event_mutations.extend(
                 _embedded_transport_hazard_destruction_mutations(
@@ -609,84 +591,6 @@ def _model_logical_death_mutation(
         before_living=True,
         before_placed=True,
         source=MODEL_LOGICAL_DEATH_RECORDED_EVENT,
-    )
-
-
-def _fight_on_death_awaiting_mutation(
-    *,
-    state: GameState,
-    event: EventRecord,
-    model_unit_by_id: dict[str, str],
-) -> _AuthorityMutation:
-    payload = _event_payload(event, field_name="Fight On Death awaiting")
-    _require_game_id(payload, state=state, field_name="Fight On Death awaiting")
-    model_id = _payload_identifier(payload, key="model_instance_id")
-    unit_id = _payload_identifier(payload, key="unit_instance_id")
-    _payload_identifier(payload, key="effect_id")
-    expected_unit_id = _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id)
-    placement = _model_placement(
-        payload.get("model_placement"),
-        "Fight On Death awaiting",
-    )
-    if (
-        unit_id != expected_unit_id
-        or placement.model_instance_id != model_id
-        or placement.unit_instance_id != expected_unit_id
-    ):
-        raise GameLifecycleError("Fight On Death awaiting placement identity drift.")
-    return _AuthorityMutation(
-        model_instance_id=model_id,
-        after_exists=True,
-        after_living=False,
-        after_placed=True,
-        before_exists=True,
-        before_living=False,
-        before_placed=False,
-        source=_FIGHT_ON_DEATH_AWAITING_EVENT,
-    )
-
-
-def _fight_on_death_cleanup_mutations(
-    *,
-    state: GameState,
-    event: EventRecord,
-    model_unit_by_id: dict[str, str],
-) -> tuple[_AuthorityMutation, ...]:
-    payload = _event_payload(event, field_name="Fight On Death cleanup")
-    _require_game_id(payload, state=state, field_name="Fight On Death cleanup")
-    model_ids = _payload_identifier_list(payload, key="model_instance_ids")
-    raw_unit_id = payload.get("unit_instance_id")
-    unit_id = (
-        None
-        if raw_unit_id is None
-        else _identifier(raw_unit_id, field_name="Fight On Death cleanup unit_instance_id")
-    )
-    if unit_id is not None and any(
-        not rules_unit_identities_share_lineage(
-            state=state,
-            first_unit_instance_id=unit_id,
-            second_unit_instance_id=_known_model_unit_id(
-                model_id,
-                model_unit_by_id=model_unit_by_id,
-            ),
-        )
-        for model_id in model_ids
-    ):
-        raise GameLifecycleError("Fight On Death cleanup lineage drift.")
-    for model_id in model_ids:
-        _known_model_unit_id(model_id, model_unit_by_id=model_unit_by_id)
-    return tuple(
-        _AuthorityMutation(
-            model_instance_id=model_id,
-            after_exists=True,
-            after_living=False,
-            after_placed=False,
-            before_exists=True,
-            before_living=False,
-            before_placed=True,
-            source=_FIGHT_ON_DEATH_REMOVED_EVENT,
-        )
-        for model_id in model_ids
     )
 
 

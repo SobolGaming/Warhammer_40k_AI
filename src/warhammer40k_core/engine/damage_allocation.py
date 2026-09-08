@@ -65,6 +65,12 @@ from warhammer40k_core.engine.damage_allocation_validation import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_reaction_kind import (
+    DestructionReactionKind as DestructionReactionKind,
+)
+from warhammer40k_core.engine.destruction_removal import (
+    remove_destroyed_model_from_battlefield as remove_destroyed_model_from_battlefield,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.model_destruction_cause_authority import (
@@ -122,12 +128,6 @@ class FeelNoPainAttackCondition(StrEnum):
 
 
 DECLINE_DESTRUCTION_REACTION_OPTION_ID = "decline_destruction_reaction"
-
-
-class DestructionReactionKind(StrEnum):
-    SHOOT_ON_DEATH = "shoot_on_death"
-    FIGHT_ON_DEATH = "fight_on_death"
-    DEADLY_DEMISE = "deadly_demise"
 
 
 class AllocationGroupRole(StrEnum):
@@ -2644,17 +2644,6 @@ def apply_damage_to_model(
     return application
 
 
-def remove_destroyed_model_from_battlefield(
-    *,
-    state: GameState,
-    model_instance_id: str,
-) -> None:
-    model = model_by_id(state=state, model_instance_id=model_instance_id)
-    if model.is_alive:
-        raise GameLifecycleError("Only destroyed models can be removed from battlefield.")
-    _remove_destroyed_model(state=state, model_instance_id=model_instance_id)
-
-
 def destroy_model_by_rule(
     *,
     state: GameState,
@@ -2863,16 +2852,6 @@ def _replace_model_wounds(
             state=state,
             model_instance_id=model_instance_id,
         )
-
-
-def _remove_destroyed_model(*, state: GameState, model_instance_id: str) -> None:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Destroyed model removal requires battlefield_state.")
-    try:
-        state.replace_battlefield_state(battlefield.with_removed_models((model_instance_id,)))
-    except PlacementError as exc:
-        raise GameLifecycleError("Destroyed model removal failed.") from exc
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:

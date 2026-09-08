@@ -12,7 +12,7 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
@@ -214,10 +214,10 @@ def _target_within_source_engagement(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    if not rules_unit_has_placed_alive_model(
+    if not rules_unit_has_present_model(
         state=state,
         rules_unit=source_rules_unit,
-    ) or not rules_unit_has_placed_alive_model(
+    ) or not rules_unit_has_present_model(
         state=state,
         rules_unit=target_rules_unit,
     ):

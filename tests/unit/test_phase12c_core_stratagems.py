@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.setup_completion_helpers import (
     enter_battle_for_fixture,
 )
@@ -50,9 +51,7 @@ from warhammer40k_core.engine.damage_allocation import (
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     DamageKind,
     FeelNoPainSource,
-    MortalWoundApplicationProgress,
     apply_damage_to_model,
-    continue_mortal_wound_application,
     model_by_id,
 )
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
@@ -64,7 +63,6 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
@@ -84,11 +82,6 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detac
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     july_2026_candidate as thousand_sons_july_candidate,
 )
-from warhammer40k_core.engine.fight_on_death import (
-    model_is_present_on_battlefield,
-    restore_model_awaiting_fight_on_death,
-    restore_selected_model_awaiting_fight_on_death,
-)
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -106,9 +99,6 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
-    MortalWoundDestructionEvidence,
-)
 from warhammer40k_core.engine.mortal_wound_model_allocation import (
     SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
 )
@@ -150,6 +140,9 @@ from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
     ReserveStatus,
+)
+from warhammer40k_core.engine.retained_model_presence import (
+    model_is_present_on_battlefield,
 )
 from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.shooting_types import ShootingType
@@ -3041,53 +3034,21 @@ def test_phase15e_crushing_impact_rejects_retained_destroyed_source_model() -> N
     )
     source_model_id = _first_model_id(state, unit_instance_id=source_unit_id)
     source_model = model_by_id(state=state, model_instance_id=source_model_id)
-    enemy_unit_id = "army-beta:enemy-unit"
-    prewound = continue_mortal_wound_application(
+    assert state.battlefield_state is not None
+    placement = state.battlefield_state.model_placement_by_id(source_model_id)
+    apply_damage_to_model(
         state=state,
-        decisions=lifecycle.decision_controller,
-        request_id="phase15e-crushing-impact-source-destruction-request",
-        progress=MortalWoundApplicationProgress.start(
-            application_id="phase15e-crushing-impact-source-destruction",
-            source_rule_id="phase12c:test:fight-on-death",
-            source_context={"source_kind": "phase15e_crushing_impact_source_test"},
-            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
-                state=state,
-                destroying_player_id="player-b",
-                source_rules_unit_instance_id=enemy_unit_id,
-                source_model_instance_id=_first_model_id(
-                    state,
-                    unit_instance_id=enemy_unit_id,
-                ),
-                destruction_source_kind=DestructionSourceKind.ABILITY,
-                action_phase=BattlePhase.CHARGE,
-                source_step="phase15e_crushing_impact_source_test",
-            ),
-            target_unit_instance_id=source_unit_id,
-            defender_player_id="player-a",
-            mortal_wounds=source_model.wounds_remaining,
-            spill_over=False,
-            priority_model_ids=(source_model_id,),
-        ),
-        dice_manager=DiceRollManager(
-            state.game_id,
-            event_log=lifecycle.decision_controller.event_log,
-        ),
-    )
-    assert prewound.request is None
-    assert prewound.application is not None
-    destroyed_event = next(
-        event
-        for event in reversed(lifecycle.decision_controller.event_log.records)
-        if event.event_type == "model_destroyed"
-        and isinstance(event.payload, dict)
-        and event.payload.get("model_instance_id") == source_model_id
-    )
-    restore_selected_model_awaiting_fight_on_death(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        model_destroyed_event_id=destroyed_event.event_id,
+        target_unit_instance_id=source_unit_id,
         model_instance_id=source_model_id,
-        source_id="phase12c:fight-on-death:crushing-impact-source",
+        damage=source_model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+        remove_destroyed_model=False,
+    )
+    retain_destroyed_model_for_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        placement=placement,
+        effect_id="phase12c:fight-on-death:crushing-impact-source",
         source_rule_id="phase12c:test:fight-on-death",
         source_phase=BattlePhase.CHARGE,
     )
@@ -5743,7 +5704,8 @@ def test_engaged_fall_back_policy_can_target_fight_on_death_only_unit_from_snaps
             damage=model.wounds_remaining,
             damage_kind=DamageKind.NORMAL,
         )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=lifecycle.decision_controller,
         state=state,
         placement=retained_placement,
         effect_id="phase12c:fight-on-death:engaged-fall-back-target",

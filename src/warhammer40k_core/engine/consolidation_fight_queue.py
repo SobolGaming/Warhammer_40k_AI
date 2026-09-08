@@ -5,7 +5,7 @@ from __future__ import annotations
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, ConsolidationModeKind
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    scenario_rules_unit_has_placed_alive_model,
+    scenario_rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
@@ -60,7 +60,7 @@ def start_consolidation_fight_queue(
     engaged = tuple(
         unit_id
         for unit_id in physically_engaged
-        if scenario_rules_unit_has_placed_alive_model(
+        if scenario_rules_unit_has_present_model(
             scenario=scenario,
             rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
         )
