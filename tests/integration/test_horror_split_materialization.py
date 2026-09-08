@@ -282,6 +282,9 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
         "horror-materialization:blue-horror" in model.source_ids
         for model in updated_bodyguard.own_models
     )
+    assert all("BLUE" in model.keywords for model in updated_bodyguard.own_models)
+    assert all("BRIMSTONE" not in model.keywords for model in updated_bodyguard.own_models)
+    assert "PINK" not in updated_bodyguard.keywords
     rules_unit = rules_unit_view_by_id(
         state=scenario.state,
         unit_instance_id=scenario.bodyguard.unit_instance_id,
@@ -2237,6 +2240,15 @@ def test_authenticated_second_split_rejects_missing_required_model_source() -> N
     assert "horror-materialization:blue-horror" in source_model.source_ids
     tampered_model = replace(
         source_model,
+        keyword_assignment=replace(
+            source_model.keyword_assignment,
+            materialization_descriptor_id=None,
+            source_ids=tuple(
+                source_id
+                for source_id in source_model.keyword_assignment.source_ids
+                if source_id != "horror-materialization:blue-horror"
+            ),
+        ),
         source_ids=tuple(
             source_id
             for source_id in source_model.source_ids
@@ -2321,6 +2333,20 @@ def test_horror_catalog_keeps_materialized_profiles_out_of_mustering() -> None:
             f"{blue_datasheet_id}:coruscating-blue-flames",
             f"{blue_datasheet_id}:blue-claws",
         )
+        assert "BLUE" in blue_unit.keywords
+        assert "BRIMSTONE" not in blue_unit.keywords
+        assert "PINK" in pink_unit.keywords
+        assert "BLUE" not in pink_unit.keywords
+        for kind, keyword in (("blue", "BLUE"), ("brimstone", "BRIMSTONE")):
+            model = _retained_horror_model(
+                package=package,
+                pink_datasheet_id=pink_datasheet_id,
+                bodyguard=pink_unit,
+                horror_kind=kind,
+                index=1,
+            )
+            assert set(model.keywords).intersection({"PINK", "BLUE", "BRIMSTONE"}) == {keyword}
+            assert ModelInstance.from_payload(model.to_payload()) == model
 
 
 def _split_scenario(
@@ -2387,6 +2413,23 @@ def _split_scenario(
         unit_selection_id="blue-leader",
         datasheet_id=blue_datasheet_id,
         model_profile_id=f"{blue_datasheet_id}:blue-horrors",
+    )
+    leader = replace(
+        leader,
+        own_models=tuple(
+            replace(
+                model,
+                keyword_assignment=replace(
+                    model.keyword_assignment,
+                    keywords=tuple(sorted({*model.keywords, "CHARACTER"})),
+                    source_ids=(
+                        *model.keyword_assignment.source_ids,
+                        "test:horrors:leader-keyword",
+                    ),
+                ),
+            )
+            for model in leader.own_models
+        ),
     )
     attacker = _single_model_unit(
         package=package,

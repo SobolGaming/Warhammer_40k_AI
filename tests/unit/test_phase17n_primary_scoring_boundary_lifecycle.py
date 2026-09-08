@@ -27,6 +27,7 @@ from tests.phase17n_primary_mission_helpers import (
 from tests.secondary_destruction_helpers import record_secondary_destruction_for_fixture
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from tests.support.catalog_runtime_fixtures import SOURCE_KEYWORD_SEQUENCE_PARTS
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
@@ -5955,9 +5956,8 @@ def _add_unit_keyword(state: GameState, unit_instance_id: str, *, keyword: str) 
         for unit_index, unit in enumerate(units):
             if unit.unit_instance_id != unit_instance_id:
                 continue
-            units[unit_index] = replace(
-                unit,
-                keywords=tuple(sorted({*unit.keywords, keyword})),
+            units[unit_index] = with_unit_keywords(
+                unit, keywords=tuple(sorted({*unit.keywords, keyword}))
             )
             state.army_definitions[army_index] = replace(army, units=tuple(units))
             return

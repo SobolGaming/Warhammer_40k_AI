@@ -24,6 +24,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.model_keyword_grants import grant_unit_keywords
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -574,7 +575,9 @@ def _apply_unit_keyword_grant(
             updated_units.append(unit)
             continue
         updated_keywords = tuple(sorted((*unit.keywords, effect.keyword)))
-        updated_units.append(replace(unit, keywords=updated_keywords))
+        updated_units.append(
+            grant_unit_keywords(unit, keywords=(effect.keyword,), source_id=effect.source_id)
+        )
         payload = {
             **cast(dict[str, JsonValue], effect.to_payload()),
             "player_id": army.player_id,

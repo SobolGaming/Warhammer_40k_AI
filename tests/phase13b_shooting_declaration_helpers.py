@@ -7,6 +7,7 @@ from typing import Any, cast
 import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -598,6 +599,7 @@ def _compact_intercessor_catalog(catalog: ArmyCatalog) -> ArmyCatalog:
 def _build_shooting_lifecycle(
     *,
     alpha_unit_ids: tuple[str, ...],
+    config_override: GameConfig | None = None,
     game_id: str = "phase13b-game",
     alpha_datasheets: dict[str, tuple[str, str, int]] | None = None,
     alpha_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
@@ -614,20 +616,24 @@ def _build_shooting_lifecycle(
     enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_enemy_pose = Pose.at(35.0, 35.0) if enemy_pose is None else enemy_pose
-    config = _config(
-        game_id=game_id,
-        alpha_unit_ids=alpha_unit_ids,
-        alpha_datasheets=alpha_datasheets,
-        alpha_unit_specs=alpha_unit_specs,
-        alpha_attachment_declarations=alpha_attachment_declarations,
-        enemy_datasheet=enemy_datasheet,
-        enemy_unit_specs=enemy_unit_specs,
-        enemy_attachment_declarations=enemy_attachment_declarations,
-        catalog=catalog,
-        alpha_faction_id=alpha_faction_id,
-        alpha_detachment_ids=alpha_detachment_ids,
-        enemy_faction_id=enemy_faction_id,
-        enemy_detachment_ids=enemy_detachment_ids,
+    config = (
+        config_override
+        if config_override is not None
+        else _config(
+            game_id=game_id,
+            alpha_unit_ids=alpha_unit_ids,
+            alpha_datasheets=alpha_datasheets,
+            alpha_unit_specs=alpha_unit_specs,
+            alpha_attachment_declarations=alpha_attachment_declarations,
+            enemy_datasheet=enemy_datasheet,
+            enemy_unit_specs=enemy_unit_specs,
+            enemy_attachment_declarations=enemy_attachment_declarations,
+            catalog=catalog,
+            alpha_faction_id=alpha_faction_id,
+            alpha_detachment_ids=alpha_detachment_ids,
+            enemy_faction_id=enemy_faction_id,
+            enemy_detachment_ids=enemy_detachment_ids,
+        )
     )
     armies = _mustered_armies(config)
     mission_setup = config.mission_setup
@@ -2046,6 +2052,10 @@ def _replace_enemy_with_attached_character_fixture(
     bodyguard_model = defender.own_models[0]
     character_model = replace(
         defender.own_models[1],
+        keyword_assignment=replace(
+            defender.own_models[1].keyword_assignment,
+            keywords=tuple(sorted({*defender.own_models[1].keywords, "CHARACTER"})),
+        ),
         source_ids=tuple(
             sorted(
                 {
@@ -2056,12 +2066,20 @@ def _replace_enemy_with_attached_character_fixture(
             )
         ),
     )
-    attached_defender = replace(
-        defender,
-        keywords=tuple(sorted({*defender.keywords, "ATTACHED_UNIT"})),
-        own_models=(bodyguard_model, character_model),
+    attached_defender = with_unit_keywords(
+        replace(
+            defender,
+            own_models=(bodyguard_model, character_model),
+        ),
+        keywords=tuple(sorted({*defender.keywords, "ATTACHED_UNIT", "CHARACTER"})),
     )
     _replace_unit_instance_in_state(state=state, replacement=attached_defender)
+    state.starting_strength_records = [
+        replace(record, starting_model_count=len(attached_defender.own_models))
+        if record.unit_instance_id == attached_defender.unit_instance_id
+        else record
+        for record in state.starting_strength_records
+    ]
     battlefield = state.battlefield_state
     assert battlefield is not None
     placement = battlefield.unit_placement_by_id(defender.unit_instance_id)

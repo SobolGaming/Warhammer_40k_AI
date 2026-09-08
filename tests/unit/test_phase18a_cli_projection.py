@@ -773,3 +773,32 @@ def _replace_first_model(state: GameState, model: ModelInstance) -> None:
     updated_unit = replace(unit, own_models=(model, *unit.own_models[1:]))
     updated_army = replace(army, units=(updated_unit, *army.units[1:]))
     state.army_definitions = [updated_army, *state.army_definitions[1:]]
+
+
+def test_unrevealed_attachments_do_not_leak_through_model_keyword_provenance() -> None:
+    session = LocalGameSession()
+    session.start(_config(game_id="order31-private-model-keywords", attached_alpha=True))
+    session.advance_until_decision_or_terminal()
+    owner = session.view(viewer_player_id="player-a")
+    opponent = session.view(viewer_player_id="player-b")
+    owner_rows = [
+        row
+        for row in owner["model_display_by_id"].values()
+        if row["unit_instance_id"].startswith("army-alpha:")
+    ]
+    opponent_rows = [
+        row
+        for row in opponent["model_display_by_id"].values()
+        if row["unit_instance_id"].startswith("army-alpha:")
+    ]
+    assert any("ATTACHED_UNIT" in row["keywords"] for row in owner_rows)
+    assert all("ATTACHED_UNIT" not in row["keywords"] for row in opponent_rows)
+    for row in opponent_rows:
+        assert all(
+            not source.startswith(("attached-role:", "runtime-attached-unit:"))
+            for source in row["keyword_source_ids"]
+        )
+    assert (
+        "ATTACHED_UNIT"
+        not in opponent["unit_display_by_id"]["army-alpha:intercessor-unit-1"]["keywords"]
+    )

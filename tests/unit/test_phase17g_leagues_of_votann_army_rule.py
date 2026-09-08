@@ -9,6 +9,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
     battle_state_with_center_objective_positions,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -907,7 +908,7 @@ def _mark_player_units_as_votann(state: GameState, *, player_id: str) -> None:
 
 
 def _with_votann_keyword(unit: UnitInstance) -> UnitInstance:
-    return replace(
+    return with_unit_keywords(
         unit,
         faction_keywords=tuple(
             dict.fromkeys((*unit.faction_keywords, army_rule.LEAGUES_OF_VOTANN_FACTION_KEYWORD))
@@ -924,7 +925,7 @@ def _add_unit_keyword(state: GameState, *, unit_instance_id: str, keyword: str) 
                 updated_units.append(unit)
                 continue
             updated_units.append(
-                replace(unit, keywords=tuple(dict.fromkeys((*unit.keywords, keyword))))
+                with_unit_keywords(unit, keywords=tuple(dict.fromkeys((*unit.keywords, keyword))))
             )
         updated_armies.append(replace(army, units=tuple(updated_units)))
     state.army_definitions = updated_armies

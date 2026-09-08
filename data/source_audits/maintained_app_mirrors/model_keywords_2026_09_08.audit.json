@@ -1,0 +1,23 @@
+{
+  "audit_id": "core-model-keywords-maintained-app-mirrors-2026-09-08",
+  "observed_at": "2026-09-08T13:35:55Z",
+  "rows": [
+    {
+      "row_id": "destroyed-model-keywords:gdm-v931",
+      "provider_name": "Game Datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": "2026-09-08T13:35:55Z",
+      "app_version": "931",
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-model-keywords:destroyed-model-keywords",
+      "transcription_sha256": "d2f96dfeb423592623f05012e82c181a7737b12c791f7fbd237202a1968025be",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "74930ebc501e1e6ff74b53e83f94d7ac728ef9f6eef8cd6d4355e4b42f800b3e"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "Complete v931 FAQ observed directly in the browser. No co-version comparison with 40k.app is asserted. P05B retains the separately pinned presence exception."
+}

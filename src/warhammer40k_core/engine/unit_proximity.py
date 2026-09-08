@@ -64,10 +64,14 @@ def rules_unit_within_friendly_keyworded_models(
         if army.player_id != source_view.owner_player_id:
             continue
         for unit in army.units:
-            component_keywords = {*unit.keywords, *unit.faction_keywords}
-            if not required_keywords.issubset(component_keywords):
-                continue
-            if not active_ability_model_ids_for_unit(state=state, unit=unit):
+            active_ids = active_ability_model_ids_for_unit(state=state, unit=unit)
+            keyworded_models = tuple(
+                model
+                for model in unit.own_models
+                if model.model_instance_id in active_ids
+                and required_keywords.issubset({*model.keywords, *model.faction_keywords})
+            )
+            if not keyworded_models:
                 continue
             candidate_view = rules_unit_view_by_id(
                 state=state, unit_instance_id=unit.unit_instance_id
@@ -81,7 +85,7 @@ def rules_unit_within_friendly_keyworded_models(
                 continue
             candidate_models = _geometry_models_for_present_models(
                 state=state,
-                models=unit.own_models,
+                models=keyworded_models,
             )
             if any(
                 source_model.range_to(candidate_model) <= float(max_range_inches)

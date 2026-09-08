@@ -11,6 +11,7 @@ from tests.movement_submission_helpers import (
     submit_default_handler_movement_proposal_if_pending,
     submit_handler_movement_proposal,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
@@ -1322,9 +1323,8 @@ def _aircraft_engagement_battle_state(
             unit_selections=tuple(beta_selections),
         ),
     )
-    enemy_aircraft = replace(
-        beta.unit_by_id("army-beta:enemy-aircraft"),
-        keywords=("Aircraft", "Fly", "Vehicle"),
+    enemy_aircraft = with_unit_keywords(
+        beta.unit_by_id("army-beta:enemy-aircraft"), keywords=("Aircraft", "Fly", "Vehicle")
     )
     beta = replace(
         beta,
@@ -1679,7 +1679,7 @@ def _aircraft_scenario() -> tuple[BattlefieldScenario, UnitInstance, UnitInstanc
             ),
         ),
     )
-    aircraft = replace(
+    aircraft = with_unit_keywords(
         alpha.unit_by_id("army-alpha:aircraft-unit"),
         keywords=("Aircraft", "Fly", "Hover", "Vehicle"),
     )

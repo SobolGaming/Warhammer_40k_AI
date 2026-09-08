@@ -8,6 +8,7 @@ from typing import Any, cast
 
 import pytest
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -548,6 +549,9 @@ def test_psychic_queued_duplicate_is_rejected_before_recording_and_can_be_declin
 
 
 def test_psychic_attached_use_survives_bodyguard_and_source_model_loss() -> None:
+    from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+    from warhammer40k_core.engine.rule_model_destruction import destroy_model_with_rule_reactions
+
     session = _psychic_level_session(attached=True)
     first = session.advance_until_decision_or_terminal().decision_request
     assert first is not None
@@ -561,14 +565,41 @@ def test_psychic_attached_use_survives_bodyguard_and_source_model_loss() -> None
     assert len(uses) == 1
     assert uses[0].rules_unit_instance_id == "attached-unit:army-alpha:bodyguard-unit"
     assert uses[0].source_component_unit_instance_id == "army-alpha:leader-unit"
+    casualty_phase = state.current_battle_phase
+    assert casualty_phase is not None
     for unit_id in (
         "army-alpha:bodyguard-unit",
         "army-alpha:leader-unit",
         "army-alpha:support-unit",
     ):
         for model_id in _unit_by_id(state, unit_id).own_model_ids():
-            destroy_model_by_rule(
-                state=state, model_instance_id=model_id, remove_from_battlefield=True
+            state.record_persisting_effect(
+                PersistingEffect(
+                    effect_id="psychic-test-casualties",
+                    source_rule_id="psychic-test-casualties",
+                    owner_player_id="player-a",
+                    target_unit_instance_ids=(uses[0].rules_unit_instance_id,),
+                    started_battle_round=state.battle_round,
+                    started_phase=casualty_phase,
+                    expiration=EffectExpiration.end_phase(
+                        battle_round=state.battle_round, phase=casualty_phase, player_id="player-a"
+                    ),
+                    effect_payload={"effect_kind": "fixture_casualties"},
+                )
+            )
+            destroy_model_with_rule_reactions(
+                state=state,
+                decisions=session.lifecycle.decision_controller,
+                model_instance_id=model_id,
+                rules_unit_instance_id=uses[0].rules_unit_instance_id,
+                destroying_player_id="player-b",
+                source_rule_id="psychic-test-casualties",
+                source_effect_ids=("psychic-test-casualties",),
+                source_phase=casualty_phase,
+                source_step="ability_resolution",
+                source_result_id=f"casualty:{model_id}",
+                completion_event_type="test_psychic_casualty",
+                completion_event_payload={"model_instance_id": model_id},
             )
         restored = GameLifecycle.from_payload(session.lifecycle.to_payload())
         assert restored.to_payload() == session.lifecycle.to_payload()
@@ -5329,7 +5360,7 @@ def _with_unit_keywords(
             replace(
                 army_definition,
                 units=tuple(
-                    replace(unit, keywords=keywords, faction_keywords=faction_keywords)
+                    with_unit_keywords(unit, keywords=keywords, faction_keywords=faction_keywords)
                     if unit.unit_instance_id == unit_instance_id
                     else unit
                     for unit in army_definition.units

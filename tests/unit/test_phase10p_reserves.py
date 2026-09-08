@@ -9,6 +9,7 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_state,
     submit_handler_movement_proposal,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -1183,7 +1184,9 @@ def test_rapid_ingress_arrival_uses_authenticated_stratagem_history() -> None:
 
 def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() -> None:
     state, _scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
-    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    deep_strike_unit = with_unit_keywords(
+        reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE")
+    )
     state.army_definitions = list(
         _with_replaced_unit(tuple(state.army_definitions), deep_strike_unit)
     )
@@ -2366,7 +2369,9 @@ def test_phase10p_deep_strike_requires_keyword_and_uses_same_arrival_path() -> N
         battle_round=2,
         placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
     )
-    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    deep_strike_unit = with_unit_keywords(
+        reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE")
+    )
     deep_strike_scenario = BattlefieldScenario(
         armies=_with_replaced_unit(scenario.armies, deep_strike_unit),
         battlefield_state=scenario.battlefield_state,
@@ -2394,7 +2399,9 @@ def test_chapter_approved_declared_deep_strike_cannot_arrive_in_battle_round_1()
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve(
         ruleset_descriptor=_chapter_approved_ruleset(),
     )
-    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    deep_strike_unit = with_unit_keywords(
+        reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE")
+    )
     deep_strike_scenario = BattlefieldScenario(
         armies=_with_replaced_unit(scenario.armies, deep_strike_unit),
         battlefield_state=scenario.battlefield_state,
@@ -2479,7 +2486,9 @@ def test_chapter_approved_during_battle_strategic_reserves_arrival_exemption_is_
 
 def test_core_rules_deep_strike_has_no_mission_pack_battle_round_1_block() -> None:
     _state, scenario, reserve_state, reserve_unit = _battle_state_with_reserve()
-    deep_strike_unit = replace(reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE"))
+    deep_strike_unit = with_unit_keywords(
+        reserve_unit, keywords=(*reserve_unit.keywords, "DEEP_STRIKE")
+    )
     deep_strike_scenario = BattlefieldScenario(
         armies=_with_replaced_unit(scenario.armies, deep_strike_unit),
         battlefield_state=scenario.battlefield_state,
@@ -3119,9 +3128,11 @@ def _aircraft_edge_departure_lifecycle() -> tuple[GameLifecycle, UnitInstance]:
     config = _config(ruleset_descriptor=ruleset_descriptor)
     armies = _mustered_armies(config)
     source_unit = armies[0].unit_by_id("army-alpha:intercessor-unit-1")
-    aircraft = replace(
-        source_unit,
-        own_models=(source_unit.own_models[0],),
+    aircraft = with_unit_keywords(
+        replace(
+            source_unit,
+            own_models=(source_unit.own_models[0],),
+        ),
         keywords=("AIRCRAFT", "FLY", "VEHICLE"),
     )
     armies = _with_replaced_unit(armies, aircraft)

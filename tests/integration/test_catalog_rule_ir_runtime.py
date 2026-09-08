@@ -29,6 +29,7 @@ from tests.support.wahapedia_bridge_fixtures import (
     soul_grinder_bridge_artifacts,
 )
 from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_version
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -981,7 +982,7 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
             MusteringOptionSelection(option_id="000001151:daemonic-allegiance:khorne"),
         ),
     )
-    support = replace(support, keywords=tuple(sorted((*support.keywords, "INFANTRY"))))
+    support = with_unit_keywords(support, keywords=tuple(sorted((*support.keywords, "INFANTRY"))))
     attacker = daemon_prince_unit(
         package=package,
         datasheet_id="000001149",

@@ -35,6 +35,11 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
+from warhammer40k_core.core.model_keywords import (
+    ModelKeywordAssignment,
+    ModelKeywordAssignmentPayload,
+    model_keyword_assignment,
+)
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.engine.dice_result_override_descriptors import (
     validate_dice_result_override_starting_resources,
@@ -83,6 +88,7 @@ class UnitFactoryError(ValueError):
 
 
 class ModelInstancePayload(TypedDict):
+    keyword_assignment: ModelKeywordAssignmentPayload
     model_instance_id: str
     datasheet_id: str
     model_profile_id: str
@@ -114,6 +120,7 @@ class UnitInstancePayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class ModelInstance:
+    keyword_assignment: ModelKeywordAssignment
     model_instance_id: str
     datasheet_id: str
     model_profile_id: str
@@ -155,6 +162,13 @@ class ModelInstance:
             ),
         )
         object.__setattr__(self, "name", _validate_identifier("ModelInstance name", self.name))
+        if type(self.keyword_assignment) is not ModelKeywordAssignment or (
+            self.keyword_assignment.datasheet_id,
+            self.keyword_assignment.model_profile_id,
+        ) != (self.datasheet_id, self.model_profile_id):
+            raise UnitFactoryError(
+                "ModelInstance keyword assignment datasheet_id/model_profile_id lineage drift."
+            )
         characteristics = _validate_characteristics(self.characteristics)
         object.__setattr__(self, "characteristics", characteristics)
         if type(self.base_size) is not BaseSizeDefinition:
@@ -194,6 +208,17 @@ class ModelInstance:
                 min_length=1,
             ),
         )
+        descriptor_id = self.keyword_assignment.materialization_descriptor_id
+        if descriptor_id is not None and descriptor_id not in self.source_ids:
+            raise UnitFactoryError("Model keyword materialization source identity drift.")
+
+    @property
+    def keywords(self) -> tuple[str, ...]:
+        return self.keyword_assignment.keywords
+
+    @property
+    def faction_keywords(self) -> tuple[str, ...]:
+        return self.keyword_assignment.faction_keywords
 
     def stable_identity(self) -> str:
         return f"model:{self.model_instance_id}"
@@ -211,6 +236,7 @@ class ModelInstance:
 
     def to_payload(self) -> ModelInstancePayload:
         return {
+            "keyword_assignment": self.keyword_assignment.to_payload(),
             "model_instance_id": self.model_instance_id,
             "datasheet_id": self.datasheet_id,
             "model_profile_id": self.model_profile_id,
@@ -226,7 +252,10 @@ class ModelInstance:
 
     @classmethod
     def from_payload(cls, payload: ModelInstancePayload) -> Self:
+        if "keyword_assignment" not in payload:
+            raise UnitFactoryError("ModelInstance requires keyword_assignment authority.")
         return cls(
+            keyword_assignment=ModelKeywordAssignment.from_payload(payload["keyword_assignment"]),
             model_instance_id=payload["model_instance_id"],
             datasheet_id=payload["datasheet_id"],
             model_profile_id=payload["model_profile_id"],
@@ -248,8 +277,6 @@ class UnitInstance:
     unit_instance_id: str
     datasheet_id: str
     name: str
-    keywords: tuple[str, ...]
-    faction_keywords: tuple[str, ...]
     datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...]
     datasheet_source_ids: tuple[str, ...]
     own_models: tuple[ModelInstance, ...]
@@ -280,26 +307,6 @@ class UnitInstance:
             ),
         )
         object.__setattr__(self, "name", _validate_identifier("UnitInstance name", self.name))
-        object.__setattr__(
-            self,
-            "keywords",
-            _validate_identifier_tuple(
-                "UnitInstance keywords",
-                self.keywords,
-                min_length=0,
-                canonicalize_keywords=True,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "faction_keywords",
-            _validate_identifier_tuple(
-                "UnitInstance faction_keywords",
-                self.faction_keywords,
-                min_length=0,
-                canonicalize_keywords=True,
-            ),
-        )
         object.__setattr__(
             self,
             "datasheet_abilities",
@@ -353,6 +360,16 @@ class UnitInstance:
         )
         object.__setattr__(self, "starting_resources", starting_resources)
 
+    @property
+    def keywords(self) -> tuple[str, ...]:
+        return tuple(sorted({k for model in self.alive_own_models() for k in model.keywords}))
+
+    @property
+    def faction_keywords(self) -> tuple[str, ...]:
+        return tuple(
+            sorted({k for model in self.alive_own_models() for k in model.faction_keywords})
+        )
+
     def stable_identity(self) -> str:
         return f"unit:{self.unit_instance_id}"
 
@@ -368,6 +385,13 @@ class UnitInstance:
 
     def own_model_ids(self) -> tuple[str, ...]:
         return tuple(model.model_instance_id for model in self.own_models)
+
+    def own_model_by_id(self, model_instance_id: str) -> ModelInstance:
+        requested = _validate_identifier("model_instance_id", model_instance_id)
+        for model in self.own_models:
+            if model.model_instance_id == requested:
+                return model
+        raise UnitFactoryError("Model does not belong to this physical unit.")
 
     def alive_own_models(self) -> tuple[ModelInstance, ...]:
         return tuple(model for model in self.own_models if model.is_alive)
@@ -398,7 +422,7 @@ class UnitInstance:
 
     @classmethod
     def from_payload(cls, payload: UnitInstancePayload) -> Self:
-        return cls(
+        unit = cls(
             split_origin=(
                 SplitUnitOrigin.from_payload(payload["split_origin"])
                 if "split_origin" in payload
@@ -407,8 +431,6 @@ class UnitInstance:
             unit_instance_id=payload["unit_instance_id"],
             datasheet_id=payload["datasheet_id"],
             name=payload["name"],
-            keywords=tuple(payload["keywords"]),
-            faction_keywords=tuple(payload["faction_keywords"]),
             datasheet_abilities=tuple(
                 DatasheetAbilityDescriptor.from_payload(ability)
                 for ability in payload["datasheet_abilities"]
@@ -432,6 +454,14 @@ class UnitInstance:
                 for allocation in payload["starting_resources"]
             ),
         )
+        if (
+            tuple(payload["keywords"]) != unit.keywords
+            or tuple(payload["faction_keywords"]) != unit.faction_keywords
+        ):
+            raise UnitFactoryError(
+                "UnitInstance keyword projection does not match model authority."
+            )
+        return unit
 
 
 @dataclass(frozen=True, slots=True)
@@ -502,6 +532,11 @@ class UnitFactory:
                     datasheet=datasheet,
                     profile=profile,
                     model_count=profile_selection.model_count,
+                    keyword_assignment=model_keyword_assignment(
+                        datasheet=datasheet,
+                        model_profile_id=profile.model_profile_id,
+                        assignments=self.catalog.model_keyword_assignments,
+                    ),
                     geometry_record=self._catalog_model_geometry(profile.model_profile_id),
                 )
             )
@@ -512,18 +547,20 @@ class UnitFactory:
             selected_mustering_options=selected_mustering_options,
         )
         own_models = [
-            replace(model, wargear_ids=model_wargear_ids[model.model_instance_id])
+            replace(
+                model,
+                wargear_ids=model_wargear_ids[model.model_instance_id],
+                keyword_assignment=_keyword_assignment_with_mustering_effects(
+                    assignment=model.keyword_assignment,
+                    selected_mustering_options=selected_mustering_options,
+                ),
+            )
             for model in own_models
         ]
         return UnitInstance(
             unit_instance_id=f"{army_id}:{selection.unit_selection_id}",
             datasheet_id=datasheet.datasheet_id,
             name=datasheet.name,
-            keywords=_keywords_with_mustering_effects(
-                base_keywords=datasheet.keywords.keywords,
-                selected_mustering_options=selected_mustering_options,
-            ),
-            faction_keywords=datasheet.keywords.faction_keywords,
             datasheet_abilities=datasheet.abilities,
             damaged_effects=datasheet.damaged_effects,
             datasheet_source_ids=datasheet.source_ids,
@@ -573,7 +610,14 @@ class UnitFactory:
             )
         )
         starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
+        assignment = model_keyword_assignment(
+            datasheet=datasheet,
+            model_profile_id=profile.model_profile_id,
+            assignments=self.catalog.model_keyword_assignments,
+            materialization_descriptor_id=materialization_descriptor_id,
+        )
         return ModelInstance(
+            keyword_assignment=assignment,
             model_instance_id=model_instance_id,
             datasheet_id=datasheet.datasheet_id,
             model_profile_id=profile.model_profile_id,
@@ -581,7 +625,7 @@ class UnitFactory:
             characteristics=profile.characteristics,
             base_size=profile.base_size,
             geometry=_model_geometry_for_profile(
-                datasheet=datasheet,
+                keywords=assignment.keywords,
                 profile=profile,
                 geometry_record=self._catalog_model_geometry(profile.model_profile_id),
             ),
@@ -619,17 +663,19 @@ def _instantiate_models_for_profile(
     datasheet: DatasheetDefinition,
     profile: ModelProfileDefinition,
     model_count: int,
+    keyword_assignment: ModelKeywordAssignment,
     geometry_record: ModelGeometryCatalogRecord | None,
 ) -> tuple[ModelInstance, ...]:
     starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
     source_ids = _merge_source_ids(datasheet.source_ids, profile.source_ids)
     geometry = _model_geometry_for_profile(
-        datasheet=datasheet,
+        keywords=keyword_assignment.keywords,
         profile=profile,
         geometry_record=geometry_record,
     )
     return tuple(
         ModelInstance(
+            keyword_assignment=keyword_assignment,
             model_instance_id=(
                 f"{army_id}:{unit_selection_id}:{profile.model_profile_id}:{index:03d}"
             ),
@@ -1062,28 +1108,34 @@ def _apply_mustering_add_wargear_effect_to_models(
     wargear_by_model_id[model.model_instance_id].append(effect.wargear_id)
 
 
-def _keywords_with_mustering_effects(
+def _keyword_assignment_with_mustering_effects(
     *,
-    base_keywords: tuple[str, ...],
+    assignment: ModelKeywordAssignment,
     selected_mustering_options: tuple[DatasheetMusteringOption, ...],
-) -> tuple[str, ...]:
-    keywords = set(base_keywords)
+) -> ModelKeywordAssignment:
+    keywords = set(assignment.keywords)
+    source_ids = set(assignment.source_ids)
     for option in selected_mustering_options:
+        if option.model_profile_id not in (None, assignment.model_profile_id):
+            continue
         for effect in option.effects:
             if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
                 if effect.keyword is None:
                     raise UnitFactoryError("Mustering option keyword effect is missing keyword.")
                 keywords.add(effect.keyword)
+                source_ids.update(option.source_ids)
                 continue
             if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
                 continue
             raise UnitFactoryError("Unsupported mustering option effect.")
-    return tuple(sorted(keywords))
+    return replace(
+        assignment, keywords=tuple(sorted(keywords)), source_ids=tuple(sorted(source_ids))
+    )
 
 
 def _model_geometry_for_profile(
     *,
-    datasheet: DatasheetDefinition,
+    keywords: tuple[str, ...],
     profile: ModelProfileDefinition,
     geometry_record: ModelGeometryCatalogRecord | None,
 ) -> ModelGeometry:
@@ -1094,7 +1146,7 @@ def _model_geometry_for_profile(
             return ModelGeometry.from_catalog_record(geometry_record)
         return ModelGeometry.from_base_size(
             profile.base_size,
-            keywords=datasheet.keywords.keywords,
+            keywords=keywords,
             geometry_source_id=profile.model_profile_id,
         )
     except GeometryError as exc:

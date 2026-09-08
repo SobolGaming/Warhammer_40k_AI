@@ -195,7 +195,7 @@ def test_s_mirrors_policy_and_static_provider_inventory_remain_complete() -> Non
         "core-rules-source-policy:40k-app-verbatim-official-app-mirror:2026-08-26",
     }
     assert len(scope["legacy_observations"]) == 33
-    assert len(scope["source_packages"]) == 19
+    assert len(scope["source_packages"]) == 20
 
 
 def test_superseded_mirror_policy_legacy_observation_inventory_is_immutable() -> None:

@@ -2791,26 +2791,8 @@ def _attached_unit_model_roles(
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     if not _unit_has_keyword(unit, "ATTACHED_UNIT"):
         return (), ()
-    character_datasheet_ids = {
-        candidate.datasheet_id
-        for army in state.army_definitions
-        for candidate in army.units
-        if _unit_has_keyword(candidate, "CHARACTER")
-    }
     character_model_ids = tuple(
-        model.model_instance_id
-        for model in alive_models
-        if "attached-role:character" in model.source_ids
-        or "attached-role:leader" in model.source_ids
-        or "attached-role:support" in model.source_ids
-        or "runtime-attached-unit:leader" in model.source_ids
-        or "runtime-attached-unit:support" in model.source_ids
-        or model.datasheet_id in character_datasheet_ids
-        or any(
-            source_id == f"datasheet:{datasheet_id}"
-            for source_id in model.source_ids
-            for datasheet_id in character_datasheet_ids
-        )
+        model.model_instance_id for model in alive_models if "CHARACTER" in model.keywords
     )
     if not character_model_ids or len(character_model_ids) == len(alive_models):
         return (), ()

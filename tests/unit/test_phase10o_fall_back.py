@@ -20,6 +20,7 @@ from tests.setup_completion_helpers import (
     record_current_battlefield_placements_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -2722,9 +2723,9 @@ def _engaged_scenario(
         replace(
             army,
             units=tuple(
-                replace(unit, keywords=active_keywords)
+                with_unit_keywords(unit, keywords=active_keywords)
                 if unit.unit_instance_id == active_unit_id
-                else replace(unit, keywords=enemy_keywords)
+                else with_unit_keywords(unit, keywords=enemy_keywords)
                 if unit.unit_instance_id == enemy_unit_id
                 else unit
                 for unit in army.units

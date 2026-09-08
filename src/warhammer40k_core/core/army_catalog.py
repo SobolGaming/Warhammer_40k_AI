@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict
 
 from warhammer40k_core.core.attachment_eligibility import (
     AttachmentEligibility,
@@ -43,6 +43,11 @@ from warhammer40k_core.core.faction import (
     FactionDefinition,
     FactionDefinitionPayload,
 )
+from warhammer40k_core.core.model_keywords import (
+    ModelKeywordAssignment,
+    ModelKeywordAssignmentPayload,
+    validate_model_keyword_assignments,
+)
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear, WargearError, WargearPayload
@@ -61,6 +66,7 @@ class ArmyCatalogError(ValueError):
 
 
 class ArmyCatalogPayload(TypedDict):
+    model_keyword_assignments: NotRequired[list[ModelKeywordAssignmentPayload]]
     catalog_id: str
     ruleset_id: RulesetIdPayload
     source_package_id: str
@@ -87,6 +93,7 @@ class ArmyCatalog:
     enhancements: tuple[EnhancementDefinition, ...] = ()
     stratagems: tuple[StratagemDefinition, ...] = ()
     source_ids: tuple[str, ...] = ()
+    model_keyword_assignments: tuple[ModelKeywordAssignment, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -109,6 +116,11 @@ class ArmyCatalog:
         enhancements = _validate_enhancement_tuple("ArmyCatalog enhancements", self.enhancements)
         stratagems = _validate_stratagem_tuple("ArmyCatalog stratagems", self.stratagems)
 
+        object.__setattr__(
+            self,
+            "model_keyword_assignments",
+            validate_model_keyword_assignments(self.model_keyword_assignments, datasheets),
+        )
         _validate_datasheet_faction_keywords(datasheets, factions)
         _validate_datasheet_wargear_links(datasheets, wargear)
         _validate_datasheet_attachment_links(datasheets)
@@ -454,7 +466,7 @@ class ArmyCatalog:
         raise ArmyCatalogError("ArmyCatalog faction_id was not found.")
 
     def to_payload(self) -> ArmyCatalogPayload:
-        return {
+        payload: ArmyCatalogPayload = {
             "catalog_id": self.catalog_id,
             "ruleset_id": self.ruleset_id.to_payload(),
             "source_package_id": self.source_package_id,
@@ -468,9 +480,21 @@ class ArmyCatalog:
             "source_ids": list(self.source_ids),
         }
 
+        if self.model_keyword_assignments:
+            payload["model_keyword_assignments"] = [
+                row.to_payload() for row in self.model_keyword_assignments
+            ]
+        return payload
+
     @classmethod
     def from_payload(cls, payload: ArmyCatalogPayload) -> Self:
         return cls(
+            model_keyword_assignments=tuple(
+                ModelKeywordAssignment.from_payload(row)
+                for row in payload["model_keyword_assignments"]
+            )
+            if "model_keyword_assignments" in payload
+            else (),
             catalog_id=payload["catalog_id"],
             ruleset_id=_ruleset_id_from_payload(payload["ruleset_id"]),
             source_package_id=payload["source_package_id"],

@@ -650,14 +650,14 @@ reference server currently requires:
   requests;
 - `event-delta-v4-phase17n-step4` for the in-process integer-cursor adapter delta only;
 - `event-delta-v5-phase17n-step4` for authenticated role-bound HTTP event deltas;
-- `game-view-v11-phase17n-step4` for role-scoped game projections whose public
+- `game-view-v12-model-keywords` for role-scoped game projections whose public
   mission state contains both directed Primary Mission assignments, complete
   group-aware turn-start position rows, and persistent Step 4 Primary Mission
   progress;
 - `battlefield-view-v4-phase17n-step3` for authoritative battlefield geometry
   with explicit terrain-area logical identity and terrain area and feature
   classifications, plus viewer-scoped model formation state before reveal;
-- `session-projection-v7-phase17n-step4` for full role-scoped reconnect projections;
+- `session-projection-v8-model-keywords` for full role-scoped reconnect projections;
 - `session-create-v4`, `session-metadata-v11-contract`,
   `session-command-envelope-v2-weapon-instances`,
   `session-command-result-v11-contract`, and `session-command-outcome-v11-contract` for the
@@ -726,8 +726,8 @@ together with their evidence cannot hide an applicable historical boundary.
 
 `primary_scoring_state_evidence_records` is authoritative replay/audit state,
 not viewer projection state. It is deliberately omitted from
-`game-view-v11-phase17n-step4` and
-`session-projection-v7-phase17n-step4`; those family versions remain unchanged.
+`game-view-v12-model-keywords` and
+`session-projection-v8-model-keywords`; their Phase 17N behavior is retained by the current families.
 Adapters render public mission progress and awarded victory-point transactions
 without receiving the engine-private registry.
 
@@ -3884,7 +3884,7 @@ hybrid projection model:
    `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. Phase 18A introduced
    `projection_schema: "game-view-v3-phase18a"`; the current `GameViewPayload`
-   uses `game-view-v11-phase17n-step4`, includes
+   uses `game-view-v12-model-keywords`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and
@@ -5092,3 +5092,34 @@ Both this origin and the effect hash remain private under the shared recursive
 redaction owner. Runtime identity changes, so older completed Psychic checkpoints
 without the required origin fail closed. One origin is retained per lifecycle;
 restoring Psychic history incurs the additional engine replay of its decision tail.
+
+## Order 31 / P02D: model keyword authority (Contract 13)
+
+Every `ModelInstance` persists a required `keyword_assignment` containing its
+`datasheet_id`, `model_profile_id`, canonical `keywords` and `faction_keywords`,
+and nonempty source IDs. Catalogs with explicit model scope must cover every
+profile with one base assignment; shared stat profiles can additionally carry
+assignments keyed by existing materialization descriptor IDs. Unscoped source
+keywords apply to every model. Runtime
+loaders reject missing assignments and mismatched profile/source lineage rather
+than reconstructing it from legacy unit payloads. Unit persistence keyword
+fields are derived living-model projections and must match their owned models.
+
+`RulesUnitView` owns current attached/split rules-unit aggregation. Only living
+models or models covered by the existing P05B retained-presence state contribute.
+Ordinary removed models and models awaiting an ordinary deferred destruction
+reaction do not contribute. Keyword loss does not expire the surviving component's
+datasheet abilities. Model identity persists through casualties, healing,
+materialization and split membership, so replay and historical validation can
+refer to the original model without granting it current presence.
+
+Game views expose intrinsic `keywords`, `faction_keywords`, and
+`keyword_source_ids` on model display rows. Current unit display keywords use the
+canonical rules unit after formation visibility permits it; unrevealed opponent
+formations retain the original roster projection. Hidden model rows have empty
+keyword inventories. Clients must use the unit projection for current eligibility,
+not aggregate every historical model row. No player choice, finite option ID,
+proposal kind, or mutation bypass is added. Existing casualty, retained-destruction,
+healing and split submissions still use the common lifecycle decision path.
+See [Contract 12 to 13](../contracts/migrations/12-to-13.md) for family versions and
+checkpoint compatibility.

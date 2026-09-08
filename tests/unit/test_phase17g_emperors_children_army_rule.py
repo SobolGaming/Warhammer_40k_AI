@@ -18,6 +18,7 @@ from tests.phase11c_command_phase_helpers import (
     unit_by_id,
 )
 from tests.phase15c_fight_order_helpers import fight_lifecycle
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -1372,7 +1373,9 @@ def _mark_player_as_emperors_children(state: GameState, *, player_id: str) -> No
                     faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
                 ),
                 units=tuple(
-                    replace(unit, faction_keywords=(army_rule.EMPERORS_CHILDREN_FACTION_KEYWORD,))
+                    with_unit_keywords(
+                        unit, faction_keywords=(army_rule.EMPERORS_CHILDREN_FACTION_KEYWORD,)
+                    )
                     for unit in army.units
                 ),
             )

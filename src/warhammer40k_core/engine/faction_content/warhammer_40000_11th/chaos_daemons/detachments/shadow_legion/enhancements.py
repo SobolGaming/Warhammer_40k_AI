@@ -100,6 +100,7 @@ from warhammer40k_core.engine.turn_end_hooks import (
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 
 
@@ -929,7 +930,7 @@ def _unit_is_enemy_within_mantle_of_gloom(
             army,
             enhancement_id=MANTLE_OF_GLOOM_ENHANCEMENT_ID,
         ):
-            if not _unit_has_keyword(bearer, SHADOW_LEGION_KEYWORD):
+            if not unit_has_roster_keyword(bearer, SHADOW_LEGION_KEYWORD):
                 raise GameLifecycleError("Mantle of Gloom requires a Shadow Legion model.")
             bearer_rules_unit = rules_unit_view_by_id(
                 state=state,

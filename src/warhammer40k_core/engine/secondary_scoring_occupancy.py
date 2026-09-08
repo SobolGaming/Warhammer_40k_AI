@@ -531,9 +531,9 @@ def _enemy_character_models(
         if army.player_id == player_id:
             continue
         for unit in army.units:
-            if not unit_has_keyword(unit, "CHARACTER"):
-                continue
             for model in unit.own_models:
+                if "CHARACTER" not in model.keywords:
+                    continue
                 models.append(
                     SecondaryCharacterModel(
                         model_instance_id=model.model_instance_id,

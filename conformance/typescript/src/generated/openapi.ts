@@ -268,7 +268,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v12-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v13-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -632,7 +632,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v12-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v13-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -843,6 +843,7 @@ export interface components {
             model_instance_id: string; model_profile_id: string | null;
             redaction: components["schemas"]["game-view--redaction.schema"]; unit_instance_id: string;
             visible_modifiers: components["schemas"]["game-view--json_value.schema"][]; wargear_ids: string[];
+            keywords: string[]; faction_keywords: string[]; keyword_source_ids: string[];
         } & {
             [key: string]: unknown;
         };
@@ -1013,7 +1014,7 @@ export interface components {
             pending_proposal: components["schemas"]["game-view--json_value.schema"];
             nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][]; player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v11-phase17n-step4"; projection_state_hash: string;
+            projection_schema: "game-view-v12-model-keywords"; projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_choices: components["schemas"]["game-view--json_value.schema"][];
@@ -1034,7 +1035,7 @@ export interface components {
             event_cursor: string; game_id: string; projection: components["schemas"]["game-view.schema"];
             projection_state_hash: string; retention_limit: number; revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v7-phase17n-step4"; session_id: string; session_revision: number;
+            schema_version: "session-projection-v8-model-keywords"; session_id: string; session_revision: number;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
         };

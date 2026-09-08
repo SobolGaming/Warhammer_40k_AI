@@ -11,6 +11,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
     ruleset,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DamagedEffectDefinition, DamagedEffectKind
@@ -1112,10 +1113,7 @@ def _mark_player_as_adepta_sororitas(
                     faction_id=army_rule.ADEPTA_SORORITAS_FACTION_ID,
                 ),
                 units=tuple(
-                    replace(
-                        unit,
-                        faction_keywords=faction_keywords,
-                    )
+                    with_unit_keywords(unit, faction_keywords=faction_keywords)
                     for unit in army.units
                 ),
             )
@@ -1141,6 +1139,10 @@ def _make_first_unit_triumph(
         replace(
             model,
             datasheet_id=army_rule.TRIUMPH_OF_SAINT_KATHERINE_DATASHEET_ID,
+            keyword_assignment=replace(
+                model.keyword_assignment,
+                datasheet_id=army_rule.TRIUMPH_OF_SAINT_KATHERINE_DATASHEET_ID,
+            ),
             starting_wounds=18,
             wounds_remaining=wounds_remaining if index == 0 else 0,
         )

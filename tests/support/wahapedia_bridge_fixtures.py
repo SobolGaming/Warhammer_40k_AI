@@ -289,9 +289,9 @@ def no_equipment_daemon_fortification_bridge_artifacts() -> tuple[WahapediaJsonA
     )
 
 
-def jakhals_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+def jakhals_bridge_artifacts(*, keyword_scope: str = "") -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
-        source_artifacts=_jakhals_source_artifacts(),
+        source_artifacts=_jakhals_source_artifacts(keyword_scope=keyword_scope),
         bridge_package_id=bridge_package_id(),
         datasheet_ids=("test-jakhals",),
         height_overrides=(
@@ -323,7 +323,7 @@ def jakhals_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
-def _jakhals_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+def _jakhals_source_artifacts(*, keyword_scope: str = "") -> tuple[WahapediaJsonArtifact, ...]:
     return (
         artifact_from_csv(
             "Abilities",
@@ -358,7 +358,7 @@ def _jakhals_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 (
                     "datasheet_id,keyword,model,is_faction_keyword",
                     "test-jakhals,Chaos,,false",
-                    "test-jakhals,Grenades,,false",
+                    f"test-jakhals,Grenades,{keyword_scope},false",
                     "test-jakhals,Infantry,,false",
                     "test-jakhals,Jakhals,,false",
                     "test-jakhals,Khorne,,false",

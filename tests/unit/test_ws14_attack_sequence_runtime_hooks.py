@@ -5,6 +5,7 @@ from dataclasses import replace
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.generic_modifier_helpers import generic_effect as _generic_effect
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
@@ -593,7 +594,7 @@ def test_ws14_attacker_scoped_generic_hooks_use_canonical_attached_rules_unit() 
 def test_ws14_attached_attacker_conditions_use_rules_unit_ownership_and_keywords() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     bodyguard, leader, formation = _attached_units(catalog)
-    leader = replace(leader, keywords=(*leader.keywords, "LEADER_GATE"))
+    leader = with_unit_keywords(leader, keywords=(*leader.keywords, "LEADER_GATE"))
     defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
     state = _state(
         _attached_army(
@@ -636,7 +637,7 @@ def test_ws14_attached_attacker_conditions_use_rules_unit_ownership_and_keywords
 def test_ws14_attached_target_proximity_uses_keywords_and_geometry_from_all_components() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     bodyguard, leader, formation = _attached_units(catalog)
-    leader = replace(leader, keywords=(*leader.keywords, "PROXIMITY_GATE"))
+    leader = with_unit_keywords(leader, keywords=(*leader.keywords, "PROXIMITY_GATE"))
     defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender")
     armies = (
         _attached_army(

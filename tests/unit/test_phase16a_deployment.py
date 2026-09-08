@@ -13,6 +13,7 @@ from tests.deployment_submission_helpers import (
     submit_deployment_placement,
     submit_deployment_unit_selection,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
@@ -751,7 +752,11 @@ def _deployment_state_with_mustered_armies(
                 )
             army = replace(
                 army,
-                units=(replace(unit, keywords=keywords, datasheet_abilities=abilities),),
+                units=(
+                    with_unit_keywords(
+                        replace(unit, datasheet_abilities=abilities), keywords=keywords
+                    ),
+                ),
             )
         state.record_army_definition(army)
     while state.current_setup_step is not SetupStep.DEPLOY_ARMIES:

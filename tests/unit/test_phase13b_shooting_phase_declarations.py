@@ -46,6 +46,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _weapon_payload_to_declaration_payload,
     _weapon_profile_by_wargear,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -1217,7 +1218,7 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     )
     assert visibility_candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
 
-    lone_target = replace(target, keywords=(*target.keywords, "Lone Operative"))
+    lone_target = with_unit_keywords(target, keywords=(*target.keywords, "Lone Operative"))
     lone_scenario = _scenario_with_replaced_unit(
         scenario=near_scenario,
         replacement=lone_target,
@@ -1294,7 +1295,7 @@ def test_gone_to_ground_reduces_hidden_detection_range_in_solid_terrain() -> Non
 
 def test_gone_to_ground_does_not_reduce_detection_when_solid_target_fully_visible() -> None:
     scenario, attacker, target, profile = _gone_to_ground_detection_context()
-    towering_attacker = replace(attacker, keywords=(*attacker.keywords, "TOWERING"))
+    towering_attacker = with_unit_keywords(attacker, keywords=(*attacker.keywords, "TOWERING"))
 
     candidate = shooting_target_candidate_for_model(
         scenario=scenario,
@@ -1821,7 +1822,7 @@ def test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_k
     assert state.battlefield_state is not None
     attacker = units["intercessor-1"]
     bodyguard = units["bodyguard-unit"]
-    vehicle_leader = replace(units["leader-unit"], keywords=("VEHICLE",))
+    vehicle_leader = with_unit_keywords(units["leader-unit"], keywords=("VEHICLE",))
     _replace_unit_instance_in_state(state=state, replacement=vehicle_leader)
     attached = _attached_formation_for_player(state=state, player_id="player-b")
     scenario = BattlefieldScenario(
@@ -1910,9 +1911,8 @@ def test_phase13d_lone_operative_within_twelve_is_visible_even_with_closer_enemy
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     profile = _first_weapon_profile(lifecycle, attacker)
-    lone_target = replace(
-        units["lone-target"],
-        keywords=(*units["lone-target"].keywords, "Lone Operative"),
+    lone_target = with_unit_keywords(
+        units["lone-target"], keywords=(*units["lone-target"].keywords, "Lone Operative")
     )
     _replace_unit_instance_in_state(state=state, replacement=lone_target)
     assert state.battlefield_state is not None
@@ -2097,7 +2097,7 @@ def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
-    infantry_target = replace(units["enemy"], keywords=("INFANTRY",))
+    infantry_target = with_unit_keywords(units["enemy"], keywords=("INFANTRY",))
     _replace_unit_instance_in_state(state=state, replacement=infantry_target)
     assert state.battlefield_state is not None
     scenario = BattlefieldScenario(
@@ -2123,7 +2123,7 @@ def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
     )
     assert invalid_candidates[0].targeting_rule_ids == (HUNTER_RULE_ID,)
 
-    vehicle_target = replace(infantry_target, keywords=("Vehicle",))
+    vehicle_target = with_unit_keywords(infantry_target, keywords=("Vehicle",))
     _replace_unit_instance_in_state(state=state, replacement=vehicle_target)
     legal_scenario = BattlefieldScenario(
         armies=tuple(state.army_definitions),
@@ -2454,7 +2454,7 @@ def test_target_side_engagement_rejects_engaged_infantry_and_applies_big_guns() 
         is ShootingTargetViolationCode.LOCKED_IN_COMBAT
     )
 
-    monster_target = replace(target, keywords=(*target.keywords, "Monster"))
+    monster_target = with_unit_keywords(target, keywords=(*target.keywords, "Monster"))
     monster_scenario = _scenario_with_replaced_unit(
         scenario=scenario,
         replacement=monster_target,
@@ -3269,9 +3269,8 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
     defender_keywords = {
         keyword.upper().replace(" ", "_").replace("-", "_") for keyword in units["enemy"].keywords
     }
-    defender = replace(
-        units["enemy"],
-        keywords=tuple(sorted({*defender_keywords, "INFANTRY", "VEHICLE"})),
+    defender = with_unit_keywords(
+        units["enemy"], keywords=tuple(sorted({*defender_keywords, "INFANTRY", "VEHICLE"}))
     )
     _replace_unit_instance_in_state(state=state, replacement=defender)
     selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())

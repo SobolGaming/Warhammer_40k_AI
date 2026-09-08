@@ -1166,10 +1166,17 @@ def test_fight_movement_restore_authenticates_target_authority_at_the_right_boun
     historical_boundary_matches = tuple(
         node
         for node in ast.walk(history_tree)
-        if isinstance(node, ast.FunctionDef) and node.name == "has_placed_living_model_before_event"
+        if isinstance(node, ast.FunctionDef) and node.name == "has_living_model_before_event"
     )
     assert len(historical_boundary_matches) == 1
     historical_boundary = historical_boundary_matches[0]
+    placed_boundary = next(
+        node
+        for node in ast.walk(history_tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "has_placed_living_model_before_event"
+    )
+    assert "require_placed=True" in ast.unparse(placed_boundary)
+    assert "self.has_living_model_before_event" in ast.unparse(placed_boundary)
     assert any(
         isinstance(node, ast.Call)
         and isinstance(node.func, ast.Name)

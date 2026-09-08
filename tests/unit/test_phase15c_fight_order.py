@@ -34,6 +34,7 @@ from tests.setup_completion_helpers import (
     record_current_battlefield_placements_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import (
     ROLE_POLICY_BY_ROLE,
@@ -448,6 +449,14 @@ def test_restore_rejects_destroyed_model_revived_without_restoration_or_fight_mo
         if model["model_instance_id"] == destroyed_model.model_instance_id
     )
     model_payload["wounds_remaining"] = 1
+    unit_payload = next(
+        unit
+        for army in revived_without_restoration["state"]["army_definitions"]
+        for unit in army["units"]
+        if unit["unit_instance_id"] == destroyed_unit.unit_instance_id
+    )
+    unit_payload["keywords"] = list(destroyed_unit.keywords)
+    unit_payload["faction_keywords"] = list(destroyed_unit.faction_keywords)
 
     with pytest.raises(
         GameLifecycleError,
@@ -2288,9 +2297,8 @@ def test_fights_first_descriptor_registers_static_ordering_source() -> None:
     third_request = _decision_request(second_status)
     third_payload = cast(dict[str, object], third_request.payload)
     payload = cast(dict[str, object], state.to_payload())
-    keyword_unit = replace(
-        units["alpha-remaining"],
-        keywords=(*units["alpha-remaining"].keywords, "Fights First"),
+    keyword_unit = with_unit_keywords(
+        units["alpha-remaining"], keywords=(*units["alpha-remaining"].keywords, "Fights First")
     )
 
     assert unit_has_fights_first(units["alpha-first"])

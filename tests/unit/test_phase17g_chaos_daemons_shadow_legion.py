@@ -11,6 +11,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
     phase11c_config,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -3532,9 +3533,11 @@ def _shadow_legion_state(
                     detachment_ids=(rule.DETACHMENT_ID,),
                 ),
                 units=tuple(
-                    replace(
-                        unit,
-                        name=name,
+                    with_unit_keywords(
+                        replace(
+                            unit,
+                            name=name,
+                        ),
                         keywords=tuple(dict.fromkeys((*unit.keywords, *unit_keywords))),
                         faction_keywords=faction_keywords,
                     )
@@ -4339,7 +4342,7 @@ def _replace_unit_keywords(
                 updated_units.append(unit)
                 continue
             updated_units.append(
-                replace(unit, keywords=keywords, faction_keywords=faction_keywords)
+                with_unit_keywords(unit, keywords=keywords, faction_keywords=faction_keywords)
             )
             did_replace = True
         updated_armies.append(replace(army, units=tuple(updated_units)))

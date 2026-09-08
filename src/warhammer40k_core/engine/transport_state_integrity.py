@@ -44,12 +44,12 @@ def validate_transport_cargo_state_consistency(*, state: GameState) -> None:
             if embarked_unit_id in embarked_unit_ids:
                 raise GameLifecycleError("unit cannot be embarked in more than one Transport.")
             embarked_unit_ids.add(embarked_unit_id)
-            if not cargo_state.capacity_profile.allows_unit(embarked_unit):
-                raise GameLifecycleError("transport_cargo_states capacity profile rejects cargo.")
             if not any(model.is_alive for model in embarked_unit.own_models):
                 raise GameLifecycleError(
                     "transport_cargo_states must not retain a wholly destroyed component."
                 )
+            if not cargo_state.capacity_profile.allows_unit(embarked_unit):
+                raise GameLifecycleError("transport_cargo_states capacity profile rejects cargo.")
             cargo_model_count += sum(model.is_alive for model in embarked_unit.own_models)
         if cargo_model_count > cargo_state.capacity_profile.max_model_count:
             raise GameLifecycleError("transport_cargo_states capacity is exceeded.")

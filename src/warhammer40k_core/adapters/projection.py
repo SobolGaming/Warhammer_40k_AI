@@ -51,14 +51,14 @@ from warhammer40k_core.engine.primary_mission_state import (
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
+from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_starting_total,
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v11-phase17n-step4"
+PROJECTION_SCHEMA_VERSION = "game-view-v12-model-keywords"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -282,6 +282,9 @@ class UnitDisplayPayload(TypedDict):
 
 
 class ModelDisplayPayload(TypedDict):
+    keywords: list[str]
+    faction_keywords: list[str]
+    keyword_source_ids: list[str]
     model_instance_id: str
     unit_instance_id: str
     datasheet_id: str | None
@@ -756,8 +759,18 @@ def _unit_display_payload(
             catalog=catalog,
             source_ids=unit.datasheet_source_ids,
         ),
-        "keywords": list(unit.keywords),
-        "faction_keywords": list(unit.faction_keywords),
+        "keywords": list(
+            rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id).keywords
+            if formation_state_visible
+            else unit.keywords
+        ),
+        "faction_keywords": list(
+            rules_unit_view_by_id(
+                state=state, unit_instance_id=unit.unit_instance_id
+            ).faction_keywords
+            if formation_state_visible
+            else unit.faction_keywords
+        ),
         "model_instance_ids": [model.model_instance_id for model in unit.own_models],
         "selected_wargear_ids": [
             wargear_id
@@ -830,6 +843,9 @@ def _model_display_payload(
             "model_profile_name": None,
             "visible_status": "hidden",
             "model_display_name": None,
+            "keywords": [],
+            "faction_keywords": [],
+            "keyword_source_ids": [],
             "wargear_ids": [],
             "base_size": None,
             "geometry": None,
@@ -865,6 +881,9 @@ def _model_display_payload(
         "model_profile_name": model.name,
         "visible_status": "visible",
         "model_display_name": model.name,
+        "keywords": list(model.keywords),
+        "faction_keywords": list(model.faction_keywords),
+        "keyword_source_ids": list(model.keyword_assignment.source_ids),
         "wargear_ids": list(model.wargear_ids),
         "base_size": _base_size_display(
             base_size_id=_base_size_id(model.model_profile_id),

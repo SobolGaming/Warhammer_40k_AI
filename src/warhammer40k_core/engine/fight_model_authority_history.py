@@ -145,6 +145,17 @@ class ModelAuthorityTimeline:
         model_instance_id: str,
         event_index: int,
     ) -> bool:
+        return self.has_living_model_before_event(
+            model_instance_id=model_instance_id, event_index=event_index, require_placed=True
+        )
+
+    def has_living_model_before_event(
+        self,
+        *,
+        model_instance_id: str,
+        event_index: int,
+        require_placed: bool = False,
+    ) -> bool:
         requested_model_id = _identifier(
             model_instance_id,
             field_name="Fight model authority model_instance_id",
@@ -160,7 +171,7 @@ class ModelAuthorityTimeline:
         authority = (
             current if position == len(boundaries) else boundaries[position].authority_before
         )
-        return authority.exists and authority.living and authority.placed
+        return authority.exists and authority.living and (authority.placed or not require_placed)
 
 
 @dataclass(frozen=True, slots=True)

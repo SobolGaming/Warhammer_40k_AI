@@ -19,6 +19,7 @@ from tests.setup_completion_helpers import (
     record_completed_command_occurrences_for_fixture,
     record_current_battlefield_placements_for_fixture,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -10935,22 +10936,24 @@ def _gate_of_infinity_pending_decision() -> tuple[
     army, enemy_army = _mustered_armies(config)
     unit = army.unit_by_id("army-alpha:gate-unit")
     transport = army.unit_by_id("army-alpha:transport-unit")
-    unit = replace(
-        unit,
-        faction_keywords=tuple(sorted((*unit.faction_keywords, "GREY KNIGHTS"))),
-        datasheet_abilities=(
-            *unit.datasheet_abilities,
-            DatasheetAbilityDescriptor(
-                ability_id=grey_knights_army_rule.GATE_OF_INFINITY_ABILITY_ID,
-                name=grey_knights_army_rule.GATE_OF_INFINITY_ABILITY_NAME,
-                source_id=grey_knights_army_rule.SOURCE_RULE_ID,
-                support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
-                source_kind=CatalogAbilitySourceKind.DATASHEET,
-                effect_description="Select this unit for Gate of Infinity.",
-                timing_tags=("end_turn",),
-                parameter_tokens=("strategic_reserves",),
+    unit = with_unit_keywords(
+        replace(
+            unit,
+            datasheet_abilities=(
+                *unit.datasheet_abilities,
+                DatasheetAbilityDescriptor(
+                    ability_id=grey_knights_army_rule.GATE_OF_INFINITY_ABILITY_ID,
+                    name=grey_knights_army_rule.GATE_OF_INFINITY_ABILITY_NAME,
+                    source_id=grey_knights_army_rule.SOURCE_RULE_ID,
+                    support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                    source_kind=CatalogAbilitySourceKind.DATASHEET,
+                    effect_description="Select this unit for Gate of Infinity.",
+                    timing_tags=("end_turn",),
+                    parameter_tokens=("strategic_reserves",),
+                ),
             ),
         ),
+        faction_keywords=tuple(sorted((*unit.faction_keywords, "GREY KNIGHTS"))),
     )
     army = replace(
         army,

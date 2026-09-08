@@ -19,6 +19,7 @@ from tests.phase11c_command_phase_helpers import (
     with_model_offsets,
 )
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -694,7 +695,7 @@ def test_shadow_in_the_warp_targets_an_attached_enemy_once_by_canonical_identity
                 faction_id=army_rule.TYRANIDS_FACTION_ID,
             ),
             units=tuple(
-                replace(unit, faction_keywords=(army_rule.TYRANIDS_FACTION_KEYWORD,))
+                with_unit_keywords(unit, faction_keywords=(army_rule.TYRANIDS_FACTION_KEYWORD,))
                 for unit in army.units
             ),
         )
@@ -1012,7 +1013,7 @@ def test_synapse_source_geometry_does_not_expand_to_attached_bodyguards() -> Non
                     faction_id=army_rule.TYRANIDS_FACTION_ID,
                 ),
                 units=tuple(
-                    replace(
+                    with_unit_keywords(
                         unit,
                         keywords=(
                             (*unit.keywords, army_rule.SYNAPSE_KEYWORD)

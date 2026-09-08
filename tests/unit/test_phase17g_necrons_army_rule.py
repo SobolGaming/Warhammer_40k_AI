@@ -8,6 +8,7 @@ from typing import cast
 
 import pytest
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -265,7 +266,7 @@ def test_reanimation_request_filters_non_necrons_and_destroyed_rules_units() -> 
     _update_unit(
         state,
         unit_instance_id=NECRON_UNIT_2_ID,
-        update=lambda unit: replace(unit, faction_keywords=()),
+        update=lambda unit: with_unit_keywords(unit, faction_keywords=()),
     )
     destroyed_unit = _unit_by_id(state, "army-alpha:necron-warriors-3")
     for model in destroyed_unit.own_models:
@@ -754,9 +755,8 @@ def _as_necrons(army: ArmyDefinition) -> ArmyDefinition:
 
 
 def _unit_with_necrons_keyword(unit: UnitInstance) -> UnitInstance:
-    return replace(
-        unit,
-        faction_keywords=tuple(sorted({*unit.faction_keywords, "Necrons"})),
+    return with_unit_keywords(
+        unit, faction_keywords=tuple(sorted({*unit.faction_keywords, "Necrons"}))
     )
 
 

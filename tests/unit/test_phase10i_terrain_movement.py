@@ -5,8 +5,11 @@ import math
 from dataclasses import replace
 from typing import cast
 
+from tests.unit_keyword_helpers import with_unit_keywords
+
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
+from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
@@ -929,6 +932,13 @@ def _endpoint_placement_unit(
     model_profile_id = f"{datasheet_id}-profile"
     base_size = BaseSizeDefinition.circular(25.0)
     model = ModelInstance(
+        keyword_assignment=ModelKeywordAssignment(
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            keywords=(),
+            faction_keywords=(),
+            source_ids=(f"source:{model_profile_id}",),
+        ),
         model_instance_id=model_instance_id,
         datasheet_id=datasheet_id,
         model_profile_id=model_profile_id,
@@ -948,16 +958,18 @@ def _endpoint_placement_unit(
         wargear_ids=(),
         source_ids=(f"source:{model_profile_id}",),
     )
-    return UnitInstance(
-        unit_instance_id=unit_instance_id,
-        datasheet_id=datasheet_id,
-        name="Endpoint placement unit",
+    return with_unit_keywords(
+        UnitInstance(
+            unit_instance_id=unit_instance_id,
+            datasheet_id=datasheet_id,
+            name="Endpoint placement unit",
+            datasheet_abilities=(),
+            datasheet_source_ids=(f"source:{datasheet_id}",),
+            own_models=(model,),
+            wargear_selections=(),
+        ),
         keywords=keywords,
         faction_keywords=(),
-        datasheet_abilities=(),
-        datasheet_source_ids=(f"source:{datasheet_id}",),
-        own_models=(model,),
-        wargear_selections=(),
     )
 
 

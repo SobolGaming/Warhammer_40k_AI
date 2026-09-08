@@ -58,12 +58,12 @@
         },
         "primary_rules_unit_turn_start_snapshots": {
           "items": {
-            "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_rules_unit_turn_start_snapshot"
+            "$ref": "https://warhammer40k-core.local/contracts/v13/game-view.schema.json#/$defs/primary_rules_unit_turn_start_snapshot"
           },
           "type": "array"
         },
         "primary_mission_progress_state": {
-          "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_mission_progress_state"
+          "$ref": "https://warhammer40k-core.local/contracts/v13/game-view.schema.json#/$defs/primary_mission_progress_state"
         },
         "primary_scoring_state_evidence_records": {
           "items": {"$ref": "#/$defs/primary_scoring_state_evidence"},
@@ -315,7 +315,7 @@
           "type": "string"
         },
         "primary_mission_progress_state": {
-          "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_mission_progress_state"
+          "$ref": "https://warhammer40k-core.local/contracts/v13/game-view.schema.json#/$defs/primary_mission_progress_state"
         },
         "primary_mission_action_states": {
           "items": {"$ref": "#/$defs/mission_action_state"},
@@ -436,7 +436,7 @@
       "properties": {
         "owner_player_id": {"minLength": 1, "type": "string"},
         "rules_unit_membership": {
-          "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_rules_unit_turn_start_membership"
+          "$ref": "https://warhammer40k-core.local/contracts/v13/game-view.schema.json#/$defs/primary_rules_unit_turn_start_membership"
         }
       },
       "required": ["owner_player_id", "rules_unit_membership"],

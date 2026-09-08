@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
@@ -1672,10 +1673,12 @@ def _replace_with_attached_wounded_unit(state: GameState, *, unit_id: str) -> Un
         replace(unit.own_models[1], wounds_remaining=1),
         role="leader",
     )
-    replacement = replace(
-        unit,
+    replacement = with_unit_keywords(
+        replace(
+            unit,
+            own_models=(bodyguard, leader, *unit.own_models[2:]),
+        ),
         keywords=tuple(sorted({*unit.keywords, "ATTACHED_UNIT"})),
-        own_models=(bodyguard, leader, *unit.own_models[2:]),
     )
     _replace_unit(state=state, replacement=replacement)
     return replacement

@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -7225,21 +7226,23 @@ def test_p12_non_circular_closer_consolidation_uses_sound_distance_bound(
         target_a_pose=Pose.at(15.0, 10.0),
         target_b_pose=Pose.at(40.0, 30.0),
     )
-    attacker = replace(
-        attacker,
-        keywords=(*attacker.keywords, "fly") if flying else attacker.keywords,
-        own_models=tuple(
-            replace(
-                model,
-                base_size=base_size,
-                geometry=ModelGeometry.from_base_size(
-                    base_size,
-                    geometry_source_id="p12-supported-base",
-                    keywords=attacker.keywords,
-                ),
-            )
-            for model in attacker.own_models
+    attacker = with_unit_keywords(
+        replace(
+            attacker,
+            own_models=tuple(
+                replace(
+                    model,
+                    base_size=base_size,
+                    geometry=ModelGeometry.from_base_size(
+                        base_size,
+                        geometry_source_id="p12-supported-base",
+                        keywords=attacker.keywords,
+                    ),
+                )
+                for model in attacker.own_models
+            ),
         ),
+        keywords=(*attacker.keywords, "fly") if flying else attacker.keywords,
     )
     placement = scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
     starts = (

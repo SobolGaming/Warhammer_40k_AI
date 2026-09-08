@@ -21,18 +21,13 @@ def scoped_roll_model_ids_for_effect(
         return tuple(sorted(current_ids))
     if type(required_model_keyword) is not str or not required_model_keyword.strip():
         raise GameLifecycleError("Catalog model scope keyword is malformed.")
-    eligible_datasheet_ids = frozenset(
-        component.unit.datasheet_id
-        for component in source_rules_unit.components
-        if required_model_keyword in component.unit.keywords
-    )
     return tuple(
         sorted(
             model.model_instance_id
             for component in source_rules_unit.components
             for model in component.unit.own_models
-            if model.datasheet_id in eligible_datasheet_ids
-            and model.is_alive
+            if required_model_keyword in model.keywords
+            and (model.is_alive or model.model_instance_id in source_rules_unit.retained_model_ids)
             and model.model_instance_id in current_ids
         )
     )

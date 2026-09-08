@@ -19,6 +19,7 @@ from tests.phase11c_command_phase_helpers import (
     unit_by_id,
     with_model_offsets,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -1710,7 +1711,7 @@ def _mark_player_as_death_guard(state: GameState, *, player_id: str) -> None:
             continue
         updated_units: list[UnitInstance] = []
         for unit in army.units:
-            updated_units.append(replace(unit, faction_keywords=("Death Guard",)))
+            updated_units.append(with_unit_keywords(unit, faction_keywords=("Death Guard",)))
         updated_armies.append(
             replace(
                 army,

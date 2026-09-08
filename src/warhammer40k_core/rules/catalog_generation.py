@@ -122,6 +122,7 @@ from warhammer40k_core.rules.catalog_generation_values import (
 from warhammer40k_core.rules.catalog_generation_values import (
     required_positive_int as _required_positive_int,
 )
+from warhammer40k_core.rules.catalog_model_keywords import model_keyword_assignments_from_rows
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRError, RuleIRPayload
@@ -295,6 +296,7 @@ def _army_catalog_from_rows(
     stratagems = tuple(_stratagem_from_row(row) for row in rows_by_table.get("Stratagems", ()))
     detachments = tuple(_detachment_from_row(row) for row in rows_by_table.get("Detachments", ()))
     return ArmyCatalog(
+        model_keyword_assignments=model_keyword_assignments_from_rows(model_rows),
         catalog_id=package_id.package_name,
         ruleset_id=RulesetId.warhammer_40000_eleventh(version=catalog_version.version_id),
         source_package_id=package_id.stable_identity(),

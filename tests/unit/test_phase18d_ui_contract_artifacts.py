@@ -245,7 +245,7 @@ def test_phase17n_projection_family_versions_cover_the_new_closed_shapes() -> No
     assert (
         _json_object(game_view_properties["projection_schema"])["const"]
         == PROJECTION_SCHEMA_VERSION
-        == "game-view-v11-phase17n-step4"
+        == "game-view-v12-model-keywords"
     )
     assert "primary_rules_unit_turn_start_snapshots" in game_view_required
     assert "primary_mission_progress_state" in game_view_required
@@ -410,7 +410,7 @@ def test_session_metadata_contract_version_accepts_compatible_major_twelve_relea
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "12.0.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
     incompatible = {**_json_object(metadata), "server_contract_version": "11.5.0"}
 
     validator.validate(compatible)
@@ -459,7 +459,7 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     assert "session-persistence.schema.json" not in json.dumps(openapi, sort_keys=True)
 
 
-def test_contract_twelve_advances_only_affected_session_wrapper_families() -> None:
+def test_contract_thirteen_advances_affected_session_and_projection_families() -> None:
     metadata = _json_object(
         _read_json(REPO_ROOT / Path("contracts/schemas/session-metadata.schema.json"))
     )
@@ -474,33 +474,33 @@ def test_contract_twelve_advances_only_affected_session_wrapper_families() -> No
     )
 
     assert metadata["$id"] == (
-        "https://warhammer40k-core.local/contracts/v12/session-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v13/session-metadata.schema.json"
     )
     assert result["$id"] == (
-        "https://warhammer40k-core.local/contracts/v12/session-command-result.schema.json"
+        "https://warhammer40k-core.local/contracts/v13/session-command-result.schema.json"
     )
     assert outcome["$id"] == (
-        "https://warhammer40k-core.local/contracts/v12/session-command-outcome.schema.json"
+        "https://warhammer40k-core.local/contracts/v13/session-command-outcome.schema.json"
     )
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v12-contract"
+        == "session-metadata-v13-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v12-contract"
+        == "session-command-result-v13-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v12-contract"
+        == "session-command-outcome-v13-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]
         == SESSION_PROJECTION_SCHEMA_VERSION
-        == "session-projection-v7-phase17n-step4"
+        == "session-projection-v8-model-keywords"
     )
 
 
@@ -584,7 +584,7 @@ def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() 
     witness = _json_object(definitions["primary_scoring_rules_unit_position_witness"])
     membership = _json_object(_json_object(witness["properties"])["rules_unit_membership"])
     assert membership["$ref"] == (
-        "https://warhammer40k-core.local/contracts/v8/game-view.schema.json"
+        "https://warhammer40k-core.local/contracts/v13/game-view.schema.json"
         "#/$defs/primary_rules_unit_turn_start_membership"
     )
     for definition_name in (

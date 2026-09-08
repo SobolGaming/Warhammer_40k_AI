@@ -272,7 +272,8 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     )
     assert "AttachmentRole.LEADER" in army_mustering_source
     assert "AttachmentRole.SUPPORT" in army_mustering_source
-    assert '"runtime-attached-unit:{role}"' in army_mustering_source
+    assert "with_attached_role_evidence" in army_mustering_source
+    assert '"runtime-attached-unit:{role}"' in source_for(ENGINE_ROOT / "model_keyword_grants.py")
     strength_inventory_source = source_for(ENGINE_ROOT / "unit_strength_inventory.py")
     assert "starting_strength_records_for_army(army_definition)" in game_state_source
     assert "def starting_strength_records_for_army(" in strength_inventory_source

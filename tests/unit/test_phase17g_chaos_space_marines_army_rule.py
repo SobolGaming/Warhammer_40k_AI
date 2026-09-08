@@ -20,6 +20,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     shooting_lifecycle,
 )
 from tests.phase15c_fight_order_helpers import fight_lifecycle
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -1664,7 +1665,8 @@ def _mark_player_as_chaos_space_marines(state: GameState, *, player_id: str) -> 
                     faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
                 ),
                 units=tuple(
-                    replace(unit, faction_keywords=("Heretic Astartes",)) for unit in army.units
+                    with_unit_keywords(unit, faction_keywords=("Heretic Astartes",))
+                    for unit in army.units
                 ),
             )
         )

@@ -4392,3 +4392,94 @@ was refreshed from the successful JUnit report and its exact inventory check
 passed. Ruff, mypy, Pyright, import-linter, pre-commit, source/identity generators,
 base-ref contract checks, five TypeScript unit tests, 342 live conformance
 assertions and the installed-wheel smoke all passed.
+
+## Order 31 — P02D model keyword authority
+
+**Status:** Implemented and locally validated; PR publication pending.
+
+**Finding IDs:** C02-04. **Dependencies and evidence gate:** P19, P05B and
+S-MIRRORS are present on main base `14e7bcfc7e733477cc7ab1309f803494a70b9c78`;
+APP-AUTHORITY. No new exception pause
+or faction-support claim is introduced.
+
+**Violated invariant:** A rules unit receives a keyword only from a model that
+currently belongs to its rules population. Previously `ModelInstance` had no
+keyword ownership and immutable unit inventories allowed a removed specialist
+to keep contributing its keyword while other models survived.
+
+**How it should be done:** Preserve source-linked assignments on each model;
+derive current rules-unit inventories from living models plus P05B retained
+presence. Ordinary destruction and retention cleanup remove contribution without
+changing surviving component abilities or deleting historical model identity.
+
+**Authoritative statement and source ID:** The complete Game Datamissions
+App-data v931 FAQ says destroyed models do not contribute keywords to their prior
+unit and illustrates the last Aspiring Sorcerer's loss of PSYKER in Rubric Marines.
+Stable source ID: `gw-11e-core-model-keywords:destroyed-model-keywords`.
+
+**Provider and provenance:** Game Datamissions,
+<https://game-datamissions.com/11th/rules/changelog>, v931 selected through the
+page's version navigation (`?v=931`), observed 2026-09-08T13:35:55Z. Transcription
+SHA-256 `d2f96dfeb423592623f05012e82c181a7737b12c791f7fbd237202a1968025be`;
+source-observation fingerprint
+`74930ebc501e1e6ff74b53e83f94d7ac728ef9f6eef8cd6d4355e4b42f800b3e`.
+The reviewed audit records the provider's non-affiliation and preserves the
+existing official historical source hash. The separately pinned P05B statement
+continues to own the retained-presence exception.
+
+**Scope and exclusions:** Catalog model keyword ownership, canonical factories,
+current rules-unit aggregation, affected model/historical consumers, lineage
+validation and adapter projections. Existing Warlord/Enhancement assignment
+scope is preserved; Order 62 owns specific bearer selection. No new named rule
+handler, generic hook family, unsupported content, or faction certification.
+
+**Owning path:** Source keyword rows retain model scope at the catalog boundary;
+complete typed catalog assignments feed UnitFactory and materialization. Engine
+mustering grants update model-owned assignments with provenance. Destruction and
+healing retain immutable model identity while current queries follow authoritative
+presence. Split records retain exactly their model memberships. Restore compares
+against canonical muster/split/materialization lineage; historical Psychic uses
+consult the existing sparse model-authority timeline at the accepted event.
+Existing materialization descriptor IDs distinguish Blue and Brimstone models
+that share a stat profile, including after the existing datasheet handoff. Source
+labels resolve at ingestion, with regular plural normalization and fail-closed
+unknown or ambiguous ownership; runtime consumers use IDs and canonical tokens.
+
+**Decision and visibility impact:** Existing facade submissions remain unchanged.
+Contract 13 updates game views, session projections, metadata/outcomes and operator
+persistence. Model rows expose intrinsic keyword/source inventories; current unit
+rows reflect model presence. Secret formation choices remain viewer-scoped.
+
+**Regressions and bug-class search:** The initial specialist-removal regression
+failed before implementation. Coverage includes exhaustive scope, source bridge,
+ordinary casualty, retained Fight On Death, cleanup, both viewers, malformed finite
+selection, checkpoint source forgery, replay and split lineage. Searches cover
+unit keyword field replacement, direct model constructors, catalog model-scope
+loss, physical model visibility, historical Psychic/Character classification,
+transport destruction and retained-source eligibility. Existing fixture keyword
+changes now update real model assignments.
+The shared redaction module also removes unrevealed attachment tags from model
+keyword provenance and unit inventories; a two-viewer regression covers the leak.
+
+**Generated artifacts and documentation:** Pinned source JSON and maintained-mirror
+audit/registry; engine build identity; Contract 13 schemas, examples, immutable new
+baseline and TypeScript models; adapter contract/migration documentation and the
+complete eight-shard test inventory.
+
+**Validation results:** Final production tree passed on 2026-09-08: 6,732
+behavioral tests with 85.02% coverage, followed by 393 code-quality tests without
+coverage, both using xdist work stealing. The successful coverage run used 18
+workers and an isolated coverage database; its JUnit report regenerated all eight
+shards and the exact fail-closed inventory check passed. Ruff check/format, mypy,
+Pyright, import-linter and pre-commit passed. Source and catalog generators,
+engine identity and base-ref external-contract checks passed. The TypeScript
+generated-client/type checks, five unit tests and 342 live conformance assertions
+passed; the package scripts ran directly with bundled Node because npm was not
+available. Installed-wheel smoke passed with 2,617 runtime resources, 27 schemas
+and six request families. No production code changed after this successful
+aggregate coverage run began.
+
+Published runtime identity:
+`warhammer40k-core-v2:runtime-tree-sha256-v1:91ea86186c4672cffd2f60b007c51d1fc0dd9d6e02a0cfeb5f230bb5dc354f82`.
+
+**PR URL and merge commit:** Pending publication; merge remains user-owned.

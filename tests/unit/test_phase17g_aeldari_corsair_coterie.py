@@ -21,6 +21,7 @@ from tests.setup_completion_helpers import (
     enter_battle_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -37,6 +38,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
 )
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -1869,9 +1871,8 @@ def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> Non
         phase=BattlePhase.FIGHT,
         active_player_id="player-a",
     )
-    non_aeldari_unit = replace(
-        _unit_by_id(non_aeldari_state, _CORSAIR_UNIT_ID),
-        faction_keywords=("OPFOR",),
+    non_aeldari_unit = with_unit_keywords(
+        _unit_by_id(non_aeldari_state, _CORSAIR_UNIT_ID), faction_keywords=("OPFOR",)
     )
     non_aeldari_state.army_definitions[0] = replace(
         non_aeldari_army,
@@ -5534,10 +5535,8 @@ def _mark_player_as_corsair_coterie(state: GameState, *, player_id: str) -> None
                     detachment_ids=("corsair-coterie",),
                 ),
                 units=tuple(
-                    replace(
-                        unit,
-                        keywords=("ANHRATHE", "INFANTRY"),
-                        faction_keywords=("AELDARI",),
+                    with_unit_keywords(
+                        unit, keywords=("ANHRATHE", "INFANTRY"), faction_keywords=("AELDARI",)
                     )
                     for unit in army.units
                 ),
@@ -5975,16 +5974,18 @@ def _unit(
         keywords=keywords,
         objective_control=objective_control,
     )
-    return UnitInstance(
-        unit_instance_id=unit_instance_id,
-        datasheet_id=datasheet_id,
-        name=name,
+    return with_unit_keywords(
+        UnitInstance(
+            unit_instance_id=unit_instance_id,
+            datasheet_id=datasheet_id,
+            name=name,
+            datasheet_abilities=(),
+            datasheet_source_ids=(f"source:{datasheet_id}",),
+            own_models=(model,),
+            wargear_selections=(),
+        ),
         keywords=keywords,
         faction_keywords=faction_keywords,
-        datasheet_abilities=(),
-        datasheet_source_ids=(f"source:{datasheet_id}",),
-        own_models=(model,),
-        wargear_selections=(),
     )
 
 
@@ -6015,6 +6016,13 @@ def _model(
 ) -> ModelInstance:
     base_size = BaseSizeDefinition.circular(32.0)
     return ModelInstance(
+        keyword_assignment=ModelKeywordAssignment(
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            keywords=(),
+            faction_keywords=(),
+            source_ids=(f"source:{model_profile_id}",),
+        ),
         model_instance_id=model_instance_id,
         datasheet_id=datasheet_id,
         model_profile_id=model_profile_id,

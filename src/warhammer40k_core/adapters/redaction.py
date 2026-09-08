@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
@@ -130,8 +131,32 @@ def visible_army_units(
         and not omniscient
         and viewer_player_id != army.player_id
     ):
-        return army.source_units()
+        return tuple(_without_private_formation_keywords(unit) for unit in army.source_units())
     return army.units
+
+
+def _without_private_formation_keywords(unit: UnitInstance) -> UnitInstance:
+    """Remove unrevealed formation metadata from the public physical roster copy."""
+    private_prefixes = ("attached-role:", "runtime-attached-unit:")
+    return replace(
+        unit,
+        own_models=tuple(
+            replace(
+                model,
+                source_ids=tuple(s for s in model.source_ids if not s.startswith(private_prefixes)),
+                keyword_assignment=replace(
+                    model.keyword_assignment,
+                    keywords=tuple(k for k in model.keywords if k != "ATTACHED_UNIT"),
+                    source_ids=tuple(
+                        s
+                        for s in model.keyword_assignment.source_ids
+                        if not s.startswith(private_prefixes)
+                    ),
+                ),
+            )
+            for model in unit.own_models
+        ),
+    )
 
 
 def public_primary_rules_unit_turn_start_snapshots(

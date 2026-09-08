@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
@@ -282,7 +283,7 @@ def test_retained_fod_base_blocks_triggered_movement_crossing_and_overlap(
             replace(
                 army,
                 units=tuple(
-                    replace(unit, keywords=(*unit.keywords, "Aircraft"))
+                    with_unit_keywords(unit, keywords=(*unit.keywords, "Aircraft"))
                     if unit.unit_instance_id == source_unit.unit_instance_id
                     else unit
                     for unit in army.units
@@ -2080,9 +2081,8 @@ def _aircraft_transit_battle_state() -> tuple[GameState, UnitInstance, UnitInsta
             ),
         ),
     )
-    enemy_aircraft = replace(
-        beta.unit_by_id("army-beta:enemy-aircraft"),
-        keywords=("Aircraft", "Fly", "Vehicle"),
+    enemy_aircraft = with_unit_keywords(
+        beta.unit_by_id("army-beta:enemy-aircraft"), keywords=("Aircraft", "Fly", "Vehicle")
     )
     beta = replace(
         beta,
@@ -2145,7 +2145,7 @@ def _aircraft_scenario() -> tuple[BattlefieldScenario, UnitInstance, UnitInstanc
             ),
         ),
     )
-    aircraft = replace(
+    aircraft = with_unit_keywords(
         alpha.unit_by_id("army-alpha:aircraft-unit"),
         keywords=("Aircraft", "Fly", "Hover", "Vehicle"),
     )

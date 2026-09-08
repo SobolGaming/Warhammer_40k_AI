@@ -114,8 +114,7 @@ def model_visibility_keywords_for_rules_unit(
     for model in models:
         if type(model) is not Model:
             raise GameLifecycleError("Model visibility keywords require geometry Model values.")
-        component = rules_unit.component_unit_for_model(model.model_id)
-        rows.append((model.model_id, component.keywords))
+        rows.append((model.model_id, rules_unit.model_by_id(model.model_id).keywords))
     return tuple(sorted(rows))
 
 

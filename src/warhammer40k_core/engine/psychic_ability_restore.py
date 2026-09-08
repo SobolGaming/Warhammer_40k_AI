@@ -32,6 +32,22 @@ def validate_psychic_usage_history(
     }
     if not uses and not psychic_sources:
         return
+    from warhammer40k_core.engine.fight_model_authority_history import (
+        build_model_authority_timeline,
+    )
+    from warhammer40k_core.engine.retained_destruction_history import (
+        retained_model_ids_before_event,
+    )
+
+    timeline = (
+        build_model_authority_timeline(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+        )
+        if uses
+        else None
+    )
     by_result: dict[str, PsychicAbilityUse] = {}
     for use in uses:
         if use.game_id != state.game_id or use.player_id not in state.player_ids:
@@ -59,8 +75,6 @@ def validate_psychic_usage_history(
         )
         if len(units) != len(components):
             raise GameLifecycleError("Psychic use component owner drifted.")
-        if not any("PSYKER" in unit.keywords for unit in units):
-            raise GameLifecycleError("Psychic use lineage has no PSYKER source.")
         source_units = tuple(
             unit for unit in units if unit.unit_instance_id == use.source_component_unit_instance_id
         )
@@ -145,6 +159,21 @@ def validate_psychic_usage_history(
         )
         if recorded_index is None or recorded_index >= use_index:
             raise GameLifecycleError("Psychic use precedes its accepted decision.")
+        retained_ids = retained_model_ids_before_event(
+            event_records=decisions.event_log.records, event_index=use_index
+        )
+        if timeline is None or not any(
+            "PSYKER" in model.keywords
+            and (
+                model.model_instance_id in retained_ids
+                or timeline.has_living_model_before_event(
+                    model_instance_id=model.model_instance_id, event_index=use_index
+                )
+            )
+            for unit in units
+            for model in unit.own_models
+        ):
+            raise GameLifecycleError("Psychic use lineage has no PSYKER source at activation.")
         if use.result_id is None or use.result_id in by_result:
             raise GameLifecycleError("Psychic use result identity is duplicated.")
         by_result[use.result_id] = use

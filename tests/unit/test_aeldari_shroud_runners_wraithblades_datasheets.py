@@ -12,6 +12,7 @@ from tests.lifecycle_submission_helpers import (
     drift_pending_destruction_reaction_payload,
     successful_attack_roll_results,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -1251,7 +1252,7 @@ def _runtime_fixture(
         selection_id="wraith-swords",
         datasheet_id=WRAITHBLADES_ID,
     )
-    psyker = replace(
+    psyker = with_unit_keywords(
         _instantiate(
             factory,
             army_id="army-a",

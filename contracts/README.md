@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `12.0.0`
+Contract version: `13.0.0`
 
 Contract 12 implements Fight On Death retention before removal, deferred
 destruction reactions, full retained target/ability presence, executable
@@ -99,7 +99,7 @@ Contract 11 retains the pending-decision and lifecycle-status families at
 `lifecycle-status-v4-phase17n-step4`. Primary Mission finite requests, their
 options, and their waiting statuses are public; existing hidden Declare Battle
 Formations choices retain the shared viewer-redaction boundary.
-The full reconnect wrapper uses `session-projection-v7-phase17n-step4`.
+The full reconnect wrapper uses `session-projection-v8-model-keywords`.
 In-process integer-cursor deltas use `event-delta-v4-phase17n-step4`, while
 authenticated HTTP deltas use `event-delta-v5-phase17n-step4`. Formal session
 metadata, command results, and command outcomes use their `v11-contract`
@@ -107,7 +107,7 @@ families because metadata declares the Contract 11 server major. Other session
 and viewer projection families are unchanged.
 Phase 18J adds the optional `battlefield_view` game-view member. Contract 11
 publishes the Step 4 progress additions as
-`game-view-v11-phase17n-step4`; the nested
+`game-view-v12-model-keywords`; the nested
 `battlefield-view-v4-phase17n-step3` family is unchanged. Roster/datacard
 identities, complete post-reveal rules-unit history rows, and Primary progress
 rows are public to both players, including unplaced reserves, while terrain
@@ -292,8 +292,8 @@ cross-record/event integrity; schema acceptance alone is not replay
 certification.
 
 The scoring-state evidence registry is deliberately absent from
-`game-view-v11-phase17n-step4` and
-`session-projection-v7-phase17n-step4`. Viewer projections expose public
+`game-view-v12-model-keywords` and
+`session-projection-v8-model-keywords`. Viewer projections expose public
 mission state and awarded victory-point transactions, not the engine-private
 replay registry; its addition therefore does not change either projection
 family discriminator.

@@ -617,7 +617,8 @@ def _eligible_agile_manoeuvre_army_and_unit(
     unit = _unit_by_id(state, unit_instance_id)
     if not _army_contains_unit(army=army, unit=unit):
         raise GameLifecycleError(f"{error_label} unit is not in the acting army.")
-    if not (_unit_has_faction_keyword(unit, ASURYANI) or _unit_has_faction_keyword(unit, AELDARI)):
+    view = rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id)
+    if not {ASURYANI, AELDARI}.intersection(view.faction_keywords):
         return (None, None)
     return (army, unit)
 
