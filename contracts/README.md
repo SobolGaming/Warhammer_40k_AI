@@ -1,6 +1,11 @@
 # CORE V2 external contract
 
-Contract version: `11.5.0`
+Contract version: `12.0.0`
+
+Contract 12 implements Fight On Death retention before removal, deferred
+destruction reactions, full retained target/ability presence, executable
+Shoot On Death and source-authorized shoot-or-fight choices with private
+continuation authority. See [11-to-12.md](migrations/11-to-12.md).
 
 Contract 11.4 adds terminal zero/star characteristic kinds and documents the
 engine-produced raw, rerolled, modified and rule-limited roll stages for Orders

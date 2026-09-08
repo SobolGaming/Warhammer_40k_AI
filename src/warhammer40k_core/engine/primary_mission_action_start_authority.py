@@ -86,7 +86,7 @@ def capture_primary_mission_action_terrain_model_inventory(
                 )
                 area_ids: tuple[str, ...] = ()
                 placement = battlefield.model_placement_or_none(model.model_instance_id)
-                if model.is_alive and placement is not None:
+                if placement is not None:
                     geometry_model = geometry_model_for_placement(
                         model=scenario.model_instance_for_placement(placement),
                         placement=placement,
@@ -104,9 +104,7 @@ def capture_primary_mission_action_terrain_model_inventory(
                         model_instance_id=model.model_instance_id,
                         wounds_remaining_at_boundary=model.wounds_remaining,
                         model_placement_json=(
-                            None
-                            if placement is None or not model.is_alive
-                            else _canonical_json(placement.to_payload())
+                            None if placement is None else _canonical_json(placement.to_payload())
                         ),
                         source_objective_control_json=_canonical_json(source_oc.to_payload()),
                         resolved_objective_control_json=_canonical_json(resolved_oc.to_payload()),
@@ -203,7 +201,6 @@ def validate_primary_mission_action_terrain_model_inventory(
             )
             or not set(row.logical_terrain_area_ids) <= area_ids
             or row.wounds_remaining_at_boundary > model.starting_wounds
-            or (placement is not None and row.wounds_remaining_at_boundary == 0)
             or (
                 placement is not None
                 and (

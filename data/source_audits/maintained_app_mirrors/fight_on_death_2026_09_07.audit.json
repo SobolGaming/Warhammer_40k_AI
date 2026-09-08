@@ -1,0 +1,35 @@
+{
+  "audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+  "observed_at": "2026-09-07T21:35:45Z",
+  "rows": [
+    {
+      "row_id": "retained-presence:gdm-v931",
+      "provider_name": "Game Datamissions",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": "2026-09-07T21:35:45Z",
+      "app_version": "931",
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-fight-on-death:retained-presence",
+      "transcription_sha256": "53e0e0abd50bb145278431b245f05e2a71b2ba09e4f56953ca23767da92d47b3",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "175989634a824a069106f3097fcacec41b5935da1bf90f195e56b6b18990c2d6"
+    },
+    {
+      "row_id": "fight-on-death:40k-app",
+      "provider_name": "40k.app",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "observed_at": "2026-09-07T21:35:45Z",
+      "app_version": null,
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "rule_source_id": "gw-11e-core-fight-on-death:fight-on-death",
+      "transcription_sha256": "b4398b729037efaade1d9649d8dfff421d118959a46ebcb222f801b79d8ec37a",
+      "provider_non_affiliation_recorded": true,
+      "source_observation_sha256": "a1a92b105252f4bd310fd8e721fd1d22729efd66875ecceea694480eedc51291"
+    }
+  ],
+  "official_historical_source": {
+    "source_id": "gw-11e-core-rules",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833"
+  },
+  "co_version_comparison": "The complete 05.04.05 statement and v931 FAQ were observed through indexed maintained-mirror pages. Direct 40k.app retrieval returned HTTP 403. No App version is inferred for 40k.app; no co-version comparison is asserted."
+}

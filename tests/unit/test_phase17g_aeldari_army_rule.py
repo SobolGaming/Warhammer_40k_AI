@@ -8,6 +8,7 @@ from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
@@ -92,7 +93,6 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
 )
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FightActivationSelection,
@@ -1069,7 +1069,7 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
     assert resolution["maximum_distance_inches"] == 6.0
 
 
-def test_retained_only_aeldari_skips_sudden_strike_but_keeps_pending_attacks() -> None:
+def test_retained_only_aeldari_keeps_sudden_strike_and_pending_attacks() -> None:
     config = _aeldari_config(
         aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
         aeldari_model_profile_id="core-character-leader",
@@ -1098,7 +1098,8 @@ def test_retained_only_aeldari_skips_sudden_strike_but_keeps_pending_attacks() -
         damage=model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=lifecycle.decision_controller,
         state=state,
         placement=retained_placement,
         effect_id="phase17g:aeldari:sudden-strike:retained-only",
@@ -1130,13 +1131,22 @@ def test_retained_only_aeldari_skips_sudden_strike_but_keeps_pending_attacks() -
     )
     melee_request = _decision_request(melee_status)
 
+    assert melee_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+    melee_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=melee_request,
+            result_id="retained-sudden-strike-selected",
+            selected_option_id=f"use:{army_rule.SUDDEN_STRIKE_MANEUVER}",
+        )
+    )
+    melee_request = _decision_request(melee_status)
     assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
     proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
     assert {
         cast(str, cast(dict[str, JsonValue], row)["model_instance_id"])
         for row in proposal_request.available_weapons
     } == {model.model_instance_id}
-    assert not any(
+    assert any(
         event.event_type == "fight_activation_ability_requested"
         for event in lifecycle.decision_controller.event_log.records
     )
@@ -1182,7 +1192,8 @@ def test_mixed_aeldari_with_retained_model_keeps_sudden_strike_authority() -> No
         damage=destroyed_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=lifecycle.decision_controller,
         state=state,
         placement=retained_placement,
         effect_id="phase17g:aeldari:sudden-strike:mixed",
@@ -1294,7 +1305,8 @@ def test_opportunity_seized_requires_living_unit_but_measures_retained_physical_
                 damage=model.wounds_remaining,
                 damage_kind=DamageKind.NORMAL,
             )
-        restore_model_awaiting_fight_on_death(
+        retain_destroyed_model_for_fixture(
+            decisions=lifecycle.decision_controller,
             state=state,
             placement=retained_placement,
             effect_id=(

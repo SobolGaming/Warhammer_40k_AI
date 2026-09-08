@@ -429,6 +429,9 @@ def _available_weapons_for_rules_unit(
     player_id: str | None = None,
     selected_shooting_type: ShootingType | None = None,
 ) -> tuple[_AvailableWeapon, ...]:
+    from warhammer40k_core.engine.retained_shooting import current_retained_shooter
+
+    retained = current_retained_shooter(state=state)
     weapons: list[_AvailableWeapon] = []
     for component in rules_unit.components:
         weapons.extend(
@@ -440,6 +443,12 @@ def _available_weapons_for_rules_unit(
                 selected_shooting_type=selected_shooting_type,
             )
         )
+    if retained is not None:
+        weapons = [
+            weapon
+            for weapon in weapons
+            if weapon["model_instance_id"] == retained.model_instance_id
+        ]
     if (
         selected_shooting_type is ShootingType.ASSAULT
         or _rules_unit_advanced_is_restricted_to_assault_weapons(
@@ -537,6 +546,13 @@ def _available_own_weapons_for_model(
     army_catalog: ArmyCatalog,
     player_id: str | None,
 ) -> tuple[_AvailableWeapon, ...]:
+    from warhammer40k_core.engine.retained_shooting import current_retained_shooter
+
+    retained = current_retained_shooter(state=state)
+    if retained is None and not model.is_alive:
+        return ()
+    if retained is not None and model.model_instance_id != retained.model_instance_id:
+        return ()
     owner_player_id = (
         rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id).owner_player_id
         if player_id is None

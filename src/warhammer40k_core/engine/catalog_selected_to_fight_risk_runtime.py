@@ -39,9 +39,6 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_pending_rule_source_effect_ids,
-)
 from warhammer40k_core.engine.fight_phase_end_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
     FightPhaseEndHookBinding,
@@ -55,6 +52,9 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.retained_model_presence import (
+    retained_pending_rule_source_effect_ids,
+)
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     generic_rule_effect_payload,
@@ -459,7 +459,7 @@ class CatalogSelectedToFightRiskRuntime:
                     existing[6].append(effect)
         candidates: list[_FightEndCandidate] = []
         pending_fight_on_death_source_ids = set(
-            fight_on_death_pending_rule_source_effect_ids(state=state)
+            retained_pending_rule_source_effect_ids(state=state)
         )
         for (
             owner_id,

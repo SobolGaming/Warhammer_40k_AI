@@ -355,6 +355,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:range-characteristic-query` | No current generated rows |
 | `catalog-ir:reserve-arrival-restriction` | Aethersense (Psychic) |
+| `catalog-ir:retained-destruction-attack-source` | No current generated rows |
 | `catalog-ir:save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:save-characteristic-query` | No current generated rows |
 | `catalog-ir:save-roll-modifier` | No current generated rows |

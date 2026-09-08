@@ -56,7 +56,7 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import (
-    placed_alive_geometry_models_for_rules_unit,
+    present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -746,7 +746,7 @@ def _geometry_models_for_rules_unit_ids(
     requested_ids = frozenset(_validate_identifier_tuple("model_ids", model_ids))
     models_by_id = {
         model.model_id: model
-        for model in placed_alive_geometry_models_for_rules_unit(
+        for model in present_geometry_models_for_rules_unit(
             state=state,
             unit_instance_id=rules_unit.unit_instance_id,
         )

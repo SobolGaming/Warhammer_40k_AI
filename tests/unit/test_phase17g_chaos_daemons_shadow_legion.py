@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     phase11c_config,
@@ -101,7 +102,6 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
@@ -1788,7 +1788,8 @@ def test_mantle_of_gloom_reduces_enemy_oc_in_engagement_with_bearers_attached_un
     )
 
 
-def test_mantle_of_gloom_requires_living_source_but_measures_retained_physical_base() -> None:
+def test_mantle_of_gloom_retains_source_ability_and_measurement() -> None:
+    retention_decisions = DecisionController()
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     bearer = _unit_for_player(state, player_id="player-a")
@@ -1821,7 +1822,8 @@ def test_mantle_of_gloom_requires_living_source_but_measures_retained_physical_b
         damage=retained_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_placement,
         effect_id="phase17g:mantle-of-gloom:mixed-source",
@@ -1854,11 +1856,12 @@ def test_mantle_of_gloom_requires_living_source_but_measures_retained_physical_b
             unit_instance_id=target.unit_instance_id,
             current_objective_control=2,
         )
-        == 2
+        == 1
     )
 
 
-def test_malice_manifest_requires_living_target_but_measures_retained_physical_base() -> None:
+def test_malice_manifest_targets_retained_presence() -> None:
+    retention_decisions = DecisionController()
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     bearer = _unit_for_player(state, player_id="player-a")
@@ -1891,7 +1894,8 @@ def test_malice_manifest_requires_living_target_but_measures_retained_physical_b
         damage=retained_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_placement,
         effect_id="phase17g:malice-made-manifest:mixed-target",
@@ -1914,13 +1918,10 @@ def test_malice_manifest_requires_living_target_but_measures_retained_physical_b
             damage_kind=DamageKind.NORMAL,
         )
 
-    assert (
-        enhancements._enemy_rules_unit_ids_within_engagement_range(
-            state=state,
-            bearer_unit_instance_id=bearer.unit_instance_id,
-        )
-        == ()
-    )
+    assert enhancements._enemy_rules_unit_ids_within_engagement_range(
+        state=state,
+        bearer_unit_instance_id=bearer.unit_instance_id,
+    ) == (target.unit_instance_id,)
 
 
 def test_mantle_of_gloom_ignores_enemy_units_outside_engagement_range() -> None:
@@ -3017,6 +3018,12 @@ def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
     unit = _unit_for_player(state, player_id="player-a")
     target = _unit_for_player(state, player_id="player-b")
+    _place_unit_poses(
+        state, unit_instance_id=unit.unit_instance_id, poses=_unit_line_poses(x=10, y=10)
+    )
+    _place_unit_poses(
+        state, unit_instance_id=target.unit_instance_id, poses=_unit_line_poses(x=20, y=10)
+    )
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     decisions = DecisionController()
     bundle = _shadow_legion_runtime_bundle(state)

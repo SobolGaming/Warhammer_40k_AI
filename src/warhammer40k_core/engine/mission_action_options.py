@@ -68,7 +68,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_display_name,
     rules_unit_id_for_unit_id,
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardStatus
@@ -473,7 +473,7 @@ def _eligible_rules_unit_instance_ids_for_action(
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[str, ...]:
     eligible_ids: list[str] = []
-    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+    for rules_unit in rules_unit_views_for_state(state=state):
         if rules_unit.owner_player_id != player_id:
             continue
         if (
@@ -770,7 +770,7 @@ def _target_display_name(*, state: GameState, target_id: str) -> str:
     for marker in state.mission_setup.objective_markers:
         if marker.objective_marker_id == target_id:
             return marker.name
-    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+    for rules_unit in rules_unit_views_for_state(state=state):
         if rules_unit.unit_instance_id == target_id:
             return rules_unit_display_name(rules_unit)
     mission_logical_terrain_area_by_id(

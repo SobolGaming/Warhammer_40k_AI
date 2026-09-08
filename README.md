@@ -557,6 +557,16 @@ Current status:
   `core_attached_units_2026_09/artifacts/package.json`; refresh and verify it
   offline with `uv run python tools/build_core_attached_units_source.py` and
   the same command plus `--check`.
+- Order 30 / P05B's retained destruction sources are pinned as versioned JSON.
+  `uv run python tools/build_core_fight_on_death_source.py` regenerates 05.04.05
+  and the retained-presence FAQ with its maintained-mirror audit.
+  `uv run python tools/build_retained_attack_sources.py` regenerates the reviewed
+  For the Chapter! and Unending Fidelity RuleIR consumers from the observed
+  App-data 946 faction mirror texts and preserved historical official provenance.
+  Both generators operate offline; append `--check` to verify committed bytes.
+  The faction package uses its separate faction source policy and certifies these
+  two executable rule consumers without claiming complete faction fieldability.
+  See [the Order 30 implementation review](docs/ORDER_30_SCOPE_PLAN.md).
 - P18C/P18D/P18E's reviewed 18.05 Emergency Disembark and App-data v931 18.06
   Assault Disembark and 18.07 Shock Disembark wording are pinned in
   `core_transports_2026_09/artifacts/package.json`; refresh and verify it

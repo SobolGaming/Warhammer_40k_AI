@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_selected_to_fight_this_phase,
 )
+from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.rules_units import (
-    placed_alive_rules_unit_views,
     rules_unit_is_battle_shocked,
 )
 from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
@@ -680,7 +680,7 @@ def _battle_shock_test_unit_ids(*, state: GameState, player_id: str) -> tuple[st
         starting_strength_records=tuple(state.starting_strength_records),
         battle_shocked_unit_ids=tuple(
             rules_unit.unit_instance_id
-            for rules_unit in placed_alive_rules_unit_views(state=state)
+            for rules_unit in fight_present_rules_unit_views(state=state)
             if rules_unit.owner_player_id == player_id
             and rules_unit_is_battle_shocked(
                 state=state,

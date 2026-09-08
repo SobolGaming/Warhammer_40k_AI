@@ -1992,8 +1992,13 @@ class GameState:
         *,
         model_instance_id: str,
     ) -> tuple[DestructionReactionSource, ...]:
-        model_id = _validate_identifier("model_instance_id", model_instance_id)
-        return self.destruction_reaction_sources_by_model_id.get(model_id, ())
+        from warhammer40k_core.engine.retained_attack_grants import (
+            destruction_reaction_sources_for_model,
+        )
+
+        return destruction_reaction_sources_for_model(
+            state=self, model_instance_id=model_instance_id
+        )
 
     def replace_model_destruction_cause_authorities(
         self, authorities: list[_mdca.ModelDestructionCauseAuthority]

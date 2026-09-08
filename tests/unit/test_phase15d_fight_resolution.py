@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -51,7 +52,6 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
 )
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ACTION,
     MELEE_TARGETING_RULE_ID,
@@ -3421,6 +3421,7 @@ def test_phase15d_attached_pile_in_moves_every_component_atomically() -> None:
 
 
 def test_phase15d_retained_destroyed_source_base_stays_a_fixed_endpoint_blocker() -> None:
+    retention_decisions = DecisionController()
     (
         _catalog,
         ruleset,
@@ -3470,7 +3471,8 @@ def test_phase15d_retained_destroyed_source_base_stays_a_fixed_endpoint_blocker(
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=destroyed_placement,
         effect_id="phase15d:fight-on-death:fixed-source-blocker",
@@ -3593,18 +3595,21 @@ def test_phase15d_retained_destroyed_source_base_stays_a_fixed_endpoint_blocker(
 @pytest.mark.parametrize(
     ("target_pose", "expected_consolidation_modes"),
     [
-        pytest.param(Pose.at(12.0, 10.0), (), id="physically-engaged"),
+        pytest.param(
+            Pose.at(12.0, 10.0), (ConsolidationModeKind.ONGOING,), id="physically-engaged"
+        ),
         pytest.param(
             Pose.at(14.5, 10.0),
-            (ConsolidationModeKind.OBJECTIVE,),
+            (ConsolidationModeKind.ENGAGING,),
             id="outside-engagement-range",
         ),
     ],
 )
-def test_phase15d_fight_on_death_only_enemy_is_not_a_fight_movement_target(
+def test_phase15d_fight_on_death_only_enemy_is_a_fight_movement_target(
     target_pose: Pose,
     expected_consolidation_modes: tuple[ConsolidationModeKind, ...],
 ) -> None:
+    retention_decisions = DecisionController()
     _catalog, ruleset, scenario, attacker, target, _target_b = _melee_fixture(
         target_a_pose=target_pose,
         target_b_pose=Pose.at(30.0, 30.0),
@@ -3626,7 +3631,8 @@ def test_phase15d_fight_on_death_only_enemy_is_not_a_fight_movement_target(
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=target_placement,
         effect_id="phase15d:fight-on-death:measurement-target",
@@ -3647,15 +3653,12 @@ def test_phase15d_fight_on_death_only_enemy_is_not_a_fight_movement_target(
         y_inches=10.0,
     )
 
-    assert (
-        legal_rules_unit_pile_in_target_unit_ids(
-            scenario=scenario,
-            ruleset_descriptor=ruleset,
-            unit_instance_id=attacker.unit_instance_id,
-            state=state,
-        )
-        == ()
-    )
+    assert legal_rules_unit_pile_in_target_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        state=state,
+    ) == (target.unit_instance_id,)
     assert (
         legal_rules_unit_consolidation_modes(
             scenario=scenario,
@@ -3666,15 +3669,12 @@ def test_phase15d_fight_on_death_only_enemy_is_not_a_fight_movement_target(
         )
         == expected_consolidation_modes
     )
-    assert (
-        legal_pile_in_target_unit_ids(
-            scenario=scenario,
-            ruleset_descriptor=ruleset,
-            unit_instance_id=attacker.unit_instance_id,
-            state=state,
-        )
-        == ()
-    )
+    assert legal_pile_in_target_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        state=state,
+    ) == (target.unit_instance_id,)
     assert (
         legal_consolidation_modes(
             scenario=scenario,
@@ -3688,6 +3688,7 @@ def test_phase15d_fight_on_death_only_enemy_is_not_a_fight_movement_target(
 
 
 def test_phase15d_mixed_enemy_remains_selectable_through_retained_pile_in_geometry() -> None:
+    retention_decisions = DecisionController()
     _catalog, ruleset, scenario, attacker, target, _target_b = _melee_fixture(
         target_a_pose=Pose.at(14.5, 10.0),
         target_b_pose=Pose.at(30.0, 30.0),
@@ -3722,7 +3723,8 @@ def test_phase15d_mixed_enemy_remains_selectable_through_retained_pile_in_geomet
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_placement,
         effect_id="phase15d:fight-on-death:mixed-pile-in-target",
@@ -3762,6 +3764,7 @@ def test_phase15d_mixed_enemy_remains_selectable_through_retained_pile_in_geomet
 
 
 def test_phase15d_fight_on_death_only_enemy_remains_a_fight_movement_collision_blocker() -> None:
+    retention_decisions = DecisionController()
     _catalog, ruleset, scenario, attacker, retained_target, living_target = _melee_fixture(
         target_a_pose=Pose.at(13.75, 10.0),
         target_b_pose=Pose.at(15.5, 10.0),
@@ -3783,7 +3786,8 @@ def test_phase15d_fight_on_death_only_enemy_remains_a_fight_movement_collision_b
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_placement,
         effect_id="phase15d:fight-on-death:enemy-collision-blocker",
@@ -3828,7 +3832,7 @@ def test_phase15d_fight_on_death_only_enemy_remains_a_fight_movement_collision_b
         ruleset_descriptor=ruleset,
         unit_instance_id=attacker.unit_instance_id,
         state=state,
-    ) == (living_target.unit_instance_id,)
+    ) == tuple(sorted((retained_target.unit_instance_id, living_target.unit_instance_id)))
     assert fight_rules_unit_movement_rule_validation(
         scenario=scenario,
         ruleset_descriptor=ruleset,
@@ -3863,6 +3867,7 @@ def test_phase15d_fight_on_death_only_enemy_remains_a_fight_movement_collision_b
 
 
 def test_phase15d_retained_enemy_base_contact_pins_objective_consolidation() -> None:
+    retention_decisions = DecisionController()
     base_contact_x = 10.0 + (40.0 / 25.4)
     _catalog, ruleset, scenario, attacker, retained_target, _living_target = _melee_fixture(
         target_a_pose=Pose.at(base_contact_x, 10.0),
@@ -3885,7 +3890,8 @@ def test_phase15d_retained_enemy_base_contact_pins_objective_consolidation() -> 
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_placement,
         effect_id="phase15d:fight-on-death:enemy-base-contact",
@@ -3926,16 +3932,13 @@ def test_phase15d_retained_enemy_base_contact_pins_objective_consolidation() -> 
         ),
     )
 
-    assert (
-        legal_rules_unit_consolidation_modes(
-            scenario=scenario,
-            ruleset_descriptor=ruleset,
-            unit_instance_id=attacker.unit_instance_id,
-            objective_markers=(objective,),
-            state=state,
-        )
-        == ()
-    )
+    assert legal_rules_unit_consolidation_modes(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_instance_id=attacker.unit_instance_id,
+        objective_markers=(objective,),
+        state=state,
+    ) == (ConsolidationModeKind.ONGOING,)
     rule_validation = fight_rules_unit_movement_rule_validation(
         scenario=scenario,
         ruleset_descriptor=ruleset,
@@ -3945,9 +3948,7 @@ def test_phase15d_retained_enemy_base_contact_pins_objective_consolidation() -> 
         state=state,
     )
     assert not rule_validation.is_valid
-    assert (
-        rule_validation.violations[0].violation_code == "consolidation_no_selectable_engaged_target"
-    )
+    assert rule_validation.violations[0].violation_code == "consolidation_mode_not_legal"
     resolution = resolve_rules_unit_fight_movement(
         scenario=scenario,
         ruleset_descriptor=ruleset,
@@ -3973,6 +3974,7 @@ def test_phase15d_retained_enemy_base_contact_pins_objective_consolidation() -> 
 
 
 def test_phase15d_grouped_completed_event_accepts_living_component_subset() -> None:
+    retention_decisions = DecisionController()
     (
         _catalog,
         ruleset,
@@ -4011,7 +4013,8 @@ def test_phase15d_grouped_completed_event_accepts_living_component_subset() -> N
         damage_kind=DamageKind.NORMAL,
     )
     assert damage.destroyed
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=destroyed_placement,
         effect_id="phase15d:fight-on-death:completed-event-component-subset",

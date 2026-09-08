@@ -18,6 +18,8 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.battlefield_presence import (
     scenario_rules_unit_has_placed_alive_model,
+    scenario_rules_unit_has_present_model,
+    scenario_rules_unit_view,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -531,8 +533,8 @@ def unit_has_line_of_sight_to_target(
             raise GameLifecycleError("terrain_features must contain TerrainFeatureDefinition.")
     validate_shooting_terrain_areas(terrain_areas)
     observing_placement = _unit_placement_or_none(scenario, observing_unit.unit_instance_id)
-    target_rules_unit = rules_unit_view_from_armies(
-        armies=scenario.armies,
+    target_rules_unit = scenario_rules_unit_view(
+        scenario=scenario,
         unit_instance_id=target_unit_id,
     )
     target_placements = _unit_placements_for_rules_unit_or_none(
@@ -692,8 +694,8 @@ def _target_candidate(
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
 ) -> ShootingTargetCandidate:
-    target_rules_unit = rules_unit_view_from_armies(
-        armies=scenario.armies,
+    target_rules_unit = scenario_rules_unit_view(
+        scenario=scenario,
         unit_instance_id=target_unit_id,
     )
     target_unit_id = target_rules_unit.unit_instance_id
@@ -737,7 +739,7 @@ def _target_candidate(
             message="Ranged target selection requires placed attacker and target units.",
             visibility_cache_key=visibility_cache_key,
         )
-    if not scenario_rules_unit_has_placed_alive_model(
+    if not scenario_rules_unit_has_present_model(
         scenario=scenario,
         rules_unit=target_rules_unit,
     ):
@@ -773,8 +775,9 @@ def _target_candidate(
         if scenario.model_instance_for_placement(
             scenario.battlefield_state.model_placement_by_id(model.model_id)
         ).is_alive
+        or model.model_id in scenario.present_destroyed_model_ids
     )
-    target_models = _geometry_models_for_target_placements(
+    target_models = _geometry_models_for_unit_placements(
         scenario=scenario,
         unit_placements=target_placements,
     )
@@ -1082,8 +1085,8 @@ def _canonical_target_unit_ids(
 
 
 def _player_id_for_unit(scenario: BattlefieldScenario, unit_instance_id: str) -> str:
-    return rules_unit_view_from_armies(
-        armies=scenario.armies,
+    return scenario_rules_unit_view(
+        scenario=scenario,
         unit_instance_id=unit_instance_id,
     ).owner_player_id
 

@@ -56,6 +56,10 @@ from warhammer40k_core.engine.catalog_tracked_target_weapon_grants import (
     clause_has_invalid_exact_tracked_target_weapon_grant_shape,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_attack_grants import (
+    RETAINED_ATTACK_CONSUMER_ID,
+    retained_attack_descriptor_for_clause,
+)
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
@@ -193,6 +197,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     for effect in clause.effects:
         consumer_ids.update(consumer_ids_for_effect(effect))
     consumer_ids.update(sticky_objective_consumer_ids_for_clause(clause))
+    if retained_attack_descriptor_for_clause(clause) is not None:
+        consumer_ids.add(RETAINED_ATTACK_CONSUMER_ID)
     if clause_is_mustering_selection(clause):
         consumer_ids.add(CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID)
     if clause_is_conditional_lone_operative(clause):
@@ -330,6 +336,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
         sorted(
             {
                 CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID,
+                RETAINED_ATTACK_CONSUMER_ID,
                 CATALOG_IR_CONDITIONAL_LONE_OPERATIVE_CONSUMER_ID,
                 CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
                 CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,

@@ -11,26 +11,12 @@ from warhammer40k_core.engine.battlefield_presence import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    ModelPlacement,
-    ModelPlacementPayload,
-    PlacementError,
-)
-from warhammer40k_core.engine.damage_allocation import (
-    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
-    DestructionReactionDecision,
-    DestructionReactionKind,
-    DestructionReactionSource,
-    DestructionReactionSourcePayload,
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_model_authority_history import (
     ModelAuthorityTimeline,
     build_model_authority_timeline,
     historical_rules_unit_model_ids,
-)
-from warhammer40k_core.engine.fight_on_death import (
-    FIGHT_ON_DEATH_AWAITING_EFFECT_KIND,
-    fight_on_death_model_ids_awaiting_attack,
 )
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -54,12 +40,6 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rule_deadly_demise_continuation import (
-    RULE_MODEL_DESTRUCTION_CONTEXT_KIND,
-)
-from warhammer40k_core.engine.rule_model_destruction_source_liabilities import (
-    validate_rule_destruction_source_liabilities,
-)
 from warhammer40k_core.engine.rules_units import (
     rules_unit_identities_share_lineage,
     rules_unit_identity_history_contains,
@@ -73,12 +53,10 @@ from warhammer40k_core.engine.shooting_targets import (
 from warhammer40k_core.engine.weapon_declaration import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
 )
-from warhammer40k_core.geometry.pose import GeometryError
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.decision_request import DecisionRequest
-    from warhammer40k_core.engine.effects import PersistingEffect
     from warhammer40k_core.engine.event_log import EventRecord
     from warhammer40k_core.engine.game_state import GameState
 
@@ -141,20 +119,12 @@ def validate_restore(
         if any(event.event_type == MODEL_LOGICAL_DEATH_RECORDED_EVENT for event in event_records)
         else None
     )
-    awaiting_effects = _fight_on_death_awaiting_effects(state=state)
     _validate_activation_history(state=state)
-    _validate_fight_on_death_restore(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
-        awaiting_effects=awaiting_effects,
-    )
     _validate_fight_on_death_authority_surfaces(
         state=state,
         event_records=event_records,
         decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
-        awaiting_effects=awaiting_effects,
         authority_timeline=authority_timeline,
     )
 
@@ -213,335 +183,18 @@ def _validate_activation_history(*, state: GameState) -> None:
         raise GameLifecycleError("Active Fight activation is missing from selected history.")
 
 
-def _validate_fight_on_death_restore(
-    *,
-    state: GameState,
-    event_records: tuple[EventRecord, ...],
-    decision_records: tuple[DecisionRecord, ...],
-    awaiting_effects: tuple[PersistingEffect, ...],
-) -> None:
-    if not awaiting_effects:
-        return
-    fight_on_death_model_ids_awaiting_attack(state=state)
-    for effect in awaiting_effects:
-        payload = _payload_object(
-            effect.effect_payload,
-            field_name="Fight On Death effect payload",
-        )
-        context_value = payload.get("completion_context")
-        if context_value is None:
-            continue
-        context = _payload_object(
-            context_value,
-            field_name="Fight On Death completion context",
-        )
-        context_kind = _payload_string(context, key="context_kind")
-        if context_kind not in {
-            _ATTACK_SEQUENCE_MODEL_DESTROYED_CONTEXT_KIND,
-            RULE_MODEL_DESTRUCTION_CONTEXT_KIND,
-        }:
-            raise GameLifecycleError("Fight On Death completion context kind is unsupported.")
-        _validate_completion_event(
-            state=state,
-            event_records=event_records,
-            effect=effect,
-            context=context,
-            context_kind=context_kind,
-        )
-        _validate_activation_result_binding(
-            state=state,
-            event_records=event_records,
-            decision_records=decision_records,
-            effect=effect,
-            payload=payload,
-            context=context,
-            context_kind=context_kind,
-        )
-        if context_kind == RULE_MODEL_DESTRUCTION_CONTEXT_KIND:
-            _validate_rule_source_liabilities(state=state, context=context)
-
-
-def _validate_completion_event(
-    *,
-    state: GameState,
-    event_records: tuple[EventRecord, ...],
-    effect: PersistingEffect,
-    context: dict[str, JsonValue],
-    context_kind: str,
-) -> None:
-    event_id = _payload_string(context, key="model_destroyed_event_id")
-    matching_events = tuple(record for record in event_records if record.event_id == event_id)
-    if len(matching_events) != 1 or matching_events[0].event_type != "model_destroyed":
-        raise GameLifecycleError(
-            "Fight On Death completion requires one authoritative model_destroyed event."
-        )
-    event_payload = _payload_object(
-        matching_events[0].payload,
-        field_name="Fight On Death model_destroyed event payload",
-    )
-    model_id = _payload_string(context, key="model_instance_id")
-    controller_id = _payload_string(context, key="destroyed_model_controller_player_id")
-    context_target_id = _payload_string(context, key="target_unit_instance_id")
-    physical_unit_id = state.unit_instance_id_for_model(model_id)
-    placement_payload = _payload_object(
-        event_payload.get("destroyed_model_placement"),
-        field_name="Fight On Death destroyed model placement",
-    )
-    try:
-        placement = ModelPlacement.from_payload(cast(ModelPlacementPayload, placement_payload))
-    except (GeometryError, KeyError, PlacementError, TypeError) as exc:
-        raise GameLifecycleError("Fight On Death destroyed model placement is invalid.") from exc
-    if (
-        event_payload.get("game_id") != state.game_id
-        or event_payload.get("battle_round") != state.battle_round
-        or event_payload.get("phase")
-        != (None if effect.started_phase is None else effect.started_phase.value)
-        or event_payload.get("model_instance_id") != model_id
-        or event_payload.get("target_unit_instance_id") != context_target_id
-        or placement.model_instance_id != model_id
-        or placement.unit_instance_id != physical_unit_id
-        or placement.player_id != controller_id
-    ):
-        raise GameLifecycleError("Fight On Death model_destroyed event identity drift.")
-    battlefield = state.battlefield_state
-    if battlefield is None or battlefield.model_placement_or_none(model_id) != placement:
-        raise GameLifecycleError("Fight On Death retained model placement drift.")
-    rules_unit_id = context_target_id
-    if context_kind == RULE_MODEL_DESTRUCTION_CONTEXT_KIND:
-        rules_unit_id = _payload_string(context, key="rules_unit_instance_id")
-        if (
-            context.get("game_id") != state.game_id
-            or context.get("battle_round") != state.battle_round
-            or context.get("active_player_id") != state.active_player_id
-            or context.get("phase")
-            != (None if effect.started_phase is None else effect.started_phase.value)
-            or event_payload.get("rules_unit_instance_id") != rules_unit_id
-            or event_payload.get("source_rule_id") != context.get("source_rule_id")
-        ):
-            raise GameLifecycleError("Rule Fight On Death model_destroyed event drift.")
-    if not rules_unit_identities_share_lineage(
-        state=state,
-        first_unit_instance_id=rules_unit_id,
-        second_unit_instance_id=physical_unit_id,
-    ):
-        raise GameLifecycleError("Fight On Death model_destroyed rules-unit lineage drift.")
-
-
-def _validate_activation_result_binding(
-    *,
-    state: GameState,
-    event_records: tuple[EventRecord, ...],
-    decision_records: tuple[DecisionRecord, ...],
-    effect: PersistingEffect,
-    payload: dict[str, JsonValue],
-    context: dict[str, JsonValue],
-    context_kind: str,
-) -> None:
-    activation_result_id = _payload_string(payload, key="activation_result_id")
-    bound_to_active = context_kind == RULE_MODEL_DESTRUCTION_CONTEXT_KIND and (
-        _matches_active_activation(
-            state=state,
-            activation_result_id=activation_result_id,
-            context=context,
-            owner_player_id=effect.owner_player_id,
-        )
-    )
-    matching_reactions = tuple(
-        record
-        for record in decision_records
-        if record.request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
-        and isinstance(record.request.payload, dict)
-        and record.request.payload.get("destruction_context") == context
-    )
-    if len(matching_reactions) != 1:
-        raise GameLifecycleError(
-            "Fight On Death completion must match one destruction reaction record."
-        )
-    record = matching_reactions[0]
-    if not bound_to_active and record.result.result_id != activation_result_id:
-        raise GameLifecycleError("Fight On Death activation result decision binding drift.")
-    selected_source = _validate_accepted_reaction(
-        effect=effect,
-        context=context,
-        record=record,
-    )
-    _validate_fight_on_death_awaiting_event(
-        state=state,
-        event_records=event_records,
-        effect=effect,
-        context=context,
-        selected_source=selected_source,
-    )
-
-
-def _validate_accepted_reaction(
-    *,
-    effect: PersistingEffect,
-    context: dict[str, JsonValue],
-    record: DecisionRecord,
-) -> DestructionReactionSource:
-    request_payload = _payload_object(
-        record.request.payload,
-        field_name="Fight On Death destruction reaction request payload",
-    )
-    decision = DestructionReactionDecision.from_result(
-        request=record.request,
-        result=record.result,
-    )
-    if (
-        decision.selected_reaction_kind is not DestructionReactionKind.FIGHT_ON_DEATH
-        or decision.selected_source_id is None
-        or decision.player_id != effect.owner_player_id
-        or decision.destruction_context != context
-    ):
-        raise GameLifecycleError("Fight On Death destruction reaction result drift.")
-    sources_value = request_payload.get("sources")
-    if not isinstance(sources_value, list) or not all(
-        isinstance(value, dict) for value in sources_value
-    ):
-        raise GameLifecycleError("Fight On Death destruction reaction sources are invalid.")
-    sources = tuple(
-        DestructionReactionSource.from_payload(
-            cast(DestructionReactionSourcePayload, source_payload)
-        )
-        for source_payload in sources_value
-    )
-    selected_sources = tuple(
-        source for source in sources if source.source_id == decision.selected_source_id
-    )
-    if (
-        len(selected_sources) != 1
-        or selected_sources[0].reaction_kind is not DestructionReactionKind.FIGHT_ON_DEATH
-        or selected_sources[0].source_rule_id != effect.source_rule_id
-    ):
-        raise GameLifecycleError("Fight On Death selected reaction source drift.")
-    return selected_sources[0]
-
-
-def _validate_fight_on_death_awaiting_event(
-    *,
-    state: GameState,
-    event_records: tuple[EventRecord, ...],
-    effect: PersistingEffect,
-    context: dict[str, JsonValue],
-    selected_source: DestructionReactionSource,
-) -> None:
-    model_id = _payload_string(context, key="model_instance_id")
-    destroyed_event_id = _payload_string(context, key="model_destroyed_event_id")
-    destroyed_matches = tuple(
-        (index, event)
-        for index, event in enumerate(event_records)
-        if event.event_id == destroyed_event_id and event.event_type == "model_destroyed"
-    )
-    awaiting_matches = tuple(
-        (index, event)
-        for index, event in enumerate(event_records)
-        if event.event_type == "fight_on_death_model_awaiting_attack"
-        and isinstance(event.payload, dict)
-        and event.payload.get("effect_id") == effect.effect_id
-    )
-    if len(destroyed_matches) != 1 or len(awaiting_matches) != 1:
-        raise GameLifecycleError(
-            "Fight On Death awaiting effect requires one canonical awaiting event."
-        )
-    destroyed_index, destroyed_event = destroyed_matches[0]
-    awaiting_index, awaiting_event = awaiting_matches[0]
-    destroyed_payload = _payload_object(
-        destroyed_event.payload,
-        field_name="Fight On Death model_destroyed event payload",
-    )
-    placement_payload = _payload_object(
-        destroyed_payload.get("destroyed_model_placement"),
-        field_name="Fight On Death destroyed model placement",
-    )
-    expected_payload = {
-        "game_id": state.game_id,
-        "battle_round": state.battle_round,
-        "phase": None if effect.started_phase is None else effect.started_phase.value,
-        "model_instance_id": model_id,
-        "unit_instance_id": state.unit_instance_id_for_model(model_id),
-        "source_id": selected_source.source_id,
-        "source_rule_id": selected_source.source_rule_id,
-        "effect_id": effect.effect_id,
-        "model_placement": placement_payload,
-    }
-    if awaiting_index <= destroyed_index or awaiting_event.payload != expected_payload:
-        raise GameLifecycleError("Fight On Death awaiting event authority drift.")
-
-
-def _matches_active_activation(
-    *,
-    state: GameState,
-    activation_result_id: str,
-    context: dict[str, JsonValue],
-    owner_player_id: str,
-) -> bool:
-    fight_state = state.fight_phase_state
-    if fight_state is None:
-        return False
-    matching = tuple(
-        selection
-        for selection in fight_state.fight_order_state.activation_selections
-        if selection.result_id == activation_result_id
-    )
-    if not matching:
-        return False
-    if len(matching) != 1:
-        raise GameLifecycleError("Rule Fight On Death activation result is ambiguous.")
-    selection = matching[0]
-    active = fight_state.active_activation
-    rules_unit_id = _payload_string(context, key="rules_unit_instance_id")
-    if (
-        active != selection
-        or selection.player_id != owner_player_id
-        or not rules_unit_identities_share_lineage(
-            state=state,
-            first_unit_instance_id=selection.unit_instance_id,
-            second_unit_instance_id=rules_unit_id,
-        )
-    ):
-        raise GameLifecycleError("Rule Fight On Death active activation binding drift.")
-    return True
-
-
-def _validate_rule_source_liabilities(
-    *,
-    state: GameState,
-    context: dict[str, JsonValue],
-) -> None:
-    raw_effect_ids = context.get("source_effect_ids")
-    if not isinstance(raw_effect_ids, list) or not all(
-        type(effect_id) is str and bool(effect_id.strip()) for effect_id in raw_effect_ids
-    ):
-        raise GameLifecycleError("Rule Fight On Death source effect IDs are invalid.")
-    source_effect_ids = cast(list[str], raw_effect_ids)
-    if len(source_effect_ids) != len(set(source_effect_ids)):
-        raise GameLifecycleError("Rule Fight On Death source effect IDs are duplicated.")
-    rules_unit_id = _payload_string(context, key="rules_unit_instance_id")
-    try:
-        validate_rule_destruction_source_liabilities(
-            state=state,
-            source_effect_ids=tuple(source_effect_ids),
-            rules_unit_instance_id=rules_unit_id,
-        )
-    except GameLifecycleError as exc:
-        raise GameLifecycleError("Rule Fight On Death source liability drift.") from exc
-    rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_id)
-
-
 def _validate_fight_on_death_authority_surfaces(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
-    awaiting_effects: tuple[PersistingEffect, ...],
     authority_timeline: ModelAuthorityTimeline | None,
 ) -> None:
-    awaiting_model_ids: frozenset[str] = (
-        frozenset()
-        if not awaiting_effects
-        else frozenset(fight_on_death_model_ids_awaiting_attack(state=state))
+    from warhammer40k_core.engine.retained_destruction_state import retained_destructions
+
+    has_retained_authority = any(
+        record.is_retained for record in retained_destructions(state=state)
     )
     for request in pending_decision_requests:
         if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
@@ -568,13 +221,12 @@ def _validate_fight_on_death_authority_surfaces(
                 movement_request=movement_request,
             )
             continue
-        if not awaiting_effects:
+        if not has_retained_authority:
             continue
         if request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
             _validate_pending_shooting_targets(
                 state=state,
                 request=request,
-                awaiting_model_ids=awaiting_model_ids,
             )
         elif request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
             melee_request = MeleeDeclarationProposalRequest.from_decision_request(request)
@@ -604,20 +256,10 @@ def _validate_fight_on_death_authority_surfaces(
     )
 
 
-def _fight_on_death_awaiting_effects(*, state: GameState) -> tuple[PersistingEffect, ...]:
-    return tuple(
-        effect
-        for effect in state.persisting_effects
-        if isinstance(effect.effect_payload, dict)
-        and effect.effect_payload.get("effect_kind") == FIGHT_ON_DEATH_AWAITING_EFFECT_KIND
-    )
-
-
 def _validate_pending_shooting_targets(
     *,
     state: GameState,
     request: DecisionRequest,
-    awaiting_model_ids: frozenset[str],
 ) -> None:
     request_payload = _payload_object(
         request.payload,
@@ -636,16 +278,29 @@ def _validate_pending_shooting_targets(
         candidate = ShootingTargetCandidate.from_payload(
             cast(ShootingTargetCandidatePayload, raw_candidate)
         )
+        from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
+
+        target = rules_unit_view_by_id(
+            state=state, unit_instance_id=candidate.target_unit_instance_id
+        )
+        present_ids = {
+            model.model_instance_id
+            for model in target.own_models
+            if model_is_present_on_battlefield(
+                state=state, model_instance_id=model.model_instance_id
+            )
+        }
+        if (
+            not set(candidate.target_visible_model_ids + candidate.target_in_range_model_ids)
+            <= present_ids
+        ):
+            raise GameLifecycleError("Ranged target model inventory authority drift.")
         if candidate.is_legal:
             _validate_target_unit_ids(
                 state=state,
                 target_unit_ids=(candidate.target_unit_instance_id,),
                 error_message=_RANGED_TARGET_AUTHORITY_ERROR,
             )
-        if awaiting_model_ids.intersection(
-            candidate.target_visible_model_ids + candidate.target_in_range_model_ids
-        ):
-            raise GameLifecycleError("Ranged target inventory includes a retained destroyed model.")
 
 
 def _validate_target_unit_ids(
@@ -654,9 +309,11 @@ def _validate_target_unit_ids(
     target_unit_ids: tuple[str, ...],
     error_message: str,
 ) -> None:
+    from warhammer40k_core.engine.battlefield_presence import rules_unit_has_present_model
+
     for target_unit_id in target_unit_ids:
         rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
-        if not rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit):
+        if not rules_unit_has_present_model(state=state, rules_unit=rules_unit):
             raise GameLifecycleError(error_message)
 
 
@@ -858,6 +515,13 @@ def _validate_recorded_fight_movement_target_authority(
     terminal_event_index: int,
     authority_timeline: ModelAuthorityTimeline,
 ) -> None:
+    from warhammer40k_core.engine.retained_destruction_history import (
+        retained_model_ids_before_event,
+    )
+
+    retained_ids = retained_model_ids_before_event(
+        event_records=event_records, event_index=terminal_event_index
+    )
     raw_witness = terminal_payload.get("target_authority_witness")
     if not isinstance(raw_witness, list) or not all(isinstance(row, dict) for row in raw_witness):
         raise GameLifecycleError("Fight movement target authority witness is invalid.")
@@ -871,12 +535,12 @@ def _validate_recorded_fight_movement_target_authority(
     for target_unit_id, row in zip(target_unit_instance_ids, witness_rows, strict=True):
         if set(row) != {
             "target_unit_instance_id",
-            "placed_living_model_instance_ids",
+            "present_model_instance_ids",
         }:
             raise GameLifecycleError("Fight movement target authority witness shape drift.")
         placed_living_model_ids = _payload_string_list(
             row,
-            key="placed_living_model_instance_ids",
+            key="present_model_instance_ids",
         )
         if (
             not placed_living_model_ids
@@ -897,6 +561,7 @@ def _validate_recorded_fight_movement_target_authority(
                     model_instance_id=model_id,
                     event_index=terminal_event_index,
                 )
+                or model_id in retained_ids
             )
         )
         if not expected_placed_living_model_ids:

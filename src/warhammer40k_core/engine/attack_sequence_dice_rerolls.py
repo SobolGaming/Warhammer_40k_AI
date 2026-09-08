@@ -1200,9 +1200,9 @@ def _target_unit_within_any_objective_marker_range(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions), battlefield_state=state.battlefield_state
-    )
+    from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+
+    scenario = battlefield_scenario_for_state(state=state)
     return any(
         measurement.within_control_range
         for objective in mission_objective_geometries(state)

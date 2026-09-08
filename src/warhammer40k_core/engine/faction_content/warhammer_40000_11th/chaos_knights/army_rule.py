@@ -73,7 +73,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.rules_unit_geometry import (
     placed_alive_geometry_models_for_component_unit,
-    placed_alive_geometry_models_for_rules_unit,
+    present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -1109,7 +1109,7 @@ def _unit_geometry_models(
     state: GameState,
     unit_instance_id: str,
 ) -> tuple[GeometryModel, ...]:
-    return placed_alive_geometry_models_for_rules_unit(
+    return present_geometry_models_for_rules_unit(
         state=state,
         unit_instance_id=unit_instance_id,
     )
@@ -1147,7 +1147,7 @@ def _current_battlefield_model_ids(
     return tuple(
         sorted(
             model.model_id
-            for model in placed_alive_geometry_models_for_rules_unit(
+            for model in present_geometry_models_for_rules_unit(
                 state=state,
                 unit_instance_id=rules_unit.unit_instance_id,
             )

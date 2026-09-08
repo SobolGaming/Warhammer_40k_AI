@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     battle_state_with_center_objective_positions,
@@ -54,7 +55,6 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
 )
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.fight_phase_decisions import (
     invalid_fight_phase_faction_rule_status,
@@ -599,11 +599,13 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
     )
 
 
-def test_relentless_carnage_requires_living_target_but_measures_retained_physical_base() -> None:
+def test_relentless_carnage_targets_retained_presence() -> None:
+    retention_decisions = DecisionController()
     target_unit_id = "army-beta:intercessor-unit-3"
     source_unit_id = "army-alpha:intercessor-unit-1"
 
     def eligible_targets(*, destroy_all: bool) -> tuple[str, ...]:
+        retention_decisions = DecisionController()
         state = _relentless_carnage_state(
             game_id=(
                 "phase17g-relentless-carnage-retained-only"
@@ -625,7 +627,8 @@ def test_relentless_carnage_requires_living_target_but_measures_retained_physica
                 damage=model.wounds_remaining,
                 damage_kind=DamageKind.NORMAL,
             )
-        restore_model_awaiting_fight_on_death(
+        retain_destroyed_model_for_fixture(
+            decisions=retention_decisions,
             state=state,
             placement=retained_placement,
             effect_id=(
@@ -641,7 +644,7 @@ def test_relentless_carnage_requires_living_target_but_measures_retained_physica
             source_unit_instance_id=source_unit_id,
         )
 
-    assert eligible_targets(destroy_all=True) == ()
+    assert eligible_targets(destroy_all=True) == (target_unit_id,)
     assert eligible_targets(destroy_all=False) == (target_unit_id,)
 
     retained_source_state = _relentless_carnage_state(
@@ -659,7 +662,8 @@ def test_relentless_carnage_requires_living_target_but_measures_retained_physica
         damage=source_model.wounds_remaining,
         damage_kind=DamageKind.NORMAL,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=retained_source_state,
         placement=source_placement,
         effect_id="phase17g:relentless-carnage:retained-source",
@@ -667,13 +671,10 @@ def test_relentless_carnage_requires_living_target_but_measures_retained_physica
         source_phase=BattlePhaseKind.FIGHT,
     )
 
-    assert (
-        datasheets._enemy_rules_unit_ids_within_source_engagement_range(  # pyright: ignore[reportPrivateUsage]
-            state=retained_source_state,
-            source_unit_instance_id=source_unit_id,
-        )
-        == ()
-    )
+    assert datasheets._enemy_rules_unit_ids_within_source_engagement_range(  # pyright: ignore[reportPrivateUsage]
+        state=retained_source_state,
+        source_unit_instance_id=source_unit_id,
+    ) == (target_unit_id,)
 
 
 def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -> None:

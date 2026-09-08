@@ -22,6 +22,55 @@ DIRECT_MODEL_DESTROYED_EVENT_OWNERS = {
 MODEL_DESTRUCTION_CAUSE_PRODUCER_PATH = (
     "src/warhammer40k_core/engine/model_destruction_cause_producers.py"
 )
+
+
+def test_retained_attack_paths_share_selection_dice_presence_and_removal_owners() -> None:
+    engine = SRC_ROOT / "engine"
+    selection = source_for(engine / "retained_destruction_selection.py")
+    permissions = source_for(engine / "retained_attack_permissions.py")
+    assert "RETAINED_ATTACK_REACTION_KINDS" in selection
+    assert "retained_attack_selection(" in selection
+    assert "DiceRollManager(" not in selection
+    assert "SHOOT_OR_FIGHT_ON_DEATH" in permissions
+    for filename in ("attack_sequence_destruction_boundary.py", "retained_destruction_attack.py"):
+        tree = ast_for(engine / filename)
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "offer_fight_on_death_retention"
+        ]
+        assert calls
+        assert all(any(keyword.arg == "manager" for keyword in call.keywords) for call in calls)
+    shooting = source_for(engine / "retained_shooting.py")
+    hazardous = source_for(engine / "hazardous_retention.py")
+    assert "begin_retained_destruction_cleanup(" in shooting
+    request_builder = next(
+        node
+        for node in ast.walk(ast_for(engine / "phases" / "shooting_requests.py"))
+        if isinstance(node, ast.FunctionDef) and node.name == "_request_shooting_declaration"
+    )
+    completion = next(
+        node
+        for node in ast.walk(request_builder)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_complete_out_of_phase_shooting"
+    )
+    enqueue = next(
+        node
+        for node in ast.walk(request_builder)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "request_decision"
+    )
+    assert completion.lineno < enqueue.lineno
+    assert "continue_applied_mortal_wound_destruction_with_rule_reactions(" in hazardous
+    assert not (engine / "rule_model_destruction_fight_on_death.py").exists()
+    assert not (engine / "rule_model_destruction_fight_continuation.py").exists()
+
+
 ATTACK_DESTRUCTION_CAUSE_RESERVATION_PATH = (
     "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
 )
@@ -88,9 +137,8 @@ PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
 }
 DIRECT_BATTLEFIELD_REMOVAL_CALL_COUNTS = {
     "with_removed_models": {
-        "src/warhammer40k_core/engine/damage_allocation.py": 1,
+        "src/warhammer40k_core/engine/destruction_removal.py": 1,
         "src/warhammer40k_core/engine/fight_activation_history_integrity.py": 1,
-        "src/warhammer40k_core/engine/fight_on_death.py": 1,
         "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": 1,
         "src/warhammer40k_core/engine/reserves.py": 1,
         "src/warhammer40k_core/engine/turn_cleanup.py": 1,
@@ -188,7 +236,7 @@ def test_p05a_attack_destruction_reactions_share_one_end_of_attacks_boundary() -
     )
     assert dispatch_source.index(
         "resolve_pending_attack_destruction_until_blocked("
-    ) < dispatch_source.index('"attack_sequence_completed"')
+    ) < dispatch_source.index("record_attack_sequence_completed(")
 
     for host_path in (
         SRC_ROOT / "engine" / "fight_attack_completion.py",
@@ -487,9 +535,19 @@ def test_battlefield_removal_owners_converge_or_are_explicitly_non_authoritative
     fall_back_source = source_for(SRC_ROOT / "engine" / "phases" / "movement_fall_back_embark.py")
     reserve_source = source_for(SRC_ROOT / "engine" / "reserves.py")
     cleanup_source = source_for(SRC_ROOT / "engine" / "turn_cleanup.py")
-    assert "_remove_destroyed_model(" in damage_source
-    assert "remove_models_awaiting_fight_on_death(" in fight_on_death_source
-    assert "remove_models_awaiting_fight_on_death(state=state)" in battle_round_source
+    assert "remove_destroyed_model_from_battlefield(" in damage_source
+    retention_source = source_for(SRC_ROOT / "engine" / "retained_destruction_cleanup.py")
+    removal_source = source_for(SRC_ROOT / "engine" / "destruction_removal.py")
+    assert "retained_destructions(state=state)" in fight_on_death_source
+    assert "begin_retained_destruction_cleanup(" in battle_round_source
+    assert battle_round_source.index("retention_status = begin_retained_destruction_cleanup(") < (
+        battle_round_source.index("        _apply_phase_end_objective_control_hooks(")
+    )
+    assert "resolve_pending_attack_destruction_until_blocked(" in retention_source
+    assert "resume_retained_rule_destruction(" in retention_source
+    assert "battlefield.with_removed_models(" in removal_source
+    assert "with_returned_model_placement(" not in fight_on_death_source
+    assert "replace_battlefield_state(" not in fight_on_death_source
     assert "record_primary_destroyed_model_departures(" in battle_round_source
     assert "record_primary_unit_destruction_for_logical_completion(" in battle_round_source
     assert "record_primary_unit_destructions_for_destroyed_models(" not in battle_round_source

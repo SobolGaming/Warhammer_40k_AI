@@ -18,7 +18,7 @@ from warhammer40k_core.engine.battle_shock_historical_authority import (
 )
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
@@ -410,7 +410,7 @@ def _target_candidates(
         source_rules_unit_instance_id,
     )
     source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_rules_unit_id)
-    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source_rules_unit):
+    if not rules_unit_has_present_model(state=state, rules_unit=source_rules_unit):
         return ()
     scenario = battlefield_scenario_for_state(state=state)
     candidates: list[tuple[str, str]] = []
@@ -418,7 +418,7 @@ def _target_candidates(
         state=state,
         player_id=source_rules_unit.owner_player_id,
     ):
-        if not rules_unit_has_placed_alive_model(state=state, rules_unit=target_rules_unit):
+        if not rules_unit_has_present_model(state=state, rules_unit=target_rules_unit):
             continue
         if scenario_rules_units_are_physically_engaged(
             scenario=scenario,

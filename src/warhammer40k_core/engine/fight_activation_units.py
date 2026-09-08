@@ -2,18 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.attached_unit_reconciliation import (
     validate_attached_rules_unit_identity_after_destruction,
 )
-from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_model_ids_for_rules_unit,
+from warhammer40k_core.engine.fight_on_death import fight_on_death_model_ids_for_rules_unit
+from warhammer40k_core.engine.fight_order import FightActivationSelection
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_model_presence import (
     model_is_present_on_battlefield,
 )
-from warhammer40k_core.engine.fight_order import FightActivationSelection
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_by_id,
@@ -72,58 +69,3 @@ def validate_attached_rules_unit_after_fight_activation(
         state=state,
         rules_unit_instance_id=rules_unit_instance_id,
     )
-
-
-def finalize_rule_destruction_after_fight_activation(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    context: dict[str, JsonValue],
-    rules_unit_instance_id: str,
-) -> LifecycleStatus | None:
-    return finalize_rule_destructions_after_fight_activation(
-        state=state,
-        decisions=decisions,
-        contexts=(context,),
-        rules_unit_instance_id=rules_unit_instance_id,
-    )
-
-
-def finalize_rule_destructions_after_fight_activation(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    contexts: tuple[dict[str, JsonValue], ...],
-    rules_unit_instance_id: str,
-) -> LifecycleStatus | None:
-    if not contexts:
-        raise GameLifecycleError("Rule Fight On Death finalization requires contexts.")
-    continuation_indexes = tuple(
-        index
-        for index, context in enumerate(contexts)
-        if context.get("completion_continuation") is not None
-    )
-    if len(continuation_indexes) > 1 or (
-        continuation_indexes and continuation_indexes[0] != len(contexts) - 1
-    ):
-        raise GameLifecycleError("Rule Fight On Death continuation ordering drift.")
-    status = None
-    for context in contexts:
-        status = rule_model_destruction.finalize_rule_model_destruction(
-            state=state,
-            decisions=decisions,
-            context=context,
-        )
-    validate_attached_rules_unit_identity_after_destruction(
-        state=state,
-        rules_unit_instance_id=rules_unit_instance_id,
-    )
-    return status
-
-
-__all__ = (
-    "active_fight_activation_rules_unit",
-    "finalize_rule_destruction_after_fight_activation",
-    "finalize_rule_destructions_after_fight_activation",
-    "validate_attached_rules_unit_after_fight_activation",
-)

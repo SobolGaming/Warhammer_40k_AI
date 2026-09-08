@@ -54,19 +54,15 @@ def optional_destruction_reaction_trigger_conditions_for_target(
         raise GameLifecycleError("Destruction reaction condition requires provenance.")
     if type(target_unit_instance_id) is not str or not target_unit_instance_id:
         raise GameLifecycleError("Destruction reaction target unit ID is invalid.")
-    if not optional_destruction_reaction_trigger_battle_round_is_current(
-        state=state,
+    if not destruction_reaction_fixed_conditions_met(
+        battle_round=state.battle_round,
+        destruction_provenance=destruction_provenance,
         descriptor=descriptor,
     ):
         return False
     if not optional_destruction_reaction_active_effect_requirement_is_met(
         state=state,
         descriptor=descriptor,
-    ):
-        return False
-    if descriptor.get("requires_destroyed_by_melee_attack") is True and not (
-        destruction_provenance.destruction_source_kind is DestructionSourceKind.ATTACK
-        and destruction_provenance.attack_kind is DestructionAttackKind.MELEE
     ):
         return False
     if descriptor.get("requires_not_fought_this_phase") is True:
@@ -78,6 +74,24 @@ def optional_destruction_reaction_trigger_conditions_for_target(
         ):
             return False
     return True
+
+
+def destruction_reaction_fixed_conditions_met(
+    *,
+    battle_round: int,
+    destruction_provenance: DestructionProvenance,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    """Source predicates whose original authority survives destruction cleanup."""
+    if (
+        "battle_round" in descriptor
+        and _positive_int(descriptor, key="battle_round") != battle_round
+    ):
+        return False
+    return descriptor.get("requires_destroyed_by_melee_attack") is not True or (
+        destruction_provenance.destruction_source_kind is DestructionSourceKind.ATTACK
+        and destruction_provenance.attack_kind is DestructionAttackKind.MELEE
+    )
 
 
 def optional_destruction_reaction_trigger_battle_round_is_current(
@@ -100,6 +114,7 @@ def optional_destruction_reaction_active_effect_requirement_is_met(
         return True
     requirement = _object(raw_requirement)
     required_owner_id = _optional_string(requirement, key="owner_player_id")
+    required_effect_id = _optional_string(requirement, key="effect_id")
     required_source_rule_id = _optional_string(requirement, key="source_rule_id")
     required_effect_kind = _optional_string(requirement, key="effect_kind")
     required_target_unit_id = _optional_string(requirement, key="target_unit_instance_id")
@@ -108,6 +123,8 @@ def optional_destruction_reaction_active_effect_requirement_is_met(
     )
     required_selected_id = _optional_string(requirement, key="selected_blessing_id")
     for effect in state.persisting_effects:
+        if required_effect_id is not None and effect.effect_id != required_effect_id:
+            continue
         if required_owner_id is not None and effect.owner_player_id != required_owner_id:
             continue
         if required_source_rule_id is not None and effect.source_rule_id != required_source_rule_id:

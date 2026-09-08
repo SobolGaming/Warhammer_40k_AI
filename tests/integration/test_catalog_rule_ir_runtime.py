@@ -136,6 +136,8 @@ from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.phases.movement import MovementPhaseHandler
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.retained_destruction_rule import resume_retained_rule_destruction
+from warhammer40k_core.engine.retained_destruction_selection import apply_retention_selection
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     MovementBudgetModifierContext,
@@ -1331,12 +1333,7 @@ def test_daemonic_patrons_destruction_routes_optional_reactions_and_physical_uni
     assert type(status) is not bool
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert state.persisting_effects
-    destroyed = next(
-        item for item in decisions.event_log.records if item.event_type == "model_destroyed"
-    )
-    assert cast(dict[str, JsonValue], destroyed.payload)["target_unit_instance_id"] == (
-        source.unit_instance_id
-    )
+    assert not any(item.event_type == "model_destroyed" for item in decisions.event_log.records)
     reaction_request = decisions.queue.peek_next()
     reaction_record = decisions.submit_result(
         DecisionResult.for_request(
@@ -1346,12 +1343,23 @@ def test_daemonic_patrons_destruction_routes_optional_reactions_and_physical_uni
         )
     )
     assert (
-        FightPhaseHandler().apply_decision(
-            state=state, decisions=decisions, result=reaction_record.result
+        resume_retained_rule_destruction(
+            state=state,
+            decisions=decisions,
+            record=apply_retention_selection(
+                state=state, decisions=decisions, result=reaction_record.result
+            ),
         )
         is None
     )
     assert not state.persisting_effects
+
+    destroyed = next(
+        item for item in decisions.event_log.records if item.event_type == "model_destroyed"
+    )
+    assert cast(dict[str, JsonValue], destroyed.payload)["target_unit_instance_id"] == (
+        source.unit_instance_id
+    )
 
 
 def test_daemonic_patrons_deadly_demise_routes_mortal_wound_fnp_before_removal() -> None:
@@ -1502,10 +1510,10 @@ def test_daemonic_patrons_fight_on_death_cleans_up_at_fight_end_and_resumes_liab
         effect
         for effect in completed_state.persisting_effects
         if cast(dict[str, JsonValue], effect.effect_payload).get("effect_kind")
-        == "fight_on_death_awaiting_attack"
+        == "retained_model_destruction"
     )
     assert len(awaiting_effects) == 1
-    assert awaiting_effects[0].effect_id.startswith("fight-on-death-awaiting:event-")
+    assert awaiting_effects[0].effect_id.startswith("retained-destruction:")
     event_types = [
         record.event_type for record in session.lifecycle.decision_controller.event_log.records
     ]
@@ -1535,17 +1543,19 @@ def test_daemonic_patrons_fight_on_death_cleans_up_at_fight_end_and_resumes_liab
     event_types = [
         record.event_type for record in session.lifecycle.decision_controller.event_log.records
     ]
-    assert "fight_on_death_models_removed" in event_types
+    assert "fight_on_death_destruction_completed" in event_types
     cleanup_payload = next(
         cast(dict[str, JsonValue], record.payload)
         for record in session.lifecycle.decision_controller.event_log.records
-        if record.event_type == "fight_on_death_models_removed"
+        if record.event_type == "fight_on_death_destruction_completed"
     )
-    assert cleanup_payload["model_instance_ids"] == [model_id]
+    assert cleanup_payload["model_instance_id"] == model_id
     assert cleanup_payload["reason"] == "phase_end"
 
 
-def _pending_daemonic_patrons_fight_on_death_fixture() -> tuple[
+def _pending_daemonic_patrons_fight_on_death_fixture(
+    *, cleanup_fnp: bool = False
+) -> tuple[
     GameState,
     DecisionController,
     CatalogSelectedToFightRiskRuntime,
@@ -1576,7 +1586,8 @@ def _pending_daemonic_patrons_fight_on_death_fixture() -> tuple[
             )
         )
     record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
-    _record_daemonic_patrons_effect(state=state, runtime=runtime, source=source)
+    if not cleanup_fnp:
+        _record_daemonic_patrons_effect(state=state, runtime=runtime, source=source)
     _record_daemonic_patrons_effect(
         state=state,
         runtime=runtime,
@@ -1593,8 +1604,33 @@ def _pending_daemonic_patrons_fight_on_death_fixture() -> tuple[
     state.clear_model_destruction_reaction_sources(model_instance_id=model_id)
     state.record_model_destruction_reaction_sources(
         model_instance_id=model_id,
-        sources=(reaction_source,),
+        sources=(
+            reaction_source,
+            *(
+                (
+                    DestructionReactionSource(
+                        source_id="order-30-rule-dd",
+                        source_rule_id="order-30-rule-dd",
+                        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+                        optional=False,
+                        payload={
+                            "trigger_roll_threshold": 1,
+                            "range_inches": 40.0,
+                            "mortal_wounds": {"kind": "fixed", "value": 1},
+                        },
+                    ),
+                )
+                if cleanup_fnp
+                else ()
+            ),
+        ),
     )
+    if cleanup_fnp:
+        state.record_model_feel_no_pain_sources(
+            model_instance_id=source.own_models[0].model_instance_id,
+            decline_allowed=True,
+            sources=(FeelNoPainSource(source_id="order-30-rule-fnp", threshold=6),),
+        )
     request = runtime.next_fight_phase_end_request(
         FightPhaseEndRequestContext(state=state, decisions=decisions)
     )
@@ -1631,6 +1667,43 @@ def _pending_daemonic_patrons_fight_on_death_fixture() -> tuple[
         model_id,
         reaction_request.request_id,
         reaction_option.option_id,
+    )
+
+
+def test_order_30_rule_cleanup_resumes_after_feel_no_pain_and_restores() -> None:
+    state, decisions, runtime, _source, model_id, request_id, option_id = (
+        _pending_daemonic_patrons_fight_on_death_fixture(cleanup_fnp=True)
+    )
+    session, config = _daemonic_patrons_session(state=state, decisions=decisions)
+    _install_daemonic_patrons_resume_runtime(session=session, config=config, runtime=runtime)
+    status = session.submit_option(
+        request_id=request_id, option_id=option_id, result_id="accept-rule-retention"
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type == "select_feel_no_pain"
+    checkpoint = session.lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(checkpoint)
+    assert restored.to_payload() == checkpoint
+    session = LocalGameSession(lifecycle=restored)
+    _install_daemonic_patrons_resume_runtime(session=session, config=config, runtime=runtime)
+    resumed = session.submit_option(
+        request_id=status.decision_request.request_id,
+        option_id=DECLINE_FEEL_NO_PAIN_OPTION_ID,
+        result_id="decline-rule-cleanup-fnp",
+    )
+    assert resumed.status_kind is not LifecycleStatusKind.INVALID
+    final_state = session.lifecycle.state
+    assert final_state is not None
+    assert final_state.battlefield_state is not None
+    assert model_id in final_state.battlefield_state.removed_model_ids
+    assert not any(
+        effect.effect_id.startswith(("retained-destruction:", "daemonic-patrons-"))
+        for effect in final_state.persisting_effects
+    )
+    assert (
+        GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
+        == session.lifecycle.to_payload()
     )
 
 
@@ -1692,6 +1765,21 @@ def _daemonic_patrons_session(
         allow_legacy_non_strict_rosters=True,
         model_geometries=package.model_geometries,
     )
+    # Match the canonical catalog's roster diagnostics as well as its units.
+    for muster_request in resume_config.army_muster_requests:
+        expected = army_mustering.muster_army(
+            catalog=fixture_catalog,
+            request=muster_request,
+            model_geometries=package.model_geometries,
+        )
+        state.replace_army_definitions(
+            [
+                replace(army, roster_legality_report=expected.roster_legality_report)
+                if army.army_id == expected.army_id
+                else army
+                for army in state.army_definitions
+            ]
+        )
     session = LocalGameSession(
         lifecycle=GameLifecycle.from_payload(
             cast(
@@ -1723,6 +1811,7 @@ def _install_daemonic_patrons_resume_runtime(
         ),
     )
     session.lifecycle._config = config
+    session.lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
     session.lifecycle._fight_phase_handler = fight_handler
     session.lifecycle._movement_phase_handler = MovementPhaseHandler(
         ruleset_descriptor=config.ruleset_descriptor,

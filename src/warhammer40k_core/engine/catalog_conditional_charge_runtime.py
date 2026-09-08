@@ -15,7 +15,7 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.catalog_conditional_charge_support import (
@@ -533,10 +533,10 @@ def _models_are_engaged(
     first_view: RulesUnitView,
     second_view: RulesUnitView,
 ) -> bool:
-    if not rules_unit_has_placed_alive_model(
+    if not rules_unit_has_present_model(
         state=context.state,
         rules_unit=first_view,
-    ) or not rules_unit_has_placed_alive_model(
+    ) or not rules_unit_has_present_model(
         state=context.state,
         rules_unit=second_view,
     ):

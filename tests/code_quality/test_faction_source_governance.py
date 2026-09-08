@@ -28,8 +28,14 @@ def test_f00_retained_generated_and_registered_evidence_agrees() -> None:
     package = faction_source_package()
     assert len(package.evidence_required_source_ids) == 3
     scope = source_authority_registry().scope("warhammer_40000_11th_factions")
-    assert len(scope.source_packages) == 1
-    assert scope.source_packages[0].catalog_sha256 == package.source_catalog.catalog_sha256()
+    owned_packages = tuple(
+        registered
+        for registered in scope.source_packages
+        if registered.package_name == package.source_catalog.package_id.package_name
+        and registered.namespace == package.source_catalog.package_id.namespace
+    )
+    assert len(owned_packages) == 1
+    assert owned_packages[0].catalog_sha256 == package.source_catalog.catalog_sha256()
     assert package.source_catalog.package_id.version == audit.package_version()
 
 

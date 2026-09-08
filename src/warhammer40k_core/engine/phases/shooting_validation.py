@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
@@ -316,7 +316,7 @@ def _enemy_placed_unit_ids(*, state: GameState, player_id: str) -> tuple[str, ..
                 state=state,
                 unit_instance_id=rules_unit_id,
             )
-            if not rules_unit_has_placed_alive_model(
+            if not rules_unit_has_present_model(
                 state=state,
                 rules_unit=rules_unit,
             ):

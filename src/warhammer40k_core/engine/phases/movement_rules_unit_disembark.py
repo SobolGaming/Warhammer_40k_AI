@@ -17,6 +17,9 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.emergency_disembark import (
+    transport_hazard_mortal_wound_application_id,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import CORE_HAZARD_ROLLS_RULE_ID
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -767,9 +770,10 @@ def apply_rules_unit_combat_disembark_to_state(
     )
     progress = start_hazardous_mortal_wound_application(
         state=state,
-        application_id=(
-            f"{disembark.selection.unit_instance_id}:combat_disembark:"
-            f"transport-hazard-mortal-wounds:r{state.battle_round}"
+        application_id=transport_hazard_mortal_wound_application_id(
+            unit_instance_id=disembark.selection.unit_instance_id,
+            disembark_mode=DisembarkModeKind.COMBAT_DISEMBARK,
+            battle_round=state.battle_round,
         ),
         source_rule_id=CORE_HAZARD_ROLLS_RULE_ID,
         source_context=source_context,

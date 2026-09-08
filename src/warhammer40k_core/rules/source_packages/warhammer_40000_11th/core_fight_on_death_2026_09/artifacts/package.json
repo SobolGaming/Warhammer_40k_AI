@@ -1,0 +1,148 @@
+{
+  "artifact_schema": "core-v2-core-fight-on-death-source-v1",
+  "source_package_id": "gw-11e-core-fight-on-death",
+  "source_version": "maintained-app-mirrors-observed-2026-09-07",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-fight-on-death:retained-presence",
+      "section_id": "FAQ",
+      "source_text": "Fight On Death (05.04.05) requires models awaiting such an ability to stay on the battlefield until their unit has attacked (or until the end of the phase). How do these models function while this is the case?\nModels awaiting a Fight On Death ability are still present on the battlefield for all rules purposes. This includes (but is not limited to) the following regarding such models:\nThey can be measured to by friendly/enemy abilities.\nThey can be considered visible to friendly/enemy models where relevant.\nThey can use their datasheet abilities.\nThey can be targeted by stratagems.\nEnemy units can still be engaged with them (which may restrict the opposing player's consolidation/pile-In moves made as part of an overrun fight).",
+      "transcription_sha256": "53e0e0abd50bb145278431b245f05e2a71b2ba09e4f56953ca23767da92d47b3",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-fight-on-death:fight-on-death",
+      "section_id": "05.04.05",
+      "source_text": "Some rules enable models to attack after they have been destroyed. When a model under such an effect is destroyed, do not remove it from play.\nThose models will stay on the battlefield until their unit is selected to attack and has attacked, or until the end of the phase (whichever comes first). Any rules triggered by those models being destroyed are resolved, and then those destroyed models are removed.\nIf a rule instructs a destroyed model to fight immediately after the attacking unit, instead that model is not removed from the battlefield until that model's unit has fought, or until the end of the phase (whichever comes first). This allows the models in the unit to fight all at once, and stratagems that target that unit will also affect that destroyed model.",
+      "transcription_sha256": "b4398b729037efaade1d9649d8dfff421d118959a46ebcb222f801b79d8ec37a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-fight-on-death:retained-presence",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "53e0e0abd50bb145278431b245f05e2a71b2ba09e4f56953ca23767da92d47b3",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "5d9b75b31f2da96cd17b1e6523d718ae1a8bec1ce3559ce3f160bd6146148190",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+      ],
+      "evidence_id": "core-fight-on-death-review:retained-presence",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P05B FAQ retained-presence",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight-on-death:retained-presence",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "53e0e0abd50bb145278431b245f05e2a71b2ba09e4f56953ca23767da92d47b3",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "6ce195cd22e18ce1cd43666b72220659102f9c5f18afee981cb9333d0892c1c5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.ability_presence:active_ability_model_ids_for_unit"
+      ],
+      "evidence_id": "core-fight-on-death-mirror:retained-presence:gdm-v931",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "retained-presence:gdm-v931",
+      "review_audit_source_observation_sha256": "175989634a824a069106f3097fcacec41b5935da1bf90f195e56b6b18990c2d6",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions FAQ retained-presence",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight-on-death:fight-on-death",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "b4398b729037efaade1d9649d8dfff421d118959a46ebcb222f801b79d8ec37a",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "700f5577df1e125e378f7c147bf8d95da985d7b0b317bd9fde1ff0cb37e359c5",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection"
+      ],
+      "evidence_id": "core-fight-on-death-review:fight-on-death",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P05B 05.04.05 fight-on-death",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-fight-on-death:fight-on-death",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "b4398b729037efaade1d9649d8dfff421d118959a46ebcb222f801b79d8ec37a",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "aa1dd37723f11498615ecd5be20fca8ecffdc1c228cd21ec57ad3e2eced86aae",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection"
+      ],
+      "evidence_id": "core-fight-on-death-mirror:fight-on-death:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-fight-on-death-maintained-app-mirrors-2026-09-07",
+      "review_audit_row_id": "fight-on-death:40k-app",
+      "review_audit_source_observation_sha256": "a1a92b105252f4bd310fd8e721fd1d22729efd66875ecceea694480eedc51291",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 05.04.05 fight-on-death",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/05-attack-sequence",
+      "observed_at": "2026-09-07T21:35:45Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "e48e85098c6c425f60da32a9735283f124a906cbf1ab846c3e9a21c6d5c3779c"
+}

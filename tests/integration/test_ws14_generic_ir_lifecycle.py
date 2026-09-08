@@ -2525,6 +2525,14 @@ def _first_model_id(state: GameState, *, unit_instance_id: str) -> str:
 
 
 def _place_units_for_more_dakka_shooting(state: GameState) -> None:
+    # The target must not be engaged with the fixture's unrelated friendly Walker.
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:walker-1",
+        poses=tuple(
+            Pose.at(x=20.0 + (index % 5) * 1.5, y=30.0 + (index // 5) * 1.5) for index in range(10)
+        ),
+    )
     _replace_unit_poses(
         state,
         unit_instance_id="army-alpha:boyz-1",

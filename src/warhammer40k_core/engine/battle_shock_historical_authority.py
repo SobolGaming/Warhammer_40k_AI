@@ -89,7 +89,17 @@ class HistoricalBattleShockAuthorityContext:
             )
         if view.is_attached_rules_unit and unit_instance_id not in self.active_attached_unit_ids:
             raise GameLifecycleError("Historical Battle-shock attached identity is not active.")
-        return view
+        from warhammer40k_core.engine.retained_destruction_history import (
+            retained_model_ids_before_event,
+        )
+        from warhammer40k_core.engine.rules_units import rules_unit_view_with_retained_models
+
+        retained_ids = retained_model_ids_before_event(
+            event_records=self.event_records, event_index=self.boundary_event_index
+        )
+        return rules_unit_view_with_retained_models(
+            view=view, retained_model_ids=tuple(sorted(retained_ids))
+        )
 
     def all_rules_units(self) -> tuple[RulesUnitView, ...]:
         return tuple(
@@ -179,14 +189,27 @@ class HistoricalBattleShockAuthorityContext:
         return self.placed_alive_model_ids(unit_instance_id)
 
     def ability_presence(self, unit_instance_id: str) -> AbilityPresence:
+        from warhammer40k_core.engine.retained_destruction_history import (
+            retained_model_ids_before_event,
+        )
+
         rules_unit = self.rules_unit_containing_unit(unit_instance_id)
         allowed = {model.model_instance_id for model in rules_unit.own_models}
         rows = tuple(row for row in self.physical_models if row.model_instance_id in allowed)
         return ability_presence_from_model_ids(
             rules_unit_instance_id=rules_unit.unit_instance_id,
             alive_model_ids={row.model_instance_id for row in rows if row.wounds_remaining > 0},
+            retained_model_ids=set(
+                retained_model_ids_before_event(
+                    event_records=self.event_records,
+                    event_index=self.boundary_event_index,
+                )
+            )
+            & allowed,
             battlefield_model_ids={
-                row.model_instance_id for row in rows if row.presence == "battlefield"
+                row.model_instance_id
+                for row in rows
+                if row.presence in {"battlefield", "retained_destroyed"}
             },
             off_battlefield_model_ids={
                 row.model_instance_id for row in rows if row.presence in {"embarked", "reserves"}

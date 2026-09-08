@@ -10,6 +10,7 @@ from warhammer40k_core.core.weapon_ability_sources import grant_weapon_ability
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.core.weapon_skill_modifiers import with_weapon_skill_modifier
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -661,7 +662,7 @@ def _rules_unit_has_visible_target(
             ruleset_descriptor=ruleset_descriptor,
             observing_unit=component.unit,
             target_unit_id=target_rules_unit.unit_instance_id,
-            placed_alive_models_only=True,
+            placed_alive_models_only=False,
             terrain_features=terrain_features,
             terrain_areas=shooting_terrain_areas_for_state(state),
         ):
@@ -674,10 +675,7 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
     if battlefield_state is None:
         raise GameLifecycleError("For the Greater Good requires battlefield_state.")
     try:
-        scenario = BattlefieldScenario(
-            armies=tuple(state.army_definitions),
-            battlefield_state=battlefield_state,
-        )
+        scenario = battlefield_scenario_for_state(state=state)
         scenario.assert_all_mustered_models_placed_or_accounted(state.unavailable_model_ids())
     except PlacementError as exc:
         raise GameLifecycleError("For the Greater Good battlefield scenario is invalid.") from exc

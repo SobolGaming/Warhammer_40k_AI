@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -33,7 +34,6 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.fight_on_death import restore_model_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -1194,6 +1194,7 @@ def test_revival_requires_phase_start_coherent_placement_without_mutation() -> N
 
 
 def test_healing_phase_start_engagement_includes_retained_fight_on_death_enemy() -> None:
+    retention_decisions = DecisionController()
     state = _battle_state()
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhaseKind.FIGHT)
     unit_id = "army-alpha:intercessor-unit-1"
@@ -1220,7 +1221,8 @@ def test_healing_phase_start_engagement_includes_retained_fight_on_death_enemy()
         state,
         model_instance_id=enemy.own_models[0].model_instance_id,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=retention_decisions,
         state=state,
         placement=retained_enemy_placement,
         effect_id="phase14h-phase-start-retained-enemy",
@@ -1316,13 +1318,15 @@ def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> 
         state,
         model_instance_id=enemy.own_models[0].model_instance_id,
     )
-    restore_model_awaiting_fight_on_death(
+    retain_destroyed_model_for_fixture(
+        decisions=decisions,
         state=state,
         placement=retained_enemy_placement,
         effect_id="phase14h-revival-retained-enemy",
         source_rule_id="phase14h-revival-retained-enemy-rule",
         source_phase=BattlePhaseKind.FIGHT,
     )
+    records_before = decisions.records
     phase_start_engagement_ids = healing_phase_start_enemy_engagement_model_ids(
         state=state,
         rules_unit=rules_unit_view_by_id(state=state, unit_instance_id=unit_id),
@@ -1358,7 +1362,7 @@ def test_revival_rejects_new_engagement_with_retained_fight_on_death_enemy() -> 
         )
 
     assert decisions.queue.pending_requests == (request,)
-    assert decisions.records == ()
+    assert decisions.records == records_before
     assert not model_by_id(
         state=state,
         model_instance_id=revival_placement.model_instance_id,

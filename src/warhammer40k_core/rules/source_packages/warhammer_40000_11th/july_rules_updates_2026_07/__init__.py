@@ -36,7 +36,7 @@ from ._artifacts import (
 )
 
 _ARTIFACT_PATH: Final = "artifacts/package.json"
-EXPECTED_ARTIFACT_SHA256: Final = "d87e8847ac50ac483e93792be8af7a19b340873fbe3c9f8b9047d036f14d3249"
+EXPECTED_ARTIFACT_SHA256: Final = "59ab29a5f0c8780418ba3a7fac29e16f228f235cedc3644c2bb75e84b68708fb"
 
 
 def _load_artifact() -> JulyRulesUpdatesPackageArtifact:

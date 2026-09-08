@@ -507,6 +507,8 @@ def test_f00_future_audit_cannot_reuse_previous_package_authorization(
                 source_observation_sha256=observations[row.row_id].source_observation_sha256,
                 identity_value=f"947@{observations[row.row_id].observed_at}",
             )
+            if row.audit_id == candidate.audit_id
+            else row
             for row in scope.audit_rows
         ),
     )
@@ -543,7 +545,7 @@ def test_f00_generator_checks_entire_package_registration(mutation: str) -> None
     elif mutation == "missing":
         packages = ()
     else:
-        packages = (*scope.source_packages, replace(package, package_name="unreviewed"))
+        packages = (*scope.source_packages, replace(package, version="unreviewed"))
     drifted = replace(
         registry,
         scopes=tuple(

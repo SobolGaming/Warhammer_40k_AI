@@ -23,10 +23,6 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.destruction_provenance import (
-    DestructionAttackKind,
-    DestructionProvenance,
-)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
@@ -166,23 +162,22 @@ def drift_pending_destruction_reaction_payload(
     pending = attack_sequence.current_pending_attack_destruction
     if pending is None:
         raise AssertionError("Drift regression requires a pending attack destruction.")
-    request_payload = lifecycle_payload["decisions"]["queue"]["pending_requests"][0]
-    destruction_context = request_payload["payload"]["destruction_context"]
-    provenance_payload = destruction_context["destruction_provenance"]
-    provenance = DestructionProvenance.from_payload(provenance_payload)
-    profile = provenance.source_weapon_profile
-    if profile is None:
-        raise AssertionError("Drift regression requires attack provenance.")
+    effect = next(
+        effect
+        for effect in lifecycle_payload["state"]["persisting_effects"]
+        if effect["effect_payload"].get("effect_kind") == "retained_model_destruction"
+        and effect["effect_payload"]["destruction"]["placement"]["model_instance_id"]
+        == pending.damage_application.model_instance_id
+    )
+    retained_pending = effect["effect_payload"]["destruction"]["owner_context"][
+        "pending_attack_destructions"
+    ][0]
+    profile = pending.attack_pool.weapon_profile
     if drift_kind in {"attack_context", "generated_hit_context"}:
-        current_context = pending.attack_context
-        stale_context = dict(current_context)
-        stale_context["attack_context_id"] = f"{current_context['attack_context_id']}:drift"
-        destruction_context["attack_context"] = stale_context
-        provenance_payload["attack_context_id"] = stale_context["attack_context_id"]
+        retained_pending["attack_context"]["attack_context_id"] += ":drift"
         return
     if drift_kind == "range":
         drifted = replace(profile, range_profile=RangeProfile.distance(12))
-        provenance_payload["attack_kind"] = DestructionAttackKind.RANGED.value
     elif drift_kind == "damage":
         drifted = replace(profile, damage_profile=DamageProfile.fixed(1))
     elif drift_kind == "keywords":
@@ -191,7 +186,7 @@ def drift_pending_destruction_reaction_payload(
         drifted = replace(profile, source_ids=(*profile.source_ids, "test:provenance-drift"))
     else:
         raise AssertionError("Unsupported destruction-reaction drift kind.")
-    provenance_payload["source_weapon_profile"] = drifted.to_payload()
+    retained_pending["attack_pool"]["weapon_profile"] = drifted.to_payload()
 
 
 def _fixed_roll(

@@ -3,14 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
-from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_model_ids_awaiting_attack,
-)
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.retained_model_presence import (
+    model_is_present_on_battlefield,
+    retained_model_ids,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     placed_alive_rules_unit_views,
     rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+    rules_unit_view_with_retained_models,
 )
 
 if TYPE_CHECKING:
@@ -24,7 +27,7 @@ def battlefield_scenario_for_state(*, state: GameState) -> BattlefieldScenario:
     return BattlefieldScenario(
         armies=tuple(state.army_definitions),
         battlefield_state=battlefield,
-        present_destroyed_model_ids=fight_on_death_model_ids_awaiting_attack(state=state),
+        present_destroyed_model_ids=retained_model_ids(state=state),
     )
 
 
@@ -42,6 +45,45 @@ def rules_unit_has_placed_alive_model(
         placed_model_ids=frozenset(battlefield.placed_model_ids()),
         rules_unit=rules_unit,
         model_instance_id=model_instance_id,
+    )
+
+
+def rules_unit_has_present_model(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    model_instance_id: str | None = None,
+) -> bool:
+    if state.battlefield_state is None:
+        return False
+    return any(
+        (model_instance_id is None or model.model_instance_id == model_instance_id)
+        and model_is_present_on_battlefield(state=state, model_instance_id=model.model_instance_id)
+        for model in rules_unit.own_models
+    )
+
+
+def scenario_rules_unit_has_present_model(
+    *,
+    scenario: BattlefieldScenario,
+    rules_unit: RulesUnitView,
+    model_instance_id: str | None = None,
+) -> bool:
+    placed_ids = frozenset(scenario.battlefield_state.placed_model_ids())
+    return any(
+        (model.is_alive or model.model_instance_id in scenario.present_destroyed_model_ids)
+        and model.model_instance_id in placed_ids
+        and (model_instance_id is None or model.model_instance_id == model_instance_id)
+        for model in rules_unit.own_models
+    )
+
+
+def scenario_rules_unit_view(
+    *, scenario: BattlefieldScenario, unit_instance_id: str
+) -> RulesUnitView:
+    view = rules_unit_view_from_armies(armies=scenario.armies, unit_instance_id=unit_instance_id)
+    return rules_unit_view_with_retained_models(
+        view=view, retained_model_ids=scenario.present_destroyed_model_ids
     )
 
 
@@ -78,7 +120,7 @@ def fight_present_rules_unit_views(*, state: GameState) -> tuple[RulesUnitView, 
     present_by_id = {
         view.unit_instance_id: view for view in placed_alive_rules_unit_views(state=state)
     }
-    for model_id in fight_on_death_model_ids_awaiting_attack(state=state):
+    for model_id in retained_model_ids(state=state):
         physical_unit_id = state.unit_instance_id_for_model(model_id)
         view = rules_unit_view_by_id(state=state, unit_instance_id=physical_unit_id)
         if view.component_unit_id_for_model(model_id) != physical_unit_id:

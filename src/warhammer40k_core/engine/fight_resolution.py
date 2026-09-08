@@ -86,7 +86,7 @@ from warhammer40k_core.engine.fight_movement_witness import (
     fight_movement_path_violation,
     validate_fight_witness_shape,
 )
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
+from warhammer40k_core.engine.fight_on_death import model_has_fight_action_authority
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -2502,7 +2502,7 @@ def _required_primary_melee_model_ids(
             continue
         if state is None and not model.is_alive:
             continue
-        if state is not None and not model_is_present_on_battlefield(
+        if state is not None and not model_has_fight_action_authority(
             state=state,
             model_instance_id=model.model_instance_id,
         ):
@@ -2572,7 +2572,7 @@ def _available_melee_weapons_for_unit(
     for model in unit.own_models:
         if state is None and not model.is_alive:
             continue
-        if state is not None and not model_is_present_on_battlefield(
+        if state is not None and not model_has_fight_action_authority(
             state=state,
             model_instance_id=model.model_instance_id,
         ):

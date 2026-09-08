@@ -84,6 +84,10 @@ def resolve_attack_sequence_mortal_wound_feel_no_pain(
         if is_deadly_demise
         else None
     )
+    if source_context.get("source_kind") == "hazardous":
+        from warhammer40k_core.engine.hazardous_retention import hazardous_retention_recorder
+
+        recorder = hazardous_retention_recorder(state=state, decisions=decisions, progress=progress)
     return resolve_mortal_wound_decision(
         state=state,
         decisions=decisions,
@@ -91,7 +95,7 @@ def resolve_attack_sequence_mortal_wound_feel_no_pain(
         result=result,
         next_request_id=next_request_id,
         dice_manager=dice_manager,
-        remove_destroyed_models=not is_deadly_demise,
+        remove_destroyed_models=recorder is None,
         logical_death_recorder=recorder,
     )
 

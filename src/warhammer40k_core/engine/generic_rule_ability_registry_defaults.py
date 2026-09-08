@@ -116,7 +116,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.shooting_selection_range import (
-    placed_alive_geometry_models_for_unit_placements,
+    geometry_models_for_unit_placements,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -1147,11 +1147,11 @@ def _unit_placements_within(
     second: UnitPlacement,
     distance_inches: float,
 ) -> bool:
-    first_models = placed_alive_geometry_models_for_unit_placements(
+    first_models = geometry_models_for_unit_placements(
         scenario=scenario,
         unit_placements=(first,),
     )
-    second_models = placed_alive_geometry_models_for_unit_placements(
+    second_models = geometry_models_for_unit_placements(
         scenario=scenario,
         unit_placements=(second,),
     )

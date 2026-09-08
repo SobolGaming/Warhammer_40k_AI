@@ -21,7 +21,7 @@ ARTIFACT_SCHEMA = "core-v2-july-rules-updates-source-package-v6"
 EXPECTED_SOURCE_PACKAGE_ID = "gw-11e-rules-and-event-updates-2026-07-22"
 EXPECTED_SOURCE_TITLE = "Warhammer 40,000 July 2026 Rules and Event Updates"
 EXPECTED_SOURCE_VERSION = "2026-07-22"
-EXPECTED_PACKAGE_HASH = "3608f6c6a26dabb2952482d8a47c1a153244af7bbf602a278b7b9d4eb5df3c3d"
+EXPECTED_PACKAGE_HASH = "27ecf29d722d8d139420abf538fc00c5ad1cfb922b0b2816f15c46c978e9d84d"
 EXPECTED_EVENT_SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
 EXPECTED_UNIVERSAL_RULE_BEHAVIORS: Mapping[str, str] = MappingProxyType(
     {
@@ -183,9 +183,8 @@ EXPECTED_APP_REVIEW_AUDIT_SOURCE_OBSERVATION_BY_RULE_ID: Mapping[str, tuple[str,
     )
 )
 EXPECTED_FIGHT_ON_DEATH_RUNTIME_CONSUMERS = (
-    "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
-    "warhammer40k_core.engine.rule_model_destruction_fight_continuation:"
-    "remove_remaining_fight_on_death_models_at_phase_end",
+    "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection",
+    "warhammer40k_core.engine.retained_destruction_cleanup:begin_retained_destruction_cleanup",
 )
 EXPECTED_UNIVERSAL_DOCUMENT_METADATA = (
     "eng_22-07_warhammer40000_universal_rules_updates",

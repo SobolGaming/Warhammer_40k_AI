@@ -1011,12 +1011,13 @@ def test_total_carnage_current_round_source_opens_reaction_window() -> None:
     assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
     assert request.actor_id == "player-a"
     assert {option.option_id for option in request.options} >= {source.source_id}
-    rolled = _event_payloads(decisions, "destruction_reaction_trigger_rolled")
-    opened = _event_payloads(decisions, "destruction_reaction_window_opened")
+    rolled = _event_payloads(decisions, "fight_on_death_retention_trigger_resolved")
+    opened = _event_payloads(decisions, "fight_on_death_retention_opened")
     assert len(rolled) == 1
     assert len(opened) == 1
     assert rolled[0]["triggered"] is True
-    assert cast(dict[str, JsonValue], rolled[0]["selected_source"])["source_id"] == source.source_id
+    assert rolled[0]["applicable"] is True
+    assert cast(dict[str, JsonValue], rolled[0]["source"])["source_id"] == source.source_id
     assert _event_payloads(decisions, "destruction_reaction_trigger_not_applicable") == ()
 
 
@@ -1120,7 +1121,7 @@ def test_total_carnage_stale_source_does_not_trigger_after_blessing_expires() ->
         ),
     )
 
-    not_applicable = _event_payloads(decisions, "destruction_reaction_trigger_not_applicable")
+    not_applicable = _event_payloads(decisions, "fight_on_death_retention_trigger_resolved")
     assert remaining_sequence is None
     assert allocated_ids == (defender_model.model_instance_id,)
     assert status is None
@@ -1128,8 +1129,11 @@ def test_total_carnage_stale_source_does_not_trigger_after_blessing_expires() ->
     assert _event_payloads(decisions, "destruction_reaction_trigger_rolled") == ()
     assert _event_payloads(decisions, "destruction_reaction_window_opened") == ()
     assert len(not_applicable) == 1
-    selected_source = cast(dict[str, JsonValue], not_applicable[0]["selected_source"])
-    descriptor = cast(dict[str, JsonValue], not_applicable[0]["descriptor"])
+    assert not_applicable[0]["applicable"] is False
+    assert not_applicable[0]["trigger_roll"] is None
+    assert not_applicable[0]["triggered"] is False
+    selected_source = cast(dict[str, JsonValue], not_applicable[0]["source"])
+    descriptor = cast(dict[str, JsonValue], selected_source["payload"])
     assert cast(str, selected_source["source_id"]).startswith(army_rule.TOTAL_CARNAGE_HOOK_ID)
     assert descriptor["battle_round"] == 1
 

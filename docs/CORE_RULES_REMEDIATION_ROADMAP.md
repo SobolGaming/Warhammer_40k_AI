@@ -4293,3 +4293,77 @@ The revised runtime identity is
 `warhammer40k-core-v2:runtime-tree-sha256-v1:c90ed5c08e063f34eb3930e82c5c6ac116c39ca2fca7eee57227c1011fc3fc98`.
 No production code changed after the successful aggregate coverage run began.
 The correction is published through PR #433; merging remains separate.
+
+### Order 30 / P05B implementation record
+
+Finding `C05-02` is implemented with the approved extension to executable Shoot On
+Death and source-authorized shoot-or-fight alternatives. Logical death now opens
+one typed retained destruction record before removal or other destruction
+triggers. Acceptance preserves the exact original base for measurement,
+visibility, abilities, Stratagem targeting, Charge/attack targets, enemy
+Engagement and Fight movement constraints. Living movement actors and damage
+recipients remain distinct from retained battlefield presence.
+
+Fight entitlement uses the unit's ordinary activation under 05.04.05 and cleans
+up after that activation or at phase end. Shooting uses the ordinary out-of-phase
+proposal and attack executor, with weapons restricted to the destroyed model.
+One source selection chooses one action; it cannot activate unrelated models or
+grant both attacks. Deferred destruction, Deadly Demise, collateral casualties,
+Feel No Pain and destroyed transports share the same cleanup and exact-once
+physical-removal owner. Nested retained shooting preserves and restores each
+parent executor. Own-Hazardous deaths use the existing applied-mortal-wound
+destruction service, including casualties waiting for their individual reactions.
+
+Source authority is preserved by the offline generators and typed data loaders:
+
+- `core_fight_on_death_2026_09` pins the complete 05.04.05 observation and v931
+  retained-presence FAQ. Its artifact SHA-256 is
+  `2465e094b0c30db3321924367db7a995660e1524c7fde5876482397bd69acd9d`.
+- `retained_attack_sources_2026_09` pins For the Chapter! and Unending Fidelity,
+  browser-observed at `2026-09-08T01:39:45+00:00`, with App-data version 946
+  (released 2026-09-02). Its artifact SHA-256 is
+  `db0180dc622c1b77fc8963a271024bd005e676402dbb103528dfe5d16c091f87`.
+  Historical official faction-pack provenance remains separate from the current
+  maintained-mirror observations. Execution status and catalog fieldability are
+  recorded separately; these consumers do not certify complete faction coverage.
+
+For the Chapter! executes after enemy attacks or its own Hazardous death, allows
+prior shooting, and automatically passes Hazardous tests for the granted shots.
+Unending Fidelity uses the generic timed RuleIR grant and Stratagem pipeline,
+spends 1CP, and offers shoot or fight on a successful 4+ only when that model has
+neither shot nor fought in the phase. The common completed-pools event records
+model participation before deferred destruction or Hazardous tests.
+
+Contract 12 records the selected action, retained presence and nested shooting
+execution. Viewer projections and event streams use the shared redaction owner;
+operator persistence and replay authenticate source/cause, decisions, original
+placement, attack participation and completion against the exact engine build.
+Obsolete remove/re-add histories fail closed. See
+`ORDER_30_SCOPE_PLAN.md`, `ADAPTER_DECISION_CONTRACT.md` and
+`../contracts/migrations/11-to-12.md` for ownership and migration details.
+
+Facade regressions cover both executable actions, both source consumers,
+acceptance/decline/failed triggers, prior-action restrictions, own Hazardous and
+Feel No Pain, nested retaliatory shooting, collateral cleanup, transport
+decisions, stale submissions, checkpoint tampering and both viewers. Existing
+phase consumers and historical integrity regressions use retained presence.
+Final local Windows validation passed on 2026-09-08: 6,712 behavioral tests with
+85.01% coverage, then 391 code-quality tests without coverage, both using xdist
+work stealing. The eight-shard inventory was regenerated from that successful
+JUnit profile and its exact fail-closed check passed. Ruff check/format, mypy,
+Pyright, import-linter and pre-commit passed. Source generators and engine identity
+checks passed; the external contract passed its isolated base-ref check against
+`8668a87a1b45e0cc58a05e07802771fcb2dad06f`. The regenerated TypeScript client,
+five client unit tests, 342 live conformance assertions and installed-wheel smoke
+(2,609 runtime resources, 27 schemas, six request families) passed.
+
+The final runtime identity is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:a493d05a282ded9d4da39df68cd32ece932e070302ac1fcd39d2f907c3b05232`.
+Source-authority JSON uses platform-stable LF bytes with reviewed SHA-256
+`d729fc2d567b59321c4d8ffa0bc981632cda3aa402a56978a37e7932d14ac2d5`.
+No production code changed after the successful aggregate coverage run began.
+
+Scope remains C05-02 plus the two approved shooting consumers. P02D's model-keyword
+schema and P05C's post-removal former-footprint measurement remain separate.
+No new named handler, speculative hook family, architecture boundary or
+out-of-scope catalog support is introduced.

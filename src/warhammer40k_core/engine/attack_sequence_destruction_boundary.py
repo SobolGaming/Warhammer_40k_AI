@@ -20,6 +20,12 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.retained_destruction_selection import offer_fight_on_death_retention
+from warhammer40k_core.engine.retained_destruction_state import (
+    DestructionOwnerKind,
+    RetainedDestructionStage,
+    retained_destruction_for_model,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_attack_sequence_2026_09,
 )
@@ -224,6 +230,38 @@ def resolve_pending_attack_destruction_until_blocked(
         _begin_destroyed_transport_disembark_if_needed,
     )
     from warhammer40k_core.engine.attack_sequence_hit_wound import _emit_damage_event
+
+    retention_status = offer_fight_on_death_retention(
+        manager=manager,
+        state=state,
+        decisions=decisions,
+        model_instance_id=pending.damage_application.model_instance_id,
+        placement=ModelPlacement.from_payload(
+            cast(ModelPlacementPayload, pending.destroyed_model_placement)
+        ),
+        owner_kind=DestructionOwnerKind.ATTACK,
+        owner_context=cast(dict[str, JsonValue], attack_sequence.to_payload()),
+        sources=pending.destruction_sources,
+        provenance=DestructionProvenance.for_attack(
+            weapon_profile=pending.attack_pool.weapon_profile,
+            attack_context_id=pending.attack_context["attack_context_id"],
+        ),
+    )
+    if retention_status is not None:
+        return attack_sequence, retention_status
+    retained = retained_destruction_for_model(
+        state=state, model_instance_id=pending.damage_application.model_instance_id
+    )
+    if retained is not None and retained.stage is RetainedDestructionStage.WAITING:
+        return attack_sequence.without_current_pending_attack_destruction(), None
+    from warhammer40k_core.engine.retained_destruction_cleanup import (
+        destruction_waits_for_retained_casualty,
+    )
+
+    if destruction_waits_for_retained_casualty(
+        state=state, model_instance_id=pending.damage_application.model_instance_id
+    ):
+        return attack_sequence.without_current_pending_attack_destruction(), None
 
     updated_sequence, transport_status = _begin_destroyed_transport_disembark_if_needed(
         state=state,

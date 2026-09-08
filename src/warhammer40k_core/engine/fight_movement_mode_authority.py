@@ -8,6 +8,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.consolidation_objectives import legal_consolidation_objective_ids
 from warhammer40k_core.engine.fight_movement_source import (
@@ -24,7 +25,6 @@ from warhammer40k_core.engine.physical_engagement import (
 )
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    placed_alive_rules_unit_views,
     rules_unit_view_by_id,
 )
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -141,7 +141,7 @@ def _targetable_enemy_rules_units(
 ) -> tuple[RulesUnitView, ...]:
     return tuple(
         candidate
-        for candidate in placed_alive_rules_unit_views(state=state)
+        for candidate in fight_present_rules_unit_views(state=state)
         if candidate.owner_player_id != rules_unit.owner_player_id
     )
 

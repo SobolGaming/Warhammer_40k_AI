@@ -26,13 +26,13 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.destroyed_transport_rules_unit_disembark import (
     emergency_disembark_omitted_model_evidence_from_event_payload,
 )
-from warhammer40k_core.engine.emergency_disembark import (
-    transport_hazard_mortal_wounds_from_completion_event,
-)
 from warhammer40k_core.engine.event_log import EventLog, EventRecord
 from warhammer40k_core.engine.mortal_wound_application_authority import (
-    direct_mortal_wound_damage_snapshot_from_event,
     validate_direct_mortal_wound_application_event_authority,
+)
+from warhammer40k_core.engine.mortal_wound_physical_history import (
+    apply_logical_death_physical_authority,
+    physical_mortal_wound_damage_snapshot_from_event,
 )
 from warhammer40k_core.engine.objective_control_record_authority import (
     objective_control_record_hash,
@@ -55,12 +55,6 @@ from warhammer40k_core.engine.primary_mission_event_decision_authority import (
 from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
     PhysicalAuthorityState as _PhysicalAuthority,
 )
-from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
-    apply_fight_on_death_awaiting as _apply_fight_on_death_awaiting,
-)
-from warhammer40k_core.engine.primary_mission_fight_on_death_physical_history import (
-    apply_fight_on_death_removed as _apply_fight_on_death_removed,
-)
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
     PrimaryScoringBoundaryStatus,
 )
@@ -82,9 +76,6 @@ from warhammer40k_core.engine.return_on_death import (
 from warhammer40k_core.engine.scoring import (
     PrimaryUnitDestructionState,
     PrimaryUnitDestructionStatePayload,
-)
-from warhammer40k_core.engine.transports import (
-    DestroyedTransportHazardRolls,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     model_restoration_events_for_event_log_interval,
@@ -634,23 +625,19 @@ def _physical_authority_by_model(
     applied_fall_back_transitions: dict[tuple[str, str], BattlefieldTransitionBatch] = {}
     applied_direct_mortal_wound_damage: dict[str, set[DamageApplication]] = {}
     for event in event_records:
-        damage_snapshot = direct_mortal_wound_damage_snapshot_from_event(event)
+        damage_snapshot = physical_mortal_wound_damage_snapshot_from_event(
+            event, event_records=event_records
+        )
         if damage_snapshot is not None:
-            application_id, applications = damage_snapshot
+            application_id, applications, expected_presence = damage_snapshot
             applied = applied_direct_mortal_wound_damage.setdefault(application_id, set())
             for damage in applications:
                 if damage in applied:
                     continue
-                _apply_damage_application(authority=authority, damage=damage)
+                _apply_damage_application(
+                    authority=authority, damage=damage, expected_presence=expected_presence
+                )
                 applied.add(damage)
-        transport_hazard = transport_hazard_mortal_wounds_from_completion_event(event)
-        if (
-            transport_hazard is not None
-            and type(transport_hazard.disembark) is DestroyedTransportHazardRolls
-            and transport_hazard.mortal_wound_application is not None
-        ):
-            for damage in transport_hazard.mortal_wound_application.applications:
-                _apply_damage_application(authority=authority, damage=damage)
         transition = authoritative_battlefield_transition_batch_or_none(event=event)
         if event.event_type == "fall_back_move_applied":
             transition = authoritative_battlefield_transition_batch_or_none(
@@ -693,7 +680,9 @@ def _physical_authority_by_model(
                 authority=authority,
                 event=event,
             )
-        if event.event_type == "attack_sequence_step":
+        if event.event_type == "model_logical_death_recorded":
+            apply_logical_death_physical_authority(authority=authority, event=event)
+        elif event.event_type == "attack_sequence_step":
             _apply_damage_step(authority=authority, event=event)
         elif event.event_type == "healing_step_resolved":
             _apply_healing_step(
@@ -703,10 +692,6 @@ def _physical_authority_by_model(
             )
         elif event.event_type == "model_destroyed":
             _apply_model_destroyed(authority=authority, event=event)
-        elif event.event_type == "fight_on_death_model_awaiting_attack":
-            _apply_fight_on_death_awaiting(authority=authority, event=event)
-        elif event.event_type == "fight_on_death_models_removed":
-            _apply_fight_on_death_removed(authority=authority, event=event)
         elif event.event_type == "primary_battlefield_departure_recorded":
             _apply_departure(
                 authority=authority,
@@ -1010,11 +995,20 @@ def _apply_damage_application(
     *,
     authority: dict[str, _PhysicalAuthority],
     damage: DamageApplication,
+    expected_presence: str = "battlefield",
 ) -> None:
     prior = authority.get(damage.model_instance_id)
+    expected_presences = {expected_presence}
+    if expected_presence == "embarked":
+        expected_presences.add("off_battlefield")
     if prior is not None and (
         prior.wounds_remaining == damage.final_wounds_remaining
-        and prior.presence in ({"destroyed"} if damage.destroyed else {None, "battlefield"})
+        and prior.presence
+        in (
+            {"destroyed", None, *expected_presences}
+            if damage.destroyed
+            else {None, *expected_presences}
+        )
     ):
         return
     if prior is not None and (
@@ -1022,12 +1016,12 @@ def _apply_damage_application(
             prior.wounds_remaining is not None
             and prior.wounds_remaining != damage.starting_wounds_remaining
         )
-        or (prior.presence is not None and prior.presence != "battlefield")
+        or (prior.presence is not None and prior.presence not in expected_presences)
     ):
         raise GameLifecycleError("Primary mission damage history is discontinuous.")
     authority[damage.model_instance_id] = _PhysicalAuthority(
-        presence="destroyed" if damage.destroyed else None if prior is None else prior.presence,
-        pose=None if damage.destroyed else None if prior is None else prior.pose,
+        presence=None if prior is None else prior.presence,
+        pose=None if prior is None else prior.pose,
         wounds_remaining=damage.final_wounds_remaining,
     )
 

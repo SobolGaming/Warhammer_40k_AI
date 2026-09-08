@@ -713,6 +713,7 @@ def validate_model_destruction_cause_producer_restore(
     _mdccr.validate_pending_model_destruction_cause_inventory(
         state=state,
         event_records=event_records,
+        decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
     )
 

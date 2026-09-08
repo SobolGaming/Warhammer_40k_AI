@@ -14,7 +14,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battlefield_presence import (
     battlefield_scenario_for_state,
-    rules_unit_has_placed_alive_model,
+    rules_unit_has_present_model,
 )
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
@@ -916,7 +916,7 @@ def _unit_is_enemy_within_mantle_of_gloom(
         state=state,
         unit_instance_id=target_unit_instance_id,
     )
-    if not rules_unit_has_placed_alive_model(
+    if not rules_unit_has_present_model(
         state=state,
         rules_unit=target_rules_unit,
     ):
@@ -986,7 +986,7 @@ def _enemy_rules_unit_ids_within_engagement_range(
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
             unit_instance_id=bearer_rules_unit.unit_instance_id,
         )
-        if rules_unit_has_placed_alive_model(
+        if rules_unit_has_present_model(
             state=state,
             rules_unit=rules_unit_view_by_id(
                 state=state,
@@ -1011,7 +1011,7 @@ def _component_unit_has_placed_alive_model(
     if type(component_unit) is not UnitInstance:
         raise GameLifecycleError("Shadow Legion model presence lookup requires UnitInstance.")
     return any(
-        rules_unit_has_placed_alive_model(
+        rules_unit_has_present_model(
             state=state,
             rules_unit=rules_unit,
             model_instance_id=model.model_instance_id,

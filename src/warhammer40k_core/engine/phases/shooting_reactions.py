@@ -86,6 +86,13 @@ def _complete_out_of_phase_shooting(
             "removed_grant_effects": [effect.to_payload() for effect in removed_grant_effects],
         },
     )
+    from warhammer40k_core.engine.retained_shooting import complete_retained_shooting
+
+    retention_status = complete_retained_shooting(
+        state=state, decisions=decisions, completed_state=completed_state
+    )
+    if retention_status is not None:
+        return retention_status
     state.replace_out_of_phase_shooting_state(None)
     return LifecycleStatus.advanced(
         stage=GameLifecycleStage.BATTLE,

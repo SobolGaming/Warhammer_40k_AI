@@ -20,6 +20,7 @@ from tools.build_core_command_phase_source import (
     CoreCommandPhaseSourceBuildError,
     build_core_command_phase_source_payload,
 )
+from tools.build_core_fight_on_death_source import build_payloads as build_fight_on_death_payloads
 from tools.build_core_movement_phase_source import build_payload as build_movement_source_payload
 from tools.build_core_other_concepts_source import (
     build_payload as build_other_concepts_source_payload,
@@ -60,6 +61,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_attached_units_2026_09,
     core_attack_sequence_2026_09,
     core_command_phase_2026_08,
+    core_fight_on_death_2026_09,
     core_movement_phase_2026_08,
     core_other_concepts_2026_08,
     core_rules,
@@ -75,6 +77,41 @@ CORE_RULES_REVIEW_AUDIT_PATH = Path("data/source_audits/40k_app/core_rules_2026_
 CORE_RULES_MAINTAINED_MIRROR_AUDIT_PATH = Path(
     "data/source_audits/maintained_app_mirrors/core_rules_2026_09_02.audit.json"
 )
+
+
+def test_order_30_source_package_is_pinned_reproducible_and_executable() -> None:
+    package = core_fight_on_death_2026_09
+    raw = Path(package.__file__).with_name("artifacts").joinpath("package.json").read_bytes()
+    artifact = package.validate_source_artifact_bytes(raw)
+    expected, audit = build_fight_on_death_payloads()
+    assert json.loads(raw) == expected
+    assert (
+        json.loads(
+            Path(
+                "data/source_audits/maintained_app_mirrors/fight_on_death_2026_09_07.audit.json"
+            ).read_bytes()
+        )
+        == audit
+    )
+    assert (
+        artifact.package_hash
+        == hashlib.sha256(
+            json.dumps(
+                {**expected, "package_hash": ""}, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest()
+    )
+    assert sorted(
+        package.source_package().source_evidence_catalog.records, key=lambda row: row.evidence_id
+    ) == sorted(package.source_evidence_records(), key=lambda row: row.evidence_id)
+    for rule in package.source_rules():
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "executable_engine_runtime"
+        for consumer in rule.runtime_consumer_ids:
+            module_name, attribute = consumer.split(":")
+            assert callable(vars(importlib.import_module(module_name))[attribute])
+    with pytest.raises(package.FightOnDeathSourceError, match="source bytes drifted"):
+        package.validate_source_artifact_bytes(raw + b"\n")
 
 
 def test_eleventh_core_rules_source_catalog_cites_local_pdf_and_round_trips() -> None:
@@ -761,10 +798,10 @@ def test_july_app_rows_pin_historical_owner_and_project_authoritative_mirror_evi
         july_rules_updates_2026_07.EXPECTED_ARTIFACT_SHA256
     )
     assert july_rules_updates_2026_07.EXPECTED_ARTIFACT_SHA256 == (
-        "d87e8847ac50ac483e93792be8af7a19b340873fbe3c9f8b9047d036f14d3249"
+        "59ab29a5f0c8780418ba3a7fac29e16f228f235cedc3644c2bb75e84b68708fb"
     )
     assert july_rules_updates_2026_07.PACKAGE_HASH == (
-        "3608f6c6a26dabb2952482d8a47c1a153244af7bbf602a278b7b9d4eb5df3c3d"
+        "27ecf29d722d8d139420abf538fc00c5ad1cfb922b0b2816f15c46c978e9d84d"
     )
     assert len(evidence_records) == 32
     assert len(rules_by_source_id) == len(source_package.evidence_required_source_ids) == 16
@@ -850,9 +887,8 @@ def test_july_app_rows_pin_historical_owner_and_project_authoritative_mirror_evi
         assert fight_on_death.load_support_status == "loaded"
         assert fight_on_death.semantic_execution_status == "partial_engine_runtime"
         assert fight_on_death.runtime_consumer_ids == (
-            "warhammer40k_core.engine.fight_on_death:restore_model_awaiting_fight_on_death",
-            "warhammer40k_core.engine.rule_model_destruction_fight_continuation:"
-            "remove_remaining_fight_on_death_models_at_phase_end",
+            "warhammer40k_core.engine.retained_destruction_selection:apply_retention_selection",
+            "warhammer40k_core.engine.retained_destruction_cleanup:begin_retained_destruction_cleanup",
         )
 
     objective_consolidation_records = evidence_by_source_id[
@@ -1243,7 +1279,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 18
+    assert len(scope.source_packages) == 19
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -3016,3 +3052,34 @@ def test_p01_source_package_pins_only_the_off_battlefield_command_obligation() -
     assert hashlib.sha256(rule.source_text.encode()).hexdigest() == rule.transcription_sha256
     with pytest.raises(source.OffBattlefieldBattleShockSourceError, match="reviewed pin"):
         source.validate_source_artifact_bytes(ARTIFACT_PATH.read_bytes() + b"\n")
+
+
+def test_order30_retained_attack_sources_pin_execution_and_fieldability() -> None:
+    from tools.build_retained_attack_sources import PATH, build_payload
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        retained_attack_sources_2026_09 as source,
+    )
+
+    raw = PATH.read_bytes()
+    assert json.loads(raw) == build_payload()
+    artifact = source.validate_source_artifact_bytes(raw)
+    package = source.source_package()
+    assert set(package.evidence_required_source_ids) == {
+        source.FOR_THE_CHAPTER_SOURCE_ID,
+        source.UNENDING_FIDELITY_SOURCE_ID,
+    }
+    for row in artifact.rules:
+        assert row.load_support_status == "loaded"
+        assert row.semantic_execution_status == "executable_engine_runtime"
+        assert not row.fieldability_certified
+        assert package.source_catalog.source_text_by_id(row.source_id).raw_text == row.source_text
+        assert source.rule_ir_for_source(row.source_id).to_payload() == row.rule_ir
+    assert artifact.version_evidence["statement"] == "Version 946\nReleased 2026-09-02."
+    assert len(artifact.historical_official_sources) == 2
+    with pytest.raises(source.RetainedAttackSourceError, match="bytes drifted"):
+        source.validate_source_artifact_bytes(raw + b"\n")
+    with pytest.raises(source.RetainedAttackSourceError, match="Unreviewed"):
+        source.rule_ir_for_source("unreviewed-source")
+    with pytest.raises(source.RetainedAttackSourceError, match="unregistered"):
+        source.observation_identity(row_id="unregistered-observation")

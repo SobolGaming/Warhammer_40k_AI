@@ -15,9 +15,10 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.physical_engagement import (
     current_rules_unit_is_physically_engaged,
 )
+from warhammer40k_core.engine.retained_model_presence import model_is_present_on_battlefield
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
+    rules_unit_views_for_state,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -55,9 +56,9 @@ def rules_unit_within_friendly_keyworded_models(
     if max_range_inches <= 0:
         raise GameLifecycleError("Keyworded-model proximity range must be positive.")
     source_view = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id)
-    source_models = _geometry_models_for_alive_models(
+    source_models = _geometry_models_for_present_models(
         state=state,
-        models=source_view.alive_models(),
+        models=source_view.own_models,
     )
     for army in state.army_definitions:
         if army.player_id != source_view.owner_player_id:
@@ -78,9 +79,9 @@ def rules_unit_within_friendly_keyworded_models(
                 return True
             if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
                 continue
-            candidate_models = _geometry_models_for_alive_models(
+            candidate_models = _geometry_models_for_present_models(
                 state=state,
-                models=tuple(model for model in unit.own_models if model.is_alive),
+                models=unit.own_models,
             )
             if any(
                 source_model.range_to(candidate_model) <= float(max_range_inches)
@@ -108,11 +109,11 @@ def rules_unit_within_friendly_keyworded_units(
     if max_range_inches <= 0:
         raise GameLifecycleError("Keyworded-unit proximity range must be positive.")
     source_view = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id)
-    source_models = _geometry_models_for_alive_models(
+    source_models = _geometry_models_for_present_models(
         state=state,
-        models=source_view.alive_models(),
+        models=source_view.own_models,
     )
-    for candidate_view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+    for candidate_view in rules_unit_views_for_state(state=state):
         if candidate_view.owner_player_id != source_view.owner_player_id:
             continue
         candidate_keywords = {*candidate_view.keywords, *candidate_view.faction_keywords}
@@ -125,9 +126,9 @@ def rules_unit_within_friendly_keyworded_units(
             return True
         if relationship is not AbilitySpatialRelationship.BATTLEFIELD:
             continue
-        candidate_models = _geometry_models_for_alive_models(
+        candidate_models = _geometry_models_for_present_models(
             state=state,
-            models=candidate_view.alive_models(),
+            models=candidate_view.own_models,
         )
         if any(
             source_model.range_to(candidate_model) <= float(max_range_inches)
@@ -138,16 +139,17 @@ def rules_unit_within_friendly_keyworded_units(
     return False
 
 
-def _geometry_models_for_alive_models(
+def _geometry_models_for_present_models(
     *,
     state: GameState,
     models: tuple[ModelInstance, ...],
 ) -> tuple[GeometryModel, ...]:
     if state.battlefield_state is None:
         raise GameLifecycleError("Model geometry lookup requires battlefield_state.")
-    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
     placed_models = tuple(
-        model for model in models if model.is_alive and model.model_instance_id in placed_model_ids
+        model
+        for model in models
+        if model_is_present_on_battlefield(state=state, model_instance_id=model.model_instance_id)
     )
     return tuple(
         geometry_model_for_placement(

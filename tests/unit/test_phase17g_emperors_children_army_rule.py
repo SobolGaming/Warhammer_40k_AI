@@ -33,6 +33,9 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.charge_targets import (
+    charge_target_candidates as _charge_target_candidates,
+)
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -68,7 +71,6 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
     ChargePhaseState,
-    _charge_target_candidates,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,

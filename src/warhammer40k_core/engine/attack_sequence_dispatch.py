@@ -139,6 +139,9 @@ def resolve_attack_sequence_until_blocked(
         if next_current is None:
             return None, allocated_model_ids, None
         current = next_current
+    from warhammer40k_core.engine.model_attack_history import record_models_attacked
+
+    record_models_attacked(state=state, decisions=decisions, sequence=current)
     current, status = _apply_deferred_mortal_wounds(
         state=state,
         decisions=decisions,
@@ -201,14 +204,9 @@ def resolve_attack_sequence_until_blocked(
         )
         if status is not None:
             return current, allocated_model_ids, status
-    decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": current.sequence_id,
-            "attacker_player_id": current.attacker_player_id,
-            "attacking_unit_instance_id": current.attacking_unit_instance_id,
-        },
-    )
+    from warhammer40k_core.engine.model_attack_history import record_attack_sequence_completed
+
+    record_attack_sequence_completed(decisions=decisions, sequence=current)
     hazardous_status = _resolve_hazardous_tests(
         state=state,
         decisions=decisions,
