@@ -58,6 +58,7 @@ def test_keyword_casualty_facade_restore_replay_and_both_viewers(retained: bool)
     import json
 
     from tests.model_keyword_helpers import mixed_keyword_shooting_session
+    from tests.model_keyword_target_helpers import assert_keyword_target_eligibility
     from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
 
     from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -70,6 +71,7 @@ def test_keyword_casualty_facade_restore_replay_and_both_viewers(retained: bool)
     session, model_id = mixed_keyword_shooting_session(retained=retained)
     pending_request(session)
     initial = session.lifecycle.to_payload()
+    assert_keyword_target_eligibility(session, present=True)
     accepted_retention = False
     for _ in range(45):
         state = session.lifecycle.state
@@ -105,6 +107,7 @@ def test_keyword_casualty_facade_restore_replay_and_both_viewers(retained: bool)
             assert state is not None
             view = rules_unit_view_by_id(state=state, unit_instance_id="army-beta:enemy")
             assert "PSYKER" in view.keywords
+            assert_keyword_target_eligibility(session, present=True)
             assert not next(m for m in view.own_models if m.model_instance_id == model_id).is_alive
             for viewer in ("player-a", "player-b"):
                 projection = session.view(viewer_player_id=viewer)
@@ -112,6 +115,7 @@ def test_keyword_casualty_facade_restore_replay_and_both_viewers(retained: bool)
             checkpoint = session.lifecycle.to_payload()
             session = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
             assert session.lifecycle.to_payload() == checkpoint
+            assert_keyword_target_eligibility(session, present=True)
         elif accepted_retention and request.decision_type == "select_shooting_unit":
             session.submit_option(
                 request_id=request.request_id,
@@ -128,6 +132,7 @@ def test_keyword_casualty_facade_restore_replay_and_both_viewers(retained: bool)
     view = rules_unit_view_by_id(state=state, unit_instance_id="army-beta:enemy")
     assert len(view.alive_models()) == 2
     assert "PSYKER" not in view.keywords
+    assert_keyword_target_eligibility(session, present=False)
     for viewer in ("player-a", "player-b"):
         projection = session.view(viewer_player_id=viewer)
         assert "PSYKER" not in projection["unit_display_by_id"]["army-beta:enemy"]["keywords"]

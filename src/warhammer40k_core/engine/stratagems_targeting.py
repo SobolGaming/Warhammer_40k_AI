@@ -443,14 +443,22 @@ def _target_unit_has_keyword(
     target_binding: StratagemTargetBinding,
     keyword: str,
 ) -> bool:
-    target_unit_id = _require_target_unit_id(target_binding)
-    canonical = _canonical_keyword(keyword)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id != target_unit_id:
-                continue
-            return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
-    raise GameLifecycleError("Stratagem target unit is unknown.")
+    return _canonical_keyword(keyword) in _target_unit_keyword_set(
+        state=state, target_binding=target_binding
+    )
+
+
+def _target_unit_keyword_set(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    faction: bool = False,
+) -> set[str]:
+    unit = rules_unit_view_by_id(
+        state=state, unit_instance_id=_require_target_unit_id(target_binding)
+    )
+    keywords = unit.faction_keywords if faction else unit.keywords
+    return {_canonical_keyword(keyword) for keyword in keywords}
 
 
 def _target_unit_within_controlled_objective_range(
@@ -532,11 +540,7 @@ def _target_unit_satisfies_required_keywords(
     required = {_canonical_keyword(keyword) for keyword in required_keywords}
     if not required:
         return True
-    target_unit_id = _require_target_unit_id(target_binding)
-    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
-    if unit is None:
-        raise GameLifecycleError("Stratagem target unit is unknown.")
-    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    stored = _target_unit_keyword_set(state=state, target_binding=target_binding)
     return required.issubset(stored)
 
 
@@ -575,11 +579,7 @@ def _target_unit_satisfies_required_keywords_any(
     required = {_canonical_keyword(keyword) for keyword in required_keywords_any}
     if not required:
         return True
-    target_unit_id = _require_target_unit_id(target_binding)
-    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
-    if unit is None:
-        raise GameLifecycleError("Stratagem target unit is unknown.")
-    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    stored = _target_unit_keyword_set(state=state, target_binding=target_binding)
     return bool(required & stored)
 
 
@@ -592,11 +592,7 @@ def _target_unit_satisfies_required_faction_keywords(
     required = {_canonical_keyword(keyword) for keyword in required_faction_keywords}
     if not required:
         return True
-    target_unit_id = _require_target_unit_id(target_binding)
-    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
-    if unit is None:
-        raise GameLifecycleError("Stratagem target unit is unknown.")
-    stored = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
+    stored = _target_unit_keyword_set(state=state, target_binding=target_binding, faction=True)
     return required.issubset(stored)
 
 
@@ -609,11 +605,7 @@ def _target_unit_has_excluded_keywords(
     excluded = {_canonical_keyword(keyword) for keyword in excluded_keywords}
     if not excluded:
         return False
-    target_unit_id = _require_target_unit_id(target_binding)
-    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
-    if unit is None:
-        raise GameLifecycleError("Stratagem target unit is unknown.")
-    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    stored = _target_unit_keyword_set(state=state, target_binding=target_binding)
     return bool(excluded & stored)
 
 
@@ -626,11 +618,7 @@ def _target_unit_has_excluded_faction_keywords(
     excluded = {_canonical_keyword(keyword) for keyword in excluded_faction_keywords}
     if not excluded:
         return False
-    target_unit_id = _require_target_unit_id(target_binding)
-    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
-    if unit is None:
-        raise GameLifecycleError("Stratagem target unit is unknown.")
-    stored = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
+    stored = _target_unit_keyword_set(state=state, target_binding=target_binding, faction=True)
     return bool(excluded & stored)
 
 
@@ -1369,7 +1357,7 @@ def _fire_overwatch_target_binding_error(
     if ruleset_descriptor is None or army_catalog is None:
         return "fire_overwatch_requires_shooting_rules_context"
     shooting_unit = _unit_by_id(state=state, unit_instance_id=shooting_unit_id)
-    if _unit_has_keyword(shooting_unit, "TITANIC"):
+    if _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="TITANIC"):
         return "fire_overwatch_unit_titanic"
     if _unit_is_within_enemy_engagement_range(
         state=state,

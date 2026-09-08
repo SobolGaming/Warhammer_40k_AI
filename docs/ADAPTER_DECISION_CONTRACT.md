@@ -5113,6 +5113,12 @@ datasheet abilities. Model identity persists through casualties, healing,
 materialization and split membership, so replay and historical validation can
 refer to the original model without granting it current presence.
 
+Live RuleIR target preflight and Stratagem eligibility, proposal validation,
+companion selection and generic effect keyword conditions consume that same
+state-backed authority, including faction keywords. Required and excluded keyword
+conditions therefore remain effective until retained-presence cleanup. This is
+the existing Contract 13 eligibility meaning; no submission or payload shape changes.
+
 Game views expose intrinsic `keywords`, `faction_keywords`, and
 `keyword_source_ids` on model display rows. Current unit display keywords use the
 canonical rules unit after formation visibility permits it; unrevealed opponent

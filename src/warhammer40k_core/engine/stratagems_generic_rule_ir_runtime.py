@@ -56,10 +56,9 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
     primary_reserve_entry_provider_from_accepted_stratagem_use,
 )
 from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveState
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     generic_rule_ir_execution_target_unit_ids,
-    unit_by_id,
     unit_has_keyword,
 )
 from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
@@ -73,7 +72,6 @@ from warhammer40k_core.engine.stratagems_model import (
 from warhammer40k_core.engine.stratagems_targeting import (
     destroyed_target_unit_ids_from_context,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -182,7 +180,7 @@ def resolve_generic_rule_ir_context_battle_shock(
     if required_source_keyword is not None:
         source_unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
         if not unit_has_keyword(
-            unit_by_id(state=state, unit_instance_id=source_unit_id),
+            rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id),
             required_source_keyword,
         ):
             return
@@ -412,7 +410,7 @@ def resolve_generic_rule_ir_return_destroyed_target(
     effect_payload: dict[str, JsonValue],
 ) -> None:
     target_unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
-    target_unit = unit_by_id(state=state, unit_instance_id=target_unit_id)
+    target_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     if not _unit_has_required_keyword_sequence(target_unit, effect_payload=effect_payload):
         return
     excluded_keyword = _optional_rule_effect_string_parameter(effect_payload, "excluded_keyword")
@@ -504,7 +502,7 @@ def _resolve_generic_roll_pool_mortal_wounds(
     )
     if required_keyword is not None:
         unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
-        unit = unit_by_id(state=state, unit_instance_id=unit_id)
+        unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
         if not unit_has_keyword(unit, required_keyword):
             return
     target_unit_id = effect_selection_unit_id(
@@ -614,7 +612,7 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
         context,
         key=_required_rule_effect_string_parameter(effect_payload, "target_unit_context_key"),
     )
-    source_unit = unit_by_id(
+    source_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=_single_execution_target_unit_id(state=state, use_record=use_record),
     )
@@ -1082,7 +1080,7 @@ def _selection_actor_player_id(
 
 
 def _unit_has_required_keyword_sequence(
-    unit: UnitInstance,
+    unit: RulesUnitView,
     *,
     effect_payload: dict[str, JsonValue],
 ) -> bool:
@@ -1104,7 +1102,7 @@ def _single_execution_target_unit_id(*, state: GameState, use_record: StratagemU
 
 def _source_keyword_bonus(
     *,
-    source_unit: UnitInstance,
+    source_unit: RulesUnitView,
     effect_payload: dict[str, JsonValue],
 ) -> int:
     keyword = _optional_rule_effect_string_parameter(effect_payload, "bonus_if_source_has_keyword")

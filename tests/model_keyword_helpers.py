@@ -43,7 +43,7 @@ def mixed_keyword_catalog() -> ArmyCatalog:
                 keywords=sheet.keywords.keywords
                 if row == specialist
                 else tuple(k for k in sheet.keywords.keywords if k != "PSYKER"),
-                faction_keywords=sheet.keywords.faction_keywords,
+                faction_keywords=sheet.keywords.faction_keywords if row == specialist else (),
                 source_ids=(f"{row.model_profile_id}:keyword-source",),
             )
             for row in sheet.model_profiles
@@ -79,15 +79,19 @@ def mixed_keyword_shooting_session(*, retained: bool = False) -> tuple[LocalGame
 
     mixed = mixed_keyword_catalog()
     catalog = replace(mixed, wargear=lethal_retained_attack_catalog().wargear)
+    shooter_ids = ("shooter", "second-shooter", "third-shooter")
     config = _config(
         game_id="order31-keyword-shooting",
-        alpha_unit_ids=("shooter", "second-shooter"),
+        alpha_unit_ids=shooter_ids,
         alpha_datasheets=None,
         alpha_unit_specs=tuple(
-            (name, "core-vehicle-monster", "core-vehicle-monster", 1)
-            for name in ("shooter", "second-shooter")
+            (name, "core-vehicle-monster", "core-vehicle-monster", 1) for name in shooter_ids
         ),
-        enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 2),
+        enemy_datasheet=None,
+        enemy_unit_specs=(
+            ("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 2),
+            ("support", "core-vehicle-monster", "core-vehicle-monster", 1),
+        ),
         catalog=catalog,
     )
     config = replace(
@@ -114,7 +118,7 @@ def mixed_keyword_shooting_session(*, retained: bool = False) -> tuple[LocalGame
         ),
     )
     lifecycle, units = _build_shooting_lifecycle(
-        alpha_unit_ids=("shooter", "second-shooter"),
+        alpha_unit_ids=shooter_ids,
         config_override=config,
         enemy_pose=Pose.at(30, 35),
     )

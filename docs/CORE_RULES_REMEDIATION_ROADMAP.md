@@ -4462,13 +4462,26 @@ changes now update real model assignments.
 The shared redaction module also removes unrevealed attachment tags from model
 keyword provenance and unit inventories; a two-viewer regression covers the leak.
 
+The PR #435 review correction routes live RuleIR target preflight and Stratagem
+required, any-of, excluded and faction-keyword gates through state-backed
+`RulesUnitView`. The same-class audit also migrated single-keyword target policies,
+companion enumeration/validation and shared generic Stratagem effect conditions.
+Those shared effect helpers now require `RulesUnitView` explicitly. The casualty
+regression checks actual RuleIR preflight and parameterized Stratagem submission
+validation while alive, retained, restored and removed, including ordinary
+casualties and both companion directions. Exact replay and both viewers remain
+covered. Static guards protect the current-eligibility boundary. Model-owned
+queries keep their applicable presence policy; roster/mustering and historical
+source-snapshot queries keep their separate identity populations. `UnitInstance`
+continues to expose only living physical component keywords.
+
 **Generated artifacts and documentation:** Pinned source JSON and maintained-mirror
 audit/registry; engine build identity; Contract 13 schemas, examples, immutable new
 baseline and TypeScript models; adapter contract/migration documentation and the
 complete eight-shard test inventory.
 
 **Validation results:** Final production tree passed on 2026-09-08: 6,732
-behavioral tests with 85.02% coverage, followed by 393 code-quality tests without
+behavioral tests with 85.02% coverage, followed by 394 code-quality tests without
 coverage, both using xdist work stealing. The successful coverage run used 18
 workers and an isolated coverage database; its JUnit report regenerated all eight
 shards and the exact fail-closed inventory check passed. Ruff check/format, mypy,
@@ -4481,7 +4494,7 @@ and six request families. No production code changed after this successful
 aggregate coverage run began.
 
 Published runtime identity:
-`warhammer40k-core-v2:runtime-tree-sha256-v1:91ea86186c4672cffd2f60b007c51d1fc0dd9d6e02a0cfeb5f230bb5dc354f82`.
+`warhammer40k-core-v2:runtime-tree-sha256-v1:b3b62ca8b174a3eb04f67254ba508cd8fa612d55a9c204a6b9e565b6f7a45437`.
 
 **PR URL and merge commit:**
 <https://github.com/SobolGaming/Warhammer_40k_AI/pull/435>. Merge pending; merge

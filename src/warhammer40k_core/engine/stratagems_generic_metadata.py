@@ -6,6 +6,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems_model import (
     StratagemDefinition,
     StratagemEligibilityContext,
@@ -154,14 +155,16 @@ def companion_effect_selections_for_binding(
     selections: list[JsonValue] = []
     if _payload_bool_or_false(payload, COMPANION_OPTIONAL_KEY):
         selections.append(None)
-    target_unit = unit_by_id(state=state, unit_instance_id=target_unit_id)
+    target_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     for unit in friendly_units(state=state, player_id=context.player_id):
         if unit.unit_instance_id == target_unit_id:
             continue
         if not companion_keywords_match(
             payload=payload,
             target_unit=target_unit,
-            companion_unit=unit,
+            companion_unit=rules_unit_view_by_id(
+                state=state, unit_instance_id=unit.unit_instance_id
+            ),
         ):
             continue
         if _payload_bool_or_false(
@@ -245,7 +248,7 @@ def companion_selection_error(
         ).unit_instance_id
     ):
         return "companion_unit_is_target"
-    companion = unit_by_id(state=state, unit_instance_id=companion_id)
+    companion = rules_unit_view_by_id(state=state, unit_instance_id=companion_id)
     if unit_owner_player_id(state=state, unit_instance_id=companion_id) != context.player_id:
         return "companion_unit_not_friendly"
     if _payload_bool_or_false(
@@ -272,7 +275,7 @@ def companion_selection_error(
         status=companion_status,
     ):
         return "companion_unit_missing_contextual_status"
-    target_unit = unit_by_id(state=state, unit_instance_id=target_unit_id)
+    target_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     if not companion_keywords_match(
         payload=payload,
         target_unit=target_unit,
@@ -352,8 +355,8 @@ def unit_has_contextual_status(
 def companion_keywords_match(
     *,
     payload: dict[str, JsonValue],
-    target_unit: UnitInstance,
-    companion_unit: UnitInstance,
+    target_unit: RulesUnitView,
+    companion_unit: RulesUnitView,
 ) -> bool:
     mapping = payload.get(COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY)
     if mapping is None:
@@ -413,15 +416,15 @@ def unit_owner_player_id(*, state: GameState, unit_instance_id: str) -> str:
     raise GameLifecycleError("Generic stratagem metadata unit owner is unknown.")
 
 
-def unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Generic stratagem metadata keyword lookup requires a unit.")
+def unit_has_keyword(unit: RulesUnitView, keyword: str) -> bool:
     return _canonical_keyword(keyword) in unit_keyword_set(unit)
 
 
-def unit_keyword_set(unit: UnitInstance) -> set[str]:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Generic stratagem metadata keyword set requires a unit.")
+def unit_keyword_set(unit: RulesUnitView) -> set[str]:
+    if type(unit) is not RulesUnitView:
+        raise GameLifecycleError(
+            "Generic stratagem keyword lookup requires a current RulesUnitView."
+        )
     return {_canonical_keyword(keyword) for keyword in (*unit.keywords, *unit.faction_keywords)}
 
 

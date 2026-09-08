@@ -45,3 +45,54 @@ def test_model_keyword_consumers_do_not_infer_ownership_from_component_keywords(
                 ):
                     violations.append(f"{name}:{node.lineno}")
     assert not violations, "Model scope inherited whole-component keywords: " + repr(violations)
+
+
+def test_current_keyword_gates_use_state_backed_rules_unit_authority() -> None:
+    required_calls = {
+        "rule_target_resolution.py": {
+            "target_spec_keyword_unavailable_reason": "rules_unit_view_by_id",
+        },
+        "stratagems_targeting.py": {
+            "_target_unit_keyword_set": "rules_unit_view_by_id",
+            "_target_unit_has_keyword": "_target_unit_keyword_set",
+            "_target_unit_satisfies_required_keywords": "_target_unit_keyword_set",
+            "_target_unit_satisfies_required_keywords_any": "_target_unit_keyword_set",
+            "_target_unit_satisfies_required_faction_keywords": "_target_unit_keyword_set",
+            "_target_unit_has_excluded_keywords": "_target_unit_keyword_set",
+            "_target_unit_has_excluded_faction_keywords": "_target_unit_keyword_set",
+            "_fire_overwatch_target_binding_error": "_target_unit_has_keyword",
+        },
+        "stratagems_geometry.py": {
+            "_heroic_intervention_target_binding_error": "_target_unit_has_keyword",
+            "_epic_challenge_context_error": "_target_unit_has_keyword",
+        },
+        "stratagems_generic_metadata.py": {
+            "companion_effect_selections_for_binding": "rules_unit_view_by_id",
+            "companion_selection_error": "rules_unit_view_by_id",
+            "companion_keywords_match": "unit_keyword_set",
+            "unit_has_keyword": "unit_keyword_set",
+        },
+    }
+    for module, gates in required_calls.items():
+        functions = {
+            node.name: node
+            for node in ast.parse((ENGINE / module).read_text()).body
+            if isinstance(node, ast.FunctionDef)
+        }
+        for function, required in gates.items():
+            calls = {
+                node.func.id
+                for node in ast.walk(functions[function])
+                if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+            }
+            assert required in calls, f"{module}:{function} bypasses current keyword authority"
+            assert "_unit_has_keyword" not in calls, f"{module}:{function} uses component keywords"
+    metadata = ast.parse((ENGINE / "stratagems_generic_metadata.py").read_text())
+    keyword_set = next(
+        node
+        for node in metadata.body
+        if isinstance(node, ast.FunctionDef) and node.name == "unit_keyword_set"
+    )
+    annotation = keyword_set.args.args[0].annotation
+    assert annotation is not None
+    assert ast.unparse(annotation) == "RulesUnitView", "Keyword helper must reject physical units"

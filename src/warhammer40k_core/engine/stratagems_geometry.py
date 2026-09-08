@@ -130,9 +130,11 @@ def _heroic_intervention_target_binding_error(
     target_binding: StratagemTargetBinding,
 ) -> str | None:
     target_unit_id = _require_target_unit_id(target_binding)
-    target_unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
-    if _unit_has_keyword(target_unit, "VEHICLE") and not (
-        _unit_has_keyword(target_unit, "CHARACTER") or _unit_has_keyword(target_unit, "WALKER")
+    if _target_unit_has_keyword(
+        state=state, target_binding=target_binding, keyword="VEHICLE"
+    ) and not (
+        _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="CHARACTER")
+        or _target_unit_has_keyword(state=state, target_binding=target_binding, keyword="WALKER")
     ):
         return "heroic_intervention_vehicle_not_character_or_walker"
     if _unit_is_within_enemy_engagement_range(
@@ -243,7 +245,9 @@ def _epic_challenge_context_error(
     unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
     if model_id not in unit.own_model_ids():
         return "epic_challenge_model_not_in_unit"
-    if not _unit_has_keyword(unit, "CHARACTER"):
+    if not _target_unit_has_keyword(
+        state=state, target_binding=target_binding, keyword="CHARACTER"
+    ):
         return "epic_challenge_unit_not_character"
     if not _model_is_alive_and_placed(state=state, model_instance_id=model_id):
         return "epic_challenge_model_not_alive_and_placed"
