@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a493d05a282ded9d4da39df68cd32ece932e070302ac1fcd39d2f907c3b05232",
-  "fingerprint": "a493d05a282ded9d4da39df68cd32ece932e070302ac1fcd39d2f907c3b05232",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:39acb9c8f509be9dac75cf49f98bbde371b2d2690a9aaecff2f48291628843df",
+  "fingerprint": "39acb9c8f509be9dac75cf49f98bbde371b2d2690a9aaecff2f48291628843df",
   "resource_count": 2609,
   "resources": [
     {
@@ -10705,9 +10705,9 @@
       "sha256": "85e4d90c6ef2edb897c164b21a2a44e626d2bd4dbeed34bf67bfcc37dfda2cc3"
     },
     {
-      "byte_length": 8353,
+      "byte_length": 8583,
       "path": "warhammer40k_core/engine/retained_attack_grants.py",
-      "sha256": "51b937ed3e1725f6f6ef918fc889fda6d526b89a9f6527b8e3065976a5d7b863"
+      "sha256": "1b18194c993fe6faa76e3e1c02b07ed93cc3b4e8f51c2ff093a83b1118f981cd"
     },
     {
       "byte_length": 3504,
@@ -10760,14 +10760,14 @@
       "sha256": "afbbf65c002752a94f98e6b1026a1fbaf25b4c7446c1a7d2180fd229cc3b44ca"
     },
     {
-      "byte_length": 17191,
+      "byte_length": 18775,
       "path": "warhammer40k_core/engine/retained_shooting.py",
-      "sha256": "9dff6ad054f505fb536e92a2d84954c597ae4cd1850fdbc6ffde7288c6e45178"
+      "sha256": "20587752bcf85aa157496aa5e33752d1c333a20c07dd92bfea812bce43f60fb2"
     },
     {
-      "byte_length": 13405,
+      "byte_length": 13633,
       "path": "warhammer40k_core/engine/retained_shooting_history.py",
-      "sha256": "bbfaeb9a5e4fd31e3e4d2137751764027ee525d57dd5f4c21f171d8d00ee66f2"
+      "sha256": "82c6de25ae68aefd78cc899ce0f49d88e919e7b2397e76723bd63673f0167546"
     },
     {
       "byte_length": 39094,
@@ -11155,9 +11155,9 @@
       "sha256": "35f0624a72f90fa3c3fb735d2231f84399047b8b7d42c62ec3680aa25326ba6a"
     },
     {
-      "byte_length": 54402,
+      "byte_length": 54427,
       "path": "warhammer40k_core/engine/stratagems_eligibility.py",
-      "sha256": "1b3b99cdb311a253c06d3cdb40969f6ec61b4481b295548be1a1440640ad0625"
+      "sha256": "3773fca6080ec2553fbd950965c2593b41cbbea31b21ff76c278847ad0b3f966"
     },
     {
       "byte_length": 14009,
@@ -11225,9 +11225,9 @@
       "sha256": "ad53fddcb9d4fd45ddc48c80339b87dfdd2a3dfb84ea06b43d81935887bc62ba"
     },
     {
-      "byte_length": 61192,
+      "byte_length": 61534,
       "path": "warhammer40k_core/engine/stratagems_targeting.py",
-      "sha256": "b00ce4b8d0b56610512ec3737dca54ebbb7ef859047a81dcc7df79fc3ab74cef"
+      "sha256": "d8ed4a13c67ada1b70fe098e7a1d0e9e2f1aa1e21e172cf92c5fa4225d4d3306"
     },
     {
       "byte_length": 1250,

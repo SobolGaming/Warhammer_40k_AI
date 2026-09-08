@@ -2168,6 +2168,21 @@ progress and exact-once completion against the event and decision histories.
 Obsolete `fight_on_death_awaiting_attack` effects and remove/re-add events fail
 closed; adapters cannot reconstruct or move the retained base.
 
+Each private retained-shooting execution and its start event require
+`parent_cause_id` (null for the root). Completion, resumption and restoration use
+the validated root-to-child chain, independently of the globally sorted effect
+inventory. Missing parents, multiple roots/children, cycles and disagreement
+with chronological start events fail closed. The runtime build identity rejects
+earlier checkpoints without this required authority field.
+
+Retained grants use the shared rules-unit effect applications: canonical attached
+identities, physical components and split predecessors discover each effect once
+per model. The selected-target Stratagem validator matches a physical option to
+its current rules-unit view before comparing the attack's selected targets. Its
+existing finite option IDs and submission envelopes are unchanged; generic RuleIR
+continues to persist the canonical target. No additional viewer-visible field is
+introduced by these corrections.
+
 The versioned `core_fight_on_death_2026_09` JSON artifact pins 05.04.05 and the
 v931 retained-presence FAQ under the maintained App-mirror source policy. Both
 source rows are loaded and executable through the shared retention and ability

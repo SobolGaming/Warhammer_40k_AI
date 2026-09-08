@@ -142,6 +142,9 @@ def persisted_retained_attack_sources(
     state: GameState,
     model_instance_id: str,
 ) -> tuple[DestructionReactionSource, ...]:
+    from warhammer40k_core.engine.rules_unit_effects import (
+        rules_unit_effect_applications_from_inventory,
+    )
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
     owners = [
@@ -154,7 +157,13 @@ def persisted_retained_attack_sources(
         raise GameLifecycleError("Retained attack source query requires one physical model owner.")
     view = rules_unit_view_by_id(state=state, unit_instance_id=owners[0].unit_instance_id)
     result: list[DestructionReactionSource] = []
-    for effect in state.persisting_effects:
+    applications = rules_unit_effect_applications_from_inventory(
+        armies=tuple(state.army_definitions),
+        effects=tuple(state.persisting_effects),
+        rules_unit=view,
+    )
+    for application in applications:
+        effect = application.effect
         payload = effect.effect_payload
         if not isinstance(payload, dict) or payload.get("effect_kind") != GENERIC_RULE_EFFECT_KIND:
             continue
@@ -164,9 +173,7 @@ def persisted_retained_attack_sources(
         grant = retained_attack_grant_for_effect(
             RuleEffectSpec.from_payload(cast(RuleEffectSpecPayload, raw_effect))
         )
-        if grant is None or not any(
-            effect.applies_to_unit(unit_id) for unit_id in view.component_unit_instance_ids
-        ):
+        if grant is None:
             continue
         if effect.owner_player_id != view.owner_player_id:
             raise GameLifecycleError(

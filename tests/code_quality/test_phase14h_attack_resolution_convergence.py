@@ -44,6 +44,12 @@ def test_retained_attack_paths_share_selection_dice_presence_and_removal_owners(
         assert calls
         assert all(any(keyword.arg == "manager" for keyword in call.keywords) for call in calls)
     shooting = source_for(engine / "retained_shooting.py")
+    grants = source_for(engine / "retained_attack_grants.py")
+    assert "rules_unit_effect_applications_from_inventory(" in grants
+    assert ".applies_to_unit(" not in grants
+    assert "parent_cause_id" in shooting
+    history = source_for(engine / "retained_shooting_history.py")
+    assert "retained_shooting_executions(state=state)" in history
     hazardous = source_for(engine / "hazardous_retention.py")
     assert "begin_retained_destruction_cleanup(" in shooting
     request_builder = next(

@@ -36,6 +36,10 @@ def validate_retained_shooting_history(
             selected[_string(payload, "cause_id")] = payload
         elif event.event_type == "retained_shooting_started":
             execution = RetainedShootingExecution.from_payload(event.payload)
+            if execution.parent_cause_id != (stack[-1].cause_id if stack else None):
+                raise GameLifecycleError(
+                    "Retained shooting parent differs from chronological history."
+                )
             if execution.cause_id not in opened or execution.cause_id not in selected:
                 raise GameLifecycleError(
                     "Retained shooting lacks its original destruction selection."

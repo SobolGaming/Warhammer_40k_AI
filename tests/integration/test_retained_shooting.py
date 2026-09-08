@@ -31,9 +31,12 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.retained_attack_permissions import RetainedAttackAction
 from warhammer40k_core.engine.retained_destruction_state import retained_destructions
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems import stratagem_decline_payload
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -358,7 +361,7 @@ def _assert_completed_retained_shooting_history_is_authenticated(
         with pytest.raises(GameLifecycleError, match=diagnostic):
             validate_retained_shooting_history(state=state, event_records=history)
     for event_type, diagnostic in (
-        ("retained_shooting_started", "entitlement drift"),
+        ("retained_shooting_started", "parent differs from chronological history"),
         ("retained_shooting_attacks_completed", "completed more than once"),
         ("retained_shooting_hazardous_automatically_passed", "weapon identity drift"),
     ):
@@ -523,24 +526,44 @@ def test_order_30_shoot_on_death_without_available_weapons_completes_once() -> N
 
 
 @pytest.mark.parametrize("action", [RetainedAttackAction.SHOOT, RetainedAttackAction.FIGHT])
+@pytest.mark.parametrize("attached", [False, True])
 def test_order_30_unending_fidelity_executes_one_selected_attack(
     action: RetainedAttackAction,
+    attached: bool,
 ) -> None:
     profile = retained_sources.stratagem_profile()
     lifecycle, units = fight_lifecycle(
         catalog=unending_fidelity_catalog(),
         game_id="order-30-fidelity",
         alpha_unit_ids=("alpha",),
-        enemy_unit_ids=("enemy",),
+        enemy_unit_ids=("enemy", "leader") if attached else ("enemy",),
+        enemy_unit_specs={"enemy": ("core-intercessor-like-infantry", "core-intercessor-like", 1)}
+        if attached
+        else None,
+        enemy_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader", bodyguard_unit_selection_id="enemy"
+            ),
+        )
+        if attached
+        else (),
         model_count=1,
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
-        origins={"alpha": Pose.at(10, 10), "enemy": Pose.at(12, 10)},
+        origins={
+            "alpha": Pose.at(10, 10),
+            "enemy": Pose.at(12, 10),
+            "leader": Pose.at(12, 11.5),
+        },
         fights_first_unit_keys=("alpha",),
         enemy_detachment_ids=(profile.detachment_id,),
     )
     state = lifecycle.state
     assert state is not None
+    target_view = rules_unit_view_by_id(
+        state=state, unit_instance_id=units["enemy"].unit_instance_id
+    )
+    assert (target_view.unit_instance_id != units["enemy"].unit_instance_id) is attached
     state.gain_command_points(
         player_id="player-b",
         amount=1,
@@ -566,6 +589,24 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID
             used = True
+            from warhammer40k_core.engine.retained_attack_grants import (
+                persisted_retained_attack_sources,
+            )
+
+            current = session.lifecycle.state
+            assert current is not None
+            grants = [
+                effect
+                for effect in current.persisting_effects
+                if effect.source_rule_id == profile.source_id
+            ]
+            assert len(grants) == 1
+            assert grants[0].target_unit_instance_ids == (target_view.unit_instance_id,)
+            for model in target_view.own_models:
+                sources = persisted_retained_attack_sources(
+                    state=current, model_instance_id=model.model_instance_id
+                )
+                assert len(sources) == 1, (target_view.unit_instance_id, model.model_instance_id)
             continue
         if request.decision_type == "select_destruction_reaction":
             break
@@ -590,10 +631,10 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
         option_id=f"{source.source_id}:{action.value}",
     )
     for _ in range(40):
-        assert (
-            GameLifecycle.from_payload(session.lifecycle.to_payload()).to_payload()
-            == session.lifecycle.to_payload()
-        )
+        checkpoint = session.lifecycle.to_payload()
+        restored = GameLifecycle.from_payload(checkpoint)
+        assert restored.to_payload() == checkpoint
+        session = LocalGameSession(lifecycle=restored)
         state = session.lifecycle.state
         assert state is not None
         assert state.battlefield_state is not None
@@ -609,6 +650,37 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
                 request_id=request.request_id,
                 result_id="fidelity-shot",
                 payload=validate_json_value(proposal.to_payload()),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        elif attached and request.decision_type == "submit_melee_declaration":
+            from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
+
+            melee = MeleeDeclarationProposalRequest.from_decision_request(request)
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id="fidelity-attached-fight",
+                payload={
+                    "proposal_request_id": melee.request_id,
+                    "proposal_kind": melee.proposal_kind,
+                    "player_id": melee.actor_id,
+                    "battle_round": melee.battle_round,
+                    "unit_instance_id": melee.unit_instance_id,
+                    "source_decision_request_id": melee.source_decision_request_id,
+                    "source_decision_result_id": melee.source_decision_result_id,
+                    "declarations": [
+                        {
+                            "attacker_model_instance_id": weapon["model_instance_id"],
+                            "wargear_id": weapon["wargear_id"],
+                            "weapon_profile_id": weapon["weapon_profile_id"],
+                            "target_allocations": [
+                                {"target_unit_instance_id": units["alpha"].unit_instance_id}
+                            ],
+                        }
+                        for weapon in cast(
+                            tuple[dict[str, JsonValue], ...], melee.available_weapons
+                        )
+                    ],
+                },
             )
             assert status.status_kind is not LifecycleStatusKind.INVALID, status
         else:
@@ -628,11 +700,21 @@ def test_order_30_unending_fidelity_executes_one_selected_attack(
     assert participations[0]["attack_phase"] == (
         "shooting" if action is RetainedAttackAction.SHOOT else "fight"
     )
+    assert (
+        sum(
+            event.event_type == "model_destroyed"
+            and isinstance(event.payload, dict)
+            and event.payload.get("model_instance_id") == model_id
+            for event in events
+        )
+        == 1
+    )
     assert not retained_destructions(state=state)
 
 
 @pytest.mark.parametrize(
-    "field", ["source_id", "model_instance_id", "source_result_id", "attacks_completed"]
+    "field",
+    ["source_id", "model_instance_id", "source_result_id", "attacks_completed", "parent_cause_id"],
 )
 def test_order_30_retained_shooting_restoration_rejects_execution_forgery(field: str) -> None:
     session, _model_id = pending_retained_attack(
@@ -931,15 +1013,27 @@ def test_order_30_unending_fidelity_rejects_a_model_that_already_fought() -> Non
         GameLifecycle.from_payload(forged)
 
 
-def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority() -> None:
+@pytest.mark.parametrize(
+    ("game_id", "child_before_parent"),
+    [("order-30-presence", False), ("order-30-presence-5", True)],
+)
+def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_authority(
+    game_id: str,
+    child_before_parent: bool,
+) -> None:
     session, parent_model_id = pending_retained_attack(
+        game_id=game_id,
         reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
         counter_shooting=True,
     )
     accepted_models: set[str] = set()
+    checked_child_checkpoint = False
+    initial = session.lifecycle.to_payload()
     restored = session.lifecycle
     state = restored.state
     assert state is not None
+    original_host = state.shooting_phase_state
+    assert original_host is not None
     for _ in range(50):
         request = pending_request(session)
         if request.decision_type == "select_destruction_reaction":
@@ -974,6 +1068,27 @@ def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_auth
         else:
             submit_fixture_request(session, request)
         checkpoint = session.lifecycle.to_payload()
+        started = [
+            event.payload
+            for event in session.lifecycle.decision_controller.event_log.records
+            if event.event_type == "retained_shooting_started"
+        ]
+        if len(started) == 2:
+            assert isinstance(started[0], dict)
+            assert isinstance(started[1], dict)
+            assert isinstance(started[0]["cause_id"], str)
+            assert isinstance(started[1]["cause_id"], str)
+            assert (started[1]["cause_id"] < started[0]["cause_id"]) is child_before_parent
+            if not checked_child_checkpoint:
+                assert pending_request(session).decision_type == "submit_shooting_declaration"
+                current = session.lifecycle.state
+                assert current is not None
+                assert current.shooting_phase_state is not None
+                assert (
+                    current.shooting_phase_state.active_selection == original_host.active_selection
+                )
+                _assert_invalid_retained_parent_chains(checkpoint)
+                checked_child_checkpoint = True
         restored = GameLifecycle.from_payload(checkpoint)
         assert restored.to_payload() == checkpoint
         session = LocalGameSession(lifecycle=restored)
@@ -986,6 +1101,7 @@ def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_auth
             )
             assert "retained_shooting_started" not in public
             assert "suspended_shooting" not in public
+            assert "parent_cause_id" not in public
             assert '"cause_id"' not in public
         state = restored.state
         assert state is not None
@@ -993,6 +1109,7 @@ def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_auth
         if parent_model_id in state.battlefield_state.removed_model_ids:
             break
     assert len(accepted_models) == 2
+    assert checked_child_checkpoint
     assert not retained_destructions(state=state)
     starts = [
         event
@@ -1002,6 +1119,21 @@ def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_auth
     assert len(starts) == 2
     assert isinstance(starts[1].payload, dict)
     assert starts[1].payload["suspended_shooting"] is not None
+    completions = [
+        event.payload
+        for event in restored.decision_controller.event_log.records
+        if event.event_type == "retained_shooting_resumed_parent"
+    ]
+    assert isinstance(starts[0].payload, dict)
+    assert [cast(dict[str, JsonValue], payload)["cause_id"] for payload in completions] == [
+        starts[1].payload["cause_id"],
+        starts[0].payload["cause_id"],
+    ]
+    assert state.out_of_phase_shooting_state is None
+    if state.shooting_phase_state is None:
+        assert state.current_battle_phase is not BattlePhase.SHOOTING
+    else:
+        assert state.shooting_phase_state.active_selection == original_host.active_selection
     for model_id in accepted_models:
         assert (
             sum(
@@ -1012,6 +1144,57 @@ def test_order_30_nested_retained_shooting_restores_each_parent_and_redacts_auth
             )
             == 1
         )
+    artifact = ReplayArtifact.capture(
+        artifact_id=f"nested-retained:{game_id}",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=restored,
+    )
+    replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+def _assert_invalid_retained_parent_chains(checkpoint: object) -> None:
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.retained_shooting import retained_shooting_executions
+
+    for mutation, message in (
+        ("missing_field", "fields drift"),
+        ("missing_parent", "missing parent"),
+        ("self_parent", "own parent"),
+        ("multiple_roots", "multiple children or roots"),
+        ("cycle", "cyclic or disconnected"),
+    ):
+        forged = json.loads(json.dumps(checkpoint))
+        executions = [
+            effect["effect_payload"]["execution"]
+            for effect in forged["state"]["persisting_effects"]
+            if effect["effect_payload"].get("effect_kind") == "retained_destruction_shooting"
+        ]
+        root = next(item for item in executions if item["parent_cause_id"] is None)
+        child = next(item for item in executions if item["parent_cause_id"] is not None)
+        if mutation == "missing_field":
+            del child["parent_cause_id"]
+        elif mutation == "missing_parent":
+            child["parent_cause_id"] = "absent-parent"
+        elif mutation == "self_parent":
+            child["parent_cause_id"] = child["cause_id"]
+        elif mutation == "multiple_roots":
+            child["parent_cause_id"] = None
+        else:
+            root["parent_cause_id"] = child["cause_id"]
+        with pytest.raises(GameLifecycleError, match=message):
+            retained_shooting_executions(state=GameState.from_payload(forged["state"]))
+        with pytest.raises(GameLifecycleError, match="Retained shooting"):
+            GameLifecycle.from_payload(forged)
+    forged = json.loads(json.dumps(checkpoint))
+    starts = [
+        event
+        for event in forged["decisions"]["event_log"]
+        if event["event_type"] == "retained_shooting_started"
+    ]
+    starts[1]["payload"]["parent_cause_id"] = None
+    with pytest.raises(GameLifecycleError, match="parent differs from chronological history"):
+        GameLifecycle.from_payload(forged)
 
 
 def test_order_30_multiple_hazardous_casualties_keep_each_pending_authority() -> None:

@@ -99,7 +99,7 @@ def unending_fidelity_catalog() -> ArmyCatalog:
                     )
                     for option in sheet.wargear_options
                 )
-                if sheet.datasheet_id == "core-character-leader"
+                if sheet.datasheet_id in {"core-character-leader", "core-intercessor-like-infantry"}
                 else sheet.wargear_options,
             )
             for sheet in catalog.datasheets
@@ -158,6 +158,7 @@ def lethal_retained_attack_catalog() -> ArmyCatalog:
 
 def pending_retained_attack(
     *,
+    game_id: str = "order-30-presence",
     deadly_demise: bool = False,
     cleanup_feel_no_pain: bool = False,
     collateral_retention: bool = False,
@@ -171,7 +172,7 @@ def pending_retained_attack(
 ) -> tuple[LocalGameSession, str]:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=lethal_retained_attack_catalog(),
-        game_id="order-30-presence",
+        game_id=game_id,
         alpha_unit_ids=("intercessor-1", "intercessor-2"),
         enemy_model_count=3,
     )

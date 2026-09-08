@@ -4347,7 +4347,7 @@ acceptance/decline/failed triggers, prior-action restrictions, own Hazardous and
 Feel No Pain, nested retaliatory shooting, collateral cleanup, transport
 decisions, stale submissions, checkpoint tampering and both viewers. Existing
 phase consumers and historical integrity regressions use retained presence.
-Final local Windows validation passed on 2026-09-08: 6,712 behavioral tests with
+Initial PR-head `e4444cd` local Windows validation passed on 2026-09-08: 6,712 behavioral tests with
 85.01% coverage, then 391 code-quality tests without coverage, both using xdist
 work stealing. The eight-shard inventory was regenerated from that successful
 JUnit profile and its exact fail-closed check passed. Ruff check/format, mypy,
@@ -4357,13 +4357,38 @@ checks passed; the external contract passed its isolated base-ref check against
 five client unit tests, 342 live conformance assertions and installed-wheel smoke
 (2,609 runtime resources, 27 schemas, six request families) passed.
 
-The final runtime identity is
+The initial published runtime identity was
 `warhammer40k-core-v2:runtime-tree-sha256-v1:a493d05a282ded9d4da39df68cd32ece932e070302ac1fcd39d2f907c3b05232`.
 Source-authority JSON uses platform-stable LF bytes with reviewed SHA-256
 `d729fc2d567b59321c4d8ffa0bc981632cda3aa402a56978a37e7932d14ac2d5`.
-No production code changed after the successful aggregate coverage run began.
+No production code changed after that initial successful aggregate coverage run began.
 
 Scope remains C05-02 plus the two approved shooting consumers. P02D's model-keyword
 schema and P05C's post-removal former-footprint measurement remain separate.
 No new named handler, speculative hook family, architecture boundary or
 out-of-scope catalog support is introduced.
+
+PR #434 review corrections preserve these owners. Retained shooting now carries
+a required parent cause; execution, resumption and historical validation share a
+validated nesting chain independent of globally sorted effect IDs. Persisted
+grants resolve through the existing rules-unit effect applications, including
+canonical attached identities, split predecessors and duplicate-alias handling.
+The selected-target Stratagem comparison also recognizes physical options as
+members of the attacked rules unit, allowing the real Unending Fidelity consumer
+to persist its canonical grant for both executable alternatives.
+
+New regressions deliberately cover both lexical parent/child orders, pending
+child restoration, exact replay, invalid parent links and exactly-once removal.
+Attached Unending Fidelity exercises Shoot and Fight through facade submissions
+and restored checkpoints; split successors discover each grant once per model.
+The corrected runtime identity is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:39acb9c8f509be9dac75cf49f98bbde371b2d2690a9aaecff2f48291628843df`.
+
+Review-correction validation passed on 2026-09-08: 6,718 behavioral tests with
+85.01% coverage and 391 code-quality tests without coverage, both using xdist
+work stealing. Both attached-unit cases also passed after the final fixture
+placement adjustment; production code was unchanged. The eight-shard profile
+was refreshed from the successful JUnit report and its exact inventory check
+passed. Ruff, mypy, Pyright, import-linter, pre-commit, source/identity generators,
+base-ref contract checks, five TypeScript unit tests, 342 live conformance
+assertions and the installed-wheel smoke all passed.

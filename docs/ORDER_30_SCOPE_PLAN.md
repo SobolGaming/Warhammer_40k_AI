@@ -132,6 +132,26 @@ coverage run, the separate code-quality suite, regenerated eight-shard inventory
 source/build/contract artifact checks against the base, TypeScript client and
 conformance checks, installed-wheel smoke and pre-commit.
 
+## PR #434 review corrections
+
+The retained-shooting executor now serializes its parent cause and reconstructs
+one validated root-to-child chain. Completion, parent resumption and historical
+validation use this same authority instead of treating globally sorted effects
+as a stack. Facade regressions explicitly exercise both lexical parent/child ID
+orders, pending-child restoration, exact replay, child-before-parent cleanup and
+exactly-once physical removal. Missing, self-referential, branching or cyclic
+parent links and disagreement with start history fail closed.
+
+Persisted retained grants now use the existing rules-unit effect application
+owner, including canonical attached identities, physical components, split
+predecessors and effect-instance deduplication. The real Unending Fidelity
+regression exposed the preceding selected-target comparison as another instance
+of the identity mismatch: Stratagem options name components while attack context
+names the rules unit. That comparison now resolves the current rules-unit view;
+the existing option IDs and generic canonical effect targets remain intact.
+Both attached-unit attack alternatives, restore boundaries and exactly-once
+cleanup are covered, along with split-predecessor and duplicate-alias discovery.
+
 ## Explicit boundaries
 
 P02D's per-model keyword schema and P05C's post-removal former-footprint

@@ -10,6 +10,7 @@ from warhammer40k_core.engine.fight_eligibility_queries import (
 from warhammer40k_core.engine.battlefield_presence import fight_present_rules_unit_views
 from warhammer40k_core.engine.rules_units import (
     rules_unit_is_battle_shocked,
+    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
 from warhammer40k_core.engine.stratagems_imports import *
@@ -197,6 +198,7 @@ def _target_binding_error(
         if context is None:
             return None
         return _selected_target_context_error(
+            state=state,
             context=context,
             target_binding=target_binding,
         )
@@ -274,6 +276,7 @@ def _target_binding_error(
     if target_spec.target_policy_id == GO_TO_GROUND_TARGET_POLICY_ID:
         if context is not None:
             selected_context_error = _selected_target_context_error(
+                state=state,
                 context=context,
                 target_binding=target_binding,
             )
@@ -292,6 +295,7 @@ def _target_binding_error(
     ):
         if context is not None:
             selected_context_error = _selected_target_context_error(
+                state=state,
                 context=context,
                 target_binding=target_binding,
             )
@@ -315,6 +319,7 @@ def _target_binding_error(
     if target_spec.target_policy_id == SMOKESCREEN_TARGET_POLICY_ID:
         if context is not None:
             selected_context_error = _selected_target_context_error(
+                state=state,
                 context=context,
                 target_binding=target_binding,
             )
@@ -834,6 +839,7 @@ def _command_reroll_permission(
 
 def _selected_target_context_error(
     *,
+    state: GameState,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
 ) -> str | None:
@@ -848,7 +854,12 @@ def _selected_target_context_error(
         return "no_selected_target_units"
     if target_binding is None:
         return None
-    if _require_target_unit_id(target_binding) not in selected_unit_ids:
+    view = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=_require_target_unit_id(target_binding),
+    )
+    current_ids = {view.unit_instance_id, *view.component_unit_instance_ids}
+    if current_ids.isdisjoint(selected_unit_ids):
         return "unit_not_selected_as_target"
     return None
 

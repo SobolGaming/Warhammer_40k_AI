@@ -38,6 +38,7 @@ _identifier = IdentifierValidator(GameLifecycleError)
 @dataclass(frozen=True, slots=True)
 class RetainedShootingExecution:
     cause_id: str
+    parent_cause_id: str | None
     model_instance_id: str
     source_id: str
     source_rule_id: str
@@ -56,6 +57,10 @@ class RetainedShootingExecution:
             "source_result_id",
         ):
             _identifier(key, getattr(self, key))
+        if self.parent_cause_id is not None:
+            _identifier("parent_cause_id", self.parent_cause_id)
+            if self.parent_cause_id == self.cause_id:
+                raise GameLifecycleError("Retained shooting cannot be its own parent.")
         if type(self.attacks_completed) is not bool:
             raise GameLifecycleError("Retained shooting completion must be boolean.")
         if (
@@ -74,6 +79,7 @@ class RetainedShootingExecution:
             validate_json_value(
                 {
                     "cause_id": self.cause_id,
+                    "parent_cause_id": self.parent_cause_id,
                     "model_instance_id": self.model_instance_id,
                     "source_id": self.source_id,
                     "source_rule_id": self.source_rule_id,
@@ -91,6 +97,7 @@ class RetainedShootingExecution:
     def from_payload(cls, payload: JsonValue) -> Self:
         if not isinstance(payload, dict) or set(payload) != {
             "cause_id",
+            "parent_cause_id",
             "model_instance_id",
             "source_id",
             "source_rule_id",
@@ -108,6 +115,9 @@ class RetainedShootingExecution:
             raise GameLifecycleError("Retained shooting completion must be boolean.")
         return cls(
             cause_id=_identifier("cause_id", payload["cause_id"]),
+            parent_cause_id=None
+            if payload["parent_cause_id"] is None
+            else _identifier("parent_cause_id", payload["parent_cause_id"]),
             model_instance_id=_identifier("model_instance_id", payload["model_instance_id"]),
             source_id=_identifier("source_id", payload["source_id"]),
             source_rule_id=_identifier("source_rule_id", payload["source_rule_id"]),
@@ -123,6 +133,7 @@ class RetainedShootingExecution:
 
 
 def retained_shooting_executions(*, state: GameState) -> tuple[RetainedShootingExecution, ...]:
+    """Return the authenticated root-to-child chain, independent of effect inventory order."""
     executions: list[RetainedShootingExecution] = []
     for effect in state.persisting_effects:
         payload = effect.effect_payload
@@ -142,7 +153,23 @@ def retained_shooting_executions(*, state: GameState) -> tuple[RetainedShootingE
         executions.append(execution)
     if len({execution.cause_id for execution in executions}) != len(executions):
         raise GameLifecycleError("Retained shooting execution is duplicated.")
-    return tuple(executions)
+    children: dict[str | None, RetainedShootingExecution] = {}
+    cause_ids = {execution.cause_id for execution in executions}
+    for execution in executions:
+        if execution.parent_cause_id in children:
+            raise GameLifecycleError("Retained shooting parent has multiple children or roots.")
+        if execution.parent_cause_id is not None and execution.parent_cause_id not in cause_ids:
+            raise GameLifecycleError("Retained shooting execution has a missing parent.")
+        children[execution.parent_cause_id] = execution
+    ordered: list[RetainedShootingExecution] = []
+    parent_id: str | None = None
+    while parent_id in children:
+        child = children.pop(parent_id)
+        ordered.append(child)
+        parent_id = child.cause_id
+    if children:
+        raise GameLifecycleError("Retained shooting parent chain is cyclic or disconnected.")
+    return tuple(ordered)
 
 
 def current_retained_shooter(*, state: GameState) -> RetainedModelDestruction | None:
@@ -250,6 +277,7 @@ def advance_retained_shooting(
         _release_parent_attack_destruction(state=state, record=record)
     execution = RetainedShootingExecution(
         cause_id=record.cause_id,
+        parent_cause_id=executions[-1].cause_id if executions else None,
         model_instance_id=record.model_instance_id,
         source_id=source.source_id,
         source_rule_id=source.source_rule_id,
