@@ -28,6 +28,7 @@ from tests.secondary_destruction_helpers import (
     synchronize_secondary_destruction_projection_payload,
 )
 from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
@@ -12057,7 +12058,7 @@ def _replace_unit(
             replace(
                 army,
                 units=tuple(
-                    replace(unit, keywords=keywords)
+                    with_unit_keywords(unit, keywords=keywords)
                     if unit.unit_instance_id == unit_instance_id
                     else unit
                     for unit in army.units

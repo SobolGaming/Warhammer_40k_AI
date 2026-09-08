@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import (
@@ -825,7 +826,7 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
 
 def test_fortification_cover_keyword_ignores_destroyed_blocker_model() -> None:
     source_army, target_army = _mustered_core_armies()
-    fortification_unit = replace(
+    fortification_unit = with_unit_keywords(
         _unit_with_dead_models(source_army.units[0]),
         keywords=tuple(sorted((*source_army.units[0].keywords, "FORTIFICATION"))),
     )
@@ -979,9 +980,8 @@ def test_fortification_cover_ignores_destroyed_attacker_placements() -> None:
         unit_instance_id=fortification_unit_id,
         model_prefix=f"{fortification_unit_id}:model",
     )
-    fortification_unit = replace(
-        fortification_unit,
-        keywords=tuple(sorted((*fortification_unit.keywords, "FORTIFICATION"))),
+    fortification_unit = with_unit_keywords(
+        fortification_unit, keywords=tuple(sorted((*fortification_unit.keywords, "FORTIFICATION")))
     )
     source_army = replace(source_army, units=(attacker_unit, fortification_unit))
     target_unit = target_army.units[0]

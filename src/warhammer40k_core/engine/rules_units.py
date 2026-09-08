@@ -19,6 +19,10 @@ from warhammer40k_core.engine.unit_split_views import (
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import core_model_keywords_2026_09
+
+RULES_UNIT_KEYWORD_SOURCE_ID = core_model_keywords_2026_09.DESTROYED_MODEL_KEYWORDS_SOURCE_ID
+
 RulesUnitComponentRole = Literal["bodyguard", "leader", "support", "unit"]
 
 
@@ -114,8 +118,9 @@ class RulesUnitView:
     def keywords(self) -> tuple[str, ...]:
         keywords = {
             keyword
-            for component in self.rules_present_components
-            for keyword in component.unit.keywords
+            for model in self.own_models
+            if model.is_alive or model.model_instance_id in self.retained_model_ids
+            for keyword in model.keywords
         }
         return tuple(sorted(keywords))
 
@@ -123,8 +128,9 @@ class RulesUnitView:
     def faction_keywords(self) -> tuple[str, ...]:
         keywords = {
             keyword
-            for component in self.rules_present_components
-            for keyword in component.unit.faction_keywords
+            for model in self.own_models
+            if model.is_alive or model.model_instance_id in self.retained_model_ids
+            for keyword in model.faction_keywords
         }
         return tuple(sorted(keywords))
 
@@ -173,6 +179,9 @@ class RulesUnitView:
                 return component.unit
         raise GameLifecycleError("RulesUnitView model_instance_id is not in the rules unit.")
 
+    def model_by_id(self, model_instance_id: str) -> ModelInstance:
+        return self.component_unit_for_model(model_instance_id).own_model_by_id(model_instance_id)
+
     def component_role_for_model(self, model_instance_id: str) -> RulesUnitComponentRole:
         requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
         for component in self.components:
@@ -204,6 +213,7 @@ class RulesUnitView:
                 model.model_instance_id
                 for model in models
                 if self.component_role_for_model(model.model_instance_id) in {"leader", "support"}
+                and "CHARACTER" in model.keywords
             )
         )
 

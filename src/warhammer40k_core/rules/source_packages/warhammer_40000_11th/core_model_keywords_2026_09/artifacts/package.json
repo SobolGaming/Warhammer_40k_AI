@@ -1,0 +1,79 @@
+{
+  "artifact_schema": "core-v2-core-model-keywords-source-v1",
+  "source_package_id": "gw-11e-core-model-keywords",
+  "source_version": "maintained-app-mirrors-observed-2026-09-08",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-model-keywords:destroyed-model-keywords",
+      "section_id": "FAQ",
+      "source_text": "Units have all the keywords of all their models, and attached units have all the keywords of all of their component units. How are destroyed models taken into account for these purposes?\nThese statements are only true so long as the models possessing those keywords remain part of the unit; destroyed models do not contribute their keywords to their prior unit. Example: The Aspiring Sorcerer model in a unit of Rubric Marines is destroyed; as none of the remaining models in the unit possess the PSYKER keyword, that unit is no longer a PSYKER unit.",
+      "transcription_sha256": "d2f96dfeb423592623f05012e82c181a7737b12c791f7fbd237202a1968025be",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.rules_units:RulesUnitView.keywords"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-model-keywords:destroyed-model-keywords",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "d2f96dfeb423592623f05012e82c181a7737b12c791f7fbd237202a1968025be",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "518596c4d4e7da9f0a0fe9c65767ec97417d8cd4fdc969c4e5008f896110bc66",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.rules_units:RulesUnitView.keywords"
+      ],
+      "evidence_id": "core-model-keywords-review:destroyed-model-keywords",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P02D FAQ destroyed-model-keywords",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-model-keywords:destroyed-model-keywords",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "d2f96dfeb423592623f05012e82c181a7737b12c791f7fbd237202a1968025be",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "887ed90662d229efa15afef1eb75878e46aaca500dd4ce165d80e2640e4214f1",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "executable_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.rules_units:RulesUnitView.keywords"
+      ],
+      "evidence_id": "core-model-keywords-mirror:destroyed-model-keywords:gdm-v931",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-model-keywords-maintained-app-mirrors-2026-09-08",
+      "review_audit_row_id": "destroyed-model-keywords:gdm-v931",
+      "review_audit_source_observation_sha256": "74930ebc501e1e6ff74b53e83f94d7ac728ef9f6eef8cd6d4355e4b42f800b3e",
+      "provider_name": "Game Datamissions",
+      "source_title": "Game Datamissions FAQ destroyed-model-keywords",
+      "source_platform": "Web",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "observed_at": null,
+      "app_version": "931",
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "787473dc91edfcbe0c27379cff3ad876517d475da9c5f75869df42b4e418be18"
+}

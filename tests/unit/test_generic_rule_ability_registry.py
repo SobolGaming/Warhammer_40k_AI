@@ -6,10 +6,12 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
+from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine import (
@@ -2187,16 +2189,18 @@ def _unit(
         name=f"{name} model",
         keywords=keywords,
     )
-    return UnitInstance(
-        unit_instance_id=unit_instance_id,
-        datasheet_id=datasheet_id,
-        name=name,
+    return with_unit_keywords(
+        UnitInstance(
+            unit_instance_id=unit_instance_id,
+            datasheet_id=datasheet_id,
+            name=name,
+            datasheet_abilities=(),
+            datasheet_source_ids=(f"source:{datasheet_id}",),
+            own_models=(model,),
+            wargear_selections=(),
+        ),
         keywords=keywords,
         faction_keywords=faction_keywords,
-        datasheet_abilities=(),
-        datasheet_source_ids=(f"source:{datasheet_id}",),
-        own_models=(model,),
-        wargear_selections=(),
     )
 
 
@@ -2210,6 +2214,13 @@ def _model(
 ) -> ModelInstance:
     base_size = BaseSizeDefinition.circular(32.0)
     return ModelInstance(
+        keyword_assignment=ModelKeywordAssignment(
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            keywords=(),
+            faction_keywords=(),
+            source_ids=(f"source:{model_profile_id}",),
+        ),
         model_instance_id=model_instance_id,
         datasheet_id=datasheet_id,
         model_profile_id=model_profile_id,

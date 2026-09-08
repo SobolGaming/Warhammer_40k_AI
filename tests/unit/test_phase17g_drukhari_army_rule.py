@@ -20,6 +20,7 @@ from tests.phase15c_fight_order_helpers import (
     fight_lifecycle,
     submit_minimal_melee_declaration,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -3464,10 +3465,12 @@ def _mark_player_as_drukhari(
                     faction_id="drukhari",
                 ),
                 units=tuple(
-                    replace(
-                        unit,
+                    with_unit_keywords(
+                        replace(
+                            unit,
+                            datasheet_abilities=datasheet_abilities or unit.datasheet_abilities,
+                        ),
                         faction_keywords=faction_keywords,
-                        datasheet_abilities=datasheet_abilities or unit.datasheet_abilities,
                     )
                     for unit in army.units
                 ),

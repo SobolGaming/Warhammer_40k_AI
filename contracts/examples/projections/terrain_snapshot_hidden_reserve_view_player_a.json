@@ -12433,6 +12433,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -12451,6 +12454,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
       "model_profile_id": "core-intercessor-like",
@@ -12685,6 +12696,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -12703,6 +12717,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
       "model_profile_id": "core-intercessor-like",
@@ -12937,6 +12959,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -12955,6 +12980,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
       "model_profile_id": "core-intercessor-like",
@@ -13189,6 +13222,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -13207,6 +13243,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
       "model_profile_id": "core-intercessor-like",
@@ -13441,6 +13485,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -13459,6 +13506,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
       "model_profile_id": "core-intercessor-like",
@@ -13693,6 +13748,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -13711,6 +13769,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
       "model_profile_id": "core-intercessor-like",
@@ -13945,6 +14011,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -13963,6 +14032,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
       "model_profile_id": "core-intercessor-like",
@@ -14197,6 +14274,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -14215,6 +14295,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
       "model_profile_id": "core-intercessor-like",
@@ -14449,6 +14537,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -14467,6 +14558,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
       "model_profile_id": "core-intercessor-like",
@@ -14701,6 +14800,9 @@
         }
       },
       "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
       "geometry": {
         "footprint_kind": "circular",
         "geometry_source_id": "core-intercessor-like",
@@ -14719,6 +14821,14 @@
           }
         ]
       },
+      "keyword_source_ids": [
+        "datasheet:core-intercessor-like-infantry",
+        "datasheet:core-intercessor-like-infantry:profile"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
       "model_display_name": "CORE Intercessor-like Infantry",
       "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
       "model_profile_id": "core-intercessor-like",
@@ -14872,8 +14982,8 @@
       "source_id": "ui-contract-terrain-snapshot-hidden-reserve:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v11-phase17n-step4",
-  "projection_state_hash": "f2d0a8d88770e5b244f9a55b3e2ef5970721513e013f2a645c33d483667498ef",
+  "projection_schema": "game-view-v12-model-keywords",
+  "projection_state_hash": "8de95eb639c83f0bcaa6777261a58be39d6228c53e46addeb9314e1187bc69fd",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

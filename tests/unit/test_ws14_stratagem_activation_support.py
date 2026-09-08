@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import replace
 from typing import cast
+
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
@@ -276,7 +277,7 @@ def test_ws14_shattering_salvo_activation_payload_selects_hit_enemy_unit() -> No
 
 def test_ws14_shattering_salvo_stratagem_denies_cover_to_selected_hit_enemy() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
-    friendly_unit = replace(
+    friendly_unit = with_unit_keywords(
         _unit(
             catalog=catalog,
             army_id="army-alpha",
@@ -441,7 +442,7 @@ def test_ws14_armour_of_contempt_fight_window_applies_and_expires_with_attack_se
         army_id="army-alpha",
         unit_selection_id="armour-of-contempt-attacker",
     )
-    defender = replace(
+    defender = with_unit_keywords(
         _unit(
             catalog=catalog,
             army_id="army-beta",

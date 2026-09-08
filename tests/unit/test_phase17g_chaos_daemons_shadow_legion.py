@@ -11,6 +11,7 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
     phase11c_config,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -167,7 +168,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveStatus,
 )
 from warhammer40k_core.engine.roster_points import RosterUnitPointValue
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     HitRollModifierContext,
@@ -865,8 +866,12 @@ def test_shadow_legion_companion_metadata_rejects_malformed_selection_payloads()
 
     assert generic_metadata.companion_keywords_match(
         payload={},
-        target_unit=heretic_astartes,
-        companion_unit=legiones_daemonica,
+        target_unit=rules_unit_view_by_id(
+            state=state, unit_instance_id=heretic_astartes.unit_instance_id
+        ),
+        companion_unit=rules_unit_view_by_id(
+            state=state, unit_instance_id=legiones_daemonica.unit_instance_id
+        ),
     )
     assert not generic_metadata.companion_keywords_match(
         payload={
@@ -874,8 +879,12 @@ def test_shadow_legion_companion_metadata_rejects_malformed_selection_payloads()
                 "Aeldari": ["Legiones Daemonica"]
             }
         },
-        target_unit=heretic_astartes,
-        companion_unit=legiones_daemonica,
+        target_unit=rules_unit_view_by_id(
+            state=state, unit_instance_id=heretic_astartes.unit_instance_id
+        ),
+        companion_unit=rules_unit_view_by_id(
+            state=state, unit_instance_id=legiones_daemonica.unit_instance_id
+        ),
     )
     malformed_payloads = (
         {
@@ -903,8 +912,12 @@ def test_shadow_legion_companion_metadata_rejects_malformed_selection_payloads()
         with pytest.raises(GameLifecycleError):
             generic_metadata.companion_keywords_match(
                 payload=cast(dict[str, JsonValue], payload),
-                target_unit=heretic_astartes,
-                companion_unit=legiones_daemonica,
+                target_unit=rules_unit_view_by_id(
+                    state=state, unit_instance_id=heretic_astartes.unit_instance_id
+                ),
+                companion_unit=rules_unit_view_by_id(
+                    state=state, unit_instance_id=legiones_daemonica.unit_instance_id
+                ),
             )
 
     with pytest.raises(GameLifecycleError, match="StratagemUseRecord"):
@@ -1017,10 +1030,10 @@ def test_shadow_legion_companion_metadata_is_fail_fast_for_context_and_unit_drif
         generic_metadata.friendly_units(state=state, player_id="missing-player")
     with pytest.raises(GameLifecycleError, match="owner is unknown"):
         generic_metadata.unit_owner_player_id(state=state, unit_instance_id="missing-unit")
-    with pytest.raises(GameLifecycleError, match="keyword lookup requires a unit"):
-        generic_metadata.unit_has_keyword(cast(UnitInstance, object()), "shadow-legion")
-    with pytest.raises(GameLifecycleError, match="keyword set requires a unit"):
-        generic_metadata.unit_keyword_set(cast(UnitInstance, object()))
+    with pytest.raises(GameLifecycleError, match="requires a current RulesUnitView"):
+        generic_metadata.unit_has_keyword(cast(RulesUnitView, object()), "shadow-legion")
+    with pytest.raises(GameLifecycleError, match="requires a current RulesUnitView"):
+        generic_metadata.unit_keyword_set(cast(RulesUnitView, object()))
     with pytest.raises(GameLifecycleError, match="Keyword must be a string"):
         generic_metadata._canonical_keyword(cast(str, object()))
 
@@ -1095,8 +1108,11 @@ def test_shadow_legion_companion_metadata_tracks_current_round_reserve_arrivals(
         unit.unit_instance_id
         for unit in generic_metadata.friendly_units(state=state, player_id="player-a")
     }
-    assert generic_metadata.unit_has_keyword(refreshed_current_arrival, "shadow-legion")
-    assert "LEGIONES DAEMONICA" in generic_metadata.unit_keyword_set(refreshed_current_arrival)
+    current_view = rules_unit_view_by_id(
+        state=state, unit_instance_id=current_arrival.unit_instance_id
+    )
+    assert generic_metadata.unit_has_keyword(current_view, "shadow-legion")
+    assert "LEGIONES DAEMONICA" in generic_metadata.unit_keyword_set(current_view)
 
 
 def test_shadow_legion_healing_source_context_flags_lock_and_validate_model_choice() -> None:
@@ -1246,14 +1262,18 @@ def test_shadow_legion_generic_runtime_effect_parameter_helpers_are_fail_fast() 
     )
     assert (
         generic_rule_ir_runtime._source_keyword_bonus(
-            source_unit=source_unit,
+            source_unit=rules_unit_view_by_id(
+                state=state, unit_instance_id=source_unit.unit_instance_id
+            ),
             effect_payload=payload,
         )
         == 3
     )
     assert (
         generic_rule_ir_runtime._source_keyword_bonus(
-            source_unit=source_unit,
+            source_unit=rules_unit_view_by_id(
+                state=state, unit_instance_id=source_unit.unit_instance_id
+            ),
             effect_payload=_generic_runtime_effect_payload(
                 (("bonus_if_source_has_keyword", "Khorne"), ("bonus", 3))
             ),
@@ -3532,9 +3552,11 @@ def _shadow_legion_state(
                     detachment_ids=(rule.DETACHMENT_ID,),
                 ),
                 units=tuple(
-                    replace(
-                        unit,
-                        name=name,
+                    with_unit_keywords(
+                        replace(
+                            unit,
+                            name=name,
+                        ),
                         keywords=tuple(dict.fromkeys((*unit.keywords, *unit_keywords))),
                         faction_keywords=faction_keywords,
                     )
@@ -4339,7 +4361,7 @@ def _replace_unit_keywords(
                 updated_units.append(unit)
                 continue
             updated_units.append(
-                replace(unit, keywords=keywords, faction_keywords=faction_keywords)
+                with_unit_keywords(unit, keywords=keywords, faction_keywords=faction_keywords)
             )
             did_replace = True
         updated_armies.append(replace(army, units=tuple(updated_units)))

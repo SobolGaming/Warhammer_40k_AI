@@ -213,7 +213,7 @@ def request_dice_result_override_if_available(
         state=state,
         unit_instance_id=attacking_unit_instance_id,
     )
-    attacker_component = rules_unit.component_unit_for_model(attacker_model_instance_id)
+    attacker_model = rules_unit.model_by_id(attacker_model_instance_id)
     eligible: list[tuple[RulesUnitComponent, DiceResultOverrideDescriptor, int]] = []
     for component in rules_unit.components:
         if not any(model.is_alive for model in component.unit.own_models):
@@ -224,8 +224,7 @@ def request_dice_result_override_if_available(
             if roll_type not in descriptor.roll_types:
                 continue
             if any(
-                keyword in attacker_component.keywords
-                for keyword in descriptor.excluded_model_keywords
+                keyword in attacker_model.keywords for keyword in descriptor.excluded_model_keywords
             ):
                 continue
             current_count = unit_resource_total(
@@ -361,7 +360,7 @@ def invalid_dice_result_override_status(
     )
     if not any(model.is_alive for model in source_component.own_models):
         return _invalid_status(state, field="source_component_alive")
-    attacker_component = rules_unit.component_unit_for_model(payload["attacker_model_instance_id"])
+    attacker_model = rules_unit.model_by_id(payload["attacker_model_instance_id"])
     descriptors = tuple(
         descriptor
         for descriptor in dice_result_override_descriptors_for_abilities(
@@ -378,9 +377,7 @@ def invalid_dice_result_override_status(
         or descriptor.resource_cost != payload["resource_cost"]
         or descriptor.replacement_value != payload["replacement_value"]
         or payload["roll_type"] not in descriptor.roll_types
-        or any(
-            keyword in attacker_component.keywords for keyword in descriptor.excluded_model_keywords
-        )
+        or any(keyword in attacker_model.keywords for keyword in descriptor.excluded_model_keywords)
     ):
         return _invalid_status(state, field="descriptor_context")
     current_count = unit_resource_total(

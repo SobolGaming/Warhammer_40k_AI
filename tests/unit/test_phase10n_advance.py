@@ -10,6 +10,7 @@ from tests.deployment_submission_helpers import (
     submit_all_deployments_if_pending,
 )
 from tests.movement_submission_helpers import submit_default_movement_proposal_if_pending
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -1274,7 +1275,7 @@ def _grant_first_unit_advance_reroll(lifecycle: GameLifecycle) -> None:
 
 
 def _unit_with_advance_reroll(unit: UnitInstance) -> UnitInstance:
-    return replace(unit, keywords=(*unit.keywords, "ADVANCE_REROLL"))
+    return with_unit_keywords(unit, keywords=(*unit.keywords, "ADVANCE_REROLL"))
 
 
 def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, object]:

@@ -15,6 +15,7 @@ from tests.phase15d_fight_resolution_helpers import (
     melee_proposal,
     melee_request,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -1395,7 +1396,9 @@ def _battle_ready_lifecycle() -> GameLifecycle:
         replace(
             army,
             units=tuple(
-                replace(unit, keywords=tuple(keyword.upper() for keyword in unit.keywords))
+                with_unit_keywords(
+                    unit, keywords=tuple(keyword.upper() for keyword in unit.keywords)
+                )
                 for unit in army.units
             ),
         )
@@ -1559,9 +1562,8 @@ def _world_eaters_state_for_melee_fixture(
     scenario: BattlefieldScenario,
     attacker: UnitInstance,
 ) -> GameState:
-    world_eaters_attacker = replace(
-        attacker,
-        faction_keywords=(army_rule.WORLD_EATERS_FACTION_KEYWORD,),
+    world_eaters_attacker = with_unit_keywords(
+        attacker, faction_keywords=(army_rule.WORLD_EATERS_FACTION_KEYWORD,)
     )
     armies = (
         replace(scenario.armies[0], units=(world_eaters_attacker,)),

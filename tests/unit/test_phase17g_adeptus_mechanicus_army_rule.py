@@ -14,6 +14,7 @@ from tests.phase11c_command_phase_helpers import (
     unit_by_id,
     with_model_offsets,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -797,11 +798,13 @@ def _mark_player_as_admech(
                 )
             )
             updated_units.append(
-                replace(
-                    unit,
+                with_unit_keywords(
+                    replace(
+                        unit,
+                        datasheet_abilities=resolved_abilities,
+                    ),
                     keywords=keywords,
                     faction_keywords=(army_rule.ADEPTUS_MECHANICUS_FACTION_KEYWORD,),
-                    datasheet_abilities=resolved_abilities,
                 )
             )
         updated_armies.append(

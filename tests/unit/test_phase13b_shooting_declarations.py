@@ -82,6 +82,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _weapon_profile_by_wargear,
 )
 from tests.psychic_modifier_helpers import submit_fixture_request
+from tests.unit_keyword_helpers import with_unit_keywords
 from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruins
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -1178,7 +1179,7 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
         state = _state(lifecycle)
         attacker = units["intercessor-1"]
         if has_fly:
-            attacker = replace(attacker, keywords=(*attacker.keywords, "Fly"))
+            attacker = with_unit_keywords(attacker, keywords=(*attacker.keywords, "Fly"))
             _replace_unit_instance_in_state(state=state, replacement=attacker)
         state.movement_phase_state = MovementPhaseState(
             battle_round=1,
@@ -5821,7 +5822,7 @@ def test_phase14i_lethal_hits_vehicle_gate_controls_auto_wound() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
-    defender = replace(units["enemy"], keywords=("VEHICLE",))
+    defender = with_unit_keywords(units["enemy"], keywords=("VEHICLE",))
     _replace_unit_instance_in_state(state=state, replacement=defender)
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -6604,7 +6605,7 @@ def test_phase14i_sustained_hits_slash_keyword_gate_controls_generated_hits() ->
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
-    defender = replace(units["enemy"], keywords=("INFANTRY",))
+    defender = with_unit_keywords(units["enemy"], keywords=("INFANTRY",))
     _replace_unit_instance_in_state(state=state, replacement=defender)
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -7168,7 +7169,7 @@ def test_phase13d_generic_rule_ir_fire_overwatch_threshold_status_applies() -> N
         )
         state = _state(lifecycle)
         attacker = units["intercessor-1"]
-        support = replace(
+        support = with_unit_keywords(
             units["intercessor-2"],
             keywords=tuple(dict.fromkeys((*units["intercessor-2"].keywords, "PSYKER"))),
             faction_keywords=tuple(
@@ -7535,7 +7536,7 @@ def test_phase13d_hazardous_tests_resolve_after_all_attacks(
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     if replacement_attacker_keywords is not None:
-        attacker = replace(attacker, keywords=replacement_attacker_keywords)
+        attacker = with_unit_keywords(attacker, keywords=replacement_attacker_keywords)
         _replace_unit_instance_in_state(state=state, replacement=attacker)
     defender = units["enemy"]
     battlefield = state.battlefield_state
@@ -8050,6 +8051,10 @@ def test_phase13c_attached_unit_roles_require_runtime_keyword_not_identifier_pre
     character_model = replace(
         defender.own_models[1],
         model_instance_id=f"{prefixed_unit_id}:character",
+        keyword_assignment=replace(
+            defender.own_models[1].keyword_assignment,
+            keywords=tuple(sorted({*defender.own_models[1].keywords, "CHARACTER"})),
+        ),
         source_ids=tuple(
             sorted(
                 {
@@ -9017,7 +9022,7 @@ def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_rol
     assert plain_candidates[0].is_legal
     assert PLUNGING_FIRE_RULE_ID not in plain_candidates[0].targeting_rule_ids
 
-    towering_attacker = replace(attacker, keywords=(*attacker.keywords, "Towering"))
+    towering_attacker = with_unit_keywords(attacker, keywords=(*attacker.keywords, "Towering"))
     towering_scenario = _scenario_with_replaced_unit(
         scenario=base_scenario,
         replacement=towering_attacker,
@@ -10731,6 +10736,10 @@ def test_phase14e_allocation_group_payloads_preserve_roles_and_priority() -> Non
     character_group_id = f"allocation-group:character:{defender.own_models[1].model_instance_id}"
     character_model = replace(
         defender.own_models[1],
+        keyword_assignment=replace(
+            defender.own_models[1].keyword_assignment,
+            keywords=tuple(sorted({*defender.own_models[1].keywords, "CHARACTER"})),
+        ),
         source_ids=tuple(
             sorted(
                 {
@@ -10813,6 +10822,10 @@ def test_phase14e_allocation_group_payloads_preserve_roles_and_priority() -> Non
 
     support_model = replace(
         character_model,
+        keyword_assignment=replace(
+            character_model.keyword_assignment,
+            keywords=tuple(sorted({*character_model.keywords, "CHARACTER"})),
+        ),
         source_ids=tuple(
             sorted(
                 (
@@ -11059,6 +11072,9 @@ def test_phase14e_allocation_order_decision_fails_fast_on_malformed_domain_objec
         own_models=tuple(
             replace(
                 model,
+                keyword_assignment=replace(
+                    model.keyword_assignment, keywords=tuple(sorted({*model.keywords, "CHARACTER"}))
+                ),
                 source_ids=tuple(sorted({*model.source_ids, "attached-role:character"})),
             )
             for model in defender.own_models
@@ -16313,9 +16329,8 @@ def test_phase13c_feel_no_pain_descriptor_registers_sources_for_each_model() -> 
 
 def test_phase13c_feel_no_pain_keyword_without_descriptor_fails_fast() -> None:
     _lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
-    defender = replace(
-        units["enemy"],
-        keywords=(*units["enemy"].keywords, "Feel No Pain"),
+    defender = with_unit_keywords(
+        units["enemy"], keywords=(*units["enemy"].keywords, "Feel No Pain")
     )
 
     with pytest.raises(GameLifecycleError, match="Feel No Pain keyword requires"):

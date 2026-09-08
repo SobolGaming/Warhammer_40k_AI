@@ -1576,7 +1576,7 @@ def _manifesting_model_can_see_target(
             observing_unit_id=manifesting_model.component_unit.unit_instance_id,
             target_unit_id=target_rules_unit.unit_instance_id,
         ),
-        observer_keywords=manifesting_model.component_unit.keywords,
+        observer_keywords=manifesting_model.model.keywords,
     )
     witness = context.resolve_line_of_sight()
     return any(target_id in in_range_ids for target_id in witness.visible_model_ids)

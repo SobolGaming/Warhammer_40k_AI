@@ -8,6 +8,7 @@ from typing import TypedDict, cast
 
 import pytest
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -1614,7 +1615,7 @@ def test_oath_wound_modifier_applies_only_for_codex_detachment_target() -> None:
         replace(
             army,
             units=tuple(
-                replace(unit, faction_keywords=(*unit.faction_keywords, "DARK ANGELS"))
+                with_unit_keywords(unit, faction_keywords=(*unit.faction_keywords, "DARK ANGELS"))
                 if unit.unit_instance_id == SPACE_MARINES_UNIT_ID
                 else unit
                 for unit in army.units
@@ -1648,7 +1649,7 @@ def test_oath_wound_modifier_applies_only_for_codex_detachment_target() -> None:
         replace(
             army,
             units=tuple(
-                replace(unit, faction_keywords=())
+                with_unit_keywords(unit, faction_keywords=())
                 if unit.unit_instance_id == SPACE_MARINES_UNIT_ID
                 else unit
                 for unit in army.units

@@ -11,7 +11,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
-from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
+from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -192,14 +192,8 @@ class MortalWoundTargetLineage:
         model_ids = tuple(model.model_instance_id for model in models)
         if len(model_ids) != len(set(model_ids)):
             raise GameLifecycleError("Mortal-wound target lineage model inventory is duplicated.")
-        character_component_ids = set(self.character_component_unit_instance_ids)
         character_model_ids = tuple(
-            sorted(
-                model.model_instance_id
-                for model in models
-                if state.unit_instance_id_for_model(model.model_instance_id)
-                in character_component_ids
-            )
+            sorted(model.model_instance_id for model in models if "CHARACTER" in model.keywords)
         )
         return models, character_model_ids
 
@@ -235,14 +229,8 @@ class MortalWoundTargetLineage:
             raise GameLifecycleError(
                 "Embarked mortal-wound target lineage contains a removed living model."
             )
-        character_component_ids = set(self.character_component_unit_instance_ids)
         character_model_ids = tuple(
-            sorted(
-                model.model_instance_id
-                for model in models
-                if state.unit_instance_id_for_model(model.model_instance_id)
-                in character_component_ids
-            )
+            sorted(model.model_instance_id for model in models if "CHARACTER" in model.keywords)
         )
         return models, character_model_ids
 
@@ -357,7 +345,7 @@ def _authoritative_character_component_unit_instance_ids(
             | {
                 component_id
                 for component_id, unit in components_by_id.items()
-                if unit_has_keyword(unit, "CHARACTER")
+                if unit_has_roster_keyword(unit, "CHARACTER")
             }
         )
     )

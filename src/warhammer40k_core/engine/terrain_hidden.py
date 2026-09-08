@@ -72,7 +72,7 @@ def terrain_hidden_model_ids(
                 not required_keywords
                 or required_keywords.intersection(
                     _canonical_keyword(keyword)
-                    for keyword in rules_unit.component_unit_for_model(model.model_id).keywords
+                    for keyword in rules_unit.model_by_id(model.model_id).keywords
                 )
             )
             and any(model_intersects_terrain_area(model, area) for area in eligible_areas)

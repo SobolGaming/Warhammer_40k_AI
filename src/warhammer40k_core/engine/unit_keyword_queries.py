@@ -26,3 +26,13 @@ def unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
         for value in unit.keywords
     }
     return requested_keyword in unit_keywords
+
+
+def unit_has_roster_keyword(unit: UnitInstance, keyword: str) -> bool:
+    """Check preserved model identity, including casualties, for lineage validation.
+
+    Current gameplay eligibility must use RulesUnitView keywords instead.
+    """
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Roster keyword identity requires a UnitInstance.")
+    return any(keyword in model.keywords for model in unit.own_models)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -50,6 +50,11 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.list_validation_errors import (
     ListValidationError,
+)
+from warhammer40k_core.engine.model_keyword_grants import (
+    grant_unit_keywords,
+    replace_unit_faction_keywords,
+    unit_with_attached_role_evidence,
 )
 from warhammer40k_core.engine.roster_points import (
     RosterEnhancementPointValue,
@@ -2912,7 +2917,9 @@ def _apply_warlord_keyword_if_selected(
         return units
     target_unit_id = f"{request.army_id}:{request.warlord_selection.unit_selection_id}"
     return tuple(
-        replace(unit, keywords=tuple(sorted({*unit.keywords, "WARLORD"})))
+        grant_unit_keywords(
+            unit, keywords=("WARLORD",), source_id=request.warlord_selection.source_id
+        )
         if unit.unit_instance_id == target_unit_id
         else unit
         for unit in units
@@ -2950,9 +2957,10 @@ def _apply_cult_of_dark_gods_faction_keyword_replacements(
             replaced_units.append(unit)
             continue
         replaced_units.append(
-            replace(
+            replace_unit_faction_keywords(
                 unit,
-                faction_keywords=(CULT_OF_DARK_GODS_REPLACEMENT_FACTION_KEYWORD,),
+                keywords=(CULT_OF_DARK_GODS_REPLACEMENT_FACTION_KEYWORD,),
+                source_id=CULT_OF_DARK_GODS_SOURCE_ID,
             )
         )
     return tuple(replaced_units)
@@ -2981,9 +2989,8 @@ def _apply_shadow_legion_keyword_grants(
             granted_units.append(unit)
             continue
         granted_units.append(
-            replace(
-                unit,
-                keywords=tuple(sorted(dict.fromkeys((*unit.keywords, *added_keywords)))),
+            grant_unit_keywords(
+                unit, keywords=tuple(added_keywords), source_id=SHADOW_LEGION_SOURCE_ID
             )
         )
     return tuple(granted_units)
@@ -3293,7 +3300,7 @@ def _resolve_attached_unit_formations(
 
     return (
         tuple(
-            _unit_with_attached_role_evidence(
+            unit_with_attached_role_evidence(
                 unit,
                 role=roles_by_unit_id.get(unit.unit_instance_id),
             )
@@ -3330,29 +3337,6 @@ def _datasheet_has_attachment_role(
     if type(role) is not AttachmentRole:
         raise ArmyMusteringError("Attachment role lookup requires an AttachmentRole.")
     return any(eligibility.role is role for eligibility in datasheet.attachment_eligibilities)
-
-
-def _unit_with_attached_role_evidence(
-    unit: UnitInstance,
-    *,
-    role: str | None,
-) -> UnitInstance:
-    if role is None:
-        return unit
-    evidence = {f"runtime-attached-unit:{role}"}
-    if role in {"leader", "support"}:
-        evidence.add(f"attached-role:{role}")
-    return replace(
-        unit,
-        keywords=tuple(sorted({*unit.keywords, "ATTACHED_UNIT"})),
-        own_models=tuple(
-            replace(
-                model,
-                source_ids=tuple(sorted({*model.source_ids, *evidence})),
-            )
-            for model in unit.own_models
-        ),
-    )
 
 
 def _validate_request_matches_catalog(

@@ -10,6 +10,7 @@ import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.support.wahapedia_bridge_fixtures import screamers_bridge_artifacts
 from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_version
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -1772,13 +1773,15 @@ def _unit_with_keywords_and_base(
     keywords: tuple[str, ...],
     base_size: BaseSizeDefinition,
 ) -> UnitInstance:
-    return replace(
-        unit,
-        keywords=keywords,
-        own_models=tuple(
-            _model_with_base(model, base_size=base_size, keywords=keywords)
-            for model in unit.own_models
+    return with_unit_keywords(
+        replace(
+            unit,
+            own_models=tuple(
+                _model_with_base(model, base_size=base_size, keywords=keywords)
+                for model in unit.own_models
+            ),
         ),
+        keywords=keywords,
     )
 
 

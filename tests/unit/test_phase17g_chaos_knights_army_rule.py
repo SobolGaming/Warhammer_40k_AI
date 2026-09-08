@@ -22,6 +22,7 @@ from tests.phase11c_command_phase_helpers import (
     with_model_offsets,
 )
 from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.replay import submit_replay_record
@@ -1129,7 +1130,9 @@ def test_harbingers_source_geometry_does_not_expand_to_attached_bodyguards() -> 
         replace(
             army,
             units=tuple(
-                replace(unit, faction_keywords=(army_rule.CHAOS_KNIGHTS_FACTION_KEYWORD,))
+                with_unit_keywords(
+                    unit, faction_keywords=(army_rule.CHAOS_KNIGHTS_FACTION_KEYWORD,)
+                )
                 if unit.unit_instance_id == source_leader_id
                 else unit
                 for unit in army.units
@@ -3691,7 +3694,7 @@ def _mark_player_faction_only_as_chaos_knights(state: GameState, *, player_id: s
 
 
 def _chaos_knights_unit(unit: UnitInstance) -> UnitInstance:
-    return replace(unit, faction_keywords=("CHAOS KNIGHTS",))
+    return with_unit_keywords(unit, faction_keywords=("CHAOS KNIGHTS",))
 
 
 def _record_harbingers_selection(

@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -9514,12 +9515,14 @@ def _with_destroyed_attached_component(
         replace(
             army,
             units=tuple(
-                replace(
-                    unit,
-                    keywords=("MONSTER",),
-                    own_models=tuple(
-                        replace(model, wounds_remaining=0) for model in unit.own_models
+                with_unit_keywords(
+                    replace(
+                        unit,
+                        own_models=tuple(
+                            replace(model, wounds_remaining=0) for model in unit.own_models
+                        ),
                     ),
+                    keywords=("MONSTER",),
                 )
                 if unit.unit_instance_id == unit_instance_id
                 else unit

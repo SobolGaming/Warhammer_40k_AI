@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -1872,11 +1873,13 @@ def test_destroyed_models_stop_contributing_unit_keywords() -> None:
     )
     army = muster_army(catalog=catalog, request=request)
     leader = army.unit_by_id("army-alpha:leader-unit")
-    leader = replace(
-        leader,
+    leader = with_unit_keywords(
+        replace(
+            leader,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in leader.own_models),
+        ),
         keywords=(*leader.keywords, "Leader Exclusive"),
         faction_keywords=(*leader.faction_keywords, "Leader Faction Exclusive"),
-        own_models=tuple(replace(model, wounds_remaining=0) for model in leader.own_models),
     )
     army_with_destroyed_leader = replace(
         army,

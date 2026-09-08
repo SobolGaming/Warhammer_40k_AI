@@ -9,6 +9,7 @@ from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.setup_completion_helpers import (
     enter_battle_for_fixture,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -6311,7 +6312,9 @@ def _replace_unit_keywords(
 ) -> None:
     for army_index, army in enumerate(state.army_definitions):
         units = tuple(
-            replace(unit, keywords=keywords) if unit.unit_instance_id == unit_instance_id else unit
+            with_unit_keywords(unit, keywords=keywords)
+            if unit.unit_instance_id == unit_instance_id
+            else unit
             for unit in army.units
         )
         if units != army.units:
@@ -6329,7 +6332,7 @@ def _replace_unit_faction_keywords(
     for army_index, army in enumerate(state.army_definitions):
         units = tuple(
             (
-                replace(unit, faction_keywords=faction_keywords)
+                with_unit_keywords(unit, faction_keywords=faction_keywords)
                 if unit.unit_instance_id == unit_instance_id
                 else unit
             )

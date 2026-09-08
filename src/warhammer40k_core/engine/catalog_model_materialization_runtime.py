@@ -1005,8 +1005,6 @@ def _replace_unit_datasheet(
         unit,
         datasheet_id=replacement_datasheet.datasheet_id,
         name=replacement_datasheet.name,
-        keywords=replacement_datasheet.keywords.keywords,
-        faction_keywords=replacement_datasheet.keywords.faction_keywords,
         datasheet_abilities=replacement_datasheet.abilities,
         datasheet_source_ids=replacement_datasheet.source_ids,
         own_models=tuple(sorted(remapped_models, key=lambda model: model.model_instance_id)),

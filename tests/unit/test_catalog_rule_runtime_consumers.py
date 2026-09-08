@@ -9,6 +9,7 @@ from typing import Any, cast
 import pytest
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase15a_charge_declaration_helpers import mission_setup as charge_mission_setup
+from tests.unit_keyword_helpers import with_unit_keywords
 from tests.visibility_corridor_helpers import one_millimeter_visibility_gap_ruins
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -591,9 +592,8 @@ def test_catalog_desperate_escape_consumer_filters_keywords_distance_and_shape_d
         )
         == ()
     )
-    monster_target = replace(
-        target_unit,
-        keywords=tuple(sorted((*target_unit.keywords, "MONSTER"))),
+    monster_target = with_unit_keywords(
+        target_unit, keywords=tuple(sorted((*target_unit.keywords, "MONSTER")))
     )
     monster_target_army = _army_with_unit(target_army, monster_target)
     monster_state = _state_with_battlefield(
@@ -821,15 +821,12 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
     target_leader = next(
         unit for unit in army.units if unit.unit_instance_id.endswith("khorne-leader")
     )
-    source_unit = replace(
+    source_unit = with_unit_keywords(
         source_unit,
         keywords=tuple(sorted((*source_unit.keywords, "FORTIFICATION"))),
         faction_keywords=("KHORNE", "LEGIONES DAEMONICA"),
     )
-    target_unit = replace(
-        target_unit,
-        faction_keywords=("KHORNE", "LEGIONES DAEMONICA"),
-    )
+    target_unit = with_unit_keywords(target_unit, faction_keywords=("KHORNE", "LEGIONES DAEMONICA"))
     army = replace(army, units=(source_unit, target_unit, target_leader))
     target_rules_unit_id = army.attached_units[0].attached_unit_instance_id
     battlefield = BattlefieldRuntimeState(
@@ -1209,14 +1206,13 @@ def test_catalog_battle_shock_runtime_helpers_fail_fast_on_contract_drift() -> N
 
 def test_catalog_battle_shock_reroll_clause_helpers_are_strict() -> None:
     source_army, _ = _mustered_core_armies()
-    fortification_unit = replace(
+    fortification_unit = with_unit_keywords(
         source_army.units[0],
         keywords=tuple(sorted((*source_army.units[0].keywords, "FORTIFICATION"))),
         faction_keywords=("LEGIONES", "DAEMONICA", "KHORNE"),
     )
-    non_fortification_unit = replace(
-        source_army.units[0],
-        faction_keywords=("LEGIONES", "DAEMONICA", "KHORNE"),
+    non_fortification_unit = with_unit_keywords(
+        source_army.units[0], faction_keywords=("LEGIONES", "DAEMONICA", "KHORNE")
     )
     fortification_rules_unit = rules_unit_view_from_armies(
         armies=(_army_with_unit(source_army, fortification_unit),),
@@ -2475,9 +2471,11 @@ def test_catalog_reserve_arrival_restriction_runtime_enforces_aethersense_rule_i
 
 def test_catalog_post_shoot_runtime_enforces_fury_weapon_filter_and_strength_effect() -> None:
     source_army, target_army = _mustered_core_armies()
-    source_unit = replace(
-        source_army.units[0],
-        own_models=(source_army.units[0].own_models[0],),
+    source_unit = with_unit_keywords(
+        replace(
+            source_army.units[0],
+            own_models=(source_army.units[0].own_models[0],),
+        ),
         keywords=(*source_army.units[0].keywords, "AELDARI"),
     )
     source_army = _army_with_unit(source_army, source_unit)
@@ -5880,9 +5878,8 @@ def test_catalog_command_point_bundle_registers_source_backed_generic_consumers(
 def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent() -> None:
     source_army, target_army = _mustered_once_per_battle_armies()
     source_unit = source_army.units[0]
-    character_target = replace(
-        target_army.units[0],
-        keywords=tuple(sorted((*target_army.units[0].keywords, "CHARACTER"))),
+    character_target = with_unit_keywords(
+        target_army.units[0], keywords=tuple(sorted((*target_army.units[0].keywords, "CHARACTER")))
     )
     target_army = _army_with_unit(target_army, character_target)
     state = _state_with_battlefield(

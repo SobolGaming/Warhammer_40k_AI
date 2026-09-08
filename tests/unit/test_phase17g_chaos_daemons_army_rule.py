@@ -19,6 +19,7 @@ from tests.phase11c_command_phase_helpers import (
     with_model_offsets,
 )
 from tests.setup_completion_helpers import record_completed_command_occurrences_for_fixture
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -3029,9 +3030,11 @@ def _mark_player_as_chaos_daemons(
                 keywords.discard("Battleline")
                 keywords.discard("BATTLELINE")
             updated_units.append(
-                replace(
-                    unit,
-                    name=unit.name if unit_name is None else unit_name,
+                with_unit_keywords(
+                    replace(
+                        unit,
+                        name=unit.name if unit_name is None else unit_name,
+                    ),
                     keywords=tuple(sorted(keywords)),
                     faction_keywords=("Legiones Daemonica",),
                 )
@@ -3067,15 +3070,17 @@ def _replace_unit_keywords_and_abilities(
                 continue
             replaced = True
             updated_units.append(
-                replace(
-                    unit,
+                with_unit_keywords(
+                    replace(
+                        unit,
+                        datasheet_abilities=(
+                            unit.datasheet_abilities
+                            if datasheet_abilities is None
+                            else datasheet_abilities
+                        ),
+                    ),
                     keywords=keywords,
                     faction_keywords=faction_keywords,
-                    datasheet_abilities=(
-                        unit.datasheet_abilities
-                        if datasheet_abilities is None
-                        else datasheet_abilities
-                    ),
                 )
             )
         updated_armies.append(replace(army, units=tuple(updated_units)))

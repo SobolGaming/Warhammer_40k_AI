@@ -23,6 +23,7 @@ from tests.setup_completion_helpers import (
     record_completed_command_occurrences_for_fixture,
     record_current_battlefield_placements_for_fixture,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -2873,7 +2874,7 @@ def test_warp_rifts_requires_attempted_placement_to_match_reserve_unit() -> None
 
 def test_warp_rifts_requires_legiones_daemonica() -> None:
     state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
-    reserve_unit = replace(reserve_unit, faction_keywords=())
+    reserve_unit = with_unit_keywords(reserve_unit, faction_keywords=())
     state.army_definitions = [
         replace(
             army,
@@ -2942,14 +2943,18 @@ def test_warp_rifts_ignores_destroyed_component_keywords() -> None:
         name="Living Khorne Bodyguard",
         keywords=("INFANTRY", "KHORNE"),
     )
-    destroyed_leader = replace(
-        _as_daemon_unit(
-            anchor_unit,
-            name="Destroyed Nurgle Leader",
-            keywords=("MONSTER", "NURGLE"),
+    destroyed_leader = with_unit_keywords(
+        replace(
+            _as_daemon_unit(
+                anchor_unit,
+                name="Destroyed Nurgle Leader",
+                keywords=("MONSTER", "NURGLE"),
+            ),
+            own_models=tuple(
+                replace(model, wounds_remaining=0) for model in anchor_unit.own_models
+            ),
         ),
         faction_keywords=(),
-        own_models=tuple(replace(model, wounds_remaining=0) for model in anchor_unit.own_models),
     )
     attached_id = "attached-unit:army-alpha:daemon-keyword-test"
     formation = AttachedUnitFormation(
@@ -4741,16 +4746,18 @@ def _as_daemon_unit(
     keywords: tuple[str, ...],
     datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
 ) -> UnitInstance:
-    return replace(
-        unit,
-        name=name,
+    return with_unit_keywords(
+        replace(
+            unit,
+            name=name,
+            datasheet_abilities=datasheet_abilities,
+            own_models=tuple(
+                _with_base_size(model, base_diameter_mm=_RESERVE_BASE_DIAMETER_MM)
+                for model in unit.own_models
+            ),
+        ),
         keywords=keywords,
         faction_keywords=(rule.LEGIONES_DAEMONICA,),
-        datasheet_abilities=datasheet_abilities,
-        own_models=tuple(
-            _with_base_size(model, base_diameter_mm=_RESERVE_BASE_DIAMETER_MM)
-            for model in unit.own_models
-        ),
     )
 
 

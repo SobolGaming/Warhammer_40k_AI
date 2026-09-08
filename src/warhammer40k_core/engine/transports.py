@@ -109,6 +109,7 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_keyword_queries import unit_has_roster_keyword
 from warhammer40k_core.engine.unit_rule_effects import (
     embark_transport_forbidden_effect_source_ids,
 )
@@ -2846,7 +2847,7 @@ def _append_transport_common_violations(
                 unit_instance_id=cargo_state.transport_unit_instance_id,
             )
         )
-    if _TRANSPORT_KEYWORD not in {_canonical_keyword(keyword) for keyword in transport.keywords}:
+    if not unit_has_roster_keyword(transport, _TRANSPORT_KEYWORD):
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.TRANSPORT_KEYWORD_REQUIRED,

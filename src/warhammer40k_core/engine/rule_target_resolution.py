@@ -6,6 +6,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -160,7 +161,7 @@ def target_spec_keyword_unavailable_reason(
     if context.state is None:
         return "missing_input:game_state"
     for unit_id in target_unit_instance_ids:
-        unit = unit_instance_by_id(state=context.state, unit_instance_id=unit_id)
+        unit = rules_unit_view_by_id(state=context.state, unit_instance_id=unit_id)
         if not unit_has_required_keywords(
             unit_keywords=unit.keywords,
             faction_keywords=unit.faction_keywords,

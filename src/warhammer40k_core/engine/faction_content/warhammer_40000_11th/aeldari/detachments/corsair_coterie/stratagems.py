@@ -530,8 +530,8 @@ def validate_cloak_and_shadow(context: StratagemHandlerContext) -> StratagemHand
     if result.reason is not None:
         return result
     unit_id = _target_unit_id(context)
-    unit = _unit_by_id(context, unit_instance_id=unit_id)
-    if not _unit_has_keyword(unit, INFANTRY):
+    view = rules_unit_view_by_id(state=context.state, unit_instance_id=unit_id)
+    if INFANTRY not in view.keywords:
         return StratagemHandlerExecutionResult.invalid(
             handler_id=CLOAK_AND_SHADOW_HANDLER_ID,
             reason="target_not_infantry",
@@ -590,8 +590,8 @@ def validate_vengeful_sorrow(context: StratagemHandlerContext) -> StratagemHandl
     if result.reason is not None:
         return result
     unit_id = _target_unit_id(context)
-    unit = _unit_by_id(context, unit_instance_id=unit_id)
-    if not _unit_has_keyword(unit, INFANTRY):
+    view = rules_unit_view_by_id(state=context.state, unit_instance_id=unit_id)
+    if INFANTRY not in view.keywords:
         return StratagemHandlerExecutionResult.invalid(
             handler_id=VENGEFUL_SORROW_HANDLER_ID,
             reason="target_not_infantry",
@@ -920,7 +920,8 @@ def _validate_corsair_stratagem(
             reason="detachment_missing",
         )
     unit = _unit_in_army(army=army, unit_instance_id=_target_unit_id(context))
-    if not _unit_has_faction_keyword(unit, AELDARI):
+    view = rules_unit_view_by_id(state=context.state, unit_instance_id=unit.unit_instance_id)
+    if AELDARI not in view.faction_keywords:
         return StratagemHandlerExecutionResult.invalid(
             handler_id=handler_id,
             reason="target_not_aeldari",
@@ -1474,11 +1475,6 @@ def _unit_owner(context: StratagemHandlerContext, *, unit_instance_id: str) -> s
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
-
-
-def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

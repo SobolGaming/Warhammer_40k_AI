@@ -641,7 +641,7 @@ def unit_has_line_of_sight_to_target(
             terrain_features=terrain_features,
             terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
             dynamic_model_blockers=blocker_models,
-            observer_keywords=observing_unit.keywords,
+            observer_keywords=observing_unit.own_model_by_id(observer_model.model_id).keywords,
         )
         if detection_eligible_model_ids.intersection(
             context.resolve_line_of_sight().visible_model_ids
@@ -1203,7 +1203,7 @@ def _best_line_of_sight_range_evidence(
             terrain_features=terrain_features,
             terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
             dynamic_model_blockers=blocker_models,
-            observer_keywords=attacker_unit.keywords,
+            observer_keywords=attacker_unit.own_model_by_id(attacker_model.model_id).keywords,
         )
         witness = context.resolve_line_of_sight()
         cover_result = context.benefit_of_cover(witness)

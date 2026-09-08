@@ -12,6 +12,7 @@ from tests.fight_movement_event_helpers import (
     grouped_fight_movement_resolution_payload,
     standalone_fight_movement_event_evidence,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -21,6 +22,7 @@ from warhammer40k_core.core.datasheet import (
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
 )
+from warhammer40k_core.core.model_keywords import ModelKeywordAssignment
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -2644,7 +2646,7 @@ def _battle_state(
     gsc_units: tuple[UnitInstance, ...] = (gsc_unit,)
     attached_units: tuple[AttachedUnitFormation, ...] = ()
     if attach_character_without_cult_ambush:
-        character = replace(
+        character = with_unit_keywords(
             _unit(
                 unit_instance_id=GSC_CHARACTER_UNIT_ID,
                 datasheet_id="primus",
@@ -3156,16 +3158,18 @@ def _unit(
         )
         for index in range(1, model_count + 1)
     )
-    return UnitInstance(
-        unit_instance_id=unit_instance_id,
-        datasheet_id=datasheet_id,
-        name=name,
+    return with_unit_keywords(
+        UnitInstance(
+            unit_instance_id=unit_instance_id,
+            datasheet_id=datasheet_id,
+            name=name,
+            datasheet_abilities=(_cult_ambush_ability(),) if has_cult_ambush else (),
+            datasheet_source_ids=(f"phase17g-gsc:datasheet:{datasheet_id}",),
+            own_models=models,
+            wargear_selections=(),
+        ),
         keywords=keywords,
         faction_keywords=("GENESTEALER CULTS",) if has_cult_ambush else ("ADEPTUS ASTARTES",),
-        datasheet_abilities=(_cult_ambush_ability(),) if has_cult_ambush else (),
-        datasheet_source_ids=(f"phase17g-gsc:datasheet:{datasheet_id}",),
-        own_models=models,
-        wargear_selections=(),
     )
 
 
@@ -3178,6 +3182,13 @@ def _model(
 ) -> ModelInstance:
     base_size = BaseSizeDefinition.circular(10.0)
     return ModelInstance(
+        keyword_assignment=ModelKeywordAssignment(
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            keywords=(),
+            faction_keywords=(),
+            source_ids=(f"phase17g-gsc:model:{model_profile_id}",),
+        ),
         model_instance_id=model_instance_id,
         datasheet_id=datasheet_id,
         model_profile_id=model_profile_id,

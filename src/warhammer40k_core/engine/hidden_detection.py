@@ -116,7 +116,7 @@ def _target_model_has_gone_to_ground_against_attacker(
         terrain_features=terrain_features,
         terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
         dynamic_model_blockers=dynamic_model_blockers,
-        observer_keywords=attacker_unit.keywords,
+        observer_keywords=attacker_unit.own_model_by_id(attacker_model.model_id).keywords,
     )
     witness = context.resolve_line_of_sight()
     if witness.unit_fully_visible:

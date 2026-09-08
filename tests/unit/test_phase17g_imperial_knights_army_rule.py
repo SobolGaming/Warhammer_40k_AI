@@ -23,6 +23,7 @@ from tests.phase11c_command_phase_helpers import (
     setup_state_at_declare_battle_formations,
     unit_by_id,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -1726,7 +1727,7 @@ def _mark_player_as_imperial_knights(state: GameState, *, player_id: str) -> Non
             updated_armies.append(army)
             continue
         updated_units = tuple(
-            replace(unit, faction_keywords=(army_rule.IMPERIAL_KNIGHTS_FACTION_KEYWORD,))
+            with_unit_keywords(unit, faction_keywords=(army_rule.IMPERIAL_KNIGHTS_FACTION_KEYWORD,))
             for unit in army.units
         )
         updated_armies.append(
@@ -1806,10 +1807,12 @@ def _mark_bondsman_source_and_armiger_target(
             if unit.unit_instance_id == BONDSMAN_ARMIGER_UNIT_ID and target_is_armiger:
                 keywords = _with_unique_keyword(unit.keywords, army_rule.ARMIGER_KEYWORD)
             updated_units.append(
-                replace(
-                    unit,
+                with_unit_keywords(
+                    replace(
+                        unit,
+                        datasheet_abilities=datasheet_abilities,
+                    ),
                     keywords=keywords,
-                    datasheet_abilities=datasheet_abilities,
                 )
             )
         updated_armies.append(replace(army, units=tuple(updated_units)))
@@ -1855,7 +1858,7 @@ def _mark_enemy_unit_as_character(state: GameState, *, player_id: str) -> None:
         updated_units: list[UnitInstance] = []
         for unit in army.units:
             updated_units.append(
-                replace(unit, keywords=tuple(sorted({*unit.keywords, "CHARACTER"})))
+                with_unit_keywords(unit, keywords=tuple(sorted({*unit.keywords, "CHARACTER"})))
             )
         updated_armies.append(replace(army, units=tuple(updated_units)))
     state.army_definitions = updated_armies

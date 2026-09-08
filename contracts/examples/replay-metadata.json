@@ -6959,6 +6959,23 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
+                    ]
+                  },
                   "model_instance_id": "army-alpha:scout-redeploy-unit:core-intercessor-like:001",
                   "model_profile_id": "core-intercessor-like",
                   "name": "CORE Intercessor-like Infantry",
@@ -7070,6 +7087,23 @@
                         "radius_x_inches": 0.6299212598425197,
                         "radius_y_inches": 0.6299212598425197
                       }
+                    ]
+                  },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
                     ]
                   },
                   "model_instance_id": "army-alpha:scout-redeploy-unit:core-intercessor-like:002",
@@ -7185,6 +7219,23 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
+                    ]
+                  },
                   "model_instance_id": "army-alpha:scout-redeploy-unit:core-intercessor-like:003",
                   "model_profile_id": "core-intercessor-like",
                   "name": "CORE Intercessor-like Infantry",
@@ -7298,6 +7349,23 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
+                    ]
+                  },
                   "model_instance_id": "army-alpha:scout-redeploy-unit:core-intercessor-like:004",
                   "model_profile_id": "core-intercessor-like",
                   "name": "CORE Intercessor-like Infantry",
@@ -7409,6 +7477,23 @@
                         "radius_x_inches": 0.6299212598425197,
                         "radius_y_inches": 0.6299212598425197
                       }
+                    ]
+                  },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
                     ]
                   },
                   "model_instance_id": "army-alpha:scout-redeploy-unit:core-intercessor-like:005",
@@ -7552,6 +7637,21 @@
                         "radius_x_inches": 2.362204724409449,
                         "radius_y_inches": 2.362204724409449
                       }
+                    ]
+                  },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-vehicle-monster",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "MONSTER",
+                      "VEHICLE"
+                    ],
+                    "model_profile_id": "core-vehicle-monster",
+                    "source_ids": [
+                      "datasheet:core-vehicle-monster",
+                      "datasheet:core-vehicle-monster:profile"
                     ]
                   },
                   "model_instance_id": "army-alpha:strategic-reserve-unit:core-vehicle-monster:001",
@@ -7714,6 +7814,21 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-deep-strike-unit",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "DEEP STRIKE",
+                      "INFANTRY"
+                    ],
+                    "model_profile_id": "core-deep-strike-model",
+                    "source_ids": [
+                      "datasheet:core-deep-strike-unit",
+                      "datasheet:core-deep-strike-unit:profile"
+                    ]
+                  },
                   "model_instance_id": "army-alpha:deep-strike-unit:core-deep-strike-model:001",
                   "model_profile_id": "core-deep-strike-model",
                   "name": "CORE Deep Strike Model",
@@ -7827,6 +7942,21 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-deep-strike-unit",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "DEEP STRIKE",
+                      "INFANTRY"
+                    ],
+                    "model_profile_id": "core-deep-strike-model",
+                    "source_ids": [
+                      "datasheet:core-deep-strike-unit",
+                      "datasheet:core-deep-strike-unit:profile"
+                    ]
+                  },
                   "model_instance_id": "army-alpha:deep-strike-unit:core-deep-strike-model:002",
                   "model_profile_id": "core-deep-strike-model",
                   "name": "CORE Deep Strike Model",
@@ -7938,6 +8068,21 @@
                         "radius_x_inches": 0.6299212598425197,
                         "radius_y_inches": 0.6299212598425197
                       }
+                    ]
+                  },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-deep-strike-unit",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "DEEP STRIKE",
+                      "INFANTRY"
+                    ],
+                    "model_profile_id": "core-deep-strike-model",
+                    "source_ids": [
+                      "datasheet:core-deep-strike-unit",
+                      "datasheet:core-deep-strike-unit:profile"
                     ]
                   },
                   "model_instance_id": "army-alpha:deep-strike-unit:core-deep-strike-model:003",
@@ -8152,6 +8297,23 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
+                    ]
+                  },
                   "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:001",
                   "model_profile_id": "core-intercessor-like",
                   "name": "CORE Intercessor-like Infantry",
@@ -8263,6 +8425,23 @@
                         "radius_x_inches": 0.6299212598425197,
                         "radius_y_inches": 0.6299212598425197
                       }
+                    ]
+                  },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
                     ]
                   },
                   "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:002",
@@ -8378,6 +8557,23 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
+                    ]
+                  },
                   "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:003",
                   "model_profile_id": "core-intercessor-like",
                   "name": "CORE Intercessor-like Infantry",
@@ -8491,6 +8687,23 @@
                       }
                     ]
                   },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
+                    ]
+                  },
                   "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:004",
                   "model_profile_id": "core-intercessor-like",
                   "name": "CORE Intercessor-like Infantry",
@@ -8602,6 +8815,23 @@
                         "radius_x_inches": 0.6299212598425197,
                         "radius_y_inches": 0.6299212598425197
                       }
+                    ]
+                  },
+                  "keyword_assignment": {
+                    "datasheet_id": "core-intercessor-like-infantry",
+                    "faction_keywords": [
+                      "CORE MARINES"
+                    ],
+                    "keywords": [
+                      "BATTLELINE",
+                      "INFANTRY",
+                      "REDEPLOY",
+                      "SCOUTS"
+                    ],
+                    "model_profile_id": "core-intercessor-like",
+                    "source_ids": [
+                      "datasheet:core-intercessor-like-infantry",
+                      "datasheet:core-intercessor-like-infantry:profile"
                     ]
                   },
                   "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:005",

@@ -89,11 +89,16 @@ from warhammer40k_core.rules.wahapedia_equipment_choice_bridge import append_cho
 from warhammer40k_core.rules.wahapedia_invulnerable_save_bridge import (
     ConditionalInvulnerableSaveBridge,
 )
+from warhammer40k_core.rules.wahapedia_keyword_inventory import datasheet_keyword_inventory
 from warhammer40k_core.rules.wahapedia_loadout_bridge import (
     LoadoutAssignments,
     parse_loadout_assignments,
     uniform_loadout_wargear_count,
 )
+from warhammer40k_core.rules.wahapedia_materialization_keywords import (
+    materialization_keyword_profiles,
+)
+from warhammer40k_core.rules.wahapedia_model_keywords import scoped_model_keyword_fields
 from warhammer40k_core.rules.wahapedia_replacement_option_bridge import (
     append_extended_replacement_rows,
     replacement_choices,
@@ -356,6 +361,21 @@ def _bridge_datasheet(
                 "datasheet_id": datasheet_id,
                 "line": entry.line,
                 "name": entry.model_name,
+                **scoped_model_keyword_fields(
+                    datasheet_id=datasheet_id,
+                    model_profile_id=entry.model_profile_id,
+                    profiles=tuple((p.model_name, p.model_profile_id) for p in composition_entries),
+                    materialization_profiles=materialization_keyword_profiles(
+                        context.rows_by_table.get("Datasheets_abilities", ()),
+                        datasheet_id=datasheet_id,
+                        error_type=WahapediaBridgeError,
+                    ),
+                    name_key=_name_key,
+                    keyword_rows=keyword_source_ids,
+                    keywords=keywords,
+                    faction_keywords=faction_keywords,
+                    error_type=WahapediaBridgeError,
+                ),
                 "model_profile_id": entry.model_profile_id,
                 "content_scope": "matched_play",
                 "m": _required_field(model_source_row, "M"),
@@ -566,45 +586,14 @@ def _keywords_for_datasheet(
     context: _BridgeContext,
     datasheet_id: str,
 ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[NormalizedSourceRow, ...]]:
-    keyword_rows = _rows_matching(
-        context.rows_by_table, "Datasheets_keywords", "datasheet_id", datasheet_id
-    )
-    if not keyword_rows:
-        raise WahapediaBridgeError("Datasheet has no keyword rows.")
-    correction = context.corrections_by_datasheet.get(datasheet_id)
-    removed = set(correction.removed_keywords if correction is not None else ())
-    keywords: list[str] = list(
-        correction.replacement_keywords
-        if correction is not None and correction.replacement_keywords is not None
-        else ()
-    )
-    replaces_keywords = correction is not None and correction.replacement_keywords is not None
-    faction_keywords: list[str] = []
-    source_rows: list[NormalizedSourceRow] = []
-    for row in keyword_rows:
-        keyword = _raw_or_field(row, "keyword").strip()
-        if not keyword:
-            if _required_field(row, "is_faction_keyword") != "true":
-                raise WahapediaBridgeError(
-                    "Empty datasheet keyword rows must be faction-keyword placeholders."
-                )
-            source_rows.append(row)
-            continue
-        if keyword in removed:
-            if correction is not None:
-                source_rows.append(row)
-            continue
-        if _required_field(row, "is_faction_keyword") == "true":
-            faction_keywords.append(keyword)
-        elif not replaces_keywords:
-            keywords.append(keyword)
-        source_rows.append(row)
-    if correction is not None:
-        source_rows.append(_correction_source_row(correction))
-    return (
-        tuple(sorted(_deduplicated(keywords))),
-        tuple(sorted(_deduplicated(faction_keywords))),
-        tuple(source_rows),
+    return datasheet_keyword_inventory(
+        keyword_rows=_rows_matching(
+            context.rows_by_table, "Datasheets_keywords", "datasheet_id", datasheet_id
+        ),
+        correction=context.corrections_by_datasheet.get(datasheet_id),
+        raw_field=_raw_or_field,
+        correction_source_row=_correction_source_row,
+        error_type=WahapediaBridgeError,
     )
 
 
@@ -1653,6 +1642,8 @@ def _artifacts_from_bridge_rows(
             table_name,
             error_type=WahapediaBridgeError,
         )
+        if any("model_keyword_assignments" in row for row in rows):
+            columns = (*columns, "model_keyword_assignments")
         csv_text = _csv_text(columns=columns, rows=tuple(rows))
         artifacts.append(
             WahapediaJsonArtifact.from_csv_table(

@@ -7,6 +7,7 @@ import pytest
 from tests.phase11c_command_phase_helpers import (
     battle_state,
 )
+from tests.unit_keyword_helpers import with_unit_keywords
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -453,10 +454,12 @@ def _mark_player_as_adeptus_custodes(
                     faction_id=ADEPTUS_CUSTODES_FACTION_ID,
                 ),
                 units=tuple(
-                    replace(
-                        unit,
+                    with_unit_keywords(
+                        replace(
+                            unit,
+                            datasheet_abilities=resolved_abilities,
+                        ),
                         faction_keywords=faction_keywords,
-                        datasheet_abilities=resolved_abilities,
                     )
                     for unit in army.units
                 ),
