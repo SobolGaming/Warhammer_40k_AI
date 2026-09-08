@@ -4395,7 +4395,8 @@ assertions and the installed-wheel smoke all passed.
 
 ## Order 31 — P02D model keyword authority
 
-**Status:** Implemented and locally validated; PR publication pending.
+**Status:** Implemented and locally validated in
+[PR #435](https://github.com/SobolGaming/Warhammer_40k_AI/pull/435); awaiting merge.
 
 **Finding IDs:** C02-04. **Dependencies and evidence gate:** P19, P05B and
 S-MIRRORS are present on main base `14e7bcfc7e733477cc7ab1309f803494a70b9c78`;
@@ -4482,4 +4483,6 @@ aggregate coverage run began.
 Published runtime identity:
 `warhammer40k-core-v2:runtime-tree-sha256-v1:91ea86186c4672cffd2f60b007c51d1fc0dd9d6e02a0cfeb5f230bb5dc354f82`.
 
-**PR URL and merge commit:** Pending publication; merge remains user-owned.
+**PR URL and merge commit:**
+<https://github.com/SobolGaming/Warhammer_40k_AI/pull/435>. Merge pending; merge
+remains user-owned.
