@@ -150,3 +150,16 @@ The source change is limited to the existing model participation validator and
 its restoration caller; fixture changes preserve the prior outcome assertions.
 The 98 passing timing samples for 9699f8f8 are retained under
 `docs/performance/order34/review-9699/`; they do not certify this later runtime.
+
+
+The aggregate exposed further direct-executor fixtures missing their accepted
+prefix. Three now retain the shared typed declaration ledger. The retained-target
+fixture now obtains a real finite selection/type request and a legal declaration,
+with an in-range, unengaged initial firing position. Its target geometry and damage
+assertions are unchanged. The existing helper that deliberately pauses before
+attack dice also retains the lifecycle's real pre-declaration origin. Its two
+private-field accesses are confined to fixture setup and documented locally;
+no production API or runtime validation exception was added. All 233 tests in
+the complete affected shooting module passed after these fixture repairs.
+The interrupted aggregate is explicitly incomplete; its workers exited and
+process-group cleanup was verified before subsequent runs.

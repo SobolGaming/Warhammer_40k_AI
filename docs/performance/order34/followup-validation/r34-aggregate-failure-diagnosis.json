@@ -1,0 +1,14 @@
+{
+  "name": "r34-aggregate-failure-diagnosis",
+  "command": "uv run pytest tests/unit/test_phase13b_shooting_declarations.py -q --no-cov --tb=short --maxfail=3",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:05:13.156820+00:00",
+  "deadline_seconds": 180.0,
+  "log": "/private/tmp/order34-evidence/r34-aggregate-failure-diagnosis.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 26147,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 96.715,
+  "committed_log": "r34-aggregate-failure-diagnosis.txt"
+}

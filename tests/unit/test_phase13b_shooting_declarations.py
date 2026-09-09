@@ -2129,7 +2129,7 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         source_model_instance_id=pool_a.attacker_model_instance_id,
         source_weapon_profile=pool_a.weapon_profile,
         target_unit_instance_id=target_a.unit_instance_id,
-        attack_context_id="phase13d-dev-queue:pool-001:attack-001",
+        attack_context_id="attack-sequence:phase13d-dev-queue:pool-001:attack-001",
         mortal_wounds=1,
     )
     deferred_b = DeferredMortalWounds(
@@ -2137,11 +2137,11 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         source_model_instance_id=pool_b.attacker_model_instance_id,
         source_weapon_profile=pool_b.weapon_profile,
         target_unit_instance_id=target_b.unit_instance_id,
-        attack_context_id="phase13d-dev-queue:pool-002:attack-001",
+        attack_context_id="attack-sequence:phase13d-dev-queue:pool-002:attack-001",
         mortal_wounds=1,
     )
     sequence = AttackSequence(
-        sequence_id="phase13d-dev-queue",
+        sequence_id="attack-sequence:phase13d-dev-queue",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(pool_a, pool_b),
@@ -2149,6 +2149,16 @@ def test_phase13d_deferred_devastating_mortal_wounds_route_each_model_choice() -
         deferred_mortal_wounds=(deferred_a, deferred_b),
     )
 
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    )
     remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
@@ -12274,7 +12284,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
         damage_profile=DamageProfile.fixed(first_target.wounds_remaining),
         keywords=(WeaponKeyword.TORRENT,),
     )
-    sequence_id = "order-9-p05a-destruction-boundary"
+    sequence_id = "attack-sequence:order-9-p05a-destruction-boundary"
     sequence = AttackSequence.start(
         sequence_id=sequence_id,
         attacker_player_id="player-a",
@@ -12287,6 +12297,16 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
                 attacks=3,
             ),
         ),
+    )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
     )
     wound_results = tuple(
         _fixed_roll_result(
@@ -12840,6 +12860,18 @@ def _retain_attack_casualty_for_fight_on_death(
     reduce_to_last_model: bool,
 ) -> str:
     state = _state(lifecycle)
+    # This source now declares a real shot; place its firing model in range as
+    # part of canonical setup, before the fixture emits any attack history.
+    prepared = _scenario_with_unit_pose(
+        scenario=battlefield_scenario_for_state(state=state),
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=_compact_test_unit_poses(
+            origin=Pose.at(18.0, 40.0), model_count=len(attacker.own_models)
+        ),
+    )
+    state.replace_battlefield_state(prepared.battlefield_state)
     if reduce_to_last_model:
         target_model = _reduce_unit_to_last_model_with_mortal_wounds(
             lifecycle,
@@ -12886,15 +12918,22 @@ def _retain_attack_casualty_for_fight_on_death(
             ),
         ),
     )
-    from tests.completed_attack_fixture_helpers import (
-        record_shooting_declaration_for_executor_fixture,
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id=f"{fixture_id}-selection",
     )
-
-    record_shooting_declaration_for_executor_fixture(
-        state=state,
-        decisions=lifecycle.decision_controller,
-        sequence=sequence,
-        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    _apply_shooting_declaration_without_advancing(
+        lifecycle,
+        request=declaration_request,
+        proposal=_proposal_from_request(
+            request=declaration_request,
+            target_unit_id=defender.unit_instance_id,
+            weapon_profile_id=weapon_profile.profile_id,
+        ),
+        result_id=f"{fixture_id}-sequence",
     )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
@@ -16049,7 +16088,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
     )
     sequence = AttackSequence.start(
-        sequence_id="phase13e-success-deadly-demise",
+        sequence_id="attack-sequence:phase13e-success-deadly-demise",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -16061,6 +16100,16 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
             ),
         ),
     )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
@@ -16069,7 +16118,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )
-    attack_context_id = "phase13e-success-deadly-demise:pool-001:attack-001"
+    attack_context_id = "attack-sequence:phase13e-success-deadly-demise:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",

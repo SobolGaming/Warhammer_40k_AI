@@ -1,0 +1,14 @@
+{
+  "name": "r34-shooting-module-final-freeze",
+  "command": "uv run pytest tests/unit/test_phase13b_shooting_declarations.py -q -n 8 --dist=worksteal --no-cov --tb=short --maxfail=5\nuv run ruff check .\nuv run ruff format --check .\nuv run mypy src tests\nuv run pyright\nuv run --no-sync python scripts/build_test_shards.py --check --shard-count 8\nuv run lint-imports\nuv run pre-commit run --all-files",
+  "cwd": "/Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI",
+  "start_utc": "2026-09-09T19:19:52.211591+00:00",
+  "deadline_seconds": 300.0,
+  "log": "/private/tmp/order34-evidence/r34-shooting-module-final-freeze.log",
+  "next_action": "consume terminal result and advance",
+  "pid": 29622,
+  "outcome": "nonzero",
+  "exit_status": 1,
+  "elapsed_seconds": 94.54,
+  "committed_log": "r34-shooting-module-final-freeze.txt"
+}
