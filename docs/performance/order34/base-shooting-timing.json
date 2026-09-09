@@ -1,0 +1,194 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "commit": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "38151852a5797700df25e38bcd3a1d2fb594dd9e7468e1eb9c87d7fb1251a570",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "uninstrumented_timing",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9"
+  },
+  "results": {
+    "visible-self-observer": {
+      "samples": [
+        {
+          "setup_seconds": 4.2548642919864506,
+          "slice_seconds": 0.12471820798236877,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1701014589052647,
+          "slice_seconds": 0.11814837506972253,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2281314169522375,
+          "slice_seconds": 0.11665516602806747,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1744585409760475,
+          "slice_seconds": 0.11808133404701948,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.20723291602917,
+          "slice_seconds": 0.11872333392966539,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.166474875062704,
+          "slice_seconds": 0.11705116694793105,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2119239160092548,
+          "slice_seconds": 0.1179071250371635,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.1187549584345626,
+      "median_seconds": 0.11808133404701948,
+      "p95_seconds": 0.12471820798236877,
+      "maximum_seconds": 0.12471820798236877,
+      "completion_rate": 1.0,
+      "slices_per_second": 8.420701023200044
+    },
+    "unseen-no-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.213931833044626,
+          "slice_seconds": 0.46984687505755574,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2441437089582905,
+          "slice_seconds": 0.4005722500151023,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1967114579165354,
+          "slice_seconds": 0.39870925003197044,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2635369170457125,
+          "slice_seconds": 0.3977397920098156,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.192031209007837,
+          "slice_seconds": 0.3975750409299508,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.236141834058799,
+          "slice_seconds": 0.3975453330203891,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.198885167017579,
+          "slice_seconds": 0.400191624998115,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.4088828808661284,
+      "median_seconds": 0.39870925003197044,
+      "p95_seconds": 0.46984687505755574,
+      "maximum_seconds": 0.46984687505755574,
+      "completion_rate": 1.0,
+      "slices_per_second": 2.4456881097142538
+    },
+    "unseen-friendly-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.295606666011736,
+          "slice_seconds": 0.33447775000240654,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2485779999988154,
+          "slice_seconds": 0.3090370000572875,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2843132090056315,
+          "slice_seconds": 0.31598745798692107,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.3028737920103595,
+          "slice_seconds": 0.3177393330261111,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2628735000034794,
+          "slice_seconds": 0.31637445802334696,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.300147125031799,
+          "slice_seconds": 0.3159996659960598,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2629795409739017,
+          "slice_seconds": 0.35709583398420364,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.32381592843947665,
+      "median_seconds": 0.31637445802334696,
+      "p95_seconds": 0.35709583398420364,
+      "maximum_seconds": 0.35709583398420364,
+      "completion_rate": 1.0,
+      "slices_per_second": 3.0881742131067114
+    }
+  },
+  "full_game_certified": false
+}
