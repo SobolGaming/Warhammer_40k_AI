@@ -679,7 +679,9 @@ def _scored_secondary_state(
         card.with_selection(resolved_secondary_mission_selection_for_card(state, card))
     )
     decisions = DecisionController()
-    seed_positive_secondary_condition(state, row, event_log=decisions.event_log)
+    seed_positive_secondary_condition(
+        state, row, event_log=decisions.event_log, decisions=decisions
+    )
     if after_positive_seed is not None:
         after_positive_seed(state)
     if not any(

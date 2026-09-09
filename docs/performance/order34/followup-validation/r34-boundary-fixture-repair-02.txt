@@ -1,0 +1,140 @@
+bringing up nodes...
+bringing up nodes...
+
+...................................................................FF.FF [ 86%]
+.F.F....FFF                                                              [100%]
+=================================== FAILURES ===================================
+_ test_phase17n_step6g_tactical_retain_leaves_card_active_without_transaction[plunder:retain:player-a] _
+[gw6] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:45: in test_phase17n_step6g_tactical_retain_leaves_card_active_without_transaction
+    assert_tactical_retain_leaves_card_active_without_transaction(row)
+tests/phase17n_step6g_secondary_certification_helpers.py:235: in assert_tactical_retain_leaves_card_active_without_transaction
+    session, _initial_payload, expectation = secondary_certification_session(row)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:263: in secondary_certification_session
+    player_a_units = certification_unit_selections_for_row(row, player_id="player-a")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_secondary_certification_fixtures.py:104: in certification_unit_selections_for_row
+    raise AssertionError(
+E   AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+_ test_phase17n_step6g_tactical_retain_leaves_card_active_without_transaction[plunder:retain:player-b] _
+[gw6] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:45: in test_phase17n_step6g_tactical_retain_leaves_card_active_without_transaction
+    assert_tactical_retain_leaves_card_active_without_transaction(row)
+tests/phase17n_step6g_secondary_certification_helpers.py:235: in assert_tactical_retain_leaves_card_active_without_transaction
+    session, _initial_payload, expectation = secondary_certification_session(row)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:263: in secondary_certification_session
+    player_a_units = certification_unit_selections_for_row(row, player_id="player-a")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_secondary_certification_fixtures.py:104: in certification_unit_selections_for_row
+    raise AssertionError(
+E   AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+_____ test_gateway_unto_damnation_attack_destruction_upgrades_and_persists _____
+[gw7] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17g_chaos_daemons_blood_legion.py:1788: in test_gateway_unto_damnation_attack_destruction_upgrades_and_persists
+    rebuilt = GameLifecycle.from_payload(payload)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:84: in validate_primary_mission_restore_integrity
+    _ocra.validate_objective_control_record_authority_lifecycle_integrity(
+src/warhammer40k_core/engine/objective_control_record_authority.py:495: in validate_objective_control_record_authority_lifecycle_integrity
+    validate_primary_mission_boundary_unit_history_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_unit_history_authority.py:57: in validate_primary_mission_boundary_unit_history_authority
+    raise GameLifecycleError("Primary mission boundary shooting state lacks exact authority.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+_ test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-b] _
+[gw7] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:32: in test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views
+    assert_secondary_scores_through_lifecycle_restore_and_views(row)
+tests/phase17n_step6g_secondary_certification_helpers.py:172: in assert_secondary_scores_through_lifecycle_restore_and_views
+    session, initial_payload, expectation = secondary_certification_session(row)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:263: in secondary_certification_session
+    player_a_units = certification_unit_selections_for_row(row, player_id="player-a")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_secondary_certification_fixtures.py:104: in certification_unit_selections_for_row
+    raise AssertionError(
+E   AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+_ test_zero_secondary_turn_capacity_cannot_score_or_discard_an_achieved_tactical _
+[gw2] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification.py:371: in test_zero_secondary_turn_capacity_cannot_score_or_discard_an_achieved_tactical
+    lifecycle=_configured_step6g_lifecycle(state=state, decisions=decisions)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:425: in configured_step6g_lifecycle
+    return GameLifecycle.from_payload(
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:57: in validate_activity_restriction_inventory
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+_ test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-a] _
+[gw5] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:32: in test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views
+    assert_secondary_scores_through_lifecycle_restore_and_views(row)
+tests/phase17n_step6g_secondary_certification_helpers.py:172: in assert_secondary_scores_through_lifecycle_restore_and_views
+    session, initial_payload, expectation = secondary_certification_session(row)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:263: in secondary_certification_session
+    player_a_units = certification_unit_selections_for_row(row, player_id="player-a")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_secondary_certification_fixtures.py:104: in certification_unit_selections_for_row
+    raise AssertionError(
+E   AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+_ test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolution _
+[gw1] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification.py:634: in test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolution
+    lifecycle=_configured_step6g_lifecycle(state=state, decisions=decisions)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:425: in configured_step6g_lifecycle
+    return GameLifecycle.from_payload(
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:74: in validate_primary_mission_restore_integrity
+    _pmbc.validate_primary_mission_boundary_checkpoint_source_registry(
+src/warhammer40k_core/engine/primary_mission_boundary_checkpoint.py:310: in validate_primary_mission_boundary_checkpoint_source_registry
+    validate_primary_mission_boundary_physical_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py:577: in validate_primary_mission_boundary_physical_authority
+    _validate_authority_against_current(
+src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py:1424: in _validate_authority_against_current
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission physical history for army-alpha:intercessor-unit-a3:core-intercessor-like:001 drifted from restored state.
+_ test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap __
+[gw2] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification.py:527: in test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap
+    lifecycle = _configured_step6g_lifecycle(state=state, decisions=decisions)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:425: in configured_step6g_lifecycle
+    return GameLifecycle.from_payload(
+src/warhammer40k_core/engine/lifecycle.py:1008: in from_payload
+    _pmri.validate_primary_mission_restore_integrity(
+src/warhammer40k_core/engine/primary_mission_restore_integrity.py:74: in validate_primary_mission_restore_integrity
+    _pmbc.validate_primary_mission_boundary_checkpoint_source_registry(
+src/warhammer40k_core/engine/primary_mission_boundary_checkpoint.py:310: in validate_primary_mission_boundary_checkpoint_source_registry
+    validate_primary_mission_boundary_physical_authority(
+src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py:577: in validate_primary_mission_boundary_physical_authority
+    _validate_authority_against_current(
+src/warhammer40k_core/engine/primary_mission_boundary_physical_authority.py:1424: in _validate_authority_against_current
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Primary mission physical history for army-alpha:intercessor-unit-a3:core-intercessor-like:001 drifted from restored state.
+______ test_positive_partial_tactical_award_scores_and_discards_the_card _______
+[gw0] darwin -- Python 3.14.5 /Users/andrzej.gorski/Documents/Projects/Warhammer_40k_AI/.venv/bin/python3
+tests/unit/test_phase17n_step6g_secondary_certification.py:680: in test_positive_partial_tactical_award_scores_and_discards_the_card
+    assert (
+E   AssertionError: assert 5 == 3
+E    +  where 5 = VictoryPointTransaction(transaction_id='victory-point:player-a:round-02:000004', player_id='player-a', battle_round=2,...667f34ea8e1cab', 'scoring_commit_checkpoint_hash': 'beb4cf8b21bf0d5b04ee83ecd4478a278635f3047090a180dd667f34ea8e1cab'}).amount
+=========================== short test summary info ============================
+FAILED tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py::test_phase17n_step6g_tactical_retain_leaves_card_active_without_transaction[plunder:retain:player-a] - AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py::test_phase17n_step6g_tactical_retain_leaves_card_active_without_transaction[plunder:retain:player-b] - AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+FAILED tests/unit/test_phase17g_chaos_daemons_blood_legion.py::test_gateway_unto_damnation_attack_destruction_upgrades_and_persists - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission boundary shooting state lacks exact authority.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py::test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-b] - AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification.py::test_zero_secondary_turn_capacity_cannot_score_or_discard_an_achieved_tactical - warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py::test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-a] - AssertionError: Step 6G matrix roster has no fixture for Secondary mission plunder.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification.py::test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolution - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission physical history for army-alpha:intercessor-unit-a3:core-intercessor-like:001 drifted from restored state.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification.py::test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap - warhammer40k_core.engine.phase.GameLifecycleError: Primary mission physical history for army-alpha:intercessor-unit-a3:core-intercessor-like:001 drifted from restored state.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification.py::test_positive_partial_tactical_award_scores_and_discards_the_card - AssertionError: assert 5 == 3
+ +  where 5 = VictoryPointTransaction(transaction_id='victory-point:player-a:round-02:000004', player_id='player-a', battle_round=2,...667f34ea8e1cab', 'scoring_commit_checkpoint_hash': 'beb4cf8b21bf0d5b04ee83ecd4478a278635f3047090a180dd667f34ea8e1cab'}).amount
+9 failed, 74 passed in 27.71s

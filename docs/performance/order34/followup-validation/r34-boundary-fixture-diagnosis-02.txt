@@ -1,0 +1,60 @@
+FFE                                                                      [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destruction-game-id] _
+tests/unit/test_phase11e_mission_scoring_cleanup.py:338: in authentic_primary_destruction_lifecycle_payload
+    return _authentic_primary_destruction_lifecycle_payload()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_phase11e_mission_scoring_cleanup.py:10893: in _authentic_primary_destruction_lifecycle_payload
+    restored = GameLifecycle.from_payload(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:252: in validate_declared_model_attack_completions
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+src/warhammer40k_core/engine/model_attack_history.py:142: in validate_retained_model_attack_history
+    raise GameLifecycleError("Model attack history lacks its declaration.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+=================================== FAILURES ===================================
+_ test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-a] _
+tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py:32: in test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views
+    assert_secondary_scores_through_lifecycle_restore_and_views(row)
+tests/phase17n_step6g_secondary_certification_helpers.py:172: in assert_secondary_scores_through_lifecycle_restore_and_views
+    session, initial_payload, expectation = secondary_certification_session(row)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/phase17n_step6g_secondary_certification_helpers.py:292: in secondary_certification_session
+    lifecycle = GameLifecycle.from_payload(
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:57: in validate_activity_restriction_inventory
+    raise GameLifecycleError(
+E   warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+_ test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn _
+tests/unit/test_phase11e_mission_scoring_cleanup.py:1050: in test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/warhammer40k_core/engine/lifecycle.py:965: in from_payload
+    _validate_payload_consistency(
+src/warhammer40k_core/engine/lifecycle.py:3344: in _validate_payload_consistency
+    validate_activity_restriction_inventory(
+src/warhammer40k_core/engine/activity_restriction_restore.py:43: in validate_activity_restriction_inventory
+    expected = activity_restrictions_from_history(
+src/warhammer40k_core/engine/activity_restriction_restore.py:76: in activity_restrictions_from_history
+    validate_declared_model_attack_completions(
+src/warhammer40k_core/engine/model_attack_history.py:252: in validate_declared_model_attack_completions
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+src/warhammer40k_core/engine/model_attack_history.py:142: in validate_retained_model_attack_history
+    raise GameLifecycleError("Model attack history lacks its declaration.")
+E   warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+=========================== short test summary info ============================
+ERROR tests/unit/test_phase11e_mission_scoring_cleanup.py::test_primary_destruction_lifecycle_restore_rejects_identity_corruption[destruction-game-id] - warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+FAILED tests/unit/test_phase17n_step6g_secondary_certification_no_prisoners_through_secure.py::test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views[plunder:tactical:player-a] - warhammer40k_core.engine.phase.GameLifecycleError: Activity restriction inventory differs from accepted activity and completed boundary history.
+FAILED tests/unit/test_phase11e_mission_scoring_cleanup.py::test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn - warhammer40k_core.engine.phase.GameLifecycleError: Model attack history lacks its declaration.
+2 failed, 1 error in 16.47s

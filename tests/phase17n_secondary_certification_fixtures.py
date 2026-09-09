@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 from tests.phase11c_command_phase_helpers import default_unit_selection, unit_selection
 from tests.phase17n_secondary_mission_helpers import resolved_secondary_mission_selection_for_card
@@ -9,22 +10,27 @@ from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.battlefield_state import ModelPlacement
-from warhammer40k_core.engine.event_log import EventLog
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
+from warhammer40k_core.engine.mission_decisions import request_mission_action_start
 from warhammer40k_core.engine.mission_terrain import (
-    MissionLogicalTerrainArea,
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_areas,
 )
 from warhammer40k_core.engine.missions import mission_pack_for_id
 from warhammer40k_core.engine.phase import BattlePhase
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     TABLE_QUARTER_NORTH_EAST,
     TABLE_QUARTER_NORTH_WEST,
     TABLE_QUARTER_SOUTH_EAST,
     TABLE_QUARTER_SOUTH_WEST,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardMode
 from warhammer40k_core.engine.secondary_scoring_inventory import (
     SecondaryMissionLifecycleCertificationRow,
@@ -93,7 +99,7 @@ def certification_unit_selections_for_row(
     *,
     player_id: str,
 ) -> tuple[UnitMusterSelection, ...]:
-    if row.secondary_mission_id not in {*_DESTRUCTION_SEEDERS, *_SEEDERS}:
+    if row.secondary_mission_id not in {*_DESTRUCTION_SEEDERS, *_SEEDERS, "plunder"}:
         raise AssertionError(
             "Step 6G matrix roster has no fixture for Secondary mission "
             f"{row.secondary_mission_id}."
@@ -183,8 +189,14 @@ def seed_positive_secondary_condition(
     row: SecondaryMissionLifecycleCertificationRow,
     *,
     event_log: EventLog | None = None,
+    decisions: DecisionController | None = None,
 ) -> SecondaryPositiveExpectation:
     _park_units_in_safe_zones(state, scoring_player_id=row.scoring_player_id)
+    if row.secondary_mission_id == "plunder":
+        if decisions is None:
+            raise AssertionError("Plunder lifecycle fixture requires its decision controller.")
+        _bind_card_selection(state, row)
+        return _seed_plunder(state, row, decisions=decisions)
     destruction_seeder = _DESTRUCTION_SEEDERS.get(row.secondary_mission_id)
     expectation = (
         _SEEDERS[row.secondary_mission_id](state, row)
@@ -195,7 +207,9 @@ def seed_positive_secondary_condition(
     return expectation
 
 
-def seed_sequential_tactical_turn_cap_conditions(state: GameState) -> None:
+def seed_sequential_tactical_turn_cap_conditions(
+    state: GameState, *, decisions: DecisionController
+) -> None:
     scoring_player_id = "player-a"
     _park_units_in_safe_zones(state, scoring_player_id=scoring_player_id)
     tempting_marker = _no_mans_land_non_home_markers(state, player_id=scoring_player_id)[0]
@@ -212,12 +226,6 @@ def seed_sequential_tactical_turn_cap_conditions(state: GameState) -> None:
         intercessors[1].unit_instance_id,
         state.mission_setup.battlefield_width_inches / 2.0,
         state.mission_setup.battlefield_depth_inches / 2.0,
-    )
-    area = _first_plunderable_area(state, player_id=scoring_player_id)
-    _record_plunder(
-        state,
-        player_id=scoring_player_id,
-        terrain_feature_id=area.logical_terrain_area_id,
     )
     opponent_home = _home_marker(state, player_id=opponent_player_id(scoring_player_id))
     _place_unit_at(
@@ -241,6 +249,17 @@ def seed_sequential_tactical_turn_cap_conditions(state: GameState) -> None:
             scoring_player_id=scoring_player_id,
             layout_id="layout-a",
         ),
+    )
+
+    _seed_plunder(
+        state,
+        SecondaryMissionLifecycleCertificationRow(
+            secondary_mission_id="plunder",
+            mode="tactical",
+            scoring_player_id=scoring_player_id,
+            layout_id="layout-a",
+        ),
+        decisions=decisions,
     )
 
 
@@ -606,13 +625,57 @@ def _seed_overwhelming_force(
 def _seed_plunder(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    *,
+    decisions: DecisionController,
 ) -> SecondaryPositiveExpectation:
-    area = _first_plunderable_area(state, player_id=row.scoring_player_id)
-    _record_plunder(
-        state,
-        player_id=row.scoring_player_id,
-        terrain_feature_id=area.logical_terrain_area_id,
+    assert state.mission_setup is not None
+    setup = state.mission_setup
+    area = min(
+        (
+            area
+            for area in mission_logical_terrain_areas(setup)
+            if not logical_terrain_area_within_player_territory(
+                area, mission_setup=setup, player_id=row.scoring_player_id
+            )
+        ),
+        key=lambda area: (
+            abs((area.bounds()[0] + area.bounds()[2]) / 2 - setup.battlefield_width_inches / 2)
+            + abs((area.bounds()[1] + area.bounds()[3]) / 2 - setup.battlefield_depth_inches / 2)
+        ),
     )
+    point = area.members[0].footprint_polygon[0]
+    unit = _intercessors(state, player_id=row.scoring_player_id)[-1]
+    _place_unit_at(state, unit.unit_instance_id, point.x_inches, point.y_inches)
+    prior_phase_index = state.battle_phase_index
+    prior_shooting_state = state.shooting_phase_state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.replace_shooting_phase_state(
+        ShootingPhaseState(battle_round=state.battle_round, active_player_id=row.scoring_player_id)
+    )
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=decisions,
+        player_id=row.scoring_player_id,
+        mission_action_id="plunder-terrain",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    request = waiting.decision_request
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["target_id"] == area.logical_terrain_area_id
+        and cast(dict[str, JsonValue], option.payload)["unit_instance_id"] == unit.unit_instance_id
+    )
+    GameLifecycle(state=state, decision_controller=decisions).submit_decision(
+        DecisionResult.for_request(
+            result_id=f"phase17n-step6g-plunder:{row.scoring_player_id}:{area.logical_terrain_area_id}",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+    state.battle_phase_index = prior_phase_index
+    state.replace_shooting_phase_state(prior_shooting_state)
     return SecondaryPositiveExpectation(
         expected_amount=5,
         expected_rule_ids=frozenset({"plunder-tactical"}),
@@ -737,24 +800,6 @@ def _record_cleanse(state: GameState, *, player_id: str, objective_marker_id: st
     )
 
 
-def _record_plunder(state: GameState, *, player_id: str, terrain_feature_id: str) -> None:
-    action_id = f"phase17n-step6g-plunder:{terrain_feature_id}"
-    source_id = _record_completed_zero_vp_mission_action(
-        state,
-        mission_action_id="plunder-terrain",
-        action_id=action_id,
-        target_id=terrain_feature_id,
-        player_id=player_id,
-    )
-    state.record_secondary_terrain_plunder(
-        player_id=player_id,
-        terrain_feature_id=terrain_feature_id,
-        action_id=action_id,
-        phase=BattlePhase.SHOOTING,
-        source_id=source_id,
-    )
-
-
 def _record_completed_zero_vp_mission_action(
     state: GameState,
     *,
@@ -798,19 +843,6 @@ def _record_completed_zero_vp_mission_action(
     )
     state.record_mission_action_state(completed)
     return mission_action.source_id
-
-
-def _first_plunderable_area(state: GameState, *, player_id: str) -> MissionLogicalTerrainArea:
-    if state.mission_setup is None:
-        raise AssertionError("Step 6G plunder fixture requires MissionSetup.")
-    for area in mission_logical_terrain_areas(state.mission_setup):
-        if not logical_terrain_area_within_player_territory(
-            area,
-            mission_setup=state.mission_setup,
-            player_id=player_id,
-        ):
-            return area
-    raise AssertionError("Step 6G plunder fixture has no plunderable terrain.")
 
 
 def _place_unit_at(
@@ -923,7 +955,6 @@ _SEEDERS = {
     "engage-on-all-fronts": _seed_engage,
     "forward-position": _seed_forward_position,
     "outflank": _seed_outflank,
-    "plunder": _seed_plunder,
     "secure-no-mans-land": _seed_secure_no_mans_land,
 }
 

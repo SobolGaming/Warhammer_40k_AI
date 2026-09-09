@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tests.completed_attack_fixture_helpers import (
+    record_shooting_declaration_for_executor_fixture,
+)
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -184,6 +187,7 @@ from warhammer40k_core.engine.phases.movement import (
 from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     ShootingPhaseHandler,
+    ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_battlefield_departure import (
@@ -922,25 +926,40 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
         _first_weapon_profile(lifecycle, attacker),
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
     )
-    sequence_id = "phase17n-meatgrinder-runtime-attack"
+    state.replace_shooting_phase_state(
+        ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            shot_unit_ids=(attacker.unit_instance_id,),
+        )
+    )
+    sequence_id = "attack-sequence:phase17n-meatgrinder-runtime-attack"
     attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence_id.removeprefix("attack-sequence:"),
+    )
     remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=config.ruleset_descriptor,
-        attack_sequence=AttackSequence.start(
-            sequence_id=sequence_id,
-            attacker_player_id="player-a",
-            attacking_unit_instance_id=attacker.unit_instance_id,
-            attack_pools=(
-                _attack_pool_for_test(
-                    attacker=attacker,
-                    defender=defender,
-                    weapon_profile=weapon_profile,
-                    attacks=1,
-                ),
-            ),
-        ),
+        attack_sequence=sequence,
         already_allocated_model_ids=(),
         dice_manager=DiceRollManager(
             sequence_id,
@@ -10819,25 +10838,40 @@ def _authentic_primary_destruction_lifecycle_payload() -> GameLifecyclePayload:
         _first_weapon_profile(lifecycle, attacker),
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
     )
-    sequence_id = "phase17n-destruction-integrity-runtime-attack"
+    state.replace_shooting_phase_state(
+        ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(attacker.unit_instance_id,),
+            shot_unit_ids=(attacker.unit_instance_id,),
+        )
+    )
+    sequence_id = "attack-sequence:phase17n-destruction-integrity-runtime-attack"
     attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence_id.removeprefix("attack-sequence:"),
+    )
     remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
         state=state,
         decisions=lifecycle.decision_controller,
         ruleset_descriptor=config.ruleset_descriptor,
-        attack_sequence=AttackSequence.start(
-            sequence_id=sequence_id,
-            attacker_player_id="player-a",
-            attacking_unit_instance_id=attacker.unit_instance_id,
-            attack_pools=(
-                _attack_pool_for_test(
-                    attacker=attacker,
-                    defender=defender,
-                    weapon_profile=weapon_profile,
-                    attacks=1,
-                ),
-            ),
-        ),
+        attack_sequence=sequence,
         already_allocated_model_ids=(),
         dice_manager=DiceRollManager(
             sequence_id,

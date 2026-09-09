@@ -2296,7 +2296,15 @@ def test_catalog_materialization_required_model_ids_fail_closed(
     _scenario, _event_records, decision_records = _authenticated_materialization_evidence(
         destruction_kind="attack"
     )
-    request_payload = copy.deepcopy(cast(dict[str, JsonValue], decision_records[0].request.payload))
+    materialization_record = next(
+        record
+        for record in decision_records
+        if record.request.decision_type
+        == SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE
+    )
+    request_payload = copy.deepcopy(
+        cast(dict[str, JsonValue], materialization_record.request.payload)
+    )
     request_payload["model_instance_ids"] = invalid_model_ids
 
     with pytest.raises(GameLifecycleError, match=expected_error):
@@ -2986,8 +2994,25 @@ def _corrupt_authenticated_materialization_evidence(
     materialized_index = _unique_event_index(events, CATALOG_MODELS_MATERIALIZED_EVENT)
     roll_index = _unique_event_index(events, CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT)
     completion_index = _unique_event_index(events, "attack_sequence_completed")
-    requested_index = _unique_event_index(events, "decision_requested")
-    recorded_index = _unique_event_index(events, "decision_recorded")
+    materialized = cast(dict[str, JsonValue], events[materialized_index].payload)
+    (record_index,) = tuple(
+        index
+        for index, record in enumerate(records)
+        if record.result.result_id == materialized["result_id"]
+    )
+    selected = records[record_index]
+    (requested_index,) = tuple(
+        index
+        for index, event in enumerate(events)
+        if event.event_type == "decision_requested"
+        and cast(dict[str, JsonValue], event.payload)["request_id"] == selected.request.request_id
+    )
+    (recorded_index,) = tuple(
+        index
+        for index, event in enumerate(events)
+        if event.event_type == "decision_recorded"
+        and cast(dict[str, JsonValue], event.payload)["record_id"] == selected.record_id
+    )
 
     if tamper_kind == "materialized_game_id":
         payload = copy.deepcopy(cast(dict[str, JsonValue], events[materialized_index].payload))
@@ -3002,10 +3027,10 @@ def _corrupt_authenticated_materialization_evidence(
         payload["result_id"] = "result:unrelated"
         events[materialized_index] = replace(events[materialized_index], payload=payload)
     elif tamper_kind == "malformed_request_payload":
-        record = records[0]
-        records[0] = replace(record, request=replace(record.request, payload=None))
+        record = records[record_index]
+        records[record_index] = replace(record, request=replace(record.request, payload=None))
     elif tamper_kind in {"inactive_source", "request_payload", "roll_identity"}:
-        record = records[0]
+        record = records[record_index]
         request_payload = copy.deepcopy(cast(dict[str, JsonValue], record.request.payload))
         if tamper_kind == "inactive_source":
             request_payload["catalog_record_id"] = "catalog-record:unrelated"
@@ -3013,17 +3038,19 @@ def _corrupt_authenticated_materialization_evidence(
             request_payload["submission_kind"] = "submission:unrelated"
         else:
             request_payload["roll_event_id"] = events[completion_index].event_id
-        records[0] = replace(record, request=replace(record.request, payload=request_payload))
+        records[record_index] = replace(
+            record, request=replace(record.request, payload=request_payload)
+        )
     elif tamper_kind == "decision_identity":
-        record = records[0]
+        record = records[record_index]
         request = replace(record.request, decision_type="decision:unrelated")
         result = replace(record.result, decision_type=request.decision_type)
-        records[0] = replace(record, request=request, result=result)
+        records[record_index] = replace(record, request=request, result=result)
     elif tamper_kind == "malformed_result_payload":
-        record = records[0]
-        records[0] = replace(record, result=replace(record.result, payload=None))
+        record = records[record_index]
+        records[record_index] = replace(record, result=replace(record.result, payload=None))
     elif tamper_kind in {"accepted_placement", "accepted_model_set"}:
-        record = records[0]
+        record = records[record_index]
         result_payload = copy.deepcopy(cast(dict[str, JsonValue], record.result.payload))
         if tamper_kind == "accepted_placement":
             result_payload["placement_kind"] = BattlefieldPlacementKind.DEPLOYMENT.value
@@ -3034,7 +3061,9 @@ def _corrupt_authenticated_materialization_evidence(
             model_placement["model_instance_id"] = (
                 f"{scenario.bodyguard.unit_instance_id}:unrelated-model"
             )
-        records[0] = replace(record, result=replace(record.result, payload=result_payload))
+        records[record_index] = replace(
+            record, result=replace(record.result, payload=result_payload)
+        )
     elif tamper_kind in {
         "roll_context",
         "destroyed_model_source",

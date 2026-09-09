@@ -163,3 +163,27 @@ no production API or runtime validation exception was added. All 233 tests in
 the complete affected shooting module passed after these fixture repairs.
 The interrupted aggregate is explicitly incomplete; its workers exited and
 process-group cleanup was verified before subsequent runs.
+
+### Final aggregate fixture audit
+
+The stricter restoration authority exposed additional incomplete historical test
+checkpoints. Direct destruction and deferred mortal-wound fixtures now retain
+accepted shooting declarations and matching phase history through the existing
+shared executor helper. Turn-end fixtures call the owning expiry API. Plunder
+scoring fixtures submit a real Action before their scoring checkpoint, keep its
+DecisionController and preserve unrelated scoring placements. Materialization
+corruption cases select the intended request/result by identity instead of
+assuming it is the first decision. The adapter mortal-wound fixture explicitly
+pins its initial replay checkpoint after the accepted executor prefix; its one
+private test-fixture assignment is annotated, and persistence/replay assertions
+are unchanged. A recalibrated fixed seed preserves the chained Ecstatic Death
+Fight alternation/no-nesting outcome.
+
+These changes repair the same invariant in canonical fixture setup; no production
+API, rule, exception policy, or outcome assertion was weakened. The stopped
+covered run retains 19 failures, seven fixture errors and 6,642 passes as failed,
+incomplete evidence. Focused repair runs preserve the diagnostic trail. The
+current source tree is unchanged from `c87d5352`; final aggregate validation uses
+the new fixture tree. The measured production/runtime and executed benchmark
+helper functions remain unchanged from `5b6752ff`; the performance artifact's
+later-fixture audit identifies the two unmeasured helper functions that changed.

@@ -293,8 +293,7 @@ def test_phase17n_step6g_secondary_selection_uses_adapter_decision_path(
 
 
 def test_zero_secondary_turn_capacity_cannot_score_or_discard_an_achieved_tactical() -> None:
-    state = _turn_cap_state()
-    decisions = _decisions_for_seeded_secondary_state(state)
+    state, decisions = _turn_cap_state()
     for secondary_mission_id in TURN_CAP_TACTICAL_IDS[:3]:
         state.score_secondary_mission_from_state(
             player_id="player-a",
@@ -459,8 +458,7 @@ def test_zero_secondary_turn_capacity_cannot_score_or_discard_an_achieved_tactic
 
 
 def test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap() -> None:
-    state = _turn_cap_state()
-    decisions = _decisions_for_seeded_secondary_state(state)
+    state, decisions = _turn_cap_state()
     record = state.prepare_current_turn_end_boundary(
         completed_phase=BattlePhase.FIGHT,
         runtime_modifier_registry=None,
@@ -575,8 +573,7 @@ def test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap(
 
 
 def test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolution() -> None:
-    state = _turn_cap_state()
-    decisions = _decisions_for_seeded_secondary_state(state)
+    state, decisions = _turn_cap_state()
     record = state.prepare_current_turn_end_boundary(
         completed_phase=BattlePhase.FIGHT,
         runtime_modifier_registry=None,
@@ -667,8 +664,7 @@ def test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolut
 
 
 def test_positive_partial_tactical_award_scores_and_discards_the_card() -> None:
-    state = _turn_cap_state()
-    decisions = _decisions_for_seeded_secondary_state(state)
+    state, decisions = _turn_cap_state()
     for secondary_mission_id, expected_amount in (
         ("a-tempting-target", 5),
         ("centre-ground", 5),
@@ -1198,7 +1194,7 @@ def test_burden_of_trust_still_scores_after_bodyguard_destruction() -> None:
     assert transactions[0].amount == 2
 
 
-def _turn_cap_state() -> GameState:
+def _turn_cap_state() -> tuple[GameState, DecisionController]:
     state = _tactical_fight_state()
     state.secondary_mission_card_states = [
         card for card in state.secondary_mission_card_states if card.player_id != "player-a"
@@ -1213,12 +1209,19 @@ def _turn_cap_state() -> GameState:
         state.record_secondary_mission_card_state(
             card.with_selection(resolved_secondary_mission_selection_for_card(state, card))
         )
-    seed_sequential_tactical_turn_cap_conditions(state)
-    return state
-
-
-def _decisions_for_seeded_secondary_state(state: GameState) -> DecisionController:
     decisions = DecisionController()
+    seed_sequential_tactical_turn_cap_conditions(state, decisions=decisions)
+    from warhammer40k_core.engine.effects import EffectExpirationBoundary
+
+    state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.turn_end(battle_round=state.battle_round, player_id="player-a")
+    )
+    return state, _decisions_for_seeded_secondary_state(state, decisions=decisions)
+
+
+def _decisions_for_seeded_secondary_state(
+    state: GameState, *, decisions: DecisionController
+) -> DecisionController:
     current_turn_has_snapshot = any(
         snapshot.active_player_id == state.active_player_id
         and snapshot.battle_round == state.battle_round
