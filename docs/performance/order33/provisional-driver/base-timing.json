@@ -1,0 +1,193 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "commit": "8ef8cb83622eb30066fbd113aa94bd87e2ec4fe3",
+  "runtime_tree": "",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "uninstrumented_timing",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "223bca6e91e667d9213ffeaf4b7593a4b7ffc4a6a194f54259a229b035825786",
+    "tests/indirect_shooting_helpers.py": "8357d3f24c97c82e9178db8b13fe2134b22dd00707b7ecdf7f5d5882d3c5c51a"
+  },
+  "results": {
+    "visible-self-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.1116899169282988,
+          "slice_seconds": 0.09865941596217453,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2505405000410974,
+          "slice_seconds": 0.09412350005004555,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.28880962496623397,
+          "slice_seconds": 0.09517824999056756,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.25967083300929517,
+          "slice_seconds": 0.09522762498818338,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.25330645800568163,
+          "slice_seconds": 0.09567499998956919,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2535811250563711,
+          "slice_seconds": 0.09444174997042865,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.25422837503720075,
+          "slice_seconds": 0.09320483391638845,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.0952157678381939,
+      "median_seconds": 0.09517824999056756,
+      "p95_seconds": 0.09865941596217453,
+      "maximum_seconds": 0.09865941596217453,
+      "completion_rate": 1.0,
+      "slices_per_second": 10.502462173065311
+    },
+    "unseen-no-observer": {
+      "samples": [
+        {
+          "setup_seconds": 0.2546773749636486,
+          "slice_seconds": 0.3902862910181284,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2548919579712674,
+          "slice_seconds": 0.28633058397099376,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2540794999804348,
+          "slice_seconds": 0.28510187508072704,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.25429804204031825,
+          "slice_seconds": 0.29250083304941654,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.25423899991437793,
+          "slice_seconds": 0.28990783309563994,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2556066249962896,
+          "slice_seconds": 0.2900202500168234,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2584625000599772,
+          "slice_seconds": 0.2913576669525355,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.30364361902632353,
+      "median_seconds": 0.2900202500168234,
+      "p95_seconds": 0.3902862910181284,
+      "maximum_seconds": 0.3902862910181284,
+      "completion_rate": 1.0,
+      "slices_per_second": 3.293334479435604
+    },
+    "unseen-friendly-observer": {
+      "samples": [
+        {
+          "setup_seconds": 0.258477000053972,
+          "slice_seconds": 0.2909494169289246,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2572873750468716,
+          "slice_seconds": 0.2615954999346286,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.29592950001824647,
+          "slice_seconds": 0.26161962503101677,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2580056249862537,
+          "slice_seconds": 0.261546750087291,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2569697500439361,
+          "slice_seconds": 0.26388237497303635,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2560152079677209,
+          "slice_seconds": 0.26379045797511935,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 0.2571763329906389,
+          "slice_seconds": 0.2644857079721987,
+          "work_counts": {},
+          "decision_count": 5,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.26683854755745934,
+      "median_seconds": 0.26379045797511935,
+      "p95_seconds": 0.2909494169289246,
+      "maximum_seconds": 0.2909494169289246,
+      "completion_rate": 1.0,
+      "slices_per_second": 3.7475844819034863
+    }
+  },
+  "full_game_certified": false
+}

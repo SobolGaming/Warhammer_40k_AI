@@ -1786,7 +1786,7 @@ def test_phase17n_indirect_fire_can_target_hidden_models_outside_detection_range
     assert indirect_candidate.target_visible_model_ids == ()
     assert indirect_candidate.target_in_range_model_ids
     assert indirect_candidate.shooting_types == (ShootingType.INDIRECT,)
-    assert indirect_candidate.hit_roll_modifier == -1
+    assert indirect_candidate.hit_roll_modifier == 0
     assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in indirect_candidate.targeting_rule_ids
     assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in indirect_candidate.targeting_rule_ids
 

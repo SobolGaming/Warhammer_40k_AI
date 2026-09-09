@@ -1,0 +1,82 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "commit": "8ef8cb83622eb30066fbd113aa94bd87e2ec4fe3",
+  "runtime_tree": "",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "work_counts_instrumented_not_timing_evidence",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "223bca6e91e667d9213ffeaf4b7593a4b7ffc4a6a194f54259a229b035825786",
+    "tests/indirect_shooting_helpers.py": "faca5b2f91ead24b67005373ad2a3dcfb8d0428664ab881cd42d0232cf91ed1a"
+  },
+  "results": {
+    "visible-self-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.0961066250456497,
+          "slice_seconds": 0.29573404195252806,
+          "work_counts": {
+            "resolve_line_of_sight": 47,
+            "resolve_visibility_pair": 25,
+            "_target_visible_to_friendly_unit": 2,
+            "_apply_phase13d_weapon_modifiers": 2
+          },
+          "decision_count": 5,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.29573404195252806,
+      "median_seconds": 0.29573404195252806,
+      "p95_seconds": 0.29573404195252806,
+      "maximum_seconds": 0.29573404195252806,
+      "completion_rate": 1.0,
+      "slices_per_second": 3.381416604587315
+    },
+    "unseen-no-observer": {
+      "samples": [
+        {
+          "setup_seconds": 0.2502094170777127,
+          "slice_seconds": 1.566749290912412,
+          "work_counts": {
+            "resolve_line_of_sight": 369,
+            "resolve_visibility_pair": 25,
+            "_target_visible_to_friendly_unit": 2,
+            "_apply_phase13d_weapon_modifiers": 2
+          },
+          "decision_count": 5,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 1.566749290912412,
+      "median_seconds": 1.566749290912412,
+      "p95_seconds": 1.566749290912412,
+      "maximum_seconds": 1.566749290912412,
+      "completion_rate": 1.0,
+      "slices_per_second": 0.6382642110006254
+    },
+    "unseen-friendly-observer": {
+      "samples": [
+        {
+          "setup_seconds": 0.2645422500791028,
+          "slice_seconds": 1.1610642079031095,
+          "work_counts": {
+            "resolve_line_of_sight": 308,
+            "resolve_visibility_pair": 5,
+            "_target_visible_to_friendly_unit": 2,
+            "_apply_phase13d_weapon_modifiers": 2
+          },
+          "decision_count": 5,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 1.1610642079031095,
+      "median_seconds": 1.1610642079031095,
+      "p95_seconds": 1.1610642079031095,
+      "maximum_seconds": 1.1610642079031095,
+      "completion_rate": 1.0,
+      "slices_per_second": 0.8612788105887851
+    }
+  },
+  "full_game_certified": false
+}

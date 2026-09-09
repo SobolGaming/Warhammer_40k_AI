@@ -20,6 +20,9 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    core_indirect_shooting_2026_09 as indirect_shooting_source,
+)
 
 ASSAULT_RULE_ID = "weapon-ability:assault"
 BLAST_RULE_ID = "weapon-ability:blast"
@@ -31,12 +34,11 @@ HAZARDOUS_RULE_ID = "gw-11e-core-abilities:core:hazardous"
 HEAVY_RULE_ID = "weapon-ability:heavy"
 HUNTER_RULE_ID = "weapon-ability:hunter"
 IGNORES_COVER_RULE_ID = "weapon-ability:ignores-cover"
-INDIRECT_FIRE_NO_VISIBLE_RULE_ID = "weapon-ability:indirect-fire:no-visible-target"
-INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID = "weapon-ability:indirect-fire:benefit-of-cover"
-INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID = "weapon-ability:indirect-fire:no-hit-rerolls"
-INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID = (
-    "weapon-ability:indirect-fire:stationary-friendly-visible"
-)
+INDIRECT_SHOOTING_POLICY = indirect_shooting_source.ATTACK_POLICY
+INDIRECT_FIRE_NO_VISIBLE_RULE_ID = INDIRECT_SHOOTING_POLICY.no_visible_rule_id
+INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID = INDIRECT_SHOOTING_POLICY.cover_rule_id
+INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID = INDIRECT_SHOOTING_POLICY.no_hit_rerolls_rule_id
+INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID = INDIRECT_SHOOTING_POLICY.stationary_visible_rule_id
 LANCE_RULE_ID = "weapon-ability:lance"
 LETHAL_HITS_RULE_ID = "weapon-ability:lethal-hits"
 MELTA_RULE_ID = "weapon-ability:melta"

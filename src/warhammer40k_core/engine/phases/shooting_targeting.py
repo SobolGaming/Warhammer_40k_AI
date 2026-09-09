@@ -169,7 +169,7 @@ def _unit_placements_for_rules_unit_or_none(
     return tuple(sorted(placements, key=lambda placement: placement.unit_instance_id))
 
 
-def _rules_unit_remained_stationary(
+def _rules_unit_has_no_advance_fall_back_or_setup(
     *,
     state: GameState,
     rules_unit: RulesUnitView,
@@ -198,6 +198,44 @@ def _rules_unit_remained_stationary(
         )
         if fell_back_state is not None:
             return False
+    return True
+
+
+def _rules_unit_remained_stationary(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    player_id: str | None = None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    if not _rules_unit_has_no_advance_fall_back_or_setup(
+        state=state, rules_unit=rules_unit, player_id=actor_id
+    ):
+        return False
+    # The persisted movement choice survives the boundary where temporary
+    # MovementPhaseState is cleared. 09.04 has no three-inch allowance.
+    return not any(
+        state.normal_move_states_for_unit_phase(
+            player_id=actor_id,
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            unit_instance_id=unit_id,
+        )
+        for unit_id in _rules_unit_state_unit_ids(rules_unit)
+    )
+
+
+def _rules_unit_within_heavy_movement_allowance(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    player_id: str | None = None,
+) -> bool:
+    if not _rules_unit_has_no_advance_fall_back_or_setup(
+        state=state, rules_unit=rules_unit, player_id=player_id
+    ):
+        return False
+    unit_ids = _rules_unit_state_unit_ids(rules_unit)
     movement_state = state.movement_phase_state
     if movement_state is None:
         return True
@@ -246,7 +284,7 @@ def _heavy_hit_roll_modifier_applies(
         player_id=actor_id,
     ):
         return False
-    return _rules_unit_remained_stationary(
+    return _rules_unit_within_heavy_movement_allowance(
         state=state,
         rules_unit=rules_unit,
         player_id=actor_id,
@@ -310,12 +348,11 @@ def _target_visible_to_friendly_unit(
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Friendly visibility query requires battlefield_state.")
-    try:
-        placed_army = battlefield.placed_army_for_player(actor_id)
-    except PlacementError as exc:
-        raise GameLifecycleError(
-            "Friendly visibility query requires placed friendly units."
-        ) from exc
+    if actor_id not in state.player_ids:
+        raise GameLifecycleError("Friendly visibility query requires a player in this game.")
+    placed_army = battlefield.placed_army_for_player_or_none(actor_id)
+    if placed_army is None:
+        return False
     for unit_placement in placed_army.unit_placements:
         if unit_placement.unit_instance_id == target_unit_instance_id:
             raise GameLifecycleError("Friendly visibility query included the target unit.")

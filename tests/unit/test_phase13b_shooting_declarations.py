@@ -657,113 +657,28 @@ def test_phase14f_select_shooting_type_is_finite_before_declaration() -> None:
     )
 
 
-def test_phase14f_indirect_shooting_type_requires_indirect_fire_weapon_profiles() -> None:
-    base_profile = _weapon_profile_by_wargear(
-        wargear_id="core-bolt-rifle",
-        weapon_profile_id="core-bolt-rifle:standard",
-    )
-    indirect_profile = replace(
-        base_profile,
-        profile_id="phase14f-mixed-indirect-fire",
-        name="Phase 14F mixed Indirect Fire rifle",
-        keywords=(WeaponKeyword.INDIRECT_FIRE,),
-        abilities=(),
-    )
-    catalog = _catalog_with_extra_bolt_profile(indirect_profile)
-    lifecycle, units = _shooting_lifecycle(
-        alpha_unit_ids=("intercessor-1",),
-        catalog=catalog,
-    )
-    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
-    type_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=selection_request,
-            option_id=units["intercessor-1"].unit_instance_id,
-            result_id="phase14f-mixed-indirect-select-unit",
-        )
-    )
+@pytest.mark.parametrize(
+    ("visible", "stationary", "observer", "mode", "modifier"),
+    [
+        (True, True, False, ShootingType.INDIRECT, 0),
+        (True, False, False, ShootingType.INDIRECT, 1),
+        (True, True, False, ShootingType.INDIRECT, -1),
+        (False, True, False, ShootingType.INDIRECT, 1),
+        (False, False, True, ShootingType.INDIRECT, 0),
+        (False, True, True, ShootingType.INDIRECT, 0),
+        (False, True, True, ShootingType.INDIRECT, -1),
+        (True, True, False, ShootingType.NORMAL, 0),
+        (True, False, False, ShootingType.NORMAL, 1),
+    ],
+)
+def test_order33_indirect_mode_and_mixed_weapon_outcomes(
+    visible: bool, stationary: bool, observer: bool, mode: ShootingType, modifier: int
+) -> None:
+    from tests.indirect_shooting_helpers import assert_indirect_outcomes
 
-    assert {option.option_id for option in type_request.options} == {
-        ShootingType.NORMAL.value,
-        ShootingType.INDIRECT.value,
-    }
-
-    declaration_request = _decision_request(
-        _submit_result(
-            lifecycle,
-            request=type_request,
-            option_id=ShootingType.INDIRECT.value,
-            result_id="phase14f-mixed-indirect-select-type",
-        )
+    assert_indirect_outcomes(
+        visible=visible, stationary=stationary, observer=observer, mode=mode, modifier=modifier
     )
-    request_payload = cast(dict[str, object], declaration_request.payload)
-    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
-    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
-    target_candidates = cast(list[dict[str, object]], proposal_request["target_candidates"])
-
-    assert {weapon["weapon_profile_id"] for weapon in weapons} == {indirect_profile.profile_id}
-    assert all(
-        WeaponKeyword.INDIRECT_FIRE.value
-        in cast(WeaponProfilePayload, weapon["weapon_profile"])["keywords"]
-        for weapon in weapons
-    )
-    assert {
-        tuple(cast(list[str], candidate["shooting_types"]))
-        for candidate in target_candidates
-        if candidate["is_legal"] is True
-    } == {(ShootingType.INDIRECT.value,)}
-
-    invalid_proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-        weapon_profile_id=indirect_profile.profile_id,
-    )
-    invalid_payload = invalid_proposal.to_payload()
-    invalid_declaration = invalid_payload["declarations"][0]
-    invalid_declaration["weapon_profile_id"] = base_profile.profile_id
-    before_records = len(lifecycle.decision_controller.records)
-
-    invalid_status = _submit_payload(
-        lifecycle,
-        request=declaration_request,
-        payload=invalid_payload,
-        result_id="phase14f-mixed-indirect-invalid-normal-profile",
-    )
-    invalid_validation = cast(
-        dict[str, object],
-        cast(dict[str, object], invalid_status.payload)["proposal_validation"],
-    )
-    invalid_violation = cast(list[dict[str, object]], invalid_validation["violations"])[0]
-
-    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
-    assert invalid_violation["violation_code"] in {
-        "weapon_declaration_unavailable",
-        "shooting_type_unavailable",
-    }
-    assert len(lifecycle.decision_controller.records) == before_records
-    assert lifecycle.decision_controller.queue.pending_requests == (declaration_request,)
-
-    valid_proposal = _proposal_from_request(
-        request=declaration_request,
-        target_unit_id=units["enemy"].unit_instance_id,
-        weapon_profile_id=indirect_profile.profile_id,
-    )
-    _submit_payload(
-        lifecycle,
-        request=declaration_request,
-        payload=valid_proposal.to_payload(),
-        result_id="phase14f-mixed-indirect-valid",
-    )
-    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
-    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
-    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
-
-    assert pool_payload["weapon_profile_id"] == indirect_profile.profile_id
-    assert pool_payload["shooting_type"] == ShootingType.INDIRECT.value
-    assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in targeting_rule_ids
-    assert INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in targeting_rule_ids
-    assert INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in targeting_rule_ids
 
 
 def test_shooting_target_candidate_cache_uses_full_weapon_profile_identity() -> None:
@@ -783,7 +698,12 @@ def test_shooting_target_candidate_cache_uses_full_weapon_profile_identity() -> 
         )
     )
 
-    assert {option.option_id for option in type_request.options} == {ShootingType.NORMAL.value}
+    # The short mortar supplies mode eligibility even when it cannot reach this
+    # target; the ordinary long rifle may shoot the visible target in either mode.
+    assert {option.option_id for option in type_request.options} == {
+        ShootingType.NORMAL.value,
+        ShootingType.INDIRECT.value,
+    }
 
     declaration_request = _decision_request(
         _submit_result(
@@ -6818,7 +6738,7 @@ def test_phase14f_indirect_fire_targets_unseen_units_and_unmodified_one_to_five_
 
     assert candidates[0].is_legal
     assert candidates[0].target_visible_model_ids == ()
-    assert candidates[0].hit_roll_modifier == -1
+    assert candidates[0].hit_roll_modifier == 0
     assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in candidates[0].targeting_rule_ids
     assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in candidates[0].targeting_rule_ids
     with pytest.raises(WeaponProfileError, match="cannot also have Indirect Fire"):
@@ -19295,3 +19215,308 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             model_instance_id=model.model_instance_id,
             wound_index=1,
         )
+
+
+@pytest.mark.parametrize(
+    ("mode", "visible"),
+    [(ShootingType.NORMAL, True), (ShootingType.INDIRECT, True), (ShootingType.INDIRECT, False)],
+)
+def test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks(
+    mode: ShootingType, visible: bool
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        INDIRECT_PROFILE,
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        shooting_event_payloads,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(visible=visible, rerolls=True, attacks=6)
+    request = select_indirect_declaration(session, mode)
+    submit_indirect_declaration(session, request, mixed=visible)
+    complete_indirect_attack(session)
+    hit_rows = [
+        cast(dict[str, JsonValue], row["payload"])
+        for row in shooting_event_payloads(session, "attack_sequence_step")
+        if row["step"] == "hit"
+    ]
+    allowed: set[str] = set()
+    forbidden: set[str] = set()
+    for hit in hit_rows:
+        original = cast(
+            dict[str, JsonValue], cast(dict[str, JsonValue], hit["roll_state"])["original_result"]
+        )
+        roll_id = cast(str, original["roll_id"])
+        restricted = mode is ShootingType.INDIRECT and hit["weapon_profile_id"] == INDIRECT_PROFILE
+        (forbidden if restricted else allowed).add(roll_id)
+    generic_rolls: set[str] = set()
+    command_rolls: set[str] = set()
+    for record in session.lifecycle.decision_controller.records:
+        body = cast(dict[str, JsonValue], record.request.payload)
+        if (
+            record.request.decision_type == "select_dice_reroll"
+            and body["roll_type"] == "attack_sequence.hit"
+        ):
+            generic_rolls.add(cast(str, body["roll_id"]))
+        if record.request.decision_type == "use_stratagem":
+            context = cast(dict[str, JsonValue], body["stratagem_context"])
+            trigger = cast(dict[str, JsonValue], context["trigger_payload"])
+            if trigger["roll_type"] == "attack_sequence.hit":
+                command_rolls.add(cast(str, trigger["roll_id"]))
+    assert generic_rolls == allowed
+    assert command_rolls == allowed
+    assert not forbidden.intersection(generic_rolls | command_rolls)
+    assert len(hit_rows) == (12 if visible else 6)
+
+
+@pytest.mark.parametrize("keyword", ["VEHICLE", "MONSTER"])
+@pytest.mark.parametrize("visible", [False, True])
+@pytest.mark.parametrize("engaged", [False, True])
+def test_r33_001_indirect_mode_requires_unengaged_rules_unit(
+    keyword: str, visible: bool, engaged: bool
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        INDIRECT_PROFILE,
+        SHOOTER,
+        TARGET,
+        complete_indirect_attack,
+        indirect_session,
+        shooting_event_payloads,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    session = indirect_session(
+        visible=visible,
+        model_count=1,
+        shooter_keyword=keyword,
+        engager_distance=1.8 if engaged else 5.0,
+    )
+    request = pending_request(session)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r33-001:unit", option_id=SHOOTER
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    modes = {option.option_id for option in request.options}
+    assert (ShootingType.INDIRECT.value in modes) is not engaged
+    if engaged:
+        assert ShootingType.CLOSE_QUARTERS.value in modes
+        before = session.lifecycle.to_payload()
+        with pytest.raises(DecisionError, match="not in the finite action space"):
+            session.submit_option(
+                request_id=request.request_id, result_id="r33-001:forged-mode", option_id="indirect"
+            )
+        assert session.lifecycle.to_payload() == before
+    mode = ShootingType.CLOSE_QUARTERS if engaged else ShootingType.INDIRECT
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r33-001:mode", option_id=mode.value
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    proposal = _proposal_from_request(
+        request=request,
+        target_unit_id="army-beta:engager" if engaged else TARGET,
+        weapon_profile_id=INDIRECT_PROFILE,
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="r33-001:declare",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    complete_indirect_attack(session)
+    assert len(shooting_event_payloads(session, "attack_sequence_completed")) == 1
+
+
+@pytest.mark.parametrize("keyword", ["VEHICLE", "MONSTER"])
+@pytest.mark.parametrize("visible", [False, True])
+def test_r33_001_new_engagement_rejects_pending_indirect_declaration(
+    keyword: str, visible: bool
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        INDIRECT_PROFILE,
+        TARGET,
+        indirect_session,
+        select_indirect_declaration,
+    )
+
+    from warhammer40k_core.engine.phases.shooting_declaration_validation import (
+        _attack_pools_or_validation,
+    )
+    from warhammer40k_core.engine.phases.shooting_validation import _unit_by_id
+
+    session = indirect_session(
+        visible=visible, model_count=1, shooter_keyword=keyword, engager_distance=5.0
+    )
+    request = select_indirect_declaration(session)
+    proposal = _proposal_from_request(
+        request=request, target_unit_id=TARGET, weapon_profile_id=INDIRECT_PROFILE
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    engager = _unit_by_id(state=state, unit_instance_id="army-beta:engager")
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            engager, army_id="army-beta", player_id="player-b", poses=(Pose.at(10.0, 36.8),)
+        )
+    )
+    before = session.lifecycle.to_payload()
+    validation = _attack_pools_or_validation(
+        state=state,
+        proposal=proposal,
+        ruleset_descriptor=session.lifecycle.config.ruleset_descriptor,
+        army_catalog=session.lifecycle.config.army_catalog,
+    )
+    assert not isinstance(validation, tuple)
+    assert not validation.is_valid
+    assert validation.violations[0].violation_code == (
+        "shooting_type_unavailable" if visible else "target_locked_in_combat"
+    )
+    assert session.lifecycle.to_payload() == before
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="r33-001:stale-engagement",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == before
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_r33_001_retained_engagement_survives_restoration(attached: bool) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+    from tests.indirect_shooting_helpers import SHOOTER, indirect_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.phases.shooting_validation import _unit_by_id
+    from warhammer40k_core.engine.physical_engagement import (
+        current_rules_unit_is_physically_engaged,
+    )
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+    session = indirect_session(
+        visible=False,
+        model_count=1,
+        shooter_keyword="VEHICLE",
+        engager_distance=1.8,
+        engager_attached=attached,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    engager_id = "army-beta:engager-leader" if attached else "army-beta:engager"
+    engager = _unit_by_id(state=state, unit_instance_id=engager_id)
+    model = engager.own_models[0]
+    placement = state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=engager_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    retain_destroyed_model_for_fixture(
+        state=state,
+        placement=placement,
+        effect_id="r33-001:retention",
+        source_rule_id="r33-001:retained-engager",
+        source_phase=BattlePhase.SHOOTING,
+        decisions=session.lifecycle.decision_controller,
+    )
+    # Retention setup uses the canonical decision owner; subsequent choices run through the facade.
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload()))
+    initial = session.lifecycle.to_payload()
+    for candidate in (
+        session,
+        LocalGameSession(lifecycle=GameLifecycle.from_payload(initial)),
+    ):
+        state = candidate.lifecycle.state
+        assert state is not None
+        assert current_rules_unit_is_physically_engaged(state=state, unit_instance_id=SHOOTER)
+        request = pending_request(candidate)
+        status = candidate.submit_option(
+            request_id=request.request_id, result_id="r33-001:retained-unit", option_id=SHOOTER
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        request = pending_request(candidate)
+        assert {option.option_id for option in request.options} == {"close_quarters"}
+    assert session.lifecycle.to_payload() == candidate.lifecycle.to_payload()
+    for viewer in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=viewer) == candidate.view(viewer_player_id=viewer)
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id=f"r33-001:retained:{attached}",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -> None:
+    from tests.indirect_shooting_helpers import (
+        INDIRECT_PROFILE,
+        ORDINARY_PROFILE,
+        TARGET,
+        indirect_session,
+        select_indirect_declaration,
+    )
+
+    session = indirect_session(visible=False)
+    request = select_indirect_declaration(session)
+    mode_request = next(
+        record.request
+        for record in session.lifecycle.decision_controller.records
+        if record.request.decision_type == "select_shooting_type"
+    )
+    assert ShootingType.NORMAL.value not in {option.option_id for option in mode_request.options}
+    proposal = _proposal_from_request(
+        request=request, target_unit_id=TARGET, weapon_profile_id=INDIRECT_PROFILE
+    )
+    before = session.lifecycle.to_payload()
+    for index, stale in enumerate((True, False)):
+        malformed = dict(proposal.to_payload())
+        if stale:
+            malformed["visibility_cache_key"] = "los:order33-stale"
+        else:
+            malformed.pop("visibility_cache_key")
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id=f"order33:invalid:{index}",
+            payload=validate_json_value(malformed),
+        )
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert session.lifecycle.to_payload() == before
+    ordinary = replace(
+        proposal,
+        declarations=(replace(proposal.declarations[0], weapon_profile_id=ORDINARY_PROFILE),),
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="order33:unseen-ordinary",
+        payload=validate_json_value(ordinary.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.shooting_phase_state is not None
+    assert state.shooting_phase_state.attack_sequence is None
+    assert not _event_payloads(session.lifecycle, "shooting_declaration_accepted")
+
+
+@pytest.mark.parametrize("modifier", [-1, 0, 1])
+def test_order33_lower_failure_range_still_requires_the_modified_hit_value(modifier: int) -> None:
+    from tests.indirect_shooting_helpers import assert_indirect_outcomes
+
+    assert_indirect_outcomes(
+        visible=True,
+        stationary=True,
+        observer=False,
+        mode=ShootingType.INDIRECT,
+        modifier=modifier,
+        ballistic_skill=4,
+    )

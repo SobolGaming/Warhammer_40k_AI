@@ -5,8 +5,8 @@ from typing import cast
 
 from tests.generic_modifier_helpers import generic_effect
 from tests.phase13b_shooting_declaration_helpers import (
-    _canonical_catalog,  # pyright: ignore[reportPrivateUsage]
-    _compact_intercessor_catalog,  # pyright: ignore[reportPrivateUsage]
+    _canonical_catalog,
+    _compact_intercessor_catalog,
     _compact_shooting_lifecycle,
     _proposal_from_request,
 )

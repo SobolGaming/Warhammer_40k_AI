@@ -1,0 +1,31 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "status": "initial calibrated Order 33 budgets; not an Order 32 deferral",
+  "work_limits": {
+    "visible-self-observer": {
+      "resolve_line_of_sight": 64,
+      "resolve_visibility_pair": 25,
+      "_target_visible_to_friendly_unit": 2,
+      "_apply_phase13d_weapon_modifiers": 2
+    },
+    "unseen-no-observer": {
+      "resolve_line_of_sight": 350,
+      "resolve_visibility_pair": 25,
+      "_target_visible_to_friendly_unit": 2,
+      "_apply_phase13d_weapon_modifiers": 2
+    },
+    "unseen-friendly-observer": {
+      "resolve_line_of_sight": 360,
+      "resolve_visibility_pair": 25,
+      "_target_visible_to_friendly_unit": 2,
+      "_apply_phase13d_weapon_modifiers": 2
+    }
+  },
+  "provisional_timing_limits_seconds": {
+    "mean": 0.45,
+    "maximum": 0.55,
+    "head_to_base_mean_ratio": 1.25
+  },
+  "timing_ci_enforced": false,
+  "full_game_certified": false
+}

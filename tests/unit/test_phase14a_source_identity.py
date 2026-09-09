@@ -1310,7 +1310,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 20
+    assert len(scope.source_packages) == 21
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -3114,3 +3114,44 @@ def test_order30_retained_attack_sources_pin_execution_and_fieldability() -> Non
         source.rule_ir_for_source("unreviewed-source")
     with pytest.raises(source.RetainedAttackSourceError, match="unregistered"):
         source.observation_identity(row_id="unregistered-observation")
+
+
+def test_order33_source_is_immutable_reproducible_and_bound_to_live_consumers() -> None:
+    from tools.build_core_indirect_shooting_source import build_payloads
+
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        core_indirect_shooting_2026_09 as package,
+    )
+
+    raw = Path(package.__file__).with_name("artifacts").joinpath("package.json").read_bytes()
+    artifact = package.validate_source_artifact_bytes(raw)
+    expected, audit = build_payloads()
+    assert json.loads(raw) == expected
+    assert (
+        json.loads(
+            Path(
+                "data/source_audits/maintained_app_mirrors/indirect_shooting_2026_09_09.audit.json"
+            ).read_bytes()
+        )
+        == audit
+    )
+    assert (
+        artifact.package_hash
+        == hashlib.sha256(
+            json.dumps(
+                {**expected, "package_hash": ""}, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest()
+    )
+    assert sorted(
+        package.source_package().source_evidence_catalog.records, key=lambda row: row.evidence_id
+    ) == sorted(package.source_evidence_records(), key=lambda row: row.evidence_id)
+    assert {rule.section_id for rule in package.source_rules()} == {"09.04", "10.07"}
+    for rule in package.source_rules():
+        assert rule.load_support_status == "loaded"
+        assert rule.semantic_execution_status == "partial_engine_runtime"
+        for consumer in rule.runtime_consumer_ids:
+            module, attribute = consumer.split(":")
+            assert callable(vars(importlib.import_module(module))[attribute])
+    with pytest.raises(package.IndirectShootingSourceError, match="source bytes drifted"):
+        package.validate_source_artifact_bytes(raw + b"\n")

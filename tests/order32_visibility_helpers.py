@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import replace
 
 from tests.phase13b_shooting_declaration_helpers import (
-    _canonical_catalog,  # pyright: ignore[reportPrivateUsage]
-    _compact_intercessor_catalog,  # pyright: ignore[reportPrivateUsage]
+    _canonical_catalog,
+    _compact_intercessor_catalog,
     _config,
-    _configure_shooting_battle_state,  # pyright: ignore[reportPrivateUsage]
+    _configure_shooting_battle_state,
     _display_geometry,
     _mustered_armies,
     _scenario_with_unit_pose,

@@ -32,6 +32,8 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phases.shooting_targeting import _target_visible_to_friendly_unit
+from warhammer40k_core.engine.phases.shooting_validation import _battlefield_scenario
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.retained_destruction_state import retained_destructions
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
@@ -87,6 +89,18 @@ def test_r32_retained_only_observer_eligibility_restores_replays_and_cleans_up(
         assert not any(model.is_alive for model in observer_component.own_models)
         presence = ability_presence(state=state, rules_unit=view)
         assert (observer_id in presence.active_model_ids) is expected
+        scenario = _battlefield_scenario(state)
+        assert (
+            _target_visible_to_friendly_unit(
+                state=state,
+                scenario=scenario,
+                ruleset_descriptor=candidate.lifecycle.config.ruleset_descriptor,
+                target_unit_instance_id=target_id,
+                terrain_features=scenario.battlefield_state.terrain_features,
+                player_id="player-b",
+            )
+            is expected
+        )
         for scope in ("this_model", "this_unit"):
             assert eligible_selection_target_unit_ids(
                 state=state,

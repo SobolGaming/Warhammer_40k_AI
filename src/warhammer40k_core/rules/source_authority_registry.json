@@ -490,6 +490,26 @@
           "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
           "identity_kind": "app_version",
           "identity_value": "931"
+        },
+        {
+          "audit_id": "core-indirect-shooting-maintained-app-mirrors-2026-09-09",
+          "row_id": "indirect-shooting:40k-app",
+          "source_observation_sha256": "d280afafb00b95b97ec33e4d29c8a157166da0e2d8f7467faee31ae34de2458e",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/10-shooting-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T12:02:18.843Z"
+        },
+        {
+          "audit_id": "core-indirect-shooting-maintained-app-mirrors-2026-09-09",
+          "row_id": "remain-stationary:40k-app",
+          "source_observation_sha256": "3d5ae30a91f9b16941fea635d81e4a25146e191c35092216927554eabca313ce",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/09-movement-phase",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-09T12:16:21.670Z"
         }
       ],
       "legacy_observations": [
@@ -881,6 +901,16 @@
           "version": "maintained-app-mirrors-observed-2026-09-08",
           "allowed_rule_source_ids": [
             "gw-11e-core-model-keywords:destroyed-model-keywords"
+          ],
+          "catalog_sha256": null
+        },
+        {
+          "namespace": "games-workshop",
+          "package_name": "gw-11e-core-indirect-shooting",
+          "version": "maintained-app-mirrors-observed-2026-09-09",
+          "allowed_rule_source_ids": [
+            "gw-11e-core-indirect-shooting:indirect-shooting",
+            "gw-11e-core-indirect-shooting:remain-stationary"
           ],
           "catalog_sha256": null
         }

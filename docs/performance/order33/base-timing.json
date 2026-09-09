@@ -1,0 +1,194 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "commit": "8ef8cb83622eb30066fbd113aa94bd87e2ec4fe3",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "891b6a3030c4526ac88fb7b8924230bda6a9d6da4fe460b5c3596fa067738339",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "mode": "uninstrumented_timing",
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_indirect_shooting.py": "fbb11e0b7161499a3bcd232349bcf838198c2d1e3904b18e5b35037cc40b604a",
+    "tests/indirect_shooting_helpers.py": "d72a9df2e41219fe0c98ca3d31c46233520185b9bd4e6cbf77ec73883a994c21"
+  },
+  "results": {
+    "visible-self-observer": {
+      "samples": [
+        {
+          "setup_seconds": 4.0462191249243915,
+          "slice_seconds": 0.10829550004564226,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1365889590233564,
+          "slice_seconds": 0.10320966597646475,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1715298750204965,
+          "slice_seconds": 0.09897729195654392,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.0922497080173343,
+          "slice_seconds": 0.09640533407218754,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.144577582948841,
+          "slice_seconds": 0.11154087504837662,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.197867290931754,
+          "slice_seconds": 0.10493500006850809,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2300779999932274,
+          "slice_seconds": 0.0981406249338761,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.1030720417287999,
+      "median_seconds": 0.10320966597646475,
+      "p95_seconds": 0.11154087504837662,
+      "maximum_seconds": 0.11154087504837662,
+      "completion_rate": 1.0,
+      "slices_per_second": 9.701951986467584
+    },
+    "unseen-no-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.171987415989861,
+          "slice_seconds": 0.39978799992240965,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.136312459013425,
+          "slice_seconds": 0.37275091593619436,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.128737665945664,
+          "slice_seconds": 0.3338477920042351,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1360557499574497,
+          "slice_seconds": 0.3292766249505803,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1720128339948133,
+          "slice_seconds": 0.33094504091423005,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1258379169739783,
+          "slice_seconds": 0.3350836660247296,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1602464580209926,
+          "slice_seconds": 0.333142124931328,
+          "work_counts": {},
+          "decision_count": 7,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.3478334520976724,
+      "median_seconds": 0.3338477920042351,
+      "p95_seconds": 0.39978799992240965,
+      "maximum_seconds": 0.39978799992240965,
+      "completion_rate": 1.0,
+      "slices_per_second": 2.8749391237942166
+    },
+    "unseen-friendly-observer": {
+      "samples": [
+        {
+          "setup_seconds": 2.179744499968365,
+          "slice_seconds": 0.27750779199413955,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.214377958094701,
+          "slice_seconds": 0.2592917080037296,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.2137662910390645,
+          "slice_seconds": 0.26075045904144645,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1906974168960005,
+          "slice_seconds": 0.2633375000441447,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.211199083016254,
+          "slice_seconds": 0.2585055830422789,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.1859742919914424,
+          "slice_seconds": 0.2556558749638498,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        },
+        {
+          "setup_seconds": 2.214559082989581,
+          "slice_seconds": 0.2616417920216918,
+          "work_counts": {},
+          "decision_count": 9,
+          "hit_count": 1
+        }
+      ],
+      "mean_seconds": 0.2623843870158972,
+      "median_seconds": 0.26075045904144645,
+      "p95_seconds": 0.27750779199413955,
+      "maximum_seconds": 0.27750779199413955,
+      "completion_rate": 1.0,
+      "slices_per_second": 3.8112023789716285
+    }
+  },
+  "full_game_certified": false
+}

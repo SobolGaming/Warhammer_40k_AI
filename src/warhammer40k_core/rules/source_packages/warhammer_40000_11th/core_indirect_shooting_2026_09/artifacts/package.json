@@ -1,0 +1,163 @@
+{
+  "artifact_schema": "core-v2-core-indirect-shooting-source-v1",
+  "source_package_id": "gw-11e-core-indirect-shooting",
+  "source_version": "maintained-app-mirrors-observed-2026-09-09",
+  "rules": [
+    {
+      "source_id": "gw-11e-core-indirect-shooting:indirect-shooting",
+      "section_id": "10.07",
+      "source_text": "INDIRECT SHOOTING\nWhen eligible: All of the following apply to your unit:\n- Unengaged and did not make an advance move this turn.\n- Has one or more [INDIRECT FIRE] weapons.\nEffect: Your unit shoots as described in Making Attacks (04).\nWhile shooting:\n- [INDIRECT FIRE] weapons in your unit can target units that are not visible to the attacking model.\n- Each time an [INDIRECT FIRE] weapon makes an attack:\n  - The target has the benefit of cover against that attack (13.08).\n  - You cannot re‑roll hit rolls.\n  - An unmodified hit roll of 1‑5 fails, unless your unit remained stationary this turn and the target is visible to one or more friendly units, in which case an unmodified hit roll of 1‑3 fails instead.\nAfter shooting: Until the end of the phase, your unit is not eligible to start an action.",
+      "transcription_sha256": "7aeef69b1ade8d455875b076fdec79b10a229999aa485ba72742eaf64dc07316",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
+        "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ]
+    },
+    {
+      "source_id": "gw-11e-core-indirect-shooting:remain-stationary",
+      "section_id": "09.04",
+      "source_text": "REMAIN STATIONARY\nWhen eligible: Any unit.\nEffect: No models are moved (either in straight lines or rotated). Units that remain stationary do not trigger any rules that are triggered when a unit starts or ends a move.",
+      "transcription_sha256": "bc0dfa0868a80975d7abf96a32a6265d48f4a1cca01157d615af0682f2c81ed7",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_targeting:_rules_unit_remained_stationary"
+      ]
+    }
+  ],
+  "attack_policy": {
+    "source_rule_id": "gw-11e-core-indirect-shooting:indirect-shooting",
+    "no_visible_rule_id": "weapon-ability:indirect-fire:no-visible-target",
+    "cover_rule_id": "weapon-ability:indirect-fire:benefit-of-cover",
+    "no_hit_rerolls_rule_id": "weapon-ability:indirect-fire:no-hit-rerolls",
+    "stationary_visible_rule_id": "weapon-ability:indirect-fire:stationary-friendly-visible",
+    "minimum_unmodified_success": 6,
+    "stationary_visible_minimum_unmodified_success": 4
+  },
+  "evidence": [
+    {
+      "rule_source_id": "gw-11e-core-indirect-shooting:indirect-shooting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "7aeef69b1ade8d455875b076fdec79b10a229999aa485ba72742eaf64dc07316",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "9bd80e8a7c7e9de1be246dc9d779d240ba577c7658707723d22a19b3e070d77b",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
+        "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ],
+      "evidence_id": "core-indirect-shooting-review:indirect-shooting",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P10 10.07 indirect-shooting",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-indirect-shooting:indirect-shooting",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "7aeef69b1ade8d455875b076fdec79b10a229999aa485ba72742eaf64dc07316",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "e68bb4742cfbe718b24112d08cf52496fc9e91005a8ab974a26f7015960fc1ce",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_declaration_validation:_apply_phase13d_weapon_modifiers",
+        "warhammer40k_core.engine.phases.shooting_requests:_shooting_types_for_selected_type_for_rules_unit",
+        "warhammer40k_core.engine.attack_sequence_hit_wound:_roll_hit"
+      ],
+      "evidence_id": "core-indirect-shooting-mirror:indirect-shooting:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-indirect-shooting-maintained-app-mirrors-2026-09-09",
+      "review_audit_row_id": "indirect-shooting:40k-app",
+      "review_audit_source_observation_sha256": "d280afafb00b95b97ec33e4d29c8a157166da0e2d8f7467faee31ae34de2458e",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 10.07 indirect-shooting",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/10-shooting-phase",
+      "observed_at": "2026-09-09T12:02:18.843Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    },
+    {
+      "rule_source_id": "gw-11e-core-indirect-shooting:remain-stationary",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "bc0dfa0868a80975d7abf96a32a6265d48f4a1cca01157d615af0682f2c81ed7",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "2f98ceb5bac4627941e75ca6506e16c6ec4d6b2e0b2475e0d3460f48e3881eb0",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_targeting:_rules_unit_remained_stationary"
+      ],
+      "evidence_id": "core-indirect-shooting-review:remain-stationary",
+      "evidence_kind": "project_reviewed_app_transcription",
+      "authority": "unverified_transcription_only",
+      "project_authority_policy_id": null,
+      "review_audit_id": null,
+      "review_audit_row_id": null,
+      "review_audit_source_observation_sha256": null,
+      "provider_name": "CORE V2 Source Review",
+      "source_title": "P10 09.04 remain-stationary",
+      "source_platform": "Repository",
+      "source_url": null,
+      "observed_at": null,
+      "app_version": null,
+      "verification_status": "unverified",
+      "provider_non_affiliation_recorded": false
+    },
+    {
+      "rule_source_id": "gw-11e-core-indirect-shooting:remain-stationary",
+      "app_build": null,
+      "capture_artifact_path": null,
+      "capture_sha256": null,
+      "transcription_sha256": "bc0dfa0868a80975d7abf96a32a6265d48f4a1cca01157d615af0682f2c81ed7",
+      "official_corroborating_source_ids": [],
+      "observation_sha256": "4230d46b85d5e2e0b4411977a10ebee236d12f5c56a0f8ab08ee1c4ac6cca58a",
+      "load_support_status": "loaded",
+      "semantic_execution_status": "partial_engine_runtime",
+      "runtime_consumer_ids": [
+        "warhammer40k_core.engine.phases.shooting_targeting:_rules_unit_remained_stationary"
+      ],
+      "evidence_id": "core-indirect-shooting-mirror:remain-stationary:40k-app",
+      "evidence_kind": "third_party_mirror",
+      "authority": "project_authoritative_app_mirror",
+      "project_authority_policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "review_audit_id": "core-indirect-shooting-maintained-app-mirrors-2026-09-09",
+      "review_audit_row_id": "remain-stationary:40k-app",
+      "review_audit_source_observation_sha256": "3d5ae30a91f9b16941fea635d81e4a25146e191c35092216927554eabca313ce",
+      "provider_name": "40k.app",
+      "source_title": "40k.app 09.04 remain-stationary",
+      "source_platform": "Web",
+      "source_url": "https://www.40k.app/rules/09-movement-phase",
+      "observed_at": "2026-09-09T12:16:21.670Z",
+      "app_version": null,
+      "verification_status": "authoritative_app_mirror",
+      "provider_non_affiliation_recorded": true
+    }
+  ],
+  "package_hash": "8b7ea3b7628763d79e6b66619a7a08e2137dff479d3ba81200ed7689bf100670"
+}

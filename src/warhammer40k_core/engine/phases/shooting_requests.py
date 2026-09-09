@@ -712,8 +712,6 @@ def _shooting_types_for_selected_type_for_rules_unit(
             army_catalog=army_catalog,
         ):
             return ()
-        if not has_weapon_keyword(weapon_profile, WeaponKeyword.INDIRECT_FIRE):
-            return ()
         if ShootingType.INDIRECT in base_types or ShootingType.NORMAL in base_types:
             return (ShootingType.INDIRECT,)
         return ()

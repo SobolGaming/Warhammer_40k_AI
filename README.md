@@ -702,3 +702,9 @@ and mirror audit are reproducible with
 `uv run python tools/build_core_embarked_abilities_source.py --check`.
 See the Order 25 evidence in
 [`docs/CORE_RULES_REMEDIATION_ROADMAP.md`](docs/CORE_RULES_REMEDIATION_ROADMAP.md).
+
+
+Order 33 / P10 Indirect Shooting implementation and review evidence are tracked
+in [the scope and acceptance matrix](docs/ORDER_33_SCOPE_PLAN.md). Reproduce its
+offline source artifacts with `uv run python tools/build_core_indirect_shooting_source.py --check`.
+The phase decision schemas remain in [the adapter contract](docs/ADAPTER_DECISION_CONTRACT.md).

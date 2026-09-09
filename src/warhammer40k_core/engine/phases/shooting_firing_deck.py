@@ -378,12 +378,6 @@ def _available_weapons_for_unit(
             for weapon in weapons
             if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
         ]
-    if selected_shooting_type is ShootingType.INDIRECT:
-        weapons = [
-            weapon
-            for weapon in weapons
-            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE)
-        ]
     if selected_shooting_type is ShootingType.NORMAL and _unit_advanced_this_turn(
         state=state,
         unit=unit,
@@ -470,12 +464,6 @@ def _available_weapons_for_rules_unit(
             weapon
             for weapon in weapons
             if has_close_quarters_weapon_keyword(weapon["weapon_profile"])
-        ]
-    if selected_shooting_type is ShootingType.INDIRECT:
-        weapons = [
-            weapon
-            for weapon in weapons
-            if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.INDIRECT_FIRE)
         ]
     if selected_shooting_type is ShootingType.NORMAL and _rules_unit_advanced_this_turn(
         state=state,
