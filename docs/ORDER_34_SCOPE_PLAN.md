@@ -88,3 +88,37 @@ remove effects through `GameState.remove_persisting_effects_by_id`, rather than
 assigning the reconstructed state's list directly. The owning API is now used;
 the gate is unchanged. The resulting production edit requires a fresh covered
 behavioral run and full code-quality run, despite the preceding 6,903-test pass.
+
+## Independent review repairs
+
+The review of `e57e8be02aa744354d8d078a78be39024ab44643` raised three stable
+findings. The earlier passing aggregates do not validate the repaired runtime.
+
+| Finding | Violated invariant and owning repair | Regression/evidence |
+|---|---|---|
+| R34-001 | A retained Shoot On Death choice could bypass Action restrictions until after parent-host mutation. The shared retained option producer, pre-pop validator and execution guard now use the common Action query; the strict retained payload records excluded actions. | Real Cleanse → parent shot → nested source-backed For the Chapter! shots; TITANIC and non-TITANIC, unavailable/forged and stale shoot choices, preserved fight/decline, checkpoint restoration and exact replay. |
+| R34-002 | Individually valid effects could be removed, retargeted or retimed during standalone restoration. A dedicated restoration module derives the complete live inventory from accepted Action decisions, completed attack history and actual expiry boundaries, then requires exact equality. | Missing/extra/retargeted/retimed Action and completed-shot inventories, including owner/round drift; existing no-damage, out-of-phase, attached and retained consumer regressions. |
+| R34-003 | The original fast work gate measured a blocked unit, missing unrestricted selection and broad live consumers. Additional comparable workloads exercise legal unit selection/preflight, 32 live effects, completed shooting, charge transitions, attached selection and retained reactions. | Versioned per-case work ceilings, base/head raw counts and separate uninstrumented timing; original component and difficult Indirect cases retained. |
+
+The bug-class search covered both ordinary and retained shooting selection,
+source alternatives, prevalidation, parent continuation, and all activity restore
+consumers. No named handler, source parsing, cache, competing activity ledger,
+geometry algorithm or adapter-specific mutation path was added. The frozen
+lifecycle module delegates restoration to the new owner. Historical checkpoint
+and live inventory reconstruction reuse the same effect builder and existing
+boundary decoder. Fixtures that manually invented Action state now submit real
+Action decisions; deterministic Hazardous seeds preserve their original outcome
+assertions after the retained request hash changes.
+
+The full attached target-declaration diagnostic stalls in the exact visibility
+solver on both base and repaired code. Both deadline outcomes and stack traces
+are retained; they are incomplete measurements, never legal/illegal answers.
+The separate bounded attached-selection workload has its own workload ID and
+stops at the real shooting-type request. Full-game certification remains open.
+
+The new calibration exposed repeated all-unit target checks during finite
+selection. Preflight and application now restrict the existing legality function
+to the selected placed unit, preserving all current checks. Completing the phase
+still enumerates the full skipped-unit inventory for payload validation. This
+reduces attached-selection line-of-sight calls from 57 to nine without caching
+or weakening stale-request validation; the base makes 30 such calls.

@@ -14,5 +14,80 @@
     "head_to_base_mean_ratio": 1.25
   },
   "timing_ci_enforced": false,
-  "full_game_certified": false
+  "full_game_certified": false,
+  "live_cases": {
+    "unrestricted": {
+      "workload_id": "order34-live-unrestricted-v1",
+      "inventory_size": 32,
+      "decision_count": 6,
+      "work_limits": {
+        "rules_unit_view_by_id": 240,
+        "rules_unit_identity_ids": 8,
+        "persisting_effects_for_lineage": 210,
+        "applies_to_unit": 8000,
+        "_legal_shooting_unit_ids": 3,
+        "_legal_charging_unit_ids": 2,
+        "invalid_shooting_unit_selection_status": 1,
+        "expire_persisting_effects_at_boundary": 4,
+        "resolve_line_of_sight": 72,
+        "resolve_visibility_pair": 7,
+        "resolve_visibility_pair_uncached": 7,
+        "decide_full": 0
+      },
+      "provisional_timing_limits_seconds": {
+        "mean": 0.2,
+        "maximum": 0.25,
+        "head_to_base_mean_ratio": 1.25
+      }
+    },
+    "attached_selection": {
+      "workload_id": "order34-live-attached_selection-v1",
+      "inventory_size": 32,
+      "decision_count": 1,
+      "work_limits": {
+        "rules_unit_view_by_id": 28,
+        "rules_unit_identity_ids": 0,
+        "persisting_effects_for_lineage": 34,
+        "applies_to_unit": 1200,
+        "_legal_shooting_unit_ids": 2,
+        "_legal_charging_unit_ids": 0,
+        "invalid_shooting_unit_selection_status": 1,
+        "expire_persisting_effects_at_boundary": 0,
+        "resolve_line_of_sight": 10,
+        "resolve_visibility_pair": 0,
+        "resolve_visibility_pair_uncached": 0,
+        "decide_full": 0
+      },
+      "provisional_timing_limits_seconds": {
+        "mean": 0.05,
+        "maximum": 0.075,
+        "head_to_base_mean_ratio": 1.25
+      }
+    },
+    "retained": {
+      "workload_id": "order34-live-retained-v1",
+      "inventory_size": 32,
+      "decision_count": 5,
+      "work_limits": {
+        "rules_unit_view_by_id": 320,
+        "rules_unit_identity_ids": 26,
+        "persisting_effects_for_lineage": 200,
+        "applies_to_unit": 6300,
+        "_legal_shooting_unit_ids": 3,
+        "_legal_charging_unit_ids": 1,
+        "invalid_shooting_unit_selection_status": 1,
+        "expire_persisting_effects_at_boundary": 10,
+        "resolve_line_of_sight": 50,
+        "resolve_visibility_pair": 6,
+        "resolve_visibility_pair_uncached": 6,
+        "decide_full": 0
+      },
+      "provisional_timing_limits_seconds": {
+        "mean": 0.45,
+        "maximum": 0.55,
+        "head_to_base_mean_ratio": 1.25
+      }
+    }
+  },
+  "calibration_policy": "Per-case work ceilings bound the measured source-backed live paths and 32-effect inventory with small explicit headroom; geometry solver calls and phase/selection multiplicities may not grow. Existing budgets are unchanged. Profile wall times are not timing evidence."
 }

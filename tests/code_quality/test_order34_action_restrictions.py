@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import cast
 
+import pytest
 from tools.build_core_actions_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import core_actions_2026_09
@@ -97,6 +98,48 @@ def test_shooting_unit_selection_has_engine_preflight_before_recording() -> None
     )
 
 
+@pytest.mark.parametrize("case", ["unrestricted", "attached_selection", "retained"])
+def test_r34_003_live_consumers_stay_within_versioned_work_budgets(case: str) -> None:
+    from scripts.measure_action_restriction_live import LIVE_CASES, WORK_METRICS, live_sample
+
+    budgets = json.loads((ROOT / "docs/performance/order34/budgets.json").read_text())
+    assert set(budgets["live_cases"]) == set(LIVE_CASES)
+    budget = budgets["live_cases"][case]
+    assert set(budget["work_limits"]) == WORK_METRICS
+    result = live_sample(profile=True, case=case)
+    assert result["inventory_size"] == budget["inventory_size"] == 32
+    assert result["decision_count"] == budget["decision_count"]
+    assert result["reached_charge"] is (case != "attached_selection")
+    counts = cast(dict[str, int], result["work_counts"])
+    assert counts.keys() <= WORK_METRICS
+    assert counts["invalid_shooting_unit_selection_status"] == 1
+    for metric, maximum in budget["work_limits"].items():
+        assert counts.get(metric, 0) <= maximum, (case, metric, counts)
+
+
+def test_r34_003_selection_checks_bound_candidates_without_skipping_legality() -> None:
+    for filename, function_name in (
+        ("shooting_handler.py", "invalid_shooting_unit_selection_status"),
+        ("shooting_unit_selection.py", "_apply_shooting_unit_selection_decision"),
+    ):
+        tree = ast.parse((ENGINE / "phases" / filename).read_text())
+        function = next(
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef) and node.name == function_name
+        )
+        calls = [
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_legal_shooting_unit_ids"
+        ]
+        assert any(
+            any(keyword.arg == "candidate_unit_ids" for keyword in call.keywords) for call in calls
+        )
+
+
 def test_historical_action_consumers_supply_exact_checkpoint_event_authority() -> None:
     for name in (
         "mission_action_options.py",
@@ -116,3 +159,42 @@ def test_historical_action_consumers_supply_exact_checkpoint_event_authority() -
         assert {"event_records", "checkpoint_event_id"} <= {
             keyword.arg for keyword in calls[0].keywords
         }, name
+
+
+def test_retained_shooting_checks_action_before_parent_mutation() -> None:
+    selection = ast.parse((ENGINE / "retained_destruction_selection.py").read_text())
+    functions = {node.name: node for node in selection.body if isinstance(node, ast.FunctionDef)}
+    for name, expected in (
+        ("offer_fight_on_death_retention", "retained_shooting_action_is_blocked"),
+        ("validate_retention_request", "validate_retained_shooting_activity"),
+    ):
+        assert any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == expected
+            for node in ast.walk(functions[name])
+        )
+    shooting = ast.parse((ENGINE / "retained_shooting.py").read_text())
+    advance = next(
+        node
+        for node in shooting.body
+        if isinstance(node, ast.FunctionDef) and node.name == "advance_retained_shooting"
+    )
+    calls = {
+        node.func.id: node.lineno
+        for node in ast.walk(advance)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert (
+        calls["validate_retained_shooting_activity"] < calls["_release_parent_attack_destruction"]
+    )
+
+
+def test_lifecycle_authenticates_complete_activity_inventory() -> None:
+    tree = ast.parse((ENGINE / "lifecycle.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "validate_activity_restriction_inventory"
+        for node in ast.walk(tree)
+    )

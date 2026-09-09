@@ -29,13 +29,13 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-class _CompletedModels(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
+class CompletedAttackModels(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     game_id: str
     battle_round: int
     active_player_id: str
-    phase: str
+    phase: BattlePhase
     sequence_id: str
-    attack_phase: str
+    attack_phase: BattlePhase
     attacking_unit_instance_id: str
     model_instance_ids: tuple[str, ...]
 
@@ -106,7 +106,7 @@ def restore_checkpoint_activity_restrictions(
         if event.event_type != MODELS_ATTACKED_EVENT_TYPE:
             continue
         try:
-            row = msgspec.convert(event.payload, type=_CompletedModels)
+            row = msgspec.convert(event.payload, type=CompletedAttackModels)
         except msgspec.ValidationError as exc:
             raise GameLifecycleError("Completed shooting activity history is malformed.") from exc
         if row.game_id != state.game_id:

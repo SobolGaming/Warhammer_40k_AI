@@ -20,9 +20,13 @@ from warhammer40k_core.engine.destruction_reaction_conditions import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
+from warhammer40k_core.engine.mission_action_eligibility import (
+    action_restriction_prevents_shooting,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.retained_attack_permissions import (
     RETAINED_ATTACK_REACTION_KINDS,
+    RetainedAttackAction,
     retained_attack_options,
     retained_attack_selection,
 )
@@ -99,6 +103,9 @@ def offer_fight_on_death_retention(
         owner_context=owner_context,
         sources=sources,
         eligible_sources=eligible,
+        excluded_actions=(RetainedAttackAction.SHOOT,)
+        if retained_shooting_action_is_blocked(state=state, placement=placement)
+        else (),
         stage=RetainedDestructionStage.OFFERED
         if eligible
         else RetainedDestructionStage.NOT_TRIGGERED,
@@ -149,7 +156,12 @@ def retention_request(record: RetainedModelDestruction) -> DecisionRequest:
         },
         sources=record.eligible_sources,
     )
-    return replace(request, options=retained_attack_options(record.eligible_sources))
+    return replace(
+        request,
+        options=retained_attack_options(
+            record.eligible_sources, excluded_actions=record.excluded_actions
+        ),
+    )
 
 
 def is_retention_request(request: DecisionRequest) -> bool:
@@ -180,6 +192,9 @@ def validate_retention_request(
     if retention_request(record) != request:
         raise GameLifecycleError("Fight On Death finite options drift.")
     validate_retention_grants(state=state, record=record)
+    _source, action = retained_attack_selection(request=request, result=result)
+    if action is RetainedAttackAction.SHOOT:
+        validate_retained_shooting_activity(state=state, record=record)
     return record
 
 
@@ -342,3 +357,26 @@ def _eligible_sources(
         if triggered:
             active.append(source)
     return tuple(active)
+
+
+def validate_retained_shooting_activity(
+    *, state: GameState, record: RetainedModelDestruction
+) -> None:
+    if retained_shooting_action_is_blocked(state=state, placement=record.placement):
+        raise GameLifecycleError("Action restriction prevents retained shooting.")
+
+
+def retained_shooting_action_is_blocked(*, state: GameState, placement: ModelPlacement) -> bool:
+    from warhammer40k_core.engine.rules_units import (
+        rules_unit_view_by_id,
+        rules_unit_view_with_retained_models,
+    )
+
+    view = rules_unit_view_by_id(state=state, unit_instance_id=placement.unit_instance_id)
+    # Evaluate the offered entitlement with its destroyed model retained. This
+    # preserves its canonical keywords before the selection establishes retention.
+    view = rules_unit_view_with_retained_models(
+        view=view,
+        retained_model_ids=tuple(sorted({*view.retained_model_ids, placement.model_instance_id})),
+    )
+    return action_restriction_prevents_shooting(state=state, rules_unit=view)

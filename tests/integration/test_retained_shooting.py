@@ -29,6 +29,7 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
     apply_damage_to_model,
 )
+from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
@@ -133,7 +134,7 @@ def test_order_30_retained_shooter_keeps_range_restriction_and_ability_geometry(
 def test_order_30_for_the_chapter_shoots_after_own_hazardous_death(with_feel_no_pain: bool) -> None:
     lifecycle, units = _compact_shooting_lifecycle(
         catalog=for_the_chapter_catalog(hazardous=True),
-        game_id="order32-own-hazard-fnp-2" if with_feel_no_pain else "order32-own-hazard-11",
+        game_id="order34-own-hazard-True-16" if with_feel_no_pain else "order34-own-hazard-False-1",
         enemy_model_count=5,
     )
     state = lifecycle.state
@@ -1214,7 +1215,7 @@ def test_order_30_multiple_hazardous_casualties_keep_each_pending_authority() ->
     )
     lifecycle, units = _shooting_lifecycle(
         catalog=catalog,
-        game_id="order-30-multi-hazard-3",
+        game_id="order34-multi-hazard-1",
         alpha_unit_ids=("intercessor-1",),
         alpha_unit_specs=(
             ("intercessor-1", "core-intercessor-like-infantry", "core-intercessor-like", 5),
@@ -1331,3 +1332,279 @@ def test_order_30_multiple_hazardous_casualties_keep_each_pending_authority() ->
             )
             == 1
         )
+
+
+@pytest.mark.parametrize("titanic", [False, True])
+def test_r34_001_action_blocks_nested_retained_shooting_before_acceptance(titanic: bool) -> None:
+    from tests.phase17n_secondary_mission_helpers import (
+        resolved_secondary_mission_selection_for_card,
+    )
+
+    from warhammer40k_core.engine.game_state import SecondaryMissionMode
+    from warhammer40k_core.engine.mission_decisions import request_mission_action_start
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.scoring import SecondaryMissionCardState
+
+    catalog = for_the_chapter_catalog()
+    if titanic:
+        catalog = replace(
+            catalog,
+            datasheets=tuple(
+                replace(
+                    sheet,
+                    keywords=replace(
+                        sheet.keywords, keywords=(*sheet.keywords.keywords, "TITANIC")
+                    ),
+                )
+                for sheet in catalog.datasheets
+            ),
+        )
+    lifecycle, units = _compact_shooting_lifecycle(
+        catalog=catalog,
+        game_id="review-r34-nested-5",
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        enemy_model_count=3,
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    assert state.mission_setup is not None
+    state.secondary_mission_choices = [
+        replace(choice, mode=SecondaryMissionMode.TACTICAL, fixed_mission_ids=())
+        if choice.player_id == "player-a"
+        else choice
+        for choice in state.secondary_mission_choices
+    ]
+    state.secondary_mission_card_states = [
+        card for card in state.secondary_mission_card_states if card.player_id != "player-a"
+    ]
+    card = SecondaryMissionCardState.active_tactical(
+        player_id="player-a",
+        secondary_mission_id="cleanse",
+        battle_round=state.battle_round,
+        source_result_id="review-r34-hold-cleanse",
+    )
+    state.record_secondary_mission_card_state(
+        card.with_selection(resolved_secondary_mission_selection_for_card(state, card))
+    )
+    actor = units["intercessor-2"]
+    marker = min(
+        state.mission_setup.objective_markers,
+        key=lambda marker: (marker.x_inches - 30) ** 2 + (marker.y_inches - 25) ** 2,
+    )
+    placement = state.battlefield_state.unit_placement_by_id(actor.unit_instance_id)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(
+            replace(
+                placement,
+                model_placements=tuple(
+                    replace(model, pose=Pose.at(marker.x_inches + 2, marker.y_inches))
+                    for model in placement.model_placements
+                ),
+            )
+        )
+    )
+    for unit_id, x, y in (
+        (units["intercessor-1"].unit_instance_id, 75.0, 50.0),
+        (units["enemy"].unit_instance_id, 85.0, 50.0),
+    ):
+        placement = state.battlefield_state.unit_placement_by_id(unit_id)
+        state.replace_battlefield_state(
+            state.battlefield_state.with_unit_placement(
+                replace(
+                    placement,
+                    model_placements=tuple(
+                        replace(model, pose=Pose.at(x, y + index * 1.5))
+                        for index, model in enumerate(placement.model_placements)
+                    ),
+                )
+            )
+        )
+    lifecycle = GameLifecycle.from_payload(lifecycle.to_payload())
+    state = lifecycle.state
+    assert state is not None
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    request = waiting.decision_request
+    assert request is not None, waiting
+    option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("unit_instance_id") == actor.unit_instance_id
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    session.submit_option(
+        request_id=request.request_id, result_id="review-r34-action", option_id=option.option_id
+    )
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    saw_child = False
+    accepted_parent = False
+    for index in range(70):
+        request = pending_request(session)
+        state = session.lifecycle.state
+        assert state is not None
+        assert state.active_player_id == "player-a", [
+            (event.event_type, event.payload)
+            for event in session.lifecycle.decision_controller.event_log.records
+            if event.event_type == "fight_on_death_retention_trigger_resolved"
+        ]
+        if request.decision_type == "select_destruction_reaction":
+            shooting = tuple(
+                option
+                for option in request.options
+                if isinstance(option.payload, dict) and option.payload.get("action") == "shoot"
+            )
+            if request.actor_id == "player-a":
+                saw_child = True
+                assert bool(shooting) is titanic
+                before = session.lifecycle.to_payload()
+                assert (
+                    GameLifecycle.from_payload(json.loads(json.dumps(before))).to_payload()
+                    == before
+                )
+                if not titanic:
+                    # An adapter cannot invent the source's unavailable shooting alternative.
+                    source = next(
+                        record
+                        for record in retained_destructions(state=state)
+                        if record.request_id == request.request_id
+                    ).eligible_sources[0]
+                    with pytest.raises(DecisionError, match="finite action space"):
+                        session.submit_option(
+                            request_id=request.request_id,
+                            result_id="review-r34-forged-shoot",
+                            option_id=source.source_id,
+                        )
+                    assert session.lifecycle.to_payload() == before
+                option_id = (
+                    shooting[0].option_id if titanic else DECLINE_DESTRUCTION_REACTION_OPTION_ID
+                )
+            elif not accepted_parent:
+                accepted_parent = True
+                assert shooting
+                option_id = shooting[0].option_id
+            else:
+                option_id = DECLINE_DESTRUCTION_REACTION_OPTION_ID
+            session.submit_option(
+                request_id=request.request_id,
+                result_id=f"review-r34-retain-{index}",
+                option_id=option_id,
+            )
+        elif request.decision_type == "submit_shooting_declaration":
+            target = actor.unit_instance_id if request.actor_id == "player-b" else "army-beta:enemy"
+            proposal = _proposal_from_request(request=request, target_unit_id=target)
+            session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=f"review-r34-shoot-{index}",
+                payload=validate_json_value(proposal.to_payload()),
+            )
+        else:
+            submit_fixture_request(session, request)
+        checkpoint = session.lifecycle.to_payload()
+        assert (
+            GameLifecycle.from_payload(json.loads(json.dumps(checkpoint))).to_payload()
+            == checkpoint
+        )
+        state = session.lifecycle.state
+        assert state is not None
+        if saw_child and not retained_destructions(state=state):
+            break
+    assert saw_child
+    assert accepted_parent
+    assert state.out_of_phase_shooting_state is None
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id=f"r34-001:{titanic}",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+
+@pytest.mark.parametrize("choice", ["shoot", "fight", "decline"])
+def test_r34_001_retained_selection_rechecks_action_before_mutation(choice: str) -> None:
+    from warhammer40k_core.engine.actions import MissionActionState
+
+    session, model_id = pending_retained_attack(
+        reaction_kind=DestructionReactionKind.SHOOT_OR_FIGHT_ON_DEATH,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    request = pending_request(session)
+    # A stale request must be checked against current engine-owned effects even
+    # when it originally included shooting. The Action's later failure cannot
+    # make that alternative legal again.
+    unit_id = state.unit_instance_id_for_model(model_id)
+    action = MissionActionState.start(
+        action_id="r34-stale-action",
+        mission_action_id="cleanse-objective",
+        player_id="player-b",
+        unit_instance_id=unit_id,
+        target_id="phase13b-remote-objective",
+        condition_target_id="phase13b-remote-objective",
+        mission_id="cleanse",
+        battle_round=state.battle_round,
+        phase="shooting",
+        start_timing="shooting_phase_action_start",
+        completion_timing="turn_end",
+        eligible_unit_instance_ids=(unit_id,),
+        interruption_conditions=("unit_destroyed",),
+        scoring_source_id="cleanse",
+        victory_points=0,
+        battle_shocked_unit_ids=(),
+    )
+    state.record_mission_action_state(action)
+    state.interrupt_mission_action(action_id=action.action_id, reason="unit_destroyed")
+    option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("action") == (None if choice == "decline" else choice)
+    )
+    before = session.lifecycle.to_payload()
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r34-stale-retention", option_id=option.option_id
+    )
+    if choice == "shoot":
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert session.lifecycle.to_payload() == before
+    else:
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        selected = [
+            event
+            for event in session.lifecycle.decision_controller.event_log.records
+            if event.event_type == "fight_on_death_retention_selected"
+        ]
+        assert selected
+
+
+def test_r34_001_retained_action_exclusions_are_strict_and_cannot_be_selected() -> None:
+    session, _model = pending_retained_attack(reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH)
+    state = session.lifecycle.state
+    assert state is not None
+    record = retained_destructions(state=state)[0]
+    with pytest.raises(GameLifecycleError, match="excluded actions are invalid"):
+        replace(record, excluded_actions=cast(tuple[RetainedAttackAction, ...], ("shoot",)))
+    with pytest.raises(GameLifecycleError, match="action was excluded"):
+        replace(
+            record,
+            excluded_actions=(RetainedAttackAction.SHOOT,),
+            selected_action=RetainedAttackAction.SHOOT,
+        )
+    for value in (None, "shoot", ["fight"], ["shoot", "shoot"]):
+        payload = record.to_payload()
+        payload["excluded_actions"] = validate_json_value(value)
+        with pytest.raises(GameLifecycleError, match="excluded actions are invalid"):
+            type(record).from_payload(payload)
+    payload = record.to_payload()
+    del payload["excluded_actions"]
+    with pytest.raises(GameLifecycleError, match="fields"):
+        type(record).from_payload(payload)

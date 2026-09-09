@@ -511,6 +511,9 @@ class ShootingPhaseHandler:
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             army_catalog=_army_catalog_for_handler(self),
             shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+            candidate_unit_ids=None
+            if result.selected_option_id == COMPLETE_SHOOTING_PHASE_OPTION_ID
+            else (result.selected_option_id,),
         )
         options = _shooting_unit_options(
             state=state, unit_ids=legal_unit_ids, include_complete=True

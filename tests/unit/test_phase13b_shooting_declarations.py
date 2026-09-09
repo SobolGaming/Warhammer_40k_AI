@@ -19675,3 +19675,43 @@ def test_order33_lower_failure_range_still_requires_the_modified_hit_value(modif
         modifier=modifier,
         ballistic_skill=4,
     )
+
+
+@pytest.mark.parametrize("mutation", ["missing", "extra", "target", "player", "round"])
+def test_r34_002_completed_shooting_inventory_is_authenticated(mutation: str) -> None:
+    from tests.indirect_shooting_helpers import (
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(observer=True)
+    request = select_indirect_declaration(session, ShootingType.NORMAL)
+    submit_indirect_declaration(session, request)
+    complete_indirect_attack(session)
+    original = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(json.loads(json.dumps(original))).to_payload() == original
+    forged = json.loads(json.dumps(original))
+    effects = forged["state"]["persisting_effects"]
+    effect = next(
+        row
+        for row in effects
+        if row["effect_payload"].get("effect_kind") == "core_unit_activity_restriction"
+    )
+    if mutation == "missing":
+        effects.remove(effect)
+    elif mutation == "extra":
+        extra = json.loads(json.dumps(effect))
+        extra["effect_payload"]["activity_id"] += ":forged"
+        extra["effect_id"] += ":forged"
+        effects.append(extra)
+    elif mutation == "target":
+        effect["target_unit_instance_ids"] = ["army-alpha:observer"]
+    elif mutation == "player":
+        effect["expiration"]["player_id"] = "player-b"
+    else:
+        effect["started_battle_round"] += 1
+        effect["expiration"]["battle_round"] += 1
+    with pytest.raises(GameLifecycleError, match="Activity restriction"):
+        GameLifecycle.from_payload(forged)

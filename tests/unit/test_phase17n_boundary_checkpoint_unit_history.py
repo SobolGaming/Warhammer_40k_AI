@@ -299,7 +299,7 @@ def test_phase17n_restore_rejects_coordinated_prior_shooting_history_erasure() -
 
     with pytest.raises(
         GameLifecycleError,
-        match="Primary mission boundary shooting state lacks exact authority",
+        match="Activity restriction inventory differs",
     ):
         GameLifecycle.from_payload(forged_payload)
 

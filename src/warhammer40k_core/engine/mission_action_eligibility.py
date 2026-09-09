@@ -134,6 +134,10 @@ def mission_action_prevents_rules_unit_from_shooting_this_phase(
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     if rules_unit.owner_player_id != requested_player_id:
         return False
+    return action_restriction_prevents_shooting(state=state, rules_unit=rules_unit)
+
+
+def action_restriction_prevents_shooting(*, state: GameState, rules_unit: RulesUnitView) -> bool:
     if "TITANIC" in rules_unit.keywords:
         return False
     return has_activity_restriction(state=state, rules_unit=rules_unit, activity="started_action")

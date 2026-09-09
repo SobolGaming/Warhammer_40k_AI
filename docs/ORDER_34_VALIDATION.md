@@ -1,5 +1,11 @@
 # Order 34 validation and review handoff
 
+**Independent review repair in progress:** R34-001, R34-002 and R34-003 were
+received on 2026-09-09. The evidence below records the previous runtime and is
+historical; production fixes invalidate those aggregate results for the new
+candidate. Repaired-head correctness, contract, performance and full CI results
+will replace this status after validation. The PR remains a draft meanwhile.
+
 PR: https://github.com/SobolGaming/Warhammer_40k_AI/pull/438
 
 Base: `e56c1a4caf2a6915548222caed0872627f8dbf43`.

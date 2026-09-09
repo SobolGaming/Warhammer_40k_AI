@@ -3337,6 +3337,13 @@ def _validate_payload_consistency(
     decision_records: tuple[DecisionRecord, ...],
     pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
+    from warhammer40k_core.engine.activity_restriction_restore import (
+        validate_activity_restriction_inventory,
+    )
+
+    validate_activity_restriction_inventory(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
     _rsi.validate_reserve_state_consistency(state=state)
     _tsi.validate_transport_cargo_state_consistency(state=state)
     validate_prebattle_alternation_restore(

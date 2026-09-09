@@ -72,12 +72,15 @@ def _legal_shooting_unit_ids(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+    candidate_unit_ids: tuple[str, ...] | None = None,
 ) -> tuple[str, ...]:
     scenario = _battlefield_scenario(state)
     active_player_id = _active_player_id(state)
     placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
     legal: list[str] = []
     for unit_id in placed_unit_ids:
+        if candidate_unit_ids is not None and unit_id not in candidate_unit_ids:
+            continue
         if (
             unit_id in shooting_state.selected_unit_ids
             or unit_id in shooting_state.shot_unit_ids

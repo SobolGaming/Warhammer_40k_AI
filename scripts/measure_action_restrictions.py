@@ -116,22 +116,37 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=7)
     parser.add_argument("--work-counts", action="store_true")
+    parser.add_argument(
+        "--live-case", choices=("unrestricted", "attached", "attached_selection", "retained")
+    )
     args = parser.parse_args()
     if args.samples < 1:
         parser.error("samples must be positive")
-    rows = [sample(profile=args.work_counts) for _ in range(args.samples)]
+    from scripts.measure_action_restriction_live import live_sample
+
+    rows = [
+        sample(profile=args.work_counts)
+        if args.live_case is None
+        else live_sample(profile=args.work_counts, case=args.live_case)
+        for _ in range(args.samples)
+    ]
     values = sorted(float(str(row["slice_seconds"])) for row in rows)
     report = {
-        "workload_id": "order34-action-restriction-slice-v1",
+        "workload_id": "order34-action-restriction-slice-v1"
+        if args.live_case is None
+        else f"order34-live-{args.live_case}-v1",
         "commit": subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
         "runtime_diff_sha256": hashlib.sha256(
             subprocess.check_output(["git", "diff", "HEAD", "--", "src"], cwd=ROOT)
         ).hexdigest(),
+        "engine_manifest_sha256": hashlib.sha256(
+            (ROOT / "src/warhammer40k_core/_engine_build_manifest.json").read_bytes()
+        ).hexdigest(),
         "platform": platform.platform(),
         "python": platform.python_version(),
-        "hardware_status": "provisional local host; single process; no competing test workers",
+        "hardware_status": "provisional local host; execution evidence records workload scheduling",
         "cpu": subprocess.check_output(
             ["sysctl", "-n", "machdep.cpu.brand_string"], text=True
         ).strip(),
@@ -139,7 +154,7 @@ def main() -> None:
         "mode": "work_counts_instrumented_not_timing_evidence"
         if args.work_counts
         else "uninstrumented_timing",
-        "query_repetitions": QUERY_REPETITIONS,
+        "query_repetitions": QUERY_REPETITIONS if args.live_case is None else None,
         "samples": rows,
         "mean_seconds": statistics.mean(values),
         "median_seconds": statistics.median(values),
@@ -152,6 +167,9 @@ def main() -> None:
             for name in (
                 "uv.lock",
                 "scripts/measure_action_restrictions.py",
+                "scripts/measure_action_restriction_live.py",
+                "tests/indirect_shooting_helpers.py",
+                "tests/retained_attack_helpers.py",
                 "tests/phase17n_primary_mission_helpers.py",
             )
         },

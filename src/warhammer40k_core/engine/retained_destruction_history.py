@@ -10,9 +10,14 @@ from warhammer40k_core.engine.model_destruction_cause_attack_restore import (
     validate_pending_attack_destruction_boundary,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.retained_attack_permissions import retained_attack_selection
+from warhammer40k_core.engine.retained_attack_permissions import (
+    RetainedAttackAction,
+    retained_attack_selection,
+)
 from warhammer40k_core.engine.retained_destruction_selection import (
+    retained_shooting_action_is_blocked,
     retention_request,
+    validate_retained_shooting_activity,
     validate_retention_grants,
 )
 from warhammer40k_core.engine.retained_destruction_state import (
@@ -398,6 +403,18 @@ def validate_retained_destruction_history(
         validate_retained_placement(state=state, record=record)
         if record.stage is RetainedDestructionStage.OFFERED:
             validate_retention_grants(state=state, record=record)
+            exclusions = (
+                (RetainedAttackAction.SHOOT,)
+                if retained_shooting_action_is_blocked(state=state, placement=record.placement)
+                else ()
+            )
+            if record.excluded_actions != exclusions:
+                raise GameLifecycleError("Retained shooting Action option authority drifted.")
+        if (
+            record.stage is RetainedDestructionStage.WAITING
+            and record.selected_action is RetainedAttackAction.SHOOT
+        ):
+            validate_retained_shooting_activity(state=state, record=record)
         if (
             record.owner_kind is DestructionOwnerKind.RULE
             and record.stage is not RetainedDestructionStage.REMOVED

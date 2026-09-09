@@ -208,3 +208,50 @@ def _model_ids(value: JsonValue) -> frozenset[str]:
     if not isinstance(value, list):
         raise GameLifecycleError("Model attack history requires model identifiers.")
     return frozenset(_identifier(model_id) for model_id in value)
+
+
+def validate_declared_model_attack_completions(*, event_records: tuple[EventRecord, ...]) -> None:
+    """Bind completions to every declaration present in this bounded lifecycle.
+
+    A lifecycle may start at a typed attack executor boundary. Such completions
+    retain their executor participation/completion pair; they do not acquire an
+    invented earlier player declaration. Full facade histories additionally bind
+    the pair to their actual declaration here.
+    """
+    declared = {
+        _identifier(_participation_for_declaration(event)["sequence_id"])
+        for event in event_records
+        if event.event_type
+        in {
+            "shooting_declaration_accepted",
+            "out_of_phase_shooting_declaration_accepted",
+            "melee_declaration_accepted",
+        }
+    }
+    relevant = tuple(
+        event
+        for event in event_records
+        if event.event_type
+        in {
+            "shooting_declaration_accepted",
+            "out_of_phase_shooting_declaration_accepted",
+            "melee_declaration_accepted",
+        }
+        or (
+            event.event_type
+            in {
+                MODELS_ATTACKED_EVENT_TYPE,
+                "attack_sequence_completed",
+                "attack_sequence_attacks_resolved",
+            }
+            and isinstance(event.payload, dict)
+            and _identifier(event.payload.get("sequence_id")) in declared
+        )
+    )
+    model_ids = frozenset(
+        model_id
+        for event in relevant
+        if event.event_type == MODELS_ATTACKED_EVENT_TYPE
+        for model_id in _model_ids(_object(event.payload).get("model_instance_ids"))
+    )
+    validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)

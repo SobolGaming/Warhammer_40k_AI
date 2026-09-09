@@ -265,6 +265,11 @@ def advance_retained_shooting(
     if not waiting:
         return None
     record = waiting[0]
+    from warhammer40k_core.engine.retained_destruction_selection import (
+        validate_retained_shooting_activity,
+    )
+
+    validate_retained_shooting_activity(state=state, record=record)
     source = next(
         source
         for source in record.eligible_sources

@@ -1305,6 +1305,13 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   adapter mutation path is introduced. Historical Action-request validation rebuilds
   activity effects from the exact checkpoint's prior-use evidence and preceding
   completed-attack events; it cannot inherit later effects or lose expired history.
+  Standalone lifecycle restoration also reconstructs the exact live activity
+  inventory from accepted Action-start decisions, paired executor participation
+  and completion events, and authenticated phase/turn boundaries. Missing, extra,
+  retargeted or retimed effects are invalid. Full facade attack histories bind
+  completion to their declarations; a checkpoint beginning inside the typed
+  attack executor retains that executor's participation/completion authority.
+  This reconstruction runs at restoration, outside live eligibility queries.
   Immediate zero-VP actions complete in the same
   decision handler without creating a VP transaction; Booby Trap records an
   engine-owned terrain trap state for later primary scoring and Plunder records
@@ -2189,6 +2196,14 @@ uses `model_shoot_completed`, resolves its deferred destruction rules and
 restores any suspended parent shooting executor. Nested retaliation is a stack
 of engine-owned continuations. The existing parameterized submission contract
 rejects stale context, foreign models and malformed declarations before mutation.
+Retained source choices omit shooting when the current Action restriction applies.
+The retained destruction payload requires `excluded_actions` (`[]` or `["shoot"]`),
+bound by the existing request hash and opening event. Decline and any independently
+granted fight choice remain available. The pending destroyed model participates in
+the current rules-unit keyword check, including the TITANIC shooting exception.
+Finite submission rechecks that authority before recording the choice or releasing
+the parent executor; execution checks it again before changing the attack host.
+Pending and accepted retained checkpoints validate the same authority on restore.
 If an out-of-phase shooter has no legal weapon/target pair, the engine completes
 that executor through the same completion and retained-cleanup path without
 emitting an impossible proposal. Empty shooting declarations remain invalid.
