@@ -428,11 +428,7 @@ def selection_visibility_conditions_apply(
         observing_components = (
             (source_rules_unit.component_unit_for_model(observer_model_id),)
             if observer_model_id is not None
-            else tuple(
-                component.unit
-                for component in source_rules_unit.components
-                if any(model.is_alive for model in component.unit.own_models)
-            )
+            else tuple(component.unit for component in source_rules_unit.rules_present_components)
         )
         if not any(
             unit_has_line_of_sight_to_target(

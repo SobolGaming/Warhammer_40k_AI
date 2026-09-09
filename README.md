@@ -2,6 +2,16 @@
 
 Strict bottom-up Warhammer 40k engine reconstruction.
 
+Order 32 replaces sampled visibility with continuous predicates over analytic
+circles, ellipses and oriented rectangles, using the shared 1mm corridor authority.
+Its source evidence, acceptance matrix, correctness argument and consumer audit
+are in the [Order 32 review](docs/performance/ORDER_32_VISIBILITY_REVIEW.md).
+Regenerate the reviewed source data offline with
+`uv run python tools/build_core_other_concepts_source.py`; use `--check` to verify
+it, then regenerate engine identity and the external contract. The owner deferred
+further performance work until complete head-to-head headless games can be timed;
+the preserved diagnostics are not performance certification.
+
 Orders 26, 27 and 29 implement exact ordered modifiers, distinct raw/modified
 roll records with source-defined limits, and shared 9–30 inch Detection/Lone
 Operative range limits. Scope and evidence are recorded in the
@@ -391,8 +401,10 @@ Build in this order:
    faction coverage, and faction-specific runtime handlers.
 6. Adapters and interfaces: headless, CLI, UI, network, event streams,
    viewer-safe projection, and trigger opportunity windows.
-7. AI, rankers, training, and performance work only after the deterministic
-   rules core and replay records are trustworthy.
+7. AI, rankers and training only after the deterministic rules core and replay
+   records are trustworthy. Profiling, benchmarks and optimization of the current
+   rules-engine slice are authorized now under the
+   [standing performance policy](docs/performance/PERFORMANCE_POLICY.md).
 
 Current status:
 

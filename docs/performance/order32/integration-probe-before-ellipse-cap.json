@@ -1,0 +1,3477 @@
+{
+  "status": "intermediate_measurement_not_delivery_gate",
+  "recorded_at_utc": "2026-09-08T20:35:04.348140+00:00",
+  "base_commit": "a1e66ec7d7c1ca05398e30d51ca61d1b62cd7332",
+  "boundary": "each public context model-pair resolution; separate child processes; hard 30s deadline outside the authority; failed query has no invented result",
+  "note": "Before analytic ellipse-cap enclosure repair. Single diagnostic sample; not a latency distribution.",
+  "results": [
+    {
+      "workload": "5-targets-sparse",
+      "status": "completed",
+      "deadline_seconds": 30,
+      "process_elapsed_seconds": 0.11883383302483708,
+      "rows": [
+        {
+          "target": "target-000",
+          "status": "started"
+        },
+        {
+          "target": "target-000",
+          "status": "completed",
+          "ms": 0.1794169656932354,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-001",
+          "status": "started"
+        },
+        {
+          "target": "target-001",
+          "status": "completed",
+          "ms": 0.05562498699873686,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-002",
+          "status": "started"
+        },
+        {
+          "target": "target-002",
+          "status": "completed",
+          "ms": 0.053416937589645386,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-003",
+          "status": "started"
+        },
+        {
+          "target": "target-003",
+          "status": "completed",
+          "ms": 0.03958307206630707,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-004",
+          "status": "started"
+        },
+        {
+          "target": "target-004",
+          "status": "completed",
+          "ms": 0.03400002606213093,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "status": "all_completed",
+          "ms": 0.4363749176263809
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "workload": "5-targets-dense",
+      "status": "completed",
+      "deadline_seconds": 30,
+      "process_elapsed_seconds": 0.10023041605018079,
+      "rows": [
+        {
+          "target": "target-000",
+          "status": "started"
+        },
+        {
+          "target": "target-000",
+          "status": "completed",
+          "ms": 2.862459048628807,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-001",
+          "status": "started"
+        },
+        {
+          "target": "target-001",
+          "status": "completed",
+          "ms": 2.1739579970017076,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-002",
+          "status": "started"
+        },
+        {
+          "target": "target-002",
+          "status": "completed",
+          "ms": 2.243375056423247,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-003",
+          "status": "started"
+        },
+        {
+          "target": "target-003",
+          "status": "completed",
+          "ms": 2.1947920322418213,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-004",
+          "status": "started"
+        },
+        {
+          "target": "target-004",
+          "status": "completed",
+          "ms": 2.3877080529928207,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "status": "all_completed",
+          "ms": 11.945332982577384
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "workload": "5-targets-dense-nonoverlapping",
+      "status": "completed",
+      "deadline_seconds": 30,
+      "process_elapsed_seconds": 0.10392958298325539,
+      "rows": [
+        {
+          "target": "target-000",
+          "status": "started"
+        },
+        {
+          "target": "target-000",
+          "status": "completed",
+          "ms": 3.379874979145825,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-001",
+          "status": "started"
+        },
+        {
+          "target": "target-001",
+          "status": "completed",
+          "ms": 2.778833033517003,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-002",
+          "status": "started"
+        },
+        {
+          "target": "target-002",
+          "status": "completed",
+          "ms": 2.783791976980865,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-003",
+          "status": "started"
+        },
+        {
+          "target": "target-003",
+          "status": "completed",
+          "ms": 2.7235839515924454,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-004",
+          "status": "started"
+        },
+        {
+          "target": "target-004",
+          "status": "completed",
+          "ms": 2.699041971936822,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "status": "all_completed",
+          "ms": 14.441291918046772
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "workload": "100-targets-sparse",
+      "status": "completed",
+      "deadline_seconds": 30,
+      "process_elapsed_seconds": 0.09470095799770206,
+      "rows": [
+        {
+          "target": "target-000",
+          "status": "started"
+        },
+        {
+          "target": "target-000",
+          "status": "completed",
+          "ms": 0.12491689994931221,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-001",
+          "status": "started"
+        },
+        {
+          "target": "target-001",
+          "status": "completed",
+          "ms": 0.05716702435165644,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-002",
+          "status": "started"
+        },
+        {
+          "target": "target-002",
+          "status": "completed",
+          "ms": 0.04833401180803776,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-003",
+          "status": "started"
+        },
+        {
+          "target": "target-003",
+          "status": "completed",
+          "ms": 0.044917105697095394,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-004",
+          "status": "started"
+        },
+        {
+          "target": "target-004",
+          "status": "completed",
+          "ms": 0.04329206421971321,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-005",
+          "status": "started"
+        },
+        {
+          "target": "target-005",
+          "status": "completed",
+          "ms": 0.04449998959898949,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-006",
+          "status": "started"
+        },
+        {
+          "target": "target-006",
+          "status": "completed",
+          "ms": 0.0426670303568244,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-007",
+          "status": "started"
+        },
+        {
+          "target": "target-007",
+          "status": "completed",
+          "ms": 0.04137493669986725,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-008",
+          "status": "started"
+        },
+        {
+          "target": "target-008",
+          "status": "completed",
+          "ms": 0.0416669063270092,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-009",
+          "status": "started"
+        },
+        {
+          "target": "target-009",
+          "status": "completed",
+          "ms": 0.041291932575404644,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-010",
+          "status": "started"
+        },
+        {
+          "target": "target-010",
+          "status": "completed",
+          "ms": 0.04129100125283003,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-011",
+          "status": "started"
+        },
+        {
+          "target": "target-011",
+          "status": "completed",
+          "ms": 0.04083395469933748,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-012",
+          "status": "started"
+        },
+        {
+          "target": "target-012",
+          "status": "completed",
+          "ms": 0.037499936297535896,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-013",
+          "status": "started"
+        },
+        {
+          "target": "target-013",
+          "status": "completed",
+          "ms": 0.03270909655839205,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-014",
+          "status": "started"
+        },
+        {
+          "target": "target-014",
+          "status": "completed",
+          "ms": 0.03287498839199543,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-015",
+          "status": "started"
+        },
+        {
+          "target": "target-015",
+          "status": "completed",
+          "ms": 0.03287498839199543,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-016",
+          "status": "started"
+        },
+        {
+          "target": "target-016",
+          "status": "completed",
+          "ms": 0.03270793240517378,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-017",
+          "status": "started"
+        },
+        {
+          "target": "target-017",
+          "status": "completed",
+          "ms": 0.04012498538941145,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-018",
+          "status": "started"
+        },
+        {
+          "target": "target-018",
+          "status": "completed",
+          "ms": 0.03975001163780689,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-019",
+          "status": "started"
+        },
+        {
+          "target": "target-019",
+          "status": "completed",
+          "ms": 0.039917067624628544,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-020",
+          "status": "started"
+        },
+        {
+          "target": "target-020",
+          "status": "completed",
+          "ms": 0.039792037568986416,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-021",
+          "status": "started"
+        },
+        {
+          "target": "target-021",
+          "status": "completed",
+          "ms": 0.039499951526522636,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-022",
+          "status": "started"
+        },
+        {
+          "target": "target-022",
+          "status": "completed",
+          "ms": 0.03916607238352299,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-023",
+          "status": "started"
+        },
+        {
+          "target": "target-023",
+          "status": "completed",
+          "ms": 0.03899994771927595,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-024",
+          "status": "started"
+        },
+        {
+          "target": "target-024",
+          "status": "completed",
+          "ms": 0.04008400719612837,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-025",
+          "status": "started"
+        },
+        {
+          "target": "target-025",
+          "status": "completed",
+          "ms": 0.041166902519762516,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-026",
+          "status": "started"
+        },
+        {
+          "target": "target-026",
+          "status": "completed",
+          "ms": 0.041082967072725296,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-027",
+          "status": "started"
+        },
+        {
+          "target": "target-027",
+          "status": "completed",
+          "ms": 0.04045804962515831,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-028",
+          "status": "started"
+        },
+        {
+          "target": "target-028",
+          "status": "completed",
+          "ms": 0.0411659711971879,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-029",
+          "status": "started"
+        },
+        {
+          "target": "target-029",
+          "status": "completed",
+          "ms": 0.04145805723965168,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-030",
+          "status": "started"
+        },
+        {
+          "target": "target-030",
+          "status": "completed",
+          "ms": 0.041499966755509377,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-031",
+          "status": "started"
+        },
+        {
+          "target": "target-031",
+          "status": "completed",
+          "ms": 0.040499959141016006,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-032",
+          "status": "started"
+        },
+        {
+          "target": "target-032",
+          "status": "completed",
+          "ms": 0.04058401100337505,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-033",
+          "status": "started"
+        },
+        {
+          "target": "target-033",
+          "status": "completed",
+          "ms": 0.04016596358269453,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-034",
+          "status": "started"
+        },
+        {
+          "target": "target-034",
+          "status": "completed",
+          "ms": 0.040082959458231926,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-035",
+          "status": "started"
+        },
+        {
+          "target": "target-035",
+          "status": "completed",
+          "ms": 0.04075001925230026,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-036",
+          "status": "started"
+        },
+        {
+          "target": "target-036",
+          "status": "completed",
+          "ms": 0.03999995533376932,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-037",
+          "status": "started"
+        },
+        {
+          "target": "target-037",
+          "status": "completed",
+          "ms": 0.03970798570662737,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-038",
+          "status": "started"
+        },
+        {
+          "target": "target-038",
+          "status": "completed",
+          "ms": 0.04000007174909115,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-039",
+          "status": "started"
+        },
+        {
+          "target": "target-039",
+          "status": "completed",
+          "ms": 0.04004209768027067,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-040",
+          "status": "started"
+        },
+        {
+          "target": "target-040",
+          "status": "completed",
+          "ms": 0.03558292519301176,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-041",
+          "status": "started"
+        },
+        {
+          "target": "target-041",
+          "status": "completed",
+          "ms": 0.032708048820495605,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-042",
+          "status": "started"
+        },
+        {
+          "target": "target-042",
+          "status": "completed",
+          "ms": 0.040375045500695705,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-043",
+          "status": "started"
+        },
+        {
+          "target": "target-043",
+          "status": "completed",
+          "ms": 0.039792037568986416,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-044",
+          "status": "started"
+        },
+        {
+          "target": "target-044",
+          "status": "completed",
+          "ms": 0.039792037568986416,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-045",
+          "status": "started"
+        },
+        {
+          "target": "target-045",
+          "status": "completed",
+          "ms": 0.03987504169344902,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-046",
+          "status": "started"
+        },
+        {
+          "target": "target-046",
+          "status": "completed",
+          "ms": 0.039792037568986416,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-047",
+          "status": "started"
+        },
+        {
+          "target": "target-047",
+          "status": "completed",
+          "ms": 0.04016596358269453,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-048",
+          "status": "started"
+        },
+        {
+          "target": "target-048",
+          "status": "completed",
+          "ms": 0.039624981582164764,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-049",
+          "status": "started"
+        },
+        {
+          "target": "target-049",
+          "status": "completed",
+          "ms": 0.03975001163780689,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-050",
+          "status": "started"
+        },
+        {
+          "target": "target-050",
+          "status": "completed",
+          "ms": 0.03970798570662737,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-051",
+          "status": "started"
+        },
+        {
+          "target": "target-051",
+          "status": "completed",
+          "ms": 0.03958400338888168,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-052",
+          "status": "started"
+        },
+        {
+          "target": "target-052",
+          "status": "completed",
+          "ms": 0.03941706381738186,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-053",
+          "status": "started"
+        },
+        {
+          "target": "target-053",
+          "status": "completed",
+          "ms": 0.039624981582164764,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-054",
+          "status": "started"
+        },
+        {
+          "target": "target-054",
+          "status": "completed",
+          "ms": 0.039334059692919254,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-055",
+          "status": "started"
+        },
+        {
+          "target": "target-055",
+          "status": "completed",
+          "ms": 0.03966700751334429,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-056",
+          "status": "started"
+        },
+        {
+          "target": "target-056",
+          "status": "completed",
+          "ms": 0.039958045817911625,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-057",
+          "status": "started"
+        },
+        {
+          "target": "target-057",
+          "status": "completed",
+          "ms": 0.04066701512783766,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-058",
+          "status": "started"
+        },
+        {
+          "target": "target-058",
+          "status": "completed",
+          "ms": 0.04012498538941145,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-059",
+          "status": "started"
+        },
+        {
+          "target": "target-059",
+          "status": "completed",
+          "ms": 0.04000007174909115,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-060",
+          "status": "started"
+        },
+        {
+          "target": "target-060",
+          "status": "completed",
+          "ms": 0.04041707143187523,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-061",
+          "status": "started"
+        },
+        {
+          "target": "target-061",
+          "status": "completed",
+          "ms": 0.03979192115366459,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-062",
+          "status": "started"
+        },
+        {
+          "target": "target-062",
+          "status": "completed",
+          "ms": 0.03975001163780689,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-063",
+          "status": "started"
+        },
+        {
+          "target": "target-063",
+          "status": "completed",
+          "ms": 0.03975001163780689,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-064",
+          "status": "started"
+        },
+        {
+          "target": "target-064",
+          "status": "completed",
+          "ms": 0.03612495493143797,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-065",
+          "status": "started"
+        },
+        {
+          "target": "target-065",
+          "status": "completed",
+          "ms": 0.031957984901964664,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-066",
+          "status": "started"
+        },
+        {
+          "target": "target-066",
+          "status": "completed",
+          "ms": 0.03208301495760679,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-067",
+          "status": "started"
+        },
+        {
+          "target": "target-067",
+          "status": "completed",
+          "ms": 0.03187498077750206,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-068",
+          "status": "started"
+        },
+        {
+          "target": "target-068",
+          "status": "completed",
+          "ms": 0.03195891622453928,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-069",
+          "status": "started"
+        },
+        {
+          "target": "target-069",
+          "status": "completed",
+          "ms": 0.03191595897078514,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-070",
+          "status": "started"
+        },
+        {
+          "target": "target-070",
+          "status": "completed",
+          "ms": 0.031957984901964664,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-071",
+          "status": "started"
+        },
+        {
+          "target": "target-071",
+          "status": "completed",
+          "ms": 0.03195891622453928,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-072",
+          "status": "started"
+        },
+        {
+          "target": "target-072",
+          "status": "completed",
+          "ms": 0.03204203676432371,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-073",
+          "status": "started"
+        },
+        {
+          "target": "target-073",
+          "status": "completed",
+          "ms": 0.03191700670868158,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-074",
+          "status": "started"
+        },
+        {
+          "target": "target-074",
+          "status": "completed",
+          "ms": 0.031957984901964664,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-075",
+          "status": "started"
+        },
+        {
+          "target": "target-075",
+          "status": "completed",
+          "ms": 0.031832954846322536,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-076",
+          "status": "started"
+        },
+        {
+          "target": "target-076",
+          "status": "completed",
+          "ms": 0.03187498077750206,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-077",
+          "status": "started"
+        },
+        {
+          "target": "target-077",
+          "status": "completed",
+          "ms": 0.03279210068285465,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-078",
+          "status": "started"
+        },
+        {
+          "target": "target-078",
+          "status": "completed",
+          "ms": 0.032208976335823536,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-079",
+          "status": "started"
+        },
+        {
+          "target": "target-079",
+          "status": "completed",
+          "ms": 0.03212492447346449,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-080",
+          "status": "started"
+        },
+        {
+          "target": "target-080",
+          "status": "completed",
+          "ms": 0.03350002225488424,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-081",
+          "status": "started"
+        },
+        {
+          "target": "target-081",
+          "status": "completed",
+          "ms": 0.03183307126164436,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-082",
+          "status": "started"
+        },
+        {
+          "target": "target-082",
+          "status": "completed",
+          "ms": 0.034374999813735485,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-083",
+          "status": "started"
+        },
+        {
+          "target": "target-083",
+          "status": "completed",
+          "ms": 0.039375037886202335,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-084",
+          "status": "started"
+        },
+        {
+          "target": "target-084",
+          "status": "completed",
+          "ms": 0.03674998879432678,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-085",
+          "status": "started"
+        },
+        {
+          "target": "target-085",
+          "status": "completed",
+          "ms": 0.032625044696033,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-086",
+          "status": "started"
+        },
+        {
+          "target": "target-086",
+          "status": "completed",
+          "ms": 0.03929203376173973,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-087",
+          "status": "started"
+        },
+        {
+          "target": "target-087",
+          "status": "completed",
+          "ms": 0.03454205580055714,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-088",
+          "status": "started"
+        },
+        {
+          "target": "target-088",
+          "status": "completed",
+          "ms": 0.03429199568927288,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-089",
+          "status": "started"
+        },
+        {
+          "target": "target-089",
+          "status": "completed",
+          "ms": 0.036708079278469086,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-090",
+          "status": "started"
+        },
+        {
+          "target": "target-090",
+          "status": "completed",
+          "ms": 0.03208301495760679,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-091",
+          "status": "started"
+        },
+        {
+          "target": "target-091",
+          "status": "completed",
+          "ms": 0.03200001083314419,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-092",
+          "status": "started"
+        },
+        {
+          "target": "target-092",
+          "status": "completed",
+          "ms": 0.03229198046028614,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-093",
+          "status": "started"
+        },
+        {
+          "target": "target-093",
+          "status": "completed",
+          "ms": 0.032624928280711174,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-094",
+          "status": "started"
+        },
+        {
+          "target": "target-094",
+          "status": "completed",
+          "ms": 0.03175006713718176,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-095",
+          "status": "started"
+        },
+        {
+          "target": "target-095",
+          "status": "completed",
+          "ms": 0.039375037886202335,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-096",
+          "status": "started"
+        },
+        {
+          "target": "target-096",
+          "status": "completed",
+          "ms": 0.03891694359481335,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-097",
+          "status": "started"
+        },
+        {
+          "target": "target-097",
+          "status": "completed",
+          "ms": 0.03958400338888168,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-098",
+          "status": "started"
+        },
+        {
+          "target": "target-098",
+          "status": "completed",
+          "ms": 0.03975001163780689,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "target": "target-099",
+          "status": "started"
+        },
+        {
+          "target": "target-099",
+          "status": "completed",
+          "ms": 0.03687501884996891,
+          "visible": true,
+          "full": true,
+          "proofs": [
+            "clear_enclosure",
+            "clear_enclosure"
+          ]
+        },
+        {
+          "status": "all_completed",
+          "ms": 4.339250037446618
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "workload": "100-targets-dense",
+      "status": "completed",
+      "deadline_seconds": 30,
+      "process_elapsed_seconds": 0.38401595794130117,
+      "rows": [
+        {
+          "target": "target-000",
+          "status": "started"
+        },
+        {
+          "target": "target-000",
+          "status": "completed",
+          "ms": 2.833541017025709,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-001",
+          "status": "started"
+        },
+        {
+          "target": "target-001",
+          "status": "completed",
+          "ms": 2.180667011998594,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-002",
+          "status": "started"
+        },
+        {
+          "target": "target-002",
+          "status": "completed",
+          "ms": 2.2402909817174077,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-003",
+          "status": "started"
+        },
+        {
+          "target": "target-003",
+          "status": "completed",
+          "ms": 2.25929100997746,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-004",
+          "status": "started"
+        },
+        {
+          "target": "target-004",
+          "status": "completed",
+          "ms": 2.1799999522045255,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-005",
+          "status": "started"
+        },
+        {
+          "target": "target-005",
+          "status": "completed",
+          "ms": 2.235791995190084,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-006",
+          "status": "started"
+        },
+        {
+          "target": "target-006",
+          "status": "completed",
+          "ms": 2.2486670641228557,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-007",
+          "status": "started"
+        },
+        {
+          "target": "target-007",
+          "status": "completed",
+          "ms": 2.23387498408556,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-008",
+          "status": "started"
+        },
+        {
+          "target": "target-008",
+          "status": "completed",
+          "ms": 2.2457080194726586,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-009",
+          "status": "started"
+        },
+        {
+          "target": "target-009",
+          "status": "completed",
+          "ms": 2.2194160846993327,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-010",
+          "status": "started"
+        },
+        {
+          "target": "target-010",
+          "status": "completed",
+          "ms": 2.5917080929502845,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-011",
+          "status": "started"
+        },
+        {
+          "target": "target-011",
+          "status": "completed",
+          "ms": 2.2300840355455875,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-012",
+          "status": "started"
+        },
+        {
+          "target": "target-012",
+          "status": "completed",
+          "ms": 2.369459019973874,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-013",
+          "status": "started"
+        },
+        {
+          "target": "target-013",
+          "status": "completed",
+          "ms": 2.2453750716522336,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-014",
+          "status": "started"
+        },
+        {
+          "target": "target-014",
+          "status": "completed",
+          "ms": 2.253041951917112,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-015",
+          "status": "started"
+        },
+        {
+          "target": "target-015",
+          "status": "completed",
+          "ms": 2.1097089629620314,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-016",
+          "status": "started"
+        },
+        {
+          "target": "target-016",
+          "status": "completed",
+          "ms": 2.6135840453207493,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-017",
+          "status": "started"
+        },
+        {
+          "target": "target-017",
+          "status": "completed",
+          "ms": 2.6305000064894557,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-018",
+          "status": "started"
+        },
+        {
+          "target": "target-018",
+          "status": "completed",
+          "ms": 2.581499982625246,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-019",
+          "status": "started"
+        },
+        {
+          "target": "target-019",
+          "status": "completed",
+          "ms": 2.6335829170420766,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-020",
+          "status": "started"
+        },
+        {
+          "target": "target-020",
+          "status": "completed",
+          "ms": 3.083791001699865,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-021",
+          "status": "started"
+        },
+        {
+          "target": "target-021",
+          "status": "completed",
+          "ms": 2.636375022120774,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-022",
+          "status": "started"
+        },
+        {
+          "target": "target-022",
+          "status": "completed",
+          "ms": 2.681832993403077,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-023",
+          "status": "started"
+        },
+        {
+          "target": "target-023",
+          "status": "completed",
+          "ms": 2.7739169308915734,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-024",
+          "status": "started"
+        },
+        {
+          "target": "target-024",
+          "status": "completed",
+          "ms": 2.8438749723136425,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-025",
+          "status": "started"
+        },
+        {
+          "target": "target-025",
+          "status": "completed",
+          "ms": 2.7900830609723926,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-026",
+          "status": "started"
+        },
+        {
+          "target": "target-026",
+          "status": "completed",
+          "ms": 2.734165987931192,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-027",
+          "status": "started"
+        },
+        {
+          "target": "target-027",
+          "status": "completed",
+          "ms": 2.3637920385226607,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-028",
+          "status": "started"
+        },
+        {
+          "target": "target-028",
+          "status": "completed",
+          "ms": 2.288083080202341,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-029",
+          "status": "started"
+        },
+        {
+          "target": "target-029",
+          "status": "completed",
+          "ms": 2.2863750346004963,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-030",
+          "status": "started"
+        },
+        {
+          "target": "target-030",
+          "status": "completed",
+          "ms": 2.9762909980490804,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-031",
+          "status": "started"
+        },
+        {
+          "target": "target-031",
+          "status": "completed",
+          "ms": 2.8750840574502945,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-032",
+          "status": "started"
+        },
+        {
+          "target": "target-032",
+          "status": "completed",
+          "ms": 2.64662504196167,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-033",
+          "status": "started"
+        },
+        {
+          "target": "target-033",
+          "status": "completed",
+          "ms": 3.008541068993509,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-034",
+          "status": "started"
+        },
+        {
+          "target": "target-034",
+          "status": "completed",
+          "ms": 2.6480420492589474,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-035",
+          "status": "started"
+        },
+        {
+          "target": "target-035",
+          "status": "completed",
+          "ms": 2.679249970242381,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-036",
+          "status": "started"
+        },
+        {
+          "target": "target-036",
+          "status": "completed",
+          "ms": 2.663542050868273,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-037",
+          "status": "started"
+        },
+        {
+          "target": "target-037",
+          "status": "completed",
+          "ms": 2.6925409911200404,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-038",
+          "status": "started"
+        },
+        {
+          "target": "target-038",
+          "status": "completed",
+          "ms": 2.7069590287283063,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-039",
+          "status": "started"
+        },
+        {
+          "target": "target-039",
+          "status": "completed",
+          "ms": 2.6623749872669578,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-040",
+          "status": "started"
+        },
+        {
+          "target": "target-040",
+          "status": "completed",
+          "ms": 2.933582989498973,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-041",
+          "status": "started"
+        },
+        {
+          "target": "target-041",
+          "status": "completed",
+          "ms": 3.074374981224537,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-042",
+          "status": "started"
+        },
+        {
+          "target": "target-042",
+          "status": "completed",
+          "ms": 3.005207981914282,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-043",
+          "status": "started"
+        },
+        {
+          "target": "target-043",
+          "status": "completed",
+          "ms": 2.608124981634319,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-044",
+          "status": "started"
+        },
+        {
+          "target": "target-044",
+          "status": "completed",
+          "ms": 2.655041986145079,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-045",
+          "status": "started"
+        },
+        {
+          "target": "target-045",
+          "status": "completed",
+          "ms": 2.6645410107448697,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-046",
+          "status": "started"
+        },
+        {
+          "target": "target-046",
+          "status": "completed",
+          "ms": 3.003958030603826,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-047",
+          "status": "started"
+        },
+        {
+          "target": "target-047",
+          "status": "completed",
+          "ms": 2.6818339247256517,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-048",
+          "status": "started"
+        },
+        {
+          "target": "target-048",
+          "status": "completed",
+          "ms": 2.6892090681940317,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-049",
+          "status": "started"
+        },
+        {
+          "target": "target-049",
+          "status": "completed",
+          "ms": 2.7321670204401016,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-050",
+          "status": "started"
+        },
+        {
+          "target": "target-050",
+          "status": "completed",
+          "ms": 3.4833330428227782,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-051",
+          "status": "started"
+        },
+        {
+          "target": "target-051",
+          "status": "completed",
+          "ms": 3.090415964834392,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-052",
+          "status": "started"
+        },
+        {
+          "target": "target-052",
+          "status": "completed",
+          "ms": 2.764499979093671,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-053",
+          "status": "started"
+        },
+        {
+          "target": "target-053",
+          "status": "completed",
+          "ms": 3.1500000040978193,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-054",
+          "status": "started"
+        },
+        {
+          "target": "target-054",
+          "status": "completed",
+          "ms": 3.090083017013967,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-055",
+          "status": "started"
+        },
+        {
+          "target": "target-055",
+          "status": "completed",
+          "ms": 2.7719999197870493,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-056",
+          "status": "started"
+        },
+        {
+          "target": "target-056",
+          "status": "completed",
+          "ms": 2.793207997456193,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-057",
+          "status": "started"
+        },
+        {
+          "target": "target-057",
+          "status": "completed",
+          "ms": 2.649292000569403,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-058",
+          "status": "started"
+        },
+        {
+          "target": "target-058",
+          "status": "completed",
+          "ms": 2.7437089011073112,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-059",
+          "status": "started"
+        },
+        {
+          "target": "target-059",
+          "status": "completed",
+          "ms": 3.172124968841672,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-060",
+          "status": "started"
+        },
+        {
+          "target": "target-060",
+          "status": "completed",
+          "ms": 3.048625076189637,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-061",
+          "status": "started"
+        },
+        {
+          "target": "target-061",
+          "status": "completed",
+          "ms": 3.485750057734549,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-062",
+          "status": "started"
+        },
+        {
+          "target": "target-062",
+          "status": "completed",
+          "ms": 3.1184579711407423,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-063",
+          "status": "started"
+        },
+        {
+          "target": "target-063",
+          "status": "completed",
+          "ms": 3.193332930095494,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-064",
+          "status": "started"
+        },
+        {
+          "target": "target-064",
+          "status": "completed",
+          "ms": 3.2414159504696727,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-065",
+          "status": "started"
+        },
+        {
+          "target": "target-065",
+          "status": "completed",
+          "ms": 3.39541700668633,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-066",
+          "status": "started"
+        },
+        {
+          "target": "target-066",
+          "status": "completed",
+          "ms": 3.1636249041184783,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-067",
+          "status": "started"
+        },
+        {
+          "target": "target-067",
+          "status": "completed",
+          "ms": 2.7910000644624233,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-068",
+          "status": "started"
+        },
+        {
+          "target": "target-068",
+          "status": "completed",
+          "ms": 2.6333749992772937,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-069",
+          "status": "started"
+        },
+        {
+          "target": "target-069",
+          "status": "completed",
+          "ms": 2.790083992294967,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-070",
+          "status": "started"
+        },
+        {
+          "target": "target-070",
+          "status": "completed",
+          "ms": 3.454666002653539,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-071",
+          "status": "started"
+        },
+        {
+          "target": "target-071",
+          "status": "completed",
+          "ms": 3.2436250476166606,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-072",
+          "status": "started"
+        },
+        {
+          "target": "target-072",
+          "status": "completed",
+          "ms": 3.5465839318931103,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-073",
+          "status": "started"
+        },
+        {
+          "target": "target-073",
+          "status": "completed",
+          "ms": 3.1795420218259096,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-074",
+          "status": "started"
+        },
+        {
+          "target": "target-074",
+          "status": "completed",
+          "ms": 3.2037500059232116,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-075",
+          "status": "started"
+        },
+        {
+          "target": "target-075",
+          "status": "completed",
+          "ms": 2.864292007870972,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-076",
+          "status": "started"
+        },
+        {
+          "target": "target-076",
+          "status": "completed",
+          "ms": 3.144708927720785,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-077",
+          "status": "started"
+        },
+        {
+          "target": "target-077",
+          "status": "completed",
+          "ms": 3.254750045016408,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-078",
+          "status": "started"
+        },
+        {
+          "target": "target-078",
+          "status": "completed",
+          "ms": 3.152166958898306,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-079",
+          "status": "started"
+        },
+        {
+          "target": "target-079",
+          "status": "completed",
+          "ms": 2.8943329816684127,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-080",
+          "status": "started"
+        },
+        {
+          "target": "target-080",
+          "status": "completed",
+          "ms": 4.021999891847372,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-081",
+          "status": "started"
+        },
+        {
+          "target": "target-081",
+          "status": "completed",
+          "ms": 3.8275410188362002,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-082",
+          "status": "started"
+        },
+        {
+          "target": "target-082",
+          "status": "completed",
+          "ms": 3.248790977522731,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-083",
+          "status": "started"
+        },
+        {
+          "target": "target-083",
+          "status": "completed",
+          "ms": 3.2540420070290565,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-084",
+          "status": "started"
+        },
+        {
+          "target": "target-084",
+          "status": "completed",
+          "ms": 3.234707983210683,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-085",
+          "status": "started"
+        },
+        {
+          "target": "target-085",
+          "status": "completed",
+          "ms": 3.204458043910563,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-086",
+          "status": "started"
+        },
+        {
+          "target": "target-086",
+          "status": "completed",
+          "ms": 3.2501250971108675,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-087",
+          "status": "started"
+        },
+        {
+          "target": "target-087",
+          "status": "completed",
+          "ms": 2.8301660204306245,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-088",
+          "status": "started"
+        },
+        {
+          "target": "target-088",
+          "status": "completed",
+          "ms": 3.2298750011250377,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-089",
+          "status": "started"
+        },
+        {
+          "target": "target-089",
+          "status": "completed",
+          "ms": 3.34245793055743,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-090",
+          "status": "started"
+        },
+        {
+          "target": "target-090",
+          "status": "completed",
+          "ms": 3.9615839486941695,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-091",
+          "status": "started"
+        },
+        {
+          "target": "target-091",
+          "status": "completed",
+          "ms": 4.031292046420276,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-092",
+          "status": "started"
+        },
+        {
+          "target": "target-092",
+          "status": "completed",
+          "ms": 3.9464160799980164,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-093",
+          "status": "started"
+        },
+        {
+          "target": "target-093",
+          "status": "completed",
+          "ms": 3.299458068795502,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-094",
+          "status": "started"
+        },
+        {
+          "target": "target-094",
+          "status": "completed",
+          "ms": 3.3217500895261765,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-095",
+          "status": "started"
+        },
+        {
+          "target": "target-095",
+          "status": "completed",
+          "ms": 3.780875005759299,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-096",
+          "status": "started"
+        },
+        {
+          "target": "target-096",
+          "status": "completed",
+          "ms": 3.297958057373762,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-097",
+          "status": "started"
+        },
+        {
+          "target": "target-097",
+          "status": "completed",
+          "ms": 3.199958009645343,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-098",
+          "status": "started"
+        },
+        {
+          "target": "target-098",
+          "status": "completed",
+          "ms": 3.0191249679774046,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "target": "target-099",
+          "status": "started"
+        },
+        {
+          "target": "target-099",
+          "status": "completed",
+          "ms": 3.3667919924482703,
+          "visible": false,
+          "full": false,
+          "proofs": [
+            "blocked_cross_section",
+            "not_visible"
+          ]
+        },
+        {
+          "status": "all_completed",
+          "ms": 291.380750015378
+        }
+      ],
+      "stderr": ""
+    },
+    {
+      "workload": "100-targets-dense-nonoverlapping",
+      "status": "external_deadline_exceeded",
+      "deadline_seconds": 30,
+      "process_elapsed_seconds": 30.007218583021313,
+      "rows": [
+        {
+          "target": "target-000",
+          "status": "started"
+        },
+        {
+          "target": "target-000",
+          "status": "completed",
+          "ms": 3.443291992880404,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-001",
+          "status": "started"
+        },
+        {
+          "target": "target-001",
+          "status": "completed",
+          "ms": 2.8745000017806888,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-002",
+          "status": "started"
+        },
+        {
+          "target": "target-002",
+          "status": "completed",
+          "ms": 2.8170000296086073,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-003",
+          "status": "started"
+        },
+        {
+          "target": "target-003",
+          "status": "completed",
+          "ms": 2.757290960289538,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-004",
+          "status": "started"
+        },
+        {
+          "target": "target-004",
+          "status": "completed",
+          "ms": 2.74554209318012,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-005",
+          "status": "started"
+        },
+        {
+          "target": "target-005",
+          "status": "completed",
+          "ms": 2.8789170319214463,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-006",
+          "status": "started"
+        },
+        {
+          "target": "target-006",
+          "status": "completed",
+          "ms": 2.7435830561444163,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-007",
+          "status": "started"
+        },
+        {
+          "target": "target-007",
+          "status": "completed",
+          "ms": 2.8364580357447267,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-008",
+          "status": "started"
+        },
+        {
+          "target": "target-008",
+          "status": "completed",
+          "ms": 2.88041599560529,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-009",
+          "status": "started"
+        },
+        {
+          "target": "target-009",
+          "status": "completed",
+          "ms": 2.627875073812902,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-010",
+          "status": "started"
+        },
+        {
+          "target": "target-010",
+          "status": "completed",
+          "ms": 4.66474995482713,
+          "visible": true,
+          "full": false,
+          "proofs": [
+            "clear_corridor",
+            "hidden_target_part"
+          ]
+        },
+        {
+          "target": "target-011",
+          "status": "started"
+        }
+      ],
+      "stderr": ""
+    }
+  ]
+}

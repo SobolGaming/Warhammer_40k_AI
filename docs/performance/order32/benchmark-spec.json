@@ -1,0 +1,89 @@
+{
+  "spec_id": "order32-visibility-diagnostics-v3",
+  "status": "diagnostic_evidence_component_acceptance_deferred_by_owner",
+  "hardware": {
+    "role": "provisional_available_environment_not_production_training_hardware",
+    "cpu": "Apple M5 Pro",
+    "physical_cpu_count": 18,
+    "logical_cpu_count": 18,
+    "memory_bytes": 68719476736,
+    "python_worker_count": 1,
+    "cpu_affinity": "not_pinned",
+    "process_concurrency": 1
+  },
+  "software": {
+    "python": "3.14.5",
+    "shapely": "2.1.2",
+    "numpy": "2.4.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "dependency_lock": "uv.lock; SHA-256 recorded in each report",
+    "optional_isolated_prototype_dependency": "z3-solver==4.15.4.0; prototype initially isolated, now a pinned runtime dependency"
+  },
+  "timing": {
+    "coverage": false,
+    "profiler_in_timing_samples": false,
+    "competing_test_workers": false,
+    "geometry_case_isolation": "fresh process for each named case",
+    "first_query_samples": 1,
+    "repeated_query_samples": 7,
+    "percentile_method": "nearest_rank",
+    "geometry_setup": "construction of immutable context definitions, reported separately",
+    "first_query": "first TerrainVisibilityContext.resolve_line_of_sight call including kernel preparation",
+    "repeated_query": "same immutable context, authoritative visibility and full visibility",
+    "shooting_setup": "canonical fixture lifecycle and LocalGameSession creation, reported separately",
+    "shooting_slice": "advance to selection, submit unit selection and Normal shooting selection through LocalGameSession, stop at declaration request",
+    "work_counts": "one separate cProfile execution per case",
+    "memory": "process peak RSS; not yet memory-growth certification"
+  },
+  "workloads": {
+    "geometry_models": [
+      "circular",
+      "oval",
+      "rectangular"
+    ],
+    "target_counts": [
+      1,
+      5,
+      100
+    ],
+    "model_blocker_counts": [
+      0,
+      30
+    ],
+    "physical_obstacles": "versioned boxes in probe source; clear, solid, 0.1in opening, near-target partial occluder, low wall, sloped corridor",
+    "dense_legacy_stress": "overlapping synthetic blockers retained as diagnostic stress; no legal gameplay claim",
+    "nonoverlapping_stress": "additional 1.25in center spacing; geometry diagnostic, not a roster/lifecycle claim",
+    "shooting_rosters": "phase13b canonical core-intercessor-like fixtures, 5-versus-5 and 10-versus-10; existing fixture catalog and mission setup",
+    "decision_policy": "select the named attacker, then engine-enumerated Normal shooting option",
+    "rng_usage": "these measured selection/declaration operations consume no random roll; full-game seed workload remains outstanding"
+  },
+  "standing_full_game_budgets": {
+    "mean_seconds_strictly_below": 60,
+    "maximum_observed_seconds": 300,
+    "required_completion_rate": 1.0,
+    "certified": false
+  },
+  "proposed_component_budgets_pending_complete_kernel": {
+    "mean_pair_query_ms": 0.5,
+    "mean_100_target_query_ms": 50,
+    "repeated_identical_100_target_query_ms": 5,
+    "shooting_10_vs_10_selection_declaration_mean_ms": 200,
+    "same_hardware_regression_ratio": 1.2,
+    "status": "deferred_by_owner_2026-09-08_not_passed",
+    "rationale": "Observed 420 model-pair queries in one 10-versus-10 selection/declaration. Assuming 50 such activations per game gives 21000 pair queries; at 0.5ms this estimates 10.5s of geometry within the 60s objective. The activation count is an estimate, not measured full-game evidence. A 200ms selection/declaration budget allows measured baseline variability plus correctness work. Recalibrate from repeated correct-kernel workloads without silently raising limits."
+  },
+  "outstanding_required_evidence": [
+    "complete correct production geometry authority",
+    "same-machine base/head comparison",
+    "real dense-terrain/high-count gameplay and completed shot outcomes",
+    "movement, casualty, retained-presence cleanup, restoration and independent-reset cache invalidation",
+    "bounded cache memory growth and cached/uncached agreement",
+    "enforced CI component and gameplay-slice budgets",
+    "supported legal full-game driver, representative full-game scenarios/seeds and normal completion"
+  ],
+  "owner_deferral": {
+    "date": "2026-09-08",
+    "scope": "Further efficiency work and provisional Order 32 component timing/performance CI gates deferred until complete head-to-head headless game measurements. Correctness and deterministic bounded-cache obligations remain required.",
+    "full_game_targets": "Unchanged and not certified."
+  }
+}

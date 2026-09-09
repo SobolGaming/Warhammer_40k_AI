@@ -31,6 +31,11 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.visibility import (
+    BenefitOfCoverResult,
+    CoverSourceReason,
+    CoverSourceRecord,
+)
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
@@ -179,11 +184,6 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
     TerrainFloorDefinition,
     TerrainWallDefinition,
-)
-from warhammer40k_core.geometry.visibility import (
-    BenefitOfCoverResult,
-    CoverSourceReason,
-    CoverSourceRecord,
 )
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
@@ -1114,7 +1114,9 @@ def _mission_setup() -> MissionSetup:
 
 def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:
     return tuple(
-        muster_army(catalog=config.army_catalog, request=request)
+        muster_army(
+            catalog=config.army_catalog, request=request, model_geometries=config.model_geometries
+        )
         for request in config.army_muster_requests
     )
 

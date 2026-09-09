@@ -37,6 +37,13 @@ from warhammer40k_core.core.terrain_areas import (
     TerrainAreaLocalTransform,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
+from warhammer40k_core.core.visibility import (
+    BenefitOfCoverResult,
+    CoverSourceReason,
+    TerrainAreaCoverSourceRecord,
+    TerrainVisibilityContext,
+    VisibilityBlockerKind,
+)
 from warhammer40k_core.engine import mission_action_policies
 from warhammer40k_core.engine.final_scoring import FinalScoringResult
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupError
@@ -58,17 +65,11 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
     model_within_solid_terrain,
     terrain_visibility_areas_from_placements,
 )
-from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry import shapely_backend, terrain_area_visibility
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.polygons import polygon_overlap_area
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.geometry.visibility import (
-    BenefitOfCoverResult,
-    CoverSourceReason,
-    TerrainAreaCoverSourceRecord,
-    TerrainVisibilityContext,
-    VisibilityBlockerKind,
-)
+from warhammer40k_core.geometry.visibility_footprints import visibility_polygon_within_union
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
@@ -3026,21 +3027,20 @@ def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(
     )
     visibility_areas = terrain_visibility_areas_from_placements(setup.terrain_areas)
     terrain_features = setup.terrain_features[:2]
-    original_polygon_within_polygon_union = shapely_backend.polygon_within_polygon_union
     association_check_count = 0
 
-    def counting_polygon_within_polygon_union(
+    def counting_polygon_within_union(
         inner: tuple[tuple[float, float], ...],
         outers: tuple[tuple[tuple[float, float], ...], ...],
     ) -> bool:
         nonlocal association_check_count
         association_check_count += 1
-        return original_polygon_within_polygon_union(inner, outers)
+        return visibility_polygon_within_union(inner, outers)
 
     monkeypatch.setattr(
-        shapely_backend,
-        "polygon_within_polygon_union",
-        counting_polygon_within_polygon_union,
+        terrain_area_visibility,
+        "visibility_polygon_within_union",
+        counting_polygon_within_union,
     )
 
     witness = TerrainVisibilityContext.from_ruleset_descriptor(

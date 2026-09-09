@@ -4,8 +4,10 @@ import json
 from dataclasses import replace
 
 import pytest
+from tests.order32_visibility_helpers import retained_observer_session, visible_enemy_selection
 from tests.phase13b_shooting_declaration_helpers import (
     _destroyed_transport_placement_payload_for_test,
+    _proposal_from_request,
     _shooting_lifecycle,
 )
 from tests.phase15c_fight_order_helpers import fight_lifecycle
@@ -19,6 +21,9 @@ from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.ability_presence import ability_presence
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    eligible_selection_target_unit_ids,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
@@ -27,10 +32,146 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.retained_destruction_state import retained_destructions
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.transports import TransportCapacityProfile, TransportCargoState
 from warhammer40k_core.geometry.pose import Pose
+
+
+@pytest.mark.parametrize("attached", [False, True])
+@pytest.mark.parametrize("retain", [False, True])
+def test_r32_retained_only_observer_eligibility_restores_replays_and_cleans_up(
+    attached: bool,
+    retain: bool,
+) -> None:
+    session, observer_id, target_id = retained_observer_session(attached=attached)
+    pending_request(session)
+    initial = session.lifecycle.to_payload()
+    for _ in range(30):
+        request = pending_request(session)
+        if request.decision_type == "select_destruction_reaction":
+            break
+        if request.decision_type == "submit_shooting_declaration":
+            state = session.lifecycle.state
+            assert state is not None
+            target_view = rules_unit_view_by_id(
+                state=state, unit_instance_id=state.unit_instance_id_for_model(observer_id)
+            )
+            proposal = _proposal_from_request(
+                request=request, target_unit_id=target_view.unit_instance_id
+            )
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id="r32-lethal-shot",
+                payload=validate_json_value(proposal.to_payload()),
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID
+        else:
+            submit_fixture_request(session, request)
+    else:
+        raise AssertionError("The real lethal shot did not offer observer retention.")
+    status = session.submit_option(
+        request_id=request.request_id,
+        result_id="r32-observer-retention-choice",
+        option_id="r32-retain-observer" if retain else "decline_destruction_reaction",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+
+    def assert_eligibility(candidate: LocalGameSession, *, expected: bool) -> None:
+        state = candidate.lifecycle.state
+        assert state is not None
+        source_id = state.unit_instance_id_for_model(observer_id)
+        view = rules_unit_view_by_id(state=state, unit_instance_id=source_id)
+        observer_component = view.component_unit_for_model(observer_id)
+        assert not any(model.is_alive for model in observer_component.own_models)
+        presence = ability_presence(state=state, rules_unit=view)
+        assert (observer_id in presence.active_model_ids) is expected
+        for scope in ("this_model", "this_unit"):
+            assert eligible_selection_target_unit_ids(
+                state=state,
+                source_player_id="player-b",
+                source_unit_instance_id=source_id,
+                source_model_instance_id=observer_id if scope == "this_model" else None,
+                selection_clause=visible_enemy_selection(observer=scope),
+                explicit_target_unit_ids=(target_id,),
+            ) == ((target_id,) if expected else ())
+        if attached:
+            # The surviving component is deliberately blocked; it cannot mask the lost observer.
+            leader_view = rules_unit_view_by_id(state=state, unit_instance_id="army-beta:leader")
+            leader = next(
+                component.unit
+                for component in leader_view.components
+                if component.unit.unit_instance_id == "army-beta:leader"
+            )
+            assert leader.own_models[0].is_alive
+            leader_id = leader.own_models[0].model_instance_id
+            assert (
+                eligible_selection_target_unit_ids(
+                    state=state,
+                    source_player_id="player-b",
+                    source_unit_instance_id=leader_view.unit_instance_id,
+                    source_model_instance_id=leader_id,
+                    selection_clause=visible_enemy_selection(observer="this_model"),
+                    explicit_target_unit_ids=(target_id,),
+                )
+                == ()
+            )
+
+    assert_eligibility(session, expected=retain)
+    checkpoint = session.lifecycle.to_payload()
+    standalone = LocalGameSession(lifecycle=GameLifecycle.from_payload(checkpoint))
+    restored = LocalGameSession.from_persistence_payload(
+        json.loads(json.dumps(session.to_persistence_payload()))
+    )
+    for candidate in (standalone, restored):
+        assert candidate.lifecycle.to_payload() == checkpoint
+        assert_eligibility(candidate, expected=retain)
+        for viewer in ("player-a", "player-b"):
+            assert candidate.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+            events = candidate.events_since(EventStreamCursor(), viewer_player_id=viewer)
+            assert events == session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+            public = json.dumps({"view": candidate.view(viewer_player_id=viewer), "events": events})
+            for private in ('"cause_id"', '"owner_context"', '"retention_sha256"'):
+                assert private not in public
+    artifact = ReplayArtifact.capture(
+        artifact_id=f"r32-observer-retained:{attached}:{retain}",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=restored.lifecycle,
+    )
+    replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED, replay
+
+    if retain:
+        for _ in range(40):
+            state = restored.lifecycle.state
+            assert state is not None
+            assert state.battlefield_state is not None
+            if observer_id in state.battlefield_state.removed_model_ids:
+                break
+            request = pending_request(restored)
+            if any(option.option_id == "complete_shooting_phase" for option in request.options):
+                status = restored.submit_option(
+                    request_id=request.request_id,
+                    result_id="r32-complete-shooting",
+                    option_id="complete_shooting_phase",
+                )
+                assert status.status_kind is not LifecycleStatusKind.INVALID
+            else:
+                submit_fixture_request(restored, request)
+        else:
+            raise AssertionError("Retained observer cleanup was not reached.")
+        assert_eligibility(restored, expected=False)
+        cleaned = GameLifecycle.from_payload(restored.lifecycle.to_payload())
+        assert cleaned.to_payload() == restored.lifecycle.to_payload()
+        assert_eligibility(LocalGameSession(lifecycle=cleaned), expected=False)
+        artifact = ReplayArtifact.capture(
+            artifact_id=f"r32-observer-cleanup:{attached}",
+            initial_lifecycle_payload=checkpoint,
+            final_lifecycle=cleaned,
+        )
+        replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+        assert replay.status is ReplayRunStatus.REPRODUCED, replay
 
 
 def test_order_30_expired_grant_rejects_selection_before_queue_pop() -> None:
@@ -385,7 +526,7 @@ def test_order_30_retained_transport_defers_cargo_placement_and_restores_cleanup
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         catalog=lethal_retained_attack_catalog(),
-        game_id="order-30-retained-transport",
+        game_id="order32-retained-transport-0",
         enemy_unit_specs=(
             ("enemy", "core-transport", "core-transport", 1),
             ("passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),

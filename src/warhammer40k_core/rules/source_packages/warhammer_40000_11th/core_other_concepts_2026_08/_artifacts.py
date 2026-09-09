@@ -18,9 +18,9 @@ from warhammer40k_core.rules.source_evidence import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-other-concepts-source-v1"
 EXPECTED_SOURCE_PACKAGE_ID: Final = "gw-11e-core-other-concepts"
-EXPECTED_SOURCE_VERSION: Final = "40k-app-other-concepts-observed-2026-08-31"
+EXPECTED_SOURCE_VERSION: Final = "maintained-app-mirrors-observed-2026-09-08"
 EXPECTED_SOURCE_URL: Final = "https://www.40k.app/rules/06-other-concepts"
-EXPECTED_OBSERVED_AT: Final = "2026-08-31T13:01:46-04:00"
+EXPECTED_OBSERVED_AT: Final = "2026-09-08T17:17:05Z"
 EXPECTED_RULE_IDENTITIES: Final = (
     (
         "visibility",
@@ -36,14 +36,32 @@ EXPECTED_RULE_IDENTITIES: Final = (
         "MORTAL WOUNDS",
         "9b8eedb42371fc609796c18ede005681d025fba136d3a8b9578f74c5a550d831",
     ),
+    (
+        "visibility-classifications",
+        "gw-11e-core-rules:other-concepts:visibility-classifications",
+        "06.01.01",
+        "VISIBILITY CLASSIFICATIONS",
+        "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4",
+    ),
+    (
+        "visibility-any-part-faq",
+        "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+        "06.01 FAQ",
+        "VISIBILITY ANY-PART FAQ",
+        "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed",
+    ),
 )
 EXPECTED_OBSERVATION_SHA256S: Final = (
     "7c9700d51718a74421b3a992336fef7ed34ba40e77c1f3ad6f70a4c91e2f7a30",
     "cf12c5ecc2b7fdc082246161fcbab2e301df0a1eb8134f4b69175f0884a35a9a",
     "57b9542afdef85452b316c1bf695591d5d66165a01bf2b0a6fc0b9104890516d",
     "faa8f4b08ebb8663e2ae5f84373465d5691b58ca56d67e461b9e81fdea4abc8a",
+    "1c957a22acf5fd65960b4b3e6878d9595b0f0ea1bfc91e95bd7640dbbc006373",
+    "b401b2f0e9fe7659f73d5da2673ad7cda858bf2e395630ba1583113fe4f844ec",
+    "3d876bcadfa01bcf585178b492cc87121c1f42757dadff7f3d78f878cab63a17",
+    "0eb915b515067bb5f70563b66e5ff97e0797e5b7048bc144806a25f9c4e87f67",
 )
-EXPECTED_PACKAGE_HASH: Final = "3e7a13f4483549fda41111147601d4f51fd6f513203ca328143df2eb3fa7335a"
+EXPECTED_PACKAGE_HASH: Final = "d8b159dafe25df81c5a6caa0528e5a6814e6e335df85ae2014268b5e8331991c"
 
 
 class CoreOtherConceptsSourceArtifactError(ValueError):

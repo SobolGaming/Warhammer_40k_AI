@@ -702,6 +702,29 @@ def test_phase15d_model_destruction_authority_rejects_logical_death_event_drift(
         )
 
 
+def test_model_destruction_restore_allows_delayed_registration_of_unrelated_deaths() -> None:
+    first, first_death, first_removal = _model_destruction_authority_for_restore_order(
+        sequence_number=1,
+        label="first-registration",
+        logical_death_event_id="event-000002",
+        destroyed_event_id="event-000003",
+    )
+    delayed, delayed_death, _delayed_removal = _model_destruction_authority_for_restore_order(
+        sequence_number=2,
+        label="delayed-registration",
+        logical_death_event_id="event-000001",
+    )
+    assert first_removal is not None
+    state = _model_destruction_authority_restore_state(first, delayed)
+
+    validate_model_destruction_cause_authority_restore(
+        state=state,
+        event_records=(delayed_death, first_death, first_removal),
+        decision_records=(),
+    )
+    assert state.model_destruction_cause_authorities == [first, delayed]
+
+
 def test_phase15d_model_destruction_authority_requires_parent_boundary_before_child() -> None:
     parent, parent_logical_death, _parent_event = _model_destruction_authority_for_restore_order(
         sequence_number=1,
@@ -718,7 +741,7 @@ def test_phase15d_model_destruction_authority_requires_parent_boundary_before_ch
 
     with pytest.raises(
         GameLifecycleError,
-        match="logical-death events do not follow cause-authority sequence",
+        match="Parent model logical death must precede child logical death",
     ):
         validate_model_destruction_cause_authority_restore(
             state=state,

@@ -1,0 +1,100 @@
+{
+  "base_sha": "a1e66ec7d7c1ca05398e30d51ca61d1b62cd7332",
+  "behavioral": {
+    "combined_branch_coverage_percent": 85.04,
+    "focused_covered_retry": {
+      "cases": [
+        "tests/unit/test_phase18e_server_api.py::test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies",
+        "tests/unit/test_phase18f_session_commands.py::test_phase18f_duplicate_http_commands_are_byte_equivalent_after_reconnect"
+      ],
+      "coverage_append": true,
+      "duration_seconds": 43.97,
+      "exit_code": 0,
+      "junit_sha256": "cbe1beef9f89fe27d97c2eaee7ef185f48f2880b10717331971587d897289c19",
+      "passed": 2,
+      "production_changes_between_runs": false,
+      "socket_permission": "enabled"
+    },
+    "full_covered_run": {
+      "affected_cases": [
+        "tests/unit/test_phase18e_server_api.py::test_phase18e_local_dev_http_server_serves_json_and_rejects_bad_bodies",
+        "tests/unit/test_phase18f_session_commands.py::test_phase18f_duplicate_http_commands_are_byte_equivalent_after_reconnect"
+      ],
+      "duration_seconds": 489.86,
+      "environment_blocked": 2,
+      "exit_code": 1,
+      "junit_sha256": "67b73cbad643871376c50456b03d4baf3a53bfefdddb1de249332b8d7820b275",
+      "passed": 6840,
+      "reason": "Sandbox denied binding local HTTP sockets: PermissionError [Errno 1]."
+    },
+    "note": "The full local command exited 1 due to environment restrictions. Only the two affected cases were retried; no second uncovered behavioral aggregate was run.",
+    "status": "all_cases_passed_with_environment_retry",
+    "threshold_percent": 85,
+    "unique_test_count": 6842
+  },
+  "ci_status": "reported in PR and final response; no CI success asserted by this local record",
+  "code_quality": {
+    "coverage": false,
+    "duration_seconds": 109.35,
+    "exit_code": 0,
+    "passed": 394,
+    "xdist": "auto/worksteal"
+  },
+  "conformance": {
+    "assertion_count": 342,
+    "client_language": "typescript",
+    "contract_version": "14.0.0",
+    "replay_sha256": "e1dbd328761732588a3a324778ebc78e43e93e123df5f195787ea44ab06593e4",
+    "scenario_id": "phase18m-a-certified-setup",
+    "status": "passed"
+  },
+  "earlier_attempts": [
+    {
+      "duration_seconds": 849.67,
+      "failed": 13,
+      "kind": "behavioral",
+      "passed": 6789,
+      "status": "interrupted; not a coverage certificate",
+      "uncompleted": 14
+    },
+    {
+      "duration_seconds": 106.88,
+      "failed": 1,
+      "kind": "code_quality",
+      "passed": 393,
+      "status": "import-boundary defect corrected by VAR-01"
+    }
+  ],
+  "passed_checks": [
+    "ruff check .",
+    "ruff format --check .",
+    "mypy src tests (2809 files)",
+    "pyright (0 errors, 0 warnings)",
+    "lint-imports (11 contracts)",
+    "build_test_shards.py --check --shard-count 8",
+    "pre-commit run --all-files",
+    "build_core_other_concepts_source.py --check",
+    "build_engine_build_identity.py --check",
+    "build_external_contract.py --check --base-ref a1e66ec7d7c1ca05398e30d51ca61d1b62cd7332",
+    "npm run check",
+    "npm run test:unit (5 tests)",
+    "npm run conformance",
+    "smoke_installed_contract_wheel.py (27 schemas, 2628 engine resources)"
+  ],
+  "performance_status": "broad efficiency and component timing gates deferred by owner; full-game targets unmeasured",
+  "resolved_stalls": {
+    "changes": [
+      "VST-01 raised parallel corridors",
+      "VST-02 endpoint containment",
+      "VST-03 rear-circle separation"
+    ],
+    "duration_seconds": 17.77,
+    "focused_cases": 14,
+    "passed": 14,
+    "runtime_timeout_answers": false,
+    "timeouts_used_only_for_diagnostic_processes": true
+  },
+  "review_status": "bounded independent no-finding reviews after repairs; not independent approval",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6b3a9365d32360c5f7492cf0ae22e7c5935fc0e4e537b9cfead318a9e7c6fe0d",
+  "schema_version": "order32-validation-v1"
+}

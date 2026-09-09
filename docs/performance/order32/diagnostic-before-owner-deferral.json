@@ -1,0 +1,4805 @@
+[
+  {
+    "workload": "5-targets-sparse",
+    "status": "completed",
+    "deadline_seconds": 30,
+    "process_elapsed_seconds": 0.11399970902130008,
+    "rows": [
+      {
+        "target": "target-000",
+        "status": "started"
+      },
+      {
+        "target": "target-000",
+        "status": "completed",
+        "ms": 0.15220791101455688,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-001",
+        "status": "started"
+      },
+      {
+        "target": "target-001",
+        "status": "completed",
+        "ms": 0.054458039812743664,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-002",
+        "status": "started"
+      },
+      {
+        "target": "target-002",
+        "status": "completed",
+        "ms": 0.04245794843882322,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-003",
+        "status": "started"
+      },
+      {
+        "target": "target-003",
+        "status": "completed",
+        "ms": 0.03724999260157347,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-004",
+        "status": "started"
+      },
+      {
+        "target": "target-004",
+        "status": "completed",
+        "ms": 0.036917044781148434,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "status": "all_completed",
+        "ms": 0.38766697980463505
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "workload": "5-targets-dense",
+    "status": "completed",
+    "deadline_seconds": 30,
+    "process_elapsed_seconds": 0.10476487502455711,
+    "rows": [
+      {
+        "target": "target-000",
+        "status": "started"
+      },
+      {
+        "target": "target-000",
+        "status": "completed",
+        "ms": 2.8079160256311297,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-001",
+        "status": "started"
+      },
+      {
+        "target": "target-001",
+        "status": "completed",
+        "ms": 2.4039580021053553,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-002",
+        "status": "started"
+      },
+      {
+        "target": "target-002",
+        "status": "completed",
+        "ms": 2.2317919647321105,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-003",
+        "status": "started"
+      },
+      {
+        "target": "target-003",
+        "status": "completed",
+        "ms": 2.1213749423623085,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-004",
+        "status": "started"
+      },
+      {
+        "target": "target-004",
+        "status": "completed",
+        "ms": 2.151958062313497,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "status": "all_completed",
+        "ms": 11.79016602691263
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "workload": "5-targets-dense-nonoverlapping",
+    "status": "completed",
+    "deadline_seconds": 30,
+    "process_elapsed_seconds": 0.10290649998933077,
+    "rows": [
+      {
+        "target": "target-000",
+        "status": "started"
+      },
+      {
+        "target": "target-000",
+        "status": "completed",
+        "ms": 3.4146669786423445,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-001",
+        "status": "started"
+      },
+      {
+        "target": "target-001",
+        "status": "completed",
+        "ms": 2.8584159445017576,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-002",
+        "status": "started"
+      },
+      {
+        "target": "target-002",
+        "status": "completed",
+        "ms": 2.73033301346004,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-003",
+        "status": "started"
+      },
+      {
+        "target": "target-003",
+        "status": "completed",
+        "ms": 2.7385420398786664,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-004",
+        "status": "started"
+      },
+      {
+        "target": "target-004",
+        "status": "completed",
+        "ms": 2.8132080333307385,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "status": "all_completed",
+        "ms": 14.63954197242856
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "workload": "100-targets-sparse",
+    "status": "completed",
+    "deadline_seconds": 30,
+    "process_elapsed_seconds": 0.09276770800352097,
+    "rows": [
+      {
+        "target": "target-000",
+        "status": "started"
+      },
+      {
+        "target": "target-000",
+        "status": "completed",
+        "ms": 0.1460839994251728,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-001",
+        "status": "started"
+      },
+      {
+        "target": "target-001",
+        "status": "completed",
+        "ms": 0.0524159986525774,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-002",
+        "status": "started"
+      },
+      {
+        "target": "target-002",
+        "status": "completed",
+        "ms": 0.04258297849446535,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-003",
+        "status": "started"
+      },
+      {
+        "target": "target-003",
+        "status": "completed",
+        "ms": 0.03850006032735109,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-004",
+        "status": "started"
+      },
+      {
+        "target": "target-004",
+        "status": "completed",
+        "ms": 0.03574998117983341,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-005",
+        "status": "started"
+      },
+      {
+        "target": "target-005",
+        "status": "completed",
+        "ms": 0.037334044463932514,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-006",
+        "status": "started"
+      },
+      {
+        "target": "target-006",
+        "status": "completed",
+        "ms": 0.0434160465374589,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-007",
+        "status": "started"
+      },
+      {
+        "target": "target-007",
+        "status": "completed",
+        "ms": 0.039041973650455475,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-008",
+        "status": "started"
+      },
+      {
+        "target": "target-008",
+        "status": "completed",
+        "ms": 0.03416708204895258,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-009",
+        "status": "started"
+      },
+      {
+        "target": "target-009",
+        "status": "completed",
+        "ms": 0.034667085856199265,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-010",
+        "status": "started"
+      },
+      {
+        "target": "target-010",
+        "status": "completed",
+        "ms": 0.03483297768980265,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-011",
+        "status": "started"
+      },
+      {
+        "target": "target-011",
+        "status": "completed",
+        "ms": 0.04112499300390482,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-012",
+        "status": "started"
+      },
+      {
+        "target": "target-012",
+        "status": "completed",
+        "ms": 0.04062510561197996,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-013",
+        "status": "started"
+      },
+      {
+        "target": "target-013",
+        "status": "completed",
+        "ms": 0.040958053432404995,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-014",
+        "status": "started"
+      },
+      {
+        "target": "target-014",
+        "status": "completed",
+        "ms": 0.03704207483679056,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-015",
+        "status": "started"
+      },
+      {
+        "target": "target-015",
+        "status": "completed",
+        "ms": 0.03295904025435448,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-016",
+        "status": "started"
+      },
+      {
+        "target": "target-016",
+        "status": "completed",
+        "ms": 0.032542040571570396,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-017",
+        "status": "started"
+      },
+      {
+        "target": "target-017",
+        "status": "completed",
+        "ms": 0.04045804962515831,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-018",
+        "status": "started"
+      },
+      {
+        "target": "target-018",
+        "status": "completed",
+        "ms": 0.03945804201066494,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-019",
+        "status": "started"
+      },
+      {
+        "target": "target-019",
+        "status": "completed",
+        "ms": 0.03925000783056021,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-020",
+        "status": "started"
+      },
+      {
+        "target": "target-020",
+        "status": "completed",
+        "ms": 0.0355839729309082,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-021",
+        "status": "started"
+      },
+      {
+        "target": "target-021",
+        "status": "completed",
+        "ms": 0.03250001464039087,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-022",
+        "status": "started"
+      },
+      {
+        "target": "target-022",
+        "status": "completed",
+        "ms": 0.03158301115036011,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-023",
+        "status": "started"
+      },
+      {
+        "target": "target-023",
+        "status": "completed",
+        "ms": 0.03970798570662737,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-024",
+        "status": "started"
+      },
+      {
+        "target": "target-024",
+        "status": "completed",
+        "ms": 0.038041966035962105,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-025",
+        "status": "started"
+      },
+      {
+        "target": "target-025",
+        "status": "completed",
+        "ms": 0.03887491766363382,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-026",
+        "status": "started"
+      },
+      {
+        "target": "target-026",
+        "status": "completed",
+        "ms": 0.03358395770192146,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-027",
+        "status": "started"
+      },
+      {
+        "target": "target-027",
+        "status": "completed",
+        "ms": 0.03324996214359999,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-028",
+        "status": "started"
+      },
+      {
+        "target": "target-028",
+        "status": "completed",
+        "ms": 0.033374992199242115,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-029",
+        "status": "started"
+      },
+      {
+        "target": "target-029",
+        "status": "completed",
+        "ms": 0.033334014005959034,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-030",
+        "status": "started"
+      },
+      {
+        "target": "target-030",
+        "status": "completed",
+        "ms": 0.032916897907853127,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-031",
+        "status": "started"
+      },
+      {
+        "target": "target-031",
+        "status": "completed",
+        "ms": 0.03700004890561104,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-032",
+        "status": "started"
+      },
+      {
+        "target": "target-032",
+        "status": "completed",
+        "ms": 0.03212492447346449,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-033",
+        "status": "started"
+      },
+      {
+        "target": "target-033",
+        "status": "completed",
+        "ms": 0.03191595897078514,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-034",
+        "status": "started"
+      },
+      {
+        "target": "target-034",
+        "status": "completed",
+        "ms": 0.03233307506889105,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-035",
+        "status": "started"
+      },
+      {
+        "target": "target-035",
+        "status": "completed",
+        "ms": 0.03216695040464401,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-036",
+        "status": "started"
+      },
+      {
+        "target": "target-036",
+        "status": "completed",
+        "ms": 0.032250070944428444,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-037",
+        "status": "started"
+      },
+      {
+        "target": "target-037",
+        "status": "completed",
+        "ms": 0.0322909327223897,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-038",
+        "status": "started"
+      },
+      {
+        "target": "target-038",
+        "status": "completed",
+        "ms": 0.03241701051592827,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-039",
+        "status": "started"
+      },
+      {
+        "target": "target-039",
+        "status": "completed",
+        "ms": 0.03233307506889105,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-040",
+        "status": "started"
+      },
+      {
+        "target": "target-040",
+        "status": "completed",
+        "ms": 0.032458920031785965,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-041",
+        "status": "started"
+      },
+      {
+        "target": "target-041",
+        "status": "completed",
+        "ms": 0.03370794001966715,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-042",
+        "status": "started"
+      },
+      {
+        "target": "target-042",
+        "status": "completed",
+        "ms": 0.03233295865356922,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-043",
+        "status": "started"
+      },
+      {
+        "target": "target-043",
+        "status": "completed",
+        "ms": 0.03174995072185993,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-044",
+        "status": "started"
+      },
+      {
+        "target": "target-044",
+        "status": "completed",
+        "ms": 0.031957984901964664,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-045",
+        "status": "started"
+      },
+      {
+        "target": "target-045",
+        "status": "completed",
+        "ms": 0.03187498077750206,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-046",
+        "status": "started"
+      },
+      {
+        "target": "target-046",
+        "status": "completed",
+        "ms": 0.0326669542118907,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-047",
+        "status": "started"
+      },
+      {
+        "target": "target-047",
+        "status": "completed",
+        "ms": 0.0326669542118907,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-048",
+        "status": "started"
+      },
+      {
+        "target": "target-048",
+        "status": "completed",
+        "ms": 0.03229198046028614,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-049",
+        "status": "started"
+      },
+      {
+        "target": "target-049",
+        "status": "completed",
+        "ms": 0.032374984584748745,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-050",
+        "status": "started"
+      },
+      {
+        "target": "target-050",
+        "status": "completed",
+        "ms": 0.032708048820495605,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-051",
+        "status": "started"
+      },
+      {
+        "target": "target-051",
+        "status": "completed",
+        "ms": 0.03200001083314419,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-052",
+        "status": "started"
+      },
+      {
+        "target": "target-052",
+        "status": "completed",
+        "ms": 0.03254192415624857,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-053",
+        "status": "started"
+      },
+      {
+        "target": "target-053",
+        "status": "completed",
+        "ms": 0.032791984267532825,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-054",
+        "status": "started"
+      },
+      {
+        "target": "target-054",
+        "status": "completed",
+        "ms": 0.032208976335823536,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-055",
+        "status": "started"
+      },
+      {
+        "target": "target-055",
+        "status": "completed",
+        "ms": 0.03245798870921135,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-056",
+        "status": "started"
+      },
+      {
+        "target": "target-056",
+        "status": "completed",
+        "ms": 0.032542040571570396,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-057",
+        "status": "started"
+      },
+      {
+        "target": "target-057",
+        "status": "completed",
+        "ms": 0.032374984584748745,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-058",
+        "status": "started"
+      },
+      {
+        "target": "target-058",
+        "status": "completed",
+        "ms": 0.03245903644710779,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-059",
+        "status": "started"
+      },
+      {
+        "target": "target-059",
+        "status": "completed",
+        "ms": 0.032208976335823536,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-060",
+        "status": "started"
+      },
+      {
+        "target": "target-060",
+        "status": "completed",
+        "ms": 0.03254192415624857,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-061",
+        "status": "started"
+      },
+      {
+        "target": "target-061",
+        "status": "completed",
+        "ms": 0.03204098902642727,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-062",
+        "status": "started"
+      },
+      {
+        "target": "target-062",
+        "status": "completed",
+        "ms": 0.03200001083314419,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-063",
+        "status": "started"
+      },
+      {
+        "target": "target-063",
+        "status": "completed",
+        "ms": 0.032084062695503235,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-064",
+        "status": "started"
+      },
+      {
+        "target": "target-064",
+        "status": "completed",
+        "ms": 0.032374984584748745,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-065",
+        "status": "started"
+      },
+      {
+        "target": "target-065",
+        "status": "completed",
+        "ms": 0.031957984901964664,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-066",
+        "status": "started"
+      },
+      {
+        "target": "target-066",
+        "status": "completed",
+        "ms": 0.03187498077750206,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-067",
+        "status": "started"
+      },
+      {
+        "target": "target-067",
+        "status": "completed",
+        "ms": 0.0322909327223897,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-068",
+        "status": "started"
+      },
+      {
+        "target": "target-068",
+        "status": "completed",
+        "ms": 0.032374984584748745,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-069",
+        "status": "started"
+      },
+      {
+        "target": "target-069",
+        "status": "completed",
+        "ms": 0.03258395008742809,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-070",
+        "status": "started"
+      },
+      {
+        "target": "target-070",
+        "status": "completed",
+        "ms": 0.032540992833673954,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-071",
+        "status": "started"
+      },
+      {
+        "target": "target-071",
+        "status": "completed",
+        "ms": 0.03195903263986111,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-072",
+        "status": "started"
+      },
+      {
+        "target": "target-072",
+        "status": "completed",
+        "ms": 0.032041920349001884,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-073",
+        "status": "started"
+      },
+      {
+        "target": "target-073",
+        "status": "completed",
+        "ms": 0.03195903263986111,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-074",
+        "status": "started"
+      },
+      {
+        "target": "target-074",
+        "status": "completed",
+        "ms": 0.03166694659739733,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-075",
+        "status": "started"
+      },
+      {
+        "target": "target-075",
+        "status": "completed",
+        "ms": 0.03183307126164436,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-076",
+        "status": "started"
+      },
+      {
+        "target": "target-076",
+        "status": "completed",
+        "ms": 0.03162503708153963,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-077",
+        "status": "started"
+      },
+      {
+        "target": "target-077",
+        "status": "completed",
+        "ms": 0.03283401019871235,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-078",
+        "status": "started"
+      },
+      {
+        "target": "target-078",
+        "status": "completed",
+        "ms": 0.031542032957077026,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-079",
+        "status": "started"
+      },
+      {
+        "target": "target-079",
+        "status": "completed",
+        "ms": 0.03170792479068041,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-080",
+        "status": "started"
+      },
+      {
+        "target": "target-080",
+        "status": "completed",
+        "ms": 0.03191700670868158,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-081",
+        "status": "started"
+      },
+      {
+        "target": "target-081",
+        "status": "completed",
+        "ms": 0.032374984584748745,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-082",
+        "status": "started"
+      },
+      {
+        "target": "target-082",
+        "status": "completed",
+        "ms": 0.03241701051592827,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-083",
+        "status": "started"
+      },
+      {
+        "target": "target-083",
+        "status": "completed",
+        "ms": 0.031791976653039455,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-084",
+        "status": "started"
+      },
+      {
+        "target": "target-084",
+        "status": "completed",
+        "ms": 0.03324996214359999,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-085",
+        "status": "started"
+      },
+      {
+        "target": "target-085",
+        "status": "completed",
+        "ms": 0.03200001083314419,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-086",
+        "status": "started"
+      },
+      {
+        "target": "target-086",
+        "status": "completed",
+        "ms": 0.03187498077750206,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-087",
+        "status": "started"
+      },
+      {
+        "target": "target-087",
+        "status": "completed",
+        "ms": 0.03220804501324892,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-088",
+        "status": "started"
+      },
+      {
+        "target": "target-088",
+        "status": "completed",
+        "ms": 0.03245903644710779,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-089",
+        "status": "started"
+      },
+      {
+        "target": "target-089",
+        "status": "completed",
+        "ms": 0.032832962460815907,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-090",
+        "status": "started"
+      },
+      {
+        "target": "target-090",
+        "status": "completed",
+        "ms": 0.032374984584748745,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-091",
+        "status": "started"
+      },
+      {
+        "target": "target-091",
+        "status": "completed",
+        "ms": 0.03204203676432371,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-092",
+        "status": "started"
+      },
+      {
+        "target": "target-092",
+        "status": "completed",
+        "ms": 0.03258406650274992,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-093",
+        "status": "started"
+      },
+      {
+        "target": "target-093",
+        "status": "completed",
+        "ms": 0.03316602669656277,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-094",
+        "status": "started"
+      },
+      {
+        "target": "target-094",
+        "status": "completed",
+        "ms": 0.03179092891514301,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-095",
+        "status": "started"
+      },
+      {
+        "target": "target-095",
+        "status": "completed",
+        "ms": 0.03291596658527851,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-096",
+        "status": "started"
+      },
+      {
+        "target": "target-096",
+        "status": "completed",
+        "ms": 0.03204203676432371,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-097",
+        "status": "started"
+      },
+      {
+        "target": "target-097",
+        "status": "completed",
+        "ms": 0.03220804501324892,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-098",
+        "status": "started"
+      },
+      {
+        "target": "target-098",
+        "status": "completed",
+        "ms": 0.0326669542118907,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "target": "target-099",
+        "status": "started"
+      },
+      {
+        "target": "target-099",
+        "status": "completed",
+        "ms": 0.03287498839199543,
+        "visible": true,
+        "full": true,
+        "proofs": [
+          "clear_enclosure",
+          "clear_enclosure"
+        ]
+      },
+      {
+        "status": "all_completed",
+        "ms": 3.9787919959053397
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "workload": "100-targets-dense",
+    "status": "completed",
+    "deadline_seconds": 30,
+    "process_elapsed_seconds": 0.38973095803521574,
+    "rows": [
+      {
+        "target": "target-000",
+        "status": "started"
+      },
+      {
+        "target": "target-000",
+        "status": "completed",
+        "ms": 2.8232079930603504,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-001",
+        "status": "started"
+      },
+      {
+        "target": "target-001",
+        "status": "completed",
+        "ms": 2.3411669535562396,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-002",
+        "status": "started"
+      },
+      {
+        "target": "target-002",
+        "status": "completed",
+        "ms": 2.2090410348027945,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-003",
+        "status": "started"
+      },
+      {
+        "target": "target-003",
+        "status": "completed",
+        "ms": 2.194209024310112,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-004",
+        "status": "started"
+      },
+      {
+        "target": "target-004",
+        "status": "completed",
+        "ms": 2.1968750515952706,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-005",
+        "status": "started"
+      },
+      {
+        "target": "target-005",
+        "status": "completed",
+        "ms": 2.269375021569431,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-006",
+        "status": "started"
+      },
+      {
+        "target": "target-006",
+        "status": "completed",
+        "ms": 2.265125047415495,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-007",
+        "status": "started"
+      },
+      {
+        "target": "target-007",
+        "status": "completed",
+        "ms": 2.242292044684291,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-008",
+        "status": "started"
+      },
+      {
+        "target": "target-008",
+        "status": "completed",
+        "ms": 2.257124986499548,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-009",
+        "status": "started"
+      },
+      {
+        "target": "target-009",
+        "status": "completed",
+        "ms": 2.2860000608488917,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-010",
+        "status": "started"
+      },
+      {
+        "target": "target-010",
+        "status": "completed",
+        "ms": 2.708749962039292,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-011",
+        "status": "started"
+      },
+      {
+        "target": "target-011",
+        "status": "completed",
+        "ms": 2.288041985593736,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-012",
+        "status": "started"
+      },
+      {
+        "target": "target-012",
+        "status": "completed",
+        "ms": 2.2802919847890735,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-013",
+        "status": "started"
+      },
+      {
+        "target": "target-013",
+        "status": "completed",
+        "ms": 2.324791974388063,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-014",
+        "status": "started"
+      },
+      {
+        "target": "target-014",
+        "status": "completed",
+        "ms": 2.3237079149112105,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-015",
+        "status": "started"
+      },
+      {
+        "target": "target-015",
+        "status": "completed",
+        "ms": 2.331750001758337,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-016",
+        "status": "started"
+      },
+      {
+        "target": "target-016",
+        "status": "completed",
+        "ms": 2.690666005946696,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-017",
+        "status": "started"
+      },
+      {
+        "target": "target-017",
+        "status": "completed",
+        "ms": 2.635292010381818,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-018",
+        "status": "started"
+      },
+      {
+        "target": "target-018",
+        "status": "completed",
+        "ms": 2.712624962441623,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-019",
+        "status": "started"
+      },
+      {
+        "target": "target-019",
+        "status": "completed",
+        "ms": 2.7372919721528888,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-020",
+        "status": "started"
+      },
+      {
+        "target": "target-020",
+        "status": "completed",
+        "ms": 2.843666006810963,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-021",
+        "status": "started"
+      },
+      {
+        "target": "target-021",
+        "status": "completed",
+        "ms": 2.700209035538137,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-022",
+        "status": "started"
+      },
+      {
+        "target": "target-022",
+        "status": "completed",
+        "ms": 2.785332966595888,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-023",
+        "status": "started"
+      },
+      {
+        "target": "target-023",
+        "status": "completed",
+        "ms": 2.682166057638824,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-024",
+        "status": "started"
+      },
+      {
+        "target": "target-024",
+        "status": "completed",
+        "ms": 2.7225830126553774,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-025",
+        "status": "started"
+      },
+      {
+        "target": "target-025",
+        "status": "completed",
+        "ms": 2.6467080460861325,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-026",
+        "status": "started"
+      },
+      {
+        "target": "target-026",
+        "status": "completed",
+        "ms": 2.764957956969738,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-027",
+        "status": "started"
+      },
+      {
+        "target": "target-027",
+        "status": "completed",
+        "ms": 2.3427079431712627,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-028",
+        "status": "started"
+      },
+      {
+        "target": "target-028",
+        "status": "completed",
+        "ms": 2.320375060662627,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-029",
+        "status": "started"
+      },
+      {
+        "target": "target-029",
+        "status": "completed",
+        "ms": 2.0918749505653977,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-030",
+        "status": "started"
+      },
+      {
+        "target": "target-030",
+        "status": "completed",
+        "ms": 3.0423339921981096,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-031",
+        "status": "started"
+      },
+      {
+        "target": "target-031",
+        "status": "completed",
+        "ms": 2.59312498383224,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-032",
+        "status": "started"
+      },
+      {
+        "target": "target-032",
+        "status": "completed",
+        "ms": 2.6765000075101852,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-033",
+        "status": "started"
+      },
+      {
+        "target": "target-033",
+        "status": "completed",
+        "ms": 2.834249986335635,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-034",
+        "status": "started"
+      },
+      {
+        "target": "target-034",
+        "status": "completed",
+        "ms": 2.6728330412879586,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-035",
+        "status": "started"
+      },
+      {
+        "target": "target-035",
+        "status": "completed",
+        "ms": 2.54604103974998,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-036",
+        "status": "started"
+      },
+      {
+        "target": "target-036",
+        "status": "completed",
+        "ms": 2.7105420595034957,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-037",
+        "status": "started"
+      },
+      {
+        "target": "target-037",
+        "status": "completed",
+        "ms": 2.954875002615154,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-038",
+        "status": "started"
+      },
+      {
+        "target": "target-038",
+        "status": "completed",
+        "ms": 2.8214160120114684,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-039",
+        "status": "started"
+      },
+      {
+        "target": "target-039",
+        "status": "completed",
+        "ms": 3.0896670650690794,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-040",
+        "status": "started"
+      },
+      {
+        "target": "target-040",
+        "status": "completed",
+        "ms": 3.7359590642154217,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-041",
+        "status": "started"
+      },
+      {
+        "target": "target-041",
+        "status": "completed",
+        "ms": 3.1734590884298086,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-042",
+        "status": "started"
+      },
+      {
+        "target": "target-042",
+        "status": "completed",
+        "ms": 3.460666979663074,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-043",
+        "status": "started"
+      },
+      {
+        "target": "target-043",
+        "status": "completed",
+        "ms": 2.8685000725090504,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-044",
+        "status": "started"
+      },
+      {
+        "target": "target-044",
+        "status": "completed",
+        "ms": 2.6943329721689224,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-045",
+        "status": "started"
+      },
+      {
+        "target": "target-045",
+        "status": "completed",
+        "ms": 2.775375032797456,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-046",
+        "status": "started"
+      },
+      {
+        "target": "target-046",
+        "status": "completed",
+        "ms": 2.9075000202283263,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-047",
+        "status": "started"
+      },
+      {
+        "target": "target-047",
+        "status": "completed",
+        "ms": 2.7666250243782997,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-048",
+        "status": "started"
+      },
+      {
+        "target": "target-048",
+        "status": "completed",
+        "ms": 2.87087494507432,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-049",
+        "status": "started"
+      },
+      {
+        "target": "target-049",
+        "status": "completed",
+        "ms": 2.7512500528246164,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-050",
+        "status": "started"
+      },
+      {
+        "target": "target-050",
+        "status": "completed",
+        "ms": 3.703000023961067,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-051",
+        "status": "started"
+      },
+      {
+        "target": "target-051",
+        "status": "completed",
+        "ms": 3.2672910019755363,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-052",
+        "status": "started"
+      },
+      {
+        "target": "target-052",
+        "status": "completed",
+        "ms": 2.8251250041648746,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-053",
+        "status": "started"
+      },
+      {
+        "target": "target-053",
+        "status": "completed",
+        "ms": 3.3301670337095857,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-054",
+        "status": "started"
+      },
+      {
+        "target": "target-054",
+        "status": "completed",
+        "ms": 3.397791995666921,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-055",
+        "status": "started"
+      },
+      {
+        "target": "target-055",
+        "status": "completed",
+        "ms": 2.806957927532494,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-056",
+        "status": "started"
+      },
+      {
+        "target": "target-056",
+        "status": "completed",
+        "ms": 2.7751249726861715,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-057",
+        "status": "started"
+      },
+      {
+        "target": "target-057",
+        "status": "completed",
+        "ms": 2.6929579908028245,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-058",
+        "status": "started"
+      },
+      {
+        "target": "target-058",
+        "status": "completed",
+        "ms": 2.762791933491826,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-059",
+        "status": "started"
+      },
+      {
+        "target": "target-059",
+        "status": "completed",
+        "ms": 2.888374961912632,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-060",
+        "status": "started"
+      },
+      {
+        "target": "target-060",
+        "status": "completed",
+        "ms": 3.3521660370752215,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-061",
+        "status": "started"
+      },
+      {
+        "target": "target-061",
+        "status": "completed",
+        "ms": 3.5807089880108833,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-062",
+        "status": "started"
+      },
+      {
+        "target": "target-062",
+        "status": "completed",
+        "ms": 3.0887919710949063,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-063",
+        "status": "started"
+      },
+      {
+        "target": "target-063",
+        "status": "completed",
+        "ms": 3.226041910238564,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-064",
+        "status": "started"
+      },
+      {
+        "target": "target-064",
+        "status": "completed",
+        "ms": 3.227708046324551,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-065",
+        "status": "started"
+      },
+      {
+        "target": "target-065",
+        "status": "completed",
+        "ms": 3.217749996110797,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-066",
+        "status": "started"
+      },
+      {
+        "target": "target-066",
+        "status": "completed",
+        "ms": 3.2112080371007323,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-067",
+        "status": "started"
+      },
+      {
+        "target": "target-067",
+        "status": "completed",
+        "ms": 2.943499945104122,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-068",
+        "status": "started"
+      },
+      {
+        "target": "target-068",
+        "status": "completed",
+        "ms": 2.9187919571995735,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-069",
+        "status": "started"
+      },
+      {
+        "target": "target-069",
+        "status": "completed",
+        "ms": 2.8275419026613235,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-070",
+        "status": "started"
+      },
+      {
+        "target": "target-070",
+        "status": "completed",
+        "ms": 3.7568750558421016,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-071",
+        "status": "started"
+      },
+      {
+        "target": "target-071",
+        "status": "completed",
+        "ms": 3.3098339335992932,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-072",
+        "status": "started"
+      },
+      {
+        "target": "target-072",
+        "status": "completed",
+        "ms": 3.6601669853553176,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-073",
+        "status": "started"
+      },
+      {
+        "target": "target-073",
+        "status": "completed",
+        "ms": 3.220916958525777,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-074",
+        "status": "started"
+      },
+      {
+        "target": "target-074",
+        "status": "completed",
+        "ms": 3.1998750055208802,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-075",
+        "status": "started"
+      },
+      {
+        "target": "target-075",
+        "status": "completed",
+        "ms": 2.8641660464927554,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-076",
+        "status": "started"
+      },
+      {
+        "target": "target-076",
+        "status": "completed",
+        "ms": 3.316250047646463,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-077",
+        "status": "started"
+      },
+      {
+        "target": "target-077",
+        "status": "completed",
+        "ms": 3.053374937735498,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-078",
+        "status": "started"
+      },
+      {
+        "target": "target-078",
+        "status": "completed",
+        "ms": 3.2719169976189733,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-079",
+        "status": "started"
+      },
+      {
+        "target": "target-079",
+        "status": "completed",
+        "ms": 2.920999890193343,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-080",
+        "status": "started"
+      },
+      {
+        "target": "target-080",
+        "status": "completed",
+        "ms": 3.70420899707824,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-081",
+        "status": "started"
+      },
+      {
+        "target": "target-081",
+        "status": "completed",
+        "ms": 3.7994160084053874,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-082",
+        "status": "started"
+      },
+      {
+        "target": "target-082",
+        "status": "completed",
+        "ms": 3.5319169983267784,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-083",
+        "status": "started"
+      },
+      {
+        "target": "target-083",
+        "status": "completed",
+        "ms": 3.1996670877560973,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-084",
+        "status": "started"
+      },
+      {
+        "target": "target-084",
+        "status": "completed",
+        "ms": 3.2854590099304914,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-085",
+        "status": "started"
+      },
+      {
+        "target": "target-085",
+        "status": "completed",
+        "ms": 2.9912079917266965,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-086",
+        "status": "started"
+      },
+      {
+        "target": "target-086",
+        "status": "completed",
+        "ms": 3.302791970781982,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-087",
+        "status": "started"
+      },
+      {
+        "target": "target-087",
+        "status": "completed",
+        "ms": 2.965749939903617,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-088",
+        "status": "started"
+      },
+      {
+        "target": "target-088",
+        "status": "completed",
+        "ms": 3.312957938760519,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-089",
+        "status": "started"
+      },
+      {
+        "target": "target-089",
+        "status": "completed",
+        "ms": 3.1279580434784293,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-090",
+        "status": "started"
+      },
+      {
+        "target": "target-090",
+        "status": "completed",
+        "ms": 4.0909170638769865,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-091",
+        "status": "started"
+      },
+      {
+        "target": "target-091",
+        "status": "completed",
+        "ms": 4.181207972578704,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-092",
+        "status": "started"
+      },
+      {
+        "target": "target-092",
+        "status": "completed",
+        "ms": 3.9500839775428176,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-093",
+        "status": "started"
+      },
+      {
+        "target": "target-093",
+        "status": "completed",
+        "ms": 3.3947500633075833,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-094",
+        "status": "started"
+      },
+      {
+        "target": "target-094",
+        "status": "completed",
+        "ms": 3.407082986086607,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-095",
+        "status": "started"
+      },
+      {
+        "target": "target-095",
+        "status": "completed",
+        "ms": 3.7330000195652246,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-096",
+        "status": "started"
+      },
+      {
+        "target": "target-096",
+        "status": "completed",
+        "ms": 3.4257080405950546,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-097",
+        "status": "started"
+      },
+      {
+        "target": "target-097",
+        "status": "completed",
+        "ms": 3.316083922982216,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-098",
+        "status": "started"
+      },
+      {
+        "target": "target-098",
+        "status": "completed",
+        "ms": 2.951917005702853,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-099",
+        "status": "started"
+      },
+      {
+        "target": "target-099",
+        "status": "completed",
+        "ms": 3.365500015206635,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_cross_section",
+          "not_visible"
+        ]
+      },
+      {
+        "status": "all_completed",
+        "ms": 296.8744160607457
+      }
+    ],
+    "stderr": ""
+  },
+  {
+    "workload": "100-targets-dense-nonoverlapping",
+    "status": "completed",
+    "deadline_seconds": 30,
+    "process_elapsed_seconds": 1.1900763750309125,
+    "rows": [
+      {
+        "target": "target-000",
+        "status": "started"
+      },
+      {
+        "target": "target-000",
+        "status": "completed",
+        "ms": 3.576999995857477,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-001",
+        "status": "started"
+      },
+      {
+        "target": "target-001",
+        "status": "completed",
+        "ms": 2.974499948322773,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-002",
+        "status": "started"
+      },
+      {
+        "target": "target-002",
+        "status": "completed",
+        "ms": 3.160458989441395,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-003",
+        "status": "started"
+      },
+      {
+        "target": "target-003",
+        "status": "completed",
+        "ms": 2.9100419487804174,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-004",
+        "status": "started"
+      },
+      {
+        "target": "target-004",
+        "status": "completed",
+        "ms": 3.1795830000191927,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-005",
+        "status": "started"
+      },
+      {
+        "target": "target-005",
+        "status": "completed",
+        "ms": 3.649833961389959,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-006",
+        "status": "started"
+      },
+      {
+        "target": "target-006",
+        "status": "completed",
+        "ms": 3.23150004260242,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-007",
+        "status": "started"
+      },
+      {
+        "target": "target-007",
+        "status": "completed",
+        "ms": 3.2607910688966513,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-008",
+        "status": "started"
+      },
+      {
+        "target": "target-008",
+        "status": "completed",
+        "ms": 2.927792025730014,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-009",
+        "status": "started"
+      },
+      {
+        "target": "target-009",
+        "status": "completed",
+        "ms": 3.017375012859702,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-010",
+        "status": "started"
+      },
+      {
+        "target": "target-010",
+        "status": "completed",
+        "ms": 4.665874992497265,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-011",
+        "status": "started"
+      },
+      {
+        "target": "target-011",
+        "status": "completed",
+        "ms": 1.3414579443633556,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-012",
+        "status": "started"
+      },
+      {
+        "target": "target-012",
+        "status": "completed",
+        "ms": 5.357959074899554,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-013",
+        "status": "started"
+      },
+      {
+        "target": "target-013",
+        "status": "completed",
+        "ms": 4.734833026304841,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-014",
+        "status": "started"
+      },
+      {
+        "target": "target-014",
+        "status": "completed",
+        "ms": 7.749957963824272,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-015",
+        "status": "started"
+      },
+      {
+        "target": "target-015",
+        "status": "completed",
+        "ms": 9.850542061030865,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-016",
+        "status": "started"
+      },
+      {
+        "target": "target-016",
+        "status": "completed",
+        "ms": 9.864249965175986,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-017",
+        "status": "started"
+      },
+      {
+        "target": "target-017",
+        "status": "completed",
+        "ms": 7.006165920756757,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-018",
+        "status": "started"
+      },
+      {
+        "target": "target-018",
+        "status": "completed",
+        "ms": 6.63345807697624,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-019",
+        "status": "started"
+      },
+      {
+        "target": "target-019",
+        "status": "completed",
+        "ms": 5.81341702491045,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-020",
+        "status": "started"
+      },
+      {
+        "target": "target-020",
+        "status": "completed",
+        "ms": 8.303667069412768,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-021",
+        "status": "started"
+      },
+      {
+        "target": "target-021",
+        "status": "completed",
+        "ms": 5.0626249285414815,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-022",
+        "status": "started"
+      },
+      {
+        "target": "target-022",
+        "status": "completed",
+        "ms": 5.873291986063123,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-023",
+        "status": "started"
+      },
+      {
+        "target": "target-023",
+        "status": "completed",
+        "ms": 4.947290988638997,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-024",
+        "status": "started"
+      },
+      {
+        "target": "target-024",
+        "status": "completed",
+        "ms": 4.927584086544812,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-025",
+        "status": "started"
+      },
+      {
+        "target": "target-025",
+        "status": "completed",
+        "ms": 4.012541030533612,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-026",
+        "status": "started"
+      },
+      {
+        "target": "target-026",
+        "status": "completed",
+        "ms": 5.208290996961296,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-027",
+        "status": "started"
+      },
+      {
+        "target": "target-027",
+        "status": "completed",
+        "ms": 1.2904169270768762,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-028",
+        "status": "started"
+      },
+      {
+        "target": "target-028",
+        "status": "completed",
+        "ms": 5.234708893112838,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-029",
+        "status": "started"
+      },
+      {
+        "target": "target-029",
+        "status": "completed",
+        "ms": 8.226166944950819,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-030",
+        "status": "started"
+      },
+      {
+        "target": "target-030",
+        "status": "completed",
+        "ms": 12.519708019681275,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-031",
+        "status": "started"
+      },
+      {
+        "target": "target-031",
+        "status": "completed",
+        "ms": 10.044540977105498,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-032",
+        "status": "started"
+      },
+      {
+        "target": "target-032",
+        "status": "completed",
+        "ms": 9.796458994969726,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-033",
+        "status": "started"
+      },
+      {
+        "target": "target-033",
+        "status": "completed",
+        "ms": 4.50312509201467,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-034",
+        "status": "started"
+      },
+      {
+        "target": "target-034",
+        "status": "completed",
+        "ms": 4.944083048030734,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-035",
+        "status": "started"
+      },
+      {
+        "target": "target-035",
+        "status": "completed",
+        "ms": 5.844249972142279,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-036",
+        "status": "started"
+      },
+      {
+        "target": "target-036",
+        "status": "completed",
+        "ms": 5.864833015948534,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-037",
+        "status": "started"
+      },
+      {
+        "target": "target-037",
+        "status": "completed",
+        "ms": 6.274916930124164,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-038",
+        "status": "started"
+      },
+      {
+        "target": "target-038",
+        "status": "completed",
+        "ms": 6.294249906204641,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-039",
+        "status": "started"
+      },
+      {
+        "target": "target-039",
+        "status": "completed",
+        "ms": 6.308457930572331,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-040",
+        "status": "started"
+      },
+      {
+        "target": "target-040",
+        "status": "completed",
+        "ms": 28.33383297547698,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-041",
+        "status": "started"
+      },
+      {
+        "target": "target-041",
+        "status": "completed",
+        "ms": 11.343040969222784,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-042",
+        "status": "started"
+      },
+      {
+        "target": "target-042",
+        "status": "completed",
+        "ms": 2.100541954860091,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-043",
+        "status": "started"
+      },
+      {
+        "target": "target-043",
+        "status": "completed",
+        "ms": 10.671167052350938,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-044",
+        "status": "started"
+      },
+      {
+        "target": "target-044",
+        "status": "completed",
+        "ms": 9.500875021331012,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-045",
+        "status": "started"
+      },
+      {
+        "target": "target-045",
+        "status": "completed",
+        "ms": 7.453583995811641,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-046",
+        "status": "started"
+      },
+      {
+        "target": "target-046",
+        "status": "completed",
+        "ms": 4.457499948330224,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-047",
+        "status": "started"
+      },
+      {
+        "target": "target-047",
+        "status": "completed",
+        "ms": 5.486999987624586,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-048",
+        "status": "started"
+      },
+      {
+        "target": "target-048",
+        "status": "completed",
+        "ms": 5.9304169844836,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-049",
+        "status": "started"
+      },
+      {
+        "target": "target-049",
+        "status": "completed",
+        "ms": 5.8847910258919,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-050",
+        "status": "started"
+      },
+      {
+        "target": "target-050",
+        "status": "completed",
+        "ms": 17.04525004606694,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-051",
+        "status": "started"
+      },
+      {
+        "target": "target-051",
+        "status": "completed",
+        "ms": 14.622792019508779,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-052",
+        "status": "started"
+      },
+      {
+        "target": "target-052",
+        "status": "completed",
+        "ms": 13.4153749095276,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-053",
+        "status": "started"
+      },
+      {
+        "target": "target-053",
+        "status": "completed",
+        "ms": 11.20949990581721,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-054",
+        "status": "started"
+      },
+      {
+        "target": "target-054",
+        "status": "completed",
+        "ms": 19.124582991935313,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-055",
+        "status": "started"
+      },
+      {
+        "target": "target-055",
+        "status": "completed",
+        "ms": 10.551125044003129,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-056",
+        "status": "started"
+      },
+      {
+        "target": "target-056",
+        "status": "completed",
+        "ms": 9.503124980255961,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-057",
+        "status": "started"
+      },
+      {
+        "target": "target-057",
+        "status": "completed",
+        "ms": 8.47437500488013,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-058",
+        "status": "started"
+      },
+      {
+        "target": "target-058",
+        "status": "completed",
+        "ms": 4.398458986543119,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-059",
+        "status": "started"
+      },
+      {
+        "target": "target-059",
+        "status": "completed",
+        "ms": 4.365416010841727,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-060",
+        "status": "started"
+      },
+      {
+        "target": "target-060",
+        "status": "completed",
+        "ms": 11.611541034653783,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-061",
+        "status": "started"
+      },
+      {
+        "target": "target-061",
+        "status": "completed",
+        "ms": 18.433333025313914,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-062",
+        "status": "started"
+      },
+      {
+        "target": "target-062",
+        "status": "completed",
+        "ms": 17.22879207227379,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-063",
+        "status": "started"
+      },
+      {
+        "target": "target-063",
+        "status": "completed",
+        "ms": 12.330666999332607,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-064",
+        "status": "started"
+      },
+      {
+        "target": "target-064",
+        "status": "completed",
+        "ms": 11.886833002790809,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-065",
+        "status": "started"
+      },
+      {
+        "target": "target-065",
+        "status": "completed",
+        "ms": 15.352417016401887,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-066",
+        "status": "started"
+      },
+      {
+        "target": "target-066",
+        "status": "completed",
+        "ms": 16.665250062942505,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-067",
+        "status": "started"
+      },
+      {
+        "target": "target-067",
+        "status": "completed",
+        "ms": 10.238624992780387,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-068",
+        "status": "started"
+      },
+      {
+        "target": "target-068",
+        "status": "completed",
+        "ms": 9.205540991388261,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-069",
+        "status": "started"
+      },
+      {
+        "target": "target-069",
+        "status": "completed",
+        "ms": 9.779000072740018,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-070",
+        "status": "started"
+      },
+      {
+        "target": "target-070",
+        "status": "completed",
+        "ms": 17.3183330334723,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-071",
+        "status": "started"
+      },
+      {
+        "target": "target-071",
+        "status": "completed",
+        "ms": 33.80379197187722,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-072",
+        "status": "started"
+      },
+      {
+        "target": "target-072",
+        "status": "completed",
+        "ms": 18.439332954585552,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-073",
+        "status": "started"
+      },
+      {
+        "target": "target-073",
+        "status": "completed",
+        "ms": 17.471125000156462,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-074",
+        "status": "started"
+      },
+      {
+        "target": "target-074",
+        "status": "completed",
+        "ms": 13.566958950832486,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-075",
+        "status": "started"
+      },
+      {
+        "target": "target-075",
+        "status": "completed",
+        "ms": 13.264333014376462,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-076",
+        "status": "started"
+      },
+      {
+        "target": "target-076",
+        "status": "completed",
+        "ms": 7.823999971151352,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-077",
+        "status": "started"
+      },
+      {
+        "target": "target-077",
+        "status": "completed",
+        "ms": 18.82670901250094,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-078",
+        "status": "started"
+      },
+      {
+        "target": "target-078",
+        "status": "completed",
+        "ms": 15.770208090543747,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-079",
+        "status": "started"
+      },
+      {
+        "target": "target-079",
+        "status": "completed",
+        "ms": 10.866667027585208,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-080",
+        "status": "started"
+      },
+      {
+        "target": "target-080",
+        "status": "completed",
+        "ms": 31.188333057798445,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-081",
+        "status": "started"
+      },
+      {
+        "target": "target-081",
+        "status": "completed",
+        "ms": 18.196084070950747,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-082",
+        "status": "started"
+      },
+      {
+        "target": "target-082",
+        "status": "completed",
+        "ms": 26.854790979996324,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-083",
+        "status": "started"
+      },
+      {
+        "target": "target-083",
+        "status": "completed",
+        "ms": 19.126708968542516,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-084",
+        "status": "started"
+      },
+      {
+        "target": "target-084",
+        "status": "completed",
+        "ms": 17.167584039270878,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-085",
+        "status": "started"
+      },
+      {
+        "target": "target-085",
+        "status": "completed",
+        "ms": 15.519249951466918,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-086",
+        "status": "started"
+      },
+      {
+        "target": "target-086",
+        "status": "completed",
+        "ms": 11.959165916778147,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-087",
+        "status": "started"
+      },
+      {
+        "target": "target-087",
+        "status": "completed",
+        "ms": 12.828040984459221,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-088",
+        "status": "started"
+      },
+      {
+        "target": "target-088",
+        "status": "completed",
+        "ms": 14.126499998383224,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-089",
+        "status": "started"
+      },
+      {
+        "target": "target-089",
+        "status": "completed",
+        "ms": 2.105874940752983,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "blocked_circular_enclosure",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-090",
+        "status": "started"
+      },
+      {
+        "target": "target-090",
+        "status": "completed",
+        "ms": 21.40950004104525,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-091",
+        "status": "started"
+      },
+      {
+        "target": "target-091",
+        "status": "completed",
+        "ms": 28.624749975278974,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-092",
+        "status": "started"
+      },
+      {
+        "target": "target-092",
+        "status": "completed",
+        "ms": 17.98858307301998,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-093",
+        "status": "started"
+      },
+      {
+        "target": "target-093",
+        "status": "completed",
+        "ms": 27.567417011596262,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-094",
+        "status": "started"
+      },
+      {
+        "target": "target-094",
+        "status": "completed",
+        "ms": 19.81500000692904,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-095",
+        "status": "started"
+      },
+      {
+        "target": "target-095",
+        "status": "completed",
+        "ms": 17.684374935925007,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-096",
+        "status": "started"
+      },
+      {
+        "target": "target-096",
+        "status": "completed",
+        "ms": 15.713082975707948,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-097",
+        "status": "started"
+      },
+      {
+        "target": "target-097",
+        "status": "completed",
+        "ms": 16.20083407033235,
+        "visible": false,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "not_visible"
+        ]
+      },
+      {
+        "target": "target-098",
+        "status": "started"
+      },
+      {
+        "target": "target-098",
+        "status": "completed",
+        "ms": 14.366083079949021,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "real_algebraic_planar_lines",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "target": "target-099",
+        "status": "started"
+      },
+      {
+        "target": "target-099",
+        "status": "completed",
+        "ms": 8.448167005553842,
+        "visible": true,
+        "full": false,
+        "proofs": [
+          "clear_corridor",
+          "hidden_target_part"
+        ]
+      },
+      {
+        "status": "all_completed",
+        "ms": 1083.287624991499
+      }
+    ],
+    "stderr": ""
+  }
+]

@@ -11,6 +11,12 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.visibility import (
+    BenefitOfCoverResult,
+    LineOfSightWitness,
+    LineOfSightWitnessPayload,
+    TerrainVisibilityContext,
+)
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
     WeaponKeyword,
@@ -84,12 +90,6 @@ from warhammer40k_core.engine.weapon_abilities import (
     hunter_target_allowed,
 )
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
-from warhammer40k_core.geometry.visibility import (
-    BenefitOfCoverResult,
-    LineOfSightWitness,
-    LineOfSightWitnessPayload,
-    TerrainVisibilityContext,
-)
 from warhammer40k_core.geometry.volume import Model
 
 BENEFIT_OF_COVER_RULE_ID = "core-rules:benefit-of-cover"

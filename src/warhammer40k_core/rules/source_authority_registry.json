@@ -470,6 +470,26 @@
           "audit_id": "core-model-keywords-maintained-app-mirrors-2026-09-08",
           "identity_kind": "app_version",
           "identity_value": "931"
+        },
+        {
+          "audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+          "row_id": "visibility-classifications",
+          "source_observation_sha256": "3398b5017348df28c7427171878963d797b23245eb6f56eb0e1df8c1c017ddf5",
+          "provider_name": "40k.app",
+          "source_url": "https://www.40k.app/rules/06-other-concepts",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "observed_at",
+          "identity_value": "2026-09-08T17:17:05Z"
+        },
+        {
+          "audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+          "row_id": "visibility-any-part-faq",
+          "source_observation_sha256": "d2d36d50451e0e498860bc04a5682c29fbdf54ca964ef9a24fed36fe7d585972",
+          "provider_name": "Game Datamissions",
+          "source_url": "https://game-datamissions.com/11th/rules/changelog",
+          "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+          "identity_kind": "app_version",
+          "identity_value": "931"
         }
       ],
       "legacy_observations": [
@@ -703,10 +723,12 @@
         {
           "namespace": "games-workshop",
           "package_name": "gw-11e-core-other-concepts",
-          "version": "40k-app-other-concepts-observed-2026-08-31",
+          "version": "maintained-app-mirrors-observed-2026-09-08",
           "allowed_rule_source_ids": [
             "gw-11e-core-rules:other-concepts:mortal-wounds",
-            "gw-11e-core-rules:other-concepts:visibility"
+            "gw-11e-core-rules:other-concepts:visibility",
+            "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+            "gw-11e-core-rules:other-concepts:visibility-classifications"
           ],
           "catalog_sha256": null
         },

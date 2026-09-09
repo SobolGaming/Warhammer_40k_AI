@@ -151,6 +151,32 @@ If a test object lacks a required field, fix the fixture. Do not weaken producti
 
 ## Test policy
 
+### Performance is part of delivery correctness
+
+Order 32 exception: on 2026-09-08 the owner explicitly deferred further efficiency
+work and provisional component performance gates until complete head-to-head
+headless games can be measured. Preserve diagnostic results and correctness/cache
+invariants; do not claim deferred budgets passed. See the versioned policy below.
+The owner subsequently approved narrowly scoped exact-solver repairs necessary
+to finish ordinary gameplay tests and CI. Broader efficiency work remains
+deferred; an unresolved calculation must never become an invented rules answer.
+
+The standing headless targets are an arithmetic mean below 60 seconds per
+complete game and no measured game above 300 seconds within the versioned
+supported workload and declared reference hardware. Correct rules, deterministic
+execution, and the shared interactive/headless authority remain mandatory.
+Finite benchmark results do not establish a universal worst-case bound.
+
+Changes to hot paths, algorithms, data structures, caches, or gameplay
+orchestration require an appropriate performance assessment. Profiling,
+benchmarking, and optimization of the current rules-engine slice are authorized
+now; this does not authorize premature AI/training or unrelated optimization.
+Follow `docs/performance/PERFORMANCE_POLICY.md`: measure base and head on the
+same environment and workload, retain machine-readable evidence, and enforce
+versioned budgets without silently raising thresholds or dropping hard cases.
+Report incomplete component, gameplay-slice, and full-game evidence separately.
+An unresolved computation or timeout must never become a visibility/rules answer.
+
 Stubs are allowed only for pure functions and must be marked `stubbed`.
 
 Final validation runs the complete behavioral suite **once with coverage**, then

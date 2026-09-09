@@ -1,0 +1,33 @@
+{
+  "audit_id": "core-visibility-maintained-app-mirrors-2026-09-08",
+  "co_version_comparison": "Full visibility definitions and v931 any-part FAQ are separate operative clauses; no co-versioned provider agreement is claimed.",
+  "historical_provenance": "Existing P06A visibility and P06B mortal-wounds source text, provenance and observation hashes remain unchanged; visibility runtime bindings migrate to the core policy owner. The official historical Core Rules PDF remains retained.",
+  "observed_at": "2026-09-08T17:17:05Z",
+  "owner_interpretation_record": "docs/performance/order32/cover-disambiguation.json",
+  "rows": [
+    {
+      "app_version": null,
+      "observed_at": "2026-09-08T17:17:05Z",
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "40k.app",
+      "provider_non_affiliation_recorded": true,
+      "row_id": "visibility-classifications",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-classifications",
+      "source_observation_sha256": "3398b5017348df28c7427171878963d797b23245eb6f56eb0e1df8c1c017ddf5",
+      "source_url": "https://www.40k.app/rules/06-other-concepts",
+      "transcription_sha256": "7bcd8275af066324fa6d6944e4683d632fe0b552a003fdc94190159a76fc89f4"
+    },
+    {
+      "app_version": "931",
+      "observed_at": "2026-09-08T17:17:05Z",
+      "policy_id": "core-rules-source-policy:maintained-direct-app-data-mirrors:2026-09-02",
+      "provider_name": "Game Datamissions",
+      "provider_non_affiliation_recorded": true,
+      "row_id": "visibility-any-part-faq",
+      "rule_source_id": "gw-11e-core-rules:other-concepts:visibility-any-part-faq",
+      "source_observation_sha256": "d2d36d50451e0e498860bc04a5682c29fbdf54ca964ef9a24fed36fe7d585972",
+      "source_url": "https://game-datamissions.com/11th/rules/changelog",
+      "transcription_sha256": "7ad46ec389adfa76cc3d0e3d763f6237835ae60a4264fbca52d48a97b79911ed"
+    }
+  ]
+}

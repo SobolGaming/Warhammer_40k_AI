@@ -404,14 +404,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_twelve_releases() -> None:
+def test_session_metadata_contract_version_accepts_current_major_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "11.5.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "14.0.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "13.0.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -424,6 +424,9 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     )
     properties = _json_object(schema["properties"])
     definitions = _json_object(schema["$defs"])
+    assert schema["$id"] == (
+        "https://warhammer40k-core.local/contracts/v14/session-persistence.schema.json"
+    )
     assert schema["additionalProperties"] is False
     assert _json_object(properties["schema_version"])["const"] == (
         SESSION_PERSISTENCE_SCHEMA_VERSION
@@ -459,7 +462,7 @@ def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addre
     assert "session-persistence.schema.json" not in json.dumps(openapi, sort_keys=True)
 
 
-def test_contract_thirteen_advances_affected_session_and_projection_families() -> None:
+def test_current_contract_preserves_model_projections_and_advances_visibility_wrappers() -> None:
     metadata = _json_object(
         _read_json(REPO_ROOT / Path("contracts/schemas/session-metadata.schema.json"))
     )
@@ -474,28 +477,28 @@ def test_contract_thirteen_advances_affected_session_and_projection_families() -
     )
 
     assert metadata["$id"] == (
-        "https://warhammer40k-core.local/contracts/v13/session-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v14/session-metadata.schema.json"
     )
     assert result["$id"] == (
-        "https://warhammer40k-core.local/contracts/v13/session-command-result.schema.json"
+        "https://warhammer40k-core.local/contracts/v14/session-command-result.schema.json"
     )
     assert outcome["$id"] == (
-        "https://warhammer40k-core.local/contracts/v13/session-command-outcome.schema.json"
+        "https://warhammer40k-core.local/contracts/v14/session-command-outcome.schema.json"
     )
     assert (
         _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
         == SESSION_METADATA_SCHEMA_VERSION
-        == "session-metadata-v13-contract"
+        == "session-metadata-v14-contract"
     )
     assert (
         _json_object(_json_object(result["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_RESULT_SCHEMA_VERSION
-        == "session-command-result-v13-contract"
+        == "session-command-result-v14-contract"
     )
     assert (
         _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
         == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
-        == "session-command-outcome-v13-contract"
+        == "session-command-outcome-v14-contract"
     )
     assert (
         _json_object(_json_object(projection["properties"])["schema_version"])["const"]

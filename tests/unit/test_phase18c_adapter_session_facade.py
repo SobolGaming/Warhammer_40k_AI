@@ -4,7 +4,13 @@ import json
 from dataclasses import dataclass, replace
 from typing import cast
 
+import pytest
 from tests.deployment_submission_helpers import deployment_placement_payload_for_request
+from tests.order32_visibility_helpers import counterexample_session
+from tests.phase13b_shooting_declaration_helpers import (
+    _attack_step_payloads,
+    _proposal_from_request,
+)
 
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -28,6 +34,7 @@ from warhammer40k_core.adapters.ui import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.attack_sequence import AttackSequenceStep
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -46,6 +53,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -81,6 +89,85 @@ class DeploymentPayloadGenerator:
         assert request.decision_type == SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE
         assert view["viewer_player_id"] == request.actor_id
         return deployment_placement_payload_for_request(self.session.lifecycle, request=request)
+
+
+@pytest.mark.parametrize("kind", ["opening", "partial"])
+def test_p06c_continuous_counterexamples_complete_shooting_and_exact_session_replay(
+    kind: str,
+) -> None:
+    session, attacker_id, target_id = counterexample_session(kind)
+    selection = _decision_request(session.advance_until_decision_or_terminal())
+    shooting_type = _decision_request(
+        session.submit_option(
+            request_id=selection.request_id, option_id=attacker_id, result_id="order32:select"
+        )
+    )
+    declaration = _decision_request(
+        session.submit_option(
+            request_id=shooting_type.request_id,
+            option_id=ShootingType.NORMAL.value,
+            result_id="order32:normal",
+        )
+    )
+    # Old sampling makes the opening target illegal and misses the partial
+    # target's Cover. A real declaration and Hit result exercise both consumers.
+    proposal = _proposal_from_request(request=declaration, target_unit_id=target_id)
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    for viewer in ("player-a", "player-b"):
+        assert restored.view(viewer_player_id=viewer) == session.view(viewer_player_id=viewer)
+    unchanged = session.lifecycle.to_payload()
+    malformed = dict(proposal.to_payload())
+    malformed["visibility_cache_key"] = "los:stale"
+    invalid = session.submit_parameterized_payload(
+        request_id=declaration.request_id,
+        payload=cast(JsonValue, malformed),
+        result_id="order32:stale",
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == unchanged
+    malformed.pop("visibility_cache_key")
+    invalid = session.submit_parameterized_payload(
+        request_id=declaration.request_id,
+        payload=cast(JsonValue, malformed),
+        result_id="order32:malformed",
+    )
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == unchanged
+    status = session.submit_parameterized_payload(
+        request_id=declaration.request_id,
+        payload=cast(JsonValue, proposal.to_payload()),
+        result_id="order32:declare",
+    )
+    for index in range(32):
+        if any(
+            event.event_type == "attack_sequence_completed"
+            for event in session.lifecycle.decision_controller.event_log.records
+        ):
+            break
+        request = _decision_request(status)
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=request.options[0].option_id,
+            result_id=f"order32:attack:{index}",
+        )
+    else:
+        pytest.fail("The shooting attack did not complete through facade submissions.")
+    hits = _attack_step_payloads(session.lifecycle, AttackSequenceStep.HIT)
+    assert hits
+    assert all(cast(dict[str, object], hit["payload"])["target_number"] == 4 for hit in hits)
+    # Persistence verification replays every decision and checks exact RNG,
+    # state, deterministic records and event-log hashes through the same facade.
+    final_checkpoint = json.loads(json.dumps(session.to_persistence_payload(), sort_keys=True))
+    replayed = LocalGameSession.from_persistence_payload(final_checkpoint)
+    assert replayed.lifecycle.to_payload() == session.lifecycle.to_payload()
+    for viewer in ("player-a", "player-b"):
+        view = session.view(viewer_player_id=viewer)
+        delta = session.events_since(EventStreamCursor(), viewer_player_id=viewer)
+        assert replayed.view(viewer_player_id=viewer) == view
+        assert replayed.events_since(EventStreamCursor(), viewer_player_id=viewer) == delta
+        assert validate_json_value(json.loads(json.dumps(delta))) == delta
+        assert "0x" not in json.dumps(view)
 
 
 def test_local_game_session_satisfies_shared_adapter_session_protocol() -> None:

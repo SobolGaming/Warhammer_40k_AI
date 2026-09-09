@@ -4094,7 +4094,7 @@ def test_infractors_excessive_assault_does_not_enter_ranged_reroll_path() -> Non
         source_datasheet_id="000004080",
         phase=BattlePhase.SHOOTING,
         with_icon=False,
-        game_id="infractors-excessive-assault-ranged-v3-000",
+        game_id="order32-infractors-ranged-0",
     )
     state = session.lifecycle.state
     assert state is not None
@@ -4203,8 +4203,8 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     ),
     [
         ("icon-lifecycle-p02-1", False, True, "applied"),
-        ("icon-of-excess-fail-10", False, False, None),
-        ("icon-cap-outcome-3", True, True, "capped"),
+        ("order32-icon-failed-2", False, False, None),
+        ("order32-icon-capped-0", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(

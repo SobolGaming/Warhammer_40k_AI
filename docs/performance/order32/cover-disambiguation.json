@@ -1,0 +1,22 @@
+{
+  "record_id": "COV32-01",
+  "status": "resolved_by_repository_owner",
+  "decision_date": "2026-09-08",
+  "category_rule": "13.08 Benefit of Cover; 06.01 Visibility",
+  "provider": "40k.app",
+  "url": "https://www.40k.app/rules/13-terrain",
+  "app_version": null,
+  "app_build": null,
+  "platform": "Web mirror observation; Codex task owner response",
+  "locale": "English transcription; official App locale not supplied",
+  "observation_timestamp": "2026-09-08; exact owner-response timestamp not retained",
+  "ambiguity": "Whether independently sufficient terrain still causes incomplete visibility when a third model independently hides the same target part.",
+  "affected_finding_ids": ["COV32-01", "C06-03", "P06C"],
+  "owner_question": "The visibility sources leave one Cover edge case unclear: terrain and a third model each independently hide the same target part. Should that terrain still grant Cover? Order 32 requires source ambiguities to be resolved, so I need a ruling before implementing this case; geometry and performance work can continue.",
+  "owner_answer_verbatim": "Yes: terrain independently hiding the part is enough.",
+  "chosen_interpretation": "A selected terrain group qualifies when it independently hides a self-facing target part, or when one and the same self-facing target part is hidden with all blockers and becomes visible after removing that terrain group. Different parts may use different observer origins. Merely blocking an alternative origin does not qualify.",
+  "supersession_scope": "Order 32 source-group attribution for incomplete visibility. Existing model-by-model Cover eligibility and source-specific gates continue to apply.",
+  "official_app_comparison": "No official App capture or comparison was supplied. This is an explicit project-owner interpretation, not additional official source evidence.",
+  "capture_artifact": null,
+  "regression": "tests/unit/test_phase13a_visibility_cover.py::test_p06c_cover_attributes_independent_joint_and_incidental_terrain"
+}

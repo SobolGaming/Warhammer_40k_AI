@@ -37,6 +37,14 @@ from warhammer40k_core.core.ruleset_descriptor import (
     battle_phase_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.visibility import (
+    BenefitOfCoverResult,
+    CoverSourceReason,
+    CoverSourceRecord,
+    LineOfSightWitness,
+    TerrainVisibilityContext,
+    VisibilityBlockerKind,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
     DamageProfile,
@@ -281,14 +289,6 @@ from warhammer40k_core.geometry.measurement import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
-from warhammer40k_core.geometry.visibility import (
-    BenefitOfCoverResult,
-    CoverSourceReason,
-    CoverSourceRecord,
-    LineOfSightWitness,
-    TerrainVisibilityContext,
-    VisibilityBlockerKind,
-)
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:

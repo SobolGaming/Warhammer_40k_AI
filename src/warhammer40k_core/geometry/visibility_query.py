@@ -10,9 +10,13 @@ from warhammer40k_core.geometry.terrain import (
     terrain_volume_from_payload,
 )
 from warhammer40k_core.geometry.visibility_corridor import (
-    line_of_sight_corridor_bounds,
     line_of_sight_corridor_intersects_model,
     line_of_sight_corridor_intersects_terrain_volume,
+)
+from warhammer40k_core.geometry.visibility_shapes import (
+    model_visibility_prism,
+    rational_point,
+    terrain_visibility_prism,
 )
 from warhammer40k_core.geometry.volume import Model, ModelPayload
 
@@ -405,43 +409,14 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
 
 
 def _terrain_broad_phase_intersects(ray: VisibilityRay, terrain: TerrainVolume) -> bool:
-    start, end = ray
-    return _bounds_overlap(
-        line_of_sight_corridor_bounds(start, end),
-        (*terrain.horizontal_bounds(), *terrain.vertical_interval()),
+    return terrain_visibility_prism(terrain).corridor_bounds_overlap(
+        rational_point(ray[0]),
+        rational_point(ray[1]),
     )
 
 
 def _model_broad_phase_intersects(ray: VisibilityRay, model: Model) -> bool:
-    radius = model.base.max_radius()
-    model_bounds = (
-        model.pose.position.x - radius,
-        model.pose.position.y - radius,
-        model.pose.position.x + radius,
-        model.pose.position.y + radius,
-        *model.volume.vertical_interval(model.pose),
-    )
-    return _bounds_overlap(line_of_sight_corridor_bounds(ray[0], ray[1]), model_bounds)
-
-
-def _bounds_overlap(
-    segment_bounds: tuple[float, float, float, float, float, float],
-    obstacle_bounds: tuple[float, float, float, float, float, float],
-) -> bool:
-    min_x, min_y, max_x, max_y, min_z, max_z = segment_bounds
-    (
-        obstacle_min_x,
-        obstacle_min_y,
-        obstacle_max_x,
-        obstacle_max_y,
-        obstacle_min_z,
-        obstacle_max_z,
-    ) = obstacle_bounds
-    return (
-        max_x >= obstacle_min_x
-        and min_x <= obstacle_max_x
-        and max_y >= obstacle_min_y
-        and min_y <= obstacle_max_y
-        and max_z >= obstacle_min_z
-        and min_z <= obstacle_max_z
+    return model_visibility_prism(model).corridor_bounds_overlap(
+        rational_point(ray[0]),
+        rational_point(ray[1]),
     )

@@ -87,7 +87,7 @@ SHOOTING_TARGETING = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting_targeting.py"
 )
 SHOOTING_TARGETS = ROOT / "src" / "warhammer40k_core" / "engine" / "shooting_targets.py"
-VISIBILITY = ROOT / "src" / "warhammer40k_core" / "geometry" / "visibility.py"
+VISIBILITY = ROOT / "src" / "warhammer40k_core" / "core" / "visibility.py"
 VISIBILITY_QUERY = ROOT / "src" / "warhammer40k_core" / "geometry" / "visibility_query.py"
 TERRAIN_AREA_VISIBILITY = (
     ROOT / "src" / "warhammer40k_core" / "geometry" / "terrain_area_visibility.py"
@@ -1270,6 +1270,16 @@ def test_attack_and_stratagem_target_geometry_share_retained_presence() -> None:
 
 
 def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> None:
+    selection_visibility = _function_node(
+        path=CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT,
+        function_name="selection_visibility_conditions_apply",
+    )
+    observer_attributes = {
+        node.attr for node in ast.walk(selection_visibility) if isinstance(node, ast.Attribute)
+    }
+    assert "rules_present_components" in observer_attributes
+    assert not observer_attributes & {"is_alive", "living_components"}
+
     living_range_consumers = {
         ENGINE / "primary_mission_action_lifecycle_policy.py",
         ENGINE / "primary_mission_action_options.py",
@@ -1362,9 +1372,14 @@ def test_p06a_all_line_of_sight_blockers_use_the_shared_one_millimeter_corridor(
 
     assert "line_of_sight_corridor_intersects_terrain_volume" in query_source
     assert "line_of_sight_corridor_intersects_model" in query_source
-    assert "line_of_sight_corridor_bounds" in query_source
-    assert "line_of_sight_corridor_intersects_polygon" in visibility_source
-    assert "line_of_sight_corridor_intersects_terrain_area" in visibility_source
+    assert "corridor_bounds_overlap" in query_source
+    assert "model_visibility_prism" in query_source
+    assert "terrain_visibility_prism" in query_source
+    assert "resolve_visibility_pair" in visibility_source
+    assert "polygon_visibility_prism" in visibility_source
+    assert "model_visibility_prism" in visibility_source
+    assert "terrain_visibility_prism" in visibility_source
+    assert "_sample_rays_for_target" not in visibility_source
     assert "line_of_sight_corridor_intersects_polygon_union" in terrain_area_source
 
     forbidden_zero_width_calls = (
@@ -1387,6 +1402,13 @@ def test_p06a_all_line_of_sight_blockers_use_the_shared_one_millimeter_corridor(
         "warhammer40k_core.geometry.shapely_backend",
         "warhammer40k_core.geometry.visibility_corridor",
         "warhammer40k_core.geometry.visibility_query",
+        "warhammer40k_core.geometry.continuous_visibility",
+        "warhammer40k_core.geometry.visibility_formulas",
+        "warhammer40k_core.geometry.visibility_planar",
+        "warhammer40k_core.geometry.visibility_exact",
+        "warhammer40k_core.geometry.visibility_certificates",
+        "warhammer40k_core.geometry.visibility_witnesses",
+        "warhammer40k_core.geometry.visibility_occlusion",
     }
     engine_bypasses: list[str] = []
     for path in sorted(ENGINE.rglob("*.py")):

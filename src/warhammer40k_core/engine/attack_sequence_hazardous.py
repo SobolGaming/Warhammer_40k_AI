@@ -569,10 +569,7 @@ def _cover_for_allocated_model(
         terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
         terrain_volumes=terrain_volumes,
         dynamic_model_blockers=dynamic_blockers,
-        observer_keywords=unit_by_id(
-            state=state,
-            unit_instance_id=attacking_unit_id,
-        ).keywords,
+        observer_keywords=attacker_model.keywords,
         target_model_keywords=model_visibility_keywords_for_rules_unit(
             rules_unit=target_rules_unit,
             models=target_geometries,
@@ -644,10 +641,7 @@ def _fortification_cover_for_allocated_model(
             terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
             terrain_volumes=terrain_volumes,
             dynamic_model_blockers=dynamic_blockers,
-            observer_keywords=unit_by_id(
-                state=state,
-                unit_instance_id=attacking_unit_id,
-            ).keywords,
+            observer_keywords=attacker_model.keywords,
             target_model_keywords=model_visibility_keywords_for_rules_unit(
                 rules_unit=rules_unit_view_by_id(
                     state=state,
@@ -661,7 +655,16 @@ def _fortification_cover_for_allocated_model(
             state=state,
             witness=witness,
         )
-        if not fortification_blocker_ids:
+        if not fortification_blocker_ids or not context.not_fully_visible_because_of(
+            witness,
+            target_model_id=target_geometry.model_id,
+            sources=tuple(
+                record
+                for record in witness.all_blocker_records()
+                if record.blocker_kind is VisibilityBlockerKind.MODEL
+                and record.blocker_id in fortification_blocker_ids
+            ),
+        ):
             continue
         blocker_witness = witness
         for blocker_id in fortification_blocker_ids:
