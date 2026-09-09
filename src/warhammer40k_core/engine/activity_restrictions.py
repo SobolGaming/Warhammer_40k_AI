@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Final, Literal
 
 import msgspec
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.game_state import GameState
 
-ACTIVITY_RESTRICTION_KIND = "core_unit_activity_restriction"
+ACTIVITY_RESTRICTION_KIND: Final = "core_unit_activity_restriction"
 ActivityKind = Literal["started_action", "completed_shooting"]
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import json
 from pathlib import Path
+from typing import cast
 
 from tools.build_core_actions_source import ARTIFACT_PATH, AUDIT_PATH, build_payloads
 
@@ -72,7 +73,25 @@ def test_action_restriction_slice_stays_within_versioned_work_budgets() -> None:
     assert result["action_count"] == 1
     counts = result["work_counts"]
     assert isinstance(counts, dict)
+    counts = cast(dict[str, int], counts)
     assert counts["record_persisting_effect"] == 1
     assert counts["expire_persisting_effects_at_boundary"] == 4
     for metric, maximum in budgets["work_limits"].items():
         assert counts.get(metric, 0) <= maximum, (metric, counts)
+
+
+def test_shooting_unit_selection_has_engine_preflight_before_recording() -> None:
+    tree = ast.parse((ENGINE / "lifecycle_shooting_prevalidation.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "invalid_shooting_unit_selection_status"
+        for node in ast.walk(tree)
+    )
+    lifecycle = ast.parse((ENGINE / "lifecycle.py").read_text())
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "pre_validate_shooting_decision"
+        for node in ast.walk(lifecycle)
+    )

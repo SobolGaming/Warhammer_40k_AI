@@ -6973,7 +6973,7 @@ def _complete_current_command_for_fixture(lifecycle: GameLifecycle) -> GameLifec
 
 def _advance_battle_phase_for_fixture(lifecycle: GameLifecycle) -> None:
     from warhammer40k_core.engine.battle_round_flow import (
-        _emit_objective_control_boundary_event_if_missing,
+        _emit_objective_control_boundary_event_if_missing,  # pyright: ignore[reportPrivateUsage]
     )
 
     state = _state(lifecycle)

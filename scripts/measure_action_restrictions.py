@@ -42,6 +42,7 @@ def sample(*, profile: bool) -> dict[str, object]:
         request=request, result_id="order34-benchmark-action", selected_option_id=option.option_id
     )
     actor = request.actor_id
+    assert actor is not None
     unit = next(
         unit for army in state.army_definitions if army.player_id == actor for unit in army.units
     )

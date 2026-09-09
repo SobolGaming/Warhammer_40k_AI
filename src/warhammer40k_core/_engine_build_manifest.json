@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:75423bbf2a0c7d17b18cfa1afdac31fdaad7413f0e5cc6d4d23e0acd45fd5b84",
-  "fingerprint": "75423bbf2a0c7d17b18cfa1afdac31fdaad7413f0e5cc6d4d23e0acd45fd5b84",
-  "resource_count": 2633,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:20c4936dd7bd8d8389479df6d70bf5e28de6217fad8cfa9f8e9729725681a285",
+  "fingerprint": "20c4936dd7bd8d8389479df6d70bf5e28de6217fad8cfa9f8e9729725681a285",
+  "resource_count": 2634,
   "resources": [
     {
       "byte_length": 113,
@@ -605,9 +605,9 @@
       "sha256": "676863600dd4704cd13e3c3b39a945e0c9fc3de165478bd2f35318a8a46dd6f7"
     },
     {
-      "byte_length": 8165,
+      "byte_length": 8179,
       "path": "warhammer40k_core/engine/activity_restrictions.py",
-      "sha256": "3778b7765b6cf0e540267fe37c5dc4e15317626bc358de6f04a8d51e0a0686d0"
+      "sha256": "8c9a9b29d6f9393d934d1f2a96515aca91b249a6098936fcee39b2aa4de33b69"
     },
     {
       "byte_length": 6553,
@@ -9640,9 +9640,9 @@
       "sha256": "60d3f4301684c2b7e40e551b9ec1fe9116e38dbace4b1504d9bb68679e53b8d4"
     },
     {
-      "byte_length": 161582,
+      "byte_length": 159534,
       "path": "warhammer40k_core/engine/lifecycle.py",
-      "sha256": "228b0a08dad5f16b101ed5a9a91f23755d4210d787060fad2ecae0b1e2d72765"
+      "sha256": "7d5bb8f1642c34236841bfdc2bc545a1ca414a0e4cbf64daaa80f08fdbeee136"
     },
     {
       "byte_length": 6643,
@@ -9688,6 +9688,11 @@
       "byte_length": 9218,
       "path": "warhammer40k_core/engine/lifecycle_setup_reactive.py",
       "sha256": "47de33b0009c21eb3f39e08fdc50ff53103371124cef068709a73ab514a0aac0"
+    },
+    {
+      "byte_length": 3469,
+      "path": "warhammer40k_core/engine/lifecycle_shooting_prevalidation.py",
+      "sha256": "90238f697a5a79d50185e75676810542a7d048455111a62b6a800a1f6e9266ac"
     },
     {
       "byte_length": 2524,
@@ -10150,9 +10155,9 @@
       "sha256": "fc52438b3853f6e44589db8daeefb6e1a621427781b5731a9fa530c0a36e4c30"
     },
     {
-      "byte_length": 54616,
+      "byte_length": 56279,
       "path": "warhammer40k_core/engine/phases/shooting_handler.py",
-      "sha256": "51ec62c12ee48f05eacff80d664ea3db705a4ca9d949429d11346ed8cb8baf66"
+      "sha256": "12d99245e3c64e626be0944d664bf02d4b53dc09c4ef64000956c92ebdeca31c"
     },
     {
       "byte_length": 16722,

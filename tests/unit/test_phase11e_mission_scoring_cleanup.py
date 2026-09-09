@@ -7403,6 +7403,38 @@ def test_order34_action_restriction_survives_phase_and_action_status(
     )
 
 
+@pytest.mark.parametrize("corruption", ["schema", "activity_id", "source", "effect_id", "duration"])
+def test_order34_activity_restriction_restore_rejects_forged_source_or_duration(
+    corruption: str,
+) -> None:
+    lifecycle = _battle_lifecycle_with_player_a_vehicle()
+    state = lifecycle.state
+    assert state is not None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    _start_mission_action_via_lifecycle(
+        lifecycle=lifecycle, target_suffix="center", result_id="order34-restore-source"
+    )
+    payload = json.loads(json.dumps(lifecycle.to_payload()))
+    effect = next(
+        row
+        for row in payload["state"]["persisting_effects"]
+        if row["effect_id"].startswith("activity-restriction:")
+    )
+    if corruption == "schema":
+        effect["effect_payload"]["unrecognized_field"] = True
+    elif corruption == "activity_id":
+        effect["effect_payload"]["activity_id"] = ""
+    elif corruption == "source":
+        effect["source_rule_id"] = "order34:forged-source"
+    elif corruption == "effect_id":
+        effect["effect_id"] = "order34:forged-effect"
+    else:
+        effect["expiration"]["expiration_kind"] = "end_phase"
+        effect["expiration"]["phase"] = "shooting"
+    with pytest.raises(GameLifecycleError, match="Activity restriction"):
+        GameLifecycle.from_payload(payload)
+
+
 def test_titanic_action_unit_remains_eligible_to_shoot() -> None:
     lifecycle = _battle_lifecycle(
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),

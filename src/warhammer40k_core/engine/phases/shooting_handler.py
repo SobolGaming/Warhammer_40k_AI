@@ -487,6 +487,45 @@ class ShootingPhaseHandler:
             )
         return None
 
+    def invalid_shooting_unit_selection_status(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        if request.decision_type != SELECT_SHOOTING_UNIT_DECISION_TYPE:
+            raise GameLifecycleError(
+                "Shooting unit prevalidation received unsupported decision_type."
+            )
+        shooting_state = state.shooting_phase_state
+        if shooting_state is None:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Shooting unit selection has no active phase state.",
+                payload={"invalid_reason": "shooting_unit_wrong_context"},
+            )
+        legal_unit_ids = _legal_shooting_unit_ids(
+            state=state,
+            shooting_state=shooting_state,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            army_catalog=_army_catalog_for_handler(self),
+            shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+        )
+        options = _shooting_unit_options(
+            state=state, unit_ids=legal_unit_ids, include_complete=True
+        )
+        selected = next(
+            (option for option in options if option.option_id == result.selected_option_id), None
+        )
+        if selected is None or selected.payload != result.payload:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Shooting unit selection is no longer legal.",
+                payload={"invalid_reason": "shooting_unit_option_drift"},
+            )
+        return None
+
     def invalid_shooting_type_selection_status(
         self,
         *,

@@ -966,8 +966,8 @@
         "identity_id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
       },
       "engine_build": {
-        "identity_hash": "1f3b6090c58910947913fe004f148f6a5c77d3f07a819e0894fd58035e9090ac",
-        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:75423bbf2a0c7d17b18cfa1afdac31fdaad7413f0e5cc6d4d23e0acd45fd5b84"
+        "identity_hash": "d703084ff0cba179bfbea58c8ab0009a881cd8a08699c4abb31469b73c892c0c",
+        "identity_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:20c4936dd7bd8d8389479df6d70bf5e28de6217fad8cfa9f8e9729725681a285"
       },
       "mission_pack": {
         "identity_hash": "486eb3726e50b8188081381c97d2ff073bdd8d3bb5c7593c79b1d9b581b92a62",

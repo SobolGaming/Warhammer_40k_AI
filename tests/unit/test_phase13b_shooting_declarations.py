@@ -19548,6 +19548,70 @@ def test_order34_completed_shooting_restricts_actions_through_exact_phase_bounda
         assert SHOOTER in current.shooting_phase_state.shot_unit_ids
 
 
+@pytest.mark.parametrize("pending_step", ["unit", "type", "declaration"])
+def test_order34_pending_shooting_revalidates_action_restriction_before_queue_pop(
+    pending_step: str,
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        SHOOTER,
+        TARGET,
+        indirect_session,
+        select_indirect_declaration,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.actions import MissionActionState
+
+    session = indirect_session(observer=True)
+    request = pending_request(session)
+    if pending_step == "declaration":
+        request = select_indirect_declaration(session, ShootingType.NORMAL)
+    elif pending_step == "type":
+        session.submit_option(
+            request_id=request.request_id, result_id="order34-stale-select", option_id=SHOOTER
+        )
+        request = pending_request(session)
+    state = _state(session.lifecycle)
+    # A typed, engine-owned accepted-start fixture simulates authoritative drift
+    # after option/declaration enumeration, before this adapter submits its choice.
+    state.record_mission_action_state(
+        MissionActionState.start(
+            action_id="order34-stale-action",
+            mission_action_id="cleanse-objective",
+            player_id="player-a",
+            unit_instance_id=SHOOTER,
+            target_id="order34-objective",
+            condition_target_id="order34-objective",
+            mission_id="cleanse",
+            battle_round=state.battle_round,
+            phase=BattlePhase.SHOOTING.value,
+            start_timing="shooting_phase",
+            completion_timing="turn_end",
+            eligible_unit_instance_ids=(SHOOTER,),
+            interruption_conditions=("unit_moved", "unit_destroyed", "unit_left_battlefield"),
+            scoring_source_id="cleanse",
+            victory_points=0,
+        )
+    )
+    before = session.lifecycle.to_payload()
+    if pending_step == "declaration":
+        proposal = _proposal_from_request(request=request, target_unit_id=TARGET)
+        status = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            result_id="order34-stale-declaration",
+            payload=validate_json_value(proposal.to_payload()),
+        )
+    else:
+        status = session.submit_option(
+            request_id=request.request_id,
+            result_id="order34-stale-option",
+            option_id=SHOOTER if pending_step == "unit" else "normal",
+        )
+    assert status.status_kind is LifecycleStatusKind.INVALID, status
+    assert session.lifecycle.to_payload() == before
+    assert session.lifecycle.decision_controller.queue.peek_next() == request
+
+
 def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -> None:
     from tests.indirect_shooting_helpers import (
         INDIRECT_PROFILE,

@@ -39,6 +39,21 @@ The implementation reuses persistent effects and exact expiry, rather than
 creating a second activity ledger. Later Snap/Overwatch timing, critical-hit,
 Heavy, and Firing Deck obligations remain outside this Order.
 
+The stale-request regression additionally exposed Shooting-unit selection
+rejecting a newly illegal unit only after queue pop. Shooting preflight is now
+extracted from the frozen lifecycle module and validates current finite options
+before recording. Type selection, declarations and charge selection already
+have that preflight path. The new regression covers unit, type and declaration
+checkpoints with unchanged state, queue, records and resources on rejection.
+The existing Order 33 work budgets still pass without threshold changes.
+
+Fixture updates replace manually populated ordinary shot flags with actual
+LocalGameSession shooting. The Stratagem fixture's direct phase advancement now
+emits its existing Objective Control boundary before its scoring checkpoint;
+this is needed for strict standalone restoration and does not change runtime
+scoring. Attached Action assertions now distinguish the next player's turn
+when the facade automatically completes the starting player's activations.
+
 ## Execution and publication
 
 The Order 33 runner was reused at `/private/tmp/order34-evidence/run.py`.
