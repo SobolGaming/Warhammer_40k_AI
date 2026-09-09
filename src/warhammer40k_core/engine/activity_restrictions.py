@@ -154,6 +154,32 @@ def _record_restriction(
     phase: BattlePhase,
     expiration: EffectExpiration,
 ) -> None:
+    state.record_persisting_effect(
+        build_activity_restriction(
+            owner_player_id=rules_unit.owner_player_id,
+            target_unit_instance_ids=tuple(
+                sorted({rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids})
+            ),
+            activity=activity,
+            activity_id=activity_id,
+            battle_round=battle_round,
+            phase=phase,
+            expiration=expiration,
+        )
+    )
+
+
+def build_activity_restriction(
+    *,
+    owner_player_id: str,
+    target_unit_instance_ids: tuple[str, ...],
+    activity: ActivityKind,
+    activity_id: str,
+    battle_round: int,
+    phase: BattlePhase,
+    expiration: EffectExpiration,
+) -> PersistingEffect:
+    """Use identical source and duration encoding for live and historical state."""
     action = activity == "started_action"
     effect = PersistingEffect(
         effect_id=f"activity-restriction:{activity}:{activity_id}",
@@ -162,10 +188,8 @@ def _record_restriction(
             if action
             else RESTRICTION_POLICY.after_shooting_descriptor_id
         ),
-        owner_player_id=rules_unit.owner_player_id,
-        target_unit_instance_ids=tuple(
-            sorted({rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids})
-        ),
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=target_unit_instance_ids,
         started_battle_round=battle_round,
         started_phase=phase,
         expiration=expiration,
@@ -185,7 +209,7 @@ def _record_restriction(
         ),
     )
     activity_restriction_payload(effect)
-    state.record_persisting_effect(effect)
+    return effect
 
 
 def record_mission_action_state(*, state: GameState, action: MissionActionState) -> None:

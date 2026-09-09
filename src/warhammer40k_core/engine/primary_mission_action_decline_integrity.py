@@ -769,6 +769,8 @@ def _validate_evidence_at_request(
     boundary_state = primary_mission_action_boundary_state_from_checkpoint(
         state=state,
         checkpoint=checkpoint,
+        event_records=event_records,
+        checkpoint_event_id=evidence.checkpoint_reference.checkpoint_event_id,
     )
     validate_recomputed_primary_mission_action_opportunity_authority(
         state=boundary_state,

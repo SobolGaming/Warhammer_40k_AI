@@ -54,6 +54,18 @@ this is needed for strict standalone restoration and does not change runtime
 scoring. Attached Action assertions now distinguish the next player's turn
 when the facade automatically completes the starting player's activations.
 
+The first aggregate run exposed a required historical consumer: Primary Mission
+checkpoint reconstruction inherited current activity effects. The shared
+reconstruction path now rebuilds these effects from authenticated prior Action
+uses and the exact completed-attack event prefix, using the same effect builder.
+Accepted-start, declined-opportunity and pending-request integrity all consume it.
+An added regression restores earlier completed-shooting eligibility after the
+current effect expires, and verifies that reconstruction does not mutate current
+state. The existing coordinated shooting-history forgery now completes its real
+attack sequence and erases the new activity effect as part of the tested forgery.
+Its deterministic declaration ID gives a no-damage outcome so unrelated damage
+anchors do not precede the intended historical-inventory rejection.
+
 ## Execution and publication
 
 The Order 33 runner was reused at `/private/tmp/order34-evidence/run.py`.

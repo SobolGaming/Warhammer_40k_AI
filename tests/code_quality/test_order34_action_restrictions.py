@@ -95,3 +95,24 @@ def test_shooting_unit_selection_has_engine_preflight_before_recording() -> None
         and node.func.id == "pre_validate_shooting_decision"
         for node in ast.walk(lifecycle)
     )
+
+
+def test_historical_action_consumers_supply_exact_checkpoint_event_authority() -> None:
+    for name in (
+        "mission_action_options.py",
+        "primary_mission_action_integrity.py",
+        "primary_mission_action_decline_integrity.py",
+        "primary_mission_pending_request_integrity.py",
+    ):
+        tree = ast.parse((ENGINE / name).read_text())
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "primary_mission_action_boundary_state_from_checkpoint"
+        ]
+        assert len(calls) == 1, name
+        assert {"event_records", "checkpoint_event_id"} <= {
+            keyword.arg for keyword in calls[0].keywords
+        }, name

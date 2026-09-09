@@ -1302,7 +1302,10 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   retained components and separation. Merely offering, declining or rejecting a
   request records neither activity. Existing finite/parameterized submissions,
   engine validation and viewer scoping remain the contract; no new decision or
-  adapter mutation path is introduced. Immediate zero-VP actions complete in the same
+  adapter mutation path is introduced. Historical Action-request validation rebuilds
+  activity effects from the exact checkpoint's prior-use evidence and preceding
+  completed-attack events; it cannot inherit later effects or lose expired history.
+  Immediate zero-VP actions complete in the same
   decision handler without creating a VP transaction; Booby Trap records an
   engine-owned terrain trap state for later primary scoring and Plunder records
   an engine-owned terrain plunder state for later secondary scoring. Turn-end

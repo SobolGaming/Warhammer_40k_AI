@@ -1310,7 +1310,7 @@ def test_source_authority_registry_is_pinned_typed_and_tamper_evident() -> None:
     assert scope.edition == "warhammer_40000_11th"
     assert scope.corpus == "core_rules_categories_01_25"
     assert len(scope.legacy_observations) == 33
-    assert len(scope.source_packages) == 21
+    assert len(scope.source_packages) == 22
     with pytest.raises(SourceAuthorityRegistryError, match="drifted from their reviewed pin"):
         load_source_authority_registry_from_json_bytes(raw + b"\n")
 
@@ -2105,7 +2105,7 @@ def test_p15df_core_stratagem_app_source_is_hash_pinned_and_truthful() -> None:
 
     assert hashlib.sha256(raw).hexdigest() == (core_stratagems_2026_08.EXPECTED_ARTIFACT_SHA256)
     assert core_stratagems_2026_08.PACKAGE_HASH == (
-        "f373b194b005a56b5caa0f52f540e26ddee45655ac9e89e8f8e85d4d642616d7"
+        "65110e9292beae53778b0d3955c7633c0c692d29925f892d1f1d73d03f9325a9"
     )
     assert [(rule.section_id, rule.title) for rule in rules] == [
         ("15.05", "Crushing Impact"),

@@ -255,6 +255,8 @@ def _validate_authoritative_action_request(
     boundary_state = primary_mission_action_boundary_state_from_checkpoint(
         state=state,
         checkpoint=checkpoint,
+        event_records=decisions.event_log.records,
+        checkpoint_event_id=checkpoint_reference.checkpoint_event_id,
     )
     battlefield = boundary_state.battlefield_state
     if battlefield is None:
