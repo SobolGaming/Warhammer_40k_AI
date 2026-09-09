@@ -1,0 +1,81 @@
+{
+  "base_sha": "a1e66ec7d7c1ca05398e30d51ca61d1b62cd7332",
+  "before_fix": {
+    "duration_seconds": 11.57,
+    "failed_retained_cases": 2,
+    "passed_ordinary_casualty_controls": 2
+  },
+  "behavioral": {
+    "branch_coverage_percent": 85.04,
+    "coverage_threshold_percent": 85,
+    "duration_seconds": 451.922,
+    "exit_code": 0,
+    "junit_sha256": "2025c0e33a1904a626d55d29d9fa6c6dcec10ec5922196bcd4a92465d7d07b2c",
+    "local_socket_permission": true,
+    "passed": 6846,
+    "retries": 0,
+    "xdist": "auto/worksteal"
+  },
+  "classification": "Pre-existing retained-only observer exclusion; Order 32 consumer completeness gap.",
+  "code_quality": {
+    "coverage": false,
+    "duration_seconds": 105.748,
+    "exit_code": 0,
+    "junit_sha256": "c1af12c0065cb07b8838b142bc2a683156cfd90e9848f4a837d3f17c48512df9",
+    "passed": 394,
+    "xdist": "auto/worksteal"
+  },
+  "conformance_replay_sha256": "e1dbd328761732588a3a324778ebc78e43e93e123df5f195787ea44ab06593e4",
+  "consumer_audit": {
+    "other_equivalent_filters_found": 0,
+    "shared_los_callers": 8,
+    "unchanged_living_only_callers": [
+      "primary_mission_action_options.py",
+      "primary_mission_action_lifecycle_policy.py"
+    ]
+  },
+  "coverage_boundaries": [
+    "standalone retained-only observer",
+    "attached retained-only component and blocked surviving Leader",
+    "explicit this_model and this_unit scope",
+    "ordinary non-retained casualty",
+    "cleanup",
+    "standalone lifecycle and JSON session restoration",
+    "facade damage and retention decisions",
+    "exact retention and cleanup replay",
+    "both viewer projections and redacted events"
+  ],
+  "finding_id": "R32-001",
+  "focused_regression": {
+    "duration_seconds": 21.33,
+    "passed": 4
+  },
+  "focused_related_tests": {
+    "duration_seconds": 86.97,
+    "passed": 81
+  },
+  "independent_review": "Bounded scope, architecture and regression review found no further issue; independent PR re-review remains required.",
+  "passed_checks": [
+    "ruff check .",
+    "ruff format --check .",
+    "mypy src tests (2809 files)",
+    "pyright (0 errors, 0 warnings)",
+    "lint-imports (11 contracts)",
+    "build_test_shards.py --check --shard-count 8",
+    "build_core_other_concepts_source.py --check",
+    "build_engine_build_identity.py --check",
+    "build_external_contract.py --check --base-ref a1e66ec7d7c1ca05398e30d51ca61d1b62cd7332",
+    "npm run check",
+    "npm run test:unit (5 tests)",
+    "npm run conformance (342 assertions)",
+    "smoke_installed_contract_wheel.py (27 schemas, 2628 resources)"
+  ],
+  "performance": "No new performance claim; owner deferral and full-game targets remain unchanged.",
+  "production_change": "Use RulesUnitView.rules_present_components for this_unit visibility observers.",
+  "publication_checks": "Pre-commit and CI status are reported with the PR review reply.",
+  "repair_round": 1,
+  "reviewed_head_sha": "fb82249f4840b3ebdd73e9b515209f7359e05e9b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2aff0715427fe404d6495347eb3a074168c7cc1eeb5be0e9e0df0cda108c0309",
+  "schema_version": "order32-review-repair-validation-v1",
+  "tested_commit": "Reported in the PR review reply; this record pins the tested runtime build."
+}

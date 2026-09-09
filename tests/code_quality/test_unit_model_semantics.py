@@ -1270,6 +1270,16 @@ def test_attack_and_stratagem_target_geometry_share_retained_presence() -> None:
 
 
 def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> None:
+    selection_visibility = _function_node(
+        path=CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT,
+        function_name="selection_visibility_conditions_apply",
+    )
+    observer_attributes = {
+        node.attr for node in ast.walk(selection_visibility) if isinstance(node, ast.Attribute)
+    }
+    assert "rules_present_components" in observer_attributes
+    assert not observer_attributes & {"is_alive", "living_components"}
+
     living_range_consumers = {
         ENGINE / "primary_mission_action_lifecycle_policy.py",
         ENGINE / "primary_mission_action_options.py",

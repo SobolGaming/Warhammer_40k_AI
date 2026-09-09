@@ -14,6 +14,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _scenario_with_unit_pose,
     _state,
 )
+from tests.retained_attack_helpers import lethal_retained_attack_catalog
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryEvidenceKind,
@@ -28,10 +29,158 @@ from warhammer40k_core.core.model_geometry_catalog import (
     ModelHeightDefinition,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+from warhammer40k_core.engine.damage_allocation import (
+    DestructionReactionKind,
+    DestructionReactionSource,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleCondition,
+    RuleConditionKind,
+    RuleTargetKind,
+    RuleTargetSpec,
+    parameters_from_pairs,
+)
+
+
+def retained_observer_session(*, attached: bool) -> tuple[LocalGameSession, str, str]:
+    """A lethal facade shot leaves a retained-only component beside a blocked Leader."""
+    catalog = _compact_intercessor_catalog(lethal_retained_attack_catalog())
+    enemy_specs: tuple[tuple[str, str, str, int], ...] = (
+        ("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 1),
+    )
+    if attached:
+        enemy_specs += (("leader", "core-character-leader", "core-character-leader", 1),)
+    config = _config(
+        game_id=f"r32-retained-observer:{attached}",
+        alpha_unit_ids=("intercessor-1", "intercessor-2"),
+        alpha_datasheets=None,
+        alpha_unit_specs=tuple(
+            (key, "core-intercessor-like-infantry", "core-intercessor-like", 1)
+            for key in ("intercessor-1", "intercessor-2")
+        ),
+        enemy_datasheet=None,
+        enemy_unit_specs=enemy_specs,
+        enemy_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader", bodyguard_unit_selection_id="enemy"
+            ),
+        )
+        if attached
+        else (),
+        catalog=catalog,
+    )
+    display = _display_geometry(
+        center_x_inches=15, center_y_inches=10, width_inches=0.1, depth_inches=2.2
+    )
+    feature = TerrainFeatureDefinition(
+        feature_id="r32-observer-wall",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=15,
+        footprint_center_y_inches=10,
+        footprint_width_inches=0.1,
+        footprint_depth_inches=2.2,
+        rules_footprint_polygon=display.footprint_polygon,
+        display_geometry=display,
+        walls=(TerrainWallDefinition("wall", 15, 10, 0, 0.1, 2.2, 3),),
+        source_id="r32-retained-observer-geometry",
+    )
+    assert config.mission_setup is not None
+    config = replace(
+        config,
+        mission_setup=replace(config.mission_setup, terrain_features=(feature,)),
+        model_geometries=tuple(
+            _analytic_geometry(profile, 0.5)
+            for profile in ("core-intercessor-like", "core-character-leader")
+        ),
+    )
+    armies = _mustered_armies(config)
+    units = {unit.unit_instance_id.split(":", 1)[1]: unit for army in armies for unit in army.units}
+    assert config.mission_setup is not None
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="r32-observer-battlefield",
+        armies=armies,
+        battlefield_width_inches=config.mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=config.mission_setup.battlefield_depth_inches,
+    )
+    poses = {
+        "intercessor-1": (10.0, 10.0),
+        "intercessor-2": (10.0, 30.0),
+        "enemy": (20.0, 13.0),
+        "leader": (20.0, 10.0),
+    }
+    for army in armies:
+        for unit in army.units:
+            key = unit.unit_instance_id.split(":", 1)[1]
+            scenario = _scenario_with_unit_pose(
+                scenario=scenario,
+                unit=unit,
+                army_id=army.army_id,
+                player_id=army.player_id,
+                poses=(Pose.at(*poses[key]),),
+            )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _state(lifecycle)
+    _configure_shooting_battle_state(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        armies=armies,
+        battlefield=replace(scenario.battlefield_state, terrain_features=(feature,)),
+        units=units,
+        embarked_unit_ids=(),
+    )
+    observer_id = units["enemy"].own_models[0].model_instance_id
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=observer_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="r32-retain-observer",
+                source_rule_id="r32-retain-observer",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+            ),
+        ),
+    )
+    return (
+        LocalGameSession(lifecycle=GameLifecycle.from_payload(lifecycle.to_payload())),
+        observer_id,
+        units["intercessor-1"].unit_instance_id,
+    )
+
+
+def visible_enemy_selection(*, observer: str) -> RuleClause:
+    """Typed visibility condition for the real generic target-eligibility consumer."""
+    text = "Select one enemy unit visible to this unit."
+    span = TextSpan(text=text, start=0, end=len(text))
+    return RuleClause(
+        clause_id="r32-visible-enemy",
+        template_id="phase17c:selected-target-constraint",
+        source_span=span,
+        target=RuleTargetSpec(
+            kind=RuleTargetKind.ENEMY_UNIT,
+            source_span=span,
+            parameters=parameters_from_pairs((("allegiance", "enemy"),)),
+        ),
+        conditions=(
+            RuleCondition(
+                kind=RuleConditionKind.VISIBILITY_PREDICATE,
+                source_span=span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("observer", observer),
+                        ("predicate", "visible_to"),
+                        ("target_reference", "selected_unit"),
+                    )
+                ),
+            ),
+        ),
+    )
 
 
 def counterexample_session(kind: str) -> tuple[LocalGameSession, str, str]:

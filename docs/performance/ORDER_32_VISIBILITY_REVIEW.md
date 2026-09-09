@@ -100,7 +100,7 @@ area evidence cannot suppress or substitute for another model's valid evidence.
 | Actual supported shapes | No phantom aperture for thin oval or rectangle; rotation retained | Analytic ellipse and polygon model domains | Phantom-aperture, oblique planar, curved blocker, transformed oval cases |
 | P06A fixed corridor | Exact 1mm width, closed contact, flat caps, actual sloped height | Shared fixed-corridor kernel | Existing P06A regressions plus sloped strip, arc, vertical disk and cap cases |
 | Terrain rules and 13.08 / COV32-01 | Enabled source group causes incompleteness; unit gate is per model | Context, exact area/feature policy, Cover and Hidden | Independent/joint/incidental sources, linked polygons, disabled-area regression |
-| Orders 30/31 | Retained models keep physical presence; observer/target keyword gates remain model-owned | Group presence, targeting, Cover, Hidden, cache identity | Existing retained-presence and Hidden tests; heterogeneous firing-model allocation regression |
+| Orders 30/31 | Retained models keep physical presence, including retained-only observer components; observer/target keyword gates remain model-owned | Group presence, targeting, Cover, Hidden, cache identity | R32-001 facade regression for retained-only and attached observers, cleanup and ordinary casualties; heterogeneous firing-model allocation regression |
 | Determinism and stale state | Cached/uncached answers and fingerprints agree; stale/forged evidence rejected | Bounded preparation/query caches and typed evidence | Geometry/keyword/policy replacements, eviction/reset, malformed exact evidence tests |
 | Shared adapter/replay path | Legal shots, stale/malformed rejection without mutation, exact restored state and both viewers | LocalGameSession and unchanged shared adapters | `test_p06c_continuous_counterexamples_complete_shooting_and_exact_session_replay` |
 | Performance | Preserve evidence; defer further optimization and provisional gates | Owner direction / versioned policy | Baseline and pre-deferral diagnostics retained; no full-game certification |
@@ -258,6 +258,7 @@ Timing values never enter authoritative records.
 | `engine/hidden_detection.py` | Migrated | Solid-terrain causation uses the same full-visibility authority and per-model keywords |
 | `engine/shooting_terrain_visibility.py` | Migrated | Model/area occupancy is analytic; group-aware blocker and retention inventory retained |
 | `engine/rule_target_resolution.py`, `stratagems_geometry.py`, faction ability consumers | Already correct | Shared unit targeting services; direct Thousand Sons observer context uses the manifesting model's keywords |
+| `engine/catalog_selected_target_effects_support.py` | Corrected (R32-001) | Unit-scoped visibility enumerates authenticated `rules_present_components`; a retained-only component can supply LOS while a surviving attached component is blocked |
 | `engine/spatial_index_state.py` / battlefield spatial state | Already correct | Spatial revisions remain inputs; complete context hash additionally protects against same-key drift |
 | `engine/model_destruction_cause_authority.py` | Corrected | Preserve Order 30 restoration for delayed unrelated Hazardous casualty registration; parent/child causality remains required |
 | Local session, UI/headless/network, projections/events and replay | Already correct routing | Same submissions/decisions/mutation; Contract 14 documents nested evidence; exact replay and both-viewer regressions |
@@ -372,6 +373,52 @@ source/build/contract checks, TypeScript checks and five unit tests, **342**
 conformance assertions and the isolated installed-wheel smoke all passed. The
 wheel validated 27 schemas and 2,628 engine resources. The tested commit and CI
 link are provided with the PR; no CI outcome is inferred from these local checks.
+
+## PR review repair: R32-001
+
+Review of head `fb82249f4840b3ebdd73e9b515209f7359e05e9b` found a pre-existing
+visibility-consumer gap: `selection_visibility_conditions_apply` excluded an
+observer component unless it contained a living model. That contradicted the
+Order 30/P05B retained-presence invariant before the continuous authority was
+called. The original consumer inventory and mixed living/retained test did not
+certify this boundary; this entry corrects that completeness claim.
+
+The consumer now uses the existing `RulesUnitView.rules_present_components`
+owner. Its view is resolved from current authenticated retention and fixed
+placement authority. Explicit model scope, ability availability, off-battlefield
+restrictions and the shared visibility query remain unchanged. Ordinary dead
+models are excluded, and cleanup removes their retained authority from fresh
+views. No geometry formula, solver, cache field or persistence shape changes.
+
+The bug-class audit inspected all eight shared LOS callers. No second equivalent
+prefilter was found. Primary Mission Action callers explicitly require living
+models; those restrictions remain. The static LOS policy audit now rejects local
+living-only filtering in this selected-target consumer and requires the shared
+rules-present component owner.
+
+`test_r32_retained_only_observer_eligibility_restores_replays_and_cleans_up` uses
+a real lethal shot, finite retention choice and cleanup through `LocalGameSession`.
+Both standalone and attached retained-only sources must expose the target through
+actual generic eligibility; the attached Leader survives but cannot see it.
+Explicit model scope, declined retention, cleanup, standalone lifecycle restore,
+JSON session persistence, exact replay and both viewers' projections/events are
+checked. Before the fix, both retained variants failed with an empty target tuple;
+both ordinary-casualty controls passed (11.57 seconds).
+
+The repair keeps the existing adapter decision contract and source interpretation.
+The earlier aggregate results above belong to the original head. Repair validation
+is recorded separately in `order32/r32-001-validation.json`; its tested commit and
+CI result accompany the PR reply. Independent re-review of that head is required;
+the finding is not dismissed or self-approved.
+
+The repair's final covered behavioral run passed **6,846 tests** with **85.04%**
+coverage in **451.98 seconds**, with local socket permission and no retries.
+The full code-quality suite passed **394 tests in 105.80 seconds**. All four
+new regression cases and 81 focused related cases pass. Ruff, mypy, pyright,
+import boundaries, shard inventory, generated source/build/contract checks,
+TypeScript checks and unit tests, 342 conformance assertions, and the installed
+wheel smoke passed. The tested runtime build is
+`2aff0715427fe404d6495347eb3a074168c7cc1eeb5be0e9e0df0cda108c0309`.
 
 ## Performance: preserved evidence and explicit deferral
 

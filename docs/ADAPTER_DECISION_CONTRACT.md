@@ -1845,6 +1845,10 @@ Phase 13A terrain visibility, line of sight, and cover foundation does not creat
 
 Order 32 replaces sampled model-visibility evidence with continuous analytic
 predicates under [Contract 14](../contracts/migrations/13-to-14.md).
+R32-001 preserves that contract: unit-scoped ability visibility uses authenticated
+rules-present observer components, including retained-only components, until
+cleanup. It changes eligibility through the existing decision path without adding
+a decision family, submission field, persistence field or viewer-visible shape.
 `LineOfSightWitness.context_fingerprint` binds the complete immutable
 context, including geometry, source IDs, model-owned keywords, terrain policy,
 ruleset identity and cache key. Each model record contains `evidence`, with
