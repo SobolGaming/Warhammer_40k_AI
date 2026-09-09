@@ -7860,8 +7860,38 @@ def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() ->
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
-def test_attached_action_history_retains_identity_through_round_trip_and_terminal_replay() -> None:
+@pytest.mark.parametrize("with_support", [False, True])
+def test_attached_action_history_retains_identity_through_round_trip_and_terminal_replay(
+    with_support: bool,
+) -> None:
     config = _config_with_player_a_attached_unit(include_independent_unit=True)
+    if with_support:
+        muster = config.army_muster_requests[0]
+        config = replace(
+            config,
+            army_muster_requests=(
+                replace(
+                    muster,
+                    unit_selections=(
+                        *muster.unit_selections,
+                        _unit_muster_selection(
+                            unit_selection_id="support-unit",
+                            datasheet_id="core-character-support",
+                            model_profile_id="core-character-support",
+                            model_count=1,
+                        ),
+                    ),
+                    attachment_declarations=(
+                        *muster.attachment_declarations,
+                        AttachmentDeclaration(
+                            source_unit_selection_id="support-unit",
+                            bodyguard_unit_selection_id="bodyguard-unit",
+                        ),
+                    ),
+                ),
+                *config.army_muster_requests[1:],
+            ),
+        )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     lifecycle.state = _battle_state_from_config(
@@ -7963,6 +7993,12 @@ def test_attached_action_history_retains_identity_through_round_trip_and_termina
         player_id="player-a",
         unit_instance_id=leader_id,
     )
+    if with_support:
+        assert rules_unit_started_mission_action_this_turn(
+            state=round_tripped_state,
+            player_id="player-a",
+            unit_instance_id="army-alpha:support-unit",
+        )
     session = LocalGameSession(lifecycle=round_tripped)
 
     charge_request = session.advance_until_decision_or_terminal().decision_request

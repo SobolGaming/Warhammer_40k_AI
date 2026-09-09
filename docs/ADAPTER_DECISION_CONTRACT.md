@@ -1308,9 +1308,12 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   Standalone lifecycle restoration also reconstructs the exact live activity
   inventory from accepted Action-start decisions, paired executor participation
   and completion events, and authenticated phase/turn boundaries. Missing, extra,
-  retargeted or retimed effects are invalid. Full facade attack histories bind
-  completion to their declarations; a checkpoint beginning inside the typed
-  attack executor retains that executor's participation/completion authority.
+  retargeted or retimed effects are invalid. Every reconstructed shooting
+  completion requires its original accepted declaration, exact decision ledger
+  closure, subject, models and timing. Mid-executor checkpoints retain this
+  declaration prefix; absence of a declaration does not establish an executor
+  origin. Copying completion events and matching effects into an unactivated
+  session is invalid.
   This reconstruction runs at restoration, outside live eligibility queries.
   Immediate zero-VP actions complete in the same
   decision handler without creating a VP transaction; Booby Trap records an

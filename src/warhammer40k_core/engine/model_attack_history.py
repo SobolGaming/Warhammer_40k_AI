@@ -10,6 +10,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 if TYPE_CHECKING:
     from warhammer40k_core.engine.attack_sequence_state import AttackSequence
     from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
 
 MODELS_ATTACKED_EVENT_TYPE = "attack_sequence_models_attacked"
@@ -210,33 +211,28 @@ def _model_ids(value: JsonValue) -> frozenset[str]:
     return frozenset(_identifier(model_id) for model_id in value)
 
 
-def validate_declared_model_attack_completions(*, event_records: tuple[EventRecord, ...]) -> None:
-    """Bind completions to every declaration present in this bounded lifecycle.
+def validate_declared_model_attack_completions(
+    *,
+    state: GameState,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
+    """Require every shooting participation to retain its original declaration.
 
-    A lifecycle may start at a typed attack executor boundary. Such completions
-    retain their executor participation/completion pair; they do not acquire an
-    invented earlier player declaration. Full facade histories additionally bind
-    the pair to their actual declaration here.
+    Mid-executor checkpoints retain the accepted declaration prefix. An omitted
+    declaration is not evidence of an authenticated executor starting boundary.
     """
-    declared = {
-        _identifier(_participation_for_declaration(event)["sequence_id"])
+    shooting = frozenset(
+        _identifier(_object(event.payload).get("sequence_id"))
         for event in event_records
-        if event.event_type
-        in {
-            "shooting_declaration_accepted",
-            "out_of_phase_shooting_declaration_accepted",
-            "melee_declaration_accepted",
-        }
-    }
+        if event.event_type == MODELS_ATTACKED_EVENT_TYPE
+        and _object(event.payload).get("attack_phase") == "shooting"
+    )
     relevant = tuple(
         event
         for event in event_records
         if event.event_type
-        in {
-            "shooting_declaration_accepted",
-            "out_of_phase_shooting_declaration_accepted",
-            "melee_declaration_accepted",
-        }
+        in {"shooting_declaration_accepted", "out_of_phase_shooting_declaration_accepted"}
         or (
             event.event_type
             in {
@@ -244,8 +240,7 @@ def validate_declared_model_attack_completions(*, event_records: tuple[EventReco
                 "attack_sequence_completed",
                 "attack_sequence_attacks_resolved",
             }
-            and isinstance(event.payload, dict)
-            and _identifier(event.payload.get("sequence_id")) in declared
+            and _identifier(_object(event.payload).get("sequence_id")) in shooting
         )
     )
     model_ids = frozenset(
@@ -255,3 +250,53 @@ def validate_declared_model_attack_completions(*, event_records: tuple[EventReco
         for model_id in _model_ids(_object(event.payload).get("model_instance_ids"))
     )
     validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
+
+    from warhammer40k_core.engine.primary_mission_event_decision_authority import (
+        validate_primary_mission_shooting_event_decision_authority,
+    )
+    from warhammer40k_core.engine.weapon_declaration import shooting_declaration_proposal_from_json
+
+    records = {record.result.result_id: record for record in decision_records}
+    ranged_history = {record.result_id: record for record in state.ranged_attack_history_records}
+    for index, event in enumerate(event_records):
+        if event.event_type not in {
+            "shooting_declaration_accepted",
+            "out_of_phase_shooting_declaration_accepted",
+        }:
+            continue
+        expected = _participation_for_declaration(event)
+        if expected["sequence_id"] not in shooting:
+            continue
+        payload = _object(event.payload)
+        authority_payload = dict(payload)
+        if event.event_type == "out_of_phase_shooting_declaration_accepted":
+            authority_payload["active_player_id"] = payload.get("player_id")
+        validate_primary_mission_shooting_event_decision_authority(
+            event_records=event_records,
+            decision_records=decision_records,
+            mutation_index=index,
+            payload=authority_payload,
+        )
+        result_id = _identifier(payload.get("result_id"))
+        ranged = ranged_history.get(result_id)
+        if ranged is None or (
+            ranged.player_id != authority_payload.get("active_player_id")
+            or ranged.request_id != payload.get("request_id")
+            or ranged.unit_instance_id != expected["attacking_unit_instance_id"]
+            or ranged.battle_round != expected["battle_round"]
+            or ranged.active_player_id != expected["active_player_id"]
+            or ranged.phase.value != expected["phase"]
+        ):
+            raise GameLifecycleError("Model attack history lacks its original ranged activation.")
+        if event.event_type == "out_of_phase_shooting_declaration_accepted":
+            if payload.get("ranged_attack_history_record") != ranged.to_payload():
+                raise GameLifecycleError("Model attack history parent timing authority drifted.")
+        elif payload.get("phase") != "shooting":
+            raise GameLifecycleError("Model attack history ordinary shooting phase drifted.")
+        record = records[result_id]
+        proposal = shooting_declaration_proposal_from_json(record.result.payload)
+        if (
+            sorted({entry.attacker_model_instance_id for entry in proposal.declarations})
+            != expected["model_instance_ids"]
+        ):
+            raise GameLifecycleError("Model attack history declaration model authority drifted.")

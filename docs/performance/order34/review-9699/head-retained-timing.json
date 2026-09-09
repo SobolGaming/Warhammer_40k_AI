@@ -1,0 +1,100 @@
+{
+  "workload_id": "order34-live-retained-v1",
+  "commit": "9699f8f8aaebc1a452b11eafda9fe14f1cddd6b9",
+  "runtime_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engine_manifest_sha256": "fe547d59e010954b7a3538a511f833fa5b4afeaa9d7d5266df3b613787b3aa9d",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.5",
+  "hardware_status": "provisional local host; execution evidence records workload scheduling",
+  "cpu": "Apple M5 Pro",
+  "memory_bytes": 68719476736,
+  "mode": "uninstrumented_timing",
+  "query_repetitions": null,
+  "samples": [
+    {
+      "case": "retained",
+      "setup_seconds": 2.4735576660605147,
+      "slice_seconds": 0.20756041700951755,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    },
+    {
+      "case": "retained",
+      "setup_seconds": 0.35444174997974187,
+      "slice_seconds": 0.20012795797083527,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    },
+    {
+      "case": "retained",
+      "setup_seconds": 0.35609812499023974,
+      "slice_seconds": 0.2524221249623224,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    },
+    {
+      "case": "retained",
+      "setup_seconds": 0.3563838329864666,
+      "slice_seconds": 0.2012061249697581,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    },
+    {
+      "case": "retained",
+      "setup_seconds": 0.36037366709206253,
+      "slice_seconds": 0.2014866250101477,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    },
+    {
+      "case": "retained",
+      "setup_seconds": 0.35763458302244544,
+      "slice_seconds": 0.19976324995514005,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    },
+    {
+      "case": "retained",
+      "setup_seconds": 0.38481358299031854,
+      "slice_seconds": 0.22481470799539238,
+      "inventory_size": 32,
+      "work_counts": {},
+      "decision_count": 5,
+      "reached_charge": true,
+      "final_phase": "movement"
+    }
+  ],
+  "mean_seconds": 0.21248302969615906,
+  "median_seconds": 0.2014866250101477,
+  "p95_seconds": 0.2524221249623224,
+  "maximum_seconds": 0.2524221249623224,
+  "completion_rate": 1.0,
+  "slices_per_second": 4.706258195913122,
+  "hashes": {
+    "uv.lock": "dddb8a6c73aec444f730b12f3bd0ad5f5ccbeeeece98998d0dc36fb5c2bbdc58",
+    "scripts/measure_action_restrictions.py": "537cd664ed3386e977d6b33ae9810e4861440018928426b246ca017a89fbab80",
+    "scripts/measure_action_restriction_live.py": "093fb4fea9b9226d939aebe957b4e3ada80ba6f0a673a094b7d2a56019c5f9d5",
+    "tests/indirect_shooting_helpers.py": "14f45bb1315eaa7a17156e70a1ee77b717af3a7ed4b7f6fd772849bc850feaa9",
+    "tests/retained_attack_helpers.py": "25b35b3ba90be56ff830b30f81826fe2f94800f09576ae8a1e85557eb878b722",
+    "tests/phase17n_primary_mission_helpers.py": "66e3fc4cc0208d40f72cfb30af4bcdf579c36794775f36254bd84ba640e3e0a5"
+  },
+  "full_game_certified": false
+}

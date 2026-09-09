@@ -73,7 +73,9 @@ def activity_restrictions_from_history(
         for unit in army.units
         for model in unit.own_models
     }
-    validate_declared_model_attack_completions(event_records=event_records)
+    validate_declared_model_attack_completions(
+        state=state, event_records=event_records, decision_records=decision_records
+    )
     decisions = {record.result.result_id: record for record in decision_records}
     participations: dict[str, CompletedAttackModels] = {}
     seen: set[str] = set()

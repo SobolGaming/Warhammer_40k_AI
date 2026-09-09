@@ -56,11 +56,6 @@ from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
-from warhammer40k_core.engine.actions import (
-    MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON,
-    MissionActionState,
-    MissionActionStatus,
-)
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -194,9 +189,7 @@ from warhammer40k_core.engine.decision_controller import (
     DecisionControllerPayload,
 )
 from warhammer40k_core.engine.decision_request import (
-    PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
-    parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.deployment_ability_queries import rules_unit_has_infiltrators
@@ -209,7 +202,7 @@ from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.catalog_runtime_hooks import (
     phase_end_objective_control_hook_bindings,
 )
@@ -245,6 +238,10 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.model_attack_history import (
+    record_attack_sequence_completed,
+    record_models_attacked,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
@@ -1389,6 +1386,7 @@ def test_selected_target_retains_attached_identity_in_lifecycle_replay_round_tri
         target_attached_id,
     ) = _configured_kakophonist_attached_target_fixture(
         single_wound_noise_marines=True,
+        game_id="order34-complete-boundary-attached-1",
     )
     assert len(target_noise_marines.own_models) == 1
     assert target_noise_marines.own_models[0].wounds_remaining == 1
@@ -1501,7 +1499,7 @@ def test_selected_target_retains_attached_identity_in_lifecycle_replay_round_tri
 def test_leader_support_retained_identity_lifecycle_and_replay_round_trip(
     use_feel_no_pain: bool,
 ) -> None:
-    explicit_game_id = "kakophonist-leader-support-replay-explicit-0" if use_feel_no_pain else None
+    explicit_game_id = "order34-complete-boundary-support-1" if use_feel_no_pain else None
     (
         config,
         armies,
@@ -6194,25 +6192,9 @@ def _record_attached_rules_unit_authoritative_state(
             },
         )
     )
-    state.record_mission_action_state(
-        MissionActionState.start(
-            action_id="test:leader-support-split:mission-action",
-            mission_action_id="test:leader-support-split:mission-action",
-            player_id="player-b",
-            unit_instance_id=target_attached_id,
-            target_id="test:leader-support-split:action-target",
-            condition_target_id="test:leader-support-split:action-target",
-            mission_id="test:leader-support-split:mission",
-            battle_round=state.battle_round,
-            phase=BattlePhase.SHOOTING.value,
-            start_timing="shooting_phase",
-            completion_timing="end_turn",
-            eligible_unit_instance_ids=(target_attached_id,),
-            interruption_conditions=(MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON,),
-            scoring_source_id="test:leader-support-split:scoring-source",
-            victory_points=0,
-        )
-    )
+    # Real Action identity/continuation coverage, including Leader + Support,
+    # lives in test_attached_action_history_retains_identity_through_round_trip_and_terminal_replay.
+    # This post-shoot fixture must not invent an opponent Action without a decision.
 
 
 def _assert_attached_rules_unit_authoritative_state(
@@ -6240,14 +6222,6 @@ def _assert_attached_rules_unit_authoritative_state(
         if effect.effect_id == "test:leader-support-split:persisting-effect"
     )
     assert persisting_effect.target_unit_instance_ids == (target_attached_id,)
-    action_state = state.mission_action_state_by_id("test:leader-support-split:mission-action")
-    assert action_state.status is MissionActionStatus.STARTED
-    assert action_state.interrupted_reason is None
-    assert not any(
-        event.event_type == "mission_action_interrupted"
-        and cast(dict[str, Any], event.payload).get("action_id") == action_state.action_id
-        for event in decisions.event_log.records
-    )
 
 
 def _configured_kakophonist_fixture(
@@ -6624,14 +6598,9 @@ def _kakophonist_post_shoot_context(
         )
     completion_event_id = f"kakophonist-completed-{sequence_suffix}"
     if authenticated_history:
-        completion_event_id = decisions.event_log.append(
-            "attack_sequence_completed",
-            {
-                "sequence_id": sequence.sequence_id,
-                "attacker_player_id": sequence.attacker_player_id,
-                "attacking_unit_instance_id": sequence.attacking_unit_instance_id,
-            },
-        ).event_id
+        record_models_attacked(state=state, decisions=decisions, sequence=sequence)
+        record_attack_sequence_completed(state=state, decisions=decisions, sequence=sequence)
+        completion_event_id = decisions.event_log.records[-1].event_id
     return AttackSequenceCompletedContext(
         state=state,
         decisions=decisions,
@@ -6650,83 +6619,15 @@ def _record_authenticated_shooting_declaration(
     sequence: AttackSequence,
     result_id: str,
 ) -> None:
-    request_id = f"kakophonist-declaration-request:{result_id}"
-    visibility_cache_key = f"kakophonist-visibility:{result_id}"
-    source_request_id = f"kakophonist-unit-selection-request:{result_id}"
-    source_result_id = f"kakophonist-unit-selection-result:{result_id}"
-    proposal_request = {
-        "request_id": request_id,
-        "active_player_id": sequence.attacker_player_id,
-        "battle_round": state.battle_round,
-        "unit_instance_id": sequence.attacking_unit_instance_id,
-        "source_decision_request_id": source_request_id,
-        "source_decision_result_id": source_result_id,
-        "visibility_cache_key": visibility_cache_key,
-        "proposal_kind": "shooting_declaration",
-    }
-    request = DecisionRequest(
-        request_id=request_id,
-        decision_type=SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
-        actor_id=sequence.attacker_player_id,
-        payload=validate_json_value(
-            {
-                "proposal_request": proposal_request,
-                "request_context": {},
-                "nested_interaction_requests": [],
-            }
-        ),
-        options=(parameterized_decision_option(),),
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
     )
-    decisions.request_decision(request)
-    proposal = ShootingDeclarationProposal(
-        proposal_request_id=request_id,
-        proposal_kind="shooting_declaration",
-        player_id=sequence.attacker_player_id,
-        battle_round=state.battle_round,
-        unit_instance_id=sequence.attacking_unit_instance_id,
-        source_decision_request_id=source_request_id,
-        source_decision_result_id=source_result_id,
-        declarations=tuple(
-            WeaponDeclaration(
-                weapon_instance_id=pool.weapon_instance_id,
-                attacker_model_instance_id=pool.attacker_model_instance_id,
-                wargear_id=pool.wargear_id,
-                weapon_profile_id=pool.weapon_profile_id,
-                target_unit_instance_id=pool.target_unit_instance_id,
-                shooting_type=pool.shooting_type,
-                selected_weapon_ability_ids=pool.selected_weapon_ability_ids,
-                firing_deck_source_unit_instance_id=(pool.firing_deck_source_unit_instance_id),
-                firing_deck_source_model_instance_id=(pool.firing_deck_source_model_instance_id),
-            )
-            for pool in sequence.attack_pools
-        ),
-        visibility_cache_key=visibility_cache_key,
-    )
-    decisions.submit_result(
-        DecisionResult(
-            result_id=result_id,
-            request_id=request.request_id,
-            decision_type=request.decision_type,
-            actor_id=request.actor_id,
-            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-            payload=validate_json_value(proposal.to_payload()),
-        )
-    )
-    decisions.event_log.append(
-        "shooting_declaration_accepted",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": sequence.attacker_player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "unit_instance_id": sequence.attacking_unit_instance_id,
-            "request_id": request.request_id,
-            "result_id": result_id,
-            "proposal_request_id": request.request_id,
-            "visibility_cache_key": visibility_cache_key,
-            "attack_pools": [pool.to_payload() for pool in sequence.attack_pools],
-            "ineligible_unit_instance_ids": [],
-        },
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=decisions,
+        sequence=sequence,
+        result_id=result_id,
     )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,

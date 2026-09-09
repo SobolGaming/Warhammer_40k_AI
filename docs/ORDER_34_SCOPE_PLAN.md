@@ -122,3 +122,31 @@ to the selected placed unit, preserving all current checks. Completing the phase
 still enumerates the full skipped-unit inventory for payload validation. This
 reduces attached-selection line-of-sight calls from 57 to nine without caching
 or weakening stale-request validation; the base makes 30 such calls.
+
+
+### Follow-up R34-002, reviewed head 9699f8f8
+
+The follow-up review closed R34-001 and demonstrated that copying an undeclared
+participation/completion pair plus its effect into an unactivated session still
+passed inventory reconstruction. The same retimed pair reproduced locally.
+The violated invariant remains provenance of the reconstructed activity, not
+just consistency between two asserted events.
+
+Every reconstructed shooting completion now retains the accepted declaration,
+its exact requested/recorded decision closure, original ranged-attack record,
+unit, contributing models, and round/turn/phase. The previous implicit executor
+baseline exemption is removed. Real mid-executor checkpoints retain the original
+declaration prefix and continue to restore; focused post-attack fixtures now
+retain that canonical typed declaration ledger instead of creating incomplete
+completion-only histories. Common fixture setup is shared. No alternate runtime
+ledger or hot eligibility history scan is introduced.
+
+The regression matrix retains the original inventory mutations and adds fresh
+unactivated-session copied pairs, foreign games, retimed pairs, a copied but
+unaccepted declaration, missing/retimed ranged activation records, and coordinated
+foreign-model declaration/participation drift. Valid mid-executor, completed,
+retained and exact-replay checkpoints are checked alongside those mutations.
+The source change is limited to the existing model participation validator and
+its restoration caller; fixture changes preserve the prior outcome assertions.
+The 98 passing timing samples for 9699f8f8 are retained under
+`docs/performance/order34/review-9699/`; they do not certify this later runtime.

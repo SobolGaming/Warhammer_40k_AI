@@ -104,6 +104,10 @@ from warhammer40k_core.engine.fight_order import (
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
+from warhammer40k_core.engine.model_attack_history import (
+    record_attack_sequence_completed,
+    record_models_attacked,
+)
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
 )
@@ -1079,8 +1083,8 @@ def test_selected_target_mortal_wounds_finalize_horror_composition_handoff(
         retained_horror_kinds=("blue",),
         models_start_destroyed=False,
         emit_destruction_events=False,
+        game_id="order34-complete-boundary-horror_final-4",
     )
-    scenario.state.game_id = "horror-selected-target-5"
     pink_model_id = scenario.bodyguard.own_models[0].model_instance_id
     fnp_source = FeelNoPainSource(
         source_id="test:horrors:selected-target:fnp-a",
@@ -2365,6 +2369,7 @@ def _split_scenario(
     non_attack_source_step: str = "ability_resolution",
     models_start_destroyed: bool = True,
     emit_destruction_events: bool = True,
+    game_id: str | None = None,
 ) -> _SplitScenario:
     package = horrors_package()
     bodyguard = _model_count_unit(
@@ -2522,7 +2527,27 @@ def _split_scenario(
         active_player_id=attack_sequence.attacker_player_id,
         phase=resolved_parent_battle_phase,
     )
+    if game_id is not None:
+        state.game_id = game_id
+    if (
+        source_phase is BattlePhase.SHOOTING
+        and resolved_parent_battle_phase is not BattlePhase.SHOOTING
+    ):
+        attack_sequence = replace(
+            attack_sequence, sequence_id=f"out-of-phase-{attack_sequence.sequence_id}"
+        )
     decisions = DecisionController()
+    if source_phase is BattlePhase.SHOOTING:
+        from tests.completed_attack_fixture_helpers import (
+            record_shooting_declaration_for_executor_fixture,
+        )
+
+        record_shooting_declaration_for_executor_fixture(
+            state=state,
+            decisions=decisions,
+            sequence=attack_sequence,
+            result_id=attack_sequence.sequence_id.split("attack-sequence:", 1)[1],
+        )
     if destruction_kind == "hazardous" and emit_destruction_events:
         decisions.event_log.append(
             "hazardous_mortal_wounds_applied",
@@ -2599,14 +2624,9 @@ def _split_scenario(
                         "model_instance_id": model.model_instance_id,
                     },
                 )
-    completed_event = decisions.event_log.append(
-        "attack_sequence_completed",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacker_player_id": attack_sequence.attacker_player_id,
-            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-        },
-    )
+    record_models_attacked(state=state, decisions=decisions, sequence=attack_sequence)
+    record_attack_sequence_completed(state=state, decisions=decisions, sequence=attack_sequence)
+    completed_event = decisions.event_log.records[-1]
     dice_manager = DiceRollManager(
         state.game_id,
         event_log=decisions.event_log,

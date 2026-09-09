@@ -7611,7 +7611,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
         keywords=(WeaponKeyword.HAZARDOUS,),
     )
-    attack_context_id = "phase14c-hazardous-fnp:pool-001:attack-001"
+    attack_context_id = "attack-sequence:phase14c-hazardous-fnp:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
@@ -7655,7 +7655,7 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
         ),
     )
     sequence = AttackSequence.start(
-        sequence_id="phase14c-hazardous-fnp",
+        sequence_id="attack-sequence:phase14c-hazardous-fnp",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -7666,6 +7666,16 @@ def test_phase14c_hazardous_mortal_wounds_route_optional_fnp_through_lifecycle()
                 attacks=1,
             ),
         ),
+    )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
     )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
@@ -12864,7 +12874,7 @@ def _retain_attack_casualty_for_fight_on_death(
         damage_profile=DamageProfile.fixed(target_model.wounds_remaining),
     )
     sequence = AttackSequence.start(
-        sequence_id=f"{fixture_id}-sequence",
+        sequence_id=f"attack-sequence:{fixture_id}-sequence",
         attacker_player_id="player-a",
         attacking_unit_instance_id=attacker.unit_instance_id,
         attack_pools=(
@@ -12876,6 +12886,16 @@ def _retain_attack_casualty_for_fight_on_death(
             ),
         ),
     )
+    from tests.completed_attack_fixture_helpers import (
+        record_shooting_declaration_for_executor_fixture,
+    )
+
+    record_shooting_declaration_for_executor_fixture(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        sequence=sequence,
+        result_id=sequence.sequence_id.removeprefix("attack-sequence:"),
+    )
     state.shooting_phase_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id="player-a",
@@ -12884,7 +12904,7 @@ def _retain_attack_casualty_for_fight_on_death(
         attack_pools=sequence.attack_pools,
         attack_sequence=sequence,
     )
-    attack_context_id = f"{fixture_id}-sequence:pool-001:attack-001"
+    attack_context_id = f"{sequence.sequence_id}:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
         reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
@@ -19714,4 +19734,89 @@ def test_r34_002_completed_shooting_inventory_is_authenticated(mutation: str) ->
         effect["started_battle_round"] += 1
         effect["expiration"]["battle_round"] += 1
     with pytest.raises(GameLifecycleError, match="Activity restriction"):
+        GameLifecycle.from_payload(forged)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["extra_pair", "foreign_game", "retimed_pair", "unaccepted_declaration"]
+)
+def test_r34_002_unactivated_unit_rejects_unproven_completion_pair(mutation: str) -> None:
+    from tests.indirect_shooting_helpers import (
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    donor = indirect_session(observer=True)
+    request = select_indirect_declaration(donor, ShootingType.NORMAL)
+    submit_indirect_declaration(donor, request)
+    complete_indirect_attack(donor)
+    fresh = indirect_session(observer=True)
+    original = fresh.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(json.loads(json.dumps(original))).to_payload() == original
+    assert not any(
+        event.event_type in {"shooting_unit_selected", "shooting_declaration_accepted"}
+        for event in fresh.lifecycle.decision_controller.event_log.records
+    )
+    state = fresh.lifecycle.state
+    assert state is not None
+    assert state.shooting_phase_state is not None
+    assert state.shooting_phase_state.shot_unit_ids == ()
+    copied_types = {"attack_sequence_models_attacked", "attack_sequence_completed"}
+    if mutation == "unaccepted_declaration":
+        copied_types.add("shooting_declaration_accepted")
+    for event in donor.lifecycle.decision_controller.event_log.records:
+        if event.event_type in copied_types:
+            payload = json.loads(json.dumps(event.payload))
+            if event.event_type == "attack_sequence_models_attacked":
+                if mutation == "foreign_game":
+                    payload["game_id"] = "foreign-donor-game"
+                elif mutation == "retimed_pair":
+                    payload["battle_round"] += 1
+            fresh.lifecycle.decision_controller.event_log.append(event.event_type, payload)
+    donor_state = donor.lifecycle.state
+    assert donor_state is not None
+    state.persisting_effects.extend(donor_state.persisting_effects)
+    forged = json.loads(json.dumps(fresh.lifecycle.to_payload()))
+    if mutation == "retimed_pair":
+        effect = forged["state"]["persisting_effects"][-1]
+        effect["started_battle_round"] += 1
+        effect["expiration"]["battle_round"] += 1
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"(Activity restriction|Model attack history|Mutation decision authority)",
+    ):
+        GameLifecycle.from_payload(forged)
+
+
+@pytest.mark.parametrize("mutation", ["missing_activation", "retimed_activation", "foreign_models"])
+def test_r34_002_completion_requires_original_declaration_subject_and_timing(mutation: str) -> None:
+    from tests.indirect_shooting_helpers import (
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(observer=True)
+    request = select_indirect_declaration(session, ShootingType.NORMAL)
+    submit_indirect_declaration(session, request)
+    # A real checkpoint inside the executor retains its accepted declaration.
+    pending = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(json.loads(json.dumps(pending))).to_payload() == pending
+    complete_indirect_attack(session)
+    forged = json.loads(json.dumps(session.lifecycle.to_payload()))
+    if mutation == "missing_activation":
+        forged["state"]["ranged_attack_history_records"] = []
+    elif mutation == "retimed_activation":
+        forged["state"]["ranged_attack_history_records"][0]["battle_round"] += 1
+    else:
+        for event in forged["decisions"]["event_log"]:
+            payload = event["payload"]
+            if event["event_type"] == "shooting_declaration_accepted":
+                payload["attack_pools"][0]["attacker_model_instance_id"] = "foreign-model"
+            elif event["event_type"] == "attack_sequence_models_attacked":
+                payload["model_instance_ids"] = ["foreign-model"]
+    with pytest.raises(GameLifecycleError, match="Model attack history"):
         GameLifecycle.from_payload(forged)

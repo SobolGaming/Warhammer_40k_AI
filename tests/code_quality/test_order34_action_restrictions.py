@@ -198,3 +198,32 @@ def test_lifecycle_authenticates_complete_activity_inventory() -> None:
         and node.func.id == "validate_activity_restriction_inventory"
         for node in ast.walk(tree)
     )
+
+
+def test_r34_002_restoration_validates_all_shooting_participation_decisions() -> None:
+    tree = ast.parse((ENGINE / "model_attack_history.py").read_text())
+    function = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "validate_declared_model_attack_completions"
+    )
+    calls = {
+        node.func.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert {
+        "validate_retained_model_attack_history",
+        "validate_primary_mission_shooting_event_decision_authority",
+    } <= calls
+    shooting = next(
+        node
+        for node in function.body
+        if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "shooting" for target in node.targets)
+    )
+    # The sequence inventory comes from asserted shooting participation, including
+    # undeclared completions; it must never be narrowed to an existing declaration set.
+    assert "MODELS_ATTACKED_EVENT_TYPE" in ast.unparse(shooting)
+    assert "declaration_accepted" not in ast.unparse(shooting)
