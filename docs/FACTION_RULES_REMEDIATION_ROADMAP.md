@@ -1,198 +1,437 @@
-# CORE V2 Faction Rules Remediation Roadmap
+# CORE V2 Faction Rules Roadmap
 
-[Faction guides and points](FACTION_SUPPORT.md) · [Observation register](FACTION_AUDIT_SOURCES.md) · [Core Rules roadmap](CORE_RULES_REMEDIATION_ROADMAP.md)
+[Faction guides and points](FACTION_SUPPORT.md) · [Observation register](FACTION_AUDIT_SOURCES.md) · [Source policy (F00)](FACTION_RULES_SOURCE_POLICY.md) · [Core Rules roadmap](CORE_RULES_REMEDIATION_ROADMAP.md)
 
-## Scope and audit result
+## Purpose and decisions
 
-This is the faction companion to the Core Rules roadmap. It inventories the
-current in-scope 11th Edition faction views, army rules, detachments, and unit
-datasheets observed on **5 September 2026**, then identifies the work needed to
-certify their implementation. Repository evidence is pinned to **`52673fa1`**.
-The latest version shown by the [40k.app faction update feed](https://www.40k.app/factions/updates)
-was **946, released 2 September 2026**.
+This document replaces the September 2026 remediation roadmap (F00–F09) with a
+complete plan for bringing every in-scope Warhammer 40,000 11th Edition faction,
+detachment, Enhancement, Upgrade, Stratagem and datasheet to certified full
+support, and for keeping that support current across App-data releases,
+including faction rewrites. F00 is complete and its evidence is preserved
+below. F01–F09 are superseded; a [legacy ID map](#legacy-workstream-ids) keeps
+the existing guides and audits readable.
 
-The inventory covers **40 faction/chapter/related-army views**, **982 distinct
-datasheet source URLs**, and **506 distinct detachment source URLs**. The guides
-contain 2,095 unit listing references because factions share entries. The
-detachment pages contain 1,756 Enhancement/Upgrade entries and 2,520 Stratagem
-entries, including inherited repetitions. These are source-navigation counts,
-not distinct rules, supported units, or independent engine factions.
+Owner decisions recorded on 9 September 2026:
 
-This PR completes the source inventory, field checklists, baseline report
-comparison, and initial drift findings. It does **not** complete a clause-by-clause
-runtime audit of all those rules. Every current-source certification remains
-open. A checklist row is an obligation, not a claim that its behavior was tested.
+| # | Decision | Consequence |
+| --- | --- | --- |
+| D1 | 40k.app is the single current authority for both structured datasheet/detachment data and operative rule text. | Catalog generation and every Wahapedia-fed generator migrate to a versioned content set extracted from retained 40k.app pages. The Wahapedia snapshot is frozen as a legacy identity crosswalk. Official GW PDFs remain official provenance. |
+| D2 | The Orks update pilot runs in parallel with the Chaos Daemons slice. | FM0.5 exercises the diff, classification, retirement and status-invalidation tooling on the two most recent Orks versions while FM1 certifies Chaos Daemons. |
+| D3 | Content-set retention is current plus one previous version, applied per faction and only after that faction's first full-support certification. | Before a faction is certified for the first time, only the current version of its content is packaged. From the first certification onward, its previous version is also packaged so its replays remain loadable. |
+| D4, D7 | All Core Rules orders close before faction implementation begins. | "Playable" has no Core-exception list. Army-construction facts (DP budgets, force-disposition consistency, Enhancement-only detachments) are settled by Core P25A–C. |
+| D5 | Space Marines are a super-family: the shared detachments are certified once, chapter views are overlays. | S2 models detachment identity as owned by the Space Marines view with chapter overlay records for chapter-owned rules, detachments and eligibility. Grey Knights is outside the overlay. |
+| D6 | Content is JSON records with typed loaders; no per-detachment Python unless a named handler is justified. | The Python scaffold, its generator and the placeholder modules are removed in FM0. Existing implemented Python detachment modules migrate to data bindings as each generic family lands. |
+| D8 | Documentation-only work may run in parallel with the remaining Core Rules orders. | The [pre-gate documentation track](#fm-pre-documentation-only-work-permitted-before-gate-0) lists exactly what may proceed before Gate 0. |
 
-The scope exclusions in [AGENTS.md](../AGENTS.md) continue to apply. Forge World,
+## Scope
+
+The scope exclusions in [AGENTS.md](../AGENTS.md) apply unchanged. Forge World,
 Crusade, Boarding Actions, Kill Team as a separate game, and Legends content are
-not admitted as supported rows. Current matched-play Deathwatch units named
-“Kill Team” remain ordinary 40,000 datasheets. Titan faction views are excluded.
-The [scope method and unresolved identity hold](FACTION_AUDIT_SOURCES.md#scope-and-identity)
-must be read before treating this inventory as exhaustive beyond the admitted
-scope. No runtime/catalog scope is expanded by this document.
+not admitted. Titan Legions and Chaos Titan Legions are excluded. Current
+matched-play Deathwatch datasheets named "Kill Team" are ordinary datasheets.
 
-## How to read the documentation
+The admitted corpus is the 40k.app faction directory: 36 primary faction views
+(7 Imperium, 13 Space Marines, 8 Chaos, 8 Xenos), 34 of them in scope after the
+Titan exclusions, plus 6 related-army views (Harlequins, Ynnari, Blood Legions,
+Plague Legions, Legions of Excess, Scintillating Legions), for the 40 admitted
+views inventoried on 5 September 2026 at App-data 946: 982 distinct datasheet
+URLs, 506 detachment URLs, 1,756 Enhancement/Upgrade entries and 2,520 Stratagem
+entries including inherited repeats. After identity resolution the distinct
+denominators are expected near 270–300 detachments, 1,000 Enhancements/Upgrades
+and 1,400 Stratagems; S2 records the exact figures. The [observation
+register](FACTION_AUDIT_SOURCES.md) and [scope method](FACTION_AUDIT_SOURCES.md#scope-and-identity)
+remain the record of that inventory. Every later milestone re-observes the
+corpus at the then-current App-data version; the September counts are not
+indefinitely current.
 
-Start with [Faction support](FACTION_SUPPORT.md), choose a faction guide, and
-expand an individual detachment or unit in its linked audit only when needed.
-Each guide uses the same structure: current support limits, army rules, changes,
-detachments, datasheets with all displayed points, and remaining work.
+## Method: breadth-first inventory and taxonomy, depth-first certification
 
-The older `docs/factions/<faction>.md` files remain generated evidence reports.
-Their exact output is checked by repository tests. They are preserved for
-traceability; the new guides are the human entry point. Changing their generators
-and output contracts is a separate implementation task, not part of this
-documentation-only PR.
+Pure depth-first work (finish one faction, then the next) lets the first
+consumer shape each abstraction; the content-specific branches that already
+exist in `engine/army_mustering.py` for Shadow Legion, Corsair Coterie and
+Be'lakor are the result. Pure breadth-first work (implement each semantic
+family across all factions before certifying any roster) delays every playable
+faction and never exercises the full-game and replay paths where defects
+surface. The roadmap therefore runs three loops:
 
-## Status and acceptance gates
+1. **Breadth loop, data only.** Retain every admitted page at one pinned
+   App-data version, resolve identities, extract structure, and classify every
+   rule clause into a semantic taxonomy. The output is the **semantic demand
+   matrix**: rows are semantic families, timing windows and decision kinds;
+   columns are factions; cells count the army rules, detachment rules,
+   Enhancements, Stratagems and datasheet abilities that need them. No engine
+   semantics are written in this loop.
+2. **Depth loop, one priority faction at a time.** Certify a faction as a
+   vertical slice to full-game replay. Each generic family the slice needs is
+   designed against the demand matrix for every faction that needs it, with one
+   consumer from the priority faction and one regression from a non-priority
+   faction proving content neutrality.
+3. **Saturation loop.** Later factions become mostly data bound to existing
+   families. Progress is measured as rules unlocked per family and the share of
+   new content that needs Python; a rising code share stops the wave for family
+   redesign.
 
-Status belongs to a **specific source version, selected content, and tested
-consumer path**. Do not label an entire faction playable because its army-rule
-module loads or one unit can shoot.
+Family selection rule: implement next the family that unlocks the most rules in
+the current priority faction, provided at least two factions demand it or a
+documented bespoke-subsystem justification exists under the named-handler
+policy in [AGENTS.md](../AGENTS.md).
 
-| Gate | Required evidence before the label is allowed |
-| --- | --- |
-| Source recorded | Approved complete operative source, provider and URL, version/date, transcription hash, observation fingerprint, stable source IDs, scope classification |
-| Load supported | Typed catalog/source package loads eagerly with validated IDs, relationships, hashes, and provenance; no placeholder fields |
-| Execution supported | Every relevant clause maps to RuleIR, a generic service/hook, or a justified named subsystem; the real lifecycle consumes it and records effects |
-| Fieldable | A specified roster passes current points, DP, force disposition, composition, equipment, attachment, allies, uniqueness, and geometry validation through the engine |
-| Playable | That fieldable roster can resolve all its selected rules and mandatory interactions through ordinary engine decisions without an unsupported path |
-| Replay verified | The same decisions reproduce state/events; restore, serialization, hidden information, and adapter projections preserve the contract |
-| Full support certified | All legal variants and rule branches in the declared scope/version have the preceding evidence, including invalid cases and cross-faction interactions |
+Design rules enforced by code-quality tests (Q2):
 
-`E` in the guides means the **baseline execution report classifies a matched
-row as executable**. `Source` means the row exists without that classification;
-`Missing` means no matching row was found. These labels describe reconciliation
-candidates, not current approvals. The detailed tables separately preserve the
-source report's `runtime_support_status`; the two reports can disagree.
-No name-based candidate match transfers execution or identity to another faction.
+1. Content is data; code is generic. A new detachment, Enhancement, Stratagem or
+   datasheet ability adds JSON records and no Python unless it needs a new
+   generic family.
+2. Generic surfaces are specified from the corpus demand matrix, never from the
+   first consumer.
+3. Every new family ships with at least two consumers from two factions, or the
+   list of corpus rules it will serve plus a non-priority regression.
+4. Identity is stable source IDs. Display names, normalized text tokens and
+   locally re-normalized keywords never gate behaviour.
+5. No source version appears in module or package names; versions live in
+   content-set identifiers.
+6. Retirement is first class. Every content record can carry `retired_in` and
+   `superseded_by`; mustering rejects retired IDs with a typed reason.
+7. One denominator model for status; one generated status artifact feeds every
+   document and the capability manifest.
 
-The generated component report contains **59 datasheet rows across seven
-factions**: Aeldari 29, Emperor's Children 13, Chaos Daemons 10, Chaos Space
-Marines 2, Thousand Sons 2, World Eaters 2, and Death Guard 1. Its legacy overall
-labels are **56 `Playable`, 3 `Blocked`, and 0 `Full`**. Those labels summarize
-component coverage; they do not establish the current roster-level gates above.
-Absence of a component row does not prove every reusable engine primitive is
-missing. See the [pinned baseline artifacts](FACTION_AUDIT_SOURCES.md#repository-evidence).
+<a id="status-and-acceptance-gates"></a>
+## Content model and status ladder
 
-The runtime module report separately records 28 faction modules: 23 partial,
-5 placeholders, and none implemented; its 266 detachment modules comprise
-8 implemented, 46 partial, and 212 placeholders. The 2,073 source coverage rows
-classify 133 as executable generic IR and 23 as executable named handlers,
-with 1,889 blocked for structured semantics and 28 blocked for source gaps.
-These are different denominators and must not be combined into a coverage percentage.
+Entities, each with a stable project-owned ID, a crosswalk row and a status
+record: faction view; army rule and its clauses; related-army pact (Daemonic
+Pact, Pact of Blood/Decay/Excess/Sorcery, Disparate Paths, Space Marine
+Chapters, Assigned Agents, Corsairs and Travelling Players, Brood Brothers,
+auxiliary rules); detachment (rule clauses, DP, force disposition,
+Enhancements/Upgrades with bearer grammar, Stratagems); datasheet (model
+profiles, composition tiers, every cost row including repeated-unit surcharges
+and equipment charges, wargear and options, keywords, Leader/Support, Core and
+unit abilities, transport and damaged sections, geometry per model variant);
+content set (one App-data version of the admitted corpus with official
+provenance links, crosswalk and tombstones).
 
-## Initial findings
+| Level | Name | Evidence required |
+| --- | --- | --- |
+| L0 | Observed | Retained page under the F00 contract: hashes, App-data version, resolved identity, scope class |
+| L1 | Loaded | Typed content-set record accepted by the fail-fast loader; crosswalk row present |
+| L2 | Structured | Datasheet: every cost tier, composition, option, keyword, Leader/Support. Detachment: DP, force disposition, complete Enhancement/Stratagem inventories with costs and bearer text |
+| L3 | Geometry | Accepted base/hull/height evidence for every model variant (datasheets only) |
+| L4 | Mapped | Every clause maps to a RuleIR template, a generic family, a justified named handler, or a typed `unsupported` reason; demand matrix updated |
+| L5 | Executable | Real lifecycle consumer exercised with real domain objects; deterministic replay payloads; unsupported branches typed |
+| L6 | Fieldable | At least one roster accepted by mustering and one illegal variant rejected with a typed reason |
+| L7 | Playable | At least one headless full game through `AdapterGameSession`/`LocalGameSession` with exact replay reproduction, viewer-scoped projections and zero unsupported diagnostics |
+| L8 | Certified | All variants, branches, negative cases and cross-faction interactions covered at the pinned version |
 
-Priority 1 protects existing execution or roster claims from known drift.
-Priority 2 closes inventory, evidence, and missing-content obligations. Findings
-remain open until a source-backed implementation PR records its acceptance evidence.
+Freshness is orthogonal: `current`, `stale` (source drift since the evidence was
+recorded) or `retired`. A faction is fully supported at version V only when
+every non-retired entity it owns or inherits is L8 and `current` at V. Reports
+show counts per level and freshness; no single percentage is published.
+
+Decomposition used for the L4–L5 gates:
+
+- A **Stratagem** has four coordinates: timing window (engine
+  `TimingTriggerKind`, reaction or opportunity window), target grammar, effect
+  template (RuleIR bound to a generic handler) and restriction grammar (CP,
+  once-per-phase/battle, keywords, conditions). It is *usable* when it appears
+  as a `use_stratagem` option at its window with correct targets and CP, and
+  *executable* when its effect applies through an engine-owned path. A missing
+  coordinate is a Track G backlog item counted across the corpus.
+- An **Enhancement or Upgrade** has bearer grammar ("Warboss model only",
+  "Infantry Warboss model only", unit-wide Upgrade), effect template and use
+  ledgers.
+- A **detachment rule** has condition (state token, keyword, phase), effect
+  template and army-construction constraints (Keywords sections, required or
+  prohibited units and detachments, DP, disposition).
+- A **datasheet ability** is certified per unit but implemented per semantic
+  family across the faction; datasheet work is grouped by family, not by unit.
+
+<a id="initial-findings"></a>
+## Open findings
+
+Findings remain open until a source-backed implementation records acceptance
+evidence. Owning work now references tracks and milestones.
 
 | ID | Priority | Finding and consequence | Owning work |
 | --- | --- | --- | --- |
-| F-SOURCE-01 | 1 | The approved maintained-mirror policy explicitly covers Core Rules categories 01–25. It does not yet provide a faction-package ingestion contract. Browser observations in this audit are planning evidence. | F00 |
-| F-ARMY-01 | 1 | Current Acts of Faith grants a Miracle die at each turn start. The Sororitas consumer and regression use battle-round start, so the implemented trigger is stale. | F02 |
-| F-ORK-01 | 1 | v946 refreshes the Ork army and detachment roster. More Dakka! is removed in the update feed but remains an implemented module in the baseline report. Old eligibility and semantic claims need retirement/replacement review. | F01–F03 |
-| F-DATA-01 | 1 | Current costs and attachments differ from older records. Eldrad's v931 cost is 120 points and its Leader recipient list changed. Bloodcrushers' six-model cost and third-unit surcharge differ from July values. | F01, F04, F07 |
-| F-EVID-01 | 1 | Module status, source labels, execution classifications, and component `Playable` labels describe different facts. Some executable generic-IR rows retain `source_only` labels and no explicit consumer IDs. They need traceable consumer evidence before a playability claim. | F01, F08–F09 |
-| F-OWN-01 | 2 | Shared source URLs, same-name faction variants, chapters, and related daemon views are not interchangeable identities. A flat name join would overstate coverage and can assign the wrong army ability. | F01, F04, F07 |
-| F-GEOM-01 | 2 | No model-height field is exposed on the inspected App datasheets; 17 admitted source pages also lack a base field. Existing geometry statuses cannot certify unreviewed variants. | F06 |
-| F-CORE-01 | 2 | Faction updates repeat shared Core Ability wording, including transport/destruction interactions. Those obligations belong to the common engine owner and the Core Rules roadmap. | F05–F08 plus Core Rules dependencies |
-| F-DOC-01 | 2 | Dense generated faction reports mix evidence layers. Consistent guides and expandable inventories now separate them; automatic maintenance and certified status generation remain follow-up work. | F09 |
-| F-SCOPE-01 | 2 | A current listing can reuse the name of historically excluded content. Warbuggies is held pending exact current-source identity review; its old Legends classification must neither admit nor conclusively classify the current entry by name alone. | F00–F01 |
+| F-ARMY-01 | 1 | Current Acts of Faith grants a Miracle die at each turn start; the Sororitas consumer and regression use battle-round start. | Debt item 9 in FM0; first case for the "IR changed → consumer stale" rule (U4) |
+| F-ORK-01 | 1 | v946 refreshes the Ork army and detachment roster: seven detachments added, More Dakka! removed, DP costs and Enhancement/Stratagem inventories changed, 73 unit changes. Retired scaffold directories remain. | FM0.5 pilot; U5–U6 |
+| F-DATA-01 | 1 | Current costs and attachments differ from older records (Eldrad, Bloodcrushers, Exorcist surcharge). | S3a; impact class "points only" and "attachment change" in U3; FM1 and FM3 |
+| F-EVID-01 | 1 | Module status, source labels, execution classifications and component labels describe different facts with different denominators. | Q1 |
+| F-OWN-01 | 2 | Shared URLs, same-name variants, chapters and related daemon views are not interchangeable identities. | S2 |
+| F-GEOM-01 | 2 | No model-height field on App datasheets; 17 pages lack a base field. | S5 |
+| F-CORE-01 | 2 | Shared Core Ability wording belongs to the common engine owner. | Gate 0 (Core roadmap PFINAL) |
+| F-DOC-01 | 2 | Generated reports mix evidence layers; guides are hand-maintained. | Q1, D1 |
+| F-SCOPE-01 | 2 | Warbuggies reuses the name of historically excluded content; held pending exact identity review. | S2 |
+| F-DEBT-01 | 1 | Generic lifecycle code branches on faction/detachment IDs and a display name (`army_mustering.py`); the scaffold generator carries a hand-maintained implemented-ID map; per-detachment RuleIR and the detachment source table are Python modules; dated runtime modules encode a source version; only Death Guard has unit/wargear Python modules. | Debt items 1–8 in FM0 |
 
-### Evidence for the urgent findings
-
-**Acts of Faith.** Compare the [current army rule](https://www.40k.app/factions/adepta-sororitas/army-rules)
-with the `BATTLE_ROUND_START_TRIGGER` registration and resolver in
-[the army-rule consumer](../src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py)
-and `test_battle_round_start_gains_miracle_die_once_for_adepta_army` in
-[its regression tests](../tests/unit/test_phase17g_adepta_sororitas_army_rule.py).
-Closure must demonstrate both players' turn starts, duplicate-trigger prevention,
-other gain sources, spending decisions, restore, and replay. It must not merely
-change a constant while leaving an unconsumed subscription.
-
-**Orks.** The [v946 update view](https://www.40k.app/factions/orks/updates)
-lists 73 unit changes and 20 detachment changes before scope filtering.
-The admitted [current detachment inventory](factions/guides/orks.md#detachments)
-contains 15 entries. Compare current Waaagh!, Da Boss, psychic-resource rules,
-and special movement clauses against the [baseline consumer](../src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/orks/army_rule.py).
-More Dakka! is a concrete stale selection claim; a renamed replacement does not
-inherit its execution status. Removed datasheets must also leave the current
-eligibility set. Do not scaffold excluded replacement/retired content.
-
-**Costs and attachment permissions.** The
-[Eldrad update](https://www.40k.app/931/factions/aeldari/units/eldrad-ulthran/updates)
-changes 130 to 120 points and narrows the displayed Leader list to Guardian
-Defenders and Storm Guardians. The
-[Bloodcrushers update](https://www.40k.app/931/factions/chaos-daemons/units/bloodcrushers/updates)
-changes six models from 190 to 200 points and the third-unit surcharge from
-20 to 40. These are source-drift observations; the exact catalog IDs and
-runtime application still need F01/F04 review. The current
-[Exorcist](https://www.40k.app/factions/adepta-sororitas/units/exorcist)
-also illustrates why a single points integer is insufficient: 180 points plus
-40 for the second and subsequent copies. Equipment charges must be counted
-per source-defined model/weapon, not dropped when parsing a minimum cost.
+Evidence for F-ARMY-01, F-ORK-01 and F-DATA-01 is unchanged from the September
+review: compare the [current Acts of Faith](https://www.40k.app/factions/adepta-sororitas/army-rules)
+with `BATTLE_ROUND_START_TRIGGER` in
+[the army-rule consumer](../src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/adepta_sororitas/army_rule.py);
+compare the [Orks v946 update view](https://www.40k.app/factions/orks/updates)
+with the [baseline Waaagh! consumer](../src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/orks/army_rule.py);
+and see the [Eldrad](https://www.40k.app/931/factions/aeldari/units/eldrad-ulthran/updates),
+[Bloodcrushers](https://www.40k.app/931/factions/chaos-daemons/units/bloodcrushers/updates)
+and [Exorcist](https://www.40k.app/factions/adepta-sororitas/units/exorcist)
+pages for cost and attachment drift.
 
 ## Every datasheet's closure checklist
 
 Every admitted datasheet has a linked field table under `docs/factions/audit/`.
-It records all displayed cost rows, composition and characteristic profiles,
-weapon/profile names, option-section presence, bases, keywords, attachment
-recipients, and ability names. Full option prose and operative rule text remain
-at the source link pending approved artifact retention in F00.
+Absence of a field means unresolved or not applicable with source evidence,
+never an invented default. Sir Hekhtur has no standalone cost; his inclusion
+relationship is represented instead of zero points. Model height requires an
+accepted geometry source beyond the App page.
 
 | Surface | What must be reconciled and tested | Owner |
 | --- | --- | --- |
-| Points | All model-count tiers, repeated-unit surcharges, equipment charges, included companion models, rounding/counting rules and current version | F04 |
-| Composition and characteristics | Every model role/count, mixed profile, M/T/SV/W/LD/OC, damaged profile, unique model and legal size | F04/F07 |
-| Wargear and weapon profiles | Default per-model ownership; all ranged/melee modes and characteristics; keywords, linked modes, multiple copies, equipment abilities | F05 |
-| Wargear options | Replacements, mutually exclusive choices, per-N-model limits, leader-specific options, dependencies and illegal combinations | F05 |
-| Base and height | Exact shape/dimensions, hull treatment, model-volume/height measurement, accepted variants and provenance; no zero/default geometry | F06 |
-| Keywords | Canonical faction/unit/model tokens, conditional grants/removals, destroyed-model effects and attached-unit membership | F07 |
-| Leadership / Support | Numeric LD plus Leader/Support slots, exact recipient IDs, attachment exceptions, attach/detach/destruction behavior | F04/F07 |
-| Core abilities | Every instance and parameter, correct common consumer, timing/stacking/eligibility, current Core Rules dependencies | F07 |
-| Unit and faction abilities | Every clause, optional choice, resource, trigger, target, duration, modifier, restoration and cross-rule interaction | F02/F07 |
-| Other sections | Transport capacity and restrictions, orders, reserves/setup, damaged behavior, special army-construction and mission effects | F04–F08 |
-| Operational proof | Legal/illegal roster validation, lifecycle loading, facade submissions, deterministic state/events, viewer-safe projections and replay | F08/F09 |
+| Points | All model-count tiers, repeated-unit surcharges, equipment charges, included companion models, current version | S3a, Track C |
+| Composition and characteristics | Every model role/count, mixed profiles, M/T/SV/W/LD/OC, damaged profile, unique model, legal sizes | S3a, Track C |
+| Wargear and weapon profiles | Default per-model ownership; all ranged/melee modes; keywords, linked modes, multiple copies, equipment abilities | S3a, Track G attack families |
+| Wargear options | Replacements, exclusive choices, per-N-model limits, leader-specific options, dependencies | S3a, Track C |
+| Base and height | Exact shape/dimensions, hull treatment, height, accepted variants and provenance | S5 |
+| Keywords | Canonical tokens, conditional grants/removals, destroyed-model effects, attached-unit membership | S3a, Core P02D, Track G keyword family |
+| Leadership / Support | LD plus Leader/Support slots, exact recipient IDs, attachment exceptions | S3a, Core P19, Track C |
+| Core abilities | Every instance and parameter, correct common consumer, timing/stacking/eligibility | Gate 0 |
+| Unit and faction abilities | Every clause, choice, resource, trigger, target, duration, modifier, restoration and interaction | T2, Track G, Track C |
+| Other sections | Transport capacity and restrictions, orders, reserves/setup, damaged behaviour, army-construction and mission effects | Track C |
+| Operational proof | Legal/illegal rosters, lifecycle loading, facade submissions, deterministic events, viewer-safe projections, replay | Q3, Q4, Track C |
 
-Absence of a field means **unresolved** or **not applicable with source evidence**,
-never an invented default. Sir Hekhtur has no standalone cost displayed; his
-inclusion relationship must be represented instead of assigning zero points.
-Model height requires an accepted geometry source beyond the App page.
+## Tracks
 
-## Ordered implementation roadmap
+Each item is one or a few bounded PRs opened one at a time, with acceptance
+evidence recorded before the next starts.
 
-The rows below are workstreams, not instructions to implement a whole faction
-in one large PR. Open one bounded remediation PR at a time, complete its
-acceptance evidence, review and merge it before the next. This documentation PR
-does not start runtime implementation. Follow the repository's bottom-up order
-and use the existing Core Rules roadmap for shared prerequisites.
+### Track S: source and identity
 
-| Order | Workstream and owning abstraction | Small complete deliverable | Acceptance evidence |
-| --- | --- | --- | --- |
-| F00 | Faction source governance: source-package policy and validators | Extend the maintained-App evidence contract to in-scope faction, detachment and datasheet packages; define geometry authority and selected version | Complete retained observations with stable IDs, hashes and provenance; divergence/ambiguity and excluded-content validation; no live runtime fetches |
-| F01 | Inventory, source identity and evidence reconciliation: catalog/source manifests and coverage reports | Build explicit provider-to-catalog crosswalks; reconcile v946/v931/v925/v913 and any older delta required by each source's baseline; record added, changed, removed, shared and unresolved content | No duplicate identity transfer or omitted admitted URL; report each existing executable row as revalidated, stale, retired or unresolved; track partial clauses and evidence layers separately |
-| F02 | Army rules: faction orchestrators plus existing generic services | Correct F-ARMY-01 and review the Ork refresh first; then close each army rule and allied/related-army restrictions in dependency order | Real resource/phase/choice lifecycle tests; current source clauses, duplicate/stale trigger rejection, restore and deterministic replay; bespoke-handler justification where required |
-| F03 | Detachments: army construction, RuleIR, Enhancements and Stratagem services | Reconcile every DP/force-disposition entry; implement rule families including Upgrades, bearer/keyword restrictions, costs and all named subrules | Source IDs for every rule; legal/illegal detachment and bearer selection; CP/once-per-window rules; real lifecycle execution and adapter decisions |
-| F04 | Datasheet pricing and mustering: catalog, points, roster and attachment validators | Current complete costs, compositions, model roles and related/ally eligibility; resolve inclusion-only entries and retired choices | Boundary tests for every cost tier/surcharge and composition family; mixed-roster validation; no legal configuration admitted with missing required data |
-| F05 | Equipment: typed wargear/profile catalogs and attack services | Exact profile variants, default loadouts and option constraints; reuse generic weapon/equipment semantics | Valid and invalid per-model loadouts, multiple weapon instances, mode choice, profile keywords, ownership and attack-path regressions |
-| F06 | Geometry: model-volume catalog, model groups, visibility and pathing | Source-backed base/hull/height records for all accepted model variants, including mixed-model units | No missing geometry for a fieldable roster; group-aware coherency, range/visibility, collision, transport and movement witnesses |
-| F07 | Datasheet semantics: descriptors, attachment groups, common ability/hook owners | Exact keywords, Leadership/Support, Core/Unit abilities and additional sections for each unit; reuse F02/F05 services | One clause-to-consumer map per source rule; attached-unit, destroyed-model, timing/stacking and negative cases; no display-name runtime gates |
-| F08 | End-to-end operation: lifecycle, adapters and replay | Certify selected representative rosters, then expand to every legal variant and cross-faction interaction | AdapterGameSession/LocalGameSession submissions, deterministic finite IDs/proposals, rejected inputs, viewer redaction, restore and full-game replay |
-| F09 | Coverage certification and documentation: evidence generator and readable guides | Generate separated source/load/execution/fieldability/playability/replay evidence and keep the human guides concise | Fresh audit of all admitted URLs against one retained target snapshot; no open mandatory clause/field; generated checks and complete repository gates |
+| ID | Deliverable | Acceptance evidence |
+| --- | --- | --- |
+| S1 | Retain all 40 admitted views at V0 (the App-data version current at Gate 0) under the F00 contract. Amend the F00 policy to admit 40k.app versioned-path observations (`/<version>/factions/...`) for historical diff fixtures only; they never authorize a current content set. | Every admitted URL has a retained observation with fingerprint; excluded and held content rejected by validators; source-authority registry updated; policy amendment and validator coverage in the same PR |
+| S2 | Identity: project-owned catalog ID registry (existing catalog IDs are grandfathered and become project-owned; new entities receive registry-allocated IDs, never name-derived), crosswalk to 40k.app page IDs, GW PDF rows and the frozen Wahapedia IDs; Space Marines inheritance/overlay model; related-army and shared-page ownership; Warbuggies and Sir Hekhtur resolved or listed unresolved | No name joins; slug renames are crosswalk updates, not identity changes; existing army lists and replay artifacts resolve unchanged |
+| S3a | Structured extraction at the data boundary from retained pages into the content set: datasheets, detachments, army rules, pacts; typed fail-fast loader | Missing fields fail; every record carries source ID, transcription hash and an official provenance link or an explicit "official PDF pending" marker; no runtime module parses page text |
+| S3b | Dual-run catalog generation for currently supported content: Wahapedia rows versus content set, field-by-field diff | Every difference attributed to source drift or an extraction defect; nothing accepted silently |
+| S3c | Switch `rules/catalog_generation.py` to the content set; freeze the Wahapedia snapshot as legacy crosswalk input only | Engine build identity and external contract regenerated; existing army lists and replays load; snapshot path label resolved |
+| S3d | Re-point Wahapedia-fed generators (Stratagem activation support, keyword lexicon, RuleIR shard ownership); replace `faction_detachments_2026_27.py` and the per-detachment `*_ir_support_2026_27.py` modules with content-set records | No runtime module imports the snapshot or a dated detachment module |
+| S4 | Version ledger and content-set diff tool at entity and field granularity, including removals | The Orks 931→946 fixture reproduces the update feed's 20 detachment and 73 unit changes |
+| S5 | Geometry authority corpus: base/hull/height evidence per model variant for every datasheet, through the existing `ModelGeometrySourceEvidence` and `ModelGeometryCatalogRecord` owners | Missing evidence is `blocked`; fieldability consumes the record; no defaults |
 
-F01 depends on F00 for implementation-ready source packages. F02–F07 depend on
-their exact source identities and existing common engine prerequisites; a later
-workstream can supply a prerequisite for an earlier faction-specific slice.
-F08 depends on all selected content's field and rule gates. F09 depends on F08
-and closure of every in-scope obligation, not a percentage threshold.
+Content-set layout (to be confirmed in S3a): `rules/source_packages/warhammer_40000_11th/app_content_sets/<app_data_version>/` containing `manifest.json`, `factions/`, `detachments/<faction>/`, `datasheets/<faction>/`, `crosswalk.json` and `tombstones.json`. Retained observations stay under `data/source_audits/maintained_app_mirrors/`. Packaged size is measured in S3a; compression is applied if the wheel budget requires it.
 
-### F00 completion evidence
+### Track T: corpus taxonomy and semantic demand
+
+| ID | Deliverable |
+| --- | --- |
+| T1 | Stratagem WHEN taxonomy over every distinct Stratagem: the closed window set and the gap list against the current 26 `TimingTriggerKind` values plus reaction and opportunity windows |
+| T2 | Effect taxonomy for abilities, Enhancements, Stratagems and detachment rules: RuleIR template catalogue with counts (hit/wound/save/damage modifiers, rerolls, weapon keyword and profile grants, Feel No Pain and damage reduction, invulnerable/save grants, movement permissions, redeploy/teleport, reserves changes, mortal wounds, fight-order changes, target restrictions, keyword grants, resource gain/spend, healing/revival/return, transport interactions, weapon grants, attachment changes, OC changes, CP gain/refund, Battle-shock manipulation) |
+| T3 | Bearer, target and condition grammar, including state tokens such as "riled up" or "Waaagh! active", ranges, visibility, phase and turn ownership |
+| T4 | Army-construction grammar: DP budgets per battle size, multiple detachments per army, force-disposition consistency, duplicate-detachment prohibition, required and prohibited units and detachments, Enhancement counts, Enhancement-only detachments (Brute Bosses has six Enhancements and no Stratagems), related-army admission and caps, model-specific Warlord and bearer. Delivered read-only to Core P25C before P25C is implemented |
+| T5 | Resource and state-token taxonomy across all 28 army rules (Miracle dice, Pain, Blessings, Battle Focus, Waaagh!, Strands of Fate, Yield, Cabal, Doctrina, Dread, Oath, Vows, Ka'tah, Orders, Kill Teams, Cult Ambush, Reanimation, Synapse/Shadow, Greater Good, Gate of Infinity, Assigned Agents, Code Chivalric, Power from Pain, Thrill Seekers, Dark Pacts, Nurgle's Gift, Shadow of Chaos): which share a typed `ResourceLedger` service and which remain bespoke state machines under the named-handler budget |
+| T6 | Decision-kind and viewer-visibility demand: finite options versus parameterized proposals per rule family; adapter contract deltas |
+
+Output: `semantic_demand_matrix.json` plus a generated table, regenerated on
+every content-set change. Pre-gate surveys are planning evidence; FM0
+regenerates the matrix from the retained content set and reconciles it with
+the surveys.
+
+### Track G: generic engine families
+
+Designed from Track T, implemented inside the depth loop. Each family delivers
+a typed hook or RuleIR handler, the engine-owned consumer and mutation, the
+adapter contract update, replay and restore coverage, one priority-faction
+consumer, one non-priority regression, and flips its demand-matrix rows to
+executable. Candidate families, to be confirmed and ordered by T1–T6: timing
+windows and opponent reaction windows; attack-sequence modifiers and rerolls
+(extend existing); weapon keyword and profile grants (extend); Feel No Pain and
+damage reduction; save grants; movement permissions including ignore-terrain,
+extra moves, redeploy/teleport and reserves ingress changes; target and
+fight-order restrictions; mortal-wound routing (extend); shared resource ledger
+with gain/spend decisions; keyword grants and army-construction constraint
+records on Core P25C surfaces; once-per-battle and once-per-army ledgers
+(generalize P22B); persisting-effect durations; destruction, return and revival
+(generalize Fight On Death and Reanimation); transport interaction modifiers;
+Enhancement weapon grants and attachment-permission changes; Objective Control
+and CP families (extend). New families require a real source-backed consumer in
+the same PR; speculative registries are forbidden.
+
+### Track C: faction certification slices
+
+Every slice follows the same order: army rule and pact → detachments (rule,
+Enhancements, Stratagems, constraints) → datasheets grouped by semantic family
+(pricing, composition, wargear, geometry, keywords, leaders, abilities) →
+fieldability (legal and illegal rosters) → headless full games and replay →
+generated guide refresh. Existing execution claims in a slice are revalidated
+against V0 before any new work reuses them.
+
+| Slice | Scope at App-data 946 (re-counted at V0) | Notes |
+| --- | --- | --- |
+| C-CD Chaos Daemons | 53 datasheets, 9 detachments; The Shadow of Chaos, Daemonic Pact | Owns shared identity for the Blood/Plague/Excess/Scintillating Legion views; five detachments with existing execution revalidated first; Bloodcrushers cost drift |
+| C-EC Emperor's Children | 18 datasheets, 9 detachments; Thrill Seekers, Pact of Excess | Legions of Excess pact; two implemented detachments revalidated |
+| C-AE Aeldari | 55 datasheets, 14 detachments; Battle Focus, Disparate Paths | Harlequins (8 owned datasheets) and Ynnari (11 owned) views; Eldrad cost and Leader drift; Strands of Fate resource |
+| C-WE World Eaters | 25 datasheets, 7 detachments; Blessings of Khorne | Blood Legions pact; Khorne Daemonkin cross-faction eligibility |
+| C-OR Orks | 53 datasheets, 15 detachments; Waaagh!, Da Boss, Unstable energies, Special Move Types | Follows the FM0.5 pilot; retired detachments already tombstoned |
+| Wave 2: Chaos | Chaos Space Marines, Death Guard, Thousand Sons, Chaos Knights | Share Dark Pacts and daemon pacts; RuleIR shards exist for CSM and Thousand Sons |
+| Wave 3: Space Marines super-family | Space Marines' shared detachments certified once; 12 chapter overlays (chapter-owned army rules such as Templar Vows, The Sons of Sanguinius, The Unforgiven, Curse of the Wulfen/Sagas; chapter-owned detachments: Black Templars 6, Blood Angels 8, Dark Angels 8, Space Wolves 7, Ultramarines 2, Deathwatch 1 plus Kill Teams, Imperial Fists/Iron Hands/Raven Guard/Salamanders/White Scars 1 each, subject to S2) | Grey Knights (Gate of Infinity, 9 own detachments) is certified separately |
+| Wave 4: Imperium | Adepta Sororitas (F-ARMY-01 closed in FM0), Adeptus Custodes, Astra Militarum, Adeptus Mechanicus, Imperial Agents, Imperial Knights | |
+| Wave 5: Xenos | Drukhari, Genestealer Cults, Leagues of Votann, Necrons, Tyranids, T'au Empire | |
+| C-FINAL | Corpus-wide L8 audit at one pinned version | |
+
+Wave order after FM5 is a proposal. By Wave 2 most work should be data only, so
+waves may run as parallel agent packets under the data-first contract (D3).
+
+### Track U: update pipeline
+
+| ID | Deliverable |
+| --- | --- |
+| U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00 |
+| U2 | Content-set diff (S4) between the packaged version and the staged version |
+| U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format |
+| U4 | Automatic status invalidation: every L5+ claim is bound to (source ID, transcription hash, RuleIR hash, cost hash, geometry evidence ID). Any diff demotes the claim to `stale` in the generated status; CI fails if a guide asserts `current` for a stale row |
+| U5 | Retirement and supersession records; mustering rejects retired IDs with typed reasons; the content-set/Python parity check removes Python for retired content |
+| U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
+| U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the content-set version; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it. Engine build identity includes every packaged content-set hash |
+| U8 | Runbook and cadence per App-data release: capture → diff → classify → packets → PRs → regenerate status, guides and changelog; roles and review points; CI freshness gate (Q6) |
+
+Impact classes assigned by U3:
+
+| Class | Example | Required work |
+| --- | --- | --- |
+| Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | Regenerate cost records; re-run roster validation; no demotion of semantic claims |
+| Text hash equal | Page re-rendered, same operative text | No-op; re-pin observation |
+| Text changed, compiled RuleIR equal | Wording tweak, same structure | Re-pin hashes; no re-certification |
+| Text changed, RuleIR differs | Acts of Faith battle-round → turn start | Demote consumer to `stale`; re-certify L4–L8 |
+| Structural add | Nazdreg; Brute Bosses; a new Enhancement | New records; L0–L8 from scratch; no Python unless a new family is needed |
+| Structural remove | More Dakka!; a removed Stratagem | Tombstone; eligibility removal; rejection regression; Python deletion via parity check |
+| Attachment or keyword change | Eldrad's narrowed Leader list | Regenerate attachment records; fieldability regressions |
+| Faction rewrite | Orks v946 | U6 procedure |
+
+Worked pilot (FM0.5, Orks): retain the two most recent Orks versions (the
+931→946 pair is retained through versioned-path URLs under the S1 amendment as
+the tooling fixture); the diff reproduces the feed; the classifier identifies
+the adds, removals, DP changes, inventory swaps and "Rules Updated" units;
+More Dakka! and every other removed detachment receive tombstones and rejection
+tests; the Orks records are regenerated from the current content set; the
+Waaagh! consumer is demoted to `stale` and re-certified against current clauses
+(F-ORK-01). Orks is not certified at that point, so no previous Orks version is
+packaged as loadable content.
+
+### Track Q: quality gates and evidence
+
+| ID | Deliverable |
+| --- | --- |
+| Q1 | One generated `content_status` artifact carrying the L0–L8 ladder and freshness for every entity. Guides, audits and the Phase 17O capability manifest derive from it. The four current coverage artifacts become inputs or are retired |
+| Q2 | Code-quality audits: no faction, detachment, unit or datasheet identifiers and no display-name comparisons in generic engine modules (allow-list: faction content and source-linked provider registries); no dated runtime module names; content set ↔ Python parity (every faction Python module maps to a current record; none exists for retired content); every content-set JSON carries version and provenance; no hand-maintained implemented-ID maps |
+| Q3 | Hypothesis roster fuzzing per certified faction: generated legal rosters must muster; targeted illegal mutations (DP over budget, wrong disposition, retired unit, illegal bearer, over-cap ally, duplicate detachment) must be rejected with typed reasons |
+| Q4 | Headless full-game harness over the certified-faction pairing matrix through the shared facade with exact replay reproduction and zero unsupported diagnostics; feeds the standing 60 s mean / 300 s maximum targets in `docs/performance/PERFORMANCE_POLICY.md` |
+| Q5 | Performance evidence per policy for any hot-path family |
+| Q6 | CI freshness gate: packaged content-set version versus the latest retained observation; stale certified claims fail unless acknowledged in the ledger |
+
+### Track D: documentation
+
+| ID | Deliverable |
+| --- | --- |
+| D1 | Guides and audits generated from Q1 only; no hand-edited status |
+| D2 | Per-content-set changelog generated from U2/U3 |
+| D3 | `ADAPTER_DECISION_CONTRACT.md` updated in the same PR as any new family or decision kind; `FACTION_AGENT_IMPLEMENTATION_CONTRACT.md` rewritten for data-first packets (records and bindings; Python only for a new family or a justified named handler) |
+
+## Debt retired in FM0
+
+1. `engine/army_mustering.py` content branches for Shadow Legion and Corsair
+   Coterie and the Be'lakor display-name gate → source-linked provider entries
+   on the Core P25C constraint surfaces.
+2. Per-detachment `*_ir_support_2026_27.py` modules and
+   `faction_detachments_2026_27.py` → content-set records (S3d).
+3. `tools/generate_faction_content_scaffold.py`, its
+   `IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH` map, the generated manifest
+   scaffolding and the placeholder detachment modules → removed; runtime
+   contributions are loaded from content-set bindings plus the remaining
+   justified Python handlers.
+4. `chaos_daemons/july_2026.py`, `july_2026_candidate.py`,
+   `july_2026_updates.py` → versioned data.
+5. The Wahapedia snapshot, whose directory label names a retired edition →
+   frozen legacy crosswalk with the label resolved (S3c).
+6. Retired Orks scaffold directories → U5.
+7. The runtime semantic coverage artifact pinned to the July execution
+   package → Q1.
+8. Death Guard `units/` and `wargear/` Python modules → RuleIR-first; Python
+   only for a justified named handler.
+9. F-ARMY-01 Acts of Faith trigger → corrected against current clauses with
+   both players' turn starts, duplicate-trigger prevention, other gain sources,
+   spending decisions, restore and replay; reference case for U4.
+
+## Sequence
+
+| Milestone | Contents | Exit criterion |
+| --- | --- | --- |
+| FM-pre | Documentation-only work permitted before Gate 0 (below) | Surveys and design documents merged; nothing under `src/`, packaged data, generators, registries or policies changed |
+| Gate 0 | Core Rules roadmap PFINAL closed, including P25A–C; T4 delivered to P25C beforehand | Core completion commit recorded as the faction baseline; V0 selected |
+| FM0 Foundation | S1–S5 (with S3a–S3d), T1–T6 regenerated, U1–U4, Q1–Q2, debt items 1–9, D3 | Demand matrix published from retained content; status artifact live; catalog generated from the content set; existing army lists and replays load; the Orks 931→946 fixture reproduces the feed; no content branching in generic modules; no placeholder Python |
+| FM0.5 Orks pilot (parallel with FM1) | U5–U8 on the two most recent Orks versions; F-ORK-01 | Retired detachments rejected; added detachments at L2; Waaagh! re-certified or explicitly `stale` |
+| FM1 Chaos Daemons | C-CD and the Track G families it demands; F-DATA-01 Bloodcrushers | Every Chaos Daemons entity at L5 or higher; at least three rosters at L7; remaining blockers only for missing geometry evidence |
+| FM2 Emperor's Children | C-EC; Legions of Excess pact | Same criteria |
+| FM3 Aeldari | C-AE; Harlequins and Ynnari; F-DATA-01 Eldrad | Same criteria |
+| FM4 World Eaters | C-WE; Blood Legions pact | Same criteria |
+| FM5 Orks | C-OR to L7 | Same criteria |
+| FM6+ Waves 2–5 | Data-dominant slices | Rules unlocked per family and the share of new content needing Python are reported per wave; a rising code share stops the wave for family redesign |
+| FM-FINAL | C-FINAL | Every in-scope entity L8 and `current` at one pinned version |
+
+A faction's first full-support certification (every owned or inherited entity
+L8 and `current`) is the event that turns on previous-version retention for
+that faction under D3.
+
+Rough PR shapes, not time estimates: FM0 about 20–25 bounded PRs (the catalog
+generation migration is the largest item); FM0.5 about 6–8; FM1 about 30–40;
+FM2 about 15–20; FM3 about 35–45; FM4 about 15–20; FM5 about 25–35; later waves
+shrink per faction as families saturate.
+
+### FM-pre: documentation-only work permitted before Gate 0
+
+Permitted in parallel with the remaining Core Rules orders:
+
+- this roadmap and its maintenance;
+- T1–T6 surveys as documents under `docs/factions/taxonomy/`, with methodology,
+  counts and observation fingerprints, including the read-only T4 grammar
+  survey delivered to Core P25C;
+- the S2 identity model design document: ID registry scheme, crosswalk schema,
+  Space Marines overlay model, related-army ownership;
+- Track U design and runbook documents: impact classes, packet schema,
+  retention policy;
+- the Q1 status-artifact schema document;
+- draft D3 contracts, marked draft until FM0 makes them binding.
+
+Not permitted before Gate 0: any change under `src/`, packaged data artifacts,
+generators, the source-authority registry, the F00 policy text, or catalog and
+runtime identity. Pre-gate documents are planning evidence; FM0 regenerates
+every artifact from retained content and reconciles it with the documents.
+
+## Evidence required to close an implementation slice
+
+Record the content-set version, faction/detachment/datasheet IDs, exact
+clauses, descriptor and execution IDs, owning consumers, remaining unsupported
+branches, test references and generated artifact hashes. State which ladder
+levels actually passed. Update the generated status artifact; the guides
+regenerate from it. Preserve history when a later content set invalidates a
+previously certified claim.
+
+Use focused regressions while iterating, then the repository's complete PR
+gates after scope and architecture review. Tests use real domain objects and
+the shared decision path. A loaded record, a documentation row, a mocked
+handler or a successful extraction is not execution evidence.
+
+## Re-audit policy
+
+Each App-data release is handled through Track U: capture, diff, classify,
+generate packets, implement, regenerate status and guides. Removals are
+inspected as carefully as modifications. The absence of an update-feed entry is
+not proof of equivalence when the packaged content set is older than the
+observed version. The generated status artifact records the actual packaged
+version and observation date; no inventory in this document is indefinitely
+current.
+
+## F00 completion evidence
 
 F00 is implemented by the separate [faction source policy](FACTION_RULES_SOURCE_POLICY.md),
 [retained JSON audit](../data/source_audits/maintained_app_mirrors/factions_2026_09_05.audit.json)
-and [generated governance review](FACTION_SOURCE_GOVERNANCE_REVIEW.md). This closes
+and [generated governance review](FACTION_SOURCE_GOVERNANCE_REVIEW.md). This closed
 F-SOURCE-01. The selected target is App-data 946, English, observed 5 September 2026.
 Three complete observations exercise all package kinds: Sororitas army rules,
 Sanctified Orators and Exorcist. The Exorcist Hull/missing-height obligation
@@ -213,59 +452,32 @@ The offline generator check is `uv run python tools/build_faction_source_governa
 
 Only source load support is established; all three observations remain
 `not_certified` for semantic execution and have no runtime consumer claims.
-F01 still owns corpus-wide retention, provider/catalog crosswalks and version
+S1–S3 own corpus-wide retention, provider/catalog crosswalks and version
 reconciliation. F-SCOPE-01 remains held for exact identity review, with no
-Warbuggies admission. The Acts of Faith consumer correction remains F02.
-No adapter decision or payload contract changes are introduced by F00.
-
-Within F03/F05/F07, group reusable work by semantics: attack modifiers and
-rerolls; ability grants; resource/CP accounting; movement/reserve/setup hooks;
-restoration/destruction; objective control; targeting/eligibility; attachment
-and roster restrictions. Add a generic hook only for a real source-backed
-consumer in the same PR. Reuse engine-owned mutation and decisions. Named
-handlers remain exceptions for bespoke faction state/resources/orchestration
-under [AGENTS.md](../AGENTS.md), with budget and lifecycle evidence.
-
-Do not close a faction row while a selected Core Ability depends on an open
-[Core Rules finding](CORE_RULES_REMEDIATION_ROADMAP.md). Transport destruction,
-disembark, movement paths, Hazardous weapon instances, attached groups, and
-damage allocation need their shared owners' evidence. Copying a local faction
-implementation would create divergent rules paths.
+Warbuggies admission. The Acts of Faith consumer correction is FM0 debt item 9.
+No adapter decision or payload contract changes were introduced by F00.
 
 After integration with `main` at `94972c20`, Order 18/P14 supplies the shared
 objective-geometry query and explicit source `objective_scope` classification.
 New faction source ingestion and objective effects must reuse those owners.
 Faction-specific effects such as the Chaos Daemons corrupted-realspace aura
-still require their own source and consumer review; the merged Core Rules work
-does not close those F07 obligations.
+still require their own source and consumer review.
 
-## Evidence required to close an implementation slice
+## Legacy workstream IDs
 
-Record the source version, faction/detachment/datasheet IDs, exact clauses,
-descriptor/execution IDs, owning consumers, remaining unsupported branches,
-test references, and generated artifact hashes. State which acceptance gates
-actually passed. Update the relevant guide and audit; preserve history when a
-new source invalidates a previously certified claim.
+The guides under `docs/factions/guides/` and the audits under
+`docs/factions/audit/` still reference the superseded F01–F09 identifiers.
+Until D1 regenerates them, read those references through this map.
 
-Use focused regressions while iterating, then the current repository's complete
-PR gates after scope and architecture review. Tests must use real domain
-objects and the shared decision path. A docs checkbox, loaded placeholder,
-mocked handler, or successful parser is not execution evidence.
-
-## Re-audit policy
-
-For content with execution evidence, start at the
-[faction update feed](https://www.40k.app/factions/updates), follow the applicable
-version and changed-item pages, and compare complete current clauses with the
-retained implementation source. Inspect removals as well as modifications.
-No update entry is not proof of equivalence when the repository baseline is older.
-
-For missing content, start at the [faction directory](https://www.40k.app/factions)
-and enumerate its current army-rule, detachment and unit navigation. Preserve
-related-army ownership and shared links. Resolve scope and source completeness
-before adding catalog/runtime rows. Reconcile points and geometry independently
-of ability execution.
-
-A later App update reopens affected source and gameplay gates. F09 must record
-the actual selected version and audit date; this 5 September inventory must not
-be described as indefinitely current.
+| Legacy ID | Superseded by |
+| --- | --- |
+| F00 | Complete; evidence above |
+| F01 | S1, S2, S4 |
+| F02 | T5, Track G resource families, Track C army-rule step |
+| F03 | T1–T4, Track G, Track C detachment step |
+| F04 | S3a, Q3, Track C datasheet step |
+| F05 | S3a, Track G attack families, Track C datasheet step |
+| F06 | S5 |
+| F07 | T2–T3, Track G, Track C datasheet step |
+| F08 | Q3, Q4, Track C fieldability and full-game steps |
+| F09 | Q1, Q6, D1, C-FINAL |
