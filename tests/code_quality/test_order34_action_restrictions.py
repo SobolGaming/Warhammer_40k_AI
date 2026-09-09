@@ -223,7 +223,28 @@ def test_r34_002_restoration_validates_all_shooting_participation_decisions() ->
         if isinstance(node, ast.Assign)
         and any(isinstance(target, ast.Name) and target.id == "shooting" for target in node.targets)
     )
-    # The sequence inventory comes from asserted shooting participation, including
-    # undeclared completions; it must never be narrowed to an existing declaration set.
+    # Both independent claims contribute: undeclared shooting cannot be dropped,
+    # nor can a shooting declaration disappear through a relabelled participation.
+    assert isinstance(shooting.value, ast.BinOp)
+    assert isinstance(shooting.value.op, ast.BitOr)
     assert "MODELS_ATTACKED_EVENT_TYPE" in ast.unparse(shooting)
-    assert "declaration_accepted" not in ast.unparse(shooting)
+    assert "declarations" in ast.unparse(shooting)
+    declarations = next(
+        node
+        for node in function.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "declarations" for target in node.targets
+        )
+    )
+    assert "shooting_declaration_accepted" in ast.unparse(declarations)
+    assert "out_of_phase_shooting_declaration_accepted" in ast.unparse(declarations)
+    models = next(
+        node
+        for node in function.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "model_ids" for target in node.targets
+        )
+    )
+    assert "declarations" in ast.unparse(models)

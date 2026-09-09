@@ -19786,6 +19786,30 @@ def test_r34_002_completed_shooting_inventory_is_authenticated(mutation: str) ->
         GameLifecycle.from_payload(forged)
 
 
+def test_r34_002_completed_shooting_cannot_be_relabelled_to_remove_action_restriction() -> None:
+    from tests.activity_restriction_assertions import (
+        assert_completed_shooting_kind_is_authenticated,
+    )
+    from tests.indirect_shooting_helpers import (
+        SHOOTER,
+        complete_indirect_attack,
+        indirect_session,
+        select_indirect_declaration,
+        submit_indirect_declaration,
+    )
+
+    session = indirect_session(observer=True)
+    request = select_indirect_declaration(session, ShootingType.NORMAL)
+    submit_indirect_declaration(session, request)
+    complete_indirect_attack(session)
+    state = _state(session.lifecycle)
+    assert state.shooting_phase_state is not None
+    assert SHOOTER in state.shooting_phase_state.shot_unit_ids
+    assert_completed_shooting_kind_is_authenticated(
+        session, player_id="player-a", unit_instance_id=SHOOTER
+    )
+
+
 @pytest.mark.parametrize(
     "mutation", ["extra_pair", "foreign_game", "retimed_pair", "unaccepted_declaration"]
 )

@@ -3118,6 +3118,10 @@ def test_phase15e_epic_challenge_registers_selected_character_model_precision() 
 
 
 def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() -> None:
+    from tests.activity_restriction_assertions import (
+        assert_completed_shooting_kind_is_authenticated,
+    )
+
     from warhammer40k_core.adapters.event_stream import EventStreamCursor
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.engine.effects import EffectExpirationBoundary
@@ -3272,6 +3276,9 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
         )
     ).run()
     assert replay.status is ReplayRunStatus.REPRODUCED, replay
+    assert_completed_shooting_kind_is_authenticated(
+        session, player_id="player-a", unit_instance_id="army-alpha:intercessor-unit-1"
+    )
     restored_state = _state(restored)
     for observed in (state, restored_state):
         assert (

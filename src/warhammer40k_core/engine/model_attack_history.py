@@ -222,12 +222,19 @@ def validate_declared_model_attack_completions(
     Mid-executor checkpoints retain the accepted declaration prefix. An omitted
     declaration is not evidence of an authenticated executor starting boundary.
     """
+    declarations = tuple(
+        _participation_for_declaration(event)
+        for event in event_records
+        if event.event_type
+        in {"shooting_declaration_accepted", "out_of_phase_shooting_declaration_accepted"}
+    )
+    # Neither side of the declaration/participation binding may opt itself out.
     shooting = frozenset(
         _identifier(_object(event.payload).get("sequence_id"))
         for event in event_records
         if event.event_type == MODELS_ATTACKED_EVENT_TYPE
         and _object(event.payload).get("attack_phase") == "shooting"
-    )
+    ) | frozenset(_identifier(declaration["sequence_id"]) for declaration in declarations)
     relevant = tuple(
         event
         for event in event_records
@@ -245,9 +252,15 @@ def validate_declared_model_attack_completions(
     )
     model_ids = frozenset(
         model_id
-        for event in relevant
-        if event.event_type == MODELS_ATTACKED_EVENT_TYPE
-        for model_id in _model_ids(_object(event.payload).get("model_instance_ids"))
+        for payload in (
+            *declarations,
+            *(
+                _object(event.payload)
+                for event in relevant
+                if event.event_type == MODELS_ATTACKED_EVENT_TYPE
+            ),
+        )
+        for model_id in _model_ids(payload.get("model_instance_ids"))
     )
     validate_retained_model_attack_history(event_records=relevant, model_instance_ids=model_ids)
 
