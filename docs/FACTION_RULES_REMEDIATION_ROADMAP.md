@@ -17,11 +17,11 @@ Owner decisions recorded on 9 September 2026:
 | # | Decision | Consequence |
 | --- | --- | --- |
 | D1 | 40k.app is the single current authority for both structured datasheet/detachment data and operative rule text. | Catalog generation and every Wahapedia-fed generator migrate to a versioned content set extracted from retained 40k.app pages. The Wahapedia snapshot is frozen as a legacy identity crosswalk. Official GW PDFs remain official provenance. |
-| D2 | The Orks update pilot runs in parallel with the Chaos Daemons slice. | FM0.5 exercises the diff, classification, retirement and status-invalidation tooling on the two most recent Orks versions while FM1 certifies Chaos Daemons. |
-| D3 | Content-set retention is current plus one previous version, applied per faction and only after that faction's first full-support certification. | Before a faction is certified for the first time, only the current version of its content is packaged. From the first certification onward, its previous version is also packaged so its replays remain loadable. |
+| D2 | The Orks update pilot runs in parallel with the Chaos Daemons slice. | FM0.5 exercises the diff, classification, retirement and status-invalidation tooling on the two most recent Orks versions while FM1-a implements Chaos Daemons. |
+| D3 | Content-set retention is current plus one previous version, applied per faction and only after that faction's first full-support certification. | Before a faction's -b certification milestone closes, only the current version of its content is packaged. From that event onward, its previous version is also packaged, every handler it needs is retained, and its replays are covered by the U7a replay compatibility contract; retention without U7a coverage is reported as `exact_build_only`, not as replayability. |
 | D4, D7 | All Core Rules orders close before faction implementation begins. | "Playable" has no Core-exception list. Army-construction facts (DP budgets, force-disposition consistency, Enhancement-only detachments) are settled by Core P25A–C. |
 | D5 | Space Marines are a super-family: the shared detachments are certified once, chapter views are overlays. | S2 models detachment identity as owned by the Space Marines view with chapter overlay records for chapter-owned rules, detachments and eligibility. Grey Knights is outside the overlay. |
-| D6 | Content is JSON records with typed loaders; no per-detachment Python unless a named handler is justified. | The Python scaffold, its generator and the placeholder modules are removed in FM0. Existing implemented Python detachment modules migrate to data bindings as each generic family lands. |
+| D6 | Content is JSON records with typed loaders; no per-detachment Python unless a named handler is justified. | The Python scaffold, its generator and the placeholder modules are removed in FM0. Existing implemented Python detachment modules migrate to data bindings as each generic family lands. Python required by any packaged content-set version is retained until no packaged version references it. |
 | D8 | Documentation-only work may run in parallel with the remaining Core Rules orders. | The [pre-gate documentation track](#fm-pre-documentation-only-work-permitted-before-gate-0) lists exactly what may proceed before Gate 0. |
 
 ## Scope
@@ -91,7 +91,10 @@ Design rules enforced by code-quality tests (Q2):
 5. No source version appears in module or package names; versions live in
    content-set identifiers.
 6. Retirement is first class. Every content record can carry `retired_in` and
-   `superseded_by`; mustering rejects retired IDs with a typed reason.
+   `superseded_by`; mustering at or after `retired_in` rejects the ID with a
+   typed reason, while games and replays declaring an earlier packaged version
+   still execute it. Rejection from current-version mustering and availability
+   for historical replay are different facts and are reported separately.
 7. One denominator model for status; one generated status artifact feeds every
    document and the capability manifest.
 
@@ -112,7 +115,8 @@ provenance links, crosswalk and tombstones).
 
 | Level | Name | Evidence required |
 | --- | --- | --- |
-| L0 | Observed | Retained page under the F00 contract: hashes, App-data version, resolved identity, scope class |
+| — | Staging | Observation without registered official provenance, held outside the admitted package as `blocked_provenance`; planning evidence only, never packaged, never counted toward any level |
+| L0 | Observed | Retained page under the F00 contract: hashes, App-data version, resolved identity, scope class, registered official provenance |
 | L1 | Loaded | Typed content-set record accepted by the fail-fast loader; crosswalk row present |
 | L2 | Structured | Datasheet: every cost tier, composition, option, keyword, Leader/Support. Detachment: DP, force disposition, complete Enhancement/Stratagem inventories with costs and bearer text |
 | L3 | Geometry | Accepted base/hull/height evidence for every model variant (datasheets only) |
@@ -208,14 +212,35 @@ evidence recorded before the next starts.
 | --- | --- | --- |
 | S1 | Retain all 40 admitted views at V0 (the App-data version current at Gate 0) under the F00 contract. Amend the F00 policy to admit 40k.app versioned-path observations (`/<version>/factions/...`) for historical diff fixtures only; they never authorize a current content set. | Every admitted URL has a retained observation with fingerprint; excluded and held content rejected by validators; source-authority registry updated; policy amendment and validator coverage in the same PR |
 | S2 | Identity: project-owned catalog ID registry (existing catalog IDs are grandfathered and become project-owned; new entities receive registry-allocated IDs, never name-derived), crosswalk to 40k.app page IDs, GW PDF rows and the frozen Wahapedia IDs; Space Marines inheritance/overlay model; related-army and shared-page ownership; Warbuggies and Sir Hekhtur resolved or listed unresolved | No name joins; slug renames are crosswalk updates, not identity changes; existing army lists and replay artifacts resolve unchanged |
-| S3a | Structured extraction at the data boundary from retained pages into the content set: datasheets, detachments, army rules, pacts; typed fail-fast loader | Missing fields fail; every record carries source ID, transcription hash and an official provenance link or an explicit "official PDF pending" marker; no runtime module parses page text |
+| S3a | Structured extraction at the data boundary from retained pages into the content set: datasheets, detachments, army rules, pacts; typed fail-fast loader | Missing fields fail; every admitted record carries source ID, transcription hash and registered official provenance (non-empty `official_source_ids` resolving to retained official artifacts with hashes, exactly as the F00 validator requires today); an observation without registered official provenance is a **staging observation** (see below), never an admitted record; no runtime module parses page text |
 | S3b | Dual-run catalog generation for currently supported content: Wahapedia rows versus content set, field-by-field diff | Every difference attributed to source drift or an extraction defect; nothing accepted silently |
-| S3c | Switch `rules/catalog_generation.py` to the content set; freeze the Wahapedia snapshot as legacy crosswalk input only | Engine build identity and external contract regenerated; existing army lists and replays load; snapshot path label resolved |
+| S3c | Switch `rules/catalog_generation.py` to the content set; freeze the Wahapedia snapshot as legacy crosswalk input only. Depends on U7a (replay compatibility contract) being merged first | Engine build identity and external contract regenerated; committed player army-list artifacts resolve their grandfathered catalog IDs unchanged; committed replay fixtures reproduce under the new build through the U7a mechanism, or are regenerated with a recorded justification per fixture; snapshot path label resolved |
 | S3d | Re-point Wahapedia-fed generators (Stratagem activation support, keyword lexicon, RuleIR shard ownership); replace `faction_detachments_2026_27.py` and the per-detachment `*_ir_support_2026_27.py` modules with content-set records | No runtime module imports the snapshot or a dated detachment module |
 | S4 | Version ledger and content-set diff tool at entity and field granularity, including removals | The Orks 931→946 fixture reproduces the update feed's 20 detachment and 73 unit changes |
 | S5 | Geometry authority corpus: base/hull/height evidence per model variant for every datasheet, through the existing `ModelGeometrySourceEvidence` and `ModelGeometryCatalogRecord` owners | Missing evidence is `blocked`; fieldability consumes the record; no defaults |
 
 Content-set layout (to be confirmed in S3a): `rules/source_packages/warhammer_40000_11th/app_content_sets/<app_data_version>/` containing `manifest.json`, `factions/`, `detachments/<faction>/`, `datasheets/<faction>/`, `crosswalk.json` and `tombstones.json`. Retained observations stay under `data/source_audits/maintained_app_mirrors/`. Packaged size is measured in S3a; compression is applied if the wheel budget requires it.
+
+**Staging observations and official provenance.** The F00 contract requires
+every retained observation to carry independent official historical source IDs,
+retained artifact paths and hashes; the validator rejects a row whose official
+references do not resolve. This roadmap does not weaken that contract. An
+App page whose content has no registered official artifact yet (for example a
+newly added datasheet before its faction-pack PDF is retained) is held as a
+staging observation under `data/source_audits/staging/`: it may inform Track T
+surveys, the demand matrix and task packets, but it is outside the admitted
+package, cannot enter the authorized content set, cannot reach L0 in the status
+ladder, and is reported with the distinct freshness/blocker value
+`blocked_provenance`. Admission requires retaining the official artifact under
+`data/raw/faction_packs` with its SHA-256 and registering it in the audit, in a
+reviewed PR. If the owner ever wants App-only content admitted without an
+official artifact, that is a separately reviewed F00 policy and validator
+amendment with its own regression evidence; it is not scheduled by this roadmap
+and a staging marker never becomes evidence by default. Q1 must preserve the
+distinction between `blocked_provenance` staging observations and admitted
+records in every generated report. Acceptance for S3a includes a fixture where a
+pending-provenance observation is rejected from the content set while a
+complete-provenance record is admitted.
 
 ### Track T: corpus taxonomy and semantic demand
 
@@ -285,24 +310,91 @@ waves may run as parallel agent packets under the data-first contract (D3).
 | U1 | Offline capture tool: given a human-triggered snapshot of the update feed and changed pages, writes a staging audit for review. Never runtime input, consistent with F00 |
 | U2 | Content-set diff (S4) between the packaged version and the staged version |
 | U3 | Impact classifier producing impact classes and generated task packets in the data-first packet format |
-| U4 | Automatic status invalidation: every L5+ claim is bound to (source ID, transcription hash, RuleIR hash, cost hash, geometry evidence ID). Any diff demotes the claim to `stale` in the generated status; CI fails if a guide asserts `current` for a stale row |
-| U5 | Retirement and supersession records; mustering rejects retired IDs with typed reasons; the content-set/Python parity check removes Python for retired content |
+| U4 | Automatic, layer-specific status invalidation (rules below): semantic execution claims, roster legality claims and certification claims are bound to separate evidence tuples; a diff demotes exactly the layers whose tuple changed to `stale`; unclassified changed clauses are `stale` pending review; CI fails if a guide asserts `current` for a stale row |
+| U5 | Retirement and supersession records (`retired_in`, `superseded_by`) governing current-version mustering only: a roster built against a content-set version at or after `retired_in` is rejected with a typed reason, while a game or replay declaring an earlier packaged version still loads and executes the record. The content-set/Python parity check removes Python only when no packaged content-set version references it |
 | U6 | Faction rewrite procedure: a new content-set version for the faction, full L0–L8 re-run with the same tooling, explicit retirement of every removed entity, guide regenerated |
-| U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the content-set version; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it. Engine build identity includes every packaged content-set hash |
+| U7 | Retention and coexistence per D3: the current content set is always packaged; a faction's previous version is packaged only after that faction's first full-support certification. Game configuration and replay artifacts carry the engine build identity and the content-set version of every participating faction; loading a replay whose faction content is not packaged fails closed with a typed error naming the repository tag that has it |
+| U7a | Replay compatibility contract (prerequisite of S3c and FM0 exit, owned jointly with the adapter/persistence contract owner): the mechanism below by which a retained previous content-set version remains replayable on a newer engine build without ignoring build identity; contract, conformance scenarios and regressions in the same PR |
 | U8 | Runbook and cadence per App-data release: capture → diff → classify → packets → PRs → regenerate status, guides and changelog; roles and review points; CI freshness gate (Q6) |
+
+#### Replay compatibility across content-set versions (U7a)
+
+Today replay and persistence require the exact `engine_build_id`, a SHA over
+the complete packaged runtime tree. Packaging a new content set therefore
+changes the identity that every existing replay expects, even when its original
+content is still packaged. Retention under D3 is meaningful only with an
+explicit compatibility mechanism; ignoring identity mismatches is forbidden.
+
+1. **Version-aware execution.** The runtime loads the content-set version named
+   by the game configuration or replay artifact for each participating faction.
+   Every generic handler and every justified named handler required by any
+   packaged content-set version is retained until no packaged version
+   references it; the Q2 parity check is evaluated against the union of
+   packaged versions, not the current version alone. Tombstones govern
+   current-version mustering, never historical availability.
+2. **Certified compatibility record.** A newer build may reproduce an artifact
+   exported by an older build only when a versioned, hashed
+   `replay_compatibility` record lists the pair (`engine_build_id` of the
+   producing build, content-set version) as certified. Certification is
+   established by replaying retained golden artifacts actually exported by the
+   producing build (decision records, event log, RNG state, viewer-scoped
+   checkpoints for both players and the operator, final state hash) under the
+   new build with exact equality. The record is regenerated and re-verified on
+   every build that claims it; a failed or absent pair is not covered.
+3. **Fail-closed fallback.** A replay whose (build, content-set) pair is not
+   covered fails with a typed error naming the exact producing build and the
+   repository tag that has it; the exact-build deployment is the only route for
+   that artifact. Operator persistence recovery (Phase 18L) keeps its exact
+   build requirement unchanged; U7a applies to historical replay only.
+4. **Contract change.** U7a amends `contracts/` and
+   `ADAPTER_DECISION_CONTRACT.md` to add the compatibility record, its
+   verification and the fail-closed behaviour, with conformance scenarios,
+   before S3c changes catalog generation. Until U7a is merged, every retained
+   previous version is `exact_build_only` in the status artifact and no
+   previous-version replayability is claimed.
+
+Acceptance evidence for U7a and for every later transition that packages a new
+content set: a golden artifact exported by the actual V build, containing a rule
+retired at V+1 (a justified named handler where one exists), reproduces exactly
+under the V+1 build; the retired content executes in that V replay and is
+rejected with a typed reason in a new V+1 roster; a deliberately uncovered
+(build, content-set) pair fails closed.
+
+#### Layered invalidation (U4)
+
+| Layer | Claims | Evidence tuple | Demoted when |
+| --- | --- | --- | --- |
+| A: semantic execution | L4, L5 | source ID; transcription hash; effect RuleIR hash; timing/window descriptor; target grammar; restriction grammar; bearer grammar; binding IDs and parameters; handler identity for named-handler-backed clauses | Any element changes, or the change cannot be classified |
+| B: roster legality | L6 | cost rows hash; composition hash; wargear/options hash; keywords hash; Leader/Support and attachment hash; army-construction constraint hash; geometry evidence IDs | Any element changes |
+| C: certification | L7, L8 | All Layer A and B tuples of every entity in the certified rosters and interactions, plus the content-set version and packaged build identity | Any contributing tuple changes |
+
+A Layer B change demotes L6–L8 for the affected rosters and preserves Layer A
+claims. A Layer A change demotes L4–L8 for the affected entity and every
+certified roster that uses it. Equality of the effect RuleIR alone never proves
+equivalence: a changed WHEN clause, target set, restriction or bearer text with
+an unchanged effect is a Layer A change. For named-handler-backed clauses, a
+recorded human review is additionally required before a text change can be
+classified as editorial; without it the claim stays `stale`.
+
+Acceptance fixtures for U3/U4: changed timing with unchanged effect IR
+invalidates the affected Layer A claim; a verified editorial-only change
+preserves it; a points-only change preserves Layer A evidence and triggers the
+required Layer B roster validation.
 
 Impact classes assigned by U3:
 
-| Class | Example | Required work |
-| --- | --- | --- |
-| Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | Regenerate cost records; re-run roster validation; no demotion of semantic claims |
-| Text hash equal | Page re-rendered, same operative text | No-op; re-pin observation |
-| Text changed, compiled RuleIR equal | Wording tweak, same structure | Re-pin hashes; no re-certification |
-| Text changed, RuleIR differs | Acts of Faith battle-round → turn start | Demote consumer to `stale`; re-certify L4–L8 |
-| Structural add | Nazdreg; Brute Bosses; a new Enhancement | New records; L0–L8 from scratch; no Python unless a new family is needed |
-| Structural remove | More Dakka!; a removed Stratagem | Tombstone; eligibility removal; rejection regression; Python deletion via parity check |
-| Attachment or keyword change | Eldrad's narrowed Leader list | Regenerate attachment records; fieldability regressions |
-| Faction rewrite | Orks v946 | U6 procedure |
+| Class | Example | Layers demoted | Required work |
+| --- | --- | --- | --- |
+| Points only | Eldrad 130→120; Bloodcrushers surcharge 20→40 | B (affected rosters), C | Regenerate cost records; re-run roster validation and re-certify affected rosters; Layer A evidence preserved |
+| Text hash equal | Page re-rendered, same operative text | none | Re-pin observation |
+| Editorial equivalent | Wording tweak with every Layer A element unchanged and, for named-handler-backed clauses, a recorded review confirming equivalence | none | Re-pin hashes; record the review |
+| Timing, target, restriction or bearer changed, effect IR equal | WHEN clause moves to a different window; bearer widened | A, C | Demote to `stale`; re-map and re-certify L4–L8 |
+| Effect IR changed | Acts of Faith battle-round → turn start | A, C | Demote to `stale`; re-certify L4–L8 |
+| Unclassified clause change | Classifier cannot attribute the diff | A, C | `stale` pending human review; no automatic re-pin |
+| Structural add | Nazdreg; Brute Bosses; a new Enhancement | n/a | Staging observation until official provenance is registered; then L0–L8 from scratch; no Python unless a new family is needed |
+| Structural remove | More Dakka!; a removed Stratagem | C for rosters using it | Tombstone with `retired_in`; current-version mustering rejection regression; Python removed only when no packaged version references it |
+| Attachment or keyword change | Eldrad's narrowed Leader list | B, C | Regenerate attachment records; fieldability regressions |
+| Faction rewrite | Orks v946 | all, for the faction | U6 procedure |
 
 Worked pilot (FM0.5, Orks): retain the two most recent Orks versions (the
 931→946 pair is retained through versioned-path URLs under the S1 amendment as
@@ -318,8 +410,8 @@ packaged as loadable content.
 
 | ID | Deliverable |
 | --- | --- |
-| Q1 | One generated `content_status` artifact carrying the L0–L8 ladder and freshness for every entity. Guides, audits and the Phase 17O capability manifest derive from it. The four current coverage artifacts become inputs or are retired |
-| Q2 | Code-quality audits: no faction, detachment, unit or datasheet identifiers and no display-name comparisons in generic engine modules (allow-list: faction content and source-linked provider registries); no dated runtime module names; content set ↔ Python parity (every faction Python module maps to a current record; none exists for retired content); every content-set JSON carries version and provenance; no hand-maintained implemented-ID maps |
+| Q1 | One generated `content_status` artifact carrying the L0–L8 ladder, freshness, per-layer evidence tuples (U4), `blocked_provenance` staging observations kept distinct from admitted records, per-faction `first_certified_at_content_set`, and the replay-compatibility coverage of every packaged version (`certified` or `exact_build_only`). Guides, audits and the Phase 17O capability manifest derive from it. The four current coverage artifacts become inputs or are retired |
+| Q2 | Code-quality audits: no faction, detachment, unit or datasheet identifiers and no display-name comparisons in generic engine modules (allow-list: faction content and source-linked provider registries); no dated runtime module names; content set ↔ Python parity evaluated against the union of packaged content-set versions (every faction Python module maps to a record in at least one packaged version; no module survives once no packaged version references it); every content-set JSON carries version and provenance; staging observations never appear in packaged data; no hand-maintained implemented-ID maps |
 | Q3 | Hypothesis roster fuzzing per certified faction: generated legal rosters must muster; targeted illegal mutations (DP over budget, wrong disposition, retired unit, illegal bearer, over-cap ally, duplicate detachment) must be rejected with typed reasons |
 | Q4 | Headless full-game harness over the certified-faction pairing matrix through the shared facade with exact replay reproduction and zero unsupported diagnostics; feeds the standing 60 s mean / 300 s maximum targets in `docs/performance/PERFORMANCE_POLICY.md` |
 | Q5 | Performance evidence per policy for any hot-path family |
@@ -344,7 +436,8 @@ packaged as loadable content.
    `IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH` map, the generated manifest
    scaffolding and the placeholder detachment modules → removed; runtime
    contributions are loaded from content-set bindings plus the remaining
-   justified Python handlers.
+   justified Python handlers. Handlers referenced by any packaged content-set
+   version are retained (U7a); only unreferenced Python is deleted.
 4. `chaos_daemons/july_2026.py`, `july_2026_candidate.py`,
    `july_2026_updates.py` → versioned data.
 5. The Wahapedia snapshot, whose directory label names a retired edition →
@@ -364,24 +457,53 @@ packaged as loadable content.
 | --- | --- | --- |
 | FM-pre | Documentation-only work permitted before Gate 0 (below) | Surveys and design documents merged; nothing under `src/`, packaged data, generators, registries or policies changed |
 | Gate 0 | Core Rules roadmap PFINAL closed, including P25A–C; T4 delivered to P25C beforehand | Core completion commit recorded as the faction baseline; V0 selected |
-| FM0 Foundation | S1–S5 (with S3a–S3d), T1–T6 regenerated, U1–U4, Q1–Q2, debt items 1–9, D3 | Demand matrix published from retained content; status artifact live; catalog generated from the content set; existing army lists and replays load; the Orks 931→946 fixture reproduces the feed; no content branching in generic modules; no placeholder Python |
-| FM0.5 Orks pilot (parallel with FM1) | U5–U8 on the two most recent Orks versions; F-ORK-01 | Retired detachments rejected; added detachments at L2; Waaagh! re-certified or explicitly `stale` |
-| FM1 Chaos Daemons | C-CD and the Track G families it demands; F-DATA-01 Bloodcrushers | Every Chaos Daemons entity at L5 or higher; at least three rosters at L7; remaining blockers only for missing geometry evidence |
-| FM2 Emperor's Children | C-EC; Legions of Excess pact | Same criteria |
-| FM3 Aeldari | C-AE; Harlequins and Ynnari; F-DATA-01 Eldrad | Same criteria |
-| FM4 World Eaters | C-WE; Blood Legions pact | Same criteria |
-| FM5 Orks | C-OR to L7 | Same criteria |
-| FM6+ Waves 2–5 | Data-dominant slices | Rules unlocked per family and the share of new content needing Python are reported per wave; a rising code share stops the wave for family redesign |
+| FM0 Foundation | S1–S5 (with S3a–S3d), T1–T6 regenerated, U1–U4 and U7a, Q1–Q2, debt items 1–9, D3 | Demand matrix published from retained content; status artifact live; catalog generated from the content set; committed army-list artifacts resolve unchanged; U7a merged and its golden-artifact fixture reproduces; the Orks 931→946 fixture reproduces the feed; no content branching in generic modules; no placeholder Python |
+| FM0.5 Orks pilot (parallel with FM1-a) | U5–U8 on the two most recent Orks versions; F-ORK-01 | Retired detachments rejected from current-version mustering with typed reasons and their unreferenced Python removed (Orks has no packaged previous version, so historical availability is proven by the U7a fixture, not here); added detachments at L2 or `blocked_provenance`; Waaagh! re-certified or explicitly `stale` |
+| FM1-a Chaos Daemons implementation | C-CD and the Track G families it demands; F-DATA-01 Bloodcrushers | Every Chaos Daemons entity at L5 or higher; at least three rosters at L7; every remaining blocker recorded per entity in the status artifact |
+| FM1-b Chaos Daemons certification | Close every recorded blocker; Q3 fuzzing and Q4 pairing harness for Chaos Daemons; C-FINAL-style audit of the faction | Every owned or inherited Chaos Daemons entity L8 and `current` at the packaged version; zero open blockers; certification event recorded |
+| FM2-a / FM2-b Emperor's Children | C-EC; Legions of Excess pact | Same criteria as FM1-a / FM1-b |
+| FM3-a / FM3-b Aeldari | C-AE; Harlequins and Ynnari; F-DATA-01 Eldrad | Same criteria |
+| FM4-a / FM4-b World Eaters | C-WE; Blood Legions pact | Same criteria |
+| FM5-a / FM5-b Orks | C-OR | Same criteria |
+| FM6+ Waves 2–5 | Data-dominant slices, each with its own -a and -b milestones | Rules unlocked per family and the share of new content needing Python are reported per wave; a rising code share stops the wave for family redesign |
 | FM-FINAL | C-FINAL | Every in-scope entity L8 and `current` at one pinned version |
 
-A faction's first full-support certification (every owned or inherited entity
-L8 and `current`) is the event that turns on previous-version retention for
-that faction under D3.
+Progression rules between milestones:
 
-Rough PR shapes, not time estimates: FM0 about 20–25 bounded PRs (the catalog
-generation migration is the largest item); FM0.5 about 6–8; FM1 about 30–40;
-FM2 about 15–20; FM3 about 35–45; FM4 about 15–20; FM5 about 25–35; later waves
-shrink per faction as families saturate.
+1. FM(n+1)-a may start when FMn-a has closed.
+2. FMn-b must close before FM(n+2)-a starts, so at most one priority faction is
+   awaiting certification while the next is being implemented.
+3. Wave 2 does not start until FM1-b through FM5-b have all closed.
+4. An -a milestone never closes a blocker by omission. Missing geometry
+   evidence, unresolved identity, `blocked_provenance` staging content, an
+   `unsupported` clause or an open Core regression are recorded per entity and
+   carried into the -b milestone; a -b milestone cannot close while any of them
+   is open. If a blocker cannot be resolved (for example no acceptable geometry
+   evidence exists for a model variant), the faction is not certified, its
+   status says so, and previous-version retention does not activate.
+
+The **first full-support certification** of a faction is the close of its -b
+milestone: every owned or inherited entity L8 and `current` at the packaged
+content-set version, zero open blockers, Q3 and Q4 green for that faction, and
+the certification event written to the status artifact as
+`first_certified_at_content_set`. From the next content set onward, that
+faction's previous version is packaged (D3) and covered by U7a.
+
+For Chaos Daemons specifically, the obligations already known to stand between
+FM1-a and FM1-b are: the four review-blocked representative heights recorded in
+the README (Bloodthirster, Lord of Change, Plaguebearers, Plagueridden) and S5
+evidence for the remaining datasheets that have no accepted geometry record;
+V0 revalidation of the five detachments and the datasheet components whose
+execution claims predate the migration; official provenance registration for
+any post-V0 addition still held in staging; and the F-DATA-01 Bloodcrushers
+cost drift. Any obligation discovered during FM1-a is added to that list in
+the status artifact rather than deferred to FM-FINAL.
+
+Rough PR shapes, not time estimates: FM0 about 25–30 bounded PRs (the catalog
+generation migration and U7a are the largest items); FM0.5 about 6–8; FM1-a
+about 30–40 and FM1-b about 5–10; FM2 about 15–20; FM3 about 35–45; FM4 about
+15–20; FM5 about 25–35 (each including its -b milestone); later waves shrink per
+faction as families saturate.
 
 ### FM-pre: documentation-only work permitted before Gate 0
 
