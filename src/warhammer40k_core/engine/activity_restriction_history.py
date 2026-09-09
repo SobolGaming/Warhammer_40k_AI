@@ -57,11 +57,13 @@ def restore_checkpoint_activity_restrictions(
     if len(boundaries) != 1 or state.active_player_id is None:
         raise GameLifecycleError("Activity history requires one exact checkpoint boundary.")
     prior_events = event_records[: boundaries[0]]
-    state.persisting_effects = [
-        effect
-        for effect in state.persisting_effects
-        if activity_restriction_payload(effect) is None
-    ]
+    state.remove_persisting_effects_by_id(
+        tuple(
+            effect.effect_id
+            for effect in state.persisting_effects
+            if activity_restriction_payload(effect) is not None
+        )
+    )
     for action in prior_uses:
         if (
             action.battle_round_started != state.battle_round

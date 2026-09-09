@@ -82,3 +82,9 @@ independent review remain mandatory; the PR will not be merged by this task.
 Performance assessment uses the current standing policy, not the Order 32
 deferral. Full-game mean <60 seconds and maximum <=300 seconds remain
 uncertified unless directly measured.
+
+The full code-quality gate additionally required the reconstruction helper to
+remove effects through `GameState.remove_persisting_effects_by_id`, rather than
+assigning the reconstructed state's list directly. The owning API is now used;
+the gate is unchanged. The resulting production edit requires a fresh covered
+behavioral run and full code-quality run, despite the preceding 6,903-test pass.
