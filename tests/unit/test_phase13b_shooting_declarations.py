@@ -19237,8 +19237,8 @@ def test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks(
         for row in shooting_event_payloads(session, "attack_sequence_step")
         if row["step"] == "hit"
     ]
-    allowed = set()
-    forbidden = set()
+    allowed: set[str] = set()
+    forbidden: set[str] = set()
     for hit in hit_rows:
         original = cast(
             dict[str, JsonValue], cast(dict[str, JsonValue], hit["roll_state"])["original_result"]
@@ -19246,8 +19246,8 @@ def test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks(
         roll_id = cast(str, original["roll_id"])
         restricted = mode is ShootingType.INDIRECT and hit["weapon_profile_id"] == INDIRECT_PROFILE
         (forbidden if restricted else allowed).add(roll_id)
-    generic_rolls = set()
-    command_rolls = set()
+    generic_rolls: set[str] = set()
+    command_rolls: set[str] = set()
     for record in session.lifecycle.decision_controller.records:
         body = cast(dict[str, JsonValue], record.request.payload)
         if (
@@ -19315,3 +19315,17 @@ def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -
     assert state.shooting_phase_state is not None
     assert state.shooting_phase_state.attack_sequence is None
     assert not _event_payloads(session.lifecycle, "shooting_declaration_accepted")
+
+
+@pytest.mark.parametrize("modifier", [-1, 0, 1])
+def test_order33_lower_failure_range_still_requires_the_modified_hit_value(modifier: int) -> None:
+    from tests.indirect_shooting_helpers import assert_indirect_outcomes
+
+    assert_indirect_outcomes(
+        visible=True,
+        stationary=True,
+        observer=False,
+        mode=ShootingType.INDIRECT,
+        modifier=modifier,
+        ballistic_skill=4,
+    )

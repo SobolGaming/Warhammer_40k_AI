@@ -8,11 +8,12 @@ import hashlib
 import json
 import math
 import platform
-import pstats
 import statistics
 import subprocess
 import time
 from pathlib import Path
+from types import CodeType
+from typing import TypedDict
 
 from tests.indirect_shooting_helpers import (
     complete_indirect_attack,
@@ -25,7 +26,15 @@ from tests.indirect_shooting_helpers import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def sample(*, visible: bool, observer: bool, profile: bool) -> dict[str, object]:
+class SliceSample(TypedDict):
+    setup_seconds: float
+    slice_seconds: float
+    work_counts: dict[str, int]
+    decision_count: int
+    hit_count: int
+
+
+def sample(*, visible: bool, observer: bool, profile: bool) -> SliceSample:
     started = time.perf_counter()
     session = indirect_session(visible=visible, observer=observer, model_count=5)
     prepared = time.perf_counter()
@@ -40,18 +49,19 @@ def sample(*, visible: bool, observer: bool, profile: bool) -> dict[str, object]
     completed = time.perf_counter()
     assert len(shooting_event_payloads(session, "attack_sequence_completed")) == 1
 
-    counts = {}
+    counts: dict[str, int] = {}
     if profile:
-        for (_filename, _line, name), (_primitive, calls, _own, _total, _callers) in pstats.Stats(
-            profiler
-        ).stats.items():
+        for entry in profiler.getstats():
+            if not isinstance(entry.code, CodeType):
+                continue
+            name = entry.code.co_name
             if name in {
                 "resolve_line_of_sight",
                 "resolve_visibility_pair",
                 "_target_visible_to_friendly_unit",
                 "_apply_phase13d_weapon_modifiers",
             }:
-                counts[name] = counts.get(name, 0) + calls
+                counts[name] = counts.get(name, 0) + entry.callcount
     return {
         "setup_seconds": prepared - started,
         "slice_seconds": completed - prepared,
@@ -81,7 +91,7 @@ def main() -> None:
             sample(visible=visible, observer=observer, profile=args.work_counts)
             for _ in range(args.samples)
         ]
-        values = sorted(float(row["slice_seconds"]) for row in rows)
+        values = sorted(row["slice_seconds"] for row in rows)
         results[name] = {
             "samples": rows,
             "mean_seconds": statistics.mean(values),

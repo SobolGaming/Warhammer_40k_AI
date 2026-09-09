@@ -4,8 +4,8 @@ from dataclasses import replace
 from typing import cast
 
 from tests.phase13b_shooting_declaration_helpers import (
-    _canonical_catalog,  # pyright: ignore[reportPrivateUsage]
-    _compact_intercessor_catalog,  # pyright: ignore[reportPrivateUsage]
+    _canonical_catalog,
+    _compact_intercessor_catalog,
     _compact_shooting_lifecycle,
 )
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request

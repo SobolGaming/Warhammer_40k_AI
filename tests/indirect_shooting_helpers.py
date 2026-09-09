@@ -21,6 +21,7 @@ from tests.phase13b_shooting_declaration_helpers import (
 from tests.psychic_modifier_helpers import pending_request, submit_fixture_request
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -31,7 +32,7 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.weapon_declaration import ShootingType
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.geometry.pose import Pose
 
 INDIRECT_PROFILE = "order33:indirect"
@@ -50,20 +51,20 @@ def indirect_session(
     rerolls: bool = False,
     game_id: str = "order33-shooting",
     model_count: int = 2,
-    heavy: bool = False,
+    ballistic_skill: int = 2,
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
-    wargear_rows = []
+    wargear_rows: list[Wargear] = []
     for wargear in catalog.wargear:
         if wargear.wargear_id != "core-bolt-rifle":
             wargear_rows.append(wargear)
             continue
         ordinary = replace(
             wargear.weapon_profiles[0],
-            keywords=(WeaponKeyword.HEAVY,) if heavy else (),
+            keywords=(),
             abilities=(),
             attack_profile=AttackProfile.fixed(attacks),
-            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 2),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, ballistic_skill),
             strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 1),
         )
         indirect = replace(
@@ -311,7 +312,13 @@ def shooting_event_payloads(
 
 
 def assert_indirect_outcomes(
-    *, visible: bool, stationary: bool, observer: bool, mode: ShootingType, modifier: int
+    *,
+    visible: bool,
+    stationary: bool,
+    observer: bool,
+    mode: ShootingType,
+    modifier: int,
+    ballistic_skill: int = 2,
 ) -> None:
     from warhammer40k_core.adapters.event_stream import EventStreamCursor
     from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
@@ -327,6 +334,7 @@ def assert_indirect_outcomes(
         observer=observer,
         attacks=36,
         hit_modifier=modifier,
+        ballistic_skill=ballistic_skill,
     )
     pending_request(session)
     initial = session.lifecycle.to_payload()
@@ -335,7 +343,10 @@ def assert_indirect_outcomes(
         dict[str, JsonValue], cast(dict[str, JsonValue], request.payload)["proposal_request"]
     )
     weapons = cast(list[dict[str, JsonValue]], offered["available_weapons"])
-    assert {row["weapon_profile_id"] for row in weapons} == {INDIRECT_PROFILE, ORDINARY_PROFILE}
+    assert {cast(str, row["weapon_profile_id"]) for row in weapons} == {
+        INDIRECT_PROFILE,
+        ORDINARY_PROFILE,
+    }
     pending_checkpoint = session.to_persistence_payload()
     restored = LocalGameSession.from_persistence_payload(pending_checkpoint)
     assert restored.to_persistence_payload() == pending_checkpoint
@@ -366,7 +377,7 @@ def assert_indirect_outcomes(
         minimum = (4 if improved else 6) if restricted else 2
         for hit in pool_hits:
             raw = cast(int, hit["unmodified_roll"])
-            skill = 3 if restricted else 2
+            skill = ballistic_skill + (1 if restricted else 0)
             assert hit["minimum_unmodified_success"] == minimum
             assert hit["target_number"] == skill
             assert hit["modifier"] == modifier
