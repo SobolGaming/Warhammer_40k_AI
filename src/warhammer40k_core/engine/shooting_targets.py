@@ -967,7 +967,6 @@ def _target_candidate(
     hit_roll_modifier = 0
     targeting_rule_ids: list[str] = list(hunter_rule_ids)
     if indirect_no_visible:
-        hit_roll_modifier -= 1
         targeting_rule_ids.extend(
             (
                 INDIRECT_FIRE_NO_VISIBLE_RULE_ID,

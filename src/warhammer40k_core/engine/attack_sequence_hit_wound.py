@@ -132,8 +132,12 @@ def _roll_hit(
     if is_snap_shooting:
         base_minimum_success = 6
     elif INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids:
+        from warhammer40k_core.engine.weapon_abilities import INDIRECT_SHOOTING_POLICY
+
         base_minimum_success = (
-            4 if INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids else 6
+            INDIRECT_SHOOTING_POLICY.stationary_visible_minimum_unmodified_success
+            if INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids
+            else INDIRECT_SHOOTING_POLICY.minimum_unmodified_success
         )
     else:
         base_minimum_success = 2

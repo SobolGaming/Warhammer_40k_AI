@@ -291,16 +291,6 @@ def _attack_pools_or_validation(
                 field="declarations",
             )
         weapon_profile = weapon["weapon_profile"]
-        if declaration.shooting_type is ShootingType.INDIRECT and not has_weapon_keyword(
-            weapon_profile,
-            WeaponKeyword.INDIRECT_FIRE,
-        ):
-            return ShootingProposalValidationResult.invalid(
-                proposal_request_id=proposal.proposal_request_id,
-                violation_code="shooting_type_unavailable",
-                message="Indirect shooting requires an Indirect Fire weapon profile.",
-                field="declarations",
-            )
         if (
             allowed_out_of_phase_target_ids is not None
             and declaration.target_unit_instance_id not in allowed_out_of_phase_target_ids

@@ -1,0 +1,14 @@
+{
+  "workload_id": "order33-indirect-shooting-slice-v1",
+  "base_sha": "8ef8cb83622eb30066fbd113aa94bd87e2ec4fe3",
+  "hardware": {"role": "provisional available host", "cpu": "Apple M5 Pro", "logical_cpus": 18, "memory_bytes": 68719476736, "concurrency": 1, "affinity": "not pinned"},
+  "software": {"python": "3.14.5", "shapely": "2.1.2", "numpy": "2.4.6", "z3": "4.15.4.0", "lock": "uv.lock (hash in reports)"},
+  "workload": "Canonical five-model shooter versus five-model target; third five-model friendly unit in observer case. Circular catalog model bases; clear or one 4x4 inch Ruins footprint with wall/floor. One fixed attack through the Indirect profile.",
+  "cases": ["visible-self-observer", "unseen-no-observer", "unseen-friendly-observer"],
+  "seed": "order33-shooting; actual history-sensitive engine RNG",
+  "policy": "Select named shooter, select Indirect, declare one indirect weapon against named enemy; keep/decline optional rolls and choose first engine-enumerated allocation option until the shot completes.",
+  "timing": "Fresh game setup separate from selection, eligibility, proposal generation/validation, attack resolution and ordinary event/replay recording; seven samples per case; no profiler, coverage or competing workers. Preparation caches remain as in ordinary repeated games.",
+  "work_counts": "Separate cProfile run of identical slice. CI budget is calibrated from base/head work counts before publication; no timing measurements in replay state.",
+  "full_game": {"mean_seconds_strictly_below": 60, "maximum_observed_seconds": 300, "certified": false},
+  "status": "Preimplementation workload; component budgets to be selected from observed base/head cost and recorded before CI gate implementation. Incorrect base supplies cost comparison only."
+}

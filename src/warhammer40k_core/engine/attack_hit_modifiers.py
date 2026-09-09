@@ -21,12 +21,10 @@ def declaration_hit_modifiers(rule_ids: tuple[str, ...]) -> tuple[RollModifier, 
         STEALTH_RULE_ID,
     )
     from warhammer40k_core.engine.weapon_abilities import (
-        INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
         heavy_rule_id,
     )
 
     values = {
-        INDIRECT_FIRE_NO_VISIBLE_RULE_ID: -1,
         STEALTH_RULE_ID: -1,
         BIG_GUNS_NEVER_TIRE_RULE_ID: -1,
         FORTIFICATION_ENGAGEMENT_RULE_ID: -1,
