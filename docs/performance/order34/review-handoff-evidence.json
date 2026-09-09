@@ -1,0 +1,804 @@
+{
+  "schema_version": "order34-review-handoff-evidence-v1",
+  "recorded_at_utc": "2026-09-09T20:32:49.357436+00:00",
+  "base_sha": "e56c1a4caf2a6915548222caed0872627f8dbf43",
+  "behavioral_candidate_sha": "533300706bbe3e8d850d41cbfe1d2c1013fe0196",
+  "source_tree": "7342088900a27801964819690229b8471b59bbc7",
+  "test_tree": "a53d1cda2ba060a3b5f099d2154f6f07d8c34887",
+  "performance_candidate_sha": "5b6752ff07bc5b86e91054a7822ee7ea7dadf7cb",
+  "engine_build": "warhammer40k-core-v2:runtime-tree-sha256-v1:ab699c69e39310e5c158976bdf3169b5ca282c8e3a65163681b59a201e20196e",
+  "local_final_results": {
+    "behavior": {
+      "tests": 6927,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 690.988
+    },
+    "quality": {
+      "tests": 410,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 117.454
+    },
+    "coverage_percent": 85.05,
+    "runner_elapsed_seconds": 812.092
+  },
+  "performance_budgets_passed": true,
+  "full_game_certified": false,
+  "draft_ci_snapshot": "followup-validation/r34-final-draft-ci.json",
+  "independent_review": {
+    "R34-001": "independently closed on 9699f8f8",
+    "R34-002": "author repair; exact published-head re-review requested at handoff",
+    "R34-003": "current-runtime evidence supplied; exact published-head re-review requested at handoff"
+  },
+  "followup_wall_time": {
+    "start_utc": "2026-09-09T16:49:11.225504+00:00",
+    "end_utc": "2026-09-09T20:32:49.357436+00:00",
+    "elapsed_seconds": 13418.131932,
+    "allocated_seconds": {
+      "aggregate_generation_quality_performance": 5100.637226999999,
+      "focused_test_execution": 535.3946809999999,
+      "review_repair_and_publication": 7782.100024,
+      "dedicated_external_wait": 0.0
+    },
+    "method": "Non-overlapping elapsed wall intervals. Running aggregate/generation/quality/performance commands take precedence over focused tests; remaining time includes diagnosis, coding, documentation and publication. This is a clock allocation, not CPU time or exclusive effort; command intervals overlap."
+  },
+  "initial_handoff_estimate_minutes": {
+    "implementation_source": 51,
+    "focused_tests": 6,
+    "author_review_repairs": 25,
+    "aggregate_generation_performance": 41.5,
+    "publication_preparation": 2
+  },
+  "command_intervals": [
+    {
+      "name": "independent-review-intake",
+      "start_utc": "2026-09-09T16:49:11.225504+00:00",
+      "elapsed_seconds": 1.457,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "r34-002-reproduction",
+      "start_utc": "2026-09-09T16:56:30.297545+00:00",
+      "elapsed_seconds": 7.449,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-001-reproduction",
+      "start_utc": "2026-09-09T16:57:25.704993+00:00",
+      "elapsed_seconds": 2.339,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-counterexamples-02",
+      "start_utc": "2026-09-09T16:59:24.660939+00:00",
+      "elapsed_seconds": 2.526,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-counterexamples-03",
+      "start_utc": "2026-09-09T17:00:34.366644+00:00",
+      "elapsed_seconds": 0.256,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-counterexamples-04",
+      "start_utc": "2026-09-09T17:00:49.151454+00:00",
+      "elapsed_seconds": 5.113,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-counterexamples-05",
+      "start_utc": "2026-09-09T17:35:28.371191+00:00",
+      "elapsed_seconds": 4.34,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-counterexamples-06",
+      "start_utc": "2026-09-09T17:36:13.166263+00:00",
+      "elapsed_seconds": 23.085,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-retained-focused-07",
+      "start_utc": "2026-09-09T17:37:38.390457+00:00",
+      "elapsed_seconds": 5.55,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-cross-path-focused-01",
+      "start_utc": "2026-09-09T17:37:51.719260+00:00",
+      "elapsed_seconds": 48.823,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-retained-focused-08",
+      "start_utc": "2026-09-09T17:38:33.941843+00:00",
+      "elapsed_seconds": 7.983,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-retained-focused-09",
+      "start_utc": "2026-09-09T17:40:14.074461+00:00",
+      "elapsed_seconds": 7.021,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-action-retained-focused-10",
+      "start_utc": "2026-09-09T17:41:11.842312+00:00",
+      "elapsed_seconds": 14.949,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-retained-lifecycle-11",
+      "start_utc": "2026-09-09T17:43:42.107363+00:00",
+      "elapsed_seconds": 12.729,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-live-calibration-01",
+      "start_utc": "2026-09-09T17:44:43.818614+00:00",
+      "elapsed_seconds": 0.322,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-live-calibration-02",
+      "start_utc": "2026-09-09T17:45:02.265241+00:00",
+      "elapsed_seconds": 6.564,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-001-pinned-reproduction",
+      "start_utc": "2026-09-09T17:45:31.397846+00:00",
+      "elapsed_seconds": 10.908,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-cross-path-focused-12",
+      "start_utc": "2026-09-09T17:46:33.575801+00:00",
+      "elapsed_seconds": 31.519,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-live-calibration-03",
+      "start_utc": "2026-09-09T17:46:54.581665+00:00",
+      "elapsed_seconds": 150.06,
+      "outcome": "timeout",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-nearby-consumers-01",
+      "start_utc": "2026-09-09T17:48:26.324478+00:00",
+      "elapsed_seconds": 140.045,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-001-reviewed-seeds",
+      "start_utc": "2026-09-09T17:49:31.792378+00:00",
+      "elapsed_seconds": 15.983,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-attached-stall-diagnostic",
+      "start_utc": "2026-09-09T17:50:15.382518+00:00",
+      "elapsed_seconds": 30.285,
+      "outcome": "timeout",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-001-corruption-proof",
+      "start_utc": "2026-09-09T17:50:56.759245+00:00",
+      "elapsed_seconds": 6.98,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-quality-iteration-01",
+      "start_utc": "2026-09-09T17:56:14.905992+00:00",
+      "elapsed_seconds": 0.262,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-restoration-repairs-13",
+      "start_utc": "2026-09-09T17:58:24.705182+00:00",
+      "elapsed_seconds": 18.706,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-live-calibration-04",
+      "start_utc": "2026-09-09T17:59:06.459122+00:00",
+      "elapsed_seconds": 10.345,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-base-attached-stall-diagnostic",
+      "start_utc": "2026-09-09T17:59:10.661917+00:00",
+      "elapsed_seconds": 30.172,
+      "outcome": "timeout",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-retained-seed-calibration",
+      "start_utc": "2026-09-09T18:01:54.678718+00:00",
+      "elapsed_seconds": 29.736,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-calibration-types-05",
+      "start_utc": "2026-09-09T18:02:34.689631+00:00",
+      "elapsed_seconds": 13.07,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-fnp-seed-calibration",
+      "start_utc": "2026-09-09T18:03:51.704174+00:00",
+      "elapsed_seconds": 17.229,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-repaired-consumers-14",
+      "start_utc": "2026-09-09T18:10:16.948035+00:00",
+      "elapsed_seconds": 105.559,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-live-work-calibration-final",
+      "start_utc": "2026-09-09T18:10:45.185126+00:00",
+      "elapsed_seconds": 39.476,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-attached-replay-diagnostic-15",
+      "start_utc": "2026-09-09T18:13:06.220011+00:00",
+      "elapsed_seconds": 6.386,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-repair-typecheck-16",
+      "start_utc": "2026-09-09T18:13:41.000433+00:00",
+      "elapsed_seconds": 46.951,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-attached-replay-detail-17",
+      "start_utc": "2026-09-09T18:14:09.280707+00:00",
+      "elapsed_seconds": 5.433,
+      "outcome": "nonzero",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "r34-live-selected-work-calibration",
+      "start_utc": "2026-09-09T18:14:25.905732+00:00",
+      "elapsed_seconds": 16.133,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-selected-preflight-regressions-18",
+      "start_utc": "2026-09-09T18:14:56.058760+00:00",
+      "elapsed_seconds": 93.642,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-live-final-work-calibration",
+      "start_utc": "2026-09-09T18:15:19.441767+00:00",
+      "elapsed_seconds": 21.148,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-repair-freeze-focused",
+      "start_utc": "2026-09-09T18:17:25.915934+00:00",
+      "elapsed_seconds": 82.047,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-strict-retained-payload-freeze",
+      "start_utc": "2026-09-09T18:19:51.228339+00:00",
+      "elapsed_seconds": 0.254,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-strict-retained-final-freeze",
+      "start_utc": "2026-09-09T18:20:09.595907+00:00",
+      "elapsed_seconds": 50.816,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-final-quality-tools",
+      "start_utc": "2026-09-09T18:20:39.829190+00:00",
+      "elapsed_seconds": 7.196,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-draft-publish-authorized",
+      "start_utc": "2026-09-09T18:22:44.971773+00:00",
+      "elapsed_seconds": 3.711,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-final-quality-tools-02",
+      "start_utc": "2026-09-09T18:23:17.047265+00:00",
+      "elapsed_seconds": 42.433,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-draft-status",
+      "start_utc": "2026-09-09T18:23:53.698069+00:00",
+      "elapsed_seconds": 2.194,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "repair-final-performance",
+      "start_utc": "2026-09-09T18:24:59.790196+00:00",
+      "elapsed_seconds": 267.074,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-legacy-boundary-fixture-audit",
+      "start_utc": "2026-09-09T18:30:23.239167+00:00",
+      "elapsed_seconds": 45.97,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "repair-complete-boundary-fixtures",
+      "start_utc": "2026-09-09T18:32:47.271001+00:00",
+      "elapsed_seconds": 64.767,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-final-contract-client",
+      "start_utc": "2026-09-09T18:32:54.248157+00:00",
+      "elapsed_seconds": 143.671,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "repair-boundary-seed-calibration",
+      "start_utc": "2026-09-09T18:37:06.461129+00:00",
+      "elapsed_seconds": 20.459,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "review-9699-followup-intake",
+      "start_utc": "2026-09-09T18:38:00.538521+00:00",
+      "elapsed_seconds": 1.363,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "r34-undeclared-pair-red",
+      "start_utc": "2026-09-09T18:43:58.162991+00:00",
+      "elapsed_seconds": 20.266,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-declaration-required-focused-02",
+      "start_utc": "2026-09-09T18:46:35.355071+00:00",
+      "elapsed_seconds": 0.664,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-declaration-required-focused-03",
+      "start_utc": "2026-09-09T18:46:48.868902+00:00",
+      "elapsed_seconds": 2.696,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-strict-declaration-focused",
+      "start_utc": "2026-09-09T18:48:30.996192+00:00",
+      "elapsed_seconds": 0.288,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-strict-declaration-focused-02",
+      "start_utc": "2026-09-09T18:48:48.065804+00:00",
+      "elapsed_seconds": 78.991,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-authority-consumer-audit",
+      "start_utc": "2026-09-09T18:51:11.098064+00:00",
+      "elapsed_seconds": 56.21,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-authority-typecheck",
+      "start_utc": "2026-09-09T18:51:46.895412+00:00",
+      "elapsed_seconds": 0.251,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-authority-typecheck-02",
+      "start_utc": "2026-09-09T18:52:34.967071+00:00",
+      "elapsed_seconds": 47.592,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-canonical-boundary-fixtures",
+      "start_utc": "2026-09-09T18:53:41.566681+00:00",
+      "elapsed_seconds": 38.63,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-final-fixture-seed-calibration",
+      "start_utc": "2026-09-09T18:55:50.554721+00:00",
+      "elapsed_seconds": 8.859,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-final-runtime-artifacts",
+      "start_utc": "2026-09-09T18:56:24.013993+00:00",
+      "elapsed_seconds": 44.296,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-final-focused-freeze",
+      "start_utc": "2026-09-09T18:57:19.137624+00:00",
+      "elapsed_seconds": 21.064,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-final-quality",
+      "start_utc": "2026-09-09T18:57:38.329737+00:00",
+      "elapsed_seconds": 42.715,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-final-aggregates",
+      "start_utc": "2026-09-09T18:58:23.111602+00:00",
+      "elapsed_seconds": 330.134,
+      "outcome": "orphan_processes",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-final-contract-client",
+      "start_utc": "2026-09-09T18:58:29.733628+00:00",
+      "elapsed_seconds": 307.065,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-publish-candidate",
+      "start_utc": "2026-09-09T18:59:22.526721+00:00",
+      "elapsed_seconds": 3.324,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "r34-followup-pr-status",
+      "start_utc": "2026-09-09T19:00:54.072710+00:00",
+      "elapsed_seconds": 2.116,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "r34-aggregate-failure-diagnosis",
+      "start_utc": "2026-09-09T19:05:13.156820+00:00",
+      "elapsed_seconds": 96.715,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-cached-failure-diagnosis",
+      "start_utc": "2026-09-09T19:07:05.972758+00:00",
+      "elapsed_seconds": 28.619,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-completed-executor-fixture-repair",
+      "start_utc": "2026-09-09T19:12:07.053344+00:00",
+      "elapsed_seconds": 7.835,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-fixture-declaration-diagnostic",
+      "start_utc": "2026-09-09T19:13:40.519897+00:00",
+      "elapsed_seconds": 4.549,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-retained-fixture-legal-declaration",
+      "start_utc": "2026-09-09T19:14:20.771475+00:00",
+      "elapsed_seconds": 5.795,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-retained-fixture-legal-declaration-02",
+      "start_utc": "2026-09-09T19:15:41.456094+00:00",
+      "elapsed_seconds": 5.866,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-retained-fixture-legal-declaration-03",
+      "start_utc": "2026-09-09T19:17:31.346144+00:00",
+      "elapsed_seconds": 6.59,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-retained-fixture-legal-declaration-04",
+      "start_utc": "2026-09-09T19:18:40.690138+00:00",
+      "elapsed_seconds": 8.407,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-shooting-module-final-freeze",
+      "start_utc": "2026-09-09T19:19:52.211591+00:00",
+      "elapsed_seconds": 94.54,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-fixture-final-quality",
+      "start_utc": "2026-09-09T19:22:50.982393+00:00",
+      "elapsed_seconds": 44.687,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-publish-fixture-freeze",
+      "start_utc": "2026-09-09T19:24:49.564753+00:00",
+      "elapsed_seconds": 2.094,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    },
+    {
+      "name": "r34-followup-runtime-performance",
+      "start_utc": "2026-09-09T19:25:09.141808+00:00",
+      "elapsed_seconds": 267.439,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-final-head-attached-diagnostic",
+      "start_utc": "2026-09-09T19:30:24.870400+00:00",
+      "elapsed_seconds": 30.24,
+      "outcome": "timeout",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-final-base-attached-diagnostic",
+      "start_utc": "2026-09-09T19:31:41.119849+00:00",
+      "elapsed_seconds": 30.207,
+      "outcome": "timeout",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-final-02",
+      "start_utc": "2026-09-09T19:36:30.931227+00:00",
+      "elapsed_seconds": 916.988,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-turn-end-action-diagnosis",
+      "start_utc": "2026-09-09T19:39:34.904904+00:00",
+      "elapsed_seconds": 15.23,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-boundary-fixture-diagnosis",
+      "start_utc": "2026-09-09T19:41:45.182467+00:00",
+      "elapsed_seconds": 4.35,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-boundary-fixture-diagnosis-02",
+      "start_utc": "2026-09-09T19:42:26.752323+00:00",
+      "elapsed_seconds": 18.197,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-boundary-fixture-repair-01",
+      "start_utc": "2026-09-09T19:50:40.014586+00:00",
+      "elapsed_seconds": 18.425,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-boundary-fixture-repair-02",
+      "start_utc": "2026-09-09T19:54:28.839790+00:00",
+      "elapsed_seconds": 28.332,
+      "outcome": "nonzero",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-ecstatic-seed-01",
+      "start_utc": "2026-09-09T19:54:38.155777+00:00",
+      "elapsed_seconds": 17.097,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-boundary-fixture-repair-03",
+      "start_utc": "2026-09-09T19:57:03.963297+00:00",
+      "elapsed_seconds": 30.539,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-boundary-fixture-quality",
+      "start_utc": "2026-09-09T19:57:22.199582+00:00",
+      "elapsed_seconds": 44.585,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-boundary-fixture-quality-final",
+      "start_utc": "2026-09-09T19:58:35.556574+00:00",
+      "elapsed_seconds": 0.247,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-boundary-fixture-quality-final-02",
+      "start_utc": "2026-09-09T19:59:07.469990+00:00",
+      "elapsed_seconds": 44.548,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-final-03",
+      "start_utc": "2026-09-09T20:00:52.263393+00:00",
+      "elapsed_seconds": 992.436,
+      "outcome": "nonzero",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-complete-scoring-module-repair",
+      "start_utc": "2026-09-09T20:08:36.547998+00:00",
+      "elapsed_seconds": 67.227,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-complete-scoring-final-quality",
+      "start_utc": "2026-09-09T20:10:21.208160+00:00",
+      "elapsed_seconds": 166.632,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-all-secondary-action-fixtures",
+      "start_utc": "2026-09-09T20:12:38.929216+00:00",
+      "elapsed_seconds": 149.162,
+      "outcome": "success",
+      "category": "focused_test_execution"
+    },
+    {
+      "name": "r34-complete-activity-fixture-quality",
+      "start_utc": "2026-09-09T20:16:24.019939+00:00",
+      "elapsed_seconds": 50.765,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-followup-final-04",
+      "start_utc": "2026-09-09T20:19:05.677774+00:00",
+      "elapsed_seconds": 812.092,
+      "outcome": "success",
+      "category": "aggregate_generation_quality_performance"
+    },
+    {
+      "name": "r34-final-draft-ci-read",
+      "start_utc": "2026-09-09T20:28:43.737757+00:00",
+      "elapsed_seconds": 1.123,
+      "outcome": "success",
+      "category": "review_repair_and_publication"
+    }
+  ],
+  "artifact_sha256": {
+    "followup-validation/r34-complete-activity-fixture-quality.json": "07bfe55cf82e025417d390b98fef45977c717d0c837f640d90fc33db0073f581",
+    "followup-validation/r34-complete-activity-fixture-quality.txt": "a4a7ab6f2bdcbd156762a6908f5de0d9c62559b2394d76cbd02b5070bd9c89aa",
+    "followup-validation/r34-final-draft-ci-read.json": "90447f54a95e2f5fd535bef29be97357a73e60850c9bb4420bc1ed0fffa682d3",
+    "followup-validation/r34-final-draft-ci-read.txt": "2e4c78c980675d38e8ef4a66f9af10d5ac7c651e21a230b11c74e2c202b0b15e",
+    "followup-validation/r34-final-draft-ci.json": "c386fec3abcee62c03288ce002edab813ad0504f8919ba5516b97b37e2d65e7a",
+    "followup-validation/r34-final-runtime-artifacts.json": "cc9ea1c48c226000d84862cfaa7937a73ef88ef8f4f971b6b6a06ea6da00df87",
+    "followup-validation/r34-final-runtime-artifacts.txt": "e359dbb201edd2af96a8956e7c99baab4bc2bd0ddba2785d0e79302296e9108b",
+    "followup-validation/r34-followup-final-04-behavior.xml.gz": "488a0658b0ec9b847ab8ca2297ab3e5089baefe4ac2be1181944ed03771b72eb",
+    "followup-validation/r34-followup-final-04-quality.xml.gz": "54c7a4f303565a0e0de31a2f2eda0e44d43dc46d18a2e5eab8ca5e08f6df7932",
+    "followup-validation/r34-followup-final-04-summary.json": "20e9f8855173d349fceb3dff65ea43dafe0ca9de80ceaaead740d9c32340f64f",
+    "followup-validation/r34-followup-final-04.json": "21e4f11f86c1afc48930be00551cef8082a7f5c1ef68a35fddc161ab70b8e6a0",
+    "followup-validation/r34-followup-final-04.txt.gz": "55cc04cf462d918daa6a5c3bcdf7cb50380c8329382e6cf5c4cfa443f4703b9c",
+    "followup-validation/r34-followup-final-contract-client.json": "d87f4b7f36b81a844e9c0e8c2e059c3ea809a5a9645c151f85081305d4c97e19",
+    "followup-validation/r34-followup-final-contract-client.txt": "fcac71f98ee95af2e77ac76b82280a43de8e67ce8cdf633cb2cec5d9409e07be",
+    "review-repair/README.md": "78375576165e1d6862454ae9f756b9272d7b82d74a5ad8dd2af60b80ae2ca64e",
+    "review-repair/base-action-timing.json": "62026d31acf8fcf746b7731f2f4354406898ba81c5a11fa24dc6c18472b5b905",
+    "review-repair/base-action-work.json": "4f0e488e2039fa29f9e36cd22855ea19919e4ab533cda12384acbfcd750ddb21",
+    "review-repair/base-attached_selection-timing.json": "424426b3aba44cfc55f49115e103123ead2f66a57b2550db8a96aa9d152199f9",
+    "review-repair/base-attached_selection-work.json": "b6e8a6b7302186c9991617762a4733dfb910c248d866d20a9aa759e38ace9887",
+    "review-repair/base-retained-timing.json": "43398986befe7e2bbeaf52d35e18bdf04cd5889adf04d4aa65c3f0503e73b593",
+    "review-repair/base-retained-work.json": "ba6c8c0628283094009d292d77ef2797aa0a7c1913c370f0d8607ed2ea943e03",
+    "review-repair/base-shooting-timing.json": "1cab085e826630ff2c10790b609c562ed815b5eba33ef65f1c139e587df8137d",
+    "review-repair/base-unrestricted-timing.json": "d84d1142c7999770eb8bc2072a1052c97b373681361eac2fe6e29b1a076b3263",
+    "review-repair/base-unrestricted-work.json": "f60e91956c06f76848caaac4a946a61b21db29306ea76477ea21db9904307369",
+    "review-repair/benchmark-input-manifest.json": "052f434b27e12e8561d02e47c37127c99b4746d99b0983004f8cbb5cb4d5e290",
+    "review-repair/benchmark-spec.json": "09aaedafc6786be72a4feca4a578487e8887914a506e5e8d1ba8fd01623cb408",
+    "review-repair/budget-validation.json": "ff7adcce9530567c9e54c9437d8b6b13c8649270890c68395a0b757e764ca4b4",
+    "review-repair/head-action-timing.json": "fddc6f20fa00ba8793f8f6e221a2aed02b680606ad9578e91813ae9e287019c9",
+    "review-repair/head-action-work.json": "91d614597a39083b351179d9c8bab4e8a416a6715ca68ca875a1bbe741a3cc15",
+    "review-repair/head-attached_selection-timing.json": "fddda2061a01a6730e37b1d34c00ba68cdcd9193c5c4a7a6e6d52d016fbd5cec",
+    "review-repair/head-attached_selection-work.json": "a40658f60cfb19298c024f3af1fe34b09c9e0ba6948a1cd4effdfaf89f9b1b28",
+    "review-repair/head-retained-timing.json": "5a6c5c798e70c45a555482d7c1b9159140a5c5ed9c1c9906dd00f74daf810efe",
+    "review-repair/head-retained-work.json": "8b362f79046c90c08ff076dab359ed0fe2d65d3d572f4970637e7ef7a63acbc5",
+    "review-repair/head-shooting-timing.json": "0c1e7f711a88c7e38f38809b4e63d4437d89e2b329cc5b2755b6285cb284a3b7",
+    "review-repair/head-unrestricted-timing.json": "1e04fd59c84d75d8770ab605f43ff807b2bbb8a4e2dbbbce0511b09274be99b8",
+    "review-repair/head-unrestricted-work.json": "ec35db2d2e9ed79ba28b8dd188d51c02bc18726fe2542d78e8d1ea390be82290",
+    "review-repair/later-fixture-audit.json": "062956af1cd9cde69e5bea32e135c295ebca1e36bdbf8d18f2184c50d025c5e7",
+    "review-repair/r34-final-base-attached-diagnostic.json": "695beeb1f09cf1d8d3d9f862095c00da0c2fa7f97ac7fcee7211163d592589f4",
+    "review-repair/r34-final-base-attached-diagnostic.txt": "f25c69c0f7d238cd8f66c95c77e5446ceb990cbc4ba7bde3112dbf9a95ea0e26",
+    "review-repair/r34-final-head-attached-diagnostic.json": "0089ee3975b52cb959de10862bdc6964f109247da2fcb45b21cbf24cc9abe5ba",
+    "review-repair/r34-final-head-attached-diagnostic.txt": "c2976f951fdac53fe8191e10d069c71ddd0419a8a9b971c79718c8a989612f6b",
+    "review-repair/r34-followup-runtime-performance.json": "5571035e8558f1957800dfb306b852d74184a348083fefccae7448e4d9a7ae79",
+    "review-repair/r34-followup-runtime-performance.txt": "dafdca22812147ae6d215ac4640120eb1d2674f5dfc3d18cc35ada4e25d6523b",
+    "review-repair/r34-live-calibration-03.json": "159a8d7ea39cf0638a3d2a06f1158b8e8e18ffd78f27e87379fe38013db1166c",
+    "review-repair/r34-live-calibration-03.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

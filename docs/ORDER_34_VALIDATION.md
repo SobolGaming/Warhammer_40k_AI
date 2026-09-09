@@ -1,133 +1,212 @@
-# Order 34 validation and review handoff
-
-**Independent review repair in progress:** R34-001, R34-002 and R34-003 were
-received on 2026-09-09. The evidence below records the previous runtime and is
-historical; production fixes invalidate those aggregate results for the new
-candidate. Repaired-head correctness, contract, performance and full CI results
-will replace this status after validation. The PR remains a draft meanwhile.
+# Order 34 validation and independent-review handoff
 
 PR: https://github.com/SobolGaming/Warhammer_40k_AI/pull/438
 
 Base: `e56c1a4caf2a6915548222caed0872627f8dbf43`.
-Final runtime/test candidate: `e57e8be02aa744354d8d078a78be39024ab44643`.
-Later evidence-only commits preserve these tested trees:
+Final behavioral candidate: `533300706bbe3e8d850d41cbfe1d2c1013fe0196`.
+Performance commit: `5b6752ff07bc5b86e91054a7822ee7ea7dadf7cb`; the production
+source tree is identical to the final behavioral candidate.
+Later evidence-only commits preserve these trees and measurement inputs:
 
-- `src`: `2aa39af0b7af29bd00da3019c2b0f3f7022aa50b`
-- `tests`: `39119009c322eee1ea31d35f1fc685108040b2dd`
-- Engine build: `warhammer40k-core-v2:runtime-tree-sha256-v1:bb89e0f65e9aa2a8cd6673646296de4b42c373446b5029d2da1734fee1738322`
+- Source tree: `7342088900a27801964819690229b8471b59bbc7`.
+- Test tree: `a53d1cda2ba060a3b5f099d2154f6f07d8c34887`.
+- Engine build: `warhammer40k-core-v2:runtime-tree-sha256-v1:ab699c69e39310e5c158976bdf3169b5ca282c8e3a65163681b59a201e20196e`.
+- Manifest SHA256: `35277d8c1634d8924bc8b722b54d7b94b512e67f07b8ba766c1156ca1c992200`.
 
-The source/owner/consumer/regression matrix and scoped architecture are in
-[ORDER_34_SCOPE_PLAN.md](ORDER_34_SCOPE_PLAN.md). Source artifacts retain complete
-operative wording, immutable observations and partial execution classifications.
-Actions, Normal/Assault/Close-quarters shooting, and the retained Indirect/Snap
-clauses use source-linked activity descriptors. This does not certify unrelated
+The source-clause, owner, consumer and regression matrix is in
+[ORDER_34_SCOPE_PLAN.md](ORDER_34_SCOPE_PLAN.md). Complete operative source
+wording, historical observations and partial execution classifications remain
+versioned. This work implements the scoped Action restrictions, not unrelated
 source-package clauses or future Orders.
 
-## Correctness evidence
+## Independent findings and repair
 
-The preceding `9558014e` behavioral suite passed 6,903 tests with 85.05% coverage
-in 628.49 s. Its full code-quality run found one direct effect-list assignment
-(402 passed, one failed). The helper now uses the existing
-`GameState.remove_persisting_effects_by_id` method; the audit remains unchanged.
-Focused mutation/source/work audits passed 12 tests, and both historical-shot
-regressions passed. The repaired `e57e8be0` candidate passed the complete covered suite: **6,903 tests, 85.05% coverage**, and all **403 code-quality tests** without coverage.
+The independent follow-up reviewed `9699f8f8aaebc1a452b11eafda9fe14f1cddd6b9`
+against the base above and requested changes. Its stable IDs are preserved:
 
-| Gate | Final candidate result | Runner log under `/private/tmp/order34-evidence/` |
+- **R34-001:** independently closed on that revision. Retained shooting option
+  generation, pre-pop validation and execution consult the shared Action/TITANIC
+  authority before changing the parent continuation. Nested real mission Action
+  and For the Chapter! regressions retain legal alternatives, persistence and replay.
+- **R34-002:** repaired in `c87d5352fbaace2e077dcd754d1030c95d7b1644`, with
+  canonical fixture repairs in the tested commit. Every asserted completed
+  shooting participation must retain an accepted declaration, exact request and
+  decision-ledger closure, original ranged activation, subject models and timing.
+  A copied participation/completion pair cannot establish an executor origin in
+  a fresh unactivated session. Valid mid-executor checkpoints retain their
+  accepted declaration prefix. The original effect-inventory mutations and new
+  undeclared, foreign, retimed and unaccepted pairs are covered. The existing
+  declaration/decision authority is reused outside hot eligibility queries.
+- **R34-003:** fresh timing and work evidence now measures the final repaired
+  runtime. All 98 uninstrumented samples and versioned budgets pass. The original
+  difficult Indirect cases and separate incomplete attached diagnostic are retained.
+
+These are author repair results, not independent approval. Re-review must target
+exactly the published evidence head; Order 34 is not represented as fully closed.
+
+## Required local validation
+
+Logs and terminal metadata are committed under
+[followup-validation](performance/order34/followup-validation/). Large complete
+logs use lossless gzip; `gzip -dc <log>.txt.gz` exposes the original terminal text.
+
+| Gate | Result | Evidence name |
 |---|---|---|
-| Covered behavior, 18 xdist workers | 6,903 passed; 85.05% coverage | `candidate-e57-behavior-coverage.log` |
-| Full code-quality, no coverage | 403 passed | `candidate-e57-code-quality.log` |
-| Ruff check/format, mypy, pyright, shard inventory, import-linter, pre-commit | Passed; mypy 2,817 files; pyright zero errors; 11 import contracts kept | `candidate-e57-quality-tools.log` |
-| Source generators: Actions, Indirect, core Stratagem App source | Exact checks passed | `candidate-e57-source-generation.log` |
-| Build identity, base-ref contract compatibility, installed-wheel smoke | Passed against the exact base; 27 schemas and six request families | `candidate-e57-contract-client.log` |
-| TypeScript generated client, typecheck, unit tests and conformance | Five unit tests and 342 conformance assertions passed | `candidate-e57-contract-client.log` |
-| Focused source/static/work-count checks | 12 passed, plus two historical-shot regressions | `mutation-owner-focused-and-generation.log` |
-| Comparable component and shooting timing budgets | All passed; no threshold changes | `candidate-e57-performance.log` |
+| Full covered behavioral suite, 18 xdist work-stealing workers | **6,927 passed, 85.05% coverage; 691.01 s** | `r34-followup-final-04` |
+| Full code-quality suite, no coverage | **410 passed; 117.51 s** | `r34-followup-final-04` |
+| Ruff check and format; mypy; pyright; exact eight-shard check; import-linter; pre-commit | Passed | `r34-complete-activity-fixture-quality` |
+| Action, Indirect and core Stratagem source checks; runtime manifest and generated contract artifacts | Passed | `r34-final-runtime-artifacts` |
+| Base-ref contract compatibility; installed-wheel smoke; TypeScript generated client/typecheck/unit tests; cross-language conformance | Passed: 2,636 wheel resources, 27 schemas, six request families, five client tests and 342 conformance assertions | `r34-followup-final-contract-client` |
+| Focused final restoration and fixture regressions | 15 passed | `r34-final-focused-freeze` |
+| Entire affected shooting declaration module | 233 passed; subsequent private-access type comments separately verified | `r34-shooting-module-final-freeze`, `r34-complete-activity-fixture-quality` |
+| Whole scoring fixture module; all Secondary certification and authority consumers | 226 and 112 passed, respectively | `r34-complete-scoring-module-repair`, `r34-all-secondary-action-fixtures` |
+| Source, static and live work-count checks | 12 passed | `r34-final-runtime-artifacts` |
+| Comparable base/head component and live timing | 98 samples, all required limits passed | `review-repair/budget-validation.json` |
 
-The cross-language conformance replay SHA-256 is
+The 233-test runner subsequently exited nonzero on two fixture private-access
+Pyright diagnostics; the table does not call that combined runner a pass. Both
+narrowly scoped fixture annotations and the complete typing/quality commands
+passed in `r34-fixture-final-quality`. No behavioral assertions were relaxed.
+
+Cross-language conformance replay SHA256:
 `e1dbd328761732588a3a324778ebc78e43e93e123df5f195787ea44ab06593e4`.
-[Machine-readable execution evidence](performance/order34/execution-evidence.json)
-retains commands, exact outcomes, start/deadline/elapsed values and log hashes.
+The contract/client run took 307.065 s while an earlier aggregate was running;
+this is correctness evidence, not a performance measurement.
 
-Focused evidence includes the source-derived Action/TITANIC matrix, actual
-turn-end cleanup, all five shooting types, Snap in the opponent's Movement phase,
-stale unit/type/declaration rejection before queue pop, forged payload rejection,
-current retained-component keywords, unrelated-unit isolation, exact replay,
-standalone restoration, JSON session persistence and both-viewer projections and
-events. Historical Primary Mission start/decline/pending validation rebuilds the
-activity inventory at its exact authenticated checkpoint. A regression preserves
-prior completed shooting even after the live effect expires.
+Final aggregate commands use the prescribed Node PATH prefix, coverage output
+in the task temporary evidence directory, and xdist work stealing. The final complete behavioral suite passed once with coverage, followed by
+all code-quality tests without coverage. The bounded combined runner exited zero
+in 812.092 s; there were no skipped tests in either suite. `-vv --tb=short` retains named diagnostics; it excludes no test.
+The behavior-file inventory is unchanged:
+the new shared fixture helper is not a behavioral test module. The exact
+`uv run --no-sync python scripts/build_test_shards.py --check --shard-count 8`
+check passes and runs again before final publication.
 
-The final commands use xdist work stealing. The Node runtime prefix is present
-for executable viewer tests. `COVERAGE_FILE` points into the task evidence
-directory; this changes only the coverage output location. No uncovered second
-full behavioral run is used. The behavioral shard file inventory is unchanged;
-the exact eight-shard check was run before each commit and will run before the
-final publication.
+## Performance and limits
 
-## Performance evidence
+[Current repaired-runtime performance](performance/order34/review-repair/README.md)
+contains all raw base/head samples, work counts, budgets, calibration, bounded
+runner outcomes, traces and a 15-file matching recursive workload-input manifest.
+Measurements ran serially on the same provisional Apple M5 Pro / 64 GiB /
+macOS 26.6.2 host, Python 3.14.5 and frozen lock, without coverage, profiling or
+competing task-owned test workers. Work profiling ran separately. All original
+ceilings remain unchanged. The full measurement runner completed in 267.439 s.
 
-[The performance report](performance/order34/README.md), raw timing/work JSON,
-matching workload hashes and [budget validation](performance/order34/budget-validation.json)
-are committed under `docs/performance/order34/`. All 56 base/head timed samples
-completed. The final Action mean is 0.1146 s versus 0.1130 s base (+1.41%).
-Shooting means are 0.1181 / 0.4129 / 0.3260 s (-0.53% / +0.98% / +0.66%).
-The earlier candidate's 0.4493 s unseen/no-observer mean is retained in the logs. No sample
-or hard case was dropped; all timing and CI work budgets passed.
+Action mean: 0.12001 s versus 0.12494 s base. Added unrestricted, attached-selection
+and retained live means: 0.07277 / 0.00422 / 0.21272 s. Original Indirect case
+means: 0.12768 / 0.43541 / 0.34639 s. The slowest-case mean remains close to its
+unchanged 0.45 s limit; local finite measurements are not a universal guarantee.
+The expanded fast CI gate checks live effects, preflight, decision and charge
+coverage and bounded named work counts. No speculative cache was introduced.
 
-These are component and one-attack gameplay-slice results on a provisional
-Apple M5 Pro host. Full-game mean below 60 s and no measured game above 300 s
-remain uncertified. Order 32's deferral is not extended.
+The separate full attached target-declaration diagnostic exceeded its calibration
+150 s deadline. Fresh 30 s probes on final head and base both stopped in the exact
+visibility solver; their logs and timeout outcomes are committed. This remains
+incomplete evidence, not a completed sample or an invented rules answer. The
+attached-selection workload does not replace this diagnostic. The later fixture
+audit records two changed turn-end helper functions outside
+the measured call paths; all benchmark production and executed helper code is
+unchanged, and both checkouts used the same pinned 5b inputs. No solver changes
+or extension of the Order 32 deferral were made.
 
-## Process evidence and recovery
+Full-game mean below 60 s and no measured game above 300 s remain **uncertified**.
+Historical e57 and 9699 timing/aggregate results do not certify the final runtime.
 
-The reused runner and per-command terminal JSON/logs remain at
-`/private/tmp/order34-evidence/`. Each tracked command records start, PID,
-deadline, exit outcome and elapsed time. Success, nonzero and timeout behavior
-were verified once. The system Python lacked `datetime.UTC`; the repository
-Python ran the existing mechanism. Initial ordinary source fetching returned
-403; approved-mirror inspection completed through a normal browser session.
+## Execution, failures and recovery
 
-The first covered aggregate run on `f18ffe1d` ended with 19 failures and 6,882
-passes after 539.6 s, then a coverage save error caused exit 3. It is failed,
-incomplete coverage evidence. Failures exposed current effects leaking into
-historical checkpoints, two missed exact source pins, and two obsolete fixtures.
-Those were repaired as one scope, followed by focused regression and type checks.
-Coverage's repository-root file rename returned `PermissionError`; a two-worker
-covered preflight successfully wrote and combined data in the temporary evidence
-directory before the required full rerun. No production fallback, test exclusion,
-worker-mode relaxation or permission-policy change was introduced.
+The existing small runner retains command, checkout, start, deadline, PID, elapsed
+time and terminal outcome. Raw local logs remain in
+`/private/tmp/order34-evidence/`; relevant review evidence is also committed.
+No general orchestration framework was added.
 
-Discovery errors, malformed initial shell quoting, stale generated manifests,
-and failed focused attempts remain in the logs. Completed process results were
-consumed. Process inspection showed active pytest workers rather than an input
-prompt. Only the deliberate runner timeout preflight required termination of
-task-owned processes. No user intervention or independent review repair occurred
-during implementation.
+The first follow-up covered aggregate was interrupted after 330.134 s with
+failures and incomplete coverage; it did not run the following quality suite.
+Signalling its process group also stopped the controller before it could emit a
+complete failure summary. Read-only inspection confirmed the owned workers had
+exited. The interruption and cleanup records are retained, and no passing result
+is claimed. Focused diagnosis found incomplete direct-executor fixtures: their
+completed shooting lacked the accepted declaration now required for restoration.
+Shared canonical declaration helpers preserve real domain state, actual ledger
+records and original combat assertions. Fixed deterministic seeds preserve the
+same requested outcomes. A paused declaration helper captures the same historical
+origin as the lifecycle before recording its first declaration.
 
-## Publication and outstanding review
+The second covered attempt stopped after 916.988 s with 19 failures, seven
+fixture setup errors and 6,642 passes; it is incomplete, failed evidence. Its
+`--maxfail=8` stop left two workers draining queued scenarios while sixteen
+workers waited. After process inspection, only its verified pytest controller
+received SIGINT, retaining the full failure summary and JUnit report. All owned
+workers exited. The final run uses normal work stealing without that early-stop
+flag and executes without competing local heavy validation processes.
 
-The owner-authorized timing exception published a clearly labeled draft after
-focused tests passed, before aggregate validation. The initial draft was
-`71c66bab`; `f18ffe1d` fixed selection preflight and type findings; `9558014e`
-fixed historical checkpoint reconstruction; `e57e8be0` uses the required GameState
-mutation API. These are the author's findings,
-not independent approval.
+The second fixture audit corrected turn-end expiry, remaining direct executors,
+identity-based corruption targets, replay checkpoint setup and a fixed Fight
+seed. Plunder scoring now uses an accepted Action through the lifecycle and
+keeps its decision history and unrelated unit placements. The final focused
+secondary/restoration run passed 53 tests; earlier passing corruption and adapter
+persistence cases remain in the 74 passes of the preceding repair run, whose
+nine then-failures are explicitly retained. The complete static command chain
+subsequently passed in 44.548 s. Production source did not change.
 
-Draft CI skips behavioral shards and coverage. Once required local validation
-passes, marking ready triggers those lanes. The exact final CI snapshot and
-elapsed-time breakdown are recorded at handoff. Independent ChatGPT review is
-owner-initiated and outstanding. This task does not merge or self-approve the PR,
-and Order 34 is not represented as fully closed.
+The third covered attempt completed all 6,927 tests: 6,921 passed and six failed
+in 989.28 s, with 85.04% coverage (992.436 s runner wall time). The following
+quality suite was not run because behavior failed. Its two remaining direct
+executor fixtures and four Cleanse cases were repaired as complete fixture
+families, with 226 scoring-module tests and all 112 Secondary certification and
+authority tests passing. The shared Action fixture now submits both Cleanse and
+Plunder through the lifecycle; the old synthetic completed-Action builder was
+removed. Complete static validation passed in 50.765 s. No production change
+occurred after the original R34-002 repair.
+
+Earlier focused failures and subsequent passing repairs are retained by name.
+There are no broad exception fallbacks, integration mocks, omitted tests or
+weakened restoration checks. The initial implementation's failed historical
+aggregates remain in prior Git history and the raw runner directory.
+
+Automatic approval review initially rejected one scoped publication attempt
+because authorization and destination were not recognized. The original explicit
+PR publishing instruction and configured SobolGaming remote were re-verified;
+the same scoped retry was approved and published. This is resolved, with no
+remaining permission blocker or request for user intervention.
+
+## Publication and CI
+
+The owner explicitly authorized draft publication after focused checks, before
+aggregate validation. Required local gates now pass on the final candidate.
+Draft CI on `53330070` passed lint, both type checkers, source semantics, code
+quality and contract conformance, but skipped behavioral shards and coverage.
+The [draft snapshot](performance/order34/followup-validation/r34-final-draft-ci.json)
+retains that distinction. Marking the final evidence head ready triggers full CI.
+Its exact-head CI status is recorded in the PR body and the stable review replies
+at handoff; a pending or skipped lane is never described as passed. No merge or
+self-approval occurs.
 
 ## Elapsed time
 
-Approximately 125.5 minutes through evidence preparation at 2026-09-09T16:48:31.266435+00:00.
-Phase allocation estimates: 51 minutes implementation/source work, six minutes
-focused test execution, 25 minutes author review/repairs, 41.5 minutes aggregate
-validation/performance/generation, and two minutes publication/handoff preparation.
-Parallel command durations overlap; exact starts, deadlines and wall durations are
-in the execution JSON and complete runner directory. There was no dedicated wait
-for external review or CI and no user intervention. The final covered run took
-598.57 s (601.181 s runner wall time); final code-quality took 118.13 s
-(118.713 s runner wall time). Ten SQLite ResourceWarnings were emitted by the
-behavioral suite; all tests passed.
+Task work began approximately 2026-09-09 14:43 UTC. Review repair began around
+16:49 UTC. The initial implementation handoff recorded approximately 125.5 minutes
+through 16:48:31 UTC: 51 minutes implementation/source work, six focused tests,
+25 author review/repair, 41.5 aggregate validation/performance/generation and two
+publication preparation. Those allocations are estimates, not stopwatch data.
+
+The follow-up repair interval includes diagnosis, canonical fixture corrections,
+focused tests, generation, typing, performance, publication and final aggregates.
+Per-command metadata supplies exact durations; overlapping command durations
+must not be added as elapsed time. Final handoff records total elapsed time and
+separates any bounded CI wait. There was no dedicated wait for independent review
+and no additional user intervention was required to execute the repairs.
+
+Through local evidence preparation at **2026-09-09 20:32:49 UTC**, total elapsed
+wall time was approximately **5 h 50 min**. The follow-up interval was 223.6 min.
+Its non-overlapping clock allocation is 129.7 min review/repair/documentation/
+publication, 8.9 min focused test execution and 85.0 min aggregate validation,
+generation, quality and performance. There was zero dedicated external wait in
+that interval. Running aggregate commands take precedence when activities overlap;
+these are wall-clock allocations, not exclusive effort or CPU time. The initial
+125.5-minute estimate above is separate, with about 40 seconds between handoffs.
+Any later bounded CI wait is reported separately in the final PR handoff.
+
+[Machine-readable final evidence](performance/order34/review-handoff-evidence.json)
+records exact command intervals, result counts, coverage, source/test identities,
+all final artifact hashes and the allocation method. Large final logs and both
+JUnit reports are retained losslessly beside their terminal metadata.
