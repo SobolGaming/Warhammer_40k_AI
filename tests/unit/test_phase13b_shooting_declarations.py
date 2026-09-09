@@ -698,7 +698,12 @@ def test_shooting_target_candidate_cache_uses_full_weapon_profile_identity() -> 
         )
     )
 
-    assert {option.option_id for option in type_request.options} == {ShootingType.NORMAL.value}
+    # The short mortar supplies mode eligibility even when it cannot reach this
+    # target; the ordinary long rifle may shoot the visible target in either mode.
+    assert {option.option_id for option in type_request.options} == {
+        ShootingType.NORMAL.value,
+        ShootingType.INDIRECT.value,
+    }
 
     declaration_request = _decision_request(
         _submit_result(
