@@ -44,6 +44,24 @@ def test_indirect_stationary_and_observer_queries_use_durable_presence_authoriti
     assert "placed_army_for_player" not in attributes
 
 
+def test_indirect_engagement_validation_precedes_general_vehicle_permission() -> None:
+    path = ENGINE / "shooting_targets.py"
+    validator = _function(path, "_locked_in_combat_validation")
+    first = validator.body[0]
+    assert isinstance(first, ast.If)
+    assert isinstance(first.test, ast.Name)
+    assert first.test.id == "indirect_no_visible"
+    candidate = _function(path, "_target_candidate")
+    call = next(
+        node
+        for node in ast.walk(candidate)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_locked_in_combat_validation"
+    )
+    assert "indirect_no_visible" in {keyword.arg for keyword in call.keywords}
+
+
 def test_completed_indirect_slice_stays_within_versioned_work_budgets() -> None:
     from scripts.measure_indirect_shooting import sample
 

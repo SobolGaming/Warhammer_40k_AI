@@ -885,6 +885,7 @@ def _target_candidate(
             weapon_profile=weapon_profile,
             target_unit_id=target_unit_id,
             engaged_target_unit_ids=locked_context.engaged_target_unit_ids,
+            indirect_no_visible=indirect_no_visible,
         )
         if locked_validation is not None:
             return _invalid_candidate(
@@ -1331,7 +1332,10 @@ def _locked_in_combat_validation(
     weapon_profile: WeaponProfile,
     target_unit_id: str,
     engaged_target_unit_ids: tuple[str, ...],
+    indirect_no_visible: bool,
 ) -> str | None:
+    if indirect_no_visible:
+        return "Indirect Shooting requires the firing rules unit to be unengaged."
     is_close_quarters = has_close_quarters_weapon_keyword(weapon_profile)
     if is_close_quarters:
         if target_unit_id not in engaged_target_unit_ids:

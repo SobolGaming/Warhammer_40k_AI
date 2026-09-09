@@ -26,6 +26,7 @@ from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
@@ -52,8 +53,27 @@ def indirect_session(
     game_id: str = "order33-shooting",
     model_count: int = 2,
     ballistic_skill: int = 2,
+    shooter_keyword: str | None = None,
+    engager_distance: float | None = None,
+    engager_attached: bool = False,
 ) -> LocalGameSession:
     catalog = _compact_intercessor_catalog(_canonical_catalog())
+    if shooter_keyword is not None:
+        assert shooter_keyword in {"VEHICLE", "MONSTER"}
+        catalog = replace(
+            catalog,
+            datasheets=tuple(
+                replace(
+                    row,
+                    keywords=replace(
+                        row.keywords, keywords=(*row.keywords.keywords, shooter_keyword)
+                    ),
+                )
+                if row.datasheet_id == "core-intercessor-like-infantry"
+                else row
+                for row in catalog.datasheets
+            ),
+        )
     wargear_rows: list[Wargear] = []
     for wargear in catalog.wargear:
         if wargear.wargear_id != "core-bolt-rifle":
@@ -83,7 +103,27 @@ def indirect_session(
             (key, "core-intercessor-like-infantry", "core-intercessor-like", model_count)
             for key in alpha_ids
         ),
-        enemy_datasheet=("core-intercessor-like-infantry", "core-intercessor-like", 5),
+        enemy_datasheet=None,
+        enemy_unit_specs=(
+            ("enemy", "core-intercessor-like-infantry", "core-intercessor-like", 5),
+            *(
+                (("engager", "core-intercessor-like-infantry", "core-intercessor-like", 1),)
+                if engager_distance is not None
+                else ()
+            ),
+            *(
+                (("engager-leader", "core-character-leader", "core-character-leader", 1),)
+                if engager_attached
+                else ()
+            ),
+        ),
+        enemy_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="engager-leader", bodyguard_unit_selection_id="engager"
+            ),
+        )
+        if engager_attached
+        else (),
         game_id=game_id,
         catalog=catalog,
     )
@@ -107,7 +147,11 @@ def indirect_session(
         for unit in army.units:
             key = unit.unit_instance_id.split(":", 1)[1]
             x, y = (
-                (30.0, 35.0)
+                (10.0, 45.0)
+                if key == "engager" and engager_attached
+                else (10.0, 35.0 + engager_distance)
+                if key in {"engager", "engager-leader"} and engager_distance is not None
+                else (30.0, 35.0)
                 if key == "enemy"
                 else (10.0, 45.0)
                 if key == "observer"

@@ -75,3 +75,22 @@ architecture edges, geometry solver changes, faction branches or runtime text
 parsing. The existing shared shooting path handles visible ordinary profiles
 and unseen Indirect profiles. The adapter contract documents this corrected
 eligibility within the existing schemas. Behavioral file names are unchanged.
+
+## Independent review repair
+
+R33-001 identified that the shared target candidate allowed an engaged vehicle
+to target an unseen unit before classifying Close-quarters versus Indirect.
+The existing physical rules-unit engagement authority now rejects unseen
+attacks before applying the general vehicle permission. Visible candidates
+remain Close-quarters; selected-mode filtering already excludes them from
+Indirect. Mode enumeration and declaration preflight consume the same typed
+candidate rejection. No additional engagement query or cache is introduced.
+Regressions cover vehicle/monster, visible/unseen and engaged/unengaged cases,
+actual legal Close-quarters completion, forged finite choices, pending
+declarations invalidated by engagement, and retained attached engagement with
+restoration/replay. Existing mixed ordinary-weapon coverage remains required.
+
+R33-002 identified two missing exact source inventories. The quality audit now
+expects 21 authorized packages and classifies the new package as a project
+reviewed transcription with project-authoritative App-mirror evidence. The
+immutable historical observation count and inventory hash remain unchanged.

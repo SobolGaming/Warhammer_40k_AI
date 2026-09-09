@@ -19271,6 +19271,192 @@ def test_order33_actual_reroll_windows_are_scoped_to_indirect_attacks(
     assert len(hit_rows) == (12 if visible else 6)
 
 
+@pytest.mark.parametrize("keyword", ["VEHICLE", "MONSTER"])
+@pytest.mark.parametrize("visible", [False, True])
+@pytest.mark.parametrize("engaged", [False, True])
+def test_r33_001_indirect_mode_requires_unengaged_rules_unit(
+    keyword: str, visible: bool, engaged: bool
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        INDIRECT_PROFILE,
+        SHOOTER,
+        TARGET,
+        complete_indirect_attack,
+        indirect_session,
+        shooting_event_payloads,
+    )
+    from tests.psychic_modifier_helpers import pending_request
+
+    session = indirect_session(
+        visible=visible,
+        model_count=1,
+        shooter_keyword=keyword,
+        engager_distance=1.8 if engaged else 5.0,
+    )
+    request = pending_request(session)
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r33-001:unit", option_id=SHOOTER
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    modes = {option.option_id for option in request.options}
+    assert (ShootingType.INDIRECT.value in modes) is not engaged
+    if engaged:
+        assert ShootingType.CLOSE_QUARTERS.value in modes
+        before = session.lifecycle.to_payload()
+        with pytest.raises(DecisionError, match="not in the finite action space"):
+            session.submit_option(
+                request_id=request.request_id, result_id="r33-001:forged-mode", option_id="indirect"
+            )
+        assert session.lifecycle.to_payload() == before
+    mode = ShootingType.CLOSE_QUARTERS if engaged else ShootingType.INDIRECT
+    status = session.submit_option(
+        request_id=request.request_id, result_id="r33-001:mode", option_id=mode.value
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    request = pending_request(session)
+    proposal = _proposal_from_request(
+        request=request,
+        target_unit_id="army-beta:engager" if engaged else TARGET,
+        weapon_profile_id=INDIRECT_PROFILE,
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="r33-001:declare",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    complete_indirect_attack(session)
+    assert len(shooting_event_payloads(session, "attack_sequence_completed")) == 1
+
+
+@pytest.mark.parametrize("keyword", ["VEHICLE", "MONSTER"])
+@pytest.mark.parametrize("visible", [False, True])
+def test_r33_001_new_engagement_rejects_pending_indirect_declaration(
+    keyword: str, visible: bool
+) -> None:
+    from tests.indirect_shooting_helpers import (
+        INDIRECT_PROFILE,
+        TARGET,
+        indirect_session,
+        select_indirect_declaration,
+    )
+
+    from warhammer40k_core.engine.phases.shooting_declaration_validation import (
+        _attack_pools_or_validation,
+    )
+    from warhammer40k_core.engine.phases.shooting_validation import _unit_by_id
+
+    session = indirect_session(
+        visible=visible, model_count=1, shooter_keyword=keyword, engager_distance=5.0
+    )
+    request = select_indirect_declaration(session)
+    proposal = _proposal_from_request(
+        request=request, target_unit_id=TARGET, weapon_profile_id=INDIRECT_PROFILE
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    engager = _unit_by_id(state=state, unit_instance_id="army-beta:engager")
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        _unit_placement_at(
+            engager, army_id="army-beta", player_id="player-b", poses=(Pose.at(10.0, 36.8),)
+        )
+    )
+    before = session.lifecycle.to_payload()
+    validation = _attack_pools_or_validation(
+        state=state,
+        proposal=proposal,
+        ruleset_descriptor=session.lifecycle.config.ruleset_descriptor,
+        army_catalog=session.lifecycle.config.army_catalog,
+    )
+    assert not isinstance(validation, tuple)
+    assert not validation.is_valid
+    assert validation.violations[0].violation_code == (
+        "shooting_type_unavailable" if visible else "target_locked_in_combat"
+    )
+    assert session.lifecycle.to_payload() == before
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="r33-001:stale-engagement",
+        payload=validate_json_value(proposal.to_payload()),
+    )
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert session.lifecycle.to_payload() == before
+
+
+@pytest.mark.parametrize("attached", [False, True])
+def test_r33_001_retained_engagement_survives_restoration(attached: bool) -> None:
+    from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
+    from tests.indirect_shooting_helpers import SHOOTER, indirect_session
+    from tests.psychic_modifier_helpers import pending_request
+
+    from warhammer40k_core.engine.phases.shooting_validation import _unit_by_id
+    from warhammer40k_core.engine.physical_engagement import (
+        current_rules_unit_is_physically_engaged,
+    )
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
+
+    session = indirect_session(
+        visible=False,
+        model_count=1,
+        shooter_keyword="VEHICLE",
+        engager_distance=1.8,
+        engager_attached=attached,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    engager_id = "army-beta:engager-leader" if attached else "army-beta:engager"
+    engager = _unit_by_id(state=state, unit_instance_id=engager_id)
+    model = engager.own_models[0]
+    placement = state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=engager_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.NORMAL,
+    )
+    assert damage.destroyed
+    retain_destroyed_model_for_fixture(
+        state=state,
+        placement=placement,
+        effect_id="r33-001:retention",
+        source_rule_id="r33-001:retained-engager",
+        source_phase=BattlePhase.SHOOTING,
+        decisions=session.lifecycle.decision_controller,
+    )
+    # Retention setup uses the canonical decision owner; subsequent choices run through the facade.
+    session = LocalGameSession(lifecycle=GameLifecycle.from_payload(session.lifecycle.to_payload()))
+    initial = session.lifecycle.to_payload()
+    for candidate in (
+        session,
+        LocalGameSession(lifecycle=GameLifecycle.from_payload(initial)),
+    ):
+        state = candidate.lifecycle.state
+        assert state is not None
+        assert current_rules_unit_is_physically_engaged(state=state, unit_instance_id=SHOOTER)
+        request = pending_request(candidate)
+        status = candidate.submit_option(
+            request_id=request.request_id, result_id="r33-001:retained-unit", option_id=SHOOTER
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        request = pending_request(candidate)
+        assert {option.option_id for option in request.options} == {"close_quarters"}
+    assert session.lifecycle.to_payload() == candidate.lifecycle.to_payload()
+    for viewer in ("player-a", "player-b"):
+        assert session.view(viewer_player_id=viewer) == candidate.view(viewer_player_id=viewer)
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id=f"r33-001:retained:{attached}",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
 def test_order33_stale_malformed_and_unseen_ordinary_submissions_fail_closed() -> None:
     from tests.indirect_shooting_helpers import (
         INDIRECT_PROFILE,
