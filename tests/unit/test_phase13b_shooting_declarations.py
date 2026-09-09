@@ -12453,7 +12453,7 @@ def test_order_9_p05a_destruction_reaction_waits_for_attacking_unit_attacks() ->
     )
     with pytest.raises(
         GameLifecycleError,
-        match="Pending attack destruction boundary evidence drift",
+        match="Model attack history is missing its completed attacks",
     ):
         GameLifecycle.from_payload(forged_pre_boundary_checkpoint)
 
